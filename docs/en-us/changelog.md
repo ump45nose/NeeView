@@ -1,5 +1,14 @@
 # Changelog
 
+## 46.3
+(2026-08-09)
+
+#### Fixed
+
+- Fixed an issue where "NowLoading" might not be displayed (#1987)
+- Fixed an issue where files would fail to move to the Recycle Bin when "Show confirmation dialog when deleting files that don't fit in the Recycle Bin" was turned off (#1986)
+
+
 ## 46.2
 (2026-08-02)
 
