@@ -48,7 +48,9 @@ namespace NeeView
                     new LayoutDockPanelLayout(Orientation.Vertical, [nameof(ImageEffectPanel)]),
                     new LayoutDockPanelLayout(Orientation.Vertical, [nameof(BookmarkPanel)]),
                     new LayoutDockPanelLayout(Orientation.Vertical, [nameof(PlaylistPanel)]),
-                ]
+                    new LayoutDockPanelLayout(Orientation.Vertical, [nameof(DestinationFolderPanel)]),
+                ],
+                SelectedItem = nameof(DestinationFolderPanel)
             }
         };
 

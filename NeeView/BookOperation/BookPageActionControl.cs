@@ -231,26 +231,44 @@ namespace NeeView
             await parameter.TryCopyAsync(entries, token);
         }
 
-        // NOTE: parameter は未使用
+        /// <summary>
+        /// 目标文件夹移动是否可执行。
+        /// </summary>
+        /// <param name="parameter">目标文件夹</param>
+        /// <param name="multiPagePolicy">当前页面的选择策略</param>
+        /// <returns>目标有效、当前页可移动且服务空闲时返回 true</returns>
         public bool CanMoveToFolder(DestinationFolder parameter, MultiPagePolicy multiPagePolicy)
         {
             var items = CollectPages(_book, multiPagePolicy);
             return Config.Current.System.IsFileWriteAccessEnabled
+                && !DestinationMoveService.Current.IsBusy
+                && parameter.IsValid()
                 && items != null
                 && items.Any()
                 && items.All(e => e.ArchiveEntry.IsFileSystem && e.ArchiveEntry.Archive is not PlaylistArchive);
         }
 
+        /// <summary>
+        /// 异步启动目标文件夹移动；忙碌时服务会立即拒绝而不会排队。
+        /// </summary>
+        /// <param name="parameter">目标文件夹</param>
+        /// <param name="multiPagePolicy">当前页面的选择策略</param>
         public void MoveToFolder(DestinationFolder parameter, MultiPagePolicy multiPagePolicy)
         {
             _ = MoveToFolderAsync(parameter, multiPagePolicy, CancellationToken.None);
         }
 
+        /// <summary>
+        /// 移动当前真实文件并将成功结果写入会话级撤销历史。
+        /// </summary>
+        /// <param name="parameter">目标文件夹</param>
+        /// <param name="multiPagePolicy">当前页面的选择策略</param>
+        /// <param name="token">取消令牌</param>
         public async Task MoveToFolderAsync(DestinationFolder parameter, MultiPagePolicy multiPagePolicy, CancellationToken token)
         {
             var pages = CollectPages(_book, multiPagePolicy).Where(e => e.ArchiveEntry.IsFileSystem);
             var paths = pages.Select(e => e.GetFilePlace()).WhereNotNull().Distinct().ToList();
-            await parameter.TryMoveAsync(paths, token);
+            await DestinationMoveService.Current.TryMoveAsync(paths, parameter.Path, token);
         }
 
         public bool CanOpenApplication(IExternalApp parameter, MultiPagePolicy multiPagePolicy)
