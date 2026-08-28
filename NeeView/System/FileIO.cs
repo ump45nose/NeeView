@@ -636,49 +636,199 @@ namespace NeeView
         #region Move
 
         /// <summary>
-        /// ファイル、ディレクトリーを指定のフォルダーに移動する
+        /// Move files or directories into a folder and return the actual Shell results.
         /// </summary>
-        public static async Task SHMoveToFolderAsync(IEnumerable<string> paths, string toDirectory, CancellationToken token)
+        /// <param name="paths">Paths to move.</param>
+        /// <param name="toDirectory">Destination directory.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <returns>Actual move results reported by the Shell.</returns>
+        public static async Task<FolderOperatonResult> SHMoveToFolderAsync(IEnumerable<string> paths, string toDirectory, CancellationToken token)
         {
-            await CloseBookAsync(paths);
+            var sourcePaths = paths.ToList();
+            await CloseBookAsync(sourcePaths);
 
-            await Task.Run(() => SHMoveToFolder(paths, toDirectory), token);
+            var result = await Task.Run(() => SHMoveToFolder(sourcePaths, toDirectory), token);
 
-            ValidateBookPages(paths);
+            ValidateBookPages(sourcePaths);
+            return result;
         }
 
-        public static async Task SHMoveAsync(string source, string destination, CancellationToken token)
+        /// <summary>
+        /// Move one file to an exact destination without overwrite.
+        /// </summary>
+        /// <param name="source">Source path.</param>
+        /// <param name="destination">Destination path.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <returns>Actual move results reported by the Shell.</returns>
+        public static async Task<FolderOperatonResult> SHMoveAsync(string source, string destination, CancellationToken token)
         {
-            await CloseBookAsync([source]);
+            return await SHMoveAsync(source, destination, false, token);
+        }
 
+        /// <summary>
+        /// Move one file to an exact destination path.
+        /// </summary>
+        /// <param name="source">移動元パス</param>
+        /// <param name="destination">移動先パス</param>
+        /// <param name="overwrite">移動先を一時退避して置き換えるか</param>
+        /// <param name="token">キャンセルトークン</param>
+        /// <returns>Shell が報告した実際の移動結果</returns>
+        public static async Task<FolderOperatonResult> SHMoveAsync(string source, string destination, bool overwrite, CancellationToken token)
+        {
+            // 上書き対象も閉じ、復元処理中にファイルロックが残らないようにする。
+            await CloseBookAsync(overwrite ? [source, destination] : [source]);
+
+            FolderOperatonResult result;
             if (LoosePath.IsDirectoryEnd(destination) || DirectoryExists(destination))
             {
-                await Task.Run(() => SHMoveToFolder([source], destination), token);
+                result = await Task.Run(() => SHMoveToFolder([source], destination), token);
             }
             else
             {
-                await Task.Run(() => SHMove(source, destination), token);
+                result = await Task.Run(() => SHMove(source, destination, overwrite), token);
             }
 
             ValidateBookPages([source]);
+            return result;
         }
 
-        private static void SHMoveToFolder(IEnumerable<string> sourcePaths, string destDirectoryPath)
+        /// <summary>
+        /// Use the Shell to move multiple items into a destination folder.
+        /// </summary>
+        /// <param name="sourcePaths">移動元パス群</param>
+        /// <param name="destDirectoryPath">移動先フォルダー</param>
+        /// <returns>Shell が報告した実際の移動結果</returns>
+        private static FolderOperatonResult SHMoveToFolder(IEnumerable<string> sourcePaths, string destDirectoryPath)
         {
             using var scope = WorkingProgressWatcher.Current.Lock("Moving files...");
 
             var result = FileOperation.MoveToFolder(WindowTools.GetWindowHandle(), sourcePaths, destDirectoryPath);
 
             BookMementoRenameRecursive(result.Items);
+            return result;
         }
 
-        private static void SHMove(string sourcePath, string destPath)
+        /// <summary>
+        /// Use the Shell to move one item to an exact path.
+        /// </summary>
+        /// <param name="sourcePath">移動元パス</param>
+        /// <param name="destPath">移動先パス</param>
+        /// <param name="overwrite">既存の移動先を安全に置き換えるか</param>
+        /// <returns>Shell が報告した実際の移動結果</returns>
+        private static FolderOperatonResult SHMove(string sourcePath, string destPath, bool overwrite = false)
         {
             using var scope = WorkingProgressWatcher.Current.Lock("Moving files...");
 
-            var result = FileOperation.Move(WindowTools.GetWindowHandle(), sourcePath, destPath);
+            var backupPath = overwrite && FileExists(destPath) ? CreateOverwriteBackupPath(destPath) : null;
+            try
+            {
+                // 既存ファイルは同じフォルダー内へ一時退避し、移動失敗時に復元できるようにする。
+                if (backupPath is not null)
+                {
+                    File.Move(destPath, backupPath);
+                }
 
-            BookMementoRenameRecursive(result.Items);
+                var result = FileOperation.Move(WindowTools.GetWindowHandle(), sourcePath, destPath);
+
+                // A cancelled Shell operation returns no items, so restore the temporary backup.
+                if (!result.Items.Any())
+                {
+                    RestoreOverwriteBackup(backupPath, destPath);
+                    return result;
+                }
+
+                var movedToDestination = result.Items.Any(e =>
+                    string.Equals(e.Source, sourcePath, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(e.Destination, destPath, StringComparison.OrdinalIgnoreCase));
+                if (!movedToDestination)
+                {
+                    // Preserve the existing file when the actual destination differs from the exact requested path.
+                    RestoreOverwriteBackup(backupPath, destPath);
+                    return result;
+                }
+
+                try
+                {
+                    BookMementoRenameRecursive(result.Items);
+                }
+                catch (Exception ex)
+                {
+                    // The file move already completed, so a book-history failure must not discard the move result.
+                    Trace.WriteLine($"Cannot update book memento after move: {ex.Message}");
+                }
+
+                if (backupPath is not null && FileExists(backupPath))
+                {
+                    try
+                    {
+                        File.Delete(backupPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Do not roll back a successful move only because the safety backup could not be deleted.
+                        Trace.WriteLine($"Cannot delete overwrite backup: {backupPath}: {ex.Message}");
+                    }
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                if (backupPath is not null
+                    && FileExists(backupPath)
+                    && !FileExists(sourcePath)
+                    && FileExists(destPath))
+                {
+                    // Infer success from file state after a Shell callback exception so undo history is not lost.
+                    Trace.WriteLine($"Shell move completed with an exception: {ex.Message}");
+                    try
+                    {
+                        File.Delete(backupPath);
+                    }
+                    catch (Exception cleanupException)
+                    {
+                        Trace.WriteLine($"Cannot delete overwrite backup: {backupPath}: {cleanupException.Message}");
+                    }
+                    return new FolderOperatonResult([new FolderOperatonItemResult(sourcePath, destPath)]);
+                }
+
+                // Restore the backup only while the destination is absent to avoid overwriting a completed move.
+                RestoreOverwriteBackup(backupPath, destPath);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Create a unique same-directory backup path for safe overwrite.
+        /// </summary>
+        /// <param name="destinationPath">本来の移動先パス</param>
+        /// <returns>同一フォルダー内の一時退避パス</returns>
+        private static string CreateOverwriteBackupPath(string destinationPath)
+        {
+            var directory = Path.GetDirectoryName(destinationPath) ?? throw new IOException($"Illegal path: {destinationPath}");
+            var fileName = Path.GetFileName(destinationPath);
+
+            string backupPath;
+            do
+            {
+                backupPath = Path.Combine(directory, $".{fileName}.neeview-{Guid.NewGuid():N}.bak");
+            }
+            while (EntryExists(backupPath));
+
+            return backupPath;
+        }
+
+        /// <summary>
+        /// Restore the temporary backup when the Shell move did not complete.
+        /// </summary>
+        /// <param name="backupPath">一時退避パス。退避していない場合は null</param>
+        /// <param name="destinationPath">本来の移動先パス</param>
+        private static void RestoreOverwriteBackup(string? backupPath, string destinationPath)
+        {
+            // Restore only while the backup exists and the exact destination is absent.
+            if (backupPath is null || !FileExists(backupPath) || EntryExists(destinationPath)) return;
+
+            File.Move(backupPath, destinationPath);
         }
 
         private static void BookMementoRenameRecursive(IEnumerable<FolderOperatonItemResult> items)
