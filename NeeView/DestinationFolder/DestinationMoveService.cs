@@ -1,5 +1,6 @@
 using NeeView.IO;
 using NeeView.Properties;
+using NeeLaboratory.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,13 +16,20 @@ namespace NeeView
     /// </summary>
     public sealed class DestinationMoveService
     {
-        private const int HistoryCapacity = 300;
-
         private static DestinationMoveService? _current;
         private readonly object _syncRoot = new();
         private readonly List<DestinationMoveRecord> _undoHistory = new();
         private readonly List<DestinationMoveRecord> _redoHistory = new();
         private int _isBusy;
+
+        /// <summary>
+        /// 初始化会话级移动历史，并监听容量配置变化。
+        /// </summary>
+        private DestinationMoveService()
+        {
+            Config.Current.Panels.SubscribePropertyChanged(nameof(PanelsConfig.DestinationMoveHistoryCapacity),
+                (s, e) => ApplyHistoryCapacity());
+        }
 
         /// <summary>
         /// 获取当前进程共享的目标文件夹移动服务。
@@ -314,11 +322,42 @@ namespace NeeView
         /// <param name="record">待压入记录</param>
         private static void PushWithCapacity(List<DestinationMoveRecord> history, DestinationMoveRecord record)
         {
-            if (history.Count >= HistoryCapacity)
+            var capacity = Config.Current.Panels.DestinationMoveHistoryCapacity;
+            if (capacity <= 0) return;
+
+            if (history.Count >= capacity)
             {
-                history.RemoveAt(0);
+                history.RemoveRange(0, history.Count - capacity + 1);
             }
             history.Add(record);
+        }
+
+        /// <summary>
+        /// 配置容量缩小时立即裁剪撤销和重做历史，并刷新命令状态。
+        /// </summary>
+        private void ApplyHistoryCapacity()
+        {
+            var capacity = Config.Current.Panels.DestinationMoveHistoryCapacity;
+            lock (_syncRoot)
+            {
+                TrimToCapacity(_undoHistory, capacity);
+                TrimToCapacity(_redoHistory, capacity);
+            }
+            RaiseStateChanged();
+        }
+
+        /// <summary>
+        /// 从最旧记录开始裁剪历史列表到指定容量。
+        /// </summary>
+        /// <param name="history">待裁剪的历史列表</param>
+        /// <param name="capacity">允许保留的最大记录数</param>
+        private static void TrimToCapacity(List<DestinationMoveRecord> history, int capacity)
+        {
+            var removeCount = Math.Max(0, history.Count - capacity);
+            if (removeCount > 0)
+            {
+                history.RemoveRange(0, removeCount);
+            }
         }
 
         /// <summary>

@@ -15,7 +15,6 @@ namespace NeeView
     /// </summary>
     public partial class DestinationFolderPanelViewModel : ObservableObject
     {
-        private const int MaximumVisibleFolders = 9;
         private readonly DestinationMoveService _moveService;
 
         /// <summary>
@@ -28,6 +27,8 @@ namespace NeeView
 
             Config.Current.System.SubscribePropertyChanged(nameof(SystemConfig.DestinationFolderCollection),
                 (s, e) => Refresh());
+            Config.Current.Panels.SubscribePropertyChanged(nameof(PanelsConfig.DestinationFolderPanelItemCount),
+                (s, e) => Refresh());
             PageFrameBoxPresenter.Current.ViewPageChanged += (s, e) => UpdateCommandStates();
             BookOperation.Current.BookChanged += (s, e) => UpdateCommandStates();
             _moveService.StateChanged += (s, e) => UpdateCommandStates();
@@ -36,7 +37,7 @@ namespace NeeView
         }
 
         /// <summary>
-        /// 获取面板中可见的前九个目标文件夹。
+        /// 获取面板中按配置数量显示的目标文件夹。
         /// </summary>
         public ObservableCollection<DestinationFolderPanelItem> Items { get; }
 
@@ -51,13 +52,16 @@ namespace NeeView
         public bool IsBusy => _moveService.IsBusy;
 
         /// <summary>
-        /// 从当前配置重新构建前九个数字映射。
+        /// 从当前配置重新构建可见的数字映射。
         /// </summary>
         public void Refresh()
         {
             Items.Clear();
+            var visibleItemCount = Config.Current.Panels.DestinationFolderPanelItemCount;
+
+            // 设置值已由配置模型限制在 1～9，数字映射始终与脚本快捷键范围一致。
             foreach (var item in Config.Current.System.DestinationFolderCollection
-                .Take(MaximumVisibleFolders)
+                .Take(visibleItemCount)
                 .Select((folder, index) => new DestinationFolderPanelItem(index + 1, folder)))
             {
                 Items.Add(item);

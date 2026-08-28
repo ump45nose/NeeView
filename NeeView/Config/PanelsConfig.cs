@@ -26,6 +26,8 @@ namespace NeeView
         [DefaultEquality] private bool _isLimitPanelWidth;
         [DefaultEquality] private bool? _isVisibleItemsCount;
         [DefaultEquality] private bool _isTextSearchEnabled;
+        [DefaultEquality] private int _destinationFolderPanelItemCount = 9;
+        [DefaultEquality] private int _destinationMoveHistoryCapacity = 300;
         [DefaultEquality] private double _conflictTopMargin = 32.0;
         [DefaultEquality] private double _conflictBottomMargin = 20.0;
 
@@ -155,6 +157,26 @@ namespace NeeView
         {
             get { return _isTextSearchEnabled; }
             set { SetProperty(ref _isTextSearchEnabled, value); }
+        }
+
+        /// <summary>
+        /// 移動先フォルダーパネルに表示する項目数を取得または設定する。
+        /// </summary>
+        [PropertyRange(1, 9, TickFrequency = 1)]
+        public int DestinationFolderPanelItemCount
+        {
+            get { return _destinationFolderPanelItemCount; }
+            set { SetProperty(ref _destinationFolderPanelItemCount, Math.Clamp(value, 1, 9)); }
+        }
+
+        /// <summary>
+        /// セッション中に保持する移動履歴の最大数を取得または設定する。0 は履歴を無効にする。
+        /// </summary>
+        [PropertyRange(0, 1000, TickFrequency = 50, IsEditable = true)]
+        public int DestinationMoveHistoryCapacity
+        {
+            get { return _destinationMoveHistoryCapacity; }
+            set { SetProperty(ref _destinationMoveHistoryCapacity, Math.Clamp(value, 0, 1000)); }
         }
 
         [PropertyMember]
