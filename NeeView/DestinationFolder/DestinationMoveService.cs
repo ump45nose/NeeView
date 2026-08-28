@@ -75,11 +75,13 @@ namespace NeeView
         /// <returns>至少有一个文件成功移动时返回 true</returns>
         public async Task<bool> TryMoveAsync(IEnumerable<string> paths, string destinationDirectory, CancellationToken token)
         {
+            // 先清理无效输入并按 Windows 路径规则去重，避免向 Shell 重复提交同一文件。
             var sourcePaths = paths.Where(e => !string.IsNullOrWhiteSpace(e)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
             if (sourcePaths.Count == 0 || !TryBeginOperation()) return false;
 
             try
             {
+                // 目标目录必须在提交 Shell 操作前存在，防止意外把目录字符串当成文件名。
                 if (!FileIO.DirectoryExists(destinationDirectory))
                 {
                     throw new DirectoryNotFoundException(destinationDirectory);
@@ -233,10 +235,12 @@ namespace NeeView
                 TextResources.GetString("DestinationMove.Overwrite.Title"),
                 TextResources.GetFormatString("DestinationMove.Overwrite.Message", destination),
                 MessageDialogIcon.Warning);
-            dialog.Commands.Add(UICommands.Yes);
+            var overwriteCommand = new UICommand("Word.Overwrite") { IsPossible = true, IsDanger = true };
+            dialog.Commands.Add(overwriteCommand);
             dialog.Commands.Add(UICommands.Cancel);
+            dialog.DefaultCommandIndex = 1;
             dialog.CancelCommandIndex = 1;
-            return dialog.ShowDialog(MainViewComponent.Current.GetWindow()).Command == UICommands.Yes;
+            return dialog.ShowDialog(MainViewComponent.Current.GetWindow()).Command == overwriteCommand;
         }
 
         /// <summary>

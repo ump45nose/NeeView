@@ -258,6 +258,13 @@ namespace NeeView
             if (_initialized)
             {
                 Restore(Config.Current.Panels.Layout);
+
+                // 迁移标记只让旧布局自动打开一次；后续启动完全尊重用户保存的隐藏或浮动状态。
+                if (!Config.Current.Panels.IsDestinationFolderPanelInitialized)
+                {
+                    OpenDock(nameof(DestinationFolderPanel), false);
+                    Config.Current.Panels.IsDestinationFolderPanelInitialized = true;
+                }
             }
         }
 

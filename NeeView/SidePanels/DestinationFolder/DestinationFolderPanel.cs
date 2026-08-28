@@ -24,6 +24,9 @@ namespace NeeView
         }
 
 #pragma warning disable CS0067
+        /// <summary>
+        /// 面板可见性锁状态变化事件；当前面板不锁定显示，因此不会主动触发。
+        /// </summary>
         public event EventHandler? IsVisibleLockChanged;
 #pragma warning restore CS0067
 

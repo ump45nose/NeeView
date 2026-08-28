@@ -213,6 +213,14 @@ namespace NeeView
         [DefaultEquality]
         public LayoutPanelManagerMemento? Layout { get; set; }
 
+        /// <summary>
+        /// 获取或设置目标文件夹面板是否已经完成首次布局补全。
+        /// </summary>
+        [PropertyMapIgnore]
+        [ObjectMergeReferenceCopy]
+        [DefaultEquality]
+        public bool IsDestinationFolderPanelInitialized { get; set; }
+
         #endregion HiddenParameters
 
 

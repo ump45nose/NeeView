@@ -825,6 +825,7 @@ namespace NeeView
         /// <param name="destinationPath">本来の移動先パス</param>
         private static void RestoreOverwriteBackup(string? backupPath, string destinationPath)
         {
+            // 只在备份仍存在且严格目标尚未生成时恢复，避免覆盖已经完成的真实移动。
             if (backupPath is null || !FileExists(backupPath) || EntryExists(destinationPath)) return;
 
             File.Move(backupPath, destinationPath);
