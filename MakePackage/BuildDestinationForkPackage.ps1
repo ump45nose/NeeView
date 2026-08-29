@@ -133,18 +133,14 @@ function New-DestinationForkPackage {
     try {
         New-Item -ItemType Directory -Path $stagingDirectory -Force | Out-Null
 
-        # 发布目录可能被开发运行留下 Profile；暂存时明确排除，保证交付包只有九个预装脚本。
+        # 发布目录可能被开发运行留下 Profile；暂存时明确排除，保证交付包从独立的干净配置启动。
         Get-ChildItem -LiteralPath $publishDirectory | Where-Object {
             $_.Name -notin @("Profile", "NeeView.settings.json", "README-zh-CN.md")
         } | ForEach-Object {
             Copy-Item -LiteralPath $_.FullName -Destination $stagingDirectory -Recurse -Force
         }
 
-        $profileScripts = Join-Path $stagingDirectory "Profile\Scripts"
-        New-Item -ItemType Directory -Path $profileScripts -Force | Out-Null
-        foreach ($index in 1..9) {
-            Copy-Item -LiteralPath (Join-Path $sourceScripts "MoveToDestination$index.nvjs") -Destination $profileScripts -Force
-        }
+        # Fork 的 1～9 已注册为可编辑的原生命令；不再预装同快捷键脚本，避免用户启用脚本后发生冲突。
         Copy-Item -LiteralPath $chineseGuide -Destination (Join-Path $stagingDirectory "README-zh-CN.md") -Force
         $settings | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $stagingDirectory "NeeView.settings.json") -Encoding utf8
 

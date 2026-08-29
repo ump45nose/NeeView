@@ -2,9 +2,11 @@
 
 This fork adds a thin, dockable `DestinationFolderPanel` without changing image rendering, decoding, caching, or archive readers.
 
-## Quick classification scripts
+## Quick classification
 
-Copy `SampleScripts/MoveToDestination1.nvjs` through `MoveToDestination9.nvjs` into the Scripts folder shown by **Options > Scripts > Open scripts folder**. The scripts also work with the original NeeView 46.3 release.
+The fork registers `MoveToDestinationFolder1` through `MoveToDestinationFolder9` as native commands with default shortcuts `1` through `9`. Their shortcut, destination index, and multi-page policy are editable in the normal command settings; enabling the Scripts folder is not required.
+
+For the original NeeView 46.3 release, copy `SampleScripts/MoveToDestination1.nvjs` through `MoveToDestination9.nvjs` into the Scripts folder shown by **Options > Scripts > Open scripts folder**. The fork ZIP does not bundle these scripts, which prevents duplicate shortcuts if scripting is enabled later.
 
 Keys `1` through `9` follow the current Destination Folders order. Renaming a folder or changing its path does not require editing a script; reordering Destination Folders changes the numeric mapping.
 

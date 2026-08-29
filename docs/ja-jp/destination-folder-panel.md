@@ -2,9 +2,11 @@
 
 この fork は画像描画、デコード、キャッシュ、アーカイブ読み込みを変更せず、ドッキング可能な `DestinationFolderPanel` だけを追加します。
 
-## クイック分類スクリプト
+## クイック分類
 
-`SampleScripts/MoveToDestination1.nvjs` から `MoveToDestination9.nvjs` を、**設定 > スクリプト > スクリプトフォルダーを開く** で表示されるフォルダーへコピーします。スクリプトはオリジナルの NeeView 46.3 でも使用できます。
+fork では `MoveToDestinationFolder1` から `MoveToDestinationFolder9` がネイティブコマンドとして登録され、既定のショートカットは `1` から `9` です。ショートカット、移動先番号、複数ページ方針は通常のコマンド設定で編集でき、スクリプトフォルダーを有効にする必要はありません。
+
+オリジナルの NeeView 46.3 では、`SampleScripts/MoveToDestination1.nvjs` から `MoveToDestination9.nvjs` を **設定 > スクリプト > スクリプトフォルダーを開く** のフォルダーへコピーします。fork の ZIP には重複ショートカットを避けるため、これらのスクリプトを同梱しません。
 
 キー `1` から `9` は現在の「移動先フォルダー」の順序に対応します。フォルダー名やパスの変更ではスクリプト編集は不要ですが、並び替えると番号の対応も変わります。
 
