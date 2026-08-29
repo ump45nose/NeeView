@@ -1281,6 +1281,7 @@ DestinationMove.SourceMissing=待移动文件已不存在，历史记录已保�
 DestinationMove.TargetIsDirectory=恢复位置已被替换为文件夹，历史记录已保留。\n\n{0}
 DestinationMove.Restored=文件已恢复，当前浏览位置未改变。\n\n{0}
 DestinationMove.Error.Title=目标文件夹移动失败
+DestinationMove.NoFilesMoved=文件提供程序未移动任何文件。
 MoveToParentBookCommand=打开父文件夹
 MoveToParentBookCommand.Remarks=将上级目录作为书籍打开。
 MultiPagePolicy.All=运行所有页面

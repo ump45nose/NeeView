@@ -1288,6 +1288,7 @@ DestinationMove.SourceMissing=The file to move no longer exists. The history ent
 DestinationMove.TargetIsDirectory=The restore destination is now a folder. The history entry was kept.\n\n{0}
 DestinationMove.Restored=The file was restored without changing the current folder.\n\n{0}
 DestinationMove.Error.Title=Destination move failed
+DestinationMove.NoFilesMoved=The file provider did not move any files.
 MoveToParentBookCommand=Go to parent
 MoveToParentBookCommand.Remarks=Open the upper hierarchy as a book.
 MultiPagePolicy.All=Run all pages
