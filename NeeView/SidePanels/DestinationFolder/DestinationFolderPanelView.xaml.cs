@@ -16,7 +16,9 @@ namespace NeeView
         {
             InitializeComponent();
             _viewModel = new DestinationFolderPanelViewModel();
-            Root.DataContext = _viewModel;
+
+            // 按钮从祖先 UserControl 读取 MoveCommand，因此必须在视图本身设置 DataContext。
+            DataContext = _viewModel;
         }
 
         /// <summary>
