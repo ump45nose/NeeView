@@ -101,7 +101,11 @@ namespace NeeView
                     .Select(e => new DestinationMoveRecord(e.Source, e.Destination))
                     .ToList();
 
-                if (records.Count == 0) return false;
+                if (records.Count == 0)
+                {
+                    // A Shell provider can report neither success nor an exception; make that failure visible.
+                    throw new IOException(TextResources.GetString("DestinationMove.NoFilesMoved"));
+                }
 
                 lock (_syncRoot)
                 {

@@ -1,5 +1,6 @@
 ﻿using NeeView.Properties;
 using System;
+using System.Globalization;
 using System.Windows.Controls;
 
 namespace NeeView
@@ -8,7 +9,44 @@ namespace NeeView
     {
         private readonly Lazy<MovePageToFolderMenuFactory> _menuFactory;
 
+        /// <summary>
+        /// Initialize the regular destination-folder menu command.
+        /// </summary>
         public MoveToFolderAsCommand()
+            : this(null)
+        {
+        }
+
+        /// <summary>
+        /// Initialize a configurable numbered destination-folder command.
+        /// </summary>
+        /// <param name="index">One-based destination-folder index and default numeric shortcut.</param>
+        public MoveToFolderAsCommand(int index)
+            : this($"MoveToDestinationFolder{index}")
+        {
+            if (index is < 1 or > 9)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index), index, "Destination folder shortcut index must be between 1 and 9.");
+            }
+
+            // Keep the folder index and shortcut in the native command configuration so users can edit both.
+            Parameter = new MoveToFolderAsCommandParameter()
+            {
+                Index = index,
+                MultiPagePolicy = MultiPagePolicy.Once,
+            };
+            ShortCutKey = new ShortcutKey(index.ToString(CultureInfo.InvariantCulture));
+            Text = $"{Text} {index.ToString(CultureInfo.InvariantCulture)}";
+            Menu = $"{Menu} {index.ToString(CultureInfo.InvariantCulture)}";
+            IsCloneable = false;
+        }
+
+        /// <summary>
+        /// Initialize the shared implementation with an optional stable command name.
+        /// </summary>
+        /// <param name="name">Command name, or null for the original menu command.</param>
+        private MoveToFolderAsCommand(string? name)
+            : base(name)
         {
             this.Group = TextResources.GetString("CommandGroup.File");
             this.IsShowMessage = true;

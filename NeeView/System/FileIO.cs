@@ -647,7 +647,11 @@ namespace NeeView
             var sourcePaths = paths.ToList();
             await CloseBookAsync(sourcePaths);
 
-            var result = await Task.Run(() => SHMoveToFolder(sourcePaths, toDirectory), token);
+            var result = await Task.Run(
+                () => ShouldUseDirectMove(sourcePaths, toDirectory)
+                    ? MoveFilesToFolderDirect(sourcePaths, toDirectory)
+                    : SHMoveToFolder(sourcePaths, toDirectory),
+                token);
 
             ValidateBookPages(sourcePaths);
             return result;
@@ -709,6 +713,82 @@ namespace NeeView
         }
 
         /// <summary>
+        /// Determine whether mapped network or UNC paths should bypass Shell IFileOperation.
+        /// </summary>
+        /// <param name="sourcePaths">Source file paths.</param>
+        /// <param name="destinationDirectory">Destination directory path.</param>
+        /// <returns>True when either side is backed by a network drive.</returns>
+        private static bool ShouldUseDirectMove(IEnumerable<string> sourcePaths, string destinationDirectory)
+        {
+            return IsNetworkPath(destinationDirectory) || sourcePaths.Any(IsNetworkPath);
+        }
+
+        /// <summary>
+        /// Detect UNC paths and mapped drives whose Shell extensions may not report move results.
+        /// </summary>
+        /// <param name="path">Path to inspect.</param>
+        /// <returns>True when the path resolves to a network drive.</returns>
+        private static bool IsNetworkPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return false;
+            if (path.StartsWith(@"\\", StringComparison.Ordinal)) return true;
+
+            try
+            {
+                var root = Path.GetPathRoot(path);
+                return !string.IsNullOrWhiteSpace(root) && new DriveInfo(root).DriveType == DriveType.Network;
+            }
+            catch (Exception ex) when (ex is ArgumentException or IOException or UnauthorizedAccessException)
+            {
+                Trace.WriteLine($"Cannot determine drive type: {path}: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Move files directly so WebDAV and other network providers produce deterministic results.
+        /// </summary>
+        /// <param name="sourcePaths">Source file paths.</param>
+        /// <param name="destinationDirectory">Existing destination directory.</param>
+        /// <returns>Actual source and destination paths for every completed move.</returns>
+        private static FolderOperatonResult MoveFilesToFolderDirect(IEnumerable<string> sourcePaths, string destinationDirectory)
+        {
+            using var scope = WorkingProgressWatcher.Current.Lock("Moving files...");
+
+            var moves = sourcePaths
+                .Select(source => new FolderOperatonItemResult(source, Path.Combine(destinationDirectory, Path.GetFileName(source))))
+                .ToList();
+
+            // Validate every destination before changing anything so a name collision cannot create a partial batch.
+            foreach (var move in moves)
+            {
+                if (EntryExists(move.Destination))
+                {
+                    throw new IOException($"Destination already exists: {move.Destination}");
+                }
+            }
+
+            var completed = new List<FolderOperatonItemResult>();
+            foreach (var move in moves)
+            {
+                File.Move(move.Source, move.Destination);
+                completed.Add(move);
+            }
+
+            var result = new FolderOperatonResult(completed);
+            try
+            {
+                BookMementoRenameRecursive(result.Items);
+            }
+            catch (Exception ex)
+            {
+                // The file move is already complete; history metadata must not invalidate the real result.
+                Trace.WriteLine($"Cannot update book memento after direct move: {ex.Message}");
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Use the Shell to move one item to an exact path.
         /// </summary>
         /// <param name="sourcePath">移動元パス</param>
@@ -728,7 +808,11 @@ namespace NeeView
                     File.Move(destPath, backupPath);
                 }
 
-                var result = FileOperation.Move(WindowTools.GetWindowHandle(), sourcePath, destPath);
+                // Network Shell providers may complete without a usable callback result, so move them directly.
+                var destinationDirectory = Path.GetDirectoryName(destPath) ?? destPath;
+                var result = ShouldUseDirectMove([sourcePath], destinationDirectory)
+                    ? MoveFileDirect(sourcePath, destPath)
+                    : FileOperation.Move(WindowTools.GetWindowHandle(), sourcePath, destPath);
 
                 // A cancelled Shell operation returns no items, so restore the temporary backup.
                 if (!result.Items.Any())
@@ -796,6 +880,18 @@ namespace NeeView
                 RestoreOverwriteBackup(backupPath, destPath);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Move one file to an exact path and return a result suitable for undo/redo history.
+        /// </summary>
+        /// <param name="sourcePath">Source file path.</param>
+        /// <param name="destinationPath">Exact destination file path.</param>
+        /// <returns>The completed move result.</returns>
+        private static FolderOperatonResult MoveFileDirect(string sourcePath, string destinationPath)
+        {
+            File.Move(sourcePath, destinationPath);
+            return new FolderOperatonResult([new FolderOperatonItemResult(sourcePath, destinationPath)]);
         }
 
         /// <summary>
