@@ -59,7 +59,7 @@ namespace NeeView
             Items.Clear();
             var visibleItemCount = Config.Current.Panels.DestinationFolderPanelItemCount;
 
-            // The configuration clamps the count to 1-9 so numbering stays aligned with the sample shortcuts.
+            // The panel can show more folders while the first nine remain aligned with numeric shortcuts.
             foreach (var item in Config.Current.System.DestinationFolderCollection
                 .Take(visibleItemCount)
                 .Select((folder, index) => new DestinationFolderPanelItem(index + 1, folder)))

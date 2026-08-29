@@ -43,7 +43,9 @@
                 Text="{properties:TextBinding DestinationFolderPanel.Empty}"
                 Visibility="{Binding HasItems, Converter={StaticResource BooleanToInverseVisibilityConverter}}" />
 
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+        <ScrollViewer Style="{StaticResource NVScrollViewer}"
+                CanContentScroll="False"
+                VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                 Visibility="{Binding HasItems, Converter={StaticResource BooleanToVisibilityConverter}}">
             <ItemsControl ItemsSource="{Binding Items}">
                 <ItemsControl.ItemTemplate>
