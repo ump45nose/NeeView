@@ -162,11 +162,11 @@ namespace NeeView
         /// <summary>
         /// 移動先フォルダーパネルに表示する項目数を取得または設定する。
         /// </summary>
-        [PropertyRange(1, 9, TickFrequency = 1)]
+        [PropertyRange(1, 50, TickFrequency = 1, IsEditable = true)]
         public int DestinationFolderPanelItemCount
         {
             get { return _destinationFolderPanelItemCount; }
-            set { SetProperty(ref _destinationFolderPanelItemCount, Math.Clamp(value, 1, 9)); }
+            set { SetProperty(ref _destinationFolderPanelItemCount, Math.Clamp(value, 1, 50)); }
         }
 
         /// <summary>

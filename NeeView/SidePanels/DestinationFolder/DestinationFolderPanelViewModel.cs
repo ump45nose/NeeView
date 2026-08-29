@@ -59,7 +59,7 @@ namespace NeeView
             Items.Clear();
             var visibleItemCount = Config.Current.Panels.DestinationFolderPanelItemCount;
 
-            // 设置值已由配置模型限制在 1～9，数字映射始终与脚本快捷键范围一致。
+            // 面板可显示更多目录；前九项仍与原生命令和脚本的数字快捷键保持一致。
             foreach (var item in Config.Current.System.DestinationFolderCollection
                 .Take(visibleItemCount)
                 .Select((folder, index) => new DestinationFolderPanelItem(index + 1, folder)))
