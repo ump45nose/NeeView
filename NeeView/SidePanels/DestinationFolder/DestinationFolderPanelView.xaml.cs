@@ -37,6 +37,9 @@ namespace NeeView
         /// <param name="e">键盘事件参数</param>
         private void NewFolderNameTextBox_KeyDown(object sender, KeyEventArgs e)
         {
+            // 输入框聚焦时禁用单键快捷键，确保英文、数字及其他字符优先进入文本框。
+            KeyExGesture.AddFilter(KeyExGestureFilter.All);
+
             if (e.Key != Key.Enter || Keyboard.Modifiers != ModifierKeys.None) return;
 
             // 统一通过 ViewModel 命令执行，确保按钮和回车共用校验与忙碌状态。
