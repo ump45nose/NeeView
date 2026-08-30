@@ -187,7 +187,7 @@ namespace NeeView
         }
 
         /// <summary>
-        /// Create a direct child folder beside the current image and refresh destinations.
+        /// Create a direct child folder, refresh destinations, and move the current image into it.
         /// </summary>
         [RelayCommand(CanExecute = nameof(CanCreateFolder))]
         private async Task CreateFolder()
@@ -209,6 +209,13 @@ namespace NeeView
                 await Task.Run(() => Directory.CreateDirectory(destinationPath));
                 NewFolderName = "";
                 await RefreshDestinationFoldersAsync(currentDirectory);
+
+                // Reuse the existing move command to retain next-page behavior and session undo history.
+                var destinationFolder = new DestinationFolder(Path.GetFileName(destinationPath), destinationPath);
+                if (BookOperation.Current.Control.CanMoveToFolder(destinationFolder, MultiPagePolicy.Once))
+                {
+                    BookOperation.Current.Control.MoveToFolder(destinationFolder, MultiPagePolicy.Once);
+                }
             }
             catch (Exception ex)
             {
