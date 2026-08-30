@@ -27,8 +27,6 @@ namespace NeeView
 
             Config.Current.System.SubscribePropertyChanged(nameof(SystemConfig.DestinationFolderCollection),
                 (s, e) => Refresh());
-            Config.Current.Panels.SubscribePropertyChanged(nameof(PanelsConfig.DestinationFolderPanelItemCount),
-                (s, e) => Refresh());
             PageFrameBoxPresenter.Current.ViewPageChanged += (s, e) => UpdateCommandStates();
             BookOperation.Current.BookChanged += (s, e) => UpdateCommandStates();
             _moveService.StateChanged += (s, e) => UpdateCommandStates();
@@ -37,7 +35,7 @@ namespace NeeView
         }
 
         /// <summary>
-        /// 获取面板中按配置数量显示的目标文件夹。
+        /// 获取面板中显示的全部目标文件夹。
         /// </summary>
         public ObservableCollection<DestinationFolderPanelItem> Items { get; }
 
@@ -52,16 +50,14 @@ namespace NeeView
         public bool IsBusy => _moveService.IsBusy;
 
         /// <summary>
-        /// 从当前配置重新构建可见的数字映射。
+        /// 从当前配置重新构建完整的目标文件夹列表。
         /// </summary>
         public void Refresh()
         {
             Items.Clear();
-            var visibleItemCount = Config.Current.Panels.DestinationFolderPanelItemCount;
 
-            // 面板可显示更多目录；前九项仍与原生命令和脚本的数字快捷键保持一致。
+            // 面板不限制数量；前九项仍与原生命令和脚本的数字快捷键保持一致。
             foreach (var item in Config.Current.System.DestinationFolderCollection
-                .Take(visibleItemCount)
                 .Select((folder, index) => new DestinationFolderPanelItem(index + 1, folder)))
             {
                 Items.Add(item);

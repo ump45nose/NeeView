@@ -16,7 +16,7 @@ Only real images opened from a folder can be moved. Archive, PDF, and playlist p
 
 ## Panel and history
 
-The panel shows the configured number of Destination Folders, from one to 50 (nine by default). When the list exceeds the available panel height, a draggable vertical scrollbar is shown. Clicking a row moves the main current image. The visible count can be changed under **Options > Panels > Destination folders**. The global `UndoDestinationMove` and `RedoDestinationMove` commands default to `Ctrl+Z` and `Ctrl+Y`; both shortcuts remain editable in the normal command settings.
+The panel always shows every configured Destination Folder without an item limit. When the list exceeds the available panel height, a draggable vertical scrollbar is shown. Clicking a row moves the main current image. The global `UndoDestinationMove` and `RedoDestinationMove` commands default to `Ctrl+Z` and `Ctrl+Y`; both shortcuts remain editable in the normal command settings.
 
 Move history is kept in memory for the current session and is limited to 300 successful file moves by default. Its capacity is configurable from 0 to 1000 in the same settings section; zero disables move history. Cancelled or failed operations do not change the history. Undo and redo keep their top record when a file is missing or an overwrite is cancelled.
 
