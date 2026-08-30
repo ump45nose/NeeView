@@ -1,4 +1,5 @@
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace NeeView
 {
@@ -17,7 +18,7 @@ namespace NeeView
             InitializeComponent();
             _viewModel = new DestinationFolderPanelViewModel();
 
-            // 按钮从祖先 UserControl 读取 MoveCommand，因此必须在视图本身设置 DataContext。
+            // Item buttons resolve MoveCommand from the ancestor UserControl, so bind the view itself.
             DataContext = _viewModel;
         }
 
@@ -27,6 +28,23 @@ namespace NeeView
         public void Refresh()
         {
             _viewModel.Refresh();
+        }
+
+        /// <summary>
+        /// Execute the same command as the create-folder button when Enter is pressed.
+        /// </summary>
+        /// <param name="sender">New-folder name text box.</param>
+        /// <param name="e">Keyboard event arguments.</param>
+        private void NewFolderNameTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter || Keyboard.Modifiers != ModifierKeys.None) return;
+
+            // Route both interactions through one command so validation and busy state stay consistent.
+            if (_viewModel.CreateFolderCommand.CanExecute(null))
+            {
+                _viewModel.CreateFolderCommand.Execute(null);
+                e.Handled = true;
+            }
         }
 
         /// <summary>
