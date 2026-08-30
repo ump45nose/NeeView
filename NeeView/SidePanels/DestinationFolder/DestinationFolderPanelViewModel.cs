@@ -187,7 +187,7 @@ namespace NeeView
         }
 
         /// <summary>
-        /// 在当前主图片所在文件夹创建直接子文件夹，并刷新目标文件夹列表。
+        /// 在当前主图片所在文件夹创建直接子文件夹，刷新列表并将当前图片移入其中。
         /// </summary>
         [RelayCommand(CanExecute = nameof(CanCreateFolder))]
         private async Task CreateFolder()
@@ -209,6 +209,13 @@ namespace NeeView
                 await Task.Run(() => Directory.CreateDirectory(destinationPath));
                 NewFolderName = "";
                 await RefreshDestinationFoldersAsync(currentDirectory);
+
+                // 复用现有移动命令，使自动分类继续获得下一页行为和会话级撤销记录。
+                var destinationFolder = new DestinationFolder(Path.GetFileName(destinationPath), destinationPath);
+                if (BookOperation.Current.Control.CanMoveToFolder(destinationFolder, MultiPagePolicy.Once))
+                {
+                    BookOperation.Current.Control.MoveToFolder(destinationFolder, MultiPagePolicy.Once);
+                }
             }
             catch (Exception ex)
             {
