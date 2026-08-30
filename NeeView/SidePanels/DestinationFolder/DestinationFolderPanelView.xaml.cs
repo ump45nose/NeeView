@@ -37,6 +37,9 @@ namespace NeeView
         /// <param name="e">Keyboard event arguments.</param>
         private void NewFolderNameTextBox_KeyDown(object sender, KeyEventArgs e)
         {
+            // Disable single-key shortcuts while focused so all text input reaches the text box first.
+            KeyExGesture.AddFilter(KeyExGestureFilter.All);
+
             if (e.Key != Key.Enter || Keyboard.Modifiers != ModifierKeys.None) return;
 
             // Route both interactions through one command so validation and busy state stay consistent.
