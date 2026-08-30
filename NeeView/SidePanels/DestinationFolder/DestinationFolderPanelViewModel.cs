@@ -27,8 +27,6 @@ namespace NeeView
 
             Config.Current.System.SubscribePropertyChanged(nameof(SystemConfig.DestinationFolderCollection),
                 (s, e) => Refresh());
-            Config.Current.Panels.SubscribePropertyChanged(nameof(PanelsConfig.DestinationFolderPanelItemCount),
-                (s, e) => Refresh());
             PageFrameBoxPresenter.Current.ViewPageChanged += (s, e) => UpdateCommandStates();
             BookOperation.Current.BookChanged += (s, e) => UpdateCommandStates();
             _moveService.StateChanged += (s, e) => UpdateCommandStates();
@@ -37,7 +35,7 @@ namespace NeeView
         }
 
         /// <summary>
-        /// Get destination folders limited by the configured visible count.
+        /// Get every configured destination folder shown by the panel.
         /// </summary>
         public ObservableCollection<DestinationFolderPanelItem> Items { get; }
 
@@ -52,16 +50,14 @@ namespace NeeView
         public bool IsBusy => _moveService.IsBusy;
 
         /// <summary>
-        /// Rebuild the visible numbered mapping from current configuration.
+        /// Rebuild the complete destination-folder list from current configuration.
         /// </summary>
         public void Refresh()
         {
             Items.Clear();
-            var visibleItemCount = Config.Current.Panels.DestinationFolderPanelItemCount;
 
-            // The panel can show more folders while the first nine remain aligned with numeric shortcuts.
+            // The panel has no item limit; the first nine remain aligned with numeric shortcuts.
             foreach (var item in Config.Current.System.DestinationFolderCollection
-                .Take(visibleItemCount)
                 .Select((folder, index) => new DestinationFolderPanelItem(index + 1, folder)))
             {
                 Items.Add(item);
