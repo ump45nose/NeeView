@@ -1,4 +1,5 @@
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace NeeView
 {
@@ -27,6 +28,23 @@ namespace NeeView
         public void Refresh()
         {
             _viewModel.Refresh();
+        }
+
+        /// <summary>
+        /// 在新文件夹输入框按下回车时执行与“新增文件夹”按钮相同的命令。
+        /// </summary>
+        /// <param name="sender">新文件夹名称输入框</param>
+        /// <param name="e">键盘事件参数</param>
+        private void NewFolderNameTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter || Keyboard.Modifiers != ModifierKeys.None) return;
+
+            // 统一通过 ViewModel 命令执行，确保按钮和回车共用校验与忙碌状态。
+            if (_viewModel.CreateFolderCommand.CanExecute(null))
+            {
+                _viewModel.CreateFolderCommand.Execute(null);
+                e.Handled = true;
+            }
         }
 
         /// <summary>
