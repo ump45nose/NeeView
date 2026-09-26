@@ -34,6 +34,8 @@ namespace NeeView
 
             Config.Current.System.SubscribePropertyChanged(nameof(SystemConfig.DestinationFolderCollection),
                 (s, e) => Refresh());
+            Config.Current.Panels.SubscribePropertyChanged(nameof(PanelsConfig.IsDestinationFolderCopyMode),
+                (s, e) => UpdateCommandStates());
             PageFrameBoxPresenter.Current.ViewPageChanged += (s, e) => UpdateCommandStates();
             BookOperation.Current.BookChanged += (s, e) => UpdateCommandStates();
             _moveService.StateChanged += (s, e) => UpdateCommandStates();
@@ -75,27 +77,37 @@ namespace NeeView
         }
 
         /// <summary>
-        /// 检查指定目标文件夹是否可以接收当前主图片。
+        /// 检查指定目标文件夹是否可以按当前模式接收主图片。
         /// </summary>
         /// <param name="item">面板目标项</param>
-        /// <returns>当前主图片可移动且服务空闲时返回 true</returns>
-        private bool CanMove(DestinationFolderPanelItem? item)
+        /// <returns>当前主图片可按所选模式处理且服务空闲时返回 true</returns>
+        private bool CanClassify(DestinationFolderPanelItem? item)
         {
             return item is not null
                 && !_moveService.IsBusy
-                && BookOperation.Current.Control.CanMoveToFolder(item.Folder, MultiPagePolicy.Once);
+                && BookOperation.Current.Control.CanMoveToFolder(item.Folder, MultiPagePolicy.Once)
+                && (!Config.Current.Panels.IsDestinationFolderCopyMode
+                    || BookOperation.Current.Control.CanCopyToFolder(item.Folder, MultiPagePolicy.Once));
         }
 
         /// <summary>
-        /// 将当前主图片移动到点击的目标文件夹。
+        /// 按当前模式将主图片移动或复制到点击的目标文件夹。
         /// </summary>
         /// <param name="item">面板目标项</param>
-        [RelayCommand(CanExecute = nameof(CanMove))]
-        private void Move(DestinationFolderPanelItem? item)
+        [RelayCommand(CanExecute = nameof(CanClassify))]
+        private void Classify(DestinationFolderPanelItem? item)
         {
             if (item is null) return;
 
-            BookOperation.Current.Control.MoveToFolder(item.Folder, MultiPagePolicy.Once);
+            // 只切换面板操作，复制保留源文件且不进入移动撤销历史。
+            if (Config.Current.Panels.IsDestinationFolderCopyMode)
+            {
+                BookOperation.Current.Control.CopyToFolder(item.Folder, MultiPagePolicy.Once);
+            }
+            else
+            {
+                BookOperation.Current.Control.MoveToFolder(item.Folder, MultiPagePolicy.Once);
+            }
         }
 
         /// <summary>
@@ -187,7 +199,7 @@ namespace NeeView
         }
 
         /// <summary>
-        /// 在当前主图片所在文件夹创建直接子文件夹，刷新列表并将当前图片移入其中。
+        /// 在当前主图片所在文件夹创建直接子文件夹，刷新列表并按当前模式处理图片。
         /// </summary>
         [RelayCommand(CanExecute = nameof(CanCreateFolder))]
         private async Task CreateFolder()
@@ -210,11 +222,21 @@ namespace NeeView
                 NewFolderName = "";
                 await RefreshDestinationFoldersAsync(currentDirectory);
 
-                // 复用现有移动命令，使自动分类继续获得下一页行为和会话级撤销记录。
+                // 新建目录也使用当前模式；移动沿用下一页与撤销历史，复制保留源图。
                 var destinationFolder = new DestinationFolder(Path.GetFileName(destinationPath), destinationPath);
                 if (BookOperation.Current.Control.CanMoveToFolder(destinationFolder, MultiPagePolicy.Once))
                 {
-                    BookOperation.Current.Control.MoveToFolder(destinationFolder, MultiPagePolicy.Once);
+                    if (Config.Current.Panels.IsDestinationFolderCopyMode)
+                    {
+                        if (BookOperation.Current.Control.CanCopyToFolder(destinationFolder, MultiPagePolicy.Once))
+                        {
+                            BookOperation.Current.Control.CopyToFolder(destinationFolder, MultiPagePolicy.Once);
+                        }
+                    }
+                    else
+                    {
+                        BookOperation.Current.Control.MoveToFolder(destinationFolder, MultiPagePolicy.Once);
+                    }
                 }
             }
             catch (Exception ex)
@@ -361,7 +383,7 @@ namespace NeeView
         private void UpdateCommandStates()
         {
             OnPropertyChanged(nameof(IsBusy));
-            MoveCommand.NotifyCanExecuteChanged();
+            ClassifyCommand.NotifyCanExecuteChanged();
             UndoCommand.NotifyCanExecuteChanged();
             RedoCommand.NotifyCanExecuteChanged();
             RefreshFromCurrentFolderCommand.NotifyCanExecuteChanged();

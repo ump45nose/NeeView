@@ -8,6 +8,7 @@ namespace NeeView
     public class MoveToFolderAsCommand : CommandElement
     {
         private readonly Lazy<MovePageToFolderMenuFactory> _menuFactory;
+        private readonly bool _useDestinationFolderPanelMode;
 
         /// <summary>
         /// Initialize the regular destination-folder menu command.
@@ -28,6 +29,9 @@ namespace NeeView
             {
                 throw new ArgumentOutOfRangeException(nameof(index), index, "Destination folder shortcut index must be between 1 and 9.");
             }
+
+            // 只有内置数字键跟随面板模式；原始 MoveToFolderAs 命令仍固定执行移动。
+            _useDestinationFolderPanelMode = true;
 
             // Keep the folder index and shortcut in the native command configuration so users can edit both.
             Parameter = new MoveToFolderAsCommandParameter()
@@ -68,7 +72,10 @@ namespace NeeView
             {
                 var folders = Config.Current.System.DestinationFolderCollection;
                 if (!folders.IsValidIndex(index)) return false;
-                return BookOperation.Current.Control.CanMoveToFolder(folders[index], parameter.MultiPagePolicy);
+                if (!BookOperation.Current.Control.CanMoveToFolder(folders[index], parameter.MultiPagePolicy)) return false;
+                return !_useDestinationFolderPanelMode
+                    || !Config.Current.Panels.IsDestinationFolderCopyMode
+                    || BookOperation.Current.Control.CanCopyToFolder(folders[index], parameter.MultiPagePolicy);
             }
             else
             {
@@ -84,7 +91,15 @@ namespace NeeView
             {
                 var folders = Config.Current.System.DestinationFolderCollection;
                 if (!folders.IsValidIndex(index)) return;
-                BookOperation.Current.Control.MoveToFolder(folders[index], parameter.MultiPagePolicy);
+                // 数字键在复制模式下使用现有复制命令，保留源图和移动历史的语义。
+                if (_useDestinationFolderPanelMode && Config.Current.Panels.IsDestinationFolderCopyMode)
+                {
+                    BookOperation.Current.Control.CopyToFolder(folders[index], parameter.MultiPagePolicy);
+                }
+                else
+                {
+                    BookOperation.Current.Control.MoveToFolder(folders[index], parameter.MultiPagePolicy);
+                }
             }
             else
             {

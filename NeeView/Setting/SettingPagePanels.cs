@@ -61,6 +61,7 @@ namespace NeeView.Setting
             this.Items.Add(section);
 
             section = new SettingItemSection(TextResources.GetString("DestinationFolderPanel.Title"));
+            section.Children.Add(new SettingItemProperty(PropertyMemberElement.Create(Config.Current.Panels, nameof(PanelsConfig.IsDestinationFolderCopyMode))));
             section.Children.Add(new SettingItemProperty(PropertyMemberElement.Create(Config.Current.Panels, nameof(PanelsConfig.DestinationMoveHistoryCapacity))));
             this.Items.Add(section);
         }

@@ -27,6 +27,7 @@ namespace NeeView
         [DefaultEquality] private bool? _isVisibleItemsCount;
         [DefaultEquality] private bool _isTextSearchEnabled;
         [DefaultEquality] private int _destinationMoveHistoryCapacity = 300;
+        [DefaultEquality] private bool _isDestinationFolderCopyMode;
         [DefaultEquality] private double _conflictTopMargin = 32.0;
         [DefaultEquality] private double _conflictBottomMargin = 20.0;
 
@@ -166,6 +167,16 @@ namespace NeeView
         {
             get { return _destinationMoveHistoryCapacity; }
             set { SetProperty(ref _destinationMoveHistoryCapacity, Math.Clamp(value, 0, 1000)); }
+        }
+
+        /// <summary>
+        /// 获取或设置目标文件夹面板和内置数字键是否使用复制模式；默认使用移动模式。
+        /// </summary>
+        [PropertyMember]
+        public bool IsDestinationFolderCopyMode
+        {
+            get { return _isDestinationFolderCopyMode; }
+            set { SetProperty(ref _isDestinationFolderCopyMode, value); }
         }
 
         [PropertyMember]
