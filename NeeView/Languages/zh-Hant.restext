@@ -2724,6 +2724,7 @@ PanelsConfig.IsDestinationFolderCopyMode.Remarks=啟用後，面板點選和內�
 PanelsConfig.IsDestinationFolderAutoRefreshEnabled=切換目錄時自動重新整理子資料夾
 PanelsConfig.IsDestinationFolderAutoRefreshEnabled.Remarks=僅在目前圖片所在目錄變更時重新整理，不定時掃描。
 DestinationFolderPanel.AutoRefresh=自動重新整理子資料夾
+DestinationFolderPanel.AutoRefreshCompact=自動重整
 DestinationFolderPanel.RefreshCurrentFolder=重新整理目前目錄的子資料夾
 DestinationFolderPanel.NewFolderName=新增子資料夾名稱
 DestinationFolderPanel.CreateFolder=新增資料夾

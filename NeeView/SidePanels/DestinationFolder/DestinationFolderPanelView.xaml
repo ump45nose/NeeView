@@ -7,7 +7,7 @@
         xmlns:nwc="clr-namespace:NeeView.Windows.Controls"
         xmlns:properties="clr-namespace:NeeView.Properties"
         mc:Ignorable="d" d:DesignHeight="480" d:DesignWidth="280"
-        MinWidth="160" Focusable="True"
+        MinWidth="250" Focusable="True"
         Foreground="{DynamicResource Panel.Foreground}">
 
     <UserControl.Resources>
@@ -39,19 +39,27 @@
 
     <DockPanel x:Name="Root" Margin="2">
         <StackPanel DockPanel.Dock="Bottom" Margin="2,4,2,2">
-            <StackPanel Orientation="Horizontal" Margin="4,2" VerticalAlignment="Center"
-                        ToolTip="{properties:TextBinding DestinationFolderPanel.Mode}">
-                <TextBlock Text="{properties:TextBinding Word.Move}" VerticalAlignment="Center" Margin="0,0,6,0" />
-                <nwc:ToggleSwitch IsChecked="{Binding Source={x:Static local:Config.Current}, Path=Panels.IsDestinationFolderCopyMode, Mode=TwoWay}"
-                                  VerticalAlignment="Center" />
-                <TextBlock Text="{properties:TextBinding DestinationFolderPanel.Copy}" VerticalAlignment="Center" Margin="6,0,0,0" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="4,2" VerticalAlignment="Center"
-                        ToolTip="{properties:TextBinding PanelsConfig.IsDestinationFolderAutoRefreshEnabled.Remarks}">
-                <TextBlock Text="{properties:TextBinding DestinationFolderPanel.AutoRefresh}" VerticalAlignment="Center" Margin="0,0,6,0" />
-                <nwc:ToggleSwitch IsChecked="{Binding Source={x:Static local:Config.Current}, Path=Panels.IsDestinationFolderAutoRefreshEnabled, Mode=TwoWay}"
-                                  VerticalAlignment="Center" />
-            </StackPanel>
+            <!-- 两个开关共用一行；完整含义保留在各自的悬停提示中。 -->
+            <Grid Margin="4,2" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal"
+                            ToolTip="{properties:TextBinding DestinationFolderPanel.Mode}">
+                    <TextBlock Text="{properties:TextBinding Word.Move}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                    <nwc:ToggleSwitch IsChecked="{Binding Source={x:Static local:Config.Current}, Path=Panels.IsDestinationFolderCopyMode, Mode=TwoWay}"
+                                      VerticalAlignment="Center" />
+                    <TextBlock Text="{properties:TextBinding DestinationFolderPanel.Copy}" VerticalAlignment="Center" Margin="6,0,0,0" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal"
+                            ToolTip="{properties:TextBinding PanelsConfig.IsDestinationFolderAutoRefreshEnabled.Remarks}">
+                    <TextBlock Text="{properties:TextBinding DestinationFolderPanel.AutoRefreshCompact}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                    <nwc:ToggleSwitch IsChecked="{Binding Source={x:Static local:Config.Current}, Path=Panels.IsDestinationFolderAutoRefreshEnabled, Mode=TwoWay}"
+                                      VerticalAlignment="Center" />
+                </StackPanel>
+            </Grid>
             <Button Margin="2" Style="{StaticResource NVButton}"
                     Content="{properties:TextBinding DestinationFolderPanel.RefreshCurrentFolder}"
                     Command="{Binding RefreshFromCurrentFolderCommand}" />
@@ -86,12 +94,12 @@
                     Command="{Binding ManageCommand}" />
         </StackPanel>
 
-        <!-- 上下两组各自滚动；中间分隔条只调整布局，不改变任何目录配置。 -->
-        <Grid>
+        <!-- 上下两组各自滚动；分隔比例保存在面板配置中，不改变目录列表。 -->
+        <Grid x:Name="FolderSectionsGrid">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*" MinHeight="48" />
+                <RowDefinition x:Name="ManagedSectionRow" Height="*" MinHeight="48" />
                 <RowDefinition Height="6" />
-                <RowDefinition Height="*" MinHeight="48" />
+                <RowDefinition x:Name="CurrentFolderSectionRow" Height="*" MinHeight="48" />
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0">
@@ -115,6 +123,7 @@
 
             <GridSplitter Grid.Row="1" Height="6" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                           ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" IsTabStop="False"
+                          DragCompleted="FolderSectionsSplitter_DragCompleted"
                           Background="{DynamicResource Panel.Splitter}"
                           ToolTip="{properties:TextBinding DestinationFolderPanel.ResizeSections}" />
 

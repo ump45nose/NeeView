@@ -16,7 +16,7 @@ The original 46.3-compatible scripts always move images. The fork also has built
 
 ## Panel and history
 
-The panel has two sections. The upper section shows all persisted folders added through **Manage destination folders**; the lower section shows only the immediate subfolders of the current image directory. Neither section limits its item count, and each has its own scrollbar. Drag the divider between them to resize their visible areas.
+The panel has two sections. The upper section shows all persisted folders added through **Manage destination folders**; the lower section shows only the immediate subfolders of the current image directory. Neither section limits its item count, and each has its own scrollbar. Drag the divider between them to resize their visible areas; the ratio is saved and restored when the panel or app reopens. The Move / Copy and auto-refresh switches share one row.
 
 Manual refresh and new-folder creation update only the lower section. The **Auto-refresh subfolders** switch is on by default and is persisted; it scans once when the current image directory changes, not periodically or on every page of the same directory. Turning it off leaves manual refresh available. A directory change clears the previous directory's child-folder list even when automatic refresh is off.
 

@@ -1293,6 +1293,7 @@ PanelsConfig.IsDestinationFolderCopyMode.Remarks=When enabled, panel clicks and 
 PanelsConfig.IsDestinationFolderAutoRefreshEnabled=Automatically refresh subfolders on folder change
 PanelsConfig.IsDestinationFolderAutoRefreshEnabled.Remarks=Refresh only when the current image folder changes; no periodic scanning.
 DestinationFolderPanel.AutoRefresh=Auto-refresh subfolders
+DestinationFolderPanel.AutoRefreshCompact=Auto
 DestinationFolderPanel.RefreshCurrentFolder=Refresh current subfolders
 DestinationFolderPanel.NewFolderName=New subfolder name
 DestinationFolderPanel.CreateFolder=Create folder
