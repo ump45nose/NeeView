@@ -27,6 +27,7 @@ namespace NeeView
         [DefaultEquality] private bool? _isVisibleItemsCount;
         [DefaultEquality] private bool _isTextSearchEnabled;
         [DefaultEquality] private int _destinationMoveHistoryCapacity = 300;
+        [DefaultEquality] private bool _isDestinationFolderCopyMode;
         [DefaultEquality] private double _conflictTopMargin = 32.0;
         [DefaultEquality] private double _conflictBottomMargin = 20.0;
 
@@ -166,6 +167,16 @@ namespace NeeView
         {
             get { return _destinationMoveHistoryCapacity; }
             set { SetProperty(ref _destinationMoveHistoryCapacity, Math.Clamp(value, 0, 1000)); }
+        }
+
+        /// <summary>
+        /// Get or set whether the destination panel and built-in number shortcuts use copy mode.
+        /// </summary>
+        [PropertyMember]
+        public bool IsDestinationFolderCopyMode
+        {
+            get { return _isDestinationFolderCopyMode; }
+            set { SetProperty(ref _isDestinationFolderCopyMode, value); }
         }
 
         [PropertyMember]

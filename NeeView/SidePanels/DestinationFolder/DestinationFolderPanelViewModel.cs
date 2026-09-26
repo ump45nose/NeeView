@@ -34,6 +34,8 @@ namespace NeeView
 
             Config.Current.System.SubscribePropertyChanged(nameof(SystemConfig.DestinationFolderCollection),
                 (s, e) => Refresh());
+            Config.Current.Panels.SubscribePropertyChanged(nameof(PanelsConfig.IsDestinationFolderCopyMode),
+                (s, e) => UpdateCommandStates());
             PageFrameBoxPresenter.Current.ViewPageChanged += (s, e) => UpdateCommandStates();
             BookOperation.Current.BookChanged += (s, e) => UpdateCommandStates();
             _moveService.StateChanged += (s, e) => UpdateCommandStates();
@@ -75,27 +77,37 @@ namespace NeeView
         }
 
         /// <summary>
-        /// Determine whether the destination can receive the current main image.
+        /// Determine whether the destination can receive the main image in the selected mode.
         /// </summary>
         /// <param name="item">Destination panel item.</param>
-        /// <returns>True when the main image is movable and the service is idle.</returns>
-        private bool CanMove(DestinationFolderPanelItem? item)
+        /// <returns>True when the main image can be classified and the move service is idle.</returns>
+        private bool CanClassify(DestinationFolderPanelItem? item)
         {
             return item is not null
                 && !_moveService.IsBusy
-                && BookOperation.Current.Control.CanMoveToFolder(item.Folder, MultiPagePolicy.Once);
+                && BookOperation.Current.Control.CanMoveToFolder(item.Folder, MultiPagePolicy.Once)
+                && (!Config.Current.Panels.IsDestinationFolderCopyMode
+                    || BookOperation.Current.Control.CanCopyToFolder(item.Folder, MultiPagePolicy.Once));
         }
 
         /// <summary>
-        /// Move the current main image to the selected destination folder.
+        /// Move or copy the current main image to the selected destination.
         /// </summary>
         /// <param name="item">Destination panel item.</param>
-        [RelayCommand(CanExecute = nameof(CanMove))]
-        private void Move(DestinationFolderPanelItem? item)
+        [RelayCommand(CanExecute = nameof(CanClassify))]
+        private void Classify(DestinationFolderPanelItem? item)
         {
             if (item is null) return;
 
-            BookOperation.Current.Control.MoveToFolder(item.Folder, MultiPagePolicy.Once);
+            // Copy retains the source file and does not enter move undo history.
+            if (Config.Current.Panels.IsDestinationFolderCopyMode)
+            {
+                BookOperation.Current.Control.CopyToFolder(item.Folder, MultiPagePolicy.Once);
+            }
+            else
+            {
+                BookOperation.Current.Control.MoveToFolder(item.Folder, MultiPagePolicy.Once);
+            }
         }
 
         /// <summary>
@@ -187,7 +199,7 @@ namespace NeeView
         }
 
         /// <summary>
-        /// Create a direct child folder, refresh destinations, and move the current image into it.
+        /// Create a direct child folder, refresh destinations, and classify the current image.
         /// </summary>
         [RelayCommand(CanExecute = nameof(CanCreateFolder))]
         private async Task CreateFolder()
@@ -210,11 +222,21 @@ namespace NeeView
                 NewFolderName = "";
                 await RefreshDestinationFoldersAsync(currentDirectory);
 
-                // Reuse the existing move command to retain next-page behavior and session undo history.
+                // Follow the selected mode; moving retains next-page behavior and undo history.
                 var destinationFolder = new DestinationFolder(Path.GetFileName(destinationPath), destinationPath);
                 if (BookOperation.Current.Control.CanMoveToFolder(destinationFolder, MultiPagePolicy.Once))
                 {
-                    BookOperation.Current.Control.MoveToFolder(destinationFolder, MultiPagePolicy.Once);
+                    if (Config.Current.Panels.IsDestinationFolderCopyMode)
+                    {
+                        if (BookOperation.Current.Control.CanCopyToFolder(destinationFolder, MultiPagePolicy.Once))
+                        {
+                            BookOperation.Current.Control.CopyToFolder(destinationFolder, MultiPagePolicy.Once);
+                        }
+                    }
+                    else
+                    {
+                        BookOperation.Current.Control.MoveToFolder(destinationFolder, MultiPagePolicy.Once);
+                    }
                 }
             }
             catch (Exception ex)
@@ -361,7 +383,7 @@ namespace NeeView
         private void UpdateCommandStates()
         {
             OnPropertyChanged(nameof(IsBusy));
-            MoveCommand.NotifyCanExecuteChanged();
+            ClassifyCommand.NotifyCanExecuteChanged();
             UndoCommand.NotifyCanExecuteChanged();
             RedoCommand.NotifyCanExecuteChanged();
             RefreshFromCurrentFolderCommand.NotifyCanExecuteChanged();

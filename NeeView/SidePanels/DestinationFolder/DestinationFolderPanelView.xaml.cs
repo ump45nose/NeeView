@@ -18,7 +18,7 @@ namespace NeeView
             InitializeComponent();
             _viewModel = new DestinationFolderPanelViewModel();
 
-            // Item buttons resolve MoveCommand from the ancestor UserControl, so bind the view itself.
+            // Item buttons resolve ClassifyCommand from the ancestor UserControl, so bind the view itself.
             DataContext = _viewModel;
         }
 
