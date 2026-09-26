@@ -29,6 +29,7 @@ namespace NeeView
         [DefaultEquality] private int _destinationMoveHistoryCapacity = 300;
         [DefaultEquality] private bool _isDestinationFolderCopyMode;
         [DefaultEquality] private bool _isDestinationFolderAutoRefreshEnabled = true;
+        [DefaultEquality] private double _destinationFolderSectionRatio = 0.5;
         [DefaultEquality] private double _conflictTopMargin = 32.0;
         [DefaultEquality] private double _conflictBottomMargin = 20.0;
 
@@ -253,6 +254,16 @@ namespace NeeView
         [ObjectMergeReferenceCopy]
         [DefaultEquality]
         public bool IsDestinationFolderPanelInitialized { get; set; }
+
+        /// <summary>
+        /// 获取或设置手动目标文件夹区域在两组列表中所占的高度比例。
+        /// </summary>
+        [PropertyMapIgnore]
+        public double DestinationFolderSectionRatio
+        {
+            get { return _destinationFolderSectionRatio; }
+            set { SetProperty(ref _destinationFolderSectionRatio, double.IsFinite(value) ? Math.Clamp(value, 0.1, 0.9) : 0.5); }
+        }
 
         #endregion HiddenParameters
 

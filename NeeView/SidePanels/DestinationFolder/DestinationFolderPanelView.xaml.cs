@@ -1,4 +1,7 @@
+using System;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
 namespace NeeView
@@ -20,6 +23,25 @@ namespace NeeView
 
             // Item buttons resolve ClassifyCommand from the ancestor UserControl, so bind the view itself.
             DataContext = _viewModel;
+
+            // 每次创建面板视图时恢复上次拖动保存的两组高度比例。
+            var ratio = Config.Current.Panels.DestinationFolderSectionRatio;
+            ManagedSectionRow.Height = new GridLength(ratio, GridUnitType.Star);
+            CurrentFolderSectionRow.Height = new GridLength(1.0 - ratio, GridUnitType.Star);
+        }
+
+        /// <summary>
+        /// 拖动结束后按实际行高保存比例，以便重新打开面板和下次启动时恢复。
+        /// </summary>
+        /// <param name="sender">两组列表之间的分隔控件</param>
+        /// <param name="e">拖动完成事件参数</param>
+        private void FolderSectionsSplitter_DragCompleted(object sender, DragCompletedEventArgs e)
+        {
+            var totalHeight = ManagedSectionRow.ActualHeight + CurrentFolderSectionRow.ActualHeight;
+            if (totalHeight <= 0.0 || !double.IsFinite(totalHeight)) return;
+
+            // 只保存比例，不保存像素高度；窗口或右侧面板尺寸变化时仍能按比例布局。
+            Config.Current.Panels.DestinationFolderSectionRatio = ManagedSectionRow.ActualHeight / totalHeight;
         }
 
         /// <summary>
