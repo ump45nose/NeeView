@@ -19,6 +19,9 @@ namespace NeeView
     {
         private readonly DestinationMoveService _moveService;
         private bool _isFolderOperationBusy;
+        // The directory and generation counter discard stale results from slow network scans.
+        private string? _currentImageDirectory;
+        private long _childFolderRefreshVersion;
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(CreateFolderCommand))]
@@ -30,28 +33,42 @@ namespace NeeView
         public DestinationFolderPanelViewModel()
         {
             _moveService = DestinationMoveService.Current;
-            Items = new ObservableCollection<DestinationFolderPanelItem>();
+            ManagedItems = new ObservableCollection<DestinationFolderPanelItem>();
+            CurrentFolderItems = new ObservableCollection<DestinationFolderPanelItem>();
 
             Config.Current.System.SubscribePropertyChanged(nameof(SystemConfig.DestinationFolderCollection),
                 (s, e) => Refresh());
             Config.Current.Panels.SubscribePropertyChanged(nameof(PanelsConfig.IsDestinationFolderCopyMode),
                 (s, e) => UpdateCommandStates());
-            PageFrameBoxPresenter.Current.ViewPageChanged += (s, e) => UpdateCommandStates();
-            BookOperation.Current.BookChanged += (s, e) => UpdateCommandStates();
+            Config.Current.Panels.SubscribePropertyChanged(nameof(PanelsConfig.IsDestinationFolderAutoRefreshEnabled),
+                (s, e) => OnAutoRefreshChanged());
+            PageFrameBoxPresenter.Current.ViewPageChanged += (s, e) => OnCurrentPageChanged();
+            BookOperation.Current.BookChanged += (s, e) => OnCurrentPageChanged();
             _moveService.StateChanged += (s, e) => UpdateCommandStates();
 
             Refresh();
+            UpdateCurrentDirectory();
         }
 
         /// <summary>
-        /// Get every configured destination folder shown by the panel.
+        /// Get all manually managed, persisted destination folders.
         /// </summary>
-        public ObservableCollection<DestinationFolderPanelItem> Items { get; }
+        public ObservableCollection<DestinationFolderPanelItem> ManagedItems { get; }
 
         /// <summary>
-        /// Get whether the panel contains a clickable destination.
+        /// Get immediate subfolders of the current image directory without persisting them.
         /// </summary>
-        public bool HasItems => Items.Count > 0;
+        public ObservableCollection<DestinationFolderPanelItem> CurrentFolderItems { get; }
+
+        /// <summary>
+        /// Get whether the managed section contains any destinations.
+        /// </summary>
+        public bool HasManagedItems => ManagedItems.Count > 0;
+
+        /// <summary>
+        /// Get whether the current-directory section contains any child folders.
+        /// </summary>
+        public bool HasCurrentFolderItems => CurrentFolderItems.Count > 0;
 
         /// <summary>
         /// Get whether a destination move is in progress.
@@ -59,21 +76,63 @@ namespace NeeView
         public bool IsBusy => _moveService.IsBusy;
 
         /// <summary>
-        /// Rebuild the complete destination-folder list from current configuration.
+        /// Rebuild the managed destination list from persistent configuration.
         /// </summary>
         public void Refresh()
         {
-            Items.Clear();
+            ManagedItems.Clear();
 
-            // The panel has no item limit; the first nine remain aligned with numeric shortcuts.
+            // Managed destinations have no item limit; only the first nine map to numeric shortcuts.
             foreach (var item in Config.Current.System.DestinationFolderCollection
                 .Select((folder, index) => new DestinationFolderPanelItem(index + 1, folder)))
             {
-                Items.Add(item);
+                ManagedItems.Add(item);
             }
 
-            OnPropertyChanged(nameof(HasItems));
+            OnPropertyChanged(nameof(HasManagedItems));
             UpdateCommandStates();
+        }
+
+        /// <summary>
+        /// React to book and visible-page changes, refreshing child folders only after a directory change.
+        /// </summary>
+        private void OnCurrentPageChanged()
+        {
+            UpdateCurrentDirectory();
+            UpdateCommandStates();
+        }
+
+        /// <summary>
+        /// Handle the auto-refresh setting, discarding stale scans or reading the current directory once.
+        /// </summary>
+        private void OnAutoRefreshChanged()
+        {
+            ++_childFolderRefreshVersion;
+            if (Config.Current.Panels.IsDestinationFolderAutoRefreshEnabled
+                && _currentImageDirectory is { } currentDirectory)
+            {
+                _ = RefreshChildFoldersAsync(currentDirectory);
+            }
+        }
+
+        /// <summary>
+        /// Track the main image directory and refresh immediate children only after a real change.
+        /// </summary>
+        private void UpdateCurrentDirectory()
+        {
+            var directory = TryGetCurrentImageDirectory(out var currentDirectory) ? currentDirectory : null;
+            if (string.Equals(_currentImageDirectory, directory, StringComparison.OrdinalIgnoreCase)) return;
+
+            _currentImageDirectory = directory;
+            ++_childFolderRefreshVersion;
+            CurrentFolderItems.Clear();
+            OnPropertyChanged(nameof(HasCurrentFolderItems));
+
+            // Same-directory page changes do not scan, and no timer polls the file system.
+            if (directory is not null && Config.Current.Panels.IsDestinationFolderAutoRefreshEnabled)
+            {
+                _ = RefreshChildFoldersAsync(directory);
+            }
         }
 
         /// <summary>
@@ -165,7 +224,7 @@ namespace NeeView
         }
 
         /// <summary>
-        /// Replace destinations with the immediate child folders of the current image folder.
+        /// Refresh immediate child folders without modifying managed destinations.
         /// </summary>
         [RelayCommand(CanExecute = nameof(CanRefreshFromCurrentFolder))]
         private async Task RefreshFromCurrentFolder()
@@ -175,11 +234,7 @@ namespace NeeView
             SetFolderOperationBusy(true);
             try
             {
-                await RefreshDestinationFoldersAsync(currentDirectory);
-            }
-            catch (Exception ex)
-            {
-                ShowFolderOperationError(ex, "DestinationFolderPanel.RefreshFailed");
+                await RefreshChildFoldersAsync(currentDirectory);
             }
             finally
             {
@@ -205,6 +260,7 @@ namespace NeeView
         private async Task CreateFolder()
         {
             if (!TryGetCurrentImageDirectory(out var currentDirectory)) return;
+            var currentImagePath = BookOperation.Current.Book?.CurrentPage?.TargetPath;
             if (!TryCreateChildDirectoryPath(currentDirectory, NewFolderName, out var destinationPath))
             {
                 ToastService.Current.Show(new Toast(
@@ -220,7 +276,15 @@ namespace NeeView
                 // Run file-system work in the background so mapped network folders do not block the panel.
                 await Task.Run(() => Directory.CreateDirectory(destinationPath));
                 NewFolderName = "";
-                await RefreshDestinationFoldersAsync(currentDirectory);
+                await RefreshChildFoldersAsync(currentDirectory);
+
+                // Do not classify a different image if navigation occurred while creating the folder.
+                if (!TryGetCurrentImageDirectory(out var activeDirectory)
+                    || !string.Equals(activeDirectory, currentDirectory, StringComparison.OrdinalIgnoreCase)
+                    || !string.Equals(BookOperation.Current.Book?.CurrentPage?.TargetPath, currentImagePath, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
 
                 // Follow the selected mode; moving retains next-page behavior and undo history.
                 var destinationFolder = new DestinationFolder(Path.GetFileName(destinationPath), destinationPath);
@@ -270,15 +334,37 @@ namespace NeeView
         }
 
         /// <summary>
-        /// Enumerate immediate child folders and replace the global destination-folder configuration.
+        /// Enumerate immediate child folders asynchronously and update only the transient panel list.
         /// </summary>
         /// <param name="currentDirectory">Directory containing the current main image.</param>
-        private static async Task RefreshDestinationFoldersAsync(string currentDirectory)
+        private async Task RefreshChildFoldersAsync(string currentDirectory)
         {
-            var folders = await Task.Run(() => EnumerateDestinationFolders(currentDirectory));
+            var refreshVersion = ++_childFolderRefreshVersion;
+            try
+            {
+                var folders = await Task.Run(() => EnumerateDestinationFolders(currentDirectory));
 
-            // Replace the collection reference so panels, commands, and numeric shortcuts refresh together.
-            Config.Current.System.DestinationFolderCollection = new DestinationFolderCollection(folders);
+                // Network scans may be slow; accept only the newest result for the active directory.
+                if (refreshVersion != _childFolderRefreshVersion
+                    || !string.Equals(_currentImageDirectory, currentDirectory, StringComparison.OrdinalIgnoreCase)) return;
+
+                CurrentFolderItems.Clear();
+                foreach (var folder in folders)
+                {
+                    // Child folders never consume numeric shortcuts, and neither section has an item cap.
+                    CurrentFolderItems.Add(new DestinationFolderPanelItem(null, folder));
+                }
+
+                OnPropertyChanged(nameof(HasCurrentFolderItems));
+                ClassifyCommand.NotifyCanExecuteChanged();
+            }
+            catch (Exception ex)
+            {
+                if (refreshVersion == _childFolderRefreshVersion)
+                {
+                    ShowFolderOperationError(ex, "DestinationFolderPanel.RefreshFailed");
+                }
+            }
         }
 
         /// <summary>

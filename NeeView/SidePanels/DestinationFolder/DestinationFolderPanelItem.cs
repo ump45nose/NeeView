@@ -1,11 +1,11 @@
 namespace NeeView
 {
     /// <summary>
-    /// Numbered destination-folder panel item.
+    /// Destination-folder panel item; only managed entries have a shortcut number.
     /// </summary>
-    /// <param name="Number">Number used for display and shortcuts.</param>
-    /// <param name="Folder">Destination folder from the current configuration.</param>
-    public sealed record DestinationFolderPanelItem(int Number, DestinationFolder Folder)
+    /// <param name="Number">Managed display number; null for a current-folder subfolder.</param>
+    /// <param name="Folder">Destination folder available for classification.</param>
+    public sealed record DestinationFolderPanelItem(int? Number, DestinationFolder Folder)
     {
         /// <summary>
         /// Get the display name.

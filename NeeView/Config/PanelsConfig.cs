@@ -28,6 +28,7 @@ namespace NeeView
         [DefaultEquality] private bool _isTextSearchEnabled;
         [DefaultEquality] private int _destinationMoveHistoryCapacity = 300;
         [DefaultEquality] private bool _isDestinationFolderCopyMode;
+        [DefaultEquality] private bool _isDestinationFolderAutoRefreshEnabled = true;
         [DefaultEquality] private double _conflictTopMargin = 32.0;
         [DefaultEquality] private double _conflictBottomMargin = 20.0;
 
@@ -177,6 +178,16 @@ namespace NeeView
         {
             get { return _isDestinationFolderCopyMode; }
             set { SetProperty(ref _isDestinationFolderCopyMode, value); }
+        }
+
+        /// <summary>
+        /// Get or set whether immediate child folders refresh on directory changes, without polling.
+        /// </summary>
+        [PropertyMember]
+        public bool IsDestinationFolderAutoRefreshEnabled
+        {
+            get { return _isDestinationFolderAutoRefreshEnabled; }
+            set { SetProperty(ref _isDestinationFolderAutoRefreshEnabled, value); }
         }
 
         [PropertyMember]
