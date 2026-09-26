@@ -19,6 +19,9 @@ namespace NeeView
     {
         private readonly DestinationMoveService _moveService;
         private bool _isFolderOperationBusy;
+        // 当前目录与递增版本号用于丢弃慢速网络枚举返回的过期结果。
+        private string? _currentImageDirectory;
+        private long _childFolderRefreshVersion;
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(CreateFolderCommand))]
@@ -30,28 +33,42 @@ namespace NeeView
         public DestinationFolderPanelViewModel()
         {
             _moveService = DestinationMoveService.Current;
-            Items = new ObservableCollection<DestinationFolderPanelItem>();
+            ManagedItems = new ObservableCollection<DestinationFolderPanelItem>();
+            CurrentFolderItems = new ObservableCollection<DestinationFolderPanelItem>();
 
             Config.Current.System.SubscribePropertyChanged(nameof(SystemConfig.DestinationFolderCollection),
                 (s, e) => Refresh());
             Config.Current.Panels.SubscribePropertyChanged(nameof(PanelsConfig.IsDestinationFolderCopyMode),
                 (s, e) => UpdateCommandStates());
-            PageFrameBoxPresenter.Current.ViewPageChanged += (s, e) => UpdateCommandStates();
-            BookOperation.Current.BookChanged += (s, e) => UpdateCommandStates();
+            Config.Current.Panels.SubscribePropertyChanged(nameof(PanelsConfig.IsDestinationFolderAutoRefreshEnabled),
+                (s, e) => OnAutoRefreshChanged());
+            PageFrameBoxPresenter.Current.ViewPageChanged += (s, e) => OnCurrentPageChanged();
+            BookOperation.Current.BookChanged += (s, e) => OnCurrentPageChanged();
             _moveService.StateChanged += (s, e) => UpdateCommandStates();
 
             Refresh();
+            UpdateCurrentDirectory();
         }
 
         /// <summary>
-        /// 获取面板中显示的全部目标文件夹。
+        /// 获取手动管理且持久化的全部目标文件夹。
         /// </summary>
-        public ObservableCollection<DestinationFolderPanelItem> Items { get; }
+        public ObservableCollection<DestinationFolderPanelItem> ManagedItems { get; }
 
         /// <summary>
-        /// 获取面板是否包含可点击的目标文件夹。
+        /// 获取当前图片目录下非递归枚举的子文件夹；此集合不写入全局配置。
         /// </summary>
-        public bool HasItems => Items.Count > 0;
+        public ObservableCollection<DestinationFolderPanelItem> CurrentFolderItems { get; }
+
+        /// <summary>
+        /// 获取手动管理区域是否有目标文件夹。
+        /// </summary>
+        public bool HasManagedItems => ManagedItems.Count > 0;
+
+        /// <summary>
+        /// 获取当前目录区域是否有子文件夹。
+        /// </summary>
+        public bool HasCurrentFolderItems => CurrentFolderItems.Count > 0;
 
         /// <summary>
         /// 获取当前是否正在执行目标文件夹移动。
@@ -59,21 +76,63 @@ namespace NeeView
         public bool IsBusy => _moveService.IsBusy;
 
         /// <summary>
-        /// 从当前配置重新构建完整的目标文件夹列表。
+        /// 从持久化配置重新构建手动管理的目标文件夹列表。
         /// </summary>
         public void Refresh()
         {
-            Items.Clear();
+            ManagedItems.Clear();
 
-            // 面板不限制数量；前九项仍与原生命令和脚本的数字快捷键保持一致。
+            // 手动管理区域不限制数量；只有前九项与数字快捷键保持一致。
             foreach (var item in Config.Current.System.DestinationFolderCollection
                 .Select((folder, index) => new DestinationFolderPanelItem(index + 1, folder)))
             {
-                Items.Add(item);
+                ManagedItems.Add(item);
             }
 
-            OnPropertyChanged(nameof(HasItems));
+            OnPropertyChanged(nameof(HasManagedItems));
             UpdateCommandStates();
+        }
+
+        /// <summary>
+        /// 响应书籍或可见页面切换；只有图片所在目录改变时才重建子目录列表。
+        /// </summary>
+        private void OnCurrentPageChanged()
+        {
+            UpdateCurrentDirectory();
+            UpdateCommandStates();
+        }
+
+        /// <summary>
+        /// 处理自动刷新开关；关闭时废弃未完成的枚举，开启时立即读取当前目录一次。
+        /// </summary>
+        private void OnAutoRefreshChanged()
+        {
+            ++_childFolderRefreshVersion;
+            if (Config.Current.Panels.IsDestinationFolderAutoRefreshEnabled
+                && _currentImageDirectory is { } currentDirectory)
+            {
+                _ = RefreshChildFoldersAsync(currentDirectory);
+            }
+        }
+
+        /// <summary>
+        /// 跟踪当前主图片目录，并在真正切换目录时按设置刷新直接子目录。
+        /// </summary>
+        private void UpdateCurrentDirectory()
+        {
+            var directory = TryGetCurrentImageDirectory(out var currentDirectory) ? currentDirectory : null;
+            if (string.Equals(_currentImageDirectory, directory, StringComparison.OrdinalIgnoreCase)) return;
+
+            _currentImageDirectory = directory;
+            ++_childFolderRefreshVersion;
+            CurrentFolderItems.Clear();
+            OnPropertyChanged(nameof(HasCurrentFolderItems));
+
+            // 普通翻页保持目录不变时不枚举；这里只响应目录切换，不进行定时轮询。
+            if (directory is not null && Config.Current.Panels.IsDestinationFolderAutoRefreshEnabled)
+            {
+                _ = RefreshChildFoldersAsync(directory);
+            }
         }
 
         /// <summary>
@@ -165,7 +224,7 @@ namespace NeeView
         }
 
         /// <summary>
-        /// 将当前主图片所在文件夹的直接子文件夹设为目标文件夹。
+        /// 手动刷新当前图片目录的直接子文件夹，不修改手动管理的目标目录。
         /// </summary>
         [RelayCommand(CanExecute = nameof(CanRefreshFromCurrentFolder))]
         private async Task RefreshFromCurrentFolder()
@@ -175,11 +234,7 @@ namespace NeeView
             SetFolderOperationBusy(true);
             try
             {
-                await RefreshDestinationFoldersAsync(currentDirectory);
-            }
-            catch (Exception ex)
-            {
-                ShowFolderOperationError(ex, "DestinationFolderPanel.RefreshFailed");
+                await RefreshChildFoldersAsync(currentDirectory);
             }
             finally
             {
@@ -205,6 +260,7 @@ namespace NeeView
         private async Task CreateFolder()
         {
             if (!TryGetCurrentImageDirectory(out var currentDirectory)) return;
+            var currentImagePath = BookOperation.Current.Book?.CurrentPage?.TargetPath;
             if (!TryCreateChildDirectoryPath(currentDirectory, NewFolderName, out var destinationPath))
             {
                 ToastService.Current.Show(new Toast(
@@ -220,7 +276,15 @@ namespace NeeView
                 // 文件系统操作放到后台执行，避免网络映射目录阻塞面板界面。
                 await Task.Run(() => Directory.CreateDirectory(destinationPath));
                 NewFolderName = "";
-                await RefreshDestinationFoldersAsync(currentDirectory);
+                await RefreshChildFoldersAsync(currentDirectory);
+
+                // 创建目录期间如果已切换图片，不要把后来显示的另一张图片误分类。
+                if (!TryGetCurrentImageDirectory(out var activeDirectory)
+                    || !string.Equals(activeDirectory, currentDirectory, StringComparison.OrdinalIgnoreCase)
+                    || !string.Equals(BookOperation.Current.Book?.CurrentPage?.TargetPath, currentImagePath, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
 
                 // 新建目录也使用当前模式；移动沿用下一页与撤销历史，复制保留源图。
                 var destinationFolder = new DestinationFolder(Path.GetFileName(destinationPath), destinationPath);
@@ -270,15 +334,37 @@ namespace NeeView
         }
 
         /// <summary>
-        /// 枚举指定目录的直接子文件夹，并用结果替换全局目标文件夹配置。
+        /// 异步枚举当前目录的直接子文件夹，并仅更新临时面板列表。
         /// </summary>
         /// <param name="currentDirectory">当前主图片所在目录</param>
-        private static async Task RefreshDestinationFoldersAsync(string currentDirectory)
+        private async Task RefreshChildFoldersAsync(string currentDirectory)
         {
-            var folders = await Task.Run(() => EnumerateDestinationFolders(currentDirectory));
+            var refreshVersion = ++_childFolderRefreshVersion;
+            try
+            {
+                var folders = await Task.Run(() => EnumerateDestinationFolders(currentDirectory));
 
-            // 替换整个集合以触发配置通知，让面板、命令和数字快捷键同步刷新。
-            Config.Current.System.DestinationFolderCollection = new DestinationFolderCollection(folders);
+                // 网络目录可能较慢；只接受最新请求且仍属于当前图片目录的结果。
+                if (refreshVersion != _childFolderRefreshVersion
+                    || !string.Equals(_currentImageDirectory, currentDirectory, StringComparison.OrdinalIgnoreCase)) return;
+
+                CurrentFolderItems.Clear();
+                foreach (var folder in folders)
+                {
+                    // 子目录不占用数字快捷键的序号；两组目录都可以无限显示。
+                    CurrentFolderItems.Add(new DestinationFolderPanelItem(null, folder));
+                }
+
+                OnPropertyChanged(nameof(HasCurrentFolderItems));
+                ClassifyCommand.NotifyCanExecuteChanged();
+            }
+            catch (Exception ex)
+            {
+                if (refreshVersion == _childFolderRefreshVersion)
+                {
+                    ShowFolderOperationError(ex, "DestinationFolderPanel.RefreshFailed");
+                }
+            }
         }
 
         /// <summary>

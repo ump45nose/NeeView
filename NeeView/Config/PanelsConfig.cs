@@ -28,6 +28,7 @@ namespace NeeView
         [DefaultEquality] private bool _isTextSearchEnabled;
         [DefaultEquality] private int _destinationMoveHistoryCapacity = 300;
         [DefaultEquality] private bool _isDestinationFolderCopyMode;
+        [DefaultEquality] private bool _isDestinationFolderAutoRefreshEnabled = true;
         [DefaultEquality] private double _conflictTopMargin = 32.0;
         [DefaultEquality] private double _conflictBottomMargin = 20.0;
 
@@ -177,6 +178,16 @@ namespace NeeView
         {
             get { return _isDestinationFolderCopyMode; }
             set { SetProperty(ref _isDestinationFolderCopyMode, value); }
+        }
+
+        /// <summary>
+        /// 获取或设置切换当前图片所在目录时是否自动刷新直接子文件夹；不进行定时轮询。
+        /// </summary>
+        [PropertyMember]
+        public bool IsDestinationFolderAutoRefreshEnabled
+        {
+            get { return _isDestinationFolderAutoRefreshEnabled; }
+            set { SetProperty(ref _isDestinationFolderAutoRefreshEnabled, value); }
         }
 
         [PropertyMember]

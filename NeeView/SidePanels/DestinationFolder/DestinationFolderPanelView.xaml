@@ -19,6 +19,22 @@
             <Setter Property="Margin" Value="4,2" />
             <Setter Property="Padding" Value="6,5" />
         </Style>
+
+        <DataTemplate x:Key="DestinationFolderItemTemplate" DataType="{x:Type local:DestinationFolderPanelItem}">
+            <Button Style="{StaticResource DestinationButtonStyle}"
+                    ToolTip="{Binding Path}"
+                    Command="{Binding DataContext.ClassifyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    CommandParameter="{Binding}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="28" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding Number}" FontWeight="Bold" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                </Grid>
+            </Button>
+        </DataTemplate>
     </UserControl.Resources>
 
     <DockPanel x:Name="Root" Margin="2">
@@ -29,6 +45,12 @@
                 <nwc:ToggleSwitch IsChecked="{Binding Source={x:Static local:Config.Current}, Path=Panels.IsDestinationFolderCopyMode, Mode=TwoWay}"
                                   VerticalAlignment="Center" />
                 <TextBlock Text="{properties:TextBinding DestinationFolderPanel.Copy}" VerticalAlignment="Center" Margin="6,0,0,0" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="4,2" VerticalAlignment="Center"
+                        ToolTip="{properties:TextBinding PanelsConfig.IsDestinationFolderAutoRefreshEnabled.Remarks}">
+                <TextBlock Text="{properties:TextBinding DestinationFolderPanel.AutoRefresh}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <nwc:ToggleSwitch IsChecked="{Binding Source={x:Static local:Config.Current}, Path=Panels.IsDestinationFolderAutoRefreshEnabled, Mode=TwoWay}"
+                                  VerticalAlignment="Center" />
             </StackPanel>
             <Button Margin="2" Style="{StaticResource NVButton}"
                     Content="{properties:TextBinding DestinationFolderPanel.RefreshCurrentFolder}"
@@ -64,33 +86,56 @@
                     Command="{Binding ManageCommand}" />
         </StackPanel>
 
-        <TextBlock Margin="10" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"
-                Text="{properties:TextBinding DestinationFolderPanel.Empty}"
-                Visibility="{Binding HasItems, Converter={StaticResource BooleanToInverseVisibilityConverter}}" />
+        <!-- 上下两组各自滚动；中间分隔条只调整布局，不改变任何目录配置。 -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" MinHeight="48" />
+                <RowDefinition Height="6" />
+                <RowDefinition Height="*" MinHeight="48" />
+            </Grid.RowDefinitions>
 
-        <ScrollViewer Style="{StaticResource NVScrollViewer}"
-                CanContentScroll="False"
-                VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
-                Visibility="{Binding HasItems, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <ItemsControl ItemsSource="{Binding Items}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type local:DestinationFolderPanelItem}">
-                        <Button Style="{StaticResource DestinationButtonStyle}"
-                                ToolTip="{Binding Path}"
-                                Command="{Binding DataContext.ClassifyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                CommandParameter="{Binding}">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="28" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{Binding Number}" FontWeight="Bold" VerticalAlignment="Center" />
-                                <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-                            </Grid>
-                        </Button>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+            <Grid Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Margin="8,3" FontWeight="Bold"
+                           Text="{properties:TextBinding DestinationFolderPanel.ManagedFolders}" />
+                <Grid Grid.Row="1">
+                    <TextBlock Margin="10" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Text="{properties:TextBinding DestinationFolderPanel.Empty}"
+                               Visibility="{Binding HasManagedItems, Converter={StaticResource BooleanToInverseVisibilityConverter}}" />
+                    <ScrollViewer Style="{StaticResource NVScrollViewer}" CanContentScroll="False"
+                                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                  Visibility="{Binding HasManagedItems, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <ItemsControl ItemsSource="{Binding ManagedItems}" ItemTemplate="{StaticResource DestinationFolderItemTemplate}" />
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+
+            <GridSplitter Grid.Row="1" Height="6" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                          ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" IsTabStop="False"
+                          Background="{DynamicResource Panel.Splitter}"
+                          ToolTip="{properties:TextBinding DestinationFolderPanel.ResizeSections}" />
+
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Margin="8,3" FontWeight="Bold"
+                           Text="{properties:TextBinding DestinationFolderPanel.CurrentFolderChildren}" />
+                <Grid Grid.Row="1">
+                    <TextBlock Margin="10" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Text="{properties:TextBinding DestinationFolderPanel.NoChildFolders}"
+                               Visibility="{Binding HasCurrentFolderItems, Converter={StaticResource BooleanToInverseVisibilityConverter}}" />
+                    <ScrollViewer Style="{StaticResource NVScrollViewer}" CanContentScroll="False"
+                                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                  Visibility="{Binding HasCurrentFolderItems, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <ItemsControl ItemsSource="{Binding CurrentFolderItems}" ItemTemplate="{StaticResource DestinationFolderItemTemplate}" />
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+        </Grid>
     </DockPanel>
 </UserControl>
