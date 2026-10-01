@@ -1,0 +1,29 @@
+name: Portable checks
+on:
+  push:
+    paths: ['portable/**', '.github/workflows/portable.yml']
+  pull_request:
+    paths: ['portable/**', '.github/workflows/portable.yml']
+permissions:
+  contents: read
+jobs:
+  modules:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      # 每个 runner 内串行构建，正式 AppKit Host 和系统交互单独验收。
+      - run: python3 portable/scripts/validate.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: portable-${{ matrix.os }}
+          path: |
+            portable/acceptance/latest-validation.json
+            portable/tests/NeeView.Portable.Tests/TestResults/portable.trx
