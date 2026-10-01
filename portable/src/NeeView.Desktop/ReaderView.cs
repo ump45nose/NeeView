@@ -42,6 +42,9 @@ public sealed class ReaderView : Control, IDisposable, IAsyncDisposable
     private readonly Dictionary<ReaderMode, ReadingAnchor> _modeAnchors = [];
     private readonly Dictionary<ContentId, CancellationTokenSource> _prefetch = [];
     private readonly HashSet<Task> _loads = [];
+    private readonly ReaderLayoutCoordinator _geometry = new();
+    private long _layoutRevision;
+    private long _layoutGeneration = -1;
     public event Action<double, double>? PanRequested;
     private double _viewportHeight = 600;
     private double _viewportWidth = 800;
@@ -74,6 +77,7 @@ public sealed class ReaderView : Control, IDisposable, IAsyncDisposable
             foreach (var request in _requests.Values) request.Cancel(); _requests.Clear();
             foreach (var display in _images.Values) display.Dispose(); _images.Clear(); _errors.Clear();
             _observed = null; _modeAnchors.Clear();
+            _layout = new([], 0); _layoutGeneration = -1;
             foreach (var request in _prefetch.Values) request.Cancel(); _prefetch.Clear();
         }
         var modeChanged = snapshot.Options.Mode != _snapshot.Options.Mode;
@@ -113,10 +117,27 @@ public sealed class ReaderView : Control, IDisposable, IAsyncDisposable
     /// <summary>按模式重新计算几何；通过锚点补偿尺寸晚到和窗口变化。</summary>
     private void Rebuild(bool restore)
     {
-        ILayoutStrategy strategy = _snapshot.Options.Mode switch { ReaderMode.Continuous => new ContinuousLayout(), ReaderMode.Masonry => new MasonryLayout(), _ => new PagedLayout() };
         var input = new LayoutInput(_snapshot.Index?.Pages ?? [], _snapshot.Options, _viewportWidth, _viewportHeight,
             _snapshot.Anchor, TopLevel.GetTopLevel(this)?.RenderScaling ?? 1);
-        _layout = strategy.Calculate(input); Height = Math.Max(_viewportHeight, _layout.Height);
+        var revision = ++_layoutRevision; var generation = _snapshot.Generation; _geometry.CancelPending();
+        if (_snapshot.Options.Mode == ReaderMode.Paged) ApplyLayout(new PagedLayout().Calculate(input), restore, generation);
+        else Track(CalculateAsync());
+        // 后台只返回纯几何；接受结果前检查视口/索引版本，防止旧布局覆盖当前模式。
+        async Task CalculateAsync()
+        {
+            try
+            {
+                var layout = await _geometry.CalculateAsync(input);
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                { if (!_disposed && revision == _layoutRevision && generation == _snapshot.Generation) ApplyLayout(layout, restore, generation); });
+            }
+            catch (OperationCanceledException) { }
+        }
+    }
+    /// <summary>在 UI 线程提交几何，按最新内容锚点补偿滚动；计算期间的用户滚动仍优先。</summary>
+    private void ApplyLayout(LayoutSnapshot layout, bool restore, long generation)
+    {
+        _layout = layout; _layoutGeneration = generation; Height = Math.Max(_viewportHeight, _layout.Height);
         Width = Math.Max(_viewportWidth, _layout.Items.Select(i => i.Bounds.X + i.Bounds.Width).DefaultIfEmpty(_viewportWidth).Max());
         if (restore && _snapshot.Options.Mode != ReaderMode.Paged)
         {
@@ -143,7 +164,7 @@ public sealed class ReaderView : Control, IDisposable, IAsyncDisposable
     /// <summary>更新可见和邻近资源；脱离范围的租约立即归还。</summary>
     private void UpdateDemands()
     {
-        if (_disposed || _session.Source is not { } source) return;
+        if (_disposed || _layoutGeneration != _snapshot.Generation || _session.Source is not { } source) return;
         var demand = _layout.Visible(Math.Max(0, _top - _viewportHeight * 0.5), _top + _viewportHeight * 1.5).ToArray();
         var needed = demand.Select(i => i.Page.Id).ToHashSet();
         foreach (var id in _requests.Keys.Where(id => !needed.Contains(id)).ToArray()) { _requests[id].Cancel(); _requests.Remove(id); }
@@ -301,5 +322,5 @@ public sealed class ReaderView : Control, IDisposable, IAsyncDisposable
     }
     /// <summary>取消需求并等待晚到任务归还像素和取消源；必须在 UI Dispatcher 仍运行时调用。</summary>
     public async ValueTask DisposeAsync()
-    { Dispose(); await Task.WhenAll(_loads.ToArray()); }
+    { Dispose(); _geometry.CancelPending(); await Task.WhenAll(_loads.ToArray()); await _geometry.DisposeAsync(); }
 }

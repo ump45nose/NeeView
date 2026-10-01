@@ -7,7 +7,7 @@ public readonly record struct RectD(double X, double Y, double Width, double Hei
 }
 public sealed record LayoutItem(PageDescriptor Page, int Part, RectD Bounds, bool Divided = false);
 public sealed record LayoutInput(IReadOnlyList<PageDescriptor> Pages, ReaderOptions Options,
-    double Width, double Height, ReadingAnchor? Anchor, double DeviceScale = 1);
+    double Width, double Height, ReadingAnchor? Anchor, double DeviceScale = 1, CancellationToken Cancellation = default);
 public interface ILayoutStrategy { LayoutSnapshot Calculate(LayoutInput input); }
 
 /// <summary>布局快照按列索引查询，避免每帧遍历万条目。</summary>
@@ -137,6 +137,7 @@ public sealed class ContinuousLayout : ILayoutStrategy
         var width = Math.Max(1, input.Width * input.Options.Zoom);
         foreach (var page in input.Pages)
         {
+            input.Cancellation.ThrowIfCancellationRequested();
             var height = width / ReadingRules.Size(page, input.Options).Aspect;
             items.Add(new(page, 0, new(Math.Max(0, (input.Width - width) / 2), y, width, height)));
             y += height + input.Options.Gap;
@@ -146,22 +147,46 @@ public sealed class ContinuousLayout : ILayoutStrategy
 }
 public sealed class MasonryLayout : ILayoutStrategy
 {
+    private const int SegmentSize = 256;
+    private sealed record Previous(LayoutInput Input, LayoutSnapshot Layout, Dictionary<int, double[]> Checkpoints);
+    private Previous? _previous;
     /// <summary>输入排序页面，按最短列投放；等高时按阅读方向选择。</summary>
     public LayoutSnapshot Calculate(LayoutInput input)
     {
+        input.Cancellation.ThrowIfCancellationRequested();
         var gap = input.Options.Gap;
         var count = Math.Max(1, (int)((input.Width + gap) / (Math.Max(80, input.Options.ColumnWidth * input.Options.Zoom) + gap)));
         var width = Math.Max(1, (input.Width - gap * (count - 1)) / count);
         var heights = new double[count]; var items = new List<LayoutItem>();
-        foreach (var page in input.Pages)
+        var checkpoints = new Dictionary<int, double[]> { [0] = new double[count] }; var start = 0;
+        if (_previous is { } previous && previous.Input.Width == input.Width && previous.Input.Options == input.Options)
         {
+            // 检查顺序/元数据相同的前缀，尺寸晚到只从之前的分段检查点重新投放。
+            var prefix = 0;
+            while (prefix < Math.Min(input.Pages.Count, previous.Input.Pages.Count) && input.Pages[prefix] == previous.Input.Pages[prefix])
+            { input.Cancellation.ThrowIfCancellationRequested(); prefix++; }
+            if (prefix == input.Pages.Count && prefix == previous.Input.Pages.Count) return previous.Layout;
+            start = prefix / SegmentSize * SegmentSize;
+            if (previous.Checkpoints.TryGetValue(start, out var saved))
+            {
+                heights = (double[])saved.Clone(); items.AddRange(previous.Layout.Items.Take(start));
+                checkpoints = previous.Checkpoints.Where(pair => pair.Key <= start).ToDictionary(pair => pair.Key, pair => pair.Value);
+            }
+            else start = 0;
+        }
+        for (var index = start; index < input.Pages.Count; index++)
+        {
+            input.Cancellation.ThrowIfCancellationRequested(); var page = input.Pages[index];
             var column = input.Options.Direction == ReadDirection.RightToLeft ? count - 1 : 0;
             var order = input.Options.Direction == ReadDirection.RightToLeft ? Enumerable.Range(0, count).Reverse() : Enumerable.Range(0, count);
             foreach (var candidate in order) if (heights[candidate] < heights[column]) column = candidate;
             var height = width / ReadingRules.Size(page, input.Options).Aspect;
             items.Add(new(page, 0, new(column * (width + gap), heights[column], width, height)));
             heights[column] += height + gap;
+            if ((index + 1) % SegmentSize == 0) checkpoints[index + 1] = (double[])heights.Clone();
         }
-        return new(items, heights.Max());
+        var result = new LayoutSnapshot(items, heights.Max());
+        // 只有成功计算才能替换缓存；取消不会留下半份高度状态。不得并发调用同一策略实例。
+        _previous = new(input with { Pages = input.Pages.ToArray(), Cancellation = default, Anchor = null }, result, checkpoints); return result;
     }
 }
