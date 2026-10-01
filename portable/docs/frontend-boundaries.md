@@ -6,7 +6,8 @@
 
 ```mermaid
 flowchart TB
-  Shell[MainWindow.axaml 页面结构] --> Window[MainWindow 宿主适配]
+  Window[MainWindow 宿主适配] --> Shell[ReaderShell.axaml 页面结构]
+  Shell -.命令事件.-> Window
   Window --> Navigation[ReaderNavigationPanel]
   Window --> Destinations[ReaderDestinationPanel]
   Window --> Viewer[ReaderView]
@@ -30,17 +31,17 @@ Desktop 的编译依赖仅指向 Application；它不引用具体内容、解码
 
 | 要调整的内容 | 修改位置 | 稳定边界 |
 |---|---|---|
-| 侧栏/工具栏/底部导航位置 | MainWindow.axaml | 保留命名插槽与按钮命令 Tag |
+| 侧栏/工具栏/底部导航位置 | ReaderShell.axaml | 保留命名插槽与按钮命令 Tag |
 | 页面/目录/历史/书签模板 | ReaderNavigationPanel | NavigationData、FolderNode、BookmarkNode |
 | 分类上下区和按钮外观 | ReaderDestinationPanel | DestinationData、SectionRatio、工作区动作 |
 | 设置页面布局 | SettingsWindow | SettingsSelection、AppSettings/ReaderOptions |
 | 主图绘制/占位/选择效果 | ReaderView、Styles/ReaderTheme.axaml | LayoutSnapshot 与像素租约 |
 | 间距、缩略图大小、设置页尺寸 | Styles/ReaderTheme.axaml | 稳定 reader-* 样式类与控件类型 |
-| 工具栏文案及枚举名称 | MainWindow.axaml、ReaderLabels | 不更改存储枚举或命令字符串 |
+| 工具栏文案及枚举名称 | ReaderShell.axaml、ReaderLabels | 不更改存储枚举或命令字符串 |
 | 键鼠绑定规则 | ReaderInputRouter | ShortcutBinding 与 ExecuteAsync |
 | 书签/分类/目录表现逻辑 | ReaderWorkspaceViewModel.Panels | 应用接口与 IReaderDialogs |
 
-主页面结构已迁入 MainWindow.axaml；MainWindow.cs 负责接口装配、事件适配与生命周期。控件不持有 MainWindow 引用，面板内也不通过全局 Application.MainWindow 寻找服务。ReaderPanelControls 捕获事件异常并交给 ViewModel。其余面板的构造式 UI 可以逐个改为 XAML，保持表现模型/数据契约不变。
+主页面结构已迁入 ReaderShell.axaml；ReaderShell 可无服务独立实例化，通过 CommandRequested 发布命令。MainWindow.cs 负责接口装配、事件适配与生命周期。控件不持有 MainWindow 引用，面板内也不通过全局 Application.MainWindow 寻找服务。ReaderPanelControls 捕获事件异常并交给 ViewModel。其余面板的构造式 UI 可以逐个改为 XAML，保持表现模型/数据契约不变。
 
 ## 页面结构与样式入口
 

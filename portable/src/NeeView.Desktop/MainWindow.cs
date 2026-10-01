@@ -6,7 +6,6 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Layout;
-using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
@@ -17,7 +16,7 @@ using NeeView.Core;
 namespace NeeView.Desktop;
 
 /// <summary>主窗口仅调用应用契约，面板虚拟化和查看器共用会话。</summary>
-public sealed partial class MainWindow : Window, IReaderDialogs
+public sealed class MainWindow : Window, IReaderDialogs
 {
     private readonly ReaderWorkspaceViewModel _workspace;
     private readonly IReaderSession _session;
@@ -50,12 +49,13 @@ public sealed partial class MainWindow : Window, IReaderDialogs
         IPlatformService platform, ILegacyImporter importer, IImageRequestScheduler scheduler, IImageDecoder decoder)
     {
         // 视觉结构由 XAML 独立定义；宿主只解析稳定插槽和装配应用接口。
-        AvaloniaXamlLoader.Load(this);
-        _status = this.FindControl<TextBlock>("StatusField")!;
-        _address = this.FindControl<TextBox>("AddressField")!;
-        _body = this.FindControl<Grid>("BodyGrid")!;
-        _position = this.FindControl<Slider>("PositionField")!;
-        _scroll = this.FindControl<ScrollViewer>("ViewerScroll")!;
+        var shell = new ReaderShell(); Content = shell; Classes.Add("reader-shell"); Title = "NeeView · macOS";
+        _status = shell.FindControl<TextBlock>("StatusField")!;
+        _address = shell.FindControl<TextBox>("AddressField")!;
+        _body = shell.FindControl<Grid>("BodyGrid")!;
+        _position = shell.FindControl<Slider>("PositionField")!;
+        _scroll = shell.FindControl<ScrollViewer>("ViewerScroll")!;
+        shell.CommandRequested += OnToolbarCommand;
         _session = session; _settingsStore = settings; _states = states; _files = files; _importer = importer;
         _workspace = new(session, settings, states, files, destinations, platform, folders) { Dialogs = this };
         DataContext = _workspace;
@@ -78,9 +78,9 @@ public sealed partial class MainWindow : Window, IReaderDialogs
                 await _session.LocateAsync(new(index.Pages[Math.Clamp((int)_position.Value, 0, index.Pages.Count - 1)].Id));
         };
         _navigation = new(_workspace, session, scheduler);
-        this.FindControl<ContentControl>("NavigationHost")!.Content = _navigation;
+        shell.FindControl<ContentControl>("NavigationHost")!.Content = _navigation;
         _destinationPanel = new(_workspace, RefreshDestinationsAsync);
-        this.FindControl<ContentControl>("DestinationsHost")!.Content = _destinationPanel;
+        shell.FindControl<ContentControl>("DestinationsHost")!.Content = _destinationPanel;
         _session.Changed += SnapshotChanged;
         AddHandler(KeyDownEvent, (_, e) => _input.KeyDown(this, e), Avalonia.Interactivity.RoutingStrategies.Tunnel);
         _viewer.AddHandler(PointerWheelChangedEvent, (_, e) => _input.Wheel(e), Avalonia.Interactivity.RoutingStrategies.Tunnel);
@@ -99,12 +99,11 @@ public sealed partial class MainWindow : Window, IReaderDialogs
         });
     }
     /// <summary>适配 XAML 按钮的稳定命令标识，捕获异步异常；排布与文案不影响命令实现。</summary>
-    /// <param name="sender">带有命令 Tag 的工具栏按钮。</param>
-    /// <param name="e">按钮点击事件。</param>
-    private async void OnToolbarClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    /// <param name="command">页面外壳发布的稳定命令标识。</param>
+    private void OnToolbarCommand(string command)
     {
-        if (sender is not Button { Tag: string command } || _closing) return;
-        await ObserveAsync(command switch { "Settings" => EditSettingsAsync, "Import" => ImportAsync, _ => () => ExecuteAsync(command) });
+        if (_closing) return;
+        _ = ObserveAsync(command switch { "Settings" => EditSettingsAsync, "Import" => ImportAsync, _ => () => ExecuteAsync(command) });
     }
     /// <summary>同步投递阅读表现更新；后台面板任务可等待、可取消，错误统一观察。</summary>
     private void SnapshotChanged(ReaderSnapshot snapshot) => Dispatcher.UIThread.Post(() =>
