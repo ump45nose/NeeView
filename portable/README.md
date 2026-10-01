@@ -55,4 +55,4 @@ MainWindow 组合独立 ReaderNavigationPanel、ReaderDestinationPanel、ReaderV
 
 validate.py 串行构建、测试、生成 12 张混合横竖 4K JPEG/CBZ、真实目录与归档解码、退出恢复；生成 acceptance/latest-validation.json。--benchmarks 额外生成四个服务链路报告，96 次采样，每次空像素缓存，OS 文件缓存未清空；不包含绘制帧。结束后强制 GC 数据仅为诊断。
 
-Preview 的 RuntimeIdentifiers 固定为 osx-arm64、osx-x64、linux-x64，发布不会改写开发锁文件。CI 已配置 macOS/Linux 模块及解码冒烟，当前未推送，远端尚未执行。自动脚本使用自己的临时状态目录，不导入或移动用户图片。
+共享 net10.0 工程与 Preview 的 RuntimeIdentifiers 固定为 osx-arm64、osx-x64、linux-x64，发布不会改写开发锁文件。CI 已配置 macOS/Linux 模块及解码冒烟，当前未推送，远端尚未执行。自动脚本使用自己的临时状态目录，不导入或移动用户图片。
