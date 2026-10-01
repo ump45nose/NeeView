@@ -19,8 +19,10 @@ public sealed class ThumbnailView : Control
     private CancellationTokenSource? _cancellation;
     private DecodedImageLease? _lease;
     private WriteableBitmap? _bitmap;
+    /// <summary>输入条目及应用接口，建立无持久化依赖的缩略图控件。</summary>
     public ThumbnailView(PageDescriptor page, IReaderSession session, IImageRequestScheduler scheduler)
     { _page = page; _session = session; _scheduler = scheduler; Width = 48; Height = 64; }
+    /// <summary>控件可见后提交需求，取消源由加载任务最终释放。</summary>
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     { base.OnAttachedToVisualTree(e); _cancellation = new(); _ = LoadAsync(_cancellation); }
     /// <summary>只有附着且代次匹配时显示缩略图。</summary>
@@ -42,10 +44,18 @@ public sealed class ThumbnailView : Control
         }
         catch (OperationCanceledException) { }
         catch (ReaderException) { }
-        finally { lease?.Dispose(); }
+        catch (Exception error) { System.Diagnostics.Trace.WriteLine("thumbnail: " + error.Message); }
+        finally
+        {
+            lease?.Dispose();
+            await Dispatcher.UIThread.InvokeAsync(() => { if (_cancellation == cancellation) _cancellation = null; });
+            cancellation.Dispose();
+        }
     }
+    /// <summary>控件移出虚拟化列表时取消需求，并立即归还显示资源。</summary>
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
-    { _cancellation?.Cancel(); _bitmap?.Dispose(); _lease?.Dispose(); _bitmap = null; _lease = null; base.OnDetachedFromVisualTree(e); }
+    { _cancellation?.Cancel(); _cancellation = null; _bitmap?.Dispose(); _lease?.Dispose(); _bitmap = null; _lease = null; base.OnDetachedFromVisualTree(e); }
+    /// <summary>输入绘制上下文，只绘制当前有效位图；后台需求不进入绘制线程。</summary>
     public override void Render(DrawingContext context)
     { base.Render(context); if (_bitmap is not null) context.DrawImage(_bitmap, new Rect(Bounds.Size)); }
 }

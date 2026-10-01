@@ -12,12 +12,19 @@ using NeeView.Core;
 namespace NeeView.Desktop;
 
 /// <summary>虚拟化查看器：单一绘制控件，图像资源仅覆盖可见和邻近区域。</summary>
-public sealed class ReaderView : Control, IDisposable
+public sealed class ReaderView : Control, IDisposable, IAsyncDisposable
 {
-    private sealed class Display(DecodedImageLease lease, WriteableBitmap bitmap, ContentVersion version) : IDisposable
+    public static readonly StyledProperty<IBrush> CanvasBrushProperty = AvaloniaProperty.Register<ReaderView, IBrush>(nameof(CanvasBrush), Brushes.Black);
+    public static readonly StyledProperty<IBrush> PlaceholderBrushProperty = AvaloniaProperty.Register<ReaderView, IBrush>(nameof(PlaceholderBrush), Brushes.DimGray);
+    public static readonly StyledProperty<IBrush> SelectionBrushProperty = AvaloniaProperty.Register<ReaderView, IBrush>(nameof(SelectionBrush), Brushes.DodgerBlue);
+    public IBrush CanvasBrush { get => GetValue(CanvasBrushProperty); set => SetValue(CanvasBrushProperty, value); }
+    public IBrush PlaceholderBrush { get => GetValue(PlaceholderBrushProperty); set => SetValue(PlaceholderBrushProperty, value); }
+    public IBrush SelectionBrush { get => GetValue(SelectionBrushProperty); set => SetValue(SelectionBrushProperty, value); }
+    private sealed class Display(DecodedImageLease lease, WriteableBitmap bitmap, ContentVersion version, int requestedWidth) : IDisposable
     {
         public DecodedImageLease Lease = lease; public WriteableBitmap Bitmap = bitmap;
         public ContentVersion Version = version;
+        public int RequestedWidth = requestedWidth;
         public void Dispose() { Bitmap.Dispose(); Lease.Dispose(); }
     }
     private readonly IReaderSession _session;
@@ -29,10 +36,18 @@ public sealed class ReaderView : Control, IDisposable
     private LayoutSnapshot _layout = new([], 0);
     private ReaderSnapshot _snapshot;
     private double _top;
+    private double _left;
+    private double? _pinchStartZoom;
+    private (ContentId Content, double X, double Y, Point Screen)? _zoomFocus;
+    private readonly Dictionary<ReaderMode, ReadingAnchor> _modeAnchors = [];
+    private readonly Dictionary<ContentId, CancellationTokenSource> _prefetch = [];
+    private readonly HashSet<Task> _loads = [];
+    public event Action<double, double>? PanRequested;
     private double _viewportHeight = 600;
     private double _viewportWidth = 800;
     private bool _disposed;
     private ReadingAnchor? _observed;
+    public Func<string, Task<bool>>? MouseGesture { get; set; }
     public event Action<double>? ScrollRequested;
     public LayoutSnapshot Layout => _layout;
     public ReaderView(IReaderSession session, IImageRequestScheduler scheduler, IImageDecoder decoder)
@@ -40,12 +55,16 @@ public sealed class ReaderView : Control, IDisposable
         _session = session; _scheduler = scheduler; _decoder = decoder; _snapshot = session.Snapshot;
         Focusable = true; ClipToBounds = true;
         PointerPressed += OnPointerPressed;
-        DoubleTapped += async (_, _) => { if (_snapshot.Anchor is { } anchor) { await session.SetOptionsAsync(_snapshot.Options with { Mode = ReaderMode.Paged }); await session.LocateAsync(anchor); } };
-        Pinch += (_, e) => { _ = session.SetOptionsAsync(_snapshot.Options with { Zoom = Math.Clamp(_snapshot.Options.Zoom * e.Scale, 0.1, 8) }); e.Handled = true; };
+        DoubleTapped += async (_, _) => { if (MouseGesture is not null && await MouseGesture("DoubleClick")) return; if (_snapshot.Anchor is { } anchor) { await session.SetOptionsAsync(_snapshot.Options with { Mode = ReaderMode.Paged }); await session.LocateAsync(anchor); } };
+        // Pinch.Scale 是从手势起点累计的比例；原生 magnify.Delta 则为本次增量，分别处理避免重复放大。
+        Pinch += (_, e) => { _pinchStartZoom ??= _snapshot.Options.Zoom; _ = ZoomAtAsync(_pinchStartZoom.Value * e.Scale, e.ScaleOrigin); e.Handled = true; };
+        PinchEnded += (_, _) => _pinchStartZoom = null;
+        PointerTouchPadGestureMagnify += (_, e) => { _ = ZoomAtAsync(_snapshot.Options.Zoom * Math.Max(0.1, 1 + e.Delta.Y), e.GetPosition(this)); e.Handled = true; };
     }
     /// <summary>更新快照；切书取消旧需求并释放显示资源。</summary>
     public void SetSnapshot(ReaderSnapshot snapshot)
     {
+        if (_disposed) return;
         var generationChanged = snapshot.Generation != _snapshot.Generation;
         var anchorChanged = snapshot.Anchor != _snapshot.Anchor;
         var geometryChanged = generationChanged || snapshot.Options != _snapshot.Options
@@ -54,9 +73,17 @@ public sealed class ReaderView : Control, IDisposable
         {
             foreach (var request in _requests.Values) request.Cancel(); _requests.Clear();
             foreach (var display in _images.Values) display.Dispose(); _images.Clear(); _errors.Clear();
-            _observed = null;
+            _observed = null; _modeAnchors.Clear();
+            foreach (var request in _prefetch.Values) request.Cancel(); _prefetch.Clear();
         }
         var modeChanged = snapshot.Options.Mode != _snapshot.Options.Mode;
+        if (modeChanged && _snapshot.Anchor is { } oldAnchor) _modeAnchors[_snapshot.Options.Mode] = oldAnchor;
+        if (modeChanged && _modeAnchors.TryGetValue(snapshot.Options.Mode, out var remembered) && remembered.Content == snapshot.Anchor?.Content)
+        {
+            snapshot = snapshot with { Anchor = remembered };
+            _ = _session.LocateAsync(remembered);
+        }
+        if (!ReferenceEquals(snapshot.Index?.Pages, _snapshot.Index?.Pages)) _errors.Clear();
         _snapshot = snapshot;
         if (geometryChanged || snapshot.Options.Mode == ReaderMode.Paged && anchorChanged) Rebuild(true);
         else
@@ -66,12 +93,13 @@ public sealed class ReaderView : Control, IDisposable
         }
     }
     /// <summary>输入视口尺寸和滚动量，更新可见需求并回报内容锚点。</summary>
-    public void SetViewport(double width, double height, double top, bool observe = true)
+    public void SetViewport(double width, double height, double top, bool observe = true, double left = 0)
     {
+        if (_disposed) return;
         var changed = Math.Abs(width - _viewportWidth) > 0.5 || Math.Abs(height - _viewportHeight) > 0.5;
-        _viewportWidth = Math.Max(1, width); _viewportHeight = Math.Max(1, height); _top = Math.Max(0, top);
+        _viewportWidth = Math.Max(1, width); _viewportHeight = Math.Max(1, height); _top = Math.Max(0, top); _left = Math.Max(0, left);
         if (changed) Rebuild(true); else UpdateDemands();
-        if (observe && _snapshot.Options.Mode != ReaderMode.Paged)
+        if (observe && !_snapshot.Loading && _snapshot.Options.Mode != ReaderMode.Paged)
         {
             var item = _layout.Visible(_top, _top + _viewportHeight).OrderBy(i => i.Bounds.Y).FirstOrDefault(i => i.Bounds.Bottom > _top);
             if (item is not null)
@@ -96,7 +124,21 @@ public sealed class ReaderView : Control, IDisposable
             ScrollRequested?.Invoke(_top);
         }
         else if (restore) { _top = 0; ScrollRequested?.Invoke(0); }
+        if (_zoomFocus is { } focus && _layout.Items.FirstOrDefault(i => i.Page.Id == focus.Content) is { } focused)
+        {
+            _zoomFocus = null;
+            var x = Math.Max(0, focused.Bounds.X + focused.Bounds.Width * focus.X - focus.Screen.X);
+            _top = Math.Max(0, focused.Bounds.Y + focused.Bounds.Height * focus.Y - focus.Screen.Y);
+            PanRequested?.Invoke(x, _top);
+        }
         UpdateDemands(); InvalidateVisual();
+    }
+    /// <summary>输入目标倍数和内容坐标，缩放围绕指针命中的图片位置。</summary>
+    public Task ZoomAtAsync(double zoom, Point point)
+    {
+        var item = _layout.Visible(_top, _top + _viewportHeight).FirstOrDefault(i => new Rect(i.Bounds.X, i.Bounds.Y, i.Bounds.Width, i.Bounds.Height).Contains(point));
+        if (item is not null) _zoomFocus = (item.Page.Id, (point.X - item.Bounds.X) / item.Bounds.Width, (point.Y - item.Bounds.Y) / item.Bounds.Height, new(point.X - _left, point.Y - _top));
+        return _session.SetOptionsAsync(_snapshot.Options with { Zoom = Math.Clamp(zoom, 0.1, 8) });
     }
     /// <summary>更新可见和邻近资源；脱离范围的租约立即归还。</summary>
     private void UpdateDemands()
@@ -110,12 +152,41 @@ public sealed class ReaderView : Control, IDisposable
         {
             if (_images.TryGetValue(item.Page.Id, out var existing) && existing.Version != item.Page.Version)
             { existing.Dispose(); _images.Remove(item.Page.Id); _errors.Remove(item.Page.Id); }
-            if (_images.ContainsKey(item.Page.Id) || _requests.ContainsKey(item.Page.Id) || _errors.ContainsKey(item.Page.Id)) continue;
+            var desired = RequestWidth(item);
+            if (_images.TryGetValue(item.Page.Id, out var shown) && (shown.RequestedWidth >= desired || item.Page.Size is { } original && shown.Lease.Size.Width >= original.Width)) continue;
+            if (_requests.ContainsKey(item.Page.Id) || _errors.ContainsKey(item.Page.Id)) continue;
             var cancellation = new CancellationTokenSource(); _requests.Add(item.Page.Id, cancellation);
             var priority = item.Page.Id == _snapshot.Anchor?.Content ? ImagePriority.Current
                 : item.Bounds.Intersects(_top, _top + _viewportHeight) ? ImagePriority.Visible : ImagePriority.Prefetch;
-            _ = LoadAsync(source, item, priority, _snapshot.Generation, cancellation);
+            Track(LoadAsync(source, item, priority, _snapshot.Generation, cancellation));
         }
+        UpdatePagedPrefetch(source);
+    }
+    /// <summary>按显示设备像素计算解码需求，分割页请求完整图片宽度。</summary>
+    private int RequestWidth(LayoutItem item) => Math.Clamp((int)Math.Ceiling((_snapshot.Options.Mode == ReaderMode.Paged ? _viewportWidth * _snapshot.Options.Zoom : item.Bounds.Width * (item.Divided ? 2 : 1)) * (TopLevel.GetTopLevel(this)?.RenderScaling ?? 2)), 128, 8192);
+    /// <summary>分页几何只有当前 frame，另行预取序列中的前后两页；退出范围即取消。</summary>
+    private void UpdatePagedPrefetch(IContentSource source)
+    {
+        var pages = _snapshot.Index?.Pages ?? [];
+        var index = pages.ToList().FindIndex(p => p.Id == _snapshot.Anchor?.Content);
+        var wanted = _snapshot.Options.Mode == ReaderMode.Paged ? pages.Skip(Math.Max(0, index - 2)).Take(5).Where(p => !_layout.Items.Any(i => i.Page.Id == p.Id)).ToArray() : [];
+        var ids = wanted.Select(p => p.Id).ToHashSet();
+        foreach (var id in _prefetch.Keys.Where(id => !ids.Contains(id)).ToArray()) { _prefetch[id].Cancel(); _prefetch.Remove(id); }
+        foreach (var page in wanted)
+        {
+            if (_prefetch.ContainsKey(page.Id)) continue;
+            var cancellation = new CancellationTokenSource(); _prefetch.Add(page.Id, cancellation);
+            Track(PrefetchAsync(source, page, cancellation));
+        }
+    }
+    /// <summary>预取只持有缓存租约至完成，绝不创建 Avalonia Bitmap。</summary>
+    private async Task PrefetchAsync(IContentSource source, PageDescriptor page, CancellationTokenSource cancellation)
+    {
+        try { using var lease = await _scheduler.RequestAsync(source, new(page, Math.Clamp((int)(_viewportWidth * _snapshot.Options.Zoom * (TopLevel.GetTopLevel(this)?.RenderScaling ?? 2)), 128, 8192), 16384), ImagePriority.Prefetch, cancellation.Token); }
+        catch (OperationCanceledException) { }
+        catch (ReaderException) { }
+        catch (Exception error) { System.Diagnostics.Trace.WriteLine("prefetch: " + error.Message); }
+        finally { await Dispatcher.UIThread.InvokeAsync(() => { if (_prefetch.GetValueOrDefault(page.Id) == cancellation) _prefetch.Remove(page.Id); }); cancellation.Dispose(); }
     }
     /// <summary>后台探测/解码，代次检查后在 UI 线程创建显示资源。</summary>
     private async Task LoadAsync(IContentSource source, LayoutItem item, ImagePriority priority, long generation, CancellationTokenSource cancellation)
@@ -129,8 +200,7 @@ public sealed class ReaderView : Control, IDisposable
                 var info = await _decoder.ProbeAsync(stream, cancellation.Token);
                 await _session.ReportSizeAsync(item.Page.Id, info.Size, generation);
             }
-            var scale = TopLevel.GetTopLevel(this)?.RenderScaling ?? 2;
-            var width = Math.Clamp((int)Math.Ceiling(item.Bounds.Width * scale * (item.Divided ? 2 : 1)), 128, 8192);
+            var width = RequestWidth(item);
             lease = await _scheduler.RequestAsync(source, new(item.Page, width, 16384), priority, cancellation.Token);
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -142,7 +212,8 @@ public sealed class ReaderView : Control, IDisposable
                     for (var row = 0; row < lease.Size.Height; row++)
                         Marshal.Copy(bytes, row * lease.Stride, framebuffer.Address + row * framebuffer.RowBytes, lease.Stride);
                 }
-                _images[item.Page.Id] = new(lease, bitmap, item.Page.Version); lease = null; InvalidateVisual();
+                if (_images.Remove(item.Page.Id, out var previous)) previous.Dispose();
+                _images[item.Page.Id] = new(lease, bitmap, item.Page.Version, width); lease = null; InvalidateVisual();
             });
         }
         catch (OperationCanceledException) { }
@@ -162,7 +233,7 @@ public sealed class ReaderView : Control, IDisposable
     /// <summary>绘制视口中的图像/错误占位，保留损坏条目的导航身份。</summary>
     public override void Render(DrawingContext context)
     {
-        base.Render(context); context.FillRectangle(new SolidColorBrush(Color.Parse("#15181D")), new Rect(Bounds.Size));
+        base.Render(context); context.FillRectangle(CanvasBrush, new Rect(Bounds.Size));
         foreach (var item in _layout.Visible(_top, _top + _viewportHeight))
         {
             var bounds = new Rect(item.Bounds.X, item.Bounds.Y, item.Bounds.Width, item.Bounds.Height);
@@ -193,12 +264,12 @@ public sealed class ReaderView : Control, IDisposable
             }
             else
             {
-                context.FillRectangle(new SolidColorBrush(Color.Parse("#262C35")), bounds);
+                context.FillRectangle(PlaceholderBrush, bounds);
                 var text = new FormattedText(_errors.TryGetValue(item.Page.Id, out var error) ? $"{item.Page.Name}\n{error}" : item.Page.Name,
                     System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, Typeface.Default, 13, Brushes.LightGray);
                 context.DrawText(text, bounds.TopLeft + new Vector(8, 8));
             }
-            if (item.Page.Id == _snapshot.Selection) context.DrawRectangle(null, new Pen(Brushes.DodgerBlue, 3), bounds);
+            if (item.Page.Id == _snapshot.Selection) context.DrawRectangle(null, new Pen(SelectionBrush, 3), bounds);
         }
     }
     /// <summary>点击明确选择操作对象；在瀑布流中滚动不改变选择。</summary>
@@ -207,11 +278,28 @@ public sealed class ReaderView : Control, IDisposable
         Focus(); var point = e.GetPosition(this);
         var item = _layout.Visible(_top, _top + _viewportHeight).FirstOrDefault(i => new Rect(i.Bounds.X, i.Bounds.Y, i.Bounds.Width, i.Bounds.Height).Contains(point));
         if (item is not null) await _session.LocateAsync(new(item.Page.Id, item.Part), true);
+        if (MouseGesture is not null && e.ClickCount == 1)
+        {
+            var properties = e.GetCurrentPoint(this).Properties;
+            var gesture = properties.IsRightButtonPressed ? "RightClick" : properties.IsMiddleButtonPressed ? "MiddleClick" : "LeftClick";
+            if (await MouseGesture(gesture)) e.Handled = true;
+        }
     }
     /// <summary>取消需求并释放全部显示租约。</summary>
     public void Dispose()
     {
-        _disposed = true; foreach (var request in _requests.Values) request.Cancel(); _requests.Clear();
+        _disposed = true; foreach (var request in _prefetch.Values) request.Cancel(); _prefetch.Clear(); foreach (var request in _requests.Values) request.Cancel(); _requests.Clear();
         foreach (var display in _images.Values) display.Dispose(); _images.Clear();
     }
+    /// <summary>追踪后台资源任务，在 UI 线程移除完成项；窗口关闭能等待请求收束。</summary>
+    private void Track(Task task)
+    {
+        _loads.Add(task);
+        _ = ObserveAsync();
+        async Task ObserveAsync()
+        { try { await task; } catch (Exception error) { System.Diagnostics.Trace.WriteLine("reader-load: " + error.Message); } finally { _loads.Remove(task); } }
+    }
+    /// <summary>取消需求并等待晚到任务归还像素和取消源；必须在 UI Dispatcher 仍运行时调用。</summary>
+    public async ValueTask DisposeAsync()
+    { Dispose(); await Task.WhenAll(_loads.ToArray()); }
 }

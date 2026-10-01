@@ -15,6 +15,11 @@ public sealed class ReaderSession : IReaderSession
     private CancellationTokenSource? _saveDelay;
     private long _openVersion;
     private bool _disposed;
+    private readonly List<Task> _retired = [];
+    private CancellationTokenSource? _indexCancellation;
+    private Task _indexTask = Task.CompletedTask;
+    private long _indexRevision;
+    private long _navigationRevision;
     public ReaderSnapshot Snapshot { get; private set; } = new(0, null, null, null, new(), false, null);
     public IContentSource? Source { get; private set; }
     public event Action<ReaderSnapshot>? Changed;
@@ -45,17 +50,28 @@ public sealed class ReaderSession : IReaderSession
     {
         var version = Interlocked.Increment(ref _openVersion);
         var cancellation = CancellationTokenSource.CreateLinkedTokenSource(token);
-        Interlocked.Exchange(ref _opening, cancellation)?.Cancel();
-        return Enqueue(async () =>
+        Cancel(Interlocked.Exchange(ref _opening, cancellation));
+        Task continuation = Task.CompletedTask;
+        var queued = Enqueue(async () =>
         {
             IContentSource? candidate = null;
+            IAsyncEnumerator<SourceIndex>? batches = null;
+            CancellationTokenSource? indexing = null;
             try
             {
                 if (version != _openVersion) return;
                 await SaveCurrentAsync();
                 Publish(Snapshot with { Loading = true, Error = null });
                 candidate = await _factory.OpenAsync(request, cancellation.Token);
-                var index = await candidate.IndexAsync(cancellation.Token);
+                SourceIndex index;
+                if (candidate is IProgressiveContentSource progressive)
+                {
+                    indexing = CancellationTokenSource.CreateLinkedTokenSource(cancellation.Token);
+                    batches = progressive.IndexBatchesAsync(indexing.Token).GetAsyncEnumerator();
+                    if (!await batches.MoveNextAsync()) throw new InvalidDataException("来源未返回索引。");
+                    index = batches.Current;
+                }
+                else index = await candidate.IndexAsync(cancellation.Token);
                 var settings = await _settings.LoadAsync(cancellation.Token);
                 var saved = await _states.GetAsync(index.Book, cancellation.Token);
                 cancellation.Token.ThrowIfCancellationRequested();
@@ -69,31 +85,89 @@ public sealed class ReaderSession : IReaderSession
                         || p.Locator.Entry?.Replace('\\', '/') == legacy.Replace('\\', '/'));
                     if (page is not null) anchor = new(page.Id);
                 }
-                if (!index.Pages.Any(p => p.Id == anchor?.Content)) anchor = index.Pages.Count > 0 ? new(index.Pages[0].Id) : null;
+                // 首批不是完整索引；历史锚点尚未枚举到时保留，不能误判为内容已删除。
+                if (anchor is null || batches is null && !index.Pages.Any(p => p.Id == anchor.Content)) anchor = index.Pages.Count > 0 ? new(index.Pages[0].Id) : null;
+                Cancel(_indexCancellation);
                 var previous = Source; Source = candidate; candidate = null;
-                Publish(new(Snapshot.Generation + 1, index, anchor, null, options, false, null));
-                if (previous is not null) await previous.DisposeAsync();
-                await _settings.SaveAsync(settings with { LastSource = index.Locator.Path });
+                Publish(new(Snapshot.Generation + 1, index, anchor, null, options, batches is not null, null));
+                if (batches is not null)
+                {
+                    // 旧索引即使晚到也仍属于会话，退出前统一等待其释放来源资源。
+                    if (!_indexTask.IsCompletedSuccessfully) _retired.Add(_indexTask);
+                    _indexCancellation = indexing;
+                    continuation = _indexTask = ContinueIndexAsync(batches, indexing!, Snapshot.Generation, ++_indexRevision,
+                        index.RequestedContent is null ? saved?.LegacyPage : null, _navigationRevision);
+                    batches = null; indexing = null;
+                }
+                if (previous is not null) _retired.Add(previous.DisposeAsync().AsTask());
+                _retired.RemoveAll(t => t.IsCompletedSuccessfully);
+                await _settings.UpdateAsync(s => s with { LastSource = index.Locator.Path });
             }
             catch (OperationCanceledException) { if (version == _openVersion) Publish(Snapshot with { Loading = false }); }
             catch (Exception error) { if (version == _openVersion) Publish(Snapshot with { Loading = false, Error = ReaderException.From(error).Message }); }
             finally
             {
+                if (batches is not null) await batches.DisposeAsync();
+                indexing?.Dispose();
                 if (candidate is not null) await candidate.DisposeAsync();
                 Interlocked.CompareExchange(ref _opening, null, cancellation);
                 cancellation.Dispose();
             }
         });
+        return FinishAsync();
+        // 打开任务在索引完成后结束，但会话队列和首图显示不等待后台枚举。
+        async Task FinishAsync() { await queued; await continuation; }
+    }
+    /// <summary>渐进索引后台推进，逐批回到会话队列；排序、尺寸和当前身份均保留。</summary>
+    private async Task ContinueIndexAsync(IAsyncEnumerator<SourceIndex> batches, CancellationTokenSource cancellation, long generation, long revision,
+        string? legacyPage, long navigationRevision)
+    {
+        try
+        {
+            while (await batches.MoveNextAsync())
+            {
+                var next = batches.Current;
+                await Enqueue(() =>
+                {
+                    if (Snapshot.Generation != generation || revision != _indexRevision || cancellation.IsCancellationRequested) return Task.CompletedTask;
+                    var sizes = Snapshot.Index?.Pages.ToDictionary(p => p.Id, p => p.Size) ?? [];
+                    next = next with { Pages = PageOrdering.Sort(next.Pages.Select(p => p with { Size = sizes.GetValueOrDefault(p.Id) }), Snapshot.Options) };
+                    var anchor = Snapshot.Anchor ?? (next.Pages.Count > 0 ? new ReadingAnchor(next.Pages[0].Id) : null);
+                    if (_navigationRevision == navigationRevision && legacyPage is not null && next.Pages.FirstOrDefault(p => p.Name.Replace('\\', '/') == legacyPage.Replace('\\', '/')) is { } restored)
+                    { anchor = new(restored.Id); legacyPage = null; }
+                    Publish(Snapshot with { Index = next, Anchor = anchor });
+                    return Task.CompletedTask;
+                });
+            }
+            await Enqueue(() =>
+            {
+                if (Snapshot.Generation == generation && revision == _indexRevision)
+                {
+                    var anchor = Snapshot.Anchor;
+                    if (Snapshot.Index is { } complete && !complete.Pages.Any(p => p.Id == anchor?.Content)) anchor = complete.Pages.FirstOrDefault() is { } first ? new(first.Id) : null;
+                    Publish(Snapshot with { Loading = false, Anchor = anchor });
+                }
+                return Task.CompletedTask;
+            });
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception error)
+        {
+            await Enqueue(() => { if (Snapshot.Generation == generation && revision == _indexRevision) Publish(Snapshot with { Loading = false, Error = ReaderException.From(error).Message }); return Task.CompletedTask; });
+        }
+        finally { await batches.DisposeAsync(); Interlocked.CompareExchange(ref _indexCancellation, null, cancellation); cancellation.Dispose(); }
     }
     /// <summary>按阅读 frame 或单资源导航，锚点保持内容身份。</summary>
     public Task NavigateAsync(int direction, bool onePage = false) => Enqueue(() =>
     {
+        ++_navigationRevision;
         if (Snapshot.Index is { } index) Publish(Snapshot with { Anchor = ReadingRules.Navigate(index.Pages, Snapshot.Anchor, Snapshot.Options, direction, onePage) });
         ScheduleSave(); return Task.CompletedTask;
     });
     /// <summary>定位内容或更新显式选择；不以滚动锚点替代分类选择。</summary>
     public Task LocateAsync(ReadingAnchor anchor, bool select = false) => Enqueue(() =>
     {
+        ++_navigationRevision;
         if (Snapshot.Index?.Pages.Any(p => p.Id == anchor.Content) == true)
             Publish(Snapshot with { Anchor = anchor, Selection = select ? anchor.Content : Snapshot.Selection });
         ScheduleSave(); return Task.CompletedTask;
@@ -117,19 +191,20 @@ public sealed class ReaderSession : IReaderSession
     public Task RefreshAsync(ContentId? prefer = null) => Enqueue(async () =>
     {
         if (Source is null) return;
+        Cancel(_indexCancellation); ++_indexRevision;
         var old = Snapshot.Index?.Pages.ToList().FindIndex(p => p.Id == Snapshot.Anchor?.Content) ?? 0;
         var fresh = await Source.IndexAsync(CancellationToken.None);
         var sizes = Snapshot.Index?.Pages.ToDictionary(p => p.Id, p => p.Size) ?? [];
         fresh = fresh with { Pages = PageOrdering.Sort(fresh.Pages.Select(p => p with { Size = sizes.GetValueOrDefault(p.Id) }), Snapshot.Options) };
         var chosen = prefer ?? Snapshot.Anchor?.Content;
         var page = fresh.Pages.FirstOrDefault(p => p.Id == chosen) ?? fresh.Pages.ElementAtOrDefault(Math.Clamp(old, 0, Math.Max(0, fresh.Pages.Count - 1)));
-        Publish(Snapshot with { Index = fresh, Anchor = page is null ? null : new(page.Id), Selection = null });
+        Publish(Snapshot with { Index = fresh, Anchor = page is null ? null : new(page.Id), Selection = null, Loading = false });
         await SaveCurrentAsync();
     });
     /// <summary>一秒防抖保存；保存消息仍在会话队列执行。</summary>
     private void ScheduleSave()
     {
-        _saveDelay?.Cancel(); _saveDelay?.Dispose(); _saveDelay = new(); var token = _saveDelay.Token;
+        Cancel(_saveDelay); _saveDelay?.Dispose(); _saveDelay = new(); var token = _saveDelay.Token;
         _ = Task.Run(async () =>
         {
             try { await Task.Delay(1000, token); await Enqueue(SaveCurrentAsync); }
@@ -141,12 +216,19 @@ public sealed class ReaderSession : IReaderSession
     private Task SaveCurrentAsync() => Snapshot.Index is { } index
         ? _states.SaveAsync(new(index.Book, index.Locator, Snapshot.Anchor, Snapshot.Options, DateTimeOffset.UtcNow)) : Task.CompletedTask;
     public Task FlushAsync() => Enqueue(SaveCurrentAsync);
+    /// <summary>取消源可能正被旧打开任务退休；已释放意味着该请求已结束。</summary>
+    private static void Cancel(CancellationTokenSource? cancellation)
+    { try { cancellation?.Cancel(); } catch (ObjectDisposedException) { } }
     /// <summary>关闭来源和消息队列；持久化完成后才释放。</summary>
     public async ValueTask DisposeAsync()
     {
-        if (_disposed) return; _disposed = true;
-        try { _opening?.Cancel(); } catch (ObjectDisposedException) { }
-        _saveDelay?.Cancel(); await FlushAsync();
+        if (_disposed) return;
+        Cancel(_opening); Cancel(_indexCancellation); await _indexTask;
+        Cancel(_saveDelay); await FlushAsync();
+        // 退休的索引仍可能回到队列完成清理，须在关闭 Writer 前收束。
+        await Task.WhenAll(_retired);
+        // 保存失败时保留可重试的会话和队列；成功后才进入不可恢复的释放阶段。
+        _disposed = true;
         _messages.Writer.TryComplete(); await _pump;
         if (Source is not null) await Source.DisposeAsync();
         _saveDelay?.Dispose();

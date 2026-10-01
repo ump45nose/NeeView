@@ -16,13 +16,16 @@ public sealed class ImageScheduler : IImageRequestScheduler
         public CancellationTokenSource Cancellation = new();
         public int Waiters;
         public bool Claimed;
+        public bool Finished;
     }
     private readonly object _gate = new();
     private readonly IImageDecoder _decoder;
+    private readonly IThumbnailCache? _thumbnails;
     private readonly Dictionary<ImageCacheKey, Entry> _cache = [];
     private readonly Dictionary<ImageCacheKey, Work> _pending = [];
     private readonly PriorityQueue<Work, (int Priority, long Sequence)> _queue = new();
     private readonly SemaphoreSlim _signal = new(0);
+    private readonly SemaphoreSlim _visibleSignal = new(0);
     private readonly SemaphoreSlim _background = new(1);
     private readonly CancellationTokenSource _shutdown = new();
     private readonly Task[] _workers;
@@ -31,9 +34,9 @@ public sealed class ImageScheduler : IImageRequestScheduler
     private long _sequence;
     private bool _disposed;
     public long CachedBytes { get { lock (_gate) return _cache.Values.Sum(e => e.Image.ByteCount); } }
-    public ImageScheduler(IImageDecoder decoder, long budget = 512L * 1024 * 1024, long thumbnailBudget = 64L * 1024 * 1024)
+    public ImageScheduler(IImageDecoder decoder, long budget = 512L * 1024 * 1024, long thumbnailBudget = 64L * 1024 * 1024, IThumbnailCache? thumbnails = null)
     {
-        _decoder = decoder; _budget = budget; _thumbnailBudget = thumbnailBudget;
+        _decoder = decoder; _budget = budget; _thumbnailBudget = thumbnailBudget; _thumbnails = thumbnails;
         _workers = [Task.Run(() => WorkerAsync(true)), Task.Run(() => WorkerAsync(false))];
     }
     /// <summary>提交需求，调用者独立取消；最后一个等待者取消后中止排队/读取。</summary>
@@ -45,17 +48,21 @@ public sealed class ImageScheduler : IImageRequestScheduler
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
             if (_cache.TryGetValue(key, out var cached)) return Lease(key, cached);
+            if (_pending.TryGetValue(key, out work!) && work.Cancellation.IsCancellationRequested)
+                _pending.Remove(key);
             if (!_pending.TryGetValue(key, out work!))
             {
                 // 可见需求不会无限积累；调用方随视口取消旧需求。
                 if (_pending.Count >= 512) throw new ReaderException(FailureKind.Unavailable, "图像请求队列已满。");
                 work = new(key, source, request, priority); _pending.Add(key, work);
                 _queue.Enqueue(work, ((int)priority, _sequence++)); _signal.Release();
+                if (priority < ImagePriority.Prefetch) _visibleSignal.Release();
             }
             else if (priority < work.Priority)
             {
                 work.Priority = priority;
                 _queue.Enqueue(work, ((int)priority, _sequence++)); _signal.Release();
+                if (priority < ImagePriority.Prefetch) _visibleSignal.Release();
             }
             work.Waiters++;
         }
@@ -70,7 +77,8 @@ public sealed class ImageScheduler : IImageRequestScheduler
             {
                 work.Waiters--;
                 if (work.Waiters == 0 && !work.Completion.Task.IsCompleted) work.Cancellation.Cancel();
-                if (work.Waiters == 0 && work.Completion.Task.IsCompleted) _pending.Remove(key);
+                if (work.Waiters == 0 && work.Completion.Task.IsCompleted && _pending.GetValueOrDefault(key) == work) _pending.Remove(key);
+                if (work.Waiters == 0 && work.Finished) work.Cancellation.Dispose();
                 Trim();
             }
         }
@@ -103,7 +111,7 @@ public sealed class ImageScheduler : IImageRequestScheduler
         {
             while (true)
             {
-                await _signal.WaitAsync(_shutdown.Token);
+                await (allowBackground ? _signal : _visibleSignal).WaitAsync(_shutdown.Token);
                 Work? work = null;
                 lock (_gate)
                 {
@@ -123,8 +131,18 @@ public sealed class ImageScheduler : IImageRequestScheduler
                 {
                     if (background) { await _background.WaitAsync(work.Cancellation.Token); acquired = true; }
                     work.Cancellation.Token.ThrowIfCancellationRequested();
-                    await using var stream = await work.Source.OpenReadAsync(work.Request.Page, work.Cancellation.Token);
-                    var image = await _decoder.DecodeAsync(stream, work.Request, work.Cancellation.Token);
+                    var image = work.Request.Thumbnail && _thumbnails is not null ? await _thumbnails.GetAsync(work.Key, work.Cancellation.Token) : null;
+                    if (image is null)
+                    {
+                        await using var stream = await work.Source.OpenReadAsync(work.Request.Page, work.Cancellation.Token);
+                        image = await _decoder.DecodeAsync(stream, work.Request, work.Cancellation.Token);
+                        if (work.Request.Thumbnail && _thumbnails is not null)
+                        {
+                            try { await _thumbnails.PutAsync(work.Key, image, work.Cancellation.Token); }
+                            catch (Exception error) when (error is IOException or UnauthorizedAccessException) { Trace.WriteLine("thumbnail cache: " + error.Message); }
+                            catch { image.Dispose(); throw; }
+                        }
+                    }
                     lock (_gate)
                     {
                         if (_disposed || work.Cancellation.IsCancellationRequested) { image.Dispose(); work.Completion.TrySetCanceled(); }
@@ -139,9 +157,15 @@ public sealed class ImageScheduler : IImageRequestScheduler
                     if (acquired) _background.Release();
                     lock (_gate)
                     {
-                        if (work.Waiters == 0) _pending.Remove(work.Key);
+                        work.Finished = true;
+                        if (work.Waiters == 0)
+                        {
+                            if (_pending.GetValueOrDefault(work.Key) == work) _pending.Remove(work.Key);
+                            work.Cancellation.Dispose();
+                        }
                         Trim();
                         if (_queue.Count > 0) _signal.Release();
+                        if (_queue.UnorderedItems.Any(item => !item.Element.Claimed && item.Element.Priority < ImagePriority.Prefetch)) _visibleSignal.Release();
                     }
                 }
             }

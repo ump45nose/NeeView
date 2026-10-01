@@ -45,7 +45,7 @@ public sealed class LegacyImporter(SqliteStateStore states, JsonSettingsStore se
                 "IsSingleFirst" => options with { SingleFirst = true },
                 "IsSingleLast" => options with { SingleLast = true },
                 "IsWide" => options with { WidePage = true },
-                "Sort" when Enum.TryParse<SortMode>(value, out var mode) => options with { Sort = mode },
+                "Sort" when LegacyDefaults.Sort(value) is { } mode => options with { Sort = mode },
                 "Base" when double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var zoom) => options with { Zoom = Math.Clamp(zoom, 0.1, 8) },
                 "Seed" when int.TryParse(value, out var seed) => options with { RandomSeed = seed },
                 _ => Unknown(options, token, warnings)
@@ -90,7 +90,7 @@ public sealed class LegacyImporter(SqliteStateStore states, JsonSettingsStore se
                 if (String(item, "Path") is not { } original) { warnings.Add("历史项缺少 Path。"); continue; }
                 var mapped = MapPath(original, mappings);
                 if (mapped == original && original.Contains(':')) warnings.Add($"路径未映射，记录保留：{original}");
-                var page = String(item, "Page");
+                var page = LegacyPage(item, warnings);
                 var access = DateTimeOffset.TryParse(String(item, "LastAccessTime"), out var time) ? time : DateTimeOffset.UtcNow;
                 books.Add(new(mapped, page, ParseProps(String(item, "Props"), warnings), access));
             }
@@ -106,13 +106,16 @@ public sealed class LegacyImporter(SqliteStateStore states, JsonSettingsStore se
             var id = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(path + ":" + treePath)))[..32];
             var original = String(node, "Path"); var mapped = original is null ? null : MapPath(original, mappings);
             marks.Add(new(id, parent, order, String(node, "Name") ?? (original is null ? "文件夹" : Path.GetFileName(original.Replace('\\', '/'))), mapped,
-                String(node, "Page"), ParseProps(String(node, "Props"), warnings)));
+                LegacyPage(node, warnings), ParseProps(String(node, "Props"), warnings)));
             if (node.TryGetProperty("Children", out var children) && children.ValueKind == JsonValueKind.Array)
             { var index = 0; foreach (var child in children.EnumerateArray()) { Walk(child, id, index, treePath + "/" + index); index++; } }
         }
         if (files.TryGetValue("UserSetting.json", out var userJson))
         {
             using var user = JsonDocument.Parse(userJson);
+            // 差分文件省略的命令也要使用 Windows 默认；仅新平台命令沿用当前值。
+            var portableOnly = current.Shortcuts.Where(binding => binding.Command is "Close" or "Quit" or "Bookmark" or "Reveal" or "Trash" or "Rename");
+            current = current with { Shortcuts = [.. portableOnly, .. LegacyDefaults.Bindings(user.RootElement)] };
             if (user.RootElement.TryGetProperty("Commands", out var commands) && commands.ValueKind == JsonValueKind.Object)
             {
                 var bindings = current.Shortcuts.ToList();
@@ -120,19 +123,20 @@ public sealed class LegacyImporter(SqliteStateStore states, JsonSettingsStore se
                 {
                     if (command.Value.ValueKind != JsonValueKind.Object) { warnings.Add($"命令记录格式异常：{command.Name}"); continue; }
                     if (!CommandCatalog.Supported.Contains(command.Name)) { warnings.Add($"未支持命令：{command.Name} = {command.Value.GetRawText()}"); continue; }
-                    if (String(command.Value, "ShortCutKey") is { } shortcut)
-                    {
-                        bindings.RemoveAll(binding => binding.Command == command.Name);
+                    // null/缺失恢复原默认，空字符串才表示禁用；Parameter 对默认键位也生效。
+                    var existing = bindings.Where(binding => CommandCatalog.Resolve(binding.Command) == CommandCatalog.Resolve(command.Name)).ToArray();
+                    bindings.RemoveAll(binding => CommandCatalog.Resolve(binding.Command) == CommandCatalog.Resolve(command.Name));
+                    var shortcut = String(command.Value, "ShortCutKey") ?? string.Join(',', existing.Select(binding => binding.Gesture));
                         foreach (var gesture in shortcut.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-                            bindings.Add(new(gesture, command.Name, command.Value.TryGetProperty("Parameter", out var parameter) ? parameter.GetRawText() : null));
-                    }
+                            bindings.Add(new(gesture, command.Name, command.Value.TryGetProperty("Parameter", out var parameter) ? parameter.ValueKind == JsonValueKind.String ? parameter.GetString() : parameter.ValueKind == JsonValueKind.Null ? null : parameter.GetRawText() : null));
                     foreach (var field in command.Value.EnumerateObject().Where(p => p.Name is "TouchGesture" or "MouseGesture")) warnings.Add($"手势暂未导入：{command.Name}.{field.Name}={field.Value}");
                 }
                 current = current with { Shortcuts = bindings };
             }
             if (user.RootElement.TryGetProperty("Config", out var config))
             {
-                if (config.TryGetProperty("BookSetting", out var reading)) current = current with { Defaults = ReadLegacyOptions(reading, current.Defaults, warnings) };
+                if (config.TryGetProperty("BookSetting", out var reading)) current = current with { Defaults = ReadLegacyOptions(reading, new(), warnings) };
+                if (config.TryGetProperty("BookSettingPolicy", out var policies)) current = current with { RestorePolicies = ReadLegacyPolicies(policies, warnings) };
                 if (config.TryGetProperty("System", out var system) && system.TryGetProperty("DestinationFolderCollection", out var destinations) && destinations.ValueKind == JsonValueKind.Array)
                     current = current with { DestinationFolders = destinations.EnumerateArray().Where(p => p.ValueKind == JsonValueKind.String).Select(p => MapPath(p.GetString()!, mappings)).ToList() };
                 if (config.TryGetProperty("Panels", out var panels))
@@ -142,7 +146,7 @@ public sealed class LegacyImporter(SqliteStateStore states, JsonSettingsStore se
                         MoveHistoryCapacity = Math.Clamp(Int(panels, "DestinationMoveHistoryCapacity", 300), 0, 1000),
                         DestinationRatio = Number(panels, "DestinationFolderSectionRatio", 0.5) };
                 }
-                foreach (var field in config.EnumerateObject().Where(p => p.Name is not ("BookSetting" or "System" or "Panels"))) warnings.Add($"未支持配置节，保留在源中：{field.Name}");
+                foreach (var field in config.EnumerateObject().Where(p => p.Name is not ("BookSetting" or "BookSettingPolicy" or "System" or "Panels"))) warnings.Add($"未支持配置节，保留在源中：{field.Name}");
             }
         }
         if (files.ContainsKey("Foldres.json")) warnings.Add("已识别 Foldres.json；文件夹面板的 Windows 专属配置暂未导入。");
@@ -157,17 +161,55 @@ public sealed class LegacyImporter(SqliteStateStore states, JsonSettingsStore se
     {
         var known = new HashSet<string>(["PageMode", "BookReadOrder", "IsSupportedDividePage", "IsSupportedSingleFirstPage", "IsSupportedSingleLastPage", "IsSupportedWidePage", "SortMode", "BaseScale", "Page"]);
         foreach (var field in element.EnumerateObject()) if (!known.Contains(field.Name)) warnings.Add($"未支持阅读设置：{field.Name}={field.Value}");
-        return defaults with { DoublePage = String(element, "PageMode") == "WidePage", Direction = String(element, "BookReadOrder") == "LeftToRight" ? ReadDirection.LeftToRight : ReadDirection.RightToLeft,
+        return defaults with { DoublePage = EnumValue(element, "PageMode", ["SinglePage", "WidePage"]) is "WidePage", Direction = EnumValue(element, "BookReadOrder", ["RightToLeft", "LeftToRight"]) == "LeftToRight" ? ReadDirection.LeftToRight : ReadDirection.RightToLeft,
             DivideWide = Bool(element, "IsSupportedDividePage", false), SingleFirst = Bool(element, "IsSupportedSingleFirstPage", false),
             SingleLast = Bool(element, "IsSupportedSingleLastPage", false), WidePage = Bool(element, "IsSupportedWidePage", true),
-            Sort = Enum.TryParse<SortMode>(String(element, "SortMode"), out var sort) ? sort : SortMode.Entry, Zoom = Number(element, "BaseScale", 1) };
+            Sort = element.TryGetProperty("SortMode", out var sorting) ? LegacyDefaults.Sort(sorting.ToString()) ?? SortMode.Entry : SortMode.Entry, Zoom = Number(element, "BaseScale", 1) };
+    }
+    /// <summary>旧枚举支持名字和固定基线的数值写法；未知值不伪造含义。</summary>
+    private static string? EnumValue(JsonElement value, string key, string[] names)
+    {
+        if (!value.TryGetProperty(key, out var property)) return null;
+        if (property.ValueKind == JsonValueKind.String) return property.GetString();
+        if (property.ValueKind == JsonValueKind.Number && property.TryGetInt32(out var index) && index >= 0 && index < names.Length) return names[index];
+        return null;
+    }
+    /// <summary>旧 Page 是内容定位字符串；数字页码不直接转成阅读锚点，报告原值。</summary>
+    private static string? LegacyPage(JsonElement item, ICollection<string> warnings)
+    {
+        if (String(item, "Page") is { } page) return page.Replace('\\', '/');
+        foreach (var name in new[] { "Page", "Index" })
+            if (item.TryGetProperty(name, out var value) && value.ValueKind != JsonValueKind.Null) warnings.Add($"旧定位无法确认语义，未转换为页码：{name}={value.GetRawText()}");
+        return null;
+    }
+    /// <summary>迁移逐字段恢复策略，忽略只用于旧原生功能的字段并留下报告。</summary>
+    private static Dictionary<string, RestorePolicy> ReadLegacyPolicies(JsonElement element, ICollection<string> warnings)
+    {
+        var fields = new Dictionary<string, string> { ["PageMode"] = "DoublePage", ["BookReadOrder"] = "Direction", ["IsSupportedDividePage"] = "DivideWide",
+            ["IsSupportedSingleFirstPage"] = "SingleFirst", ["IsSupportedSingleLastPage"] = "SingleLast", ["IsSupportedWidePage"] = "WidePage", ["SortMode"] = "Sort", ["BaseScale"] = "Zoom" };
+        var result = new Dictionary<string, RestorePolicy>();
+        foreach (var field in element.EnumerateObject())
+        {
+            var text = EnumValue(element, field.Name, ["Default", "Continue", "RestoreOrDefault", "RestoreOrContinue", "RestoreOrDefaultReset"]);
+            if (fields.TryGetValue(field.Name, out var target) && Enum.TryParse<RestorePolicy>(text, out var policy)) result[target] = policy;
+            else warnings.Add($"未支持恢复策略：{field.Name}={field.Value}");
+        }
+        return result;
+    }
+    /// <summary>单图书籍归一到目录，保留图片名作为 Page；未映射 Windows 路径仍只读保留。</summary>
+    private static (string Path, string? Page) NormalizeBook(string path, string? page)
+    {
+        if (path.Contains('\\') || path.Contains(':')) return (path, page);
+        var images = new[] { ".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tif", ".tiff", ".gif" };
+        return images.Contains(Path.GetExtension(path), StringComparer.OrdinalIgnoreCase)
+            ? (Path.GetDirectoryName(path)!, Path.GetFileName(path)) : (path, page);
     }
     private static IEnumerable<JsonElement> Enumerate(JsonElement root, params string[] keys)
     { foreach (var key in keys) if (root.TryGetProperty(key, out var values) && values.ValueKind == JsonValueKind.Array) return values.EnumerateArray().ToArray(); return []; }
     private static string? String(JsonElement value, string key) => value.TryGetProperty(key, out var property) && property.ValueKind == JsonValueKind.String ? property.GetString() : null;
     private static bool Bool(JsonElement value, string key, bool fallback) => value.TryGetProperty(key, out var property) && property.ValueKind is JsonValueKind.True or JsonValueKind.False ? property.GetBoolean() : fallback;
-    private static int Int(JsonElement value, string key, int fallback) => value.TryGetProperty(key, out var property) && property.TryGetInt32(out var number) ? number : fallback;
-    private static double Number(JsonElement value, string key, double fallback) => value.TryGetProperty(key, out var property) && property.TryGetDouble(out var number) && double.IsFinite(number) ? number : fallback;
+    private static int Int(JsonElement value, string key, int fallback) => value.TryGetProperty(key, out var property) && property.ValueKind == JsonValueKind.Number && property.TryGetInt32(out var number) ? number : fallback;
+    private static double Number(JsonElement value, string key, double fallback) => value.TryGetProperty(key, out var property) && property.ValueKind == JsonValueKind.Number && property.TryGetDouble(out var number) && double.IsFinite(number) ? number : fallback;
     /// <summary>应用选定计划；数据库事务与设置恢复清单支持异常和进程中断。</summary>
     public async Task ApplyAsync(ImportPlan plan, CancellationToken token = default)
     {
@@ -192,12 +234,13 @@ public sealed class LegacyImporter(SqliteStateStore states, JsonSettingsStore se
                     foreach (var mark in plan.Bookmarks)
                     {
                         BookId? book = null;
-                        if (mark.Path is { } path)
+                        var normalized = mark.Path is null ? (Path: (string?)null, Page: mark.Page) : NormalizeBook(mark.Path, mark.Page);
+                        if (normalized.Path is { } path)
                         {
                             book = new(await IdentityAsync(connection, transaction, "book", new(path), token));
-                            if (!plan.Books.Any(b => b.Path == path)) await ImportBookAsync(connection, transaction, new(path, mark.Page, mark.Options, DateTimeOffset.UtcNow), token);
+                            if (!plan.Books.Any(b => b.Path == path)) await ImportBookAsync(connection, transaction, new(path, normalized.Page, mark.Options, DateTimeOffset.UtcNow), token);
                         }
-                        var bookmark = new Bookmark(mark.Id, mark.Parent, mark.Order, mark.Name, book, mark.Path is null ? null : new(mark.Path), null, mark.Page);
+                        var bookmark = new Bookmark(mark.Id, mark.Parent, mark.Order, mark.Name, book, normalized.Path is null ? null : new(normalized.Path), null, normalized.Page);
                         using var command = connection.CreateCommand(); command.Transaction = transaction;
                         command.CommandText = "INSERT INTO bookmarks VALUES($id,$parent,$order,$data) ON CONFLICT(id) DO UPDATE SET parent_id=$parent,sort_order=$order,data=$data";
                         command.Parameters.AddWithValue("$id", mark.Id); command.Parameters.AddWithValue("$parent", (object?)mark.Parent ?? DBNull.Value); command.Parameters.AddWithValue("$order", mark.Order); command.Parameters.AddWithValue("$data", StoreJson.Serialize(bookmark));
@@ -238,8 +281,9 @@ public sealed class LegacyImporter(SqliteStateStore states, JsonSettingsStore se
     }
     private static async Task ImportBookAsync(SqliteConnection connection, SqliteTransaction transaction, ImportBook book, CancellationToken token)
     {
-        var id = new BookId(await IdentityAsync(connection, transaction, "book", new(book.Path), token));
-        var state = new ReadingState(id, new(book.Path), null, book.Options, book.Access, book.Page);
+        var normalized = NormalizeBook(book.Path, book.Page);
+        var id = new BookId(await IdentityAsync(connection, transaction, "book", new(normalized.Path), token));
+        var state = new ReadingState(id, new(normalized.Path), null, book.Options, book.Access, normalized.Page);
         using var command = connection.CreateCommand(); command.Transaction = transaction;
         command.CommandText = "INSERT INTO reading_states VALUES($id,$data,$time) ON CONFLICT(book_id) DO UPDATE SET data=$data,accessed=$time";
         command.Parameters.AddWithValue("$id", id.Value); command.Parameters.AddWithValue("$data", StoreJson.Serialize(state)); command.Parameters.AddWithValue("$time", book.Access.ToString("O")); await command.ExecuteNonQueryAsync(token);

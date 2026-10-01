@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Threading.Channels;
 using NeeView.Application;
 using NeeView.Core;
 using SharpCompress.Archives;
@@ -50,29 +51,95 @@ public sealed class ContentSourceFactory(IIdentityRegistry registry, string cach
         throw new ReaderException(FailureKind.Unsupported, "首版支持图片、目录及 ZIP/RAR/7z；PDF、媒体、嵌套归档尚不支持。");
     }
 }
-public sealed class DirectorySource(string directory, string? requested, IIdentityRegistry registry) : IContentSource
+public sealed class DirectorySource(string directory, string? requested, IIdentityRegistry registry) : IProgressiveContentSource
 {
     private bool _disposed;
     public SourceLocator Locator { get; } = new(directory);
     public SourceCapabilities Capabilities { get; } = new(true, AccessCost.Random, false);
     private static readonly HashSet<string> Images = new([".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tif", ".tiff", ".gif"], StringComparer.OrdinalIgnoreCase);
+    /// <summary>按首版格式声明判断图片文件，不读取内容。</summary>
     public static bool IsImage(string path) => Images.Contains(Path.GetExtension(path));
-    /// <summary>分批处理枚举结果，登记身份；每个文件不保持句柄。</summary>
+    /// <summary>完整索引用于刷新；打开流程使用批次接口先显示目标图片。</summary>
     public async Task<SourceIndex> IndexAsync(CancellationToken cancellationToken)
     {
+        SourceIndex? result = null;
+        await foreach (var batch in IndexBatchesAsync(cancellationToken)) result = batch;
+        return result!;
+    }
+    /// <summary>每批最多128条；已知单图先登记并发布，枚举始终在有界后台 I/O 中执行。</summary>
+    public async IAsyncEnumerable<SourceIndex> IndexBatchesAsync([System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
+    {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        var entries = await SourceIo.RunAsync(() => Directory.EnumerateFiles(directory)
-            .Where(IsImage).Select(p => new FileInfo(p)).OrderBy(p => p.Name, NaturalNameComparer.Instance).ToArray(), cancellationToken);
+        var book = await registry.GetBookAsync(Locator, token);
         var pages = new List<PageDescriptor>(); ContentId? selected = null;
-        foreach (var entry in entries)
+        if (requested is not null)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            var locator = new SourceLocator(entry.FullName);
-            var id = await registry.GetContentAsync(locator, cancellationToken);
-            pages.Add(new(id, entry.Name, locator, new(entry.Length, entry.LastWriteTimeUtc.Ticks), pages.Count));
-            if (entry.FullName == requested) selected = id;
+            var info = await SourceIo.RunAsync(() =>
+            { var file = new FileInfo(requested); return (file.Exists, file.FullName, file.Name, Length: file.Exists ? file.Length : 0, Stamp: file.Exists ? file.LastWriteTimeUtc.Ticks : 0); }, token);
+            if (info.Exists)
+            {
+                selected = await registry.GetContentAsync(new(info.FullName), token);
+                pages.Add(new(selected.Value, info.Name, new(info.FullName), new(info.Length, info.Stamp), -1));
+                yield return new(book, Locator, pages.ToArray(), selected, Capabilities);
+            }
         }
-        return new(await registry.GetBookAsync(Locator, cancellationToken), Locator, pages, selected, Capabilities);
+        var order = 0;
+        using var producerCancellation = CancellationTokenSource.CreateLinkedTokenSource(token);
+        var batches = Channel.CreateBounded<(string Path, string Name, long Length, long Stamp)[]>(new BoundedChannelOptions(2) { SingleReader = true, SingleWriter = true });
+        _ = ProduceAsync(); // 生产者独占迭代器；超时返回后不并发释放仍在系统调用中的句柄。
+        try
+        {
+            while (true)
+            {
+                (string Path, string Name, long Length, long Stamp)[] batch = []; var completed = false;
+                try { batch = await batches.Reader.ReadAsync(token).AsTask().WaitAsync(TimeSpan.FromSeconds(15), token); }
+                catch (ChannelClosedException)
+                {
+                    await batches.Reader.Completion; // 损坏、权限等生产者错误保持真实类别。
+                    completed = true;
+                }
+                if (completed)
+                {
+                    var final = pages.OrderBy(p => p.Name, NaturalNameComparer.Instance).Select((p, i) => p with { EntryIndex = i }).ToArray();
+                    yield return new(book, Locator, final, selected, Capabilities); yield break;
+                }
+                token.ThrowIfCancellationRequested(); ObjectDisposedException.ThrowIf(_disposed, this);
+                foreach (var entry in batch)
+                {
+                    var locator = new SourceLocator(entry.Path); var id = await registry.GetContentAsync(locator, token);
+                    var page = new PageDescriptor(id, entry.Name, locator, new(entry.Length, entry.Stamp), order++);
+                    var existing = pages.FindIndex(p => p.Id == id);
+                    if (existing >= 0) pages[existing] = page; else pages.Add(page);
+                }
+                yield return new(book, Locator, pages.ToArray(), selected, Capabilities);
+            }
+        }
+        finally { producerCancellation.Cancel(); }
+        // 所有文件元数据在后台读取；有限通道控制预枚举量，晚到调用自行释放迭代器。
+        async Task ProduceAsync()
+        {
+            var producerToken = producerCancellation.Token;
+            try
+            {
+                await SourceIo.RunOwnedAsync(() =>
+                {
+                    using var iterator = Directory.EnumerateFiles(directory).GetEnumerator();
+                    var entries = new List<(string, string, long, long)>();
+                    while (iterator.MoveNext())
+                    {
+                        producerToken.ThrowIfCancellationRequested();
+                        if (!IsImage(iterator.Current)) continue;
+                        var file = new FileInfo(iterator.Current); entries.Add((file.FullName, file.Name, file.Length, file.LastWriteTimeUtc.Ticks));
+                        if (entries.Count < 128) continue;
+                        batches.Writer.WriteAsync(entries.ToArray(), producerToken).AsTask().GetAwaiter().GetResult(); entries.Clear();
+                    }
+                    if (entries.Count > 0) batches.Writer.WriteAsync(entries.ToArray(), producerToken).AsTask().GetAwaiter().GetResult();
+                    return true;
+                }, producerToken);
+                batches.Writer.TryComplete();
+            }
+            catch (Exception error) { batches.Writer.TryComplete(error); }
+        }
     }
     /// <summary>返回请求独占文件流；允许应用随后移动或删除源文件。</summary>
     public async Task<Stream> OpenReadAsync(PageDescriptor page, CancellationToken cancellationToken)
@@ -92,7 +159,6 @@ public sealed class ArchiveSource : IContentSource
     private readonly string _cache;
     private readonly SemaphoreSlim _gate = new(1);
     private readonly Dictionary<string, string> _extracted = new(StringComparer.Ordinal);
-    private long _bytes;
     private bool _disposed;
     private const long DiskBudget = 2L * 1024 * 1024 * 1024;
     public SourceLocator Locator { get; }
@@ -110,14 +176,20 @@ public sealed class ArchiveSource : IContentSource
         var metadata = await SourceIo.RunAsync(() =>
         {
             using var archive = ArchiveFactory.OpenArchive(Locator.Path);
+            if (!archive.IsComplete || System.Text.RegularExpressions.Regex.IsMatch(Locator.Path, @"\.part[0-9]+\.rar$", System.Text.RegularExpressions.RegexOptions.IgnoreCase)
+                || File.Exists(Path.ChangeExtension(Locator.Path, ".r00")) || File.Exists(Path.ChangeExtension(Locator.Path, ".z01")))
+                throw new ReaderException(FailureKind.Unsupported, "分卷压缩包暂不支持，请先在外部合并或解压。");
             if (archive.IsSolid) Capabilities = Capabilities with { AccessCost = AccessCost.Sequential };
             var values = new List<(string Key, long Size)>();
+            var nested = false;
             foreach (var entry in archive.Entries)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 if (entry.IsEncrypted) throw new ReaderException(FailureKind.Password, "此压缩包需要密码，首版尚不支持。");
                 if (!entry.IsDirectory && entry.Key is { } key && DirectorySource.IsImage(key)) values.Add((key, entry.Size));
+                else if (!entry.IsDirectory && entry.Key is { } archiveKey && new[] { ".zip", ".cbz", ".rar", ".cbr", ".7z", ".cb7" }.Contains(Path.GetExtension(archiveKey), StringComparer.OrdinalIgnoreCase)) nested = true;
             }
+            if (values.Count == 0 && nested) throw new ReaderException(FailureKind.Unsupported, "此来源仅包含嵌套压缩包，首版暂不支持递归打开。");
             return values;
         }, cancellationToken);
         var stamp = await SourceIo.RunAsync(() => new FileInfo(Locator.Path).LastWriteTimeUtc.Ticks, cancellationToken);
@@ -138,17 +210,13 @@ public sealed class ArchiveSource : IContentSource
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
             var key = page.Locator.Entry ?? throw new InvalidDataException("缺少归档条目定位。");
-            if (!_extracted.TryGetValue(key, out var cached))
+            if (!_extracted.TryGetValue(key, out var cached) || !File.Exists(cached))
             {
                 Directory.CreateDirectory(_cache);
                 if (page.Version.Length < 0 || page.Version.Length > DiskBudget) throw new ReaderException(FailureKind.Unsupported, "条目大小不可信或超过 2 GiB 解压预算。");
-                // 仅删除本来源创建的缓存；打开的流通过 FileShare.Delete 继续持有资源。
-                if (_bytes + page.Version.Length > DiskBudget)
-                {
-                    foreach (var path in _extracted.Values) File.Delete(path);
-                    _extracted.Clear(); _bytes = 0;
-                }
                 cached = Path.Combine(_cache, Guid.NewGuid().ToString("N"));
+                ArchiveCacheBudget.Reserve(cached, page.Version.Length);
+                Directory.CreateDirectory(_cache);
                 var target = cached;
                 try
                 {
@@ -174,17 +242,17 @@ public sealed class ArchiveSource : IContentSource
                             while ((count = source.Read(buffer)) > 0)
                             {
                                 cancellationToken.ThrowIfCancellationRequested(); written += count;
-                                if (_bytes + written > DiskBudget) throw new InvalidDataException("解压输出超过磁盘总预算。");
+                                if (written > page.Version.Length || written > DiskBudget) throw new InvalidDataException("解压输出超过磁盘总预算。");
                                 output.Write(buffer, 0, count);
                             }
                         }
                         return true;
                     }, cancellationToken);
-                    _extracted[key] = cached; _bytes += new FileInfo(cached).Length;
+                    _extracted[key] = cached;
                 }
-                catch { if (File.Exists(cached)) File.Delete(cached); throw; }
+                catch { ArchiveCacheBudget.Retire(cached); throw; }
             }
-            return new FileStream(cached, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete, 65536, FileOptions.Asynchronous);
+            return ArchiveCacheBudget.Open(cached);
         }
         finally { _gate.Release(); }
     }
@@ -192,7 +260,7 @@ public sealed class ArchiveSource : IContentSource
     public async ValueTask DisposeAsync()
     {
         await _gate.WaitAsync();
-        try { _disposed = true; if (Directory.Exists(_cache)) Directory.Delete(_cache, true); }
+        try { _disposed = true; foreach (var path in _extracted.Values) ArchiveCacheBudget.Retire(path); _extracted.Clear(); if (Directory.Exists(_cache) && !Directory.EnumerateFileSystemEntries(_cache).Any()) Directory.Delete(_cache); }
         finally { _gate.Release(); }
     }
 }

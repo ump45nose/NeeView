@@ -30,6 +30,11 @@ public interface IContentSource : IAsyncDisposable
     Task<Stream> OpenReadAsync(PageDescriptor page, CancellationToken cancellationToken);
 }
 public interface IContentSourceFactory { Task<IContentSource> OpenAsync(OpenRequest request, CancellationToken cancellationToken); }
+/// <summary>支持渐进索引的来源；每个快照完整包含此前条目，最后一个快照完成索引。</summary>
+public interface IProgressiveContentSource : IContentSource
+{
+    IAsyncEnumerable<SourceIndex> IndexBatchesAsync(CancellationToken token);
+}
 public interface IIdentityRegistry
 {
     Task<BookId> GetBookAsync(SourceLocator locator, CancellationToken token);
@@ -62,6 +67,11 @@ public interface IImageDecoder
 }
 public enum ImagePriority { Current, Visible, Prefetch, Thumbnail }
 public readonly record struct ImageCacheKey(ContentId Content, ContentVersion Version, int Width, int Height, bool Thumbnail);
+public interface IThumbnailCache
+{
+    Task<DecodedImageLease?> GetAsync(ImageCacheKey key, CancellationToken token);
+    Task PutAsync(ImageCacheKey key, DecodedImageLease image, CancellationToken token);
+}
 public interface IImageRequestScheduler : IAsyncDisposable
 {
     Task<DecodedImageLease> RequestAsync(IContentSource source, DecodeRequest request, ImagePriority priority, CancellationToken token);
@@ -89,8 +99,13 @@ public interface ISettingsStore
 {
     Task<AppSettings> LoadAsync(CancellationToken token = default);
     Task SaveAsync(AppSettings settings, CancellationToken token = default);
+    Task<AppSettings> UpdateAsync(Func<AppSettings, AppSettings> update, CancellationToken token = default);
 }
-public sealed record RecoveryOperation(string Id, string Source, string Target, string? Temporary, string? Backup, string Stage);
+/// <summary>文件操作的可重放日志；摘要用于拒绝覆盖外部修改过的文件，旧记录保持可读。</summary>
+public sealed record RecoveryOperation(string Id, string Source, string Target, string? Temporary, string? Backup, string Stage,
+    bool Copy = false, string? SourceDigest = null, string? BackupDigest = null, ContentId? Content = null,
+    string? RestoreBackup = null, string? RestorePath = null, string? RestoreDigest = null);
+public sealed record FileRecoveryResult(string Id, bool Resolved, string Message);
 public interface IReaderStateStore
 {
     Task<ReadingState?> GetAsync(BookId book, CancellationToken token = default);
@@ -140,6 +155,8 @@ public interface IFileActionService
         ConflictChoice conflict = ConflictChoice.Cancel, CancellationToken token = default);
     Task<FileActionResult> UndoAsync(ConflictChoice conflict = ConflictChoice.Cancel, CancellationToken token = default);
     Task<FileActionResult> RedoAsync(ConflictChoice conflict = ConflictChoice.Cancel, CancellationToken token = default);
+    Task<IReadOnlyList<FileRecoveryResult>> RecoverAsync(CancellationToken token = default);
+    Task DrainAsync();
 }
 public interface IDestinationFolderService
 {

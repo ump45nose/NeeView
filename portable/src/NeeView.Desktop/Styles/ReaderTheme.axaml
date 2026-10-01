@@ -1,0 +1,15 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:NeeView.Desktop">
+  <!-- 视觉资源集中维护，查看器和页面业务不包含固定产品色彩。 -->
+  <Styles.Resources>
+    <SolidColorBrush x:Key="ReaderCanvasBrush">#15181D</SolidColorBrush>
+    <SolidColorBrush x:Key="ReaderPlaceholderBrush">#262C35</SolidColorBrush>
+    <SolidColorBrush x:Key="ReaderSelectionBrush">#4DA3FF</SolidColorBrush>
+  </Styles.Resources>
+  <Style Selector="local|ReaderView">
+    <Setter Property="CanvasBrush" Value="{DynamicResource ReaderCanvasBrush}" />
+    <Setter Property="PlaceholderBrush" Value="{DynamicResource ReaderPlaceholderBrush}" />
+    <Setter Property="SelectionBrush" Value="{DynamicResource ReaderSelectionBrush}" />
+  </Style>
+  <Style Selector="Window"><Setter Property="FontSize" Value="14" /></Style>
+  <Style Selector="TabItem"><Setter Property="Padding" Value="8,6" /></Style>
+</Styles>

@@ -25,7 +25,8 @@ public static class Composition
         collection.AddSingleton<IReaderStateStore>(p => p.GetRequiredService<SqliteStateStore>());
         collection.AddSingleton<IContentSourceFactory>(p => new ContentSourceFactory(p.GetRequiredService<IIdentityRegistry>(), cache));
         collection.AddSingleton<IImageDecoder, MagickImageDecoder>();
-        collection.AddSingleton<IImageRequestScheduler, ImageScheduler>();
+        collection.AddSingleton<IThumbnailCache>(new DiskThumbnailCache(Path.Combine(cache, "thumbnails")));
+        collection.AddSingleton<IImageRequestScheduler>(p => new ImageScheduler(p.GetRequiredService<IImageDecoder>(), thumbnails: p.GetRequiredService<IThumbnailCache>()));
         collection.AddSingleton<IFileActionService>(p => new FileActionService(p.GetRequiredService<IIdentityRegistry>(), p.GetRequiredService<IReaderStateStore>(), platform, Path.Combine(data, "file-backups")));
         collection.AddTransient<IDestinationFolderService, DestinationFolderService>();
         collection.AddSingleton<IFolderNavigator, FolderNavigator>();
@@ -33,7 +34,12 @@ public static class Composition
         collection.AddSingleton<LegacyImporter>(); collection.AddSingleton<ILegacyImporter>(p => p.GetRequiredService<LegacyImporter>());
         var services = collection.BuildServiceProvider();
         await services.GetRequiredService<LegacyImporter>().RecoverAsync();
-        DesktopApp.Services = services; DesktopApp.ShutdownServices = async () => await services.DisposeAsync();
+        await services.GetRequiredService<IFileActionService>().RecoverAsync();
+        DesktopApp.Services = services; DesktopApp.ShutdownServices = async () =>
+        {
+            await services.GetRequiredService<IFileActionService>().DrainAsync();
+            await services.DisposeAsync();
+        };
         return services;
     }
 }

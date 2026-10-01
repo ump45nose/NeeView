@@ -6,6 +6,7 @@ public static class CommandCatalog
         "NextPage", "PrevPage", "NextOnePage", "PrevOnePage", "MoveNext", "MovePrev", "FirstPage", "LastPage",
         "Open", "Bookmark", "UndoDestinationMove", "RedoDestinationMove", "MoveToFolderAs", "Reveal", "Trash", "Rename", "Copy",
         "Paged", "Continuous", "Masonry", "ToggleDouble", "ToggleDirection", "ZoomIn", "ZoomOut", "ActualPixels", "Fit", "Rotate", "Close", "Quit",
+        "LoadAs", "SetPageModeOne", "SetPageModeTwo", "TogglePageMode", "ToggleBookReadOrder", "SetBookReadOrderLeft", "SetBookReadOrderRight", "ViewScaleUp", "ViewScaleDown", "ViewReset",
         .. Enumerable.Range(1, 9).Select(i => $"MoveToDestinationFolder{i}")], StringComparer.Ordinal);
     /// <summary>返回默认命令键位；旧 Control 导入时不改成 Command。</summary>
     public static IEnumerable<ShortcutBinding> DefaultBindings()
@@ -19,8 +20,16 @@ public static class CommandCatalog
         yield return new("WheelDown", "NextPage"); yield return new("WheelUp", "PrevPage");
         for (var i = 1; i <= 9; i++) yield return new(i.ToString(), $"MoveToDestinationFolder{i}");
     }
+    /// <summary>仅用于比较的手势归一，保留配置中的原始 Control/Command 写法。</summary>
+    public static string NormalizeGesture(string value) => value.Trim().Replace("Control+", "Ctrl+", StringComparison.OrdinalIgnoreCase).Replace("Command+", "Meta+", StringComparison.OrdinalIgnoreCase);
+    /// <summary>旧命令名保持存储，只在执行及比较绑定时转换等价含义。</summary>
+    public static string Resolve(string command) => command switch
+    {
+        "LoadAs" => "Open", "TogglePageMode" => "ToggleDouble", "ToggleBookReadOrder" => "ToggleDirection",
+        "ViewScaleUp" => "ZoomIn", "ViewScaleDown" => "ZoomOut", _ => command
+    };
     /// <summary>返回冲突手势与命令集合，不静默覆盖。</summary>
     public static IReadOnlyList<string> Conflicts(IEnumerable<ShortcutBinding> bindings) => bindings
-        .GroupBy(b => b.Gesture, StringComparer.OrdinalIgnoreCase).Where(g => g.Select(b => b.Command).Distinct().Count() > 1)
+        .GroupBy(b => NormalizeGesture(b.Gesture), StringComparer.OrdinalIgnoreCase).Where(g => g.Select(b => (Resolve(b.Command), b.Parameter)).Distinct().Count() > 1)
         .Select(g => $"{g.Key}: {string.Join(", ", g.Select(b => b.Command))}").ToArray();
 }

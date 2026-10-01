@@ -16,6 +16,20 @@ public sealed class JsonSettingsStore(string path) : ISettingsStore
 {
     private readonly SemaphoreSlim _gate = new(1);
     public string Path { get; } = path;
+    /// <summary>在同一互斥内读取并合并字段；并发的阅读来源与面板配置互不覆盖。</summary>
+    public async Task<AppSettings> UpdateAsync(Func<AppSettings, AppSettings> update, CancellationToken token = default)
+    {
+        await _gate.WaitAsync(token);
+        try
+        {
+            var current = File.Exists(Path) ? StoreJson.Read<AppSettings>(await File.ReadAllTextAsync(Path, token)) : new();
+            if (current.Version > 1) throw new InvalidDataException("设置版本高于当前程序，不能覆盖。");
+            var next = update(current);
+            await WriteAsync(next, token);
+            return next;
+        }
+        finally { _gate.Release(); }
+    }
     /// <summary>读取和验证版本；不覆盖损坏或未来版本的文件。</summary>
     public async Task<AppSettings> LoadAsync(CancellationToken token = default)
     {
@@ -34,6 +48,12 @@ public sealed class JsonSettingsStore(string path) : ISettingsStore
     public async Task SaveAsync(AppSettings settings, CancellationToken token = default)
     {
         await _gate.WaitAsync(token);
+        try { await WriteAsync(settings, token); }
+        finally { _gate.Release(); }
+    }
+    /// <summary>调用方持有设置锁，写入临时文件并原子替换。</summary>
+    private async Task WriteAsync(AppSettings settings, CancellationToken token)
+    {
         var temporary = Path + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
         {
@@ -45,7 +65,7 @@ public sealed class JsonSettingsStore(string path) : ISettingsStore
             }
             token.ThrowIfCancellationRequested(); File.Move(temporary, Path, true);
         }
-        finally { if (File.Exists(temporary)) File.Delete(temporary); _gate.Release(); }
+        finally { if (File.Exists(temporary)) File.Delete(temporary); }
     }
 }
 
@@ -90,10 +110,22 @@ public sealed class SqliteStateStore : IReaderStateStore, IIdentityRegistry, IAs
     {
         using var transaction = connection.BeginTransaction();
         using var command = connection.CreateCommand(); command.Transaction = transaction;
+        // 幂等恢复：源身份已迁移时不得再次删除目标身份。
+        using var lookup = connection.CreateCommand(); lookup.Transaction = transaction;
+        lookup.CommandText = "SELECT id FROM identities WHERE kind='content' AND locator=$old";
+        lookup.Parameters.AddWithValue("$old", LocatorKey(oldLocator));
+        var movedId = await lookup.ExecuteScalarAsync(token) as string;
+        if (movedId is null) { transaction.Commit(); return true; }
+        var targetBookLocator = new SourceLocator(Path.GetDirectoryName(newLocator.Path)!);
+        using var registerBook = connection.CreateCommand(); registerBook.Transaction = transaction;
+        registerBook.CommandText = "INSERT OR IGNORE INTO identities(kind,locator,id) VALUES('book',$locator,$id); SELECT id FROM identities WHERE kind='book' AND locator=$locator;";
+        registerBook.Parameters.AddWithValue("$locator", LocatorKey(targetBookLocator)); registerBook.Parameters.AddWithValue("$id", Guid.NewGuid().ToString("N"));
+        var targetBook = new BookId((string)(await registerBook.ExecuteScalarAsync(token))!);
         // 被覆盖的旧定位先失效，历史记录仍保留原身份，不能误指向新内容。
-        command.CommandText = "DELETE FROM identities WHERE locator=$new; UPDATE identities SET locator=$new WHERE locator=$old;";
+        command.CommandText = "DELETE FROM identities WHERE kind='content' AND locator=$new AND EXISTS(SELECT 1 FROM identities WHERE kind='content' AND locator=$old); UPDATE identities SET locator=$new WHERE kind='content' AND locator=$old;";
         command.Parameters.AddWithValue("$new", LocatorKey(newLocator)); command.Parameters.AddWithValue("$old", LocatorKey(oldLocator));
         await command.ExecuteNonQueryAsync(token);
+        var migratedStates = new List<ReadingState>();
         foreach (var table in new[] { "reading_states", "bookmarks" })
         {
             using var read = connection.CreateCommand(); read.Transaction = transaction;
@@ -107,12 +139,15 @@ public sealed class SqliteStateStore : IReaderStateStore, IIdentityRegistry, IAs
                     if (table == "bookmarks")
                     {
                         var bookmark = StoreJson.Read<Bookmark>(data);
-                        if (bookmark.Locator == oldLocator) updates.Add((rows.GetString(0), StoreJson.Serialize(bookmark with { Locator = newLocator })));
+                        if (bookmark.Anchor?.Content.Value == movedId || bookmark.Locator?.Path == Path.GetDirectoryName(oldLocator.Path) && bookmark.LegacyPage?.Replace('\\', '/') == Path.GetFileName(oldLocator.Path))
+                            updates.Add((rows.GetString(0), StoreJson.Serialize(bookmark with { Locator = targetBookLocator, Book = targetBook, LegacyPage = bookmark.LegacyPage is null ? null : Path.GetFileName(newLocator.Path) })));
+                        else if (bookmark.Locator == oldLocator) updates.Add((rows.GetString(0), StoreJson.Serialize(bookmark with { Locator = newLocator })));
                     }
                     else
                     {
                         var state = StoreJson.Read<ReadingState>(data);
-                        if (state.Locator == oldLocator) updates.Add((rows.GetString(0), StoreJson.Serialize(state with { Locator = newLocator })));
+                        if (state.Anchor?.Content.Value == movedId || state.Locator == oldLocator)
+                            migratedStates.Add(state with { Book = targetBook, Locator = targetBookLocator, LegacyPage = state.LegacyPage is null ? null : Path.GetFileName(newLocator.Path) });
                     }
                 }
             }
@@ -122,6 +157,13 @@ public sealed class SqliteStateStore : IReaderStateStore, IIdentityRegistry, IAs
                 write.CommandText = $"UPDATE {table} SET data=$data WHERE {(table == "bookmarks" ? "id" : "book_id")}=$id";
                 write.Parameters.AddWithValue("$data", update.Data); write.Parameters.AddWithValue("$id", update.Id); await write.ExecuteNonQueryAsync(token);
             }
+        }
+        // 目标目录已有更近期阅读状态时保留它；书签仍直接指向移动图片身份。
+        foreach (var state in migratedStates)
+        {
+            using var write = connection.CreateCommand(); write.Transaction = transaction;
+            write.CommandText = "INSERT INTO reading_states VALUES($id,$data,$time) ON CONFLICT(book_id) DO UPDATE SET data=$data,accessed=$time WHERE excluded.accessed >= reading_states.accessed";
+            write.Parameters.AddWithValue("$id", state.Book.Value); write.Parameters.AddWithValue("$data", StoreJson.Serialize(state)); write.Parameters.AddWithValue("$time", state.LastAccess.ToString("O")); await write.ExecuteNonQueryAsync(token);
         }
         transaction.Commit(); return true;
     }, token);

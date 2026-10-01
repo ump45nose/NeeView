@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup><OutputType>Exe</OutputType><RootNamespace>NeeView.Preview</RootNamespace></PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><RootNamespace>NeeView.Preview</RootNamespace>
+    <!-- 开发/发布共享固定 RID 图，ARM64 打包不会反复改写默认 lock 文件。 -->
+    <RuntimeIdentifiers>osx-arm64;osx-x64;linux-x64</RuntimeIdentifiers>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../Host/Composition.cs" Link="Composition.cs" />
     <ProjectReference Include="../NeeView.Desktop/NeeView.Desktop.csproj" />

@@ -20,7 +20,8 @@ public sealed class DestinationFolderService(ISettingsStore settings) : IDestina
     public async Task RefreshAsync(string? directory, bool force, CancellationToken token = default)
     {
         var configuration = await settings.LoadAsync(token); Managed = configuration.DestinationFolders.ToArray();
-        if (!force && (_directory == directory || !configuration.AutoRefreshDestinations)) return;
+        if (!force && _directory == directory) return;
+        if (!force && !configuration.AutoRefreshDestinations) { _directory = directory; Children = []; Interlocked.Increment(ref _version); return; }
         _directory = directory; var version = Interlocked.Increment(ref _version);
         if (directory is null) { Children = []; return; }
         var children = await SourceIo.RunAsync(() => Directory.EnumerateDirectories(directory)
