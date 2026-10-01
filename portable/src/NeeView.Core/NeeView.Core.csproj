@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><RootNamespace>NeeView.Core</RootNamespace></PropertyGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>

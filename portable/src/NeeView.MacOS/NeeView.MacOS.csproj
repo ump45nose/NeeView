@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0-macos</TargetFramework><SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion><RootNamespace>NeeView.MacOS</RootNamespace></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../Host/Composition.cs" Link="Composition.cs" />
+    <ProjectReference Include="../NeeView.Desktop/NeeView.Desktop.csproj" />
+    <ProjectReference Include="../NeeView.Content/NeeView.Content.csproj" />
+    <ProjectReference Include="../NeeView.Imaging/NeeView.Imaging.csproj" />
+    <ProjectReference Include="../NeeView.Persistence/NeeView.Persistence.csproj" />
+    <ProjectReference Include="../NeeView.Platform.MacOS/NeeView.Platform.MacOS.csproj" />
+  </ItemGroup>
+</Project>

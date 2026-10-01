@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><RootNamespace>NeeView.Imaging</RootNamespace></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../NeeView.Application/NeeView.Application.csproj" />
+    <PackageReference Include="Magick.NET-Q8-AnyCPU" />
+  </ItemGroup>
+</Project>

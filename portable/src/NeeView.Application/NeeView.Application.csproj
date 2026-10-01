@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><RootNamespace>NeeView.Application</RootNamespace></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../NeeView.Core/NeeView.Core.csproj" />
+  </ItemGroup>
+</Project>
