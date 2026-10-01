@@ -58,10 +58,10 @@ public sealed class ReaderDestinationPanel : UserControl
     private Control Label(string path, bool managed)
     {
         var index = _paths.ToList().IndexOf(path);
-        var text = new TextBlock { Text = (managed && index is >= 0 and < 9 ? $"{index + 1} · " : "") + Path.GetFileName(path.TrimEnd('/')), Margin = new(6) };
+        var text = new TextBlock { Classes = { "reader-destination-label" }, Text = (managed && index is >= 0 and < 9 ? $"{index + 1} · " : "") + Path.GetFileName(path.TrimEnd('/')) };
         ToolTip.SetTip(text, path); return text;
     }
     /// <summary>组合区标题和虚拟化列表；列表拥有各自滚动状态。</summary>
     private static Control Section(string title, Control list)
-    { var dock = new DockPanel(); var text = new TextBlock { Text = title, Margin = new(6) }; DockPanel.SetDock(text, Dock.Top); dock.Children.Add(text); dock.Children.Add(list); return dock; }
+    { var dock = new DockPanel(); var text = new TextBlock { Classes = { "reader-section-title" }, Text = title }; DockPanel.SetDock(text, Dock.Top); dock.Children.Add(text); dock.Children.Add(list); return dock; }
 }

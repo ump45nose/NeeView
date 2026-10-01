@@ -8,7 +8,7 @@ internal static class ReaderPanelControls
     /// <summary>输入标题和异步动作，返回捕获异常的按钮。</summary>
     public static Button Button(string label, Func<Task> action, ReaderWorkspaceViewModel workspace)
     {
-        var button = new Button { Content = label, Margin = new(2) };
+        var button = new Button { Content = label }; button.Classes.Add("reader-action");
         button.Click += async (_, _) => await RunAsync(action, workspace); return button;
     }
     /// <summary>统一观察控件事件的异步任务，避免事件异常逃逸。</summary>

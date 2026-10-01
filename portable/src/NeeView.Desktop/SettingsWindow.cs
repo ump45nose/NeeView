@@ -13,15 +13,15 @@ public sealed class SettingsWindow : Window
     /// <summary>输入配置与当前书籍选项，返回用户确认的修改；取消不产生副作用。</summary>
     public SettingsWindow(AppSettings settings, ReaderOptions current)
     {
-        Title = "NeeView 设置"; Width = 760; Height = 650; WindowStartupLocation = WindowStartupLocation.CenterOwner;
-        var dock = new DockPanel { Margin = new(16) }; Content = dock;
+        Classes.Add("reader-settings"); Title = "NeeView 设置"; WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        var dock = new DockPanel { Classes = { "reader-settings-root" } }; Content = dock;
         var tabs = new TabControl();
         var currentEditor = new ReadingOptionsEditor(current);
         var defaultsEditor = new ReadingOptionsEditor(settings.Defaults);
-        var shortcuts = new StackPanel { Spacing = 8 };
+        var shortcuts = new StackPanel { Classes = { "reader-shortcuts" } };
         var rows = new List<(TextBox Gesture, ComboBox Command, TextBox Parameter)>();
         var shortcutPanel = new DockPanel();
-        var description = new TextBlock { Text = "数字键保持 NeeView 含义；系统命令使用 Meta（Command）。鼠标可填写 WheelUp、WheelDown、LeftClick、RightClick、MiddleClick、DoubleClick。", TextWrapping = Avalonia.Media.TextWrapping.Wrap, Margin = new(0, 8) };
+        var description = new TextBlock { Classes = { "reader-help" }, Text = "数字键保持 NeeView 含义；系统命令使用 Meta（Command）。鼠标可填写 WheelUp、WheelDown、LeftClick、RightClick、MiddleClick、DoubleClick。", TextWrapping = Avalonia.Media.TextWrapping.Wrap };
         DockPanel.SetDock(description, Dock.Top); shortcutPanel.Children.Add(description);
         var add = new Button { Content = "添加绑定", HorizontalAlignment = HorizontalAlignment.Left }; DockPanel.SetDock(add, Dock.Bottom); shortcutPanel.Children.Add(add);
         add.Click += (_, _) => AddBinding(new("", "NextPage"));
@@ -37,7 +37,7 @@ public sealed class SettingsWindow : Window
             rows.Add(entry); delete.Click += (_, _) => { rows.Remove(entry); shortcuts.Children.Remove(row); };
             row.Children.Add(gesture); Grid.SetColumn(command, 1); row.Children.Add(command); Grid.SetColumn(parameter, 2); row.Children.Add(parameter); Grid.SetColumn(delete, 3); row.Children.Add(delete); shortcuts.Children.Add(row);
         }
-        var classification = new StackPanel { Spacing = 14, Margin = new(12) };
+        var classification = new StackPanel { Classes = { "reader-settings-group" } };
         var capacity = new NumericUpDown { Minimum = 0, Maximum = 1000, Value = settings.MoveHistoryCapacity };
         var copy = new CheckBox { Content = "数字分类默认复制", IsChecked = settings.CopyMode };
         var auto = new CheckBox { Content = "图片目录变化时自动刷新子目录", IsChecked = settings.AutoRefreshDestinations };
@@ -45,17 +45,17 @@ public sealed class SettingsWindow : Window
         var right = new CheckBox { Content = "显示分类侧栏", IsChecked = settings.RightVisible };
         classification.Children.Add(new TextBlock { Text = "移动历史容量（退出时清空）" }); classification.Children.Add(capacity);
         classification.Children.Add(copy); classification.Children.Add(auto); classification.Children.Add(left); classification.Children.Add(right);
-        var policies = new StackPanel { Spacing = 8, Margin = new(12) };
+        var policies = new StackPanel { Classes = { "reader-settings-group" } };
         var policyRows = new List<(string Field, ComboBox Value)>();
         foreach (var (field, name) in new[] { ("DoublePage", "单双页"), ("Direction", "阅读方向"), ("DivideWide", "宽图分割"), ("SingleFirst", "封面单页"), ("SingleLast", "末页单页"), ("WidePage", "宽图独占双页"), ("Sort", "排序"), ("Zoom", "缩放") })
         {
-            var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12 };
-            var value = new ComboBox { ItemsSource = ReaderLabels.Choices(Enum.GetValues<RestorePolicy>()), SelectedItem = new ReaderChoice<RestorePolicy>(settings.RestorePolicies.GetValueOrDefault(field, RestorePolicy.RestoreOrDefault), ReaderLabels.Text(settings.RestorePolicies.GetValueOrDefault(field, RestorePolicy.RestoreOrDefault))), MinWidth = 230 };
-            row.Children.Add(new TextBlock { Text = name, Width = 130, VerticalAlignment = VerticalAlignment.Center }); row.Children.Add(value); policies.Children.Add(row); policyRows.Add((field, value));
+            var row = new StackPanel { Classes = { "reader-policy-row" }, Orientation = Orientation.Horizontal };
+            var value = new ComboBox { Classes = { "reader-policy-value" }, ItemsSource = ReaderLabels.Choices(Enum.GetValues<RestorePolicy>()), SelectedItem = new ReaderChoice<RestorePolicy>(settings.RestorePolicies.GetValueOrDefault(field, RestorePolicy.RestoreOrDefault), ReaderLabels.Text(settings.RestorePolicies.GetValueOrDefault(field, RestorePolicy.RestoreOrDefault))) };
+            row.Children.Add(new TextBlock { Classes = { "reader-policy-label" }, Text = name, VerticalAlignment = VerticalAlignment.Center }); row.Children.Add(value); policies.Children.Add(row); policyRows.Add((field, value));
         }
         tabs.ItemsSource = new[] { new TabItem { Header = "当前书籍", Content = currentEditor }, new TabItem { Header = "默认阅读", Content = defaultsEditor }, new TabItem { Header = "恢复规则", Content = policies }, new TabItem { Header = "快捷键与鼠标", Content = shortcutPanel }, new TabItem { Header = "分类与侧栏", Content = classification } };
-        var bottom = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Spacing = 8 };
-        var message = new TextBlock { TextWrapping = Avalonia.Media.TextWrapping.Wrap, MaxWidth = 460 };
+        var bottom = new StackPanel { Classes = { "reader-dialog-actions" }, Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+        var message = new TextBlock { Classes = { "reader-settings-feedback" }, TextWrapping = Avalonia.Media.TextWrapping.Wrap };
         var cancel = new Button { Content = "取消" }; cancel.Click += (_, _) => Close();
         var save = new Button { Content = "保存" }; save.Click += (_, _) =>
         {
@@ -78,7 +78,7 @@ public sealed class ReadingOptionsEditor : ScrollViewer
     /// <summary>输入不可变阅读选项，建立本地编辑状态。</summary>
     public ReadingOptionsEditor(ReaderOptions options)
     {
-        _original = options; var panel = new StackPanel { Spacing = 12, Margin = new(12) }; Content = panel;
+        _original = options; var panel = new StackPanel { Classes = { "reader-settings-group" } }; Content = panel;
         _mode = Choice(panel, "查看模式", Enum.GetValues<ReaderMode>(), options.Mode); _direction = Choice(panel, "阅读方向", Enum.GetValues<ReadDirection>(), options.Direction);
         _scale = Choice(panel, "缩放规则", Enum.GetValues<ScaleMode>(), options.Scale); _sort = Choice(panel, "排序", Enum.GetValues<SortMode>(), options.Sort);
         _double = Flag(panel, "双页阅读", options.DoublePage); _divide = Flag(panel, "单页模式分割宽图", options.DivideWide);
@@ -92,7 +92,7 @@ public sealed class ReadingOptionsEditor : ScrollViewer
         Zoom = (double)(_zoom.Value ?? 1), ColumnWidth = (double)(_column.Value ?? 320) };
     /// <summary>建立有标签的枚举编辑项。</summary>
     private static ComboBox Choice<T>(StackPanel parent, string label, T[] values, T selected)
-    { parent.Children.Add(new TextBlock { Text = label }); var box = new ComboBox { ItemsSource = ReaderLabels.Choices(values), SelectedItem = new ReaderChoice<T>(selected, ReaderLabels.Text(selected!)), MinWidth = 280 }; parent.Children.Add(box); return box; }
+    { parent.Children.Add(new TextBlock { Text = label }); var box = new ComboBox { Classes = { "reader-option-choice" }, ItemsSource = ReaderLabels.Choices(values), SelectedItem = new ReaderChoice<T>(selected, ReaderLabels.Text(selected!)) }; parent.Children.Add(box); return box; }
     /// <summary>建立布尔阅读选项。</summary>
     private static CheckBox Flag(StackPanel parent, string label, bool value)
     { var box = new CheckBox { Content = label, IsChecked = value }; parent.Children.Add(box); return box; }

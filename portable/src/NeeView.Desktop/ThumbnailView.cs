@@ -21,7 +21,7 @@ public sealed class ThumbnailView : Control
     private WriteableBitmap? _bitmap;
     /// <summary>输入条目及应用接口，建立无持久化依赖的缩略图控件。</summary>
     public ThumbnailView(PageDescriptor page, IReaderSession session, IImageRequestScheduler scheduler)
-    { _page = page; _session = session; _scheduler = scheduler; Width = 48; Height = 64; }
+    { _page = page; _session = session; _scheduler = scheduler; }
     /// <summary>控件可见后提交需求，取消源由加载任务最终释放。</summary>
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     { base.OnAttachedToVisualTree(e); _cancellation = new(); _ = LoadAsync(_cancellation); }

@@ -6,6 +6,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Layout;
+using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
@@ -16,7 +17,7 @@ using NeeView.Core;
 namespace NeeView.Desktop;
 
 /// <summary>主窗口仅调用应用契约，面板虚拟化和查看器共用会话。</summary>
-public sealed class MainWindow : Window, IReaderDialogs
+public sealed partial class MainWindow : Window, IReaderDialogs
 {
     private readonly ReaderWorkspaceViewModel _workspace;
     private readonly IReaderSession _session;
@@ -26,10 +27,10 @@ public sealed class MainWindow : Window, IReaderDialogs
     private readonly ILegacyImporter _importer;
     private readonly ReaderView _viewer;
     private readonly ScrollViewer _scroll;
-    private readonly TextBlock _status = new() { Margin = new(8, 4), TextTrimming = TextTrimming.CharacterEllipsis };
-    private readonly TextBox _address = new() { PlaceholderText = "图片、目录或 ZIP / RAR / 7z 路径", MinWidth = 200 };
-    private readonly Grid _body = new();
-    private readonly Slider _position = new() { Minimum = 0, Maximum = 1 };
+    private readonly TextBlock _status;
+    private readonly TextBox _address;
+    private readonly Grid _body;
+    private readonly Slider _position;
     private AppSettings _settings = new();
     private bool _updating;
     private bool _closing;
@@ -48,6 +49,13 @@ public sealed class MainWindow : Window, IReaderDialogs
         IFileActionService files, IDestinationFolderService destinations, IFolderNavigator folders,
         IPlatformService platform, ILegacyImporter importer, IImageRequestScheduler scheduler, IImageDecoder decoder)
     {
+        // 视觉结构由 XAML 独立定义；宿主只解析稳定插槽和装配应用接口。
+        AvaloniaXamlLoader.Load(this);
+        _status = this.FindControl<TextBlock>("StatusField")!;
+        _address = this.FindControl<TextBox>("AddressField")!;
+        _body = this.FindControl<Grid>("BodyGrid")!;
+        _position = this.FindControl<Slider>("PositionField")!;
+        _scroll = this.FindControl<ScrollViewer>("ViewerScroll")!;
         _session = session; _settingsStore = settings; _states = states; _files = files; _importer = importer;
         _workspace = new(session, settings, states, files, destinations, platform, folders) { Dialogs = this };
         DataContext = _workspace;
@@ -56,29 +64,23 @@ public sealed class MainWindow : Window, IReaderDialogs
         _workspace.SettingsChanged += () => Dispatcher.UIThread.Post(() => { if (!_closing) { _settings = _workspace.Settings; ApplySettings(); } });
         _workspace.CloseRequested += Close;
         _workspace.QuitRequested += () => (Avalonia.Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.TryShutdown();
-        Title = "NeeView · macOS"; Width = 1280; Height = 860; MinWidth = 800; MinHeight = 480; FontSize = 14;
         _input = new(() => _settings, () => _session.Snapshot, ExecuteAsync, text => _status.Text = text);
         _viewer = new(session, scheduler, decoder) { MouseGesture = _input.GestureAsync };
-        _scroll = new() { Content = _viewer, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto };
+        _scroll.Content = _viewer;
         _viewer.ScrollRequested += y => { _scroll.Offset = new(_scroll.Offset.X, y); };
         _viewer.PanRequested += (x, y) => _scroll.Offset = new(x, y);
         _scroll.ScrollChanged += (_, _) => _viewer.SetViewport(_scroll.Viewport.Width, _scroll.Viewport.Height, _scroll.Offset.Y, left: _scroll.Offset.X);
         _scroll.SizeChanged += (_, _) => _viewer.SetViewport(_scroll.Bounds.Width, _scroll.Bounds.Height, _scroll.Offset.Y, false, _scroll.Offset.X);
-        var root = new DockPanel(); Content = root;
-        var toolbar = BuildToolbar(); DockPanel.SetDock(toolbar, Dock.Top); root.Children.Add(toolbar);
-        var bottom = new StackPanel { Orientation = Orientation.Vertical }; DockPanel.SetDock(bottom, Dock.Bottom);
+        _address.KeyDown += (_, e) => { if (e.Key == Key.Enter) { Open(_address.Text ?? ""); e.Handled = true; } };
         _position.PropertyChanged += async (_, e) =>
         {
             if (e.Property == Slider.ValueProperty && !_updating && _session.Snapshot.Index is { } index && index.Pages.Count > 0)
                 await _session.LocateAsync(new(index.Pages[Math.Clamp((int)_position.Value, 0, index.Pages.Count - 1)].Id));
         };
-        bottom.Children.Add(_position); bottom.Children.Add(_status); root.Children.Add(bottom);
-        _body.ColumnDefinitions = new("240,5,*,5,260"); root.Children.Add(_body);
-        _navigation = new(_workspace, session, scheduler); Grid.SetColumn(_navigation, 0); _body.Children.Add(_navigation);
-        var splitter1 = new GridSplitter { ResizeDirection = GridResizeDirection.Columns }; Grid.SetColumn(splitter1, 1); _body.Children.Add(splitter1);
-        Grid.SetColumn(_scroll, 2); _body.Children.Add(_scroll);
-        var splitter2 = new GridSplitter { ResizeDirection = GridResizeDirection.Columns }; Grid.SetColumn(splitter2, 3); _body.Children.Add(splitter2);
-        _destinationPanel = new(_workspace, RefreshDestinationsAsync); Grid.SetColumn(_destinationPanel, 4); _body.Children.Add(_destinationPanel);
+        _navigation = new(_workspace, session, scheduler);
+        this.FindControl<ContentControl>("NavigationHost")!.Content = _navigation;
+        _destinationPanel = new(_workspace, RefreshDestinationsAsync);
+        this.FindControl<ContentControl>("DestinationsHost")!.Content = _destinationPanel;
         _session.Changed += SnapshotChanged;
         AddHandler(KeyDownEvent, (_, e) => _input.KeyDown(this, e), Avalonia.Interactivity.RoutingStrategies.Tunnel);
         _viewer.AddHandler(PointerWheelChangedEvent, (_, e) => _input.Wheel(e), Avalonia.Interactivity.RoutingStrategies.Tunnel);
@@ -96,17 +98,13 @@ public sealed class MainWindow : Window, IReaderDialogs
             if (!_closing && pending.Count > 0) _status.Text = $"有 {pending.Count} 个中断文件操作，原文件和备份已保留；请在恢复记录中核对。";
         });
     }
-    /// <summary>构造常用阅读工具栏，所有按钮进入统一命令入口。</summary>
-    private Control BuildToolbar()
+    /// <summary>适配 XAML 按钮的稳定命令标识，捕获异步异常；排布与文案不影响命令实现。</summary>
+    /// <param name="sender">带有命令 Tag 的工具栏按钮。</param>
+    /// <param name="e">按钮点击事件。</param>
+    private async void OnToolbarClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        var dock = new DockPanel { Margin = new(6) };
-        var buttons = new WrapPanel { Orientation = Orientation.Horizontal };
-        foreach (var (label, command) in new[] { ("打开", "Open"), ("‹", "PrevPage"), ("›", "NextPage"), ("分页", "Paged"), ("连续", "Continuous"), ("瀑布流", "Masonry"), ("双页", "ToggleDouble"), ("方向", "ToggleDirection"), ("适应", "Fit"), ("100%", "ActualPixels"), ("书签", "Bookmark") })
-            buttons.Children.Add(Button(label, () => ExecuteAsync(command)));
-        buttons.Children.Add(Button("设置", EditSettingsAsync)); buttons.Children.Add(Button("导入", ImportAsync));
-        DockPanel.SetDock(buttons, Dock.Bottom); dock.Children.Add(buttons); dock.Children.Add(_address);
-        _address.KeyDown += (_, e) => { if (e.Key == Key.Enter) { Open(_address.Text ?? ""); e.Handled = true; } };
-        return dock;
+        if (sender is not Button { Tag: string command } || _closing) return;
+        await ObserveAsync(command switch { "Settings" => EditSettingsAsync, "Import" => ImportAsync, _ => () => ExecuteAsync(command) });
     }
     /// <summary>同步投递阅读表现更新；后台面板任务可等待、可取消，错误统一观察。</summary>
     private void SnapshotChanged(ReaderSnapshot snapshot) => Dispatcher.UIThread.Post(() =>
@@ -235,7 +233,7 @@ public sealed class MainWindow : Window, IReaderDialogs
     /// <summary>创建统一异步按钮，错误在当前窗口显示。</summary>
     private Button Button(string label, Func<Task> action)
     {
-        var button = new Button { Content = label, Margin = new(2) };
+        var button = new Button { Content = label }; button.Classes.Add("reader-action");
         button.Click += async (_, _) => await ObserveAsync(action);
         return button;
     }

@@ -15,7 +15,7 @@ public sealed class ReaderNavigationPanel : UserControl
     private readonly TreeView _tree = new();
     private readonly ListBox _history = new();
     private readonly TreeView _bookmarks = new();
-    private readonly TextBlock _information = new() { Margin = new(10), TextWrapping = TextWrapping.Wrap };
+    private readonly TextBlock _information = new() { Classes = { "reader-information" }, TextWrapping = TextWrapping.Wrap };
     private readonly ComboBox _sort = new() { ItemsSource = ReaderLabels.Choices(Enum.GetValues<SortMode>()) };
     private bool _updating;
     private string? _rootPath;
@@ -28,9 +28,9 @@ public sealed class ReaderNavigationPanel : UserControl
         _pages.ItemTemplate = new FuncDataTemplate<PageDescriptor>((page, _) =>
         {
             if (page is null) return new TextBlock();
-            var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Margin = new(4) };
+            var row = new StackPanel { Classes = { "reader-page-row" }, Orientation = Orientation.Horizontal };
             row.Children.Add(new ThumbnailView(page, session, scheduler));
-            row.Children.Add(new TextBlock { Text = page.Name, VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis, MaxWidth = 170 }); return row;
+            row.Children.Add(new TextBlock { Classes = { "reader-page-name" }, Text = page.Name, VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis }); return row;
         });
         _pages.SelectionChanged += async (_, _) => await ReaderPanelControls.RunAsync(async () =>
         { if (!_updating && _pages.SelectedItem is PageDescriptor page) await session.LocateAsync(new(page.Id), true); }, workspace);
@@ -40,10 +40,10 @@ public sealed class ReaderNavigationPanel : UserControl
         _tree.ItemTemplate = new FuncTreeDataTemplate<FolderNode>((node, _) => new TextBlock { Text = node?.ToString() }, node => node.Children);
         _tree.SelectionChanged += async (_, _) => await ReaderPanelControls.RunAsync(async () =>
         { if (_updating || _tree.SelectedItem is not FolderNode node) return; await workspace.ExpandFolderAsync(node); await workspace.OpenAsync(node.Path); }, workspace);
-        _history.ItemTemplate = new FuncDataTemplate<ReadingState>((state, _) => new TextBlock { Text = state?.Locator.Path, Margin = new(4), TextTrimming = TextTrimming.CharacterEllipsis });
+        _history.ItemTemplate = new FuncDataTemplate<ReadingState>((state, _) => new TextBlock { Classes = { "reader-list-label" }, Text = state?.Locator.Path, TextTrimming = TextTrimming.CharacterEllipsis });
         _history.DoubleTapped += async (_, _) => await ReaderPanelControls.RunAsync(async () =>
         { if (_history.SelectedItem is ReadingState state) await workspace.OpenAsync(state.Locator.Path); }, workspace);
-        _bookmarks.ItemTemplate = new FuncTreeDataTemplate<BookmarkNode>((node, _) => new TextBlock { Text = node?.Item.Name, Margin = new(4) }, node => node.Children);
+        _bookmarks.ItemTemplate = new FuncTreeDataTemplate<BookmarkNode>((node, _) => new TextBlock { Classes = { "reader-list-label" }, Text = node?.Item.Name }, node => node.Children);
         _bookmarks.DoubleTapped += async (_, _) => await ReaderPanelControls.RunAsync(async () =>
         { if (_bookmarks.SelectedItem is BookmarkNode node) await workspace.OpenBookmarkAsync(node.Item); }, workspace);
         var marks = new DockPanel(); var actions = new WrapPanel();

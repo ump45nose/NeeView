@@ -18,7 +18,13 @@ namespace NeeView.Portable.Tests;
 
 public sealed class TestApplication : Avalonia.Application
 {
-    public override void Initialize() => Styles.Add(new FluentTheme());
+    /// <summary>装载与正式界面相同的样式，Headless 交互覆盖真实 XAML 和主题入口。</summary>
+    public override void Initialize()
+    {
+        Styles.Add(new FluentTheme());
+        Styles.Add(new Avalonia.Markup.Xaml.Styling.StyleInclude(new Uri("avares://NeeView.Desktop/"))
+        { Source = new Uri("avares://NeeView.Desktop/Styles/ReaderTheme.axaml") });
+    }
 }
 public static class TestAvaloniaBuilder
 {

@@ -49,7 +49,7 @@ python3 scripts/package_macos.py --sign 'Developer ID Application: …' --notary
 
 ## 前端调整
 
-MainWindow 组合独立 ReaderNavigationPanel、ReaderDestinationPanel、ReaderView 和 SettingsWindow。命令与面板业务进入 ReaderWorkspaceViewModel，目录/书签数据由应用接口加载，控件不引用数据库或解压实现。颜色使用 ReaderTheme.axaml，中文显示使用 ReaderLabels；可逐个替换控件为 XAML 模板，不影响阅读规则和文件操作。
+主页面排布与工具栏位于 MainWindow.axaml，宿主装配独立 ReaderNavigationPanel、ReaderDestinationPanel、ReaderView 和 SettingsWindow。命令与面板业务进入 ReaderWorkspaceViewModel，目录/书签数据由应用接口加载，控件不引用数据库或解压实现。颜色、间距、缩略图和设置页尺寸集中在 ReaderTheme.axaml，显示文本使用 ReaderLabels；其余面板可逐个替换为 XAML 模板，不影响阅读规则和文件操作。后台布局协调器只计算纯几何，与窗口和绘制独立。
 
 ## 可复现证据
 

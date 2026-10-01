@@ -21,7 +21,7 @@ flowchart TB
   Application --> Core
 ```
 
-Core 只含内容身份、排序、阅读规则、锚点和布局。Application 声明内容、图像、存储、文件、平台接口并协调状态。Desktop 使用独立 ReaderView、导航控件、分类控件和设置窗口；表现逻辑集中在无控件引用的工作区 ViewModel，输入与主题各自独立。详见 [前端边界](frontend-boundaries.md)。具体实现由 Host 注册。Preview 是共享界面的开发验证入口；正式 MacOS Host 和 Platform.MacOS 使用 net10.0-macos / AppKit，须完整 Xcode。
+Core 只含内容身份、排序、阅读规则、锚点和布局。Application 声明内容、图像、存储、文件、平台接口并协调状态。Desktop 使用独立 ReaderView、导航控件、分类控件和设置窗口；主页面结构位于 MainWindow.axaml，表现逻辑集中在无控件引用的工作区 ViewModel，输入与主题各自独立。详见 [前端边界](frontend-boundaries.md)。具体实现由 Host 注册。Preview 是共享界面的开发验证入口；正式 MacOS Host 和 Platform.MacOS 使用 net10.0-macos / AppKit，须完整 Xcode。
 
 运行时采用 C# / .NET 10、Avalonia 12.1.3、CommunityToolkit.Mvvm、Magick.NET Q8 14.17.2、SharpCompress 0.50.3、SQLite 和 JSON。依赖集中锁定，提交 NuGet lock 文件。
 
@@ -34,6 +34,7 @@ ContentId 与路径分离；路径登记持久化。移动/重命名保留身份
 ## 显示和操作流程
 
 打开请求 → 会话 → 来源索引 → 布局 → 可见需求 → 调度 → 解码 → 像素租约 → 绘制。分页、连续和瀑布流使用同一索引和缓存。只为可见和邻近页面解码，不创建全量图片控件。
+连续与瀑布流由独立协调器在后台串行计算；瀑布流每 256 页保存检查点，从未变前缀重排。结果按布局版本和书籍代次裁决，提交时使用最新阅读锚点；几何缓存保存输入副本，取消不替换成功缓存。
 
 文件目标 → 能力校验 → 串行操作 → 恢复记录 → 实际文件结果 → 身份/索引/缓存更新 → 会话响应 → 成功后修改移动历史。归档条目只读；瀑布流分类必须显式选中。
 
@@ -49,7 +50,7 @@ ContentId 与路径分离；路径登记持久化。移动/重命名保留身份
 
 P1–P5 的主要功能已有共享界面和服务实现，按独立模块继续迭代；阶段状态见验收表。目录/ZIP/RAR/7z 的真实解码和位置恢复有脚本证据，文件恢复使用持久化日志状态机，旧数据导入固定 Windows 数值/默认键位。
 
-49 项自动测试通过不代表全部阶段验收结束。当前仍需：Windows 原行为动态对照、真机触控板/多屏/NAS/跨卷、布局后台增量重排与长时间内存、实际用户旧数据导入、正式 Host 构建和 Developer ID 公证安装。性能报告的终点是像素租约，不是绘制完成。
+51 项自动测试通过不代表全部阶段验收结束。当前仍需：Windows 原行为动态对照、真机触控板/多屏/NAS/跨卷、绘制帧与长时间内存、实际用户旧数据导入、正式 Host 构建和 Developer ID 公证安装。性能报告的终点是像素租约，不是绘制完成。
 
 ## 开发约束
 
