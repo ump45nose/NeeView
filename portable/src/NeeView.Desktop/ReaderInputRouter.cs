@@ -13,10 +13,13 @@ public sealed class ReaderInputRouter(Func<AppSettings> settings, Func<ReaderSna
     /// <summary>文本编辑拥有独立作用域；冲突键位明确显示所有命令而不执行。</summary>
     public async void KeyDown(Window owner, KeyEventArgs e)
     {
-        if (e.Source is TextBox || owner.FocusManager?.GetFocusedElement() is TextBox) return;
+        var editingText = e.Source is TextBox || owner.FocusManager?.GetFocusedElement() is TextBox;
         foreach (var binding in settings().Shortcuts)
         {
             if (!TryGesture(binding.Gesture, out var gesture) || !gesture.Matches(e)) continue;
+            // 文本输入保留数字与编辑键；Command 系统打开/关闭/退出仍属于窗口作用域。
+            if (editingText && !(e.KeyModifiers.HasFlag(KeyModifiers.Meta)
+                && CommandCatalog.Resolve(binding.Command) is "Open" or "Close" or "Quit")) continue;
             var conflicts = CommandCatalog.Conflicts(settings().Shortcuts).Where(c => c.StartsWith(CommandCatalog.NormalizeGesture(binding.Gesture) + ":", StringComparison.OrdinalIgnoreCase)).ToArray();
             e.Handled = true;
             if (conflicts.Length > 0) { message(string.Join("；", conflicts)); return; }

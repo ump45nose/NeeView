@@ -53,7 +53,9 @@ public static class OptionRestore
         var values = new Dictionary<string, object?>();
         foreach (var property in typeof(ReaderOptions).GetProperties())
         {
-            var policy = policies?.GetValueOrDefault(property.Name) ?? RestorePolicy.RestoreOrDefault;
+            // 差分配置缺失的字段使用恢复策略；不能把字典缺失返回的枚举零值当作显式 Default。
+            var policy = policies is not null && policies.TryGetValue(property.Name, out var configured)
+                ? configured : RestorePolicy.RestoreOrDefault;
             var source = policy switch
             {
                 RestorePolicy.Default => defaults,

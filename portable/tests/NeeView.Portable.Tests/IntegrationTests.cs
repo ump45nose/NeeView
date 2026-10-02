@@ -14,6 +14,28 @@ namespace NeeView.Portable.Tests;
 
 public sealed class IntegrationTests
 {
+    /// <summary>未单独配置的恢复字段使用历史值；显式默认策略仍可覆盖每本书保存的模式。</summary>
+    [Fact]
+    public async Task RestartRestoresBookModeAndExplicitDefaultStillWins()
+    {
+        await using var workspace = new TestWorkspace();
+        var folder = Path.Combine(workspace.Root, "mode-restore"); Directory.CreateDirectory(folder);
+        await File.WriteAllBytesAsync(Path.Combine(folder, "1.jpg"), [1]);
+        // 模拟设置页仅写入部分策略，Mode 没有配置项时不能误用枚举零值 Default。
+        await workspace.Settings.SaveAsync(new() { RestorePolicies = new() { [nameof(ReaderOptions.Zoom)] = RestorePolicy.Continue } });
+        await using (var initial = workspace.Session())
+        {
+            await initial.OpenAsync(new(folder));
+            await initial.SetOptionsAsync(initial.Snapshot.Options with { Mode = ReaderMode.Masonry });
+        }
+        await using (var restored = workspace.Session())
+        {
+            await restored.OpenAsync(new(folder)); Assert.Equal(ReaderMode.Masonry, restored.Snapshot.Options.Mode);
+        }
+        await workspace.Settings.UpdateAsync(s => s with { RestorePolicies = new() { [nameof(ReaderOptions.Mode)] = RestorePolicy.Default } });
+        await using var defaultMode = workspace.Session(); await defaultMode.OpenAsync(new(folder));
+        Assert.Equal(ReaderMode.Paged, defaultMode.Snapshot.Options.Mode);
+    }
     [Fact]
     public async Task DirectoryZipNavigationRestoreAndFailureKeepCurrentBook()
     {

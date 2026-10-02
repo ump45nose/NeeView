@@ -36,8 +36,8 @@ public sealed class ReaderDestinationPanel : UserControl
         actions.Children.Add(ReaderPanelControls.Button("移除目标", async () => { if (_managed.SelectedItem is string path) await workspace.EditDestinationAsync(path, false); }, workspace));
         actions.Children.Add(ReaderPanelControls.Button("上移目标", async () => { if (_managed.SelectedItem is string path) await workspace.EditDestinationAsync(path, true); }, workspace));
         DockPanel.SetDock(actions, Dock.Bottom); dock.Children.Add(actions);
-        _managed.ItemTemplate = new FuncDataTemplate<string>((path, _) => Label(path!, true));
-        _children.ItemTemplate = new FuncDataTemplate<string>((path, _) => Label(path!, false));
+        _managed.ItemTemplate = new FuncDataTemplate<string>((path, _) => Label(path, true));
+        _children.ItemTemplate = new FuncDataTemplate<string>((path, _) => Label(path, false));
         _managed.DoubleTapped += async (_, _) => await ReaderPanelControls.RunAsync(async () => { if (_managed.SelectedItem is string path) await workspace.ClassifyAsync(path); }, workspace);
         _children.DoubleTapped += async (_, _) => await ReaderPanelControls.RunAsync(async () => { if (_children.SelectedItem is string path) await workspace.ClassifyAsync(path); }, workspace);
         var upper = Section("目标目录（前九项对应数字键）", _managed); var lower = Section("当前目录的直接子目录", _children);
@@ -55,8 +55,13 @@ public sealed class ReaderDestinationPanel : UserControl
     public void ApplySettings(AppSettings settings)
     { _updating = true; try { _copy.IsChecked = settings.CopyMode; _autoRefresh.IsChecked = settings.AutoRefreshDestinations; } finally { _updating = false; } }
     /// <summary>创建目录条目显示控件，完整定位通过提示展示。</summary>
-    private Control Label(string path, bool managed)
+    /// <param name="path">真实目录路径；容器清理阶段可能传入空数据。</param>
+    /// <param name="managed">是否为需要编号的手动目标。</param>
+    /// <returns>当前数据对应的目录标签或空占位控件。</returns>
+    private Control Label(string? path, bool managed)
     {
+        // 列表重绑定时模板会先清理旧数据；空项不能打断刷新而留下重复容器。
+        if (path is null) return new TextBlock();
         var index = _paths.ToList().IndexOf(path);
         var text = new TextBlock { Classes = { "reader-destination-label" }, Text = (managed && index is >= 0 and < 9 ? $"{index + 1} · " : "") + Path.GetFileName(path.TrimEnd('/')) };
         ToolTip.SetTip(text, path); return text;

@@ -33,6 +33,49 @@ public static class TestAvaloniaBuilder
 }
 public sealed class UiTests
 {
+    /// <summary>分类列表多次重绑定时，Avalonia 的空数据模板清理不能中断刷新或留下重复条目。</summary>
+    [AvaloniaFact]
+    public async Task DestinationRefreshClearsTemplatesAndKeepsSingleChild()
+    {
+        await using var workspace = new TestWorkspace();
+        await using var session = workspace.Session();
+        var model = new ReaderWorkspaceViewModel(session, workspace.Settings, workspace.States, new CountingFiles(),
+            new DestinationFolderService(workspace.Settings), new TestPlatform(), new FolderNavigator());
+        var panel = new ReaderDestinationPanel(model, _ => Task.CompletedTask);
+        var window = new Window { Content = panel, Width = 500, Height = 600 }; window.Show();
+        try
+        {
+            // 真机失败发生在刷新已有子目录后添加目标；重复绑定复现容器销毁与重建。
+            var child = Path.Combine(workspace.Root, "收纳");
+            panel.SetData(new([], [child])); window.UpdateLayout();
+            var lists = panel.GetVisualDescendants().OfType<ListBox>().ToArray();
+            foreach (var list in lists) Assert.NotNull(list.ItemTemplate!.Build(null));
+            for (var refresh = 0; refresh < 3; refresh++)
+            {
+                panel.SetData(new([workspace.Root], [child])); window.UpdateLayout();
+                Assert.Single(lists[1].Items);
+                Assert.Single(lists[1].GetVisualDescendants().OfType<ListBoxItem>());
+            }
+        }
+        finally { window.Close(); }
+    }
+    /// <summary>地址框仍隔离数字分类，但 Command+W 必须保留系统关闭语义。</summary>
+    [AvaloniaFact]
+    public void TextEditingKeepsSystemCloseShortcut()
+    {
+        var commands = new List<string>();
+        var router = new ReaderInputRouter(() => new AppSettings(), () => new(0, null, null, null, new(), false, null),
+            (command, _) => { commands.Add(command); return Task.CompletedTask; }, _ => { });
+        var address = new TextBox(); var owner = new Window { Content = address }; owner.Show(); address.Focus();
+        try
+        {
+            var close = new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Source = address, Key = Key.W, KeyModifiers = KeyModifiers.Meta };
+            router.KeyDown(owner, close); Assert.True(close.Handled); Assert.Equal(["Close"], commands);
+            var digit = new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Source = address, Key = Key.D1 };
+            router.KeyDown(owner, digit); Assert.False(digit.Handled); Assert.Single(commands);
+        }
+        finally { owner.Close(); }
+    }
     /// <summary>程序恢复跨列锚点不能被当作用户滚动；真实滚动仍更新锚点并保留分类选择。</summary>
     [AvaloniaFact]
     public async Task ProgrammaticMasonryScrollKeepsAnchorAndUserScrollStillUpdatesIt()
