@@ -32,6 +32,10 @@ public sealed class ReaderView : Control, IDisposable
     private Avalonia.Vector _initialPan;
     private bool _dragged;
     private bool _disposed;
+    private Book? _displayBook;
+    private PageRange? _displayRange;
+    private readonly PageFrames.PageFrameScrollControl _scrollControl = new();
+    private readonly SemaphoreSlim _scrollGate = new(1);
     private string? _loadError;
     public event EventHandler<string>? GestureRequested;
     public event EventHandler? DisplayCompleted;
@@ -48,6 +52,12 @@ public sealed class ReaderView : Control, IDisposable
         var revision = ++_revision; _request?.Cancel(); var request = new CancellationTokenSource(); _request = request;
         _operation.SetViewport(new CoreSize(Bounds.Width, Bounds.Height), TopLevel.GetTopLevel(this)?.RenderScaling ?? 1);
         _frame = _operation.Frame; _loadError = null;
+        if (!ReferenceEquals(_displayBook, _operation.Book) || _displayRange != _frame?.FrameRange)
+        {
+            _displayBook = _operation.Book; _displayRange = _frame?.FrameRange;
+            AlignPageOrigin(_operation.MoveDirection);
+        }
+        ClampPan();
         var sources = _frame?.Elements.Where(e => !e.IsDummy).Select(e => e.Page).Distinct().ToArray() ?? [];
         foreach (var page in _images.Keys.Except(sources).ToArray()) { _images[page].Dispose(); _images.Remove(page); }
         InvalidateVisual();
@@ -138,12 +148,58 @@ public sealed class ReaderView : Control, IDisposable
         var old = _zoom; _zoom = Math.Clamp(_zoom * factor, .1, 16); var ratio = _zoom / old;
         var relative = origin - new Point(Bounds.Width / 2, Bounds.Height / 2);
         _pan = _pan * ratio + relative * (1 - ratio);
+        ClampPan();
         await RefreshAsync();
     }
     /// <summary>重置手工缩放及平移，100% 由引擎 StretchMode.None 与设备比例决定。</summary>
     public void ResetTransform() { _zoom = 1; _pan = default; InvalidateVisual(); }
     /// <summary>高精度滚动平移；分页导航由输入映射处理。</summary>
-    public void Pan(Avalonia.Vector delta) { _pan += delta; InvalidateVisual(); }
+    public void Pan(Avalonia.Vector delta) { _pan += delta; ClampPan(); InvalidateVisual(); }
+    /// <summary>沿用原 DragArea.SnapView，精确滚动和拖动不允许把图片完全推出视口。</summary>
+    private void ClampPan()
+    {
+        if (_frame is null || Bounds.Width <= 0 || Bounds.Height <= 0) return;
+        var delta = new DragArea(new(0, 0, Bounds.Width, Bounds.Height), GetContentRect()).SnapView(true);
+        _pan += new Avalonia.Vector(delta.X, delta.Y);
+    }
+    /// <summary>原 ScrollToNextFrame：先应用 NScroll 位移，终止后才进入原帧导航。</summary>
+    /// <param name="direction">下一帧为 1，上一帧为 -1。</param>
+    /// <param name="parameter">原滚动类型、步幅、终端容差与换行停顿。</param>
+    public async Task ScrollToNextFrameAsync(int direction, ScrollPageCommandParameter parameter)
+    {
+        await _scrollGate.WaitAsync();
+        try
+        {
+            if (_disposed || _frame is null || _operation?.Context is not { } context || _operation.IsLoading || Bounds.Width <= 0 || Bounds.Height <= 0) return;
+            var result = _scrollControl.ScrollToNext(context, GetContentRect(), new(0, 0, Bounds.Width, Bounds.Height), direction, parameter);
+            if (result is null) return;
+            if (!result.IsTerminated) { Pan(new(result.Vector.X, result.Vector.Y)); return; }
+            // 导航仍走 BookOperation 的原帧范围；切书后不能应用旧命令的原点。
+            var book = _operation.Book; var position = _operation.Position;
+            await _operation.MoveAsync(direction);
+            if (_disposed || !ReferenceEquals(book, _operation.Book) || position == _operation.Position) return;
+            await RefreshAsync();
+        }
+        finally { _scrollGate.Release(); }
+    }
+    /// <summary>将原页框实际绘制尺寸转为轴对齐矩形，含双页间距、分割及旋转。</summary>
+    public NeeView.Rect GetContentRect()
+    {
+        if (_frame is null) return default;
+        var sources = _frame.GetDirectedSources().ToArray(); var scale = _frame.Scale * _zoom;
+        var size = new CoreSize(sources.Sum(e => e.Width) * scale + _frame.TotalSpan * _zoom, sources.Max(e => e.Height) * scale);
+        var rotated = PageFrames.GeometryMath.RotateSize(size, _frame.Angle);
+        return new((Bounds.Width - rotated.Width) / 2 + _pan.X, (Bounds.Height - rotated.Height) / 2 + _pan.Y, rotated.Width, rotated.Height);
+    }
+    /// <summary>新帧按阅读与移动方向进入起点；普通刷新/手工缩放保留当前平移。</summary>
+    private void AlignPageOrigin(int direction)
+    {
+        _pan = default;
+        var rect = GetContentRect();
+        var x = Math.Max(0, rect.Width - Bounds.Width) / 2; var y = Math.Max(0, rect.Height - Bounds.Height) / 2;
+        var readDirection = _operation?.Context?.ReadOrder.ToSign() ?? 1;
+        _pan = new(direction * readDirection > 0 ? x : -x, direction > 0 ? y : -y);
+    }
     /// <summary>导航器将图像内指定位置移到视口中心；页框及旋转仍由原引擎计算。</summary>
     public void Navigate(Point point)
     {
@@ -183,7 +239,7 @@ public sealed class ReaderView : Control, IDisposable
         if (_pressed is not { } start) return;
         var position = e.GetPosition(this); var delta = new Avalonia.Vector(position.X - start.X, position.Y - start.Y);
         if (delta.Length > 4) _dragged = true;
-        if (_dragged) { _pan = _initialPan + delta; InvalidateVisual(); }
+        if (_dragged) { _pan = _initialPan + delta; ClampPan(); InvalidateVisual(); }
     }
     /// <summary>未拖动的左右点击送入原快捷键映射。</summary>
     protected override void OnPointerReleased(PointerReleasedEventArgs e)

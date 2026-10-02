@@ -3,9 +3,20 @@ namespace NeeView;
 /// <summary>替代实际使用的 WPF 尺寸值，不包含控件或属性系统。</summary>
 public readonly record struct Size(double Width, double Height);
 /// <summary>布局比例或偏移值。</summary>
-public readonly record struct Vector(double X, double Y);
-/// <summary>归一化裁剪区域，坐标属于图片而非窗口。</summary>
-public readonly record struct Rect(double X, double Y, double Width, double Height);
+public record struct Vector(double X, double Y)
+{
+    public readonly double LengthSquared => X * X + Y * Y;
+    /// <summary>按原 Vector.IsZero 判断零位移。</summary>
+    public readonly bool IsZero() => X == 0 && Y == 0;
+}
+/// <summary>矩形值；调用方明确其为图片归一化裁剪区域或显示坐标，不携带控件引用。</summary>
+public readonly record struct Rect(double X, double Y, double Width, double Height)
+{
+    public double Left => X;
+    public double Top => Y;
+    public double Right => X + Width;
+    public double Bottom => Y + Height;
+}
 
 /// <summary>macOS 精确滚动及捏合输入；坐标属于窗口内容区域，单位为 DIP。</summary>
 public sealed record PlatformGesture(bool IsMagnify, double X, double Y, double DeltaX, double DeltaY, double Magnification, nint SourceWindow = 0);

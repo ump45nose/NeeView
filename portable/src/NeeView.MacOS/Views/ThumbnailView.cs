@@ -48,7 +48,7 @@ public sealed class ThumbnailView : Control, IDisposable
         if (keepSelectionVisible && Config.Current.FilmStrip.IsSelectedCenter) _start = Math.Max(0, slot - count / 2);
         else if (keepSelectionVisible && (slot < _start || slot >= _start + count)) _start = Math.Max(0, slot - count / 2);
         _start = Math.Clamp(_start, 0, Math.Max(0, (book?.Pages.Count ?? 0) - count));
-        var pages = book is null || !IsVisible || Bounds.Width <= 0 ? [] : IsNavigator
+        var pages = book is null || !IsEffectivelyVisible || TopLevel.GetTopLevel(this) is null || Bounds.Width <= 0 ? [] : IsNavigator
             ? book.CurrentPage is { } current ? new[] { current } : []
             : Enumerable.Range(_start, Math.Min(count, book.Pages.Count - _start)).Select(i => book.Pages[PageIndex(i)]).ToArray();
         foreach (var page in _images.Keys.Except(pages).ToArray()) { _images[page].Dispose(); _images.Remove(page); }

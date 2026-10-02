@@ -25,6 +25,7 @@ public sealed partial class MainWindow : Window
     private CancellationTokenSource? _slider;
     private double _wheel;
     private double _leftWidth, _rightWidth;
+    private SidePanelPresenter? _sidePanels;
     public ReaderView Viewer => this.FindControl<ReaderView>("MainViewSocket")!;
     private ThumbnailView FilmStrip => this.FindControl<ThumbnailView>("DockFilmStripSocket")!;
     private ThumbnailView NavigatorView => this.FindControl<ThumbnailView>("Navigator")!;
@@ -34,7 +35,7 @@ public sealed partial class MainWindow : Window
         "ViewScaleUp", "ViewScaleDown", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
         "LeftAutoHide", "RightAutoHide", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
-        "ToggleVisibleFilmStrip", "ToggleHideFilmStrip"
+        "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "NextScrollPage", "PrevScrollPage"
     };
     /// <summary>由启动层接入原生事件；只消费主查看器区域，其余控件使用框架输入。</summary>
     public void AttachPlatformInput(IPlatformInput input)
@@ -79,6 +80,7 @@ public sealed partial class MainWindow : Window
         model.PanelsRefreshed += Model_PanelsRefreshed;
         _leftWidth = model.LeftWidth; _rightWidth = model.RightWidth; UpdatePanelColumns(); model.Attach();
         FilmStrip.Attach(model.Operation, images); NavigatorView.Attach(model.Operation, images);
+        _sidePanels = new(this, model);
         FilmStrip.PageRequested += async (_, index) => { try { await model.Operation.JumpAsync(index); } catch (Exception ex) { ShowError(ex.Message); } };
         NavigatorView.NavigateRequested += (_, point) => Viewer.Navigate(point);
         BuildMenus();
@@ -111,12 +113,12 @@ public sealed partial class MainWindow : Window
         "ToggleIsSupportedSingleFirstPage" => _model?.FirstSingle,
         "ToggleIsSupportedSingleLastPage" => _model?.LastSingle,
         "ToggleBookmark" => _model?.IsBookmark,
-        "ToggleVisibleBookshelf" => Config.Current.Panels.IsLeftVisible && _model?.ShowFolderList == true,
-        "ToggleVisiblePageList" => Config.Current.Panels.IsLeftVisible && _model?.ShowPageList == true,
-        "ToggleVisibleHistoryList" => Config.Current.Panels.IsLeftVisible && _model?.ShowHistory == true,
-        "ToggleVisibleFileInfo" => Config.Current.Panels.IsRightVisible && _model?.ShowInformation == true,
-        "ToggleVisibleBookmarkList" => Config.Current.Panels.IsRightVisible && _model?.ShowBookmarks == true,
-        "ToggleVisibleNavigator" => Config.Current.Panels.IsRightVisible && _model?.ShowNavigator == true,
+        "ToggleVisibleBookshelf" => _model?.ShowFolderList,
+        "ToggleVisiblePageList" => _model?.ShowPageList,
+        "ToggleVisibleHistoryList" => _model?.ShowHistory,
+        "ToggleVisibleFileInfo" => _model?.ShowInformation,
+        "ToggleVisibleBookmarkList" => _model?.ShowBookmarks,
+        "ToggleVisibleNavigator" => _model?.ShowNavigator,
         "ToggleVisibleFilmStrip" => Config.Current.FilmStrip.IsEnabled,
         "ToggleHideFilmStrip" => Config.Current.FilmStrip.IsHideFilmStrip,
         "LeftAutoHide" => Config.Current.Panels.IsLeftAutoHide,
@@ -129,6 +131,8 @@ public sealed partial class MainWindow : Window
     private void Model_PanelsRefreshed(object? sender, EventArgs e)
     {
         UpdatePanelColumns();
+        _sidePanels?.Refresh();
+        _ = NavigatorView.RefreshAsync();
         MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck);
     }
     /// <summary>隐藏时收起面板列，重新显示恢复用户拖动后的宽度。</summary>
@@ -174,6 +178,8 @@ public sealed partial class MainWindow : Window
                 case "ToggleFullScreen": WindowState = WindowState == WindowState.FullScreen ? WindowState.Normal : WindowState.FullScreen; break;
                 case "ViewScaleUp": await Viewer.ZoomAsync(1.2); break;
                 case "ViewScaleDown": await Viewer.ZoomAsync(1 / 1.2); break;
+                case "NextScrollPage": await Viewer.ScrollToNextFrameAsync(1, _model.SaveData.GetScrollParameter(name)); break;
+                case "PrevScrollPage": await Viewer.ScrollToNextFrameAsync(-1, _model.SaveData.GetScrollParameter(name)); break;
                 case "SetStretchModeUniform": Config.Current.View.StretchMode = PageStretchMode.Uniform; Viewer.ResetTransform(); await Viewer.RefreshAsync(); break;
                 case "SetStretchModeNone": Config.Current.View.StretchMode = PageStretchMode.None; Viewer.ResetTransform(); await Viewer.RefreshAsync(); break;
                 case "ToggleHideLeftPanel": Config.Current.Panels.IsLeftVisible = !Config.Current.Panels.IsLeftVisible; _model.RefreshPanels(); break;
@@ -300,6 +306,7 @@ public sealed partial class MainWindow : Window
     private async void Key_Down(object? sender, KeyEventArgs e)
     {
         if (e.Handled || _model is null) return;
+        if (e.Key == Key.Escape && _sidePanels?.CancelDrag() == true) { e.Handled = true; return; }
         if (e.KeyModifiers == KeyModifiers.Meta && e.Key is Key.O or Key.W or Key.Q)
         { e.Handled = true; await ExecuteAsync(e.Key == Key.O ? "LoadAs" : e.Key == Key.W ? "CloseWindow" : "CloseApplication"); return; }
         if (FocusManager?.GetFocusedElement() is TextBox) return;
@@ -384,11 +391,12 @@ public sealed partial class MainWindow : Window
                 var right = this.FindControl<Border>("RightPanel")!.Bounds.Width;
                 if (left > 0) Config.Current.Panels.LeftWidth = left;
                 if (right > 0) Config.Current.Panels.RightWidth = right;
+                _sidePanels?.SaveWeights();
                 // 先完成可靠保存，再退订与释放显示资源；失败不能留下已销毁的阅读窗口。
                 await _model.Operation.DisposeAsync();
                 _model.Detach(); _model.Refreshed -= Model_Refreshed; _model.PanelsRefreshed -= Model_PanelsRefreshed;
             }
-            _platformInput?.Dispose(); FilmStrip.Dispose(); NavigatorView.Dispose(); Viewer.Dispose(); _images?.Dispose(); _closedPrepared = true;
+            _sidePanels?.Dispose(); _platformInput?.Dispose(); FilmStrip.Dispose(); NavigatorView.Dispose(); Viewer.Dispose(); _images?.Dispose(); _closedPrepared = true;
         }
         finally { _preparing = false; _shutdown = null; }
     }

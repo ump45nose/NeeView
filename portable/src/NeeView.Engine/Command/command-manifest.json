@@ -938,14 +938,14 @@
     "Text": "滚动 + 上一页",
     "Shortcut": "WheelUp",
     "Source": "NeeView/Command/Commands/PrevScrollPageCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2滚动与边界翻页已接入；全景/完整参数编辑待后续"
   },
   {
     "Name": "NextScrollPage",
     "Text": "滚动 + 下一页",
     "Shortcut": "WheelDown",
     "Source": "NeeView/Command/Commands/NextScrollPageCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2滚动与边界翻页已接入；全景/完整参数编辑待后续"
   },
   {
     "Name": "JumpPage",

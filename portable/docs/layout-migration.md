@@ -11,27 +11,29 @@
 | DockPageSliderSocket | PageSliderView | 位置滑条与页码，导航防抖 |
 | DockStatusArea / 覆盖层 | 状态文本/MessageLayer | 当前条目、模式、方向、错误/加载 |
 | 设置左导航/搜索、右内容 | SettingsWindow.axaml | 当前/默认阅读设置、可搜索235命令键位编辑；其他页占位 |
-| 停靠、拖动、自动隐藏详细规则 | 原SidePanel控件 | 用户追加拖拽重排/跨栏/自动组合/边缘分组目标；P2后续独立增量，进入P3前处理 |
+| 停靠、拖动、自动隐藏详细规则 | LayoutPanelManager / SidePanelPresenter | 跨栏重排、分割组合/拆组、比例/选择恢复、拖动锁定已接入；浮动窗口及完整细节待后续 |
 
 | 原面板 | 当前区域/入口 | 当前状态 |
 |---|---|---|
 | FolderPanel | 左栏 | 当前目录直接子目录、上一级和双击打开；树/延迟展开待P2/P3 |
 | HistoryPanel | 左rail历史 | 访问时间排序、搜索、双击打开并恢复原位置 |
 | BookmarkPanel | 右rail书签 | 原树基础编辑/书籍切换/双击打开；完整服务待迁入 |
-| PlaylistPanel | 右rail播放列表 | 待P5，禁用 |
-| DestinationFolderPanel | 右rail目标文件夹 | 待P4，禁用；两区配置/九数字命令已登记 |
+| PlaylistPanel | 默认右rail播放列表 | 待P5，可选择占位 |
+| DestinationFolderPanel | 默认右rail目标文件夹 | 待P4，可选择占位；两区配置/九数字命令已登记 |
 | PageListPanel | 左栏 | 虚拟化名称列表和定位；缩略图待P2/P3 |
 | FileInformationPanel | 右栏 | 条目、尺寸、字节、来源和解码错误 |
 | NavigatePanel | 右rail导航器 | 当前页缩略图与点击定位，图像外留白不触发 |
-| ImageEffectPanel | 右rail效果 | 待P5，禁用 |
+| ImageEffectPanel | 默认右rail效果 | 待P5，可选择占位 |
 
-Headless 测试检查区域顺序、栏宽、图像绘制、调整列宽/显隐保持、输入作用域及设置窗口装载。P1截图见 `../acceptance/p1-layout.png`，P2另存 `../acceptance/p2-layout.png`。用户已认可总体布局；尚未将拖拽组合标为通过。正式Mac应用已启动和绘制，真机截图另存为 `../acceptance/p1-macos-runtime.png`；两类证据不能替代Windows动态对照或用户视觉验收。
+Headless 测试检查区域顺序、栏宽、图像绘制、调整列宽/显隐保持、输入作用域及设置窗口装载。P1 截图见 `../acceptance/p1-layout.png`，P2 首批见 `../acceptance/p2-layout.png`；第二批另存 `p2-docking-layout.png` 和 `p2-docking-reading-layout.png`，不覆盖历史截图。组合、跨栏和取消经过实际 Headless 指针测试，正式 Mac 已验证组合/拆组、跨栏、比例及重启恢复，见 `../acceptance/p2-docking-macos-runtime.md`。用户已认可总体布局；新增交互仍待用户验收，不能替代 Windows 动态对照。
 
-## 左右侧栏拖拽组合后续验收
+## 左右侧栏拖拽组合当前规则与边界
 
-- 图标跨左右栏移动和重排，拖入现有面板组自动组合。
-- 拖到边缘形成独立组；组间分隔比例、顺序、选择和窗口重开恢复。
-- 自动隐藏面板拖动期间保持展开；取消不破坏布局。
-- 未迁入面板保留可识别占位。
+- 图标跨栏移动和重排；原 leader 图标携带整组，非 leader 标题拖到图标栏拆出单面板。
+- 拖入内容形成横向/纵向分割组；沿用原分半算法，多项组保留方向，同组重排，跨组仅均分目标项权重。原模型并非标签页，不另增中心合并分支。
+- 组内分隔比例、组顺序、选择及窗口重开恢复；保存原 PanelLayoutV2/SelectedItem/GridLength。
+- 拖动期间两栏自动隐藏锁定；Escape、捕获丢失和无效落点取消，不改变布局。
+- 未迁入面板可组合、选择并显示明确占位。
+- 浮动窗口、旧 V0/V1 布局导入及完整自动隐藏细节未迁入；未知旧字段只保留，不宣称其行为已支持。
 
 依据原 CustomLayoutPanelManager、SidePanelFrameView、SidePanelIcon、SidePanelViewModel、LayoutDockPanel 与 SidePanelDropAcceptor；不增加大型停靠框架。

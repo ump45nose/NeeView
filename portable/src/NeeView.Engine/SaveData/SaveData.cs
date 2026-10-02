@@ -64,6 +64,14 @@ public sealed class SaveData(string directory)
         return item?["ShortCutKey"]?.GetValue<string>() ?? fallback;
     }
 
+    /// <summary>读取原滚动命令差分 Parameter；缺省使用原参数，未知字段不写回。</summary>
+    public ScrollPageCommandParameter GetScrollParameter(string name)
+    {
+        var options = new JsonSerializerOptions(Options);
+        options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        return _setting["Commands"]?[name]?["Parameter"]?.Deserialize<ScrollPageCommandParameter>(options) ?? new();
+    }
+
     /// <summary>编辑原 Commands 差分键位；空字符串表示解绑，未知参数保持。</summary>
     public void SetShortcut(string name, string value) => Object(Object(_setting, "Commands"), name)["ShortCutKey"] = value;
 

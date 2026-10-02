@@ -13,7 +13,7 @@
 | 当前图打开、排序后保持条目 | Book/Book.cs、BookHub/BookHub.cs | 原 Page 对象和 EntryName，不使用另一套身份数据库 |
 | History/Props | Book/BookMemento.cs、SaveData/SaveDataProfile.cs | 保留 Path/Page/Props 和未知字段；Mac只补半页与false-wide值 |
 | 差分快捷键 | Command/CommandElement.cs、CommandTable.cs | Commands[name].ShortCutKey，null恢复默认、空串禁用；Control保持 |
-| 滚动翻页 | BookPageMoveControl、PageFrameBox.ScrollToNextFrame、PageFrames/NScroll.cs | P2 后续，禁用；不能将先滚动/换行停顿/边界翻页替换成普通翻页 |
+| 滚动翻页 | BookPageMoveControl、PageFrameBox.ScrollToNextFrame、PageFrames/NScroll.cs、DragArea.SnapView | 原五模式、分段/终端吸附、计时与停顿顺序迁入；分页接通，全景/完整参数编辑待后续，真鼠标待验 |
 | 九数字分类、固定移动 | MoveToDestinationFolderCommand、MoveToFolderAsCommand | 元数据保留，业务待P4 |
 | 两区分类和移动历史 | SidePanels/DestinationFolder、DestinationFolder/DestinationMoveService.cs | 完整目标登记；待P4，不能继承旧测试通过状态 |
 | 原窗口/九面板/设置 | MainWindow.xaml、SidePanelFrameView.xaml、Options | 布局壳及核心面板转换；见layout-migration.md，Windows截图待验证 |
@@ -21,7 +21,7 @@
 | 连续、瀑布流 | 原阅读链 | 待 P3 |
 | 完整默认菜单 | Menu/MenuTree.cs:CreateDefault、MenuNode.cs、MenuElementType.cs | 原八组树逐项迁入；未迁移节点禁用占位，原语言资源解析文案 |
 | 胶片条/导航器 | Config/FilmStripConfig.cs、PageSelect/FilmStrip、SidePanels/Navigate | 原部分配置与布局适配；只解码可见缩略图，完整预览/参数/滚轮模式待迁入 |
-| 侧栏拖拽组合 | SidePanels/CustomLayoutPanelManager、SidePanelViewModel、SidePanelDropAcceptor、LayoutDockPanel | 用户追加目标，P2 后续独立增量，进入 P3 前处理 |
+| 侧栏拖拽组合 | SidePanels/CustomLayoutPanelManager、SidePanelViewModel、SidePanelDropAcceptor、LayoutDockPanel | 原组模型、leader 整组移动/成员拆组、分半组合及 V2 JSON 适配；Headless/真机恢复通过；浮动/旧布局导入待迁移 |
 | 历史/书签 | Bookamrk/BookmarkCollection.cs、BookMemento、HistoryCollection | 原 JSON 树字段/顺序保留；访问排序、基础编辑和共享阅读状态接入，完整服务待迁入 |
 | 旧Profile/nvzip | SaveData | 待 P5，完整旧迁移规则待迁入 |
 

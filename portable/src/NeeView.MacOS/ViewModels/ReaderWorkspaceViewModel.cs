@@ -1,12 +1,15 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Avalonia.Threading;
 using NeeView;
+using NeeView.Runtime.LayoutPanel;
 namespace NeeView.MacOS.ViewModels;
 
 /// <summary>窗口表现状态；视图可独立调整，所有阅读动作进入原 BookOperation。</summary>
 public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTable commands, SaveData saveData)
     : ObservableObject
 {
+    public LayoutPanelManager Layout { get; } = new(Config.Current.Panels.Layout);
+    public bool IsPanelDragging { get; private set; }
     public BookOperation Operation { get; } = operation;
     public CommandTable Commands { get; } = commands;
     public SaveData SaveData { get; } = saveData;
@@ -30,20 +33,19 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public bool LastSingle => Operation.Book?.Setting.IsSupportedSingleLastPage ?? false;
     public double LeftWidth => Config.Current.Panels.LeftWidth;
     public double RightWidth => Config.Current.Panels.RightWidth;
-    public bool LeftVisible => Config.Current.Panels.IsLeftVisible && (!LeftAutoHide || _leftHovered);
-    public bool RightVisible => Config.Current.Panels.IsRightVisible && (!RightAutoHide || _rightHovered);
+    public bool LeftVisible => (Config.Current.Panels.IsLeftVisible || IsPanelDragging) && Layout.Docks["Left"].Items.Count > 0 && (!LeftAutoHide || _leftHovered || IsPanelDragging);
+    public bool RightVisible => (Config.Current.Panels.IsRightVisible || IsPanelDragging) && Layout.Docks["Right"].Items.Count > 0 && (!RightAutoHide || _rightHovered || IsPanelDragging);
     public bool LeftAutoHide => Config.Current.Panels.IsLeftAutoHide;
     public bool RightAutoHide => Config.Current.Panels.IsRightAutoHide;
     private bool _leftHovered, _rightHovered;
-    private string _leftPanel = "FolderPanel", _rightPanel = "FileInformationPanel";
-    public bool ShowPageList => _leftPanel == "PageListPanel";
-    public bool ShowFolderList => _leftPanel == "FolderPanel";
-    public bool ShowHistory => _leftPanel == "HistoryPanel";
-    public bool ShowInformation => _rightPanel == "FileInformationPanel";
-    public bool ShowBookmarks => _rightPanel == "BookmarkPanel";
-    public bool ShowNavigator => _rightPanel == "NavigatePanel";
-    public string LeftTitle => ShowPageList ? "页面列表" : ShowHistory ? "历史" : "文件夹";
-    public string RightTitle => ShowBookmarks ? "书签" : ShowNavigator ? "导航器" : "信息";
+    public bool ShowPageList => IsPanelVisible("PageListPanel");
+    public bool ShowFolderList => IsPanelVisible("FolderPanel");
+    public bool ShowHistory => IsPanelVisible("HistoryPanel");
+    public bool ShowInformation => IsPanelVisible("FileInformationPanel");
+    public bool ShowBookmarks => IsPanelVisible("BookmarkPanel");
+    public bool ShowNavigator => IsPanelVisible("NavigatePanel");
+    /// <summary>跨栏后按实际组选择与栏显隐计算面板状态。</summary>
+    public bool IsPanelVisible(string name) => Layout.Find(name) is { } found && ReferenceEquals(Layout.Docks[found.Side].SelectedItem, found.Group) && (found.Side == "Left" ? LeftVisible : RightVisible);
     private string _historySearch = "";
     public string HistorySearch { get => _historySearch; set { if (SetProperty(ref _historySearch, value)) OnPropertyChanged(nameof(History)); } }
     public IReadOnlyList<HistoryEntry> History => SaveData.HistoryEntries.Where(e => e.Path.Contains(HistorySearch, StringComparison.CurrentCultureIgnoreCase)).ToArray();
@@ -55,9 +57,9 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public event EventHandler? PanelsRefreshed;
 
     /// <summary>装配业务订阅；后台回报统一切 UI 线程。</summary>
-    public void Attach() { Operation.Changed += Operation_Changed; SaveData.Changed += SaveData_Changed; Refresh(); }
+    public void Attach() { Layout.Changed += Layout_Changed; Operation.Changed += Operation_Changed; SaveData.Changed += SaveData_Changed; Refresh(); }
     /// <summary>关闭窗口时解除订阅，避免旧窗口收到新书变化。</summary>
-    public void Detach() { Operation.Changed -= Operation_Changed; SaveData.Changed -= SaveData_Changed; }
+    public void Detach() { Layout.Changed -= Layout_Changed; Operation.Changed -= Operation_Changed; SaveData.Changed -= SaveData_Changed; }
     /// <summary>历史与书签回报只更新导航面板，不重新解码当前帧。</summary>
     private void SaveData_Changed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() =>
     {
@@ -76,22 +78,22 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     /// <summary>切换已支持侧栏页面或显隐，业务阅读位置不变。</summary>
     public void SelectPanel(string name)
     {
-        if (name is "FolderPanel" or "PageListPanel" or "HistoryPanel")
-        {
-            Config.Current.Panels.IsLeftVisible = !Config.Current.Panels.IsLeftVisible || _leftPanel != name;
-            _leftPanel = name;
-        }
-        else
-        {
-            Config.Current.Panels.IsRightVisible = !Config.Current.Panels.IsRightVisible || _rightPanel != name;
-            _rightPanel = name;
-        }
-        RefreshPanels();
+        if (Layout.Find(name) is not { } found) return;
+        var dock = Layout.Docks[found.Side];
+        bool selected = ReferenceEquals(dock.SelectedItem, found.Group);
+        if (found.Side == "Left") Config.Current.Panels.IsLeftVisible = !Config.Current.Panels.IsLeftVisible || !selected;
+        else Config.Current.Panels.IsRightVisible = !Config.Current.Panels.IsRightVisible || !selected;
+        dock.SelectedItem = found.Group;
+        Config.Current.Panels.Layout = Layout.CreateMemento(); RefreshPanels();
     }
+    /// <summary>拖动锁定两侧自动隐藏，取消或完成后恢复原显隐配置。</summary>
+    public void SetPanelDragging(bool value) { IsPanelDragging = value; RefreshPanels(); }
+    /// <summary>布局变化只保存原布局节点并刷新表现，不触发阅读解码。</summary>
+    private void Layout_Changed(object? sender, EventArgs e) { Config.Current.Panels.Layout = Layout.CreateMemento(); RefreshPanels(); }
     /// <summary>只通知侧栏绑定，不发布阅读刷新或重新申请图像。</summary>
     public void RefreshPanels()
     {
-        foreach (var name in new[] { nameof(LeftVisible), nameof(RightVisible), nameof(LeftAutoHide), nameof(RightAutoHide), nameof(ShowPageList), nameof(ShowFolderList), nameof(ShowHistory), nameof(LeftTitle), nameof(RightTitle), nameof(ShowBookmarks), nameof(ShowInformation), nameof(ShowNavigator), nameof(FilmStripVisible) }) OnPropertyChanged(name);
+        foreach (var name in new[] { nameof(LeftVisible), nameof(RightVisible), nameof(LeftAutoHide), nameof(RightAutoHide), nameof(ShowPageList), nameof(ShowFolderList), nameof(ShowHistory), nameof(ShowBookmarks), nameof(ShowInformation), nameof(ShowNavigator), nameof(FilmStripVisible) }) OnPropertyChanged(name);
         PanelsRefreshed?.Invoke(this, EventArgs.Empty);
     }
     /// <summary>自动隐藏只改变窗口表现状态，不改变书籍和目录索引。</summary>

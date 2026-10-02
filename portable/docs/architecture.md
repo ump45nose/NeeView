@@ -1,6 +1,6 @@
 # NeeView Mac 源码迁移架构
 
-P0/P1 已建立工程骨架、原窗口区域和目录/图片/ZIP 阅读链路。本轮进入 P2 首批：完整菜单占位、RAR/7z、历史/书签、胶片条/导航器与输入设置。P2 尚未整体完成。Mac 独立维护；原 Windows 工程是固定行为参考，不参与 Mac 构建。
+P0/P1 已建立工程骨架、原窗口区域和目录/图片/ZIP 阅读链路。P2 首批接入完整菜单占位、RAR/7z、历史/书签、胶片条/导航器与输入设置；第二批接入原侧栏布局数据和拖拽组合、原 NScroll 滚动翻页。P2 尚未整体完成。Mac 独立维护；原 Windows 工程是固定行为参考，不参与 Mac 构建。
 
 ## 基线与技术栈
 
@@ -53,7 +53,9 @@ Book/Page/Archive/BookOperation 是原关系的 P1 子集适配，尚未完整�
 
 ## 界面与迁移目标
 
-原 MainWindow/SidePanelFrame 的区域关系是布局基准，原 Colors/IconGeometries 是资源基准。顶部菜单/地址、左右图标栏/面板、中央查看器、底部滑条/状态和胶片条插槽已转换。九个原面板完整登记，历史、书签、导航器已启用，未迁移入口禁用。用户已认可总体布局，并要求完整菜单占位和左右侧栏拖拽自动组合；菜单树已迁入，拖拽重排/组合/分组停靠明确列为 P2 后续独立增量，进入 P3 前处理。完整自动隐藏与 Windows 动态对照仍待验证。
+原 MainWindow/SidePanelFrame 的区域关系是布局基准，原 Colors/IconGeometries 是资源基准。顶部菜单/地址、左右图标栏/面板、中央查看器、底部滑条/状态和胶片条插槽已转换。九个原面板完整登记，历史、书签、导航器已启用。未迁移命令保留禁用菜单，未迁移面板可选择并显示阶段说明。用户已认可总体布局；第二批按原 LayoutPanel 关系接入跨栏重排、分割组合、成员拆组、组间比例/选择恢复与拖动自动隐藏锁定。Engine 只保存布局数据，SidePanelPresenter 负责 Avalonia 控件和拖放预览，主题可独立更改。原浮动窗口、旧 V0/V1 布局导入、完整自动隐藏细节及 Windows 动态对照仍待迁移/验证。
+
+滚动翻页从原 PageFrameBox/NScroll/ScrollResult 迁入五种模式、分段、终端吸附和换行停顿，普通滚轮命令到边界后才进入原帧导航。精确滚动仍走表现平移，由原 DragArea.SnapView 约束；书籍阅读方向与帧移动方向分别保留。全景 PagesAsOne、完整参数编辑和复杂鼠标组合仍待后续。详见 [P2 第二批契约](p2-docking-scroll.md)。
 
 [前端边界](frontend-boundaries.md)、[行为对照](behavior-baseline.md)、[完整命令表](command-migration.md)、[布局表](layout-migration.md)、[模块设计](modules/M01.md) 和 [阶段证据](../acceptance/stages.md) 是后续开发契约。P2 阅读导航剩余增量、P3 大量图片、P4 fork 分类、P5 兼容/高级内容/发布仍是目标，未继承旧重写方案的“通过”。
 

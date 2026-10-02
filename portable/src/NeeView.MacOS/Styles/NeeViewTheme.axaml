@@ -16,4 +16,5 @@
   <Style Selector="ListBox"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /></Style>
   <Style Selector="ListBoxItem"><Setter Property="Padding" Value="8,5" /><Setter Property="MinHeight" Value="28" /></Style>
   <Style Selector="GridSplitter"><Setter Property="Background" Value="{DynamicResource Panel.Splitter}" /></Style>
+  <Style Selector="Border.panel-drop-preview"><Setter Property="Background" Value="#605CACEB" /><Setter Property="BorderBrush" Value="#FF5CACEB" /><Setter Property="BorderThickness" Value="2" /></Style>
 </Styles>

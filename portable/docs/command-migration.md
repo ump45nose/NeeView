@@ -128,8 +128,8 @@
 | NextPage | 前进 | Left,LeftClick | P1 Engine | NeeView/Command/Commands/NextPageCommand.cs |
 | PrevOnePage | 后退一页 |  | P1 Engine | NeeView/Command/Commands/PrevOnePageCommand.cs |
 | NextOnePage | 前进一页 |  | P1 Engine | NeeView/Command/Commands/NextOnePageCommand.cs |
-| PrevScrollPage | 滚动 + 上一页 | WheelUp | 待 P2–P5 | NeeView/Command/Commands/PrevScrollPageCommand.cs |
-| NextScrollPage | 滚动 + 下一页 | WheelDown | 待 P2–P5 | NeeView/Command/Commands/NextScrollPageCommand.cs |
+| PrevScrollPage | 滚动 + 上一页 | WheelUp | P2 原NScroll/边界翻页接入；全景与完整参数编辑待后续 | NeeView/Command/Commands/PrevScrollPageCommand.cs |
+| NextScrollPage | 滚动 + 下一页 | WheelDown | P2 原NScroll/边界翻页接入；全景与完整参数编辑待后续 | NeeView/Command/Commands/NextScrollPageCommand.cs |
 | JumpPage | 转到指定页面 |  | 待 P2–P5 | NeeView/Command/Commands/JumpPageCommand.cs |
 | JumpRandomPage | 转到随机页面 |  | 待 P2–P5 | NeeView/Command/Commands/JumpRandomPageCommand.cs |
 | PrevSizePage | 后退指定页数 |  | 待 P2–P5 | NeeView/Command/Commands/PrevSizePageCommand.cs |

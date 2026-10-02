@@ -17,6 +17,8 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
     public PageFrame? Frame { get; private set; }
     public PagePosition Position { get; private set; } = PagePosition.Zero;
     public PageFrameContext? Context { get; private set; }
+    /// <summary>保留最近生成帧的移动方向，供反向半页重算和显示原点使用；与书籍阅读方向分离。</summary>
+    public int MoveDirection { get; private set; } = 1;
     public bool IsLoading { get; private set; }
     public string? Error { get; private set; }
     public event EventHandler? Changed;
@@ -128,7 +130,8 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
     public void SetViewport(Size size, double scale)
     {
         if (_disposed || Context is null || size.Width <= 0 || size.Height <= 0) return;
-        Context.CanvasSize = size; Context.DeviceScale = Math.Max(1, scale); RebuildFrame(1);
+        // 视口变化必须保留当前生成方向，否则反向分割页会被改成前半页。
+        Context.CanvasSize = size; Context.DeviceScale = Math.Max(1, scale); RebuildFrame(MoveDirection);
     }
     /// <summary>立即保存，用于切书和正常退出。</summary>
     public Task SaveAsync() => saveData.SaveAsync(Book, Position.Part);
@@ -136,6 +139,8 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
     /// <summary>使用完整迁入的 PageFrameFactory；半页位置在关闭分割时恢复整页。</summary>
     private void RebuildFrame(int direction)
     {
+        // PageFrame.Direction 是书籍阅读方向；移动方向独立保留，供分割生成与展示原点使用。
+        MoveDirection = direction;
         if (Book is null || Context is null || Book.Pages.Count == 0) { Frame = null; return; }
         var page = Book.Pages[Math.Clamp(Position.Index, 0, Book.Pages.Count - 1)];
         if (!(Context.PageMode == PageMode.SinglePage && Context.IsSupportedDividePage && Maths.AspectRatioTools.IsLandscape(page.Content.PageDataSource.Size))) Position = new(page.Index, direction > 0 ? 0 : 1);

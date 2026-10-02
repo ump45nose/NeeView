@@ -49,6 +49,7 @@ public sealed class ViewConfig
 /// <summary>窗口级布局状态，独立于书籍和阅读规则。</summary>
 public sealed class PanelsConfig
 {
+    public Runtime.LayoutPanel.LayoutPanelManagerMemento? Layout { get; set; }
     public double LeftWidth { get; set; } = 240;
     public double RightWidth { get; set; } = 240;
     public bool IsLeftVisible { get; set; } = true;

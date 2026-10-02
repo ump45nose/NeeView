@@ -240,6 +240,24 @@
       "target": "src/NeeView.Engine/Menu/MenuElementType.cs",
       "sha256": "4f9be66bf58d74d83c4a2f79c5cb40f5d5f970c7d59591a6191d52ead41ea082",
       "status": "P2迁入原节点类型枚举，移除平台属性标记"
+    },
+    {
+      "source": "NeeView/PageFrames/NScroll.cs",
+      "target": "src/NeeView.Engine/PageFrames/NScroll.cs",
+      "sha256": "eceeb984886d9adaa03aad209b79984235e191efad101282c05f446836d931c1",
+      "status": "原五模式及分段/换行/SnapZero算法迁入；替换实际WPF矩形与向量，补中文注释"
+    },
+    {
+      "source": "NeeView/PageFrames/ScrollResult.cs",
+      "target": "src/NeeView.Engine/PageFrames/ScrollResult.cs",
+      "sha256": "8ea8f7005e7355f13981c37800e696419456c3d2c6566ad8d00c8fab18ca6761",
+      "status": "原终止和换行判断迁入"
+    },
+    {
+      "source": "NeeView/MouseInput/DragArea.cs",
+      "target": "src/NeeView.Engine/MouseInput/DragArea.cs",
+      "sha256": "0619c9eee509e9e5df153ba2607c41ecba348f70dfa96f088f2dd5c1aff93cae",
+      "status": "原四边越界与SnapView边界吸附算法迁入；控件坐标辅助留在展示端"
     }
   ],
   "partial_adapters": [
@@ -290,6 +308,30 @@
       "target": "src/NeeView.Engine/Config/Config.cs",
       "sha256": "c333f557d6a29cbe331c03646c771cceeba14787aead6a0af472a8a9c2c5ac4e",
       "status": "P2恢复IsEnabled/IsHideFilmStrip/ImageWidth/IsVisibleNumber/IsSelectedCenter原默认值；其余原字段保留JSON"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/ScrollPageCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/ScrollPageCommandParameter.cs",
+      "sha256": "5e3a121f834ef07fcca8b42dfb71a4f11a4de5c87edd82971f603d25fe10956d",
+      "status": "保留原默认、五位舍入、限幅及废弃字段映射；移除WPF属性编辑注解，Parameter从原差分JSON读取"
+    },
+    {
+      "source": "NeeView/NeeView/Runtime/LayoutPanel/LayoutDockPanelContent.cs",
+      "target": "src/NeeView.Engine/SidePanels/LayoutPanelManager.cs",
+      "sha256": "20c39f51fcf47ef76e7d9aaffb89369c26277204bdedef829ce83ae5fd94c77a",
+      "status": "迁入MovePanel leader携组/成员独立、PanelLayoutV2字符串与SelectedItem快照；暂不支持浮动窗口/旧V0V1布局导入"
+    },
+    {
+      "source": "NeeView/NeeView/Runtime/LayoutPanel/LayoutPanelCollection.cs",
+      "target": "src/NeeView.Engine/SidePanels/LayoutPanelManager.cs",
+      "sha256": "4f7896f0b83cd1407935fa25ba2e88713988d32e3175531cf78663737c16467f",
+      "status": "保留组/排列方向/leader关系；同步状态只在展示线程修改"
+    },
+    {
+      "source": "NeeView/NeeView/Runtime/LayoutPanel/LayoutPanel.cs",
+      "target": "src/NeeView.Engine/SidePanels/LayoutPanelManager.cs",
+      "sha256": "9d079658a81e634909210174bb59ec79060cb618bd07412d2d5f93d549902bcc",
+      "status": "保留Key与GridLength比例；控件/拖影分离到SidePanelPresenter，WindowPlacement原JSON保留"
     }
   ],
   "rule_references": [
@@ -304,6 +346,18 @@
       "lines": "44-50",
       "target": "src/NeeView.Engine/Book/Book.cs",
       "status": "普通来源Entry回退到FileName"
+    },
+    {
+      "source": "NeeView/PageFrames/PageFrameBox.cs",
+      "lines": "1170-1203",
+      "target": "src/NeeView.Engine/PageFrames/PageFrameScrollControl.cs",
+      "status": "原计时重置、换行停顿、终止判断顺序；AddPosition与MoveToNextFrame展示适配在ReaderView"
+    },
+    {
+      "source": "NeeView/NeeView/Runtime/LayoutPanel/LayoutPanelContainer.xaml.cs",
+      "lines": "107-167,266-307",
+      "target": "src/NeeView.Engine/SidePanels/LayoutPanelManager.cs",
+      "status": "同组重排、跨组单成员移入、目标比例均分及方向分半算法"
     }
   ],
   "ui_sources": [
