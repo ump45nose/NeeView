@@ -69,7 +69,9 @@ public sealed class MainWindow : Window, IReaderDialogs
         _scroll.Content = _viewer;
         _viewer.ScrollRequested += y => { _scroll.Offset = new(_scroll.Offset.X, y); };
         _viewer.PanRequested += (x, y) => _scroll.Offset = new(x, y);
-        _scroll.ScrollChanged += (_, _) => _viewer.SetViewport(_scroll.Viewport.Width, _scroll.Viewport.Height, _scroll.Offset.Y, left: _scroll.Offset.X);
+        // 启动探测和重排会改变滚动范围并自动修正 offset；此类回报更新显示，但不能覆盖保存的锚点。
+        _scroll.ScrollChanged += (_, e) => _viewer.SetViewport(_scroll.Viewport.Width, _scroll.Viewport.Height, _scroll.Offset.Y,
+            observe: e.ExtentDelta == default && e.ViewportDelta == default, left: _scroll.Offset.X);
         _scroll.SizeChanged += (_, _) => _viewer.SetViewport(_scroll.Bounds.Width, _scroll.Bounds.Height, _scroll.Offset.Y, false, _scroll.Offset.X);
         _address.KeyDown += (_, e) => { if (e.Key == Key.Enter) { Open(_address.Text ?? ""); e.Handled = true; } };
         _position.PropertyChanged += async (_, e) =>

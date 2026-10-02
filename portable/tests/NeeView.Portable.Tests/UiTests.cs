@@ -33,6 +33,42 @@ public static class TestAvaloniaBuilder
 }
 public sealed class UiTests
 {
+    /// <summary>短瀑布流启动时尺寸探测改变滚动范围，宿主不能把范围修正保存为用户的新位置。</summary>
+    [AvaloniaFact]
+    public async Task StartupMasonryExtentChangesKeepSavedAnchor()
+    {
+        await using var workspace = new TestWorkspace();
+        var directory = Path.Combine(workspace.Root, "short-book"); Directory.CreateDirectory(directory);
+        for (var number = 1; number <= 3; number++)
+            await File.WriteAllBytesAsync(Path.Combine(directory, $"{number:D3}.jpg"), [(byte)number], TestContext.Current.CancellationToken);
+        ReadingAnchor anchor;
+        await using (var saved = workspace.Session())
+        {
+            await saved.OpenAsync(new(directory)); anchor = new(saved.Snapshot.Index!.Pages[2].Id);
+            await saved.SetOptionsAsync(saved.Snapshot.Options with { Mode = ReaderMode.Masonry }); await saved.LocateAsync(anchor);
+        }
+        var session = workspace.Session(); var decoder = new MixedProbeDecoder();
+        await using var scheduler = new ImageScheduler(decoder);
+        var window = new MainWindow(session, workspace.Settings, workspace.States, new CountingFiles(), new DestinationFolderService(workspace.Settings),
+            new FolderNavigator(), new TestPlatform(), new LegacyImporter(workspace.States, workspace.Settings), scheduler, decoder);
+        var scroll = ((ReaderShell)window.Content!).FindControl<ScrollViewer>("ViewerScroll")!;
+        var extentChanges = 0; scroll.ScrollChanged += (_, e) => { if (e.ExtentDelta != default) extentChanges++; };
+        try
+        {
+            window.Show(); await window.OpenAsync(directory);
+            // 驱动真实测量及异步尺寸回报，覆盖启动窗口、默认占位和已知尺寸之间的多次重排。
+            for (var step = 0; step < 20; step++) { window.UpdateLayout(); await Task.Delay(20, TestContext.Current.CancellationToken); }
+            await session.FlushAsync(); Assert.True(extentChanges > 0);
+            Assert.Equal(ReaderMode.Masonry, session.Snapshot.Options.Mode); Assert.Equal(anchor, session.Snapshot.Anchor);
+            Assert.All(session.Snapshot.Index!.Pages, page => Assert.NotNull(page.Size));
+            // 重放 macOS 的晚到范围修正：查看器记录的目标与宿主实际 offset 不同，事件同时携带 extent delta。
+            var viewer = (ReaderView)scroll.Content!;
+            viewer.SetViewport(scroll.Viewport.Width, scroll.Viewport.Height, scroll.Offset.Y + 25, false);
+            scroll.RaiseEvent(new ScrollChangedEventArgs(new Vector(0, -25), new Vector(0, -25), default));
+            await session.FlushAsync(); Assert.Equal(anchor, session.Snapshot.Anchor);
+        }
+        finally { await window.PrepareShutdownAsync(); window.Close(); }
+    }
     /// <summary>分类列表多次重绑定时，Avalonia 的空数据模板清理不能中断刷新或留下重复条目。</summary>
     [AvaloniaFact]
     public async Task DestinationRefreshClearsTemplatesAndKeepsSingleChild()
@@ -171,6 +207,16 @@ public sealed class UiTests
         public Task<FileActionResult> RedoAsync(ConflictChoice conflict = ConflictChoice.Cancel, CancellationToken token = default) => UndoAsync(conflict, token);
         public Task<IReadOnlyList<FileRecoveryResult>> RecoverAsync(CancellationToken token = default) => Task.FromResult<IReadOnlyList<FileRecoveryResult>>([]);
         public Task DrainAsync() => Task.CompletedTask;
+    }
+    /// <summary>以三张测试流首字节提供混合横竖尺寸；像素输出沿用受限假解码器。</summary>
+    private sealed class MixedProbeDecoder : IImageDecoder
+    {
+        private readonly FakeDecoder _pixels = new();
+        /// <summary>前两图竖向，第三图横向，触发未知尺寸补齐后的滚动范围变化。</summary>
+        public Task<ImageInfo> ProbeAsync(Stream stream, CancellationToken token)
+        { token.ThrowIfCancellationRequested(); return Task.FromResult(new ImageInfo(stream.ReadByte() == 3 ? new(3840, 2160) : new(2160, 3840), "test")); }
+        /// <summary>仅返回少量测试像素，回归不依赖真实原生内存或图片文件。</summary>
+        public Task<DecodedImageLease> DecodeAsync(Stream stream, DecodeRequest request, CancellationToken token) => _pixels.DecodeAsync(stream, request, token);
     }
     /// <summary>模拟读取旧配置已完成但 UI 恢复回调尚未返回的存储。</summary>
     private sealed class DelayedSettings(ISettingsStore inner) : ISettingsStore

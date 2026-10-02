@@ -1,57 +1,57 @@
 {
-  "utc": "2026-10-02T05:02:48.919597+00:00",
+  "utc": "2026-10-02T05:11:03.621729+00:00",
   "steps": [
     {
       "name": "Preview 构建",
       "exit_code": 0,
-      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Core -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Core/bin/Debug/net10.0/NeeView.Core.dll\n  NeeView.Application -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Application/bin/Debug/net10.0/NeeView.Application.dll\n  NeeView.Desktop -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Desktop/bin/Debug/net10.0/NeeView.Desktop.dll\n  NeeView.Content -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Content/bin/Debug/net10.0/NeeView.Content.dll\n  NeeView.Imaging -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Imaging/bin/Debug/net10.0/NeeView.Imaging.dll\n  NeeView.Persistence -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Persistence/bin/Debug/net10.0/NeeView.Persistence.dll\n  NeeView.Preview -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Preview/bin/Debug/net10.0/NeeView.Preview.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:04.48\n"
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Core -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Core/bin/Debug/net10.0/NeeView.Core.dll\n  NeeView.Application -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Application/bin/Debug/net10.0/NeeView.Application.dll\n  NeeView.Desktop -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Desktop/bin/Debug/net10.0/NeeView.Desktop.dll\n  NeeView.Content -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Content/bin/Debug/net10.0/NeeView.Content.dll\n  NeeView.Imaging -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Imaging/bin/Debug/net10.0/NeeView.Imaging.dll\n  NeeView.Persistence -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Persistence/bin/Debug/net10.0/NeeView.Persistence.dll\n  NeeView.Preview -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Preview/bin/Debug/net10.0/NeeView.Preview.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:03.96\n"
     },
     {
       "name": "自动测试",
       "exit_code": 0,
-      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Core -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Core/bin/Debug/net10.0/NeeView.Core.dll\n  NeeView.Application -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Application/bin/Debug/net10.0/NeeView.Application.dll\n  NeeView.Content -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Content/bin/Debug/net10.0/NeeView.Content.dll\n  NeeView.Imaging -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Imaging/bin/Debug/net10.0/NeeView.Imaging.dll\n  NeeView.Persistence -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Persistence/bin/Debug/net10.0/NeeView.Persistence.dll\n  NeeView.Desktop -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Desktop/bin/Debug/net10.0/NeeView.Desktop.dll\n  NeeView.Portable.Tests -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Portable.Tests/bin/Debug/net10.0/NeeView.Portable.Tests.dll\n/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Portable.Tests/bin/Debug/net10.0/NeeView.Portable.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行\n总共 1 个测试文件与指定模式相匹配。\n警告: 正在覆盖结果文件: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Portable.Tests/TestResults/portable.trx\n结果文件: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Portable.Tests/TestResults/portable.trx\n\n已通过! - 失败:     0，通过:    55，已跳过:     0，总计:    55，持续时间: 1 s - NeeView.Portable.Tests.dll (net10.0)\n"
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Core -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Core/bin/Debug/net10.0/NeeView.Core.dll\n  NeeView.Application -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Application/bin/Debug/net10.0/NeeView.Application.dll\n  NeeView.Content -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Content/bin/Debug/net10.0/NeeView.Content.dll\n  NeeView.Imaging -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Imaging/bin/Debug/net10.0/NeeView.Imaging.dll\n  NeeView.Persistence -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Persistence/bin/Debug/net10.0/NeeView.Persistence.dll\n  NeeView.Desktop -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Desktop/bin/Debug/net10.0/NeeView.Desktop.dll\n  NeeView.Portable.Tests -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Portable.Tests/bin/Debug/net10.0/NeeView.Portable.Tests.dll\n/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Portable.Tests/bin/Debug/net10.0/NeeView.Portable.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行\n总共 1 个测试文件与指定模式相匹配。\n警告: 正在覆盖结果文件: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Portable.Tests/TestResults/portable.trx\n结果文件: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Portable.Tests/TestResults/portable.trx\n\n已通过! - 失败:     0，通过:    56，已跳过:     0，总计:    56，持续时间: 1 s - NeeView.Portable.Tests.dll (net10.0)\n"
     },
     {
       "name": "真实解码/恢复 acceptance-images",
       "exit_code": 0,
-      "output": "probe 2160x3840 Jpeg\ndecode 001.jpg 2048x3640 29818880B\nprobe 2160x3840 Jpeg\ndecode 002.jpg 2048x3640 29818880B\nprobe 3840x2160 Jpeg\ndecode 003.jpg 2048x1152 9437184B\nprobe 2160x3840 Jpeg\ndecode 004.jpg 2048x3640 29818880B\nprobe 2160x3840 Jpeg\ndecode 005.jpg 2048x3640 29818880B\nprobe 3840x2160 Jpeg\ndecode 006.jpg 2048x1152 9437184B\nprobe 2160x3840 Jpeg\ndecode 007.jpg 2048x3640 29818880B\nprobe 2160x3840 Jpeg\ndecode 008.jpg 2048x3640 29818880B\npages=12 elapsed=3000ms cache=197787648 restored=True\n"
+      "output": "probe 2160x3840 Jpeg\ndecode 001.jpg 2048x3640 29818880B\nprobe 2160x3840 Jpeg\ndecode 002.jpg 2048x3640 29818880B\nprobe 3840x2160 Jpeg\ndecode 003.jpg 2048x1152 9437184B\nprobe 2160x3840 Jpeg\ndecode 004.jpg 2048x3640 29818880B\nprobe 2160x3840 Jpeg\ndecode 005.jpg 2048x3640 29818880B\nprobe 3840x2160 Jpeg\ndecode 006.jpg 2048x1152 9437184B\nprobe 2160x3840 Jpeg\ndecode 007.jpg 2048x3640 29818880B\nprobe 2160x3840 Jpeg\ndecode 008.jpg 2048x3640 29818880B\npages=12 elapsed=2934ms cache=197787648 restored=True\n"
     },
     {
       "name": "真实解码/恢复 acceptance-images.cbz",
       "exit_code": 0,
-      "output": "probe 2160x3840 Jpeg\ndecode 002.jpg 2048x3640 29818880B\nprobe 3840x2160 Jpeg\ndecode 003.jpg 2048x1152 9437184B\nprobe 2160x3840 Jpeg\ndecode 001.jpg 2048x3640 29818880B\nprobe 2160x3840 Jpeg\ndecode 004.jpg 2048x3640 29818880B\nprobe 2160x3840 Jpeg\ndecode 010.jpg 2048x3640 29818880B\nprobe 2160x3840 Jpeg\ndecode 011.jpg 2048x3640 29818880B\nprobe 2160x3840 Jpeg\ndecode 005.jpg 2048x3640 29818880B\nprobe 2160x3840 Jpeg\ndecode 007.jpg 2048x3640 29818880B\npages=12 elapsed=3182ms cache=218169344 restored=True\n"
+      "output": "probe 2160x3840 Jpeg\ndecode 002.jpg 2048x3640 29818880B\nprobe 3840x2160 Jpeg\ndecode 003.jpg 2048x1152 9437184B\nprobe 2160x3840 Jpeg\ndecode 001.jpg 2048x3640 29818880B\nprobe 2160x3840 Jpeg\ndecode 004.jpg 2048x3640 29818880B\nprobe 2160x3840 Jpeg\ndecode 010.jpg 2048x3640 29818880B\nprobe 2160x3840 Jpeg\ndecode 011.jpg 2048x3640 29818880B\nprobe 2160x3840 Jpeg\ndecode 005.jpg 2048x3640 29818880B\nprobe 2160x3840 Jpeg\ndecode 007.jpg 2048x3640 29818880B\npages=12 elapsed=3042ms cache=218169344 restored=True\n"
     },
     {
       "name": "真实解码/恢复 Rar.rar",
       "exit_code": 0,
-      "output": "probe 384x512 Jpeg\ndecode jpg/test.jpg 384x512 786432B\npages=1 elapsed=202ms cache=786432 restored=True\n"
+      "output": "probe 384x512 Jpeg\ndecode jpg/test.jpg 384x512 786432B\npages=1 elapsed=184ms cache=786432 restored=True\n"
     },
     {
       "name": "真实解码/恢复 Rar.solid.rar",
       "exit_code": 0,
-      "output": "probe 384x512 Jpeg\ndecode jpg/test.jpg 384x512 786432B\npages=1 elapsed=205ms cache=786432 restored=True\n"
+      "output": "probe 384x512 Jpeg\ndecode jpg/test.jpg 384x512 786432B\npages=1 elapsed=207ms cache=786432 restored=True\n"
     },
     {
       "name": "真实解码/恢复 Rar5.solid.rar",
       "exit_code": 0,
-      "output": "probe 384x512 Jpeg\ndecode jpg/test.jpg 384x512 786432B\npages=1 elapsed=443ms cache=786432 restored=True\n"
+      "output": "probe 384x512 Jpeg\ndecode jpg/test.jpg 384x512 786432B\npages=1 elapsed=430ms cache=786432 restored=True\n"
     },
     {
       "name": "真实解码/恢复 7Zip.LZMA.7z",
       "exit_code": 0,
-      "output": "probe 384x512 Jpeg\ndecode jpg/test.jpg 384x512 786432B\npages=1 elapsed=446ms cache=786432 restored=True\n"
+      "output": "probe 384x512 Jpeg\ndecode jpg/test.jpg 384x512 786432B\npages=1 elapsed=426ms cache=786432 restored=True\n"
     },
     {
       "name": "真实解码/恢复 7Zip.solid.7z",
       "exit_code": 0,
-      "output": "probe 384x512 Jpeg\ndecode jpg/test.jpg 384x512 786432B\npages=1 elapsed=523ms cache=786432 restored=True\n"
+      "output": "probe 384x512 Jpeg\ndecode jpg/test.jpg 384x512 786432B\npages=1 elapsed=439ms cache=786432 restored=True\n"
     }
   ],
   "scope": "模块/Headless/服务链路；不包含真实滚动帧或签名公证",
   "tests": {
-    "total": "55",
-    "executed": "55",
-    "passed": "55",
+    "total": "56",
+    "executed": "56",
+    "passed": "56",
     "failed": "0",
     "error": "0",
     "timeout": "0",
