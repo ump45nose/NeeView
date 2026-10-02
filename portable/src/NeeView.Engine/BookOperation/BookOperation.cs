@@ -17,6 +17,8 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
     private bool _keepHistoryOrder;
     private FilmStrip? _filmStrip;
     private BookshelfFolderList? _bookshelf;
+    private HistoryList? _historyList;
+    public HistoryList HistoryList => _historyList ??= new(saveData);
     public BookshelfFolderList Bookshelf => _bookshelf ??= new(archives);
     public PageSelector PageSelector { get; } = new();
     public FilmStrip FilmStrip => _filmStrip ??= new(PageSelector);
@@ -65,13 +67,18 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
             {
                 opening.Token.ThrowIfCancellationRequested();
                 if (_disposed || _closing || generation != _generation) return false;
-                await saveData.SaveAsync(Book, Position.Part, opening.Token, _keepHistoryOrder);
-                var old = Book; Book = book; source = null;
-                _keepHistoryOrder = keepHistoryOrder;
-                Config.Current.BookSetting = setting;
-                Context = new(setting, Config.Current);
-                Position = new(index, entryName is not null || ImageFormats.IsImage(path) ? 0 : Math.Clamp(restored.Part, 0, 1));
-                RebuildFrame(1);
+                await saveData.SaveAsync(Book, Position.Part, opening.Token, _keepHistoryOrder || keepHistoryOrder);
+                var old = Book;
+                // 与 Remove/Clear 串行提交：取消的打开不能解除抑制，新书提交后清空仍作用于新书。
+                if (!await saveData.BeginHistoryVisitAsync(book.Path, () =>
+                {
+                    opening.Token.ThrowIfCancellationRequested();
+                    if (_disposed || _closing || generation != _generation) return false;
+                    Book = book; source = null; _keepHistoryOrder = keepHistoryOrder;
+                    Config.Current.BookSetting = setting; Context = new(setting, Config.Current);
+                    Position = new(index, entryName is not null || ImageFormats.IsImage(path) ? 0 : Math.Clamp(restored.Part, 0, 1));
+                    RebuildFrame(1); return true;
+                })) return false;
                 if (old is not null) await old.DisposeAsync();
                 if (!replayBookHistory) BookHistory.Add(book.Path);
                 if (!replayPageHistory) RecordPageHistory();
@@ -206,6 +213,29 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
         finally { _gate.Release(); }
     }
 
+    /// <summary>打开历史列表条目；保留访问排序，当前书籍不重复加载，失败保留旧书。</summary>
+    /// <param name="path">原 History.Items.Path，不是页码或文件删除目标。</param>
+    public async Task OpenHistoryAsync(string path)
+    {
+        if (_disposed || _closing || IsLoading || Book?.Path == path) return;
+        await OpenCoreAsync(path, CancellationToken.None, keepHistoryOrder: true);
+    }
+
+    /// <summary>按原筛选后访问列表前后浏览，独立于 PageHistory/BookHubHistory 的游标。</summary>
+    public async Task MoveHistoryListAsync(int direction)
+    {
+        await _historyGate.WaitAsync();
+        try
+        {
+            if (_disposed || _closing || IsLoading) return;
+            HistoryList.Address = Book?.Path;
+            var target = HistoryList.GetTarget(direction);
+            if (target is not null) await OpenHistoryAsync(target.Path);
+            else { Error = direction < 0 ? "已到历史记录末项。" : "已到最新历史记录。"; Notify(); }
+        }
+        finally { _historyGate.Release(); }
+    }
+
     /// <summary>重放原页面或书籍打开历史；加载失败/被新打开取代时保留游标供重试。</summary>
     /// <param name="direction">后退为 -1，前进为 1。</param>
     /// <param name="bookOnly">true 按打开顺序，false 按书籍路径和页面条目名。</param>
@@ -324,7 +354,7 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
         finally { if (ReferenceEquals(_saving, pending)) _saving = null; pending.Dispose(); }
     }
     /// <summary>发布业务变化；界面订阅者负责切换 UI 线程。</summary>
-    private void Notify() => Changed?.Invoke(this, EventArgs.Empty);
+    private void Notify() { HistoryList.Address = Book?.Path; Changed?.Invoke(this, EventArgs.Empty); }
     /// <summary>取消打开和防抖，完成状态保存后释放当前来源。</summary>
     public ValueTask DisposeAsync()
     {

@@ -1,6 +1,6 @@
 # 完整命令迁移表
 
-固定基线 235 个实例；数量是登记清单，不代表功能覆盖率。当前包含 P1 与 P2 五批增量，阶段标记仅说明执行入口已接入，完整参数/手势及交互范围见验收记录。未迁入命令保留原菜单节点、键位和参数，禁用占位。原复杂手势可以原样保存，不意味着其执行已迁入。
+固定基线 235 个实例；数量是登记清单，不代表功能覆盖率。当前包含 P1 与 P2 六批增量，阶段标记仅说明执行入口已接入，完整参数/手势及交互范围见验收记录。未迁入命令保留原菜单节点、键位和参数，禁用占位。原复杂手势可以原样保存，不意味着其执行已迁入。
 
 | 原命令 | 文案 | 默认输入 | 当前实现 | 原出处 |
 |---|---|---|---|---|
@@ -42,7 +42,7 @@
 | DeleteBook | 删除书籍 |  | 待 P2–P5 | NeeView/Command/Commands/DeleteBookCommand.cs |
 | RenameBook | 重命名书籍 |  | 待 P2–P5 | NeeView/Command/Commands/RenameBookCommand.cs |
 | SelectArchiver | 选择归档程序 |  | 待 P2–P5 | NeeView/Command/Commands/SelectArchiverCommand.cs |
-| ClearHistory | 清理历史记录 |  | 待 P2–P5 | NeeView/Command/Commands/ClearHistoryCommand.cs |
+| ClearHistory | 清理历史记录 |  | P2 原历史集合清空；具体范围见验收表 | NeeView/Command/Commands/ClearHistoryCommand.cs |
 | ClearHistoryInPlace | 删除当前位置的历史记录 |  | 待 P2–P5 | NeeView/Command/Commands/ClearHistoryInPlaceCommand.cs |
 | RemoveUnlinkedHistory | 删除无效的历史记录 |  | 待 P2–P5 | NeeView/Command/Commands/RemoveUnlinkedHistoryCommand.cs |
 | ToggleStretchMode | 切换拉伸 | LeftButton+WheelDown | 待 P2–P5 | NeeView/Command/Commands/ToggleStretchModeCommand.cs |
@@ -85,7 +85,7 @@
 | FocusFolderSearchBox | 聚焦到书架搜索框 |  | 待 P2–P5 | NeeView/Command/Commands/FocusFolderSearchBoxCommand.cs |
 | FocusBookmarkSearchBox | 聚焦到书签搜索框 |  | 待 P2–P5 | NeeView/Command/Commands/FocusBookmarkSearchBoxCommand.cs |
 | FocusPageListSearchBox | 聚焦到页面列表搜索框 |  | 待 P2–P5 | NeeView/Command/Commands/FocusPageListSearchBoxCommand.cs |
-| FocusHistorySearchBox | 聚焦到历史记录搜索框 |  | 待 P2–P5 | NeeView/Command/Commands/FocusHistorySearchBoxCommand.cs |
+| FocusHistorySearchBox | 聚焦到历史记录搜索框 |  | P2 原历史面板焦点；具体范围见验收表 | NeeView/Command/Commands/FocusHistorySearchBoxCommand.cs |
 | FocusBookmarkList | 显示书签 |  | 待 P2：书架书签位置/目录树互联 | NeeView/Command/Commands/FocusBookmarkListCommand.cs |
 | FocusMainView | 聚焦到主视图 |  | 待 P2–P5 | NeeView/Command/Commands/FocusMainViewCommand.cs |
 | ToggleVisibleFilmStrip | 显示/隐藏幻灯条 |  | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleFilmStripCommand.cs |
@@ -144,8 +144,8 @@
 | PrevBook | 上一本书籍 | Up | P2 原普通书架前后项；失败保留选择 | NeeView/Command/Commands/PrevBookCommand.cs |
 | NextBook | 下一本书籍 | Down | P2 原普通书架前后项；失败保留选择 | NeeView/Command/Commands/NextBookCommand.cs |
 | RandomBook | 随机排序书籍 |  | 待 P2–P5 | NeeView/Command/Commands/RandomBookCommand.cs |
-| PrevHistory | 后退到上一条历史记录 |  | 待 P2–P5 | NeeView/Command/Commands/PrevHistoryCommand.cs |
-| NextHistory | 前进到下一条历史记录 |  | 待 P2–P5 | NeeView/Command/Commands/NextHistoryCommand.cs |
+| PrevHistory | 后退到上一条历史记录 |  | P2 原过滤后历史列表导航；具体范围见验收表 | NeeView/Command/Commands/PrevHistoryCommand.cs |
+| NextHistory | 前进到下一条历史记录 |  | P2 原过滤后历史列表导航；具体范围见验收表 | NeeView/Command/Commands/NextHistoryCommand.cs |
 | PrevBookHistory | 后退到上一本书籍 | Alt+Left | P2 原导航历史接入；具体范围见验收表 | NeeView/Command/Commands/PrevBookHistoryCommand.cs |
 | NextBookHistory | 前进到下一本书籍 | Alt+Right | P2 原导航历史接入；具体范围见验收表 | NeeView/Command/Commands/NextBookHistoryCommand.cs |
 | MoveToParentBook | 打开父文件夹 | Alt+Up | 待 P2–P5 | NeeView/Command/Commands/MoveToParentBookCommand.cs |

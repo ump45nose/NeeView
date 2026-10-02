@@ -26,6 +26,8 @@ public sealed class CommandTable
         _actions["NextHistoryPage"] = () => operation.NavigateHistoryAsync(1);
         _actions["PrevBookHistory"] = () => operation.NavigateHistoryAsync(-1, true);
         _actions["NextBookHistory"] = () => operation.NavigateHistoryAsync(1, true);
+        _actions["PrevHistory"] = () => operation.MoveHistoryListAsync(-1);
+        _actions["NextHistory"] = () => operation.MoveHistoryListAsync(1);
         _actions["PrevBook"] = () => operation.MoveBookAsync(-1);
         _actions["NextBook"] = () => operation.MoveBookAsync(1);
         _actions["PrevFolderPage"] = () => operation.MoveFolderPageAsync(-1);

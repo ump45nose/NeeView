@@ -10,6 +10,9 @@ public sealed class SaveData(string directory)
     private JsonObject _setting = new();
     private JsonObject _history = new();
     private JsonObject _bookmarks = new();
+    // 原 Remove/Clear 不会因阅读位置保存自动重新登记；显式重新打开才恢复登记。
+    private readonly HashSet<string> _suppressedHistoryPaths = new(StringComparer.Ordinal);
+    private string? _activeHistoryPath;
     public BookmarkCollection Bookmarks { get; private set; } = new(new() { Children = [] });
     public BookmarkNode BookmarkRoot => Bookmarks.Items;
     private BookmarkNodeMemento[] _removedBookmarks = [];
@@ -28,6 +31,8 @@ public sealed class SaveData(string directory)
         _bookmarks = await ReadAsync("Bookmark.json", token);
         Bookmarks = new(_bookmarks["Nodes"]?.Deserialize<BookmarkNode>(Options) ?? new() { Children = [] });
         _removedBookmarks = [];
+        _suppressedHistoryPaths.Clear();
+        _activeHistoryPath = null;
         if (!BookmarkRoot.IsFolder) throw new JsonException("Bookmark.Nodes 必须是根文件夹。");
         RefreshHistory();
         var raw = _setting["Config"] as JsonObject;
@@ -43,6 +48,7 @@ public sealed class SaveData(string directory)
             config.FilmStrip = ReadBranch<FilmStripConfig>(raw, "FilmStrip");
             config.Slider = ReadBranch<SliderConfig>(raw, "Slider");
             config.Bookshelf = ReadBranch<BookshelfConfig>(raw, "Bookshelf");
+            config.History = ReadBranch<HistoryConfig>(raw, "History");
         }
         Config.SetCurrent(config);
     }
@@ -213,6 +219,55 @@ public sealed class SaveData(string directory)
         Bookmarks.Remove(node);
     }
 
+    /// <summary>在历史编辑锁内提交真实新书，再解除登记抑制，避免取消或清空与新访问交错。</summary>
+    /// <param name="commit">原打开流程的最后代次检查与书籍赋值；返回 false 表示未提交。</param>
+    /// <returns>书籍及新访问是否同时提交；没有额外文件写入。</returns>
+    internal async Task<bool> BeginHistoryVisitAsync(string path, Func<bool> commit)
+    {
+        await _gate.WaitAsync();
+        try
+        {
+            if (!commit()) return false;
+            _suppressedHistoryPaths.Remove(path); _activeHistoryPath = path; return true;
+        }
+        finally { _gate.Release(); }
+    }
+
+    /// <summary>移除指定历史记录，沿用原 BookHistoryCollection.Remove；不删除源文件或书签。</summary>
+    /// <param name="paths">选中批次的书籍路径，精确比较，不将路径统一转小写。</param>
+    /// <returns>实际删除数；失败恢复原 JSON、抑制记录及可重试状态。</returns>
+    public Task<int> RemoveHistoryAsync(IEnumerable<string> paths, CancellationToken token = default) =>
+        EditHistoryAsync(paths.ToHashSet(StringComparer.Ordinal), token);
+
+    /// <summary>清空全部访问记录，保留搜索历史与未知根字段；不受界面过滤限制。</summary>
+    public Task<int> ClearHistoryAsync(CancellationToken token = default) => EditHistoryAsync(null, token);
+
+    /// <summary>串行修改历史与三文件事务；选中删除和清空使用同一失败回滚。</summary>
+    private async Task<int> EditHistoryAsync(HashSet<string>? paths, CancellationToken token)
+    {
+        await _gate.WaitAsync(token);
+        var previous = _history.DeepClone().AsObject();
+        var suppressed = _suppressedHistoryPaths.ToArray();
+        try
+        {
+            var items = _history["Items"] as JsonArray;
+            var removed = items?.OfType<JsonObject>().Where(item => item["Path"] is JsonValue value &&
+                (paths is null || paths.Contains(value.GetValue<string>()))).ToArray() ?? [];
+            if (removed.Length == 0 && paths is not null) return 0;
+            // 首次打开还未到防抖保存时也允许清空；不能让晚到的当前书保存重新登记。
+            if (paths is null && _activeHistoryPath is not null) _suppressedHistoryPaths.Add(_activeHistoryPath);
+            foreach (var item in removed)
+            { _suppressedHistoryPaths.Add(item["Path"]!.GetValue<string>()); items!.Remove(item); }
+            await WritePairAsync(token); RefreshHistory(); return removed.Length;
+        }
+        catch
+        {
+            _history = previous; _suppressedHistoryPaths.Clear(); _suppressedHistoryPaths.UnionWith(suppressed);
+            throw;
+        }
+        finally { _gate.Release(); Changed?.Invoke(this, EventArgs.Empty); }
+    }
+
     /// <summary>生成按访问时间倒序的只读历史；未知字段仍保留在权威 JSON 中。</summary>
     private void RefreshHistory() => HistoryEntries = (_history["Items"] as JsonArray)?.OfType<JsonObject>()
         .Where(e => e["Path"] is JsonValue).Select(e => new HistoryEntry(e["Path"]!.GetValue<string>(), e["Page"]?.GetValue<string>(),
@@ -227,7 +282,7 @@ public sealed class SaveData(string directory)
         try
         {
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "History" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 Merge(Object(config, branch), JsonSerializer.SerializeToNode(value, Options)!.AsObject());
@@ -246,7 +301,7 @@ public sealed class SaveData(string directory)
                 item["MacPagePart"] = part;
                 item["MacIsSupportedWidePage"] = memento.IsSupportedWidePage;
                 // 原 KeepHistoryOrder：阅读位置仍更新，重放不改变访问排序或原数组位置。
-                if (!keepHistoryOrder || old is null)
+                if (!_suppressedHistoryPaths.Contains(book.Path) && (!keepHistoryOrder || old is null))
                 { if (old is not null) items.Remove(old); items.Insert(0, item); }
                 Object(config, "StartUp")["LastBookV2"] = new JsonObject { ["Path"] = book.Path, ["Page"] = memento.Page, ["Props"] = item["Props"]!.DeepClone() };
             }

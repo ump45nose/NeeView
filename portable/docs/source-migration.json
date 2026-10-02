@@ -470,6 +470,60 @@
       "target": "src/NeeView.MacOS/Views/MainWindow.axaml.cs",
       "sha256": "70b6bfd3fe04040220aa70462903e8a15ca10b276c3e1409e11e0b16adda23ab",
       "status": "核对原命令进入Bookshelf书签Query位置及目录树互联；当前保留禁用占位，不替换成独立书签面板聚焦"
+    },
+    {
+      "source": "NeeView/Config/HistoryConfig.cs",
+      "target": "src/NeeView.Engine/Config/HistoryConfig.cs",
+      "sha256": "727986b8c0d9dc0abb92f91869d9b6e231bf4c512892827088ba5e4cefd0d76d",
+      "status": "原历史列表四开关及默认值；显示样式/保留策略/高级搜索原JSON字段保留，行为待迁"
+    },
+    {
+      "source": "NeeView/SidePanels/History/HistoryList.cs",
+      "target": "src/NeeView.Engine/SidePanels/History/HistoryList.cs",
+      "sha256": "d03256719e12ae1f3b11462a0c8a25e52b2e58cc2518e4daedadb21b176bce49",
+      "status": "原直接父目录过滤、日期分组、过滤后前后列表目标；WPF集合视图移到表现，结构化搜索待迁"
+    },
+    {
+      "source": "NeeView/BookHistory/BookHistoryCollection.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.cs",
+      "sha256": "addd035b3f7540da5b0851c2b79fbef2bbf880518c39bf553c75f654342fbece",
+      "status": "原Remove/Clear集合行为适配现有JSON事务；当前记录移除后位置保存不重新登记，显式新访问才恢复；无效清理/保留限制待迁"
+    },
+    {
+      "source": "NeeView/SidePanels/History/HistoryListViewModel.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.History.cs",
+      "sha256": "9f73ad1ea93b4ed89c461f3250e97258475d02cde5c58562aa50b441fbf4c1ea",
+      "status": "原更多菜单/清空确认/四开关；样式与无效清理禁用占位"
+    },
+    {
+      "source": "NeeView/SidePanels/History/HistoryListBox.xaml.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.History.cs",
+      "sha256": "203bfc7e3eba0e60c2d7fb4a9848dae6716d794b534a2554567950f4e108bf9d",
+      "status": "原KeepHistoryOrder/SkipSamePlace、单/双击、Enter/Delete、多选移除、上下文目标适配Avalonia"
+    },
+    {
+      "source": "NeeView/Command/Commands/PrevHistoryCommand.cs",
+      "target": "src/NeeView.Engine/Command/CommandTable.cs",
+      "sha256": "1ab0b2e3b96234af5e86d93443aed7acb3547c27e70bf06da1fad1786c7e8d0f",
+      "status": "接入原过滤后PrevHistory，与进程页面/打开历史独立"
+    },
+    {
+      "source": "NeeView/Command/Commands/NextHistoryCommand.cs",
+      "target": "src/NeeView.Engine/Command/CommandTable.cs",
+      "sha256": "e869d8ed6098bb18419ad3e96d1778a768d8093f1ccd94c8a0aa4b3a358f469c",
+      "status": "接入原过滤后NextHistory，边界不循环"
+    },
+    {
+      "source": "NeeView/Command/Commands/ClearHistoryCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml.cs",
+      "sha256": "92ac4afb9377b7025743fbb1dcc3aacea260846bc599afcfe6caadb442dec491",
+      "status": "原Clear直接清空；面板更多菜单另有确认；ClearHistoryInPlace与无效清理仍禁用"
+    },
+    {
+      "source": "NeeView/Command/Commands/FocusHistorySearchBoxCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml.cs",
+      "sha256": "bb2050f3298f53071080a39369693a0b6fa82e473a112d60d780d5e4d8baa996",
+      "status": "明确显示历史面板并聚焦搜索，不切换关闭已打开面板"
     }
   ],
   "rule_references": [

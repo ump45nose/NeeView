@@ -62,9 +62,17 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public bool ShowNavigator => IsPanelVisible("NavigatePanel");
     /// <summary>跨栏后按实际组选择与栏显隐计算面板状态。</summary>
     public bool IsPanelVisible(string name) => Layout.Find(name) is { } found && ReferenceEquals(Layout.Docks[found.Side].SelectedItem, found.Group) && (found.Side == "Left" ? LeftVisible : RightVisible);
-    private string _historySearch = "";
-    public string HistorySearch { get => _historySearch; set { if (SetProperty(ref _historySearch, value)) OnPropertyChanged(nameof(History)); } }
-    public IReadOnlyList<HistoryEntry> History => SaveData.HistoryEntries.Where(e => e.Path.Contains(HistorySearch, StringComparison.CurrentCultureIgnoreCase)).ToArray();
+    public string HistorySearch { get => Operation.HistoryList.SearchKeyword; set { if (value == HistorySearch) return; Operation.HistoryList.SearchKeyword = value; OnPropertyChanged(); RefreshHistory(); } }
+    private IReadOnlyList<HistoryRow> _historyRows = [];
+    public IReadOnlyList<HistoryRow> History => _historyRows;
+    private HistoryRow? _selectedHistory;
+    public HistoryRow? SelectedHistory { get => _selectedHistory; set => SetProperty(ref _selectedHistory, value); }
+    public bool HistorySearchVisible => Config.Current.History.IsVisibleSearchBox;
+    public bool HistoryCountVisible => Config.Current.History.IsVisibleItemsCount;
+    public string HistoryPlace => Operation.HistoryList.FilterPath ?? "全部历史记录";
+    public string HistoryCount => $"{History.Count} / {SaveData.HistoryEntries.Count} 项";
+    private Book? _historyBook;
+    public event EventHandler? HistoryRefreshed;
     public IReadOnlyList<BookmarkNode> Bookmarks => SaveData.BookmarkRoot.Children ?? [];
     private BookmarkNode? _selectedBookmark;
     public BookmarkNode? SelectedBookmark { get => _selectedBookmark; set => SetProperty(ref _selectedBookmark, value); }
@@ -108,7 +116,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     /// <summary>历史与书签回报只更新导航面板，不重新解码当前帧。</summary>
     private void SaveData_Changed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() =>
     {
-        OnPropertyChanged(nameof(History)); OnPropertyChanged(nameof(Bookmarks)); OnPropertyChanged(nameof(IsBookmark)); OnPropertyChanged(nameof(CanRestoreBookmarks));
+        RefreshHistory(); OnPropertyChanged(nameof(Bookmarks)); OnPropertyChanged(nameof(IsBookmark)); OnPropertyChanged(nameof(CanRestoreBookmarks));
         if (SelectedBookmark is not null && !SaveData.BookmarkRoot.Walk().Contains(SelectedBookmark)) SelectedBookmark = null;
     });
     /// <summary>界面只展示最新业务状态，排队回报不会携带旧书快照。</summary>
@@ -118,7 +126,33 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     {
         Address = Operation.Book?.Path ?? Address;
         // 先替换列表来源，再恢复选择；反向顺序会被 ListBox 的 TwoWay 清空回报覆盖。
-        OnPropertyChanged(""); SelectedPage = Operation.Book?.CurrentPage; Refreshed?.Invoke(this, EventArgs.Empty);
+        OnPropertyChanged(""); SelectedPage = Operation.Book?.CurrentPage; RefreshHistory(); Refreshed?.Invoke(this, EventArgs.Empty);
+    }
+    /// <summary>复用未变化的历史展示行，保留列表选择；分组与筛选不刷新正文或读取文件。</summary>
+    public void RefreshHistory()
+    {
+        var selectedPath = !ReferenceEquals(_historyBook, Operation.Book) ? Operation.Book?.Path : SelectedHistory?.Path;
+        _historyBook = Operation.Book;
+        var old = _historyRows.GroupBy(row => row.Path, StringComparer.Ordinal).ToDictionary(group => group.Key, group => group.First(), StringComparer.Ordinal);
+        string? previousGroup = null;
+        _historyRows = Operation.HistoryList.GetViewItems().Select(entry =>
+        {
+            string? group = Config.Current.History.IsGroupBy ? HistoryList.GetGroupName(entry.LastAccessTime, DateTime.Today) : null;
+            var header = group == previousGroup ? null : group; previousGroup = group;
+            return old.TryGetValue(entry.Path, out var row) && row.Entry == entry && row.GroupHeader == header ? row : new HistoryRow(entry, header);
+        }).ToArray();
+        OnPropertyChanged(nameof(History));
+        SelectedHistory = _historyRows.FirstOrDefault(row => row.Path == selectedPath) ?? _historyRows.FirstOrDefault();
+        foreach (var name in new[] { nameof(HistorySearchVisible), nameof(HistoryCountVisible), nameof(HistoryPlace), nameof(HistoryCount) }) OnPropertyChanged(name);
+        HistoryRefreshed?.Invoke(this, EventArgs.Empty);
+    }
+    /// <summary>焦点命令明确显示所需面板，不使用切换语义把已打开面板关闭。</summary>
+    public void ShowPanel(string name)
+    {
+        if (Layout.Find(name) is not { } found) return;
+        if (found.Side == "Left") Config.Current.Panels.IsLeftVisible = true; else Config.Current.Panels.IsRightVisible = true;
+        Layout.Docks[found.Side].SelectedItem = found.Group;
+        Config.Current.Panels.Layout = Layout.CreateMemento(); RefreshPanels();
     }
     /// <summary>切换已支持侧栏页面或显隐，业务阅读位置不变。</summary>
     public void SelectPanel(string name)
@@ -148,3 +182,11 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
 }
 /// <summary>原排序枚举的界面文案，展示顺序不改变 JSON 枚举值。</summary>
 public sealed record FolderOrderChoice(FolderOrder Mode, string Label);
+/// <summary>历史行的独立表现数据；分组标题不成为可导航或删除的伪历史条目。</summary>
+public sealed record HistoryRow(HistoryEntry Entry, string? GroupHeader)
+{
+    public string Path => Entry.Path;
+    public string Name => Entry.Name;
+    public string? Page => Entry.Page;
+    public bool HasGroupHeader => GroupHeader is not null;
+}

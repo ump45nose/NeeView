@@ -297,7 +297,7 @@
     "Text": "清理历史记录",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ClearHistoryCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 原历史集合清空"
   },
   {
     "Name": "ClearHistoryInPlace",
@@ -621,7 +621,7 @@
     "Text": "聚焦到历史记录搜索框",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/FocusHistorySearchBoxCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 原历史面板焦点",
     "MenuText": "历史记录搜索框"
   },
   {
@@ -1051,14 +1051,14 @@
     "Text": "后退到上一条历史记录",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/PrevHistoryCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 原过滤后历史列表导航"
   },
   {
     "Name": "NextHistory",
     "Text": "前进到下一条历史记录",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/NextHistoryCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 原过滤后历史列表导航"
   },
   {
     "Name": "PrevBookHistory",

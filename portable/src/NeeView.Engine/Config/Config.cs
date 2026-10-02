@@ -13,6 +13,7 @@ public sealed class Config
     public FilmStripConfig FilmStrip { get; set; } = new();
     public SliderConfig Slider { get; set; } = new();
     public BookshelfConfig Bookshelf { get; set; } = new();
+    public HistoryConfig History { get; set; } = new();
     public bool IsAddressBarEnabled { get; set; } = true;
     /// <summary>启动时装配唯一配置，读取前不初始化具体窗口。</summary>
     public static void SetCurrent(Config config) => Current = config;
@@ -73,6 +74,7 @@ public sealed class ViewConfig
 /// <summary>窗口级布局状态，独立于书籍和阅读规则。</summary>
 public sealed class PanelsConfig
 {
+    public bool OpenWithDoubleClick { get; set; }
     public Runtime.LayoutPanel.LayoutPanelManagerMemento? Layout { get; set; }
     public double LeftWidth { get; set; } = 240;
     public double RightWidth { get; set; } = 240;

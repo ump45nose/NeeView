@@ -44,4 +44,15 @@ public static class MenuPresenter
             foreach (var child in item.Items.OfType<MenuItem>()) Refresh(child);
         }
     }
+    /// <summary>刷新已迁入命令的运行时可用性，能力占位与边界禁用仍可识别。</summary>
+    public static void RefreshAvailability(Menu menu, Func<string, bool> canExecute)
+    {
+        foreach (var item in menu.Items.OfType<MenuItem>()) Refresh(item);
+        // 保持原菜单树，不重建或删除条目。
+        void Refresh(MenuItem item)
+        {
+            if (item.Tag is string name) item.IsEnabled = canExecute(name);
+            foreach (var child in item.Items.OfType<MenuItem>()) Refresh(child);
+        }
+    }
 }

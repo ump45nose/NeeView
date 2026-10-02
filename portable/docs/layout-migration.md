@@ -16,7 +16,7 @@
 | 原面板 | 当前区域/入口 | 当前状态 |
 |---|---|---|
 | FolderPanel | 左栏 | 原普通书架目录/归档混合列表、默认排序、独立浏览/同步/刷新及Enter/双击打开；树/封面/每目录参数待迁 |
-| HistoryPanel | 左rail历史 | 访问时间排序、搜索、双击打开并恢复原位置 |
+| HistoryPanel | 左rail历史 | 原访问倒序/日期分组/当前目录过滤、单或双击/Enter打开、前后列表、多选移除及更多菜单；四样式/无效清理保留占位，见p2-history-list.md |
 | BookmarkPanel | 右rail书签 | 原树基础编辑/书籍切换/双击打开；完整服务待迁入 |
 | PlaylistPanel | 默认右rail播放列表 | 待P5，可选择占位 |
 | DestinationFolderPanel | 默认右rail目标文件夹 | 待P4，可选择占位；两区配置/九数字命令已登记 |

@@ -38,7 +38,7 @@ public sealed partial class MainWindow : Window
         "LeftAutoHide", "RightAutoHide", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
-        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "RegisterBookmark"
+        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "RegisterBookmark", "FocusHistorySearchBox", "ClearHistory"
     };
     /// <summary>由启动层接入原生事件；只消费主查看器区域，其余控件使用框架输入。</summary>
     public void AttachPlatformInput(IPlatformInput input)
@@ -78,12 +78,17 @@ public sealed partial class MainWindow : Window
         slider.AddHandler(PointerPressedEvent, Slider_Pressed, RoutingStrategies.Tunnel);
         slider.AddHandler(PointerReleasedEvent, Slider_Released, RoutingStrategies.Tunnel, handledEventsToo: true);
         AttachBookmarkInput();
+        // 历史列表模板会消费按下事件；隧道记录命中行，释放按原单/双击配置打开。
+        var history = this.FindControl<ListBox>("HistoryList")!;
+        history.AddHandler(PointerPressedEvent, History_Pressed, RoutingStrategies.Tunnel);
+        history.AddHandler(PointerReleasedEvent, History_Released, RoutingStrategies.Bubble, handledEventsToo: true);
         Closing += Window_Closing;
     }
     /// <summary>由唯一启动层传入已经装配的契约，不在控件中创建解码或存储实现。</summary>
     public void Bind(ReaderWorkspaceViewModel model, BitmapFactory images, IPlatformService platform)
     {
         _model = model; _images = images; _platform = platform; DataContext = model;
+        model.HistoryRefreshed += History_Refreshed;
         Viewer.Attach(model.Operation, images); model.Refreshed += Model_Refreshed;
         model.PanelsRefreshed += Model_PanelsRefreshed;
         _leftWidth = model.LeftWidth; _rightWidth = model.RightWidth; UpdatePanelColumns(); model.Attach();
@@ -114,6 +119,7 @@ public sealed partial class MainWindow : Window
         foreach (var name in new[] { "JumpPage", "PrevHistoryPage", "NextHistoryPage", "PrevBookHistory", "NextBookHistory" })
             root.Children[3].Children!.Add(new(null, MenuElementType.Command, name));
         MenuPresenter.Populate(this.FindControl<Menu>("MenuBar")!, root, _model.Commands, _model.SaveData, IsCommandAvailable, ExecuteAsync, GetCommandCheck);
+        RefreshHistoryCommandStates();
     }
     /// <summary>原菜单绑定的勾选表现；只读取引擎配置，不在菜单中维护第二套状态。</summary>
     private bool? GetCommandCheck(string name) => name switch
@@ -240,6 +246,10 @@ public sealed partial class MainWindow : Window
                 case "LoadRecentBook":
                     var recent = _model.SaveData.HistoryEntries.FirstOrDefault(e => e.Path != _model.Operation.Book?.Path);
                     if (recent is not null) await OpenAsync(recent.Path); break;
+                case "ClearHistory": if (!_model.Operation.IsLoading) await _model.SaveData.ClearHistoryAsync(); break;
+                case "FocusHistorySearchBox":
+                    Config.Current.History.IsVisibleSearchBox = true; _model.RefreshHistory(); _model.ShowPanel("HistoryPanel");
+                    this.FindControl<TextBox>("HistorySearchBox")!.Focus(); break;
                 case "OpenBookExplorer": if (_model.Operation.Book is { } source) await _platform!.RevealAsync(source.Path); break;
                 case "ToggleVisibleBookshelf": _model.SelectPanel("FolderPanel"); break;
                 case "ToggleVisiblePageList": _model.SelectPanel("PageListPanel"); break;
@@ -308,7 +318,8 @@ public sealed partial class MainWindow : Window
         catch (Exception ex) { ShowError(ex.Message); }
     }
     /// <summary>历史打开继续走原恢复策略，失败保持当前书籍。</summary>
-    private async void History_DoubleTapped(object? sender, TappedEventArgs e) { if (sender is ListBox { SelectedItem: HistoryEntry entry }) await OpenAsync(entry.Path); }
+    private async void History_DoubleTapped(object? sender, TappedEventArgs e)
+    { if (Config.Current.Panels.OpenWithDoubleClick && HistoryRowFromSource(e.Source) is { } row) await OpenHistoryAsync(row.Path); }
     /// <summary>文件夹保留展开交互，只打开实际双击的书籍节点。</summary>
     private async void Bookmark_DoubleTapped(object? sender, TappedEventArgs e)
     {
@@ -452,6 +463,13 @@ public sealed partial class MainWindow : Window
         // 普通列表拥有方向/定位键；选条目不能触发全局 Up/Down 书籍导航。
         if (FocusManager?.GetFocusedElement() is Control focused && (focused is ListBox or TreeView || focused.GetVisualAncestors().Any(x => x is ListBox or TreeView)))
         {
+            if (e.KeyModifiers == KeyModifiers.None && e.Key is Key.Enter or Key.Delete && this.FindControl<ListBox>("HistoryList")!.IsKeyboardFocusWithin)
+            {
+                e.Handled = true;
+                if (e.Key == Key.Delete) await RemoveSelectedHistoryAsync();
+                else if (_model.SelectedHistory is { } history) await OpenHistoryAsync(history.Path);
+                return;
+            }
             if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.Enter && this.FindControl<ListBox>("FolderList")!.IsKeyboardFocusWithin)
             {
                 e.Handled = true;
@@ -565,6 +583,7 @@ public sealed partial class MainWindow : Window
                 _sidePanels?.SaveWeights();
                 // 先完成可靠保存，再退订与释放显示资源；失败不能留下已销毁的阅读窗口。
                 await _model.Operation.DisposeAsync();
+                _model.HistoryRefreshed -= History_Refreshed;
                 _model.Detach(); _model.Refreshed -= Model_Refreshed; _model.PanelsRefreshed -= Model_PanelsRefreshed;
             }
             _sidePanels?.Dispose(); _platformInput?.Dispose(); FilmStrip.Dispose(); NavigatorView.Dispose(); Viewer.Dispose(); _images?.Dispose(); _closedPrepared = true;

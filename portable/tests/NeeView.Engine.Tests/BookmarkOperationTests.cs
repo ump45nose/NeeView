@@ -239,7 +239,9 @@ public sealed class BookmarkOperationTests
             }
             finally { Directory.Delete(blocked); }
             Dispatcher.UIThread.RunJobs(); window.UpdateLayout();
-            var output = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../acceptance/p2-bookmark-bookmark-layout.png"));
+            // 回归使用当前阶段标签，不能在后续阶段覆盖已提交的第五批截图。
+            var phase = Environment.GetEnvironmentVariable("NEEVIEW_ACCEPTANCE_PHASE") ?? "p2-bookmark";
+            var output = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, $"../../../../../acceptance/{phase}-bookmark-layout.png"));
             Directory.CreateDirectory(Path.GetDirectoryName(output)!);
             using (var image = new RenderTargetBitmap(new PixelSize(1200, 800))) { image.Render(window); image.Save(output, PngBitmapEncoderOptions.Default); }
             Assert.True(new FileInfo(output).Length > 1000);
