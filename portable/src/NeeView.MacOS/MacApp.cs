@@ -85,6 +85,7 @@ public sealed partial class MacApp : Avalonia.Application
             var decoder = new MagickImageDecoder(); var operation = new BookOperation(new Backends.ArchiveFactory(), decoder, state);
             var images = new BitmapFactory(decoder); var model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state);
             _window = new MainWindow(); _window.Bind(model, images, new MacPlatformService());
+            _window.AttachPlatformInput(new MacTrackpadInput());
             _window.Closed += (_, _) => _window = null;
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) desktop.MainWindow = _window;
             _window.Show(); if (restore) await _window.RestoreLastAsync();

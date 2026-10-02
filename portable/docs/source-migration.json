@@ -228,6 +228,18 @@
       "target": "src/NeeView.Engine/PageFrames/IContentSizeCalculatorProfile.cs",
       "sha256": "fb5e1175dfc073dc30c675bf92dc21af031e9808251e821c5e8febccb8fdd8f2",
       "status": "原算法迁入；WPF几何/变换改为有限值与数值计算，展示订阅不进入Engine"
+    },
+    {
+      "source": "NeeView/Menu/MenuNode.cs",
+      "target": "src/NeeView.Engine/Menu/MenuNode.cs",
+      "sha256": "825f30a3d67c52f758fa944e1f8a5c4f464a89114882ccaef679fd5579180a5f",
+      "status": "P2迁入原可序列化菜单树结构，补充方法注释"
+    },
+    {
+      "source": "NeeView/Menu/MenuElementType.cs",
+      "target": "src/NeeView.Engine/Menu/MenuElementType.cs",
+      "sha256": "4f9be66bf58d74d83c4a2f79c5cb40f5d5f970c7d59591a6191d52ead41ea082",
+      "status": "P2迁入原节点类型枚举，移除平台属性标记"
     }
   ],
   "partial_adapters": [
@@ -260,6 +272,24 @@
       "target": "src/NeeView.Engine/Archiver/Archive.cs",
       "sha256": "ba65b2fb43f8ad7cdc61650ce534935d50d7336c10ea772b7d077ea1c48417f1",
       "status": "P1 Archive/Entry读取子集，SharpCompress后端；密码/嵌套待迁入"
+    },
+    {
+      "source": "NeeView/Menu/MenuTree.cs",
+      "target": "src/NeeView.Engine/Menu/default-menu.json",
+      "sha256": "ed4596b305bec3607e8cd3012fab4863f15b887f9772ada58de3ebdcf1342a3f",
+      "status": "P2逐项提取CreateDefault的八组菜单、命令名和分隔线；不是完整菜单编辑器"
+    },
+    {
+      "source": "NeeView/Bookamrk/BookmarkCollection.cs",
+      "target": "src/NeeView.Engine/Bookamrk/BookmarkNode.cs",
+      "sha256": "6f7832de6843494619f3533cd5dfd14776d64ea6f1f3d763d3da492d92d3fd57",
+      "status": "P2迁入BookmarkNode/Walk，Color使用原JSON字符串，ObservableCollection保持树通知，增加未知字段保留；不是完整Collection服务"
+    },
+    {
+      "source": "NeeView/Config/FilmStripConfig.cs",
+      "target": "src/NeeView.Engine/Config/Config.cs",
+      "sha256": "c333f557d6a29cbe331c03646c771cceeba14787aead6a0af472a8a9c2c5ac4e",
+      "status": "P2恢复IsEnabled/IsHideFilmStrip/ImageWidth/IsVisibleNumber/IsSelectedCenter原默认值；其余原字段保留JSON"
     }
   ],
   "rule_references": [
@@ -306,6 +336,24 @@
       "sha256": "7f27c6804342028357f7f13ac046696918b752ec58ef3ec6869ec67c0ca1d5f8",
       "target": "src/NeeView.MacOS/Views/MainWindow.axaml",
       "status": "原默认左3/右6分组和顺序；未迁移入口禁用"
+    },
+    {
+      "source": "NeeView/PageSelect/FilmStrip/FilmStrip.cs",
+      "target": "src/NeeView.MacOS/Views/ThumbnailView.cs",
+      "sha256": "3d5e56dfdb01201727a14eb48137a387792bfb8ca4b90d10ca52a3be73e455d3",
+      "status": "P2转换可见需求、阅读方向反转、选择定位关系；滚轮选择防抖/完整预览/更多配置待迁入"
+    },
+    {
+      "source": "NeeView/Languages/shared.restext",
+      "target": "src/NeeView.Engine/Command/command-manifest.json",
+      "sha256": "c23b80f9757f82436791b31550e2d2ebdbe891f5f3a49b6ab5d1b86aad8833bb",
+      "status": "P2按原shared引用解析中文命令名与Menu文案，补齐此前只读直译遗漏"
+    },
+    {
+      "source": "NeeView/Languages/zh-Hans.restext",
+      "target": "src/NeeView.Engine/Command/command-manifest.json",
+      "sha256": "499108d4cf3b1b9c95dfc52eb4f53a128b73a364285665c5289b46895da5eb52",
+      "status": "P2按原shared引用解析中文命令名与Menu文案，补齐此前只读直译遗漏"
     }
   ],
   "backend_reuse": [

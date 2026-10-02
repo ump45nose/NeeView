@@ -4,25 +4,26 @@
     "Text": "打开文件",
     "Shortcut": "Ctrl+O",
     "Source": "NeeView/Command/Commands/LoadAsCommand.cs",
-    "Stage": "P1 宿主适配"
+    "Stage": "P1 宿主适配",
+    "MenuText": "打开(O)..."
   },
   {
     "Name": "LoadRecentBook",
     "Text": "最近使用的书籍",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/LoadRecentBookCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 宿主接入；具体范围见验收表"
   },
   {
     "Name": "ReLoad",
-    "Text": "ReLoad",
+    "Text": "重新载入",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ReLoadCommand.cs",
     "Stage": "P1 宿主适配"
   },
   {
     "Name": "Unload",
-    "Text": "Unload",
+    "Text": "关闭",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/UnloadCommand.cs",
     "Stage": "待 P2–P5"
@@ -43,115 +44,131 @@
   },
   {
     "Name": "OpenExternalAppAs",
-    "Text": "OpenExternalAppAs",
+    "Text": "在外部应用中打开",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/OpenExternalAppAsCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "在外部应用中打开(A)"
   },
   {
     "Name": "CutFile",
     "Text": "剪切文件",
     "Shortcut": "Ctrl+X",
     "Source": "NeeView/Command/Commands/CutFileCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "剪切(T)"
   },
   {
     "Name": "CopyFile",
     "Text": "复制文件",
     "Shortcut": "Ctrl+C",
     "Source": "NeeView/Command/Commands/CopyFileCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "复制(C)"
   },
   {
     "Name": "CopyImage",
     "Text": "复制图像",
     "Shortcut": "Ctrl+Shift+C",
     "Source": "NeeView/Command/Commands/CopyImageCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "复制图像"
   },
   {
     "Name": "Paste",
     "Text": "粘贴",
     "Shortcut": "Ctrl+V",
     "Source": "NeeView/Command/Commands/PasteCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "粘贴(V)"
   },
   {
     "Name": "CopyToFolderAs",
     "Text": "复制到文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/CopyToFolderAsCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "复制到文件夹(Y)"
   },
   {
     "Name": "MoveToFolderAs",
     "Text": "移动到文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "移动到文件夹(E)"
   },
   {
     "Name": "MoveToDestinationFolder1",
     "Text": "移动到文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "移动到文件夹(E)"
   },
   {
     "Name": "MoveToDestinationFolder2",
     "Text": "移动到文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "移动到文件夹(E)"
   },
   {
     "Name": "MoveToDestinationFolder3",
     "Text": "移动到文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "移动到文件夹(E)"
   },
   {
     "Name": "MoveToDestinationFolder4",
     "Text": "移动到文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "移动到文件夹(E)"
   },
   {
     "Name": "MoveToDestinationFolder5",
     "Text": "移动到文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "移动到文件夹(E)"
   },
   {
     "Name": "MoveToDestinationFolder6",
     "Text": "移动到文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "移动到文件夹(E)"
   },
   {
     "Name": "MoveToDestinationFolder7",
     "Text": "移动到文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "移动到文件夹(E)"
   },
   {
     "Name": "MoveToDestinationFolder8",
     "Text": "移动到文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "移动到文件夹(E)"
   },
   {
     "Name": "MoveToDestinationFolder9",
     "Text": "移动到文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "移动到文件夹(E)"
   },
   {
     "Name": "UndoDestinationMove",
@@ -172,63 +189,71 @@
     "Text": "另存为",
     "Shortcut": "Ctrl+S",
     "Source": "NeeView/Command/Commands/ExportImageAsCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "另存为(S)..."
   },
   {
     "Name": "ExportImage",
     "Text": "保存为文件",
     "Shortcut": "Shift+Ctrl+S",
     "Source": "NeeView/Command/Commands/ExportImageCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "保存(S)"
   },
   {
     "Name": "ExportBookAs",
     "Text": "导出书籍",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ExportBookAsCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "导出书籍..."
   },
   {
     "Name": "Print",
-    "Text": "Print",
+    "Text": "打印",
     "Shortcut": "Ctrl+P",
     "Source": "NeeView/Command/Commands/PrintCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "打印(P)..."
   },
   {
     "Name": "DeleteFile",
     "Text": "删除文件",
     "Shortcut": "Delete",
     "Source": "NeeView/Command/Commands/DeleteFileCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "删除(D)"
   },
   {
     "Name": "OpenBookExplorer",
     "Text": "在资源管理器中打开书籍",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/OpenBookExplorerCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 宿主接入；具体范围见验收表"
   },
   {
     "Name": "OpenBookExternalAppAs",
     "Text": "用外部应用打开书籍",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/OpenBookExternalAppAsCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "用外部应用打开书籍(A)"
   },
   {
     "Name": "CutBook",
     "Text": "剪切书籍",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/CutBookCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "剪切书籍(T)"
   },
   {
     "Name": "CopyBook",
     "Text": "复制书籍",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/CopyBookCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "复制书籍(C)"
   },
   {
     "Name": "CopyBookToFolderAs",
@@ -249,14 +274,16 @@
     "Text": "删除书籍",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/DeleteBookCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "删除书籍(D)"
   },
   {
     "Name": "RenameBook",
     "Text": "重命名书籍",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/RenameBookCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "重命名书籍（M）"
   },
   {
     "Name": "SelectArchiver",
@@ -302,42 +329,42 @@
   },
   {
     "Name": "SetStretchModeNone",
-    "Text": "SetStretchModeNone",
+    "Text": "原始大小",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetStretchModeNoneCommand.cs",
     "Stage": "P1 宿主适配"
   },
   {
     "Name": "SetStretchModeUniform",
-    "Text": "SetStretchModeUniform",
+    "Text": "适应窗口",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetStretchModeUniformCommand.cs",
     "Stage": "P1 宿主适配"
   },
   {
     "Name": "SetStretchModeUniformToFill",
-    "Text": "SetStretchModeUniformToFill",
+    "Text": "铺满整个窗口",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetStretchModeUniformToFillCommand.cs",
     "Stage": "待 P2–P5"
   },
   {
     "Name": "SetStretchModeUniformToSize",
-    "Text": "SetStretchModeUniformToSize",
+    "Text": "适应窗口区域",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetStretchModeUniformToSizeCommand.cs",
     "Stage": "待 P2–P5"
   },
   {
     "Name": "SetStretchModeUniformToVertical",
-    "Text": "SetStretchModeUniformToVertical",
+    "Text": "适应窗口高度",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetStretchModeUniformToVerticalCommand.cs",
     "Stage": "待 P2–P5"
   },
   {
     "Name": "SetStretchModeUniformToHorizontal",
-    "Text": "SetStretchModeUniformToHorizontal",
+    "Text": "适应窗口宽度",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetStretchModeUniformToHorizontalCommand.cs",
     "Stage": "待 P2–P5"
@@ -361,7 +388,8 @@
     "Text": "启用/禁用逐点放大",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleNearestNeighborCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "逐点放大"
   },
   {
     "Name": "ToggleBackground",
@@ -372,42 +400,42 @@
   },
   {
     "Name": "SetBackgroundBlack",
-    "Text": "SetBackgroundBlack",
+    "Text": "黑色背景",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundBlackCommand.cs",
     "Stage": "待 P2–P5"
   },
   {
     "Name": "SetBackgroundWhite",
-    "Text": "SetBackgroundWhite",
+    "Text": "白色背景",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundWhiteCommand.cs",
     "Stage": "待 P2–P5"
   },
   {
     "Name": "SetBackgroundAuto",
-    "Text": "SetBackgroundAuto",
+    "Text": "背景适应图像颜色",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundAutoCommand.cs",
     "Stage": "待 P2–P5"
   },
   {
     "Name": "SetBackgroundCheck",
-    "Text": "SetBackgroundCheck",
+    "Text": "白色方格背景",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundCheckCommand.cs",
     "Stage": "待 P2–P5"
   },
   {
     "Name": "SetBackgroundCheckDark",
-    "Text": "SetBackgroundCheckDark",
+    "Text": "黑色方格背景",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundCheckDarkCommand.cs",
     "Stage": "待 P2–P5"
   },
   {
     "Name": "SetBackgroundCustom",
-    "Text": "SetBackgroundCustom",
+    "Text": "自定义背景",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundCustomCommand.cs",
     "Stage": "待 P2–P5"
@@ -417,203 +445,232 @@
     "Text": "启用/禁用总是置顶显示",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleTopmostCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "总是置顶显示"
   },
   {
     "Name": "ToggleVisibleAddressBar",
     "Text": "显示/隐藏地址栏",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleVisibleAddressBarCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "地址栏"
   },
   {
     "Name": "ToggleHideMenu",
     "Text": "启用/禁用自动隐藏菜单",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleHideMenuCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "自动隐藏菜单"
   },
   {
     "Name": "ToggleVisibleSideBar",
     "Text": "显示/隐藏侧边栏",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleVisibleSideBarCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "侧边栏"
   },
   {
     "Name": "ToggleHidePanel",
     "Text": "启用/禁用自动隐藏面板",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleHidePanelCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "自动隐藏面板"
   },
   {
     "Name": "ToggleHideLeftPanel",
     "Text": "切换自动隐藏左面板",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleHideLeftPanelCommand.cs",
-    "Stage": "P1 宿主适配"
+    "Stage": "P1 宿主适配",
+    "MenuText": "自动隐藏左面板"
   },
   {
     "Name": "ToggleHideRightPanel",
     "Text": "切换自动隐藏右面板",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleHideRightPanelCommand.cs",
-    "Stage": "P1 宿主适配"
+    "Stage": "P1 宿主适配",
+    "MenuText": "自动隐藏右面板"
   },
   {
     "Name": "ToggleVisiblePageSlider",
     "Text": "显示/隐藏滚动条",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleVisiblePageSliderCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "滚动条"
   },
   {
     "Name": "ToggleHidePageSlider",
     "Text": "启用/禁用自动隐藏滚动条",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleHidePageSliderCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "自动隐藏滚动条"
   },
   {
     "Name": "ToggleVisibleBookshelf",
     "Text": "显示/隐藏书架",
     "Shortcut": "B",
     "Source": "NeeView/Command/Commands/ToggleVisibleBookshelfCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 宿主接入；具体范围见验收表",
+    "MenuText": "书架"
   },
   {
     "Name": "ToggleVisiblePageList",
     "Text": "显示/隐藏页面列表面板",
     "Shortcut": "P",
     "Source": "NeeView/Command/Commands/ToggleVisiblePageListCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 宿主接入；具体范围见验收表",
+    "MenuText": "页面列表面板"
   },
   {
     "Name": "ToggleVisibleBookmarkList",
     "Text": "显示/隐藏书签面板",
     "Shortcut": "D",
     "Source": "NeeView/Command/Commands/ToggleVisibleBookmarkListCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 宿主接入；具体范围见验收表",
+    "MenuText": "书签面板"
   },
   {
     "Name": "ToggleVisiblePlaylist",
     "Text": "显示/隐藏播放列表面板",
     "Shortcut": "M",
     "Source": "NeeView/Command/Commands/ToggleVisiblePlaylistCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "播放列表面板"
   },
   {
     "Name": "ToggleVisibleHistoryList",
     "Text": "显示/隐藏历史记录面板",
     "Shortcut": "H",
     "Source": "NeeView/Command/Commands/ToggleVisibleHistoryListCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 宿主接入；具体范围见验收表",
+    "MenuText": "历史记录面板"
   },
   {
     "Name": "ToggleVisibleFileInfo",
     "Text": "显示/隐藏信息面板",
     "Shortcut": "I",
     "Source": "NeeView/Command/Commands/ToggleVisibleFileInfoCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 宿主接入；具体范围见验收表",
+    "MenuText": "信息面板"
   },
   {
     "Name": "ToggleVisibleNavigator",
     "Text": "显示/隐藏导航面板",
     "Shortcut": "N",
     "Source": "NeeView/Command/Commands/ToggleVisibleNavigatorCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 宿主接入；具体范围见验收表",
+    "MenuText": "导航面板"
   },
   {
     "Name": "ToggleVisibleEffectInfo",
     "Text": "显示/隐藏效果面板",
     "Shortcut": "E",
     "Source": "NeeView/Command/Commands/ToggleVisibleEffectInfoCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "效果面板"
   },
   {
     "Name": "ToggleVisibleFoldersTree",
     "Text": "显示/隐藏目录树",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleVisibleFoldersTreeCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "目录树"
   },
   {
     "Name": "ToggleVisibleContentsTree",
     "Text": "显示/隐藏内容面板",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleVisibleContentsTreeCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "目录"
   },
   {
     "Name": "FocusFolderSearchBox",
     "Text": "聚焦到书架搜索框",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/FocusFolderSearchBoxCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "书架搜索框"
   },
   {
     "Name": "FocusBookmarkSearchBox",
     "Text": "聚焦到书签搜索框",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/FocusBookmarkSearchBoxCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "书签搜索框"
   },
   {
     "Name": "FocusPageListSearchBox",
     "Text": "聚焦到页面列表搜索框",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/FocusPageListSearchBoxCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "页面列表搜索框"
   },
   {
     "Name": "FocusHistorySearchBox",
     "Text": "聚焦到历史记录搜索框",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/FocusHistorySearchBoxCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "历史记录搜索框"
   },
   {
     "Name": "FocusBookmarkList",
     "Text": "显示书签",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/FocusBookmarkListCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "书签面板"
   },
   {
     "Name": "FocusMainView",
     "Text": "聚焦到主视图",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/FocusMainViewCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "主视图"
   },
   {
     "Name": "ToggleVisibleFilmStrip",
     "Text": "显示/隐藏幻灯条",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleVisibleFilmStripCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 宿主接入；具体范围见验收表",
+    "MenuText": "幻灯条"
   },
   {
     "Name": "ToggleHideFilmStrip",
     "Text": "启用/禁用自动隐藏幻灯条",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleHideFilmStripCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 宿主接入；具体范围见验收表",
+    "MenuText": "自动隐藏幻灯条"
   },
   {
     "Name": "ToggleMainViewFloating",
     "Text": "切换主视图窗口",
     "Shortcut": "F12",
     "Source": "NeeView/Command/Commands/ToggleMainViewFloatingCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "主视图窗口"
   },
   {
     "Name": "ToggleFullScreen",
     "Text": "切换全屏状态",
     "Shortcut": "F11",
     "Source": "NeeView/Command/Commands/ToggleFullScreenCommand.cs",
-    "Stage": "P1 宿主适配"
+    "Stage": "P1 宿主适配",
+    "MenuText": "全屏"
   },
   {
     "Name": "SetFullScreen",
@@ -634,35 +691,40 @@
     "Text": "切换全桌面",
     "Shortcut": "Shift+F11",
     "Source": "NeeView/Command/Commands/ToggleFullDesktopCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "全桌面"
   },
   {
     "Name": "ToggleWindowMinimize",
     "Text": "最小化窗口",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleWindowMinimizeCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "最小化"
   },
   {
     "Name": "ToggleWindowMaximize",
     "Text": "最大化窗口",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleWindowMaximizeCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "最大化"
   },
   {
     "Name": "ShowHiddenPanels",
     "Text": "临时显示面板",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ShowHiddenPanelsCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "临时显示面板"
   },
   {
     "Name": "ToggleSlideShow",
     "Text": "幻灯片播放/停止",
     "Shortcut": "F5",
     "Source": "NeeView/Command/Commands/ToggleSlideShowCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "幻灯片"
   },
   {
     "Name": "ViewScrollNTypeUp",
@@ -729,7 +791,7 @@
   },
   {
     "Name": "ViewScaleStretch",
-    "Text": "ViewScaleStretch",
+    "Text": "拉伸",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewScaleStretchCommand.cs",
     "Stage": "待 P2–P5"
@@ -767,32 +829,36 @@
     "Text": "启用/禁用自动左旋转",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsAutoRotateLeftCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 Engine 接入；Windows动态对照待验",
+    "MenuText": "自动左旋转"
   },
   {
     "Name": "ToggleIsAutoRotateRight",
     "Text": "启用/禁用自动右旋转",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsAutoRotateRightCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 Engine 接入；Windows动态对照待验",
+    "MenuText": "自动右旋转"
   },
   {
     "Name": "ToggleIsAutoRotateForcedLeft",
     "Text": "启用/禁用强制左旋转",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsAutoRotateForcedLeftCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 Engine 接入；Windows动态对照待验",
+    "MenuText": "强制左旋转"
   },
   {
     "Name": "ToggleIsAutoRotateForcedRight",
     "Text": "启用/禁用强制右旋转",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsAutoRotateForcedRightCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 Engine 接入；Windows动态对照待验",
+    "MenuText": "强制右旋转"
   },
   {
     "Name": "ToggleViewFlipHorizontal",
-    "Text": "ToggleViewFlipHorizontal",
+    "Text": "左右翻转",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleViewFlipHorizontalCommand.cs",
     "Stage": "待 P2–P5"
@@ -813,7 +879,7 @@
   },
   {
     "Name": "ToggleViewFlipVertical",
-    "Text": "ToggleViewFlipVertical",
+    "Text": "上下翻转",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleViewFlipVerticalCommand.cs",
     "Stage": "待 P2–P5"
@@ -956,7 +1022,8 @@
     "Text": "书籍锁定状态",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleBookLockCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "书籍锁定"
   },
   {
     "Name": "PrevBook",
@@ -1156,14 +1223,14 @@
   },
   {
     "Name": "SetPageModeOne",
-    "Text": "SetPageModeOne",
+    "Text": "单页显示",
     "Shortcut": "Ctrl+1",
     "Source": "NeeView/Command/Commands/SetPageModeOneCommand.cs",
     "Stage": "P1 Engine"
   },
   {
     "Name": "SetPageModeTwo",
-    "Text": "SetPageModeTwo",
+    "Text": "双页显示",
     "Shortcut": "Ctrl+2",
     "Source": "NeeView/Command/Commands/SetPageModeTwoCommand.cs",
     "Stage": "P1 Engine"
@@ -1187,14 +1254,16 @@
     "Text": "水平页面布局",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetPageOrientationHorizontalCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "水平"
   },
   {
     "Name": "SetPageOrientationVertical",
     "Text": "垂直页面布局",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetPageOrientationVerticalCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "垂直"
   },
   {
     "Name": "ToggleBookReadOrder",
@@ -1205,49 +1274,49 @@
   },
   {
     "Name": "SetBookReadOrderRight",
-    "Text": "SetBookReadOrderRight",
+    "Text": "右开 (从右向左)",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookReadOrderRightCommand.cs",
     "Stage": "P1 Engine"
   },
   {
     "Name": "SetBookReadOrderLeft",
-    "Text": "SetBookReadOrderLeft",
+    "Text": "左开 (从左向右）",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookReadOrderLeftCommand.cs",
     "Stage": "P1 Engine"
   },
   {
     "Name": "ToggleIsSupportedDividePage",
-    "Text": "ToggleIsSupportedDividePage",
+    "Text": "分割横向页面",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsSupportedDividePageCommand.cs",
     "Stage": "P1 Engine"
   },
   {
     "Name": "ToggleIsSupportedWidePage",
-    "Text": "ToggleIsSupportedWidePage",
+    "Text": "横向页面视为双页",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsSupportedWidePageCommand.cs",
     "Stage": "P1 Engine"
   },
   {
     "Name": "ToggleIsSupportedSingleFirstPage",
-    "Text": "ToggleIsSupportedSingleFirstPage",
+    "Text": "首页单独显示",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsSupportedSingleFirstPageCommand.cs",
     "Stage": "P1 Engine"
   },
   {
     "Name": "ToggleIsSupportedSingleLastPage",
-    "Text": "ToggleIsSupportedSingleLastPage",
+    "Text": "尾页单独显示",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsSupportedSingleLastPageCommand.cs",
     "Stage": "P1 Engine"
   },
   {
     "Name": "ToggleIsRecursiveFolder",
-    "Text": "ToggleIsRecursiveFolder",
+    "Text": "载入子文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsRecursiveFolderCommand.cs",
     "Stage": "待 P2–P5"
@@ -1285,7 +1354,7 @@
     "Text": "文件日期降序",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetSortModeTimeStampDescendingCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 Engine 接入；Windows动态对照待验"
   },
   {
     "Name": "SetSortModeSize",
@@ -1299,7 +1368,7 @@
     "Text": "文件大小降序",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetSortModeSizeDescendingCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 Engine 接入；Windows动态对照待验"
   },
   {
     "Name": "SetSortModeEntry",
@@ -1334,7 +1403,8 @@
     "Text": "添加/删除书签",
     "Shortcut": "Ctrl+D",
     "Source": "NeeView/Command/Commands/ToggleBookmarkCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 宿主接入；具体范围见验收表",
+    "MenuText": "书签"
   },
   {
     "Name": "RegisterBookmark",
@@ -1362,7 +1432,8 @@
     "Text": "添加/删除播放列表项目",
     "Shortcut": "Ctrl+M",
     "Source": "NeeView/Command/Commands/TogglePlaylistItemCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "添加到播放列表"
   },
   {
     "Name": "PrevPlaylistItem",
@@ -1418,42 +1489,48 @@
     "Text": "启用/禁用自定义大小",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleCustomSizeCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "自定义大小"
   },
   {
     "Name": "ToggleTrim",
     "Text": "切换裁剪",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleTrimCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "裁剪"
   },
   {
     "Name": "ToggleResizeFilter",
     "Text": "启用/禁用调整大小滤镜",
     "Shortcut": "Ctrl+R",
     "Source": "NeeView/Command/Commands/ToggleResizeFilterCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "调整大小滤镜"
   },
   {
     "Name": "ToggleGrid",
     "Text": "启用/禁用网格",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleGridCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "网格"
   },
   {
     "Name": "ToggleEffect",
     "Text": "启用/禁用效果",
     "Shortcut": "Ctrl+E",
     "Source": "NeeView/Command/Commands/ToggleEffectCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "效果"
   },
   {
     "Name": "ToggleIsLoupe",
     "Text": "启用/禁用放大镜",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsLoupeCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "放大镜"
   },
   {
     "Name": "LoupeOn",
@@ -1488,14 +1565,16 @@
     "Text": "启用/禁用悬浮滚动",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleHoverScrollCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "悬停滚动"
   },
   {
     "Name": "ToggleAutoScroll",
     "Text": "切换自动滚动",
     "Shortcut": "MiddleClick",
     "Source": "NeeView/Command/Commands/ToggleAutoScrollCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "自动滚动"
   },
   {
     "Name": "CancelScript",
@@ -1509,7 +1588,8 @@
     "Text": "打开设置窗口",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/OpenOptionsWindowCommand.cs",
-    "Stage": "P1 宿主适配"
+    "Stage": "P1 宿主适配",
+    "MenuText": "设置(S)..."
   },
   {
     "Name": "OpenSettingFilesFolder",
@@ -1530,42 +1610,48 @@
     "Text": "显示版本信息",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/OpenVersionWindowCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "关于本程序(A)..."
   },
   {
     "Name": "CloseApplication",
     "Text": "退出应用程序",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/CloseApplicationCommand.cs",
-    "Stage": "P1 宿主适配"
+    "Stage": "P1 宿主适配",
+    "MenuText": "退出(X)"
   },
   {
     "Name": "TogglePermitFile",
     "Text": "启用/禁用文件操作",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/TogglePermitFileCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "允许文件操作(P)"
   },
   {
     "Name": "HelpCommandList",
     "Text": "显示命令帮助",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/HelpCommandListCommand.cs",
-    "Stage": "P1 宿主适配"
+    "Stage": "P1 宿主适配",
+    "MenuText": "命令帮助"
   },
   {
     "Name": "HelpScript",
     "Text": "显示脚本帮助",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/HelpScriptCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "脚本帮助"
   },
   {
     "Name": "HelpMainMenu",
     "Text": "显示主菜单帮助",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/HelpMainMenuCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "主菜单帮助"
   },
   {
     "Name": "HelpSearchOption",
@@ -1586,14 +1672,16 @@
     "Text": "导出设置",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ExportBackupCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "导出设置..."
   },
   {
     "Name": "ImportBackup",
     "Text": "导入设置",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ImportBackupCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "导入设置..."
   },
   {
     "Name": "ReloadSetting",
@@ -1635,13 +1723,15 @@
     "Text": "调整窗口大小",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/StretchWindowCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "调整窗口大小"
   },
   {
     "Name": "OpenConsole",
     "Text": "打开脚本控制台",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/OpenConsoleCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "待 P2–P5",
+    "MenuText": "打开脚本控制台(C)..."
   }
 ]

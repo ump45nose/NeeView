@@ -3,9 +3,10 @@ namespace NeeView;
 /// <summary>原图像工厂的后端适配与字节缓存，显示资源由租约统一计入预算。</summary>
 public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
 {
-    private sealed class Entry(DecodedImageLease image)
+    private sealed class Entry(DecodedImageLease image, bool thumbnail)
     {
         public DecodedImageLease Image { get; } = image;
+        public bool IsThumbnail { get; } = thumbnail;
         public int References;
         public int WaitingConsumers;
         public long DisplayBytes;
@@ -20,7 +21,7 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
         public CancellationTokenSource Cancellation { get; set; } = null!;
         public bool Finished;
     }
-    private readonly record struct Key(Archive Archive, int Id, long Length, DateTime Version, int Width, int Height);
+    private readonly record struct Key(Archive Archive, int Id, long Length, DateTime Version, int Width, int Height, bool Thumbnail);
     private readonly object _sync = new();
     private readonly Dictionary<Key, Entry> _cache = [];
     private readonly Dictionary<Key, Pending> _pending = [];
@@ -30,13 +31,15 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
     private bool _disposed;
     private long _clock;
     public long Budget { get; set; } = 512L * 1024 * 1024;
+    public long ThumbnailBudget { get; set; } = 64L * 1024 * 1024;
     public long ByteCount { get { lock (_sync) return _cache.Values.Sum(e => e.Image.ByteCount + e.DisplayBytes); } }
 
     /// <summary>合并相同规格读取，取消当前需求不影响其他共享需求。</summary>
     public async Task<BitmapLease> GetAsync(Page page, DecodeRequest request, CancellationToken token, bool background = false)
     {
         var entry = page.ArchiveEntry;
-        var key = new Key(entry.Archive, entry.Id, entry.Length, entry.LastWriteTime, request.TargetWidth, request.TargetHeight);
+        token.ThrowIfCancellationRequested();
+        var key = new Key(entry.Archive, entry.Id, entry.Length, entry.LastWriteTime, request.TargetWidth, request.TargetHeight, request.IsThumbnail);
         Pending work;
         lock (_sync)
         {
@@ -96,7 +99,7 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
             await _decodeSlots.WaitAsync(pending.Cancellation.Token); decodeHeld = true;
             await using var stream = await entry.Archive.OpenEntryAsync(entry, pending.Cancellation.Token);
             var image = await decoder.DecodeAsync(stream, request, pending.Cancellation.Token);
-            var result = new Entry(image);
+            var result = new Entry(image, request.IsThumbnail);
             lock (_sync)
             {
                 if (_disposed || pending.Cancellation.IsCancellationRequested) { image.Dispose(); throw new OperationCanceledException(); }
@@ -135,12 +138,14 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
     /// <summary>只回收没有显示租约的旧像素，当前显示资源不会提前释放。</summary>
     private void Trim()
     {
-        var total = _cache.Values.Sum(e => e.Image.ByteCount + e.DisplayBytes);
+        var main = _cache.Values.Where(e => !e.IsThumbnail).Sum(e => e.Image.ByteCount + e.DisplayBytes);
+        var thumbnails = _cache.Values.Where(e => e.IsThumbnail).Sum(e => e.Image.ByteCount + e.DisplayBytes);
         foreach (var pair in _cache.OrderBy(e => e.Value.Used).ToArray())
         {
-            if (total <= Budget) break;
-            var entry = pair.Value; if (entry.References != 0 || entry.WaitingConsumers != 0) continue;
-            total -= entry.Image.ByteCount; _cache.Remove(pair.Key); entry.Cached = false; entry.Image.Dispose();
+            var entry = pair.Value;
+            if ((entry.IsThumbnail ? thumbnails <= ThumbnailBudget : main <= Budget) || entry.References != 0 || entry.WaitingConsumers != 0) continue;
+            if (entry.IsThumbnail) thumbnails -= entry.Image.ByteCount + entry.DisplayBytes; else main -= entry.Image.ByteCount + entry.DisplayBytes;
+            _cache.Remove(pair.Key); entry.Cached = false; entry.Image.Dispose();
         }
     }
     /// <summary>取消队列并释放未被显示持有的资源；晚到解码自行清理。</summary>

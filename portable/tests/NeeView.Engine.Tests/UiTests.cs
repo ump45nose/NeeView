@@ -31,6 +31,51 @@ public static class TestAvaloniaBuilder
 }
 public sealed class UiTests
 {
+    /// <summary>菜单保留原未实现能力；历史、书签和可见缩略图进入真实链路。</summary>
+    [AvaloniaFact]
+    public async Task CompleteMenusAndNavigationUseOriginalBook()
+    {
+        using var fixture = new Fixture(); var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
+        var operation = fixture.Operation(state); var images = new BitmapFactory(new NeeView.Backends.MagickImageDecoder());
+        var model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state);
+        var window = new MainWindow(); window.Bind(model, images, new TestPlatform()); window.Show();
+        try
+        {
+            await window.OpenAsync(fixture.Images); window.UpdateLayout();
+            var menu = window.FindControl<Menu>("MenuBar")!;
+            Assert.Equal(8, menu.ItemCount);
+            var file = (MenuItem)menu.Items[0]!;
+            Assert.False(file.Items.OfType<MenuItem>().Single(i => i.Tag as string == "Print").IsEnabled);
+            Assert.True(file.Items.OfType<MenuItem>().Single(i => i.Tag as string == "LoadAs").IsEnabled);
+            await window.ExecuteAsync("ToggleBookmark"); Dispatcher.UIThread.RunJobs();
+            Assert.True(model.IsBookmark); Assert.Single(model.Bookmarks);
+            await window.ExecuteAsync("ToggleVisibleHistoryList"); window.UpdateLayout();
+            Assert.True(model.ShowHistory); Assert.Single(model.History);
+            Assert.True(((MenuItem)menu.Items[1]!).Items.OfType<MenuItem>().Single(i => i.Tag as string == "ToggleVisibleHistoryList").IsChecked);
+            await window.ExecuteAsync("ToggleVisibleBookmarkList"); window.UpdateLayout();
+            Assert.True(model.ShowBookmarks); Assert.Equal(1, window.FindControl<TreeView>("BookmarkTree")!.ItemCount);
+            await window.ExecuteAsync("ToggleVisibleFilmStrip"); window.UpdateLayout();
+            var strip = window.FindControl<ThumbnailView>("DockFilmStripSocket")!; await strip.RefreshAsync();
+            Assert.True(strip.IsVisible); Assert.InRange(strip.DisplayCount, 1, 5);
+            await window.ExecuteAsync("ToggleVisibleFilmStrip"); await strip.RefreshAsync(); Assert.Equal(0, strip.DisplayCount);
+            // 来自其他窗口的原生手势必须继续传播，不能操作主窗口。
+            Assert.False(window.HandlePlatformGesture(new(false, 400, 300, 0, 80, 0, (nint)12345)));
+        }
+        finally { await window.PrepareShutdownAsync(); window.Close(); }
+    }
+    /// <summary>原鼠标组合绑定必须可保存；新输入冲突和错误值则明确阻止。</summary>
+    [AvaloniaFact]
+    public async Task InputEditorPreservesOriginalGesturesAndRejectsConflicts()
+    {
+        using var fixture = new Fixture(); var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
+        await using var operation = fixture.Operation(state);
+        var edits = new CommandTable(operation).Definitions.Select(d => new ShortcutEdit(d, d.Shortcut, false)).ToArray();
+        SettingsWindow.ValidateInputs(edits);
+        var next = edits.Single(e => e.Name == "NextPage"); next.Value = "Ctrl+O";
+        Assert.Throws<ArgumentException>(() => SettingsWindow.ValidateInputs(edits));
+        next.Value = "NoSuchInput"; Assert.Throws<ArgumentException>(() => SettingsWindow.ValidateInputs(edits));
+        next.Value = "Control+Shift+F12"; SettingsWindow.ValidateInputs(edits);
+    }
     /// <summary>原窗口区域相对位置及图标栏尺寸直接对照 XAML 来源。</summary>
     [AvaloniaFact]
     public async Task OriginalRegionsAndRealReaderRender()
@@ -52,7 +97,7 @@ public sealed class UiTests
             Assert.True(left.Bounds.Right < window.Viewer.Bounds.Left); Assert.True(window.Viewer.Bounds.Right < right.Bounds.Left);
             Assert.True(area.Bounds.Bottom <= bottom.Bounds.Top);
             Assert.Equal(5, window.FindControl<ListBox>("PageList")!.ItemCount);
-            var output = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../acceptance/p1-layout.png")); Directory.CreateDirectory(Path.GetDirectoryName(output)!);
+            var output = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../acceptance/p2-layout.png")); Directory.CreateDirectory(Path.GetDirectoryName(output)!);
             using var image = new RenderTargetBitmap(new PixelSize(1200, 800)); image.Render(window); image.Save(output, PngBitmapEncoderOptions.Default);
             Assert.True(new FileInfo(output).Length > 1000);
         }
@@ -71,6 +116,11 @@ public sealed class UiTests
             window.FindControl<TextBox>("AddressBar")!.Focus();
             window.KeyPress(Avalonia.Input.Key.Left, Avalonia.Input.RawInputModifiers.None, Avalonia.Input.PhysicalKey.ArrowLeft, null); window.KeyRelease(Avalonia.Input.Key.Left, Avalonia.Input.RawInputModifiers.None, Avalonia.Input.PhysicalKey.ArrowLeft, null);
             await Task.Delay(50, TestContext.Current.CancellationToken); Assert.Equal(0, operation.Book!.CurrentPage!.Index);
+            var fileMenu = (MenuItem)window.FindControl<Menu>("MenuBar")!.Items[0]!;
+            fileMenu.IsSubMenuOpen = true;
+            window.KeyPress(Avalonia.Input.Key.Left, Avalonia.Input.RawInputModifiers.None, Avalonia.Input.PhysicalKey.ArrowLeft, null); window.KeyRelease(Avalonia.Input.Key.Left, Avalonia.Input.RawInputModifiers.None, Avalonia.Input.PhysicalKey.ArrowLeft, null);
+            await Task.Delay(50, TestContext.Current.CancellationToken); Assert.Equal(0, operation.Book.CurrentPage!.Index);
+            window.FindControl<Menu>("MenuBar")!.Close();
             window.Viewer.Focus(); window.KeyPress(Avalonia.Input.Key.Left, Avalonia.Input.RawInputModifiers.None, Avalonia.Input.PhysicalKey.ArrowLeft, null); window.KeyRelease(Avalonia.Input.Key.Left, Avalonia.Input.RawInputModifiers.None, Avalonia.Input.PhysicalKey.ArrowLeft, null);
             for (int i = 0; i < 30 && operation.Book.CurrentPage!.Index == 0; i++) await Task.Delay(20, TestContext.Current.CancellationToken);
             Assert.Equal(1, operation.Book.CurrentPage!.Index);

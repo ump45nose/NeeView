@@ -22,5 +22,6 @@
     <AvaloniaResource Include="../../src/NeeView.MacOS/Views/**/*.axaml" Link="Views/%(Filename)%(Extension)" />
     <AvaloniaResource Include="../../src/NeeView.MacOS/Styles/**/*.axaml" Link="Styles/%(Filename)%(Extension)" />
     <Using Include="Xunit" />
+    <None Update="Fixtures/**/*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

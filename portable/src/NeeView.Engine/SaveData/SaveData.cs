@@ -9,6 +9,10 @@ public sealed class SaveData(string directory)
     private readonly SemaphoreSlim _gate = new(1);
     private JsonObject _setting = new();
     private JsonObject _history = new();
+    private JsonObject _bookmarks = new();
+    public BookmarkNode BookmarkRoot { get; private set; } = new() { Children = [] };
+    public IReadOnlyList<HistoryEntry> HistoryEntries { get; private set; } = [];
+    public event EventHandler? Changed;
     public string DirectoryPath { get; } = directory;
     public string? LastBookPath => _setting["Config"]?["StartUp"]?["LastBookV2"]?["Path"]?.GetValue<string>();
 
@@ -18,6 +22,10 @@ public sealed class SaveData(string directory)
         RecoverInterruptedSave();
         _setting = await ReadAsync("UserSetting.json", token);
         _history = await ReadAsync("History.json", token);
+        _bookmarks = await ReadAsync("Bookmark.json", token);
+        BookmarkRoot = _bookmarks["Nodes"]?.Deserialize<BookmarkNode>(Options) ?? new() { Children = [] };
+        if (!BookmarkRoot.IsFolder) throw new JsonException("Bookmark.Nodes 必须是根文件夹。");
+        RefreshHistory();
         var raw = _setting["Config"] as JsonObject;
         var config = new Config();
         if (raw is not null)
@@ -28,6 +36,7 @@ public sealed class SaveData(string directory)
             config.Book = ReadBranch<BookConfig>(raw, "Book");
             config.View = ReadBranch<ViewConfig>(raw, "View");
             config.Panels = ReadBranch<PanelsConfig>(raw, "Panels");
+            config.FilmStrip = ReadBranch<FilmStripConfig>(raw, "FilmStrip");
         }
         Config.SetCurrent(config);
     }
@@ -36,6 +45,8 @@ public sealed class SaveData(string directory)
     public (BookMemento? Memento, int Part) Find(string path)
     {
         var entry = (_history["Items"] as JsonArray)?.OfType<JsonObject>().FirstOrDefault(e => e["Path"]?.GetValue<string>() == path);
+        if (entry is null && BookmarkRoot.Walk().FirstOrDefault(e => e.Path == path) is { } bookmark)
+            entry = JsonSerializer.SerializeToNode(bookmark, Options)!.AsObject();
         if (entry is null) return (null, 0);
         var props = entry["Props"]?.GetValue<string>();
         // 新版未知 Props 仍保留在节点中，只将当前已识别 token 传入原解析器。
@@ -53,14 +64,87 @@ public sealed class SaveData(string directory)
         return item?["ShortCutKey"]?.GetValue<string>() ?? fallback;
     }
 
+    /// <summary>编辑原 Commands 差分键位；空字符串表示解绑，未知参数保持。</summary>
+    public void SetShortcut(string name, string value) => Object(Object(_setting, "Commands"), name)["ShortCutKey"] = value;
+
+    /// <summary>按原书籍路径查询书签，不把当前页面独立注册为另一本书。</summary>
+    public bool IsBookmark(string path) => BookmarkRoot.Walk().Any(e => !e.IsFolder && e.Path == path);
+
+    /// <summary>切换书籍书签；保存失败回滚树，书籍阅读状态仍由 History 共享。</summary>
+    public Task ToggleBookmarkAsync(Book book, CancellationToken token = default) => EditBookmarkAsync(() =>
+    {
+        var existing = BookmarkRoot.Walk().FirstOrDefault(e => !e.IsFolder && e.Path == book.Path);
+        if (existing is not null) RemoveNode(existing);
+        else
+        {
+            var memento = book.CreateMemento();
+            BookmarkRoot.Children!.Add(new() { Path = book.Path, Page = memento.Page, Props = memento.ToPropertiesString() });
+        }
+    }, token);
+
+    /// <summary>在指定原树文件夹中添加命名目录；空名称及过期节点返回错误。</summary>
+    public Task AddBookmarkFolderAsync(BookmarkNode? parent, string name, CancellationToken token = default) => EditBookmarkAsync(() =>
+    {
+        parent ??= BookmarkRoot;
+        if (!parent.IsFolder || !BookmarkRoot.Walk().Contains(parent)) throw new InvalidOperationException("书签文件夹已失效。");
+        parent.Children!.Add(new() { Name = ValidateName(name), EntryTime = DateTime.Now, Children = [] });
+    }, token);
+
+    /// <summary>重命名书籍或文件夹，保留 Path/Page/Props、颜色及未知字段。</summary>
+    public Task RenameBookmarkAsync(BookmarkNode node, string name, CancellationToken token = default) => EditBookmarkAsync(() =>
+    {
+        if (ReferenceEquals(node, BookmarkRoot) || !BookmarkRoot.Walk().Contains(node)) throw new InvalidOperationException("书签节点已失效。");
+        node.Name = ValidateName(name);
+    }, token);
+
+    /// <summary>删除指定书签节点或文件夹，仅更改书签记录，不删除源文件。</summary>
+    public Task RemoveBookmarkAsync(BookmarkNode node, CancellationToken token = default) => EditBookmarkAsync(() => RemoveNode(node), token);
+
+    /// <summary>统一树编辑与文件提交；失败恢复编辑前数据供用户重试。</summary>
+    private async Task EditBookmarkAsync(Action edit, CancellationToken token)
+    {
+        await _gate.WaitAsync(token);
+        // 保留节点身份，失败后树控件的选择和调用方持有的节点仍可用于重试。
+        var previous = BookmarkRoot.Walk().Select(node => (Node: node, node.Name, Children: node.Children?.ToArray())).ToArray();
+        try { edit(); await WritePairAsync(token); }
+        catch
+        {
+            foreach (var snapshot in previous)
+            {
+                snapshot.Node.Name = snapshot.Name;
+                if (snapshot.Children is null) continue;
+                snapshot.Node.Children!.Clear();
+                foreach (var child in snapshot.Children) snapshot.Node.Children.Add(child);
+            }
+            throw;
+        }
+        finally { _gate.Release(); Changed?.Invoke(this, EventArgs.Empty); }
+    }
+    /// <summary>定位父节点后移除，禁止移除根目录或不属于当前树的旧节点。</summary>
+    private void RemoveNode(BookmarkNode node)
+    {
+        var parent = BookmarkRoot.Walk().FirstOrDefault(e => e.Children?.Contains(node) == true);
+        if (parent is null) throw new InvalidOperationException("书签节点已失效。");
+        parent.Children!.Remove(node);
+    }
+    /// <summary>统一命名校验，返回去除首尾空白的有效名称。</summary>
+    private static string ValidateName(string name) => string.IsNullOrWhiteSpace(name) ? throw new ArgumentException("名称不能为空。") : name.Trim();
+
+    /// <summary>生成按访问时间倒序的只读历史；未知字段仍保留在权威 JSON 中。</summary>
+    private void RefreshHistory() => HistoryEntries = (_history["Items"] as JsonArray)?.OfType<JsonObject>()
+        .Where(e => e["Path"] is JsonValue).Select(e => new HistoryEntry(e["Path"]!.GetValue<string>(), e["Page"]?.GetValue<string>(),
+            e["LastAccessTime"]?.GetValue<DateTime>() ?? DateTime.MinValue)).OrderByDescending(e => e.LastAccessTime).ToArray() ?? [];
+
     /// <summary>保存阅读状态与布局，已知字段合并进原节点后原子替换文件。</summary>
     public async Task SaveAsync(Book? book, int part, CancellationToken token = default)
     {
         await _gate.WaitAsync(token);
+        var previousSetting = _setting.DeepClone().AsObject();
+        var previousHistory = _history.DeepClone().AsObject();
         try
         {
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 Merge(Object(config, branch), JsonSerializer.SerializeToNode(value, Options)!.AsObject());
@@ -86,8 +170,12 @@ public sealed class SaveData(string directory)
             _setting["Format"] ??= JsonValue.Create("NeeView.UserSetting/46.3.0");
             _history["Format"] ??= JsonValue.Create("NeeView.History/46.3.0");
             await WritePairAsync(token);
+            RefreshHistory();
         }
+        // 文件事务失败时恢复同一权威内存状态；用户尚未保存的表单/Config 可继续重试。
+        catch { _setting = previousSetting; _history = previousHistory; throw; }
         finally { _gate.Release(); }
+        Changed?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>读取单个 JSON 文件；无法解析时传播错误，保留原文件。</summary>
@@ -119,17 +207,22 @@ public sealed class SaveData(string directory)
         var names = new HashSet<string> { "SinglePage", "WidePage", "RightToLeft", "LeftToRight", "IsDivide", "IsSingleFirst", "IsSingleLast", "IsWide", "IsRecursive", "Sort", "Rot", "Base", "Seed", "Fx" };
         return string.Join(' ', (props ?? "").Split([' ', ','], StringSplitOptions.RemoveEmptyEntries).Where(e => names.Contains(e.Split('=')[0]) == known));
     }
-    /// <summary>先写完两个临时文件，再保留回滚副本；记录存在时启动恢复旧完整状态。</summary>
+    /// <summary>先写完三个临时文件，再保留回滚副本；记录存在时启动恢复旧完整状态。</summary>
     private async Task WritePairAsync(CancellationToken token)
     {
         Directory.CreateDirectory(DirectoryPath);
-        string[] names = ["History.json", "UserSetting.json"];
+        string[] names = ["History.json", "UserSetting.json", "Bookmark.json"];
         var marker = System.IO.Path.Combine(DirectoryPath, ".save-pending.json");
         try
         {
             // 准备阶段不改动权威文件；任一序列化或权限失败均可直接重试。
             await WriteTemporaryAsync(names[0], _history, token);
             await WriteTemporaryAsync(names[1], _setting, token);
+            // 在副本上准备书签文件，提交失败不能污染权威内存节点。
+            var preparedBookmarks = _bookmarks.DeepClone().AsObject();
+            preparedBookmarks["Format"] ??= JsonValue.Create("NeeView.Bookmark/46.3.0");
+            preparedBookmarks["Nodes"] = JsonSerializer.SerializeToNode(BookmarkRoot, Options);
+            await WriteTemporaryAsync(names[2], preparedBookmarks, token);
             var previous = new JsonObject();
             foreach (var name in names)
             {
@@ -146,6 +239,7 @@ public sealed class SaveData(string directory)
                 File.Move(path + ".tmp", path, true);
             }
             File.Delete(marker);
+            _bookmarks = preparedBookmarks;
         }
         catch { RecoverInterruptedSave(); throw; }
         finally
@@ -159,13 +253,13 @@ public sealed class SaveData(string directory)
             }
         }
     }
-    /// <summary>恢复未完成的双文件保存；未知或损坏标记传播错误，保留恢复材料。</summary>
+    /// <summary>恢复未完成的保存，兼容旧双文件标记；损坏标记保留恢复材料。</summary>
     private void RecoverInterruptedSave()
     {
         var marker = System.IO.Path.Combine(DirectoryPath, ".save-pending.json");
         if (!File.Exists(marker)) return;
         var previous = JsonNode.Parse(File.ReadAllText(marker))!.AsObject();
-        foreach (var name in new[] { "History.json", "UserSetting.json" })
+        foreach (var name in new[] { "History.json", "UserSetting.json", "Bookmark.json" }.Where(previous.ContainsKey))
         {
             var path = System.IO.Path.Combine(DirectoryPath, name);
             if (previous[name]!.GetValue<bool>()) File.Copy(path + ".save-backup", path, true);
@@ -181,4 +275,10 @@ public sealed class SaveData(string directory)
         await JsonSerializer.SerializeAsync(stream, value, Options, token);
         await stream.FlushAsync(token); stream.Flush(true);
     }
+}
+
+/// <summary>原 History.Items 的只读投影；位置仍为条目名，路径是书籍定位。</summary>
+public sealed record HistoryEntry(string Path, string? Page, DateTime LastAccessTime)
+{
+    public string Name => System.IO.Path.GetFileName(Path.TrimEnd(System.IO.Path.DirectorySeparatorChar));
 }

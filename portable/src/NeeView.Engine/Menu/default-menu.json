@@ -1,0 +1,613 @@
+{
+  "MenuElementType": 1,
+  "Children": [
+    {
+      "Name": "文件",
+      "MenuElementType": 1,
+      "Children": [
+        {
+          "MenuElementType": 2,
+          "CommandName": "LoadAs"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "Unload"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "LoadRecentBook"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "TogglePlaylistItem"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "OpenExplorer"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "OpenExternalAppAs"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "CutFile"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "CopyFile"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "Paste"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "CopyToFolderAs"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "MoveToFolderAs"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ExportImageAs"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "Print"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "DeleteFile"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "CloseApplication"
+        }
+      ]
+    },
+    {
+      "Name": "显示",
+      "MenuElementType": 1,
+      "Children": [
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleVisibleBookshelf"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleVisiblePageList"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleVisibleBookmarkList"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleVisiblePlaylist"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleVisibleHistoryList"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleVisibleFileInfo"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleVisibleNavigator"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleVisibleEffectInfo"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleVisibleSideBar"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleHideLeftPanel"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleHideRightPanel"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleVisibleAddressBar"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleHideMenu"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleVisibleFilmStrip"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleHideFilmStrip"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleVisiblePageSlider"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleHidePageSlider"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleMainViewFloating"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleTopmost"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleFullScreen"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleSlideShow"
+        }
+      ]
+    },
+    {
+      "Name": "图像",
+      "MenuElementType": 1,
+      "Children": [
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetStretchModeNone"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetStretchModeUniform"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetStretchModeUniformToFill"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetStretchModeUniformToSize"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetStretchModeUniformToVertical"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetStretchModeUniformToHorizontal"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleStretchAllowScaleUp"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleStretchAllowScaleDown"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleNearestNeighbor"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetBackgroundBlack"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetBackgroundWhite"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetBackgroundAuto"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetBackgroundCheck"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetBackgroundCheckDark"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetBackgroundCustom"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleHoverScroll"
+        }
+      ]
+    },
+    {
+      "Name": "跳转",
+      "MenuElementType": 1,
+      "Children": [
+        {
+          "MenuElementType": 2,
+          "CommandName": "PrevPage"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "NextPage"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "PrevOnePage"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "NextOnePage"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "PrevSizePage"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "NextSizePage"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "FirstPage"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "LastPage"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "PrevPlaylistItemInBook"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "NextPlaylistItemInBook"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "PrevBook"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "NextBook"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "PrevPlaylistItem"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "NextPlaylistItem"
+        }
+      ]
+    },
+    {
+      "Name": "页面",
+      "MenuElementType": 1,
+      "Children": [
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetPageModeOne"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetPageModeTwo"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleIsPanorama"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetPageOrientationHorizontal"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetPageOrientationVertical"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetBookReadOrderRight"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetBookReadOrderLeft"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleIsAutoRotateLeft"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleIsAutoRotateRight"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleIsAutoRotateForcedLeft"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleIsAutoRotateForcedRight"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleIsSupportedDividePage"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleIsSupportedWidePage"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleIsSupportedSingleFirstPage"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleIsSupportedSingleLastPage"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleIsRecursiveFolder"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetSortModeFileName"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetSortModeFileNameDescending"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetSortModeTimeStamp"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetSortModeTimeStampDescending"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetSortModeSize"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetSortModeSizeDescending"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetSortModeEntry"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetSortModeEntryDescending"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetSortModeRandom"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SetDefaultPageSetting"
+        }
+      ]
+    },
+    {
+      "Name": "书籍",
+      "MenuElementType": 1,
+      "Children": [
+        {
+          "MenuElementType": 2,
+          "CommandName": "ToggleBookmark"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "SelectArchiver"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "OpenBookExplorer"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "OpenBookExternalAppAs"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "CutBook"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "CopyBook"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "CopyBookToFolderAs"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "MoveBookToFolderAs"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ExportBookAs"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "DeleteBook"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "RenameBook"
+        }
+      ]
+    },
+    {
+      "Name": "选项",
+      "MenuElementType": 1,
+      "Children": [
+        {
+          "MenuElementType": 2,
+          "CommandName": "OpenOptionsWindow"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ReloadSetting"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ExportBackup"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "ImportBackup"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "OpenSettingFilesFolder"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "OpenScriptsFolder"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "OpenConsole"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "TogglePermitFile"
+        }
+      ]
+    },
+    {
+      "Name": "帮助",
+      "MenuElementType": 1,
+      "Children": [
+        {
+          "MenuElementType": 2,
+          "CommandName": "HelpMainMenu"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "HelpCommandList"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "HelpScript"
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "HelpSearchOption"
+        },
+        {
+          "MenuElementType": 4
+        },
+        {
+          "MenuElementType": 2,
+          "CommandName": "OpenVersionWindow"
+        }
+      ]
+    }
+  ]
+}

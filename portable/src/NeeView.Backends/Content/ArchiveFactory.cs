@@ -3,7 +3,7 @@ using SharpCompress.Readers;
 using NeeView;
 namespace NeeView.Backends;
 
-/// <summary>原 Archive 工厂的 Mac 实现，P1 只开放目录与 ZIP。</summary>
+/// <summary>原 Archive 工厂的 Mac 实现，目录、ZIP、RAR 与 7z 共用原来源关系。</summary>
 public sealed class ArchiveFactory : IArchiveFactory
 {
     /// <summary>后台列出当前目录直接子目录，不随同目录翻页重复调用。</summary>
@@ -20,8 +20,10 @@ public sealed class ArchiveFactory : IArchiveFactory
         }
         if (Directory.Exists(path)) return new FolderArchive(path);
         if (!File.Exists(path)) throw new FileNotFoundException("来源不存在。", path);
-        if (System.IO.Path.GetExtension(path).ToLowerInvariant() is ".zip" or ".cbz") return new ZipArchive(path);
-        throw new NotSupportedException("P1 支持目录、图片及 ZIP/CBZ；其他来源尚未迁移。");
+        if (System.Text.RegularExpressions.Regex.IsMatch(path, @"(?:\.part\d+\.rar|\.r\d{2}|\.\d{3})$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+            throw new NotSupportedException("分卷归档尚未迁移，请使用完整的单文件归档。");
+        if (System.IO.Path.GetExtension(path).ToLowerInvariant() is ".zip" or ".cbz" or ".rar" or ".cbr" or ".7z") return new CompressedArchive(path);
+        throw new NotSupportedException("支持目录、图片、ZIP/CBZ、RAR/CBR 和 7z；其他来源尚未迁移。");
     }, token);
 }
 
@@ -89,17 +91,30 @@ public sealed class FolderArchive(string path) : Archive(path)
     public override ValueTask DisposeAsync() { IsDisposed = true; return ValueTask.CompletedTask; }
 }
 
-/// <summary>SharpCompress ZIP 后端，沿用 ArchiveEntry ID 区分重复名称。</summary>
-public sealed class ZipArchive : Archive
+/// <summary>SharpCompress 归档后端，沿用 ArchiveEntry ID 区分重复名称。</summary>
+public sealed class CompressedArchive : Archive
 {
     private readonly IArchive _archive;
     private readonly SemaphoreSlim _gate = new(1);
     private readonly List<IArchiveEntry> _entries;
-    /// <summary>打开只读 ZIP，不按归档路径创建本地文件。</summary>
-    public ZipArchive(string path) : base(path)
+    private readonly Dictionary<int, (string Path, long Length, long Used)> _solidFiles = [];
+    private string? _cacheDirectory;
+    private long _cacheClock;
+    private const long DiskBudget = 2L * 1024 * 1024 * 1024;
+    public long CachedBytes => _solidFiles.Values.Sum(e => e.Length);
+    // 7z 的块读取器也持有解码状态，统一采用独立顺序抽取和请求结果缓存。
+    private bool RequiresSequential => _archive.IsSolid || _archive.Type == SharpCompress.Common.ArchiveType.SevenZip;
+    /// <summary>打开只读普通或固实归档，不按归档路径创建本地文件。</summary>
+    public CompressedArchive(string path) : base(path)
     {
         _archive = SharpCompress.Archives.ArchiveFactory.OpenArchive(path, new ReaderOptions());
-        try { _entries = _archive.Entries.ToList(); }
+        try
+        {
+            // ZIP/7z 的通用 Volume.IsMultiVolume 默认值不代表真实分卷；RAR 使用头部标志。
+            if (_archive.Volumes.Count() > 1 || _archive.Volumes.OfType<SharpCompress.Common.Rar.RarVolume>().Any(v => v.IsMultiVolume))
+                throw new NotSupportedException("分卷归档尚未迁移。");
+            _entries = _archive.Entries.ToList();
+        }
         catch { _archive.Dispose(); throw; }
     }
     /// <summary>返回稳定的 entry ID 和原条目元数据。</summary>
@@ -130,10 +145,40 @@ public sealed class ZipArchive : Archive
         try
         {
             ObjectDisposedException.ThrowIf(IsDisposed, this);
-            if (entry.Length > 2L * 1024 * 1024 * 1024) throw new NotSupportedException("条目超过临时解压预算。");
-            using var input = _entries[entry.Id].OpenEntryStream();
+            if (entry.Length > DiskBudget) throw new NotSupportedException("条目超过临时解压预算。");
+            if (_solidFiles.TryGetValue(entry.Id, out var cached))
+            {
+                _solidFiles[entry.Id] = (cached.Path, cached.Length, ++_cacheClock);
+                return (Stream)new FileStream(cached.Path, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete);
+            }
+            // 固实包必须从块前部顺序恢复解码状态；不能直接调用随机条目流。
+            // Reader 释放会关闭底层 SourceStream，固实抽取需独立来源，不能破坏登记索引的归档。
+            using var extraction = RequiresSequential ? SharpCompress.Archives.ArchiveFactory.OpenArchive(Path, new ReaderOptions()) : null;
+            using var reader = extraction?.ExtractAllEntries();
+            if (reader is not null)
+            {
+                // 7z 索引可能把目录排在文件之前，Reader 则使用物理顺序；以名称与同名序号定位。
+                int occurrence = _entries.Take(entry.Id + 1).Count(e => e.Key?.Replace('\\', '/') == entry.EntryName);
+                bool found = false;
+                while (reader.MoveToNextEntry())
+                {
+                    token.ThrowIfCancellationRequested();
+                    if (reader.Entry.Key?.Replace('\\', '/') == entry.EntryName && --occurrence == 0) { found = true; break; }
+                }
+                if (!found) throw new InvalidDataException("固实归档条目无法定位。");
+            }
+            using var input = reader?.OpenEntryStream() ?? _entries[entry.Id].OpenEntryStream();
             Stream output;
-            if (entry.Length <= 32L * 1024 * 1024) output = new MemoryStream();
+            string? cachedPath = null;
+            if (RequiresSequential)
+            {
+                _cacheDirectory ??= System.IO.Path.Combine(System.IO.Path.GetTempPath(), "NeeView.Mac", Guid.NewGuid().ToString("N"));
+                Directory.CreateDirectory(_cacheDirectory);
+                TrimSolidCache(Math.Max(0, entry.Length));
+                cachedPath = System.IO.Path.Combine(_cacheDirectory, Guid.NewGuid().ToString("N"));
+                output = new FileStream(cachedPath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.Read | FileShare.Delete);
+            }
+            else if (entry.Length <= 32L * 1024 * 1024) output = new MemoryStream();
             else
             {
                 var directory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "NeeView.Mac"); Directory.CreateDirectory(directory);
@@ -145,21 +190,42 @@ public sealed class ZipArchive : Archive
                 while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
                 {
                     token.ThrowIfCancellationRequested(); total += read;
-                    if (total > 2L * 1024 * 1024 * 1024) throw new InvalidDataException("解压内容超出预算。");
+                    if (total > DiskBudget) throw new InvalidDataException("解压内容超出预算。");
                     output.Write(buffer, 0, read);
+                }
+                if (entry.Length >= 0 && total != entry.Length) throw new InvalidDataException("归档条目读取不完整，实际长度与索引不一致。");
+                if (cachedPath is not null)
+                {
+                    TrimSolidCache(total); output.Flush();
+                    _solidFiles[entry.Id] = (cachedPath, total, ++_cacheClock);
                 }
                 output.Position = 0; return output;
             }
-            catch { output.Dispose(); throw; }
+            catch { output.Dispose(); if (cachedPath is not null) File.Delete(cachedPath); throw; }
         }
         // 超时只取消调用方等待；工作真正结束后才允许 Dispose 关闭归档。
         finally { _gate.Release(); }
     }, token);
+    /// <summary>按来源的 2 GiB 预算回收最旧固实结果；已打开请求流仍由调用方拥有。</summary>
+    private void TrimSolidCache(long incoming)
+    {
+        long total = CachedBytes;
+        foreach (var pair in _solidFiles.OrderBy(e => e.Value.Used).ToArray())
+        {
+            if (total + incoming <= DiskBudget) break;
+            File.Delete(pair.Value.Path); _solidFiles.Remove(pair.Key); total -= pair.Value.Length;
+        }
+    }
     /// <summary>等待当前解压结束后关闭归档，不中途释放原生来源。</summary>
     public override async ValueTask DisposeAsync()
     {
         await _gate.WaitAsync();
-        try { if (!IsDisposed) { IsDisposed = true; _archive.Dispose(); } }
+        try
+        {
+            if (!IsDisposed) { IsDisposed = true; _archive.Dispose(); }
+            if (_cacheDirectory is not null && Directory.Exists(_cacheDirectory)) Directory.Delete(_cacheDirectory, true);
+            _solidFiles.Clear();
+        }
         finally { _gate.Release(); }
     }
 }

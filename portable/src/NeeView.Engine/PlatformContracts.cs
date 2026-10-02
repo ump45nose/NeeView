@@ -7,10 +7,20 @@ public readonly record struct Vector(double X, double Y);
 /// <summary>归一化裁剪区域，坐标属于图片而非窗口。</summary>
 public readonly record struct Rect(double X, double Y, double Width, double Height);
 
+/// <summary>macOS 精确滚动及捏合输入；坐标属于窗口内容区域，单位为 DIP。</summary>
+public sealed record PlatformGesture(bool IsMagnify, double X, double Y, double DeltaX, double DeltaY, double Magnification, nint SourceWindow = 0);
+
+/// <summary>平台事件桥接，处理器只消费查看器内事件；其余原生事件继续传播。</summary>
+public interface IPlatformInput : IDisposable
+{
+    /// <summary>安装窗口处理器，返回 true 表示已消费；释放时移除原生监听。</summary>
+    void Attach(Func<PlatformGesture, bool> handler);
+}
+
 /// <summary>内容来源替换点；沿用 Archive/ArchiveEntry 模型。</summary>
 public interface IArchiveFactory
 {
-    /// <summary>打开目录或 ZIP。调用方负责释放返回来源。</summary>
+    /// <summary>打开目录、ZIP、RAR 或 7z。调用方负责释放返回来源。</summary>
     Task<Archive> OpenAsync(string path, CancellationToken token);
     /// <summary>列出直接子目录，用于 P1 基础导航。</summary>
     Task<IReadOnlyList<FolderItem>> ListFoldersAsync(string path, CancellationToken token);
@@ -31,7 +41,7 @@ public interface IImageDecoder
 /// <summary>图片尺寸及格式元数据。</summary>
 public sealed record ImageInfo(Size Size, string Format);
 /// <summary>解码目标尺寸，以设备像素计。</summary>
-public sealed record DecodeRequest(int TargetWidth, int TargetHeight);
+public sealed record DecodeRequest(int TargetWidth, int TargetHeight, bool IsThumbnail = false);
 /// <summary>单个像素缓冲的所有者；显示端不能保留已释放缓冲。</summary>
 public sealed class DecodedImageLease(Size size, byte[] pixels) : IDisposable
 {

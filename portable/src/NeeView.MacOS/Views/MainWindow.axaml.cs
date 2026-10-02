@@ -16,6 +16,7 @@ public sealed partial class MainWindow : Window
     private ReaderWorkspaceViewModel? _model;
     private BitmapFactory? _images;
     private IPlatformService? _platform;
+    private IPlatformInput? _platformInput;
     private bool _closedPrepared;
     private bool _preparing;
     private Task? _shutdown;
@@ -25,6 +26,39 @@ public sealed partial class MainWindow : Window
     private double _wheel;
     private double _leftWidth, _rightWidth;
     public ReaderView Viewer => this.FindControl<ReaderView>("MainViewSocket")!;
+    private ThumbnailView FilmStrip => this.FindControl<ThumbnailView>("DockFilmStripSocket")!;
+    private ThumbnailView NavigatorView => this.FindControl<ThumbnailView>("Navigator")!;
+    private static readonly HashSet<string> HostCommands = new(StringComparer.Ordinal)
+    {
+        "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen",
+        "ViewScaleUp", "ViewScaleDown", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
+        "LeftAutoHide", "RightAutoHide", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
+        "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
+        "ToggleVisibleFilmStrip", "ToggleHideFilmStrip"
+    };
+    /// <summary>由启动层接入原生事件；只消费主查看器区域，其余控件使用框架输入。</summary>
+    public void AttachPlatformInput(IPlatformInput input)
+    {
+        _platformInput?.Dispose(); _platformInput = input; input.Attach(HandlePlatformGesture);
+    }
+    /// <summary>真实精确滚动连续平移，捏合围绕当前指针缩放，不使用增量大小猜设备。</summary>
+    public bool HandlePlatformGesture(PlatformGesture gesture)
+    {
+        if (_preparing || !IsActive || OwnedWindows.Any(w => w.IsVisible) || _model?.Operation.Book is null) return false;
+        if (gesture.SourceWindow != (TryGetPlatformHandle()?.Handle ?? 0)) return false;
+        var point = Viewer.TranslatePoint(new Point(0, 0), this);
+        if (point is null) return false;
+        var local = new Point(gesture.X - point.Value.X, gesture.Y - point.Value.Y);
+        if (!new Avalonia.Rect(Viewer.Bounds.Size).Contains(local)) return false;
+        if (gesture.IsMagnify) _ = ZoomFromGestureAsync(1 + gesture.Magnification, local);
+        else Viewer.Pan(new(gesture.DeltaX, gesture.DeltaY));
+        return true;
+    }
+    /// <summary>观察异步缩放错误，原生回调不可阻塞等待解码。</summary>
+    private async Task ZoomFromGestureAsync(double factor, Point point)
+    {
+        try { if (factor > 0) await Viewer.ZoomAsync(factor, point); } catch (Exception ex) { ShowError(ex.Message); }
+    }
 
     /// <summary>加载可独立验收的布局，设计器和 Headless 不需要具体后端。</summary>
     public MainWindow()
@@ -44,9 +78,59 @@ public sealed partial class MainWindow : Window
         Viewer.Attach(model.Operation, images); model.Refreshed += Model_Refreshed;
         model.PanelsRefreshed += Model_PanelsRefreshed;
         _leftWidth = model.LeftWidth; _rightWidth = model.RightWidth; UpdatePanelColumns(); model.Attach();
+        FilmStrip.Attach(model.Operation, images); NavigatorView.Attach(model.Operation, images);
+        FilmStrip.PageRequested += async (_, index) => { try { await model.Operation.JumpAsync(index); } catch (Exception ex) { ShowError(ex.Message); } };
+        NavigatorView.NavigateRequested += (_, point) => Viewer.Navigate(point);
+        BuildMenus();
     }
+    /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
+    public bool IsCommandAvailable(string name) => HostCommands.Contains(name) || _model?.Commands.IsAvailable(name) == true;
+    /// <summary>迁入完整菜单后追加 Mac 打开目录及已有交互，保持原八组顺序。</summary>
+    private void BuildMenus()
+    {
+        if (_model is null) return;
+        var root = MenuTree.CreateDefault();
+        root.Children![0].Children!.Insert(1, new("打开目录…", MenuElementType.Command, "OpenFolder"));
+        root.Children[0].Children!.Add(new("重新载入", MenuElementType.Command, "ReLoad"));
+        root.Children[0].Children!.Add(new("关闭窗口", MenuElementType.Command, "CloseWindow"));
+        foreach (var (text, command) in new[] { ("左侧栏自动隐藏", "LeftAutoHide"), ("右侧栏自动隐藏", "RightAutoHide") })
+            root.Children[1].Children!.Add(new(text, MenuElementType.Command, command));
+        foreach (var (text, command) in new[] { ("放大", "ViewScaleUp"), ("缩小", "ViewScaleDown") })
+            root.Children[2].Children!.Add(new(text, MenuElementType.Command, command));
+        MenuPresenter.Populate(this.FindControl<Menu>("MenuBar")!, root, _model.Commands, _model.SaveData, IsCommandAvailable, ExecuteAsync, GetCommandCheck);
+    }
+    /// <summary>原菜单绑定的勾选表现；只读取引擎配置，不在菜单中维护第二套状态。</summary>
+    private bool? GetCommandCheck(string name) => name switch
+    {
+        "SetPageModeOne" => _model?.Operation.Book?.Setting.PageMode == PageMode.SinglePage,
+        "SetPageModeTwo" => _model?.Operation.Book?.Setting.PageMode == PageMode.WidePage,
+        "SetBookReadOrderRight" => _model?.Operation.Book?.Setting.BookReadOrder == PageReadOrder.RightToLeft,
+        "SetBookReadOrderLeft" => _model?.Operation.Book?.Setting.BookReadOrder == PageReadOrder.LeftToRight,
+        "ToggleIsSupportedDividePage" => _model?.Divide,
+        "ToggleIsSupportedWidePage" => _model?.Wide,
+        "ToggleIsSupportedSingleFirstPage" => _model?.FirstSingle,
+        "ToggleIsSupportedSingleLastPage" => _model?.LastSingle,
+        "ToggleBookmark" => _model?.IsBookmark,
+        "ToggleVisibleBookshelf" => Config.Current.Panels.IsLeftVisible && _model?.ShowFolderList == true,
+        "ToggleVisiblePageList" => Config.Current.Panels.IsLeftVisible && _model?.ShowPageList == true,
+        "ToggleVisibleHistoryList" => Config.Current.Panels.IsLeftVisible && _model?.ShowHistory == true,
+        "ToggleVisibleFileInfo" => Config.Current.Panels.IsRightVisible && _model?.ShowInformation == true,
+        "ToggleVisibleBookmarkList" => Config.Current.Panels.IsRightVisible && _model?.ShowBookmarks == true,
+        "ToggleVisibleNavigator" => Config.Current.Panels.IsRightVisible && _model?.ShowNavigator == true,
+        "ToggleVisibleFilmStrip" => Config.Current.FilmStrip.IsEnabled,
+        "ToggleHideFilmStrip" => Config.Current.FilmStrip.IsHideFilmStrip,
+        "LeftAutoHide" => Config.Current.Panels.IsLeftAutoHide,
+        "RightAutoHide" => Config.Current.Panels.IsRightAutoHide,
+        "SetStretchModeUniform" => Config.Current.View.StretchMode == PageStretchMode.Uniform,
+        "SetStretchModeNone" => Config.Current.View.StretchMode == PageStretchMode.None,
+        _ => null
+    };
     /// <summary>表现变化只更新列宽；GridSplitter 的实际宽度由窗口保存，控件不设置固定 Width。</summary>
-    private void Model_PanelsRefreshed(object? sender, EventArgs e) => UpdatePanelColumns();
+    private void Model_PanelsRefreshed(object? sender, EventArgs e)
+    {
+        UpdatePanelColumns();
+        MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck);
+    }
     /// <summary>隐藏时收起面板列，重新显示恢复用户拖动后的宽度。</summary>
     private void UpdatePanelColumns()
     {
@@ -75,7 +159,7 @@ public sealed partial class MainWindow : Window
             switch (name)
             {
                 case "LoadAs":
-                    var files = await StorageProvider.OpenFilePickerAsync(new() { Title = "打开图片或 ZIP / CBZ", AllowMultiple = false });
+                    var files = await StorageProvider.OpenFilePickerAsync(new() { Title = "打开图片、ZIP / RAR / 7z", AllowMultiple = false });
                     if (files.FirstOrDefault()?.TryGetLocalPath() is { } file) await OpenAsync(file); break;
                 case "OpenFolder":
                     var folders = await StorageProvider.OpenFolderPickerAsync(new() { Title = "打开图片目录", AllowMultiple = false });
@@ -96,18 +180,35 @@ public sealed partial class MainWindow : Window
                 case "ToggleHideRightPanel": Config.Current.Panels.IsRightVisible = !Config.Current.Panels.IsRightVisible; _model.RefreshPanels(); break;
                 case "LeftAutoHide": Config.Current.Panels.IsLeftAutoHide = !Config.Current.Panels.IsLeftAutoHide; _model.RefreshPanels(); break;
                 case "RightAutoHide": Config.Current.Panels.IsRightAutoHide = !Config.Current.Panels.IsRightAutoHide; _model.RefreshPanels(); break;
-                case "OpenOptionsWindow": await new SettingsWindow(_model).ShowDialog(this); break;
+                case "OpenOptionsWindow": await new SettingsWindow(_model, IsCommandAvailable).ShowDialog(this); BuildMenus(); break;
                 case "HelpCommandList": await ShowCommandStatusAsync(); break;
+                case "ToggleBookmark":
+                    if (_model.Operation.Book is { } marked) { await _model.Operation.SaveAsync(); await _model.SaveData.ToggleBookmarkAsync(marked); } break;
+                case "LoadRecentBook":
+                    var recent = _model.SaveData.HistoryEntries.FirstOrDefault(e => e.Path != _model.Operation.Book?.Path);
+                    if (recent is not null) await OpenAsync(recent.Path); break;
+                case "OpenBookExplorer": if (_model.Operation.Book is { } source) await _platform!.RevealAsync(source.Path); break;
+                case "ToggleVisibleBookshelf": _model.SelectPanel("FolderPanel"); break;
+                case "ToggleVisiblePageList": _model.SelectPanel("PageListPanel"); break;
+                case "ToggleVisibleHistoryList": _model.SelectPanel("HistoryPanel"); break;
+                case "ToggleVisibleFileInfo": _model.SelectPanel("FileInformationPanel"); break;
+                case "ToggleVisibleBookmarkList": _model.SelectPanel("BookmarkPanel"); break;
+                case "ToggleVisibleNavigator": _model.SelectPanel("NavigatePanel"); break;
+                case "ToggleVisibleFilmStrip": Config.Current.FilmStrip.IsEnabled = !Config.Current.FilmStrip.IsEnabled; _model.RefreshPanels(); await FilmStrip.RefreshAsync(); break;
+                case "ToggleHideFilmStrip": Config.Current.FilmStrip.IsHideFilmStrip = !Config.Current.FilmStrip.IsHideFilmStrip; _model.RefreshPanels(); break;
                 default: await _model.Commands.ExecuteAsync(name); break;
             }
         }
         catch (Exception ex) { ShowError(ex.Message); }
+        MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck);
     }
     /// <summary>业务回报刷新查看器；只在来源改变时更新目录导航。</summary>
     private async void Model_Refreshed(object? sender, EventArgs e)
     {
         if (_preparing || _model is null) return;
+        MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck);
         await Viewer.RefreshAsync();
+        await FilmStrip.RefreshAsync(); await NavigatorView.RefreshAsync();
         var book = _model.Operation.Book;
         if (book is null || ReferenceEquals(_folderBook, book)) return;
         _folderBook = book; _folders?.Cancel(); var pending = new CancellationTokenSource(); _folders = pending;
@@ -134,6 +235,57 @@ public sealed partial class MainWindow : Window
     }
     /// <summary>目录双击统一打开，控件只持有只读条目。</summary>
     private async void Folder_DoubleTapped(object? sender, TappedEventArgs e) { if (sender is ListBox { SelectedItem: FolderItem item }) await OpenAsync(item.Path); }
+    /// <summary>历史打开继续走原恢复策略，失败保持当前书籍。</summary>
+    private async void History_DoubleTapped(object? sender, TappedEventArgs e) { if (sender is ListBox { SelectedItem: HistoryEntry entry }) await OpenAsync(entry.Path); }
+    /// <summary>文件夹保留展开交互，书籍节点双击打开。</summary>
+    private async void Bookmark_DoubleTapped(object? sender, TappedEventArgs e) { if (sender is TreeView { SelectedItem: BookmarkNode { IsFolder: false, Path: { } path } }) await OpenAsync(path); }
+    /// <summary>在所选文件夹中创建节点；未选文件夹时使用根目录。</summary>
+    private async void Bookmark_NewFolder(object? sender, RoutedEventArgs e)
+    {
+        if (_model is null) return;
+        var parent = this.FindControl<TreeView>("BookmarkTree")!.SelectedItem as BookmarkNode;
+        var name = await AskNameAsync("新建书签文件夹", "");
+        if (name is null) return;
+        try { await _model.SaveData.AddBookmarkFolderAsync(parent?.IsFolder == true ? parent : null, name); }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+    /// <summary>修改所选节点名称，取消不写入状态。</summary>
+    private async void Bookmark_Rename(object? sender, RoutedEventArgs e)
+    {
+        if (_model is null || this.FindControl<TreeView>("BookmarkTree")!.SelectedItem is not BookmarkNode node) return;
+        var name = await AskNameAsync("重命名书签", node.DisplayName);
+        if (name is null) return;
+        try { await _model.SaveData.RenameBookmarkAsync(node, name); } catch (Exception ex) { ShowError(ex.Message); }
+    }
+    /// <summary>移除树记录；文件夹包含子项时明确确认范围。</summary>
+    private async void Bookmark_Remove(object? sender, RoutedEventArgs e)
+    {
+        if (_model is null || this.FindControl<TreeView>("BookmarkTree")!.SelectedItem is not BookmarkNode node) return;
+        if (!await ConfirmAsync("移除书签", $"移除“{node.DisplayName}”{(node.IsFolder ? "及其全部书签子项" : "")}？")) return;
+        try { await _model.SaveData.RemoveBookmarkAsync(node); } catch (Exception ex) { ShowError(ex.Message); }
+    }
+    /// <summary>小型命名对话框仅返回用户文本，业务校验由 Engine 完成。</summary>
+    private Task<string?> AskNameAsync(string title, string value)
+    {
+        var input = new TextBox { Text = value }; var cancel = new Button { Content = "取消" }; var save = new Button { Content = "确定" };
+        var dialog = new Window { Title = title, Width = 380, Height = 160, WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Content = new StackPanel { Margin = new Thickness(16), Spacing = 12, Children = { input, new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 8, Children = { cancel, save } } } } };
+        cancel.Click += (_, _) => dialog.Close(null); save.Click += (_, _) => { if (!string.IsNullOrWhiteSpace(input.Text)) dialog.Close(input.Text.Trim()); };
+        return dialog.ShowDialog<string?>(this);
+    }
+    /// <summary>范围明确的确认对话框，关闭或取消返回 false。</summary>
+    private Task<bool> ConfirmAsync(string title, string message)
+    {
+        var cancel = new Button { Content = "取消" }; var accept = new Button { Content = "移除" };
+        var dialog = new Window { Title = title, Width = 380, Height = 160, WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Content = new StackPanel { Margin = new Thickness(16), Spacing = 16, Children = { new TextBlock { Text = message, TextWrapping = Avalonia.Media.TextWrapping.Wrap }, new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 8, Children = { cancel, accept } } } } };
+        cancel.Click += (_, _) => dialog.Close(false); accept.Click += (_, _) => dialog.Close(true);
+        return dialog.ShowDialog<bool>(this);
+    }
+    /// <summary>进入底栏展开已启用的自动隐藏胶片条。</summary>
+    private void FilmStrip_Entered(object? sender, PointerEventArgs e) => _model?.HoverFilmStrip(true);
+    /// <summary>离开底栏恢复胶片条隐藏状态。</summary>
+    private void FilmStrip_Exited(object? sender, PointerEventArgs e) => _model?.HoverFilmStrip(false);
     /// <summary>滑条拖动防抖，连续位置变化不会排满导航队列。</summary>
     private async void Slider_ValueChanged(object? sender, Avalonia.Controls.Primitives.RangeBaseValueChangedEventArgs e)
     {
@@ -151,6 +303,8 @@ public sealed partial class MainWindow : Window
         if (e.KeyModifiers == KeyModifiers.Meta && e.Key is Key.O or Key.W or Key.Q)
         { e.Handled = true; await ExecuteAsync(e.Key == Key.O ? "LoadAs" : e.Key == Key.W ? "CloseWindow" : "CloseApplication"); return; }
         if (FocusManager?.GetFocusedElement() is TextBox) return;
+        // 弹出菜单拥有方向键，不能让原阅读快捷键抢走菜单导航/选择。
+        if (this.FindControl<Menu>("MenuBar")!.IsOpen || FocusManager?.GetFocusedElement() is MenuItem) return;
         var matches = _model.Commands.Definitions.Where(d => _model.SaveData.GetShortcut(d.Name, d.Shortcut).Split(',').Any(s => MatchKey(s, e))).ToArray();
         if (matches.Length == 0) return; e.Handled = true;
         if (matches.Length > 1) { ShowError("快捷键冲突：" + string.Join("、", matches.Select(d => d.Text))); return; }
@@ -178,12 +332,12 @@ public sealed partial class MainWindow : Window
         if (matches.Length == 1) await ExecuteAsync(matches[0].Name);
         else if (matches.Length > 1) ShowError("输入冲突：" + string.Join("、", matches.Select(d => d.Text)));
     }
-    /// <summary>普通滚轮按原绑定，高精度增量保持连续平移；完整触控板桥接属于 P2。</summary>
+    /// <summary>普通滚轮按原绑定；正式 Mac 精确滚动由平台桥接提前消费。</summary>
     private async void Viewer_Wheel(object? sender, PointerWheelEventArgs e)
     {
         e.Handled = true;
         if (e.KeyModifiers.HasFlag(KeyModifiers.Control) || e.KeyModifiers.HasFlag(KeyModifiers.Meta)) { await Viewer.ZoomAsync(Math.Pow(1.15, e.Delta.Y), e.GetPosition(Viewer)); return; }
-        if (Math.Abs(e.Delta.Y) < 1 || Math.Abs(e.Delta.X) > 0) { Viewer.Pan(e.Delta * 24); return; }
+        if (Math.Abs(e.Delta.X) > 0) { Viewer.Pan(new(e.Delta.X * 24, 0)); return; }
         _wheel += e.Delta.Y;
         if (Math.Abs(_wheel) < 1) return;
         var direction = Math.Sign(_wheel); _wheel -= direction; await GestureAsync(direction > 0 ? "WheelUp" : "WheelDown");
@@ -193,7 +347,7 @@ public sealed partial class MainWindow : Window
     /// <summary>显示完整基线命令及迁移状态，已登记数量不当作功能覆盖率。</summary>
     private Task ShowCommandStatusAsync()
     {
-        var text = string.Join('\n', _model!.Commands.Definitions.Select(d => $"{d.Text}  [{d.Name}]  {d.Stage}  {d.Shortcut}"));
+        var text = string.Join('\n', _model!.Commands.Definitions.Select(d => $"{d.Text}  [{d.Name}]  {(IsCommandAvailable(d.Name) ? "已接入，详见验收记录" : d.Stage)}  {_model.SaveData.GetShortcut(d.Name, d.Shortcut)}"));
         return new Window { Title = "命令迁移状态", Width = 680, Height = 600, Content = new ScrollViewer { Content = new TextBlock { Text = text, Margin = new Thickness(16) } } }.ShowDialog(this);
     }
     /// <summary>错误信息只改变表现，不覆盖当前阅读内容。</summary>
@@ -234,7 +388,7 @@ public sealed partial class MainWindow : Window
                 await _model.Operation.DisposeAsync();
                 _model.Detach(); _model.Refreshed -= Model_Refreshed; _model.PanelsRefreshed -= Model_PanelsRefreshed;
             }
-            Viewer.Dispose(); _images?.Dispose(); _closedPrepared = true;
+            _platformInput?.Dispose(); FilmStrip.Dispose(); NavigatorView.Dispose(); Viewer.Dispose(); _images?.Dispose(); _closedPrepared = true;
         }
         finally { _preparing = false; _shutdown = null; }
     }

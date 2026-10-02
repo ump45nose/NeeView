@@ -1,16 +1,16 @@
 # 完整命令迁移表
 
-固定基线 235 个实例；数量是登记清单，不代表功能覆盖率。Engine 动作和宿主动作分别标记；后续命令不可执行。原参数继续保留在 JSON，完整可编辑参数入口待 P2。
+固定基线 235 个实例；数量是登记清单，不代表功能覆盖率。当前包含 P1 与 P2 首批，阶段标记仅说明执行入口已接入，完整参数/手势及交互范围见验收记录。未迁入命令保留原菜单节点、键位和参数，禁用占位。原复杂手势可以原样保存，不意味着其执行已迁入。
 
 | 原命令 | 文案 | 默认输入 | 当前实现 | 原出处 |
 |---|---|---|---|---|
 | LoadAs | 打开文件 | Ctrl+O | P1 宿主适配 | NeeView/Command/Commands/LoadAsCommand.cs |
-| LoadRecentBook | 最近使用的书籍 |  | 待 P2–P5 | NeeView/Command/Commands/LoadRecentBookCommand.cs |
-| ReLoad | ReLoad |  | P1 宿主适配 | NeeView/Command/Commands/ReLoadCommand.cs |
-| Unload | Unload |  | 待 P2–P5 | NeeView/Command/Commands/UnloadCommand.cs |
+| LoadRecentBook | 最近使用的书籍 |  | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/LoadRecentBookCommand.cs |
+| ReLoad | 重新载入 |  | P1 宿主适配 | NeeView/Command/Commands/ReLoadCommand.cs |
+| Unload | 关闭 |  | 待 P2–P5 | NeeView/Command/Commands/UnloadCommand.cs |
 | OpenExplorer | 在资源管理器中打开 |  | P1 宿主适配 | NeeView/Command/Commands/OpenExplorerCommand.cs |
 | OpenExternalApp | 在外部应用中打开 (简单) |  | 待 P2–P5 | NeeView/Command/Commands/OpenExternalAppCommand.cs |
-| OpenExternalAppAs | OpenExternalAppAs |  | 待 P2–P5 | NeeView/Command/Commands/OpenExternalAppAsCommand.cs |
+| OpenExternalAppAs | 在外部应用中打开 |  | 待 P2–P5 | NeeView/Command/Commands/OpenExternalAppAsCommand.cs |
 | CutFile | 剪切文件 | Ctrl+X | 待 P2–P5 | NeeView/Command/Commands/CutFileCommand.cs |
 | CopyFile | 复制文件 | Ctrl+C | 待 P2–P5 | NeeView/Command/Commands/CopyFileCommand.cs |
 | CopyImage | 复制图像 | Ctrl+Shift+C | 待 P2–P5 | NeeView/Command/Commands/CopyImageCommand.cs |
@@ -31,9 +31,9 @@
 | ExportImageAs | 另存为 | Ctrl+S | 待 P2–P5 | NeeView/Command/Commands/ExportImageAsCommand.cs |
 | ExportImage | 保存为文件 | Shift+Ctrl+S | 待 P2–P5 | NeeView/Command/Commands/ExportImageCommand.cs |
 | ExportBookAs | 导出书籍 |  | 待 P2–P5 | NeeView/Command/Commands/ExportBookAsCommand.cs |
-| Print | Print | Ctrl+P | 待 P2–P5 | NeeView/Command/Commands/PrintCommand.cs |
+| Print | 打印 | Ctrl+P | 待 P2–P5 | NeeView/Command/Commands/PrintCommand.cs |
 | DeleteFile | 删除文件 | Delete | 待 P2–P5 | NeeView/Command/Commands/DeleteFileCommand.cs |
-| OpenBookExplorer | 在资源管理器中打开书籍 |  | 待 P2–P5 | NeeView/Command/Commands/OpenBookExplorerCommand.cs |
+| OpenBookExplorer | 在资源管理器中打开书籍 |  | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/OpenBookExplorerCommand.cs |
 | OpenBookExternalAppAs | 用外部应用打开书籍 |  | 待 P2–P5 | NeeView/Command/Commands/OpenBookExternalAppAsCommand.cs |
 | CutBook | 剪切书籍 |  | 待 P2–P5 | NeeView/Command/Commands/CutBookCommand.cs |
 | CopyBook | 复制书籍 |  | 待 P2–P5 | NeeView/Command/Commands/CopyBookCommand.cs |
@@ -47,22 +47,22 @@
 | RemoveUnlinkedHistory | 删除无效的历史记录 |  | 待 P2–P5 | NeeView/Command/Commands/RemoveUnlinkedHistoryCommand.cs |
 | ToggleStretchMode | 切换拉伸 | LeftButton+WheelDown | 待 P2–P5 | NeeView/Command/Commands/ToggleStretchModeCommand.cs |
 | ToggleStretchModeReverse | 切换拉伸 (反向) | LeftButton+WheelUp | 待 P2–P5 | NeeView/Command/Commands/ToggleStretchModeReverseCommand.cs |
-| SetStretchModeNone | SetStretchModeNone |  | P1 宿主适配 | NeeView/Command/Commands/SetStretchModeNoneCommand.cs |
-| SetStretchModeUniform | SetStretchModeUniform |  | P1 宿主适配 | NeeView/Command/Commands/SetStretchModeUniformCommand.cs |
-| SetStretchModeUniformToFill | SetStretchModeUniformToFill |  | 待 P2–P5 | NeeView/Command/Commands/SetStretchModeUniformToFillCommand.cs |
-| SetStretchModeUniformToSize | SetStretchModeUniformToSize |  | 待 P2–P5 | NeeView/Command/Commands/SetStretchModeUniformToSizeCommand.cs |
-| SetStretchModeUniformToVertical | SetStretchModeUniformToVertical |  | 待 P2–P5 | NeeView/Command/Commands/SetStretchModeUniformToVerticalCommand.cs |
-| SetStretchModeUniformToHorizontal | SetStretchModeUniformToHorizontal |  | 待 P2–P5 | NeeView/Command/Commands/SetStretchModeUniformToHorizontalCommand.cs |
+| SetStretchModeNone | 原始大小 |  | P1 宿主适配 | NeeView/Command/Commands/SetStretchModeNoneCommand.cs |
+| SetStretchModeUniform | 适应窗口 |  | P1 宿主适配 | NeeView/Command/Commands/SetStretchModeUniformCommand.cs |
+| SetStretchModeUniformToFill | 铺满整个窗口 |  | 待 P2–P5 | NeeView/Command/Commands/SetStretchModeUniformToFillCommand.cs |
+| SetStretchModeUniformToSize | 适应窗口区域 |  | 待 P2–P5 | NeeView/Command/Commands/SetStretchModeUniformToSizeCommand.cs |
+| SetStretchModeUniformToVertical | 适应窗口高度 |  | 待 P2–P5 | NeeView/Command/Commands/SetStretchModeUniformToVerticalCommand.cs |
+| SetStretchModeUniformToHorizontal | 适应窗口宽度 |  | 待 P2–P5 | NeeView/Command/Commands/SetStretchModeUniformToHorizontalCommand.cs |
 | ToggleStretchAllowScaleUp | 允许放大 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleStretchAllowScaleUpCommand.cs |
 | ToggleStretchAllowScaleDown | 允许缩小 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleStretchAllowScaleDownCommand.cs |
 | ToggleNearestNeighbor | 启用/禁用逐点放大 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleNearestNeighborCommand.cs |
 | ToggleBackground | 切换背景 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleBackgroundCommand.cs |
-| SetBackgroundBlack | SetBackgroundBlack |  | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundBlackCommand.cs |
-| SetBackgroundWhite | SetBackgroundWhite |  | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundWhiteCommand.cs |
-| SetBackgroundAuto | SetBackgroundAuto |  | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundAutoCommand.cs |
-| SetBackgroundCheck | SetBackgroundCheck |  | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundCheckCommand.cs |
-| SetBackgroundCheckDark | SetBackgroundCheckDark |  | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundCheckDarkCommand.cs |
-| SetBackgroundCustom | SetBackgroundCustom |  | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundCustomCommand.cs |
+| SetBackgroundBlack | 黑色背景 |  | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundBlackCommand.cs |
+| SetBackgroundWhite | 白色背景 |  | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundWhiteCommand.cs |
+| SetBackgroundAuto | 背景适应图像颜色 |  | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundAutoCommand.cs |
+| SetBackgroundCheck | 白色方格背景 |  | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundCheckCommand.cs |
+| SetBackgroundCheckDark | 黑色方格背景 |  | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundCheckDarkCommand.cs |
+| SetBackgroundCustom | 自定义背景 |  | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundCustomCommand.cs |
 | ToggleTopmost | 启用/禁用总是置顶显示 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleTopmostCommand.cs |
 | ToggleVisibleAddressBar | 显示/隐藏地址栏 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleAddressBarCommand.cs |
 | ToggleHideMenu | 启用/禁用自动隐藏菜单 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleHideMenuCommand.cs |
@@ -72,13 +72,13 @@
 | ToggleHideRightPanel | 切换自动隐藏右面板 |  | P1 宿主适配 | NeeView/Command/Commands/ToggleHideRightPanelCommand.cs |
 | ToggleVisiblePageSlider | 显示/隐藏滚动条 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleVisiblePageSliderCommand.cs |
 | ToggleHidePageSlider | 启用/禁用自动隐藏滚动条 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleHidePageSliderCommand.cs |
-| ToggleVisibleBookshelf | 显示/隐藏书架 | B | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleBookshelfCommand.cs |
-| ToggleVisiblePageList | 显示/隐藏页面列表面板 | P | 待 P2–P5 | NeeView/Command/Commands/ToggleVisiblePageListCommand.cs |
-| ToggleVisibleBookmarkList | 显示/隐藏书签面板 | D | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleBookmarkListCommand.cs |
+| ToggleVisibleBookshelf | 显示/隐藏书架 | B | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleBookshelfCommand.cs |
+| ToggleVisiblePageList | 显示/隐藏页面列表面板 | P | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisiblePageListCommand.cs |
+| ToggleVisibleBookmarkList | 显示/隐藏书签面板 | D | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleBookmarkListCommand.cs |
 | ToggleVisiblePlaylist | 显示/隐藏播放列表面板 | M | 待 P2–P5 | NeeView/Command/Commands/ToggleVisiblePlaylistCommand.cs |
-| ToggleVisibleHistoryList | 显示/隐藏历史记录面板 | H | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleHistoryListCommand.cs |
-| ToggleVisibleFileInfo | 显示/隐藏信息面板 | I | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleFileInfoCommand.cs |
-| ToggleVisibleNavigator | 显示/隐藏导航面板 | N | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleNavigatorCommand.cs |
+| ToggleVisibleHistoryList | 显示/隐藏历史记录面板 | H | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleHistoryListCommand.cs |
+| ToggleVisibleFileInfo | 显示/隐藏信息面板 | I | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleFileInfoCommand.cs |
+| ToggleVisibleNavigator | 显示/隐藏导航面板 | N | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleNavigatorCommand.cs |
 | ToggleVisibleEffectInfo | 显示/隐藏效果面板 | E | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleEffectInfoCommand.cs |
 | ToggleVisibleFoldersTree | 显示/隐藏目录树 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleFoldersTreeCommand.cs |
 | ToggleVisibleContentsTree | 显示/隐藏内容面板 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleContentsTreeCommand.cs |
@@ -88,8 +88,8 @@
 | FocusHistorySearchBox | 聚焦到历史记录搜索框 |  | 待 P2–P5 | NeeView/Command/Commands/FocusHistorySearchBoxCommand.cs |
 | FocusBookmarkList | 显示书签 |  | 待 P2–P5 | NeeView/Command/Commands/FocusBookmarkListCommand.cs |
 | FocusMainView | 聚焦到主视图 |  | 待 P2–P5 | NeeView/Command/Commands/FocusMainViewCommand.cs |
-| ToggleVisibleFilmStrip | 显示/隐藏幻灯条 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleFilmStripCommand.cs |
-| ToggleHideFilmStrip | 启用/禁用自动隐藏幻灯条 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleHideFilmStripCommand.cs |
+| ToggleVisibleFilmStrip | 显示/隐藏幻灯条 |  | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleFilmStripCommand.cs |
+| ToggleHideFilmStrip | 启用/禁用自动隐藏幻灯条 |  | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleHideFilmStripCommand.cs |
 | ToggleMainViewFloating | 切换主视图窗口 | F12 | 待 P2–P5 | NeeView/Command/Commands/ToggleMainViewFloatingCommand.cs |
 | ToggleFullScreen | 切换全屏状态 | F11 | P1 宿主适配 | NeeView/Command/Commands/ToggleFullScreenCommand.cs |
 | SetFullScreen | 全屏 |  | 待 P2–P5 | NeeView/Command/Commands/SetFullScreenCommand.cs |
@@ -108,19 +108,19 @@
 | ViewPresetScroll | 预设滚动 |  | 待 P2–P5 | NeeView/Command/Commands/ViewPresetScrollCommand.cs |
 | ViewScaleUp | 放大 | RightButton+WheelUp | P1 宿主适配 | NeeView/Command/Commands/ViewScaleUpCommand.cs |
 | ViewScaleDown | 缩小 | RightButton+WheelDown | P1 宿主适配 | NeeView/Command/Commands/ViewScaleDownCommand.cs |
-| ViewScaleStretch | ViewScaleStretch |  | 待 P2–P5 | NeeView/Command/Commands/ViewScaleStretchCommand.cs |
+| ViewScaleStretch | 拉伸 |  | 待 P2–P5 | NeeView/Command/Commands/ViewScaleStretchCommand.cs |
 | ViewBaseScaleUp | 放大基准比例 |  | 待 P2–P5 | NeeView/Command/Commands/ViewBaseScaleUpCommand.cs |
 | ViewBaseScaleDown | 缩小基准比例 |  | 待 P2–P5 | NeeView/Command/Commands/ViewBaseScaleDownCommand.cs |
 | ViewRotateLeft | 左旋 |  | 待 P2–P5 | NeeView/Command/Commands/ViewRotateLeftCommand.cs |
 | ViewRotateRight | 右旋 |  | 待 P2–P5 | NeeView/Command/Commands/ViewRotateRightCommand.cs |
-| ToggleIsAutoRotateLeft | 启用/禁用自动左旋转 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleIsAutoRotateLeftCommand.cs |
-| ToggleIsAutoRotateRight | 启用/禁用自动右旋转 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleIsAutoRotateRightCommand.cs |
-| ToggleIsAutoRotateForcedLeft | 启用/禁用强制左旋转 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleIsAutoRotateForcedLeftCommand.cs |
-| ToggleIsAutoRotateForcedRight | 启用/禁用强制右旋转 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleIsAutoRotateForcedRightCommand.cs |
-| ToggleViewFlipHorizontal | ToggleViewFlipHorizontal |  | 待 P2–P5 | NeeView/Command/Commands/ToggleViewFlipHorizontalCommand.cs |
+| ToggleIsAutoRotateLeft | 启用/禁用自动左旋转 |  | P2 Engine 接入；Windows动态对照待验 | NeeView/Command/Commands/ToggleIsAutoRotateLeftCommand.cs |
+| ToggleIsAutoRotateRight | 启用/禁用自动右旋转 |  | P2 Engine 接入；Windows动态对照待验 | NeeView/Command/Commands/ToggleIsAutoRotateRightCommand.cs |
+| ToggleIsAutoRotateForcedLeft | 启用/禁用强制左旋转 |  | P2 Engine 接入；Windows动态对照待验 | NeeView/Command/Commands/ToggleIsAutoRotateForcedLeftCommand.cs |
+| ToggleIsAutoRotateForcedRight | 启用/禁用强制右旋转 |  | P2 Engine 接入；Windows动态对照待验 | NeeView/Command/Commands/ToggleIsAutoRotateForcedRightCommand.cs |
+| ToggleViewFlipHorizontal | 左右翻转 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleViewFlipHorizontalCommand.cs |
 | ViewFlipHorizontalOn | 允许左右翻转 |  | 待 P2–P5 | NeeView/Command/Commands/ViewFlipHorizontalOnCommand.cs |
 | ViewFlipHorizontalOff | 取消左右翻转 |  | 待 P2–P5 | NeeView/Command/Commands/ViewFlipHorizontalOffCommand.cs |
-| ToggleViewFlipVertical | ToggleViewFlipVertical |  | 待 P2–P5 | NeeView/Command/Commands/ToggleViewFlipVerticalCommand.cs |
+| ToggleViewFlipVertical | 上下翻转 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleViewFlipVerticalCommand.cs |
 | ViewFlipVerticalOn | 允许上下翻转 |  | 待 P2–P5 | NeeView/Command/Commands/ViewFlipVerticalOnCommand.cs |
 | ViewFlipVerticalOff | 取消上下翻转 |  | 待 P2–P5 | NeeView/Command/Commands/ViewFlipVerticalOffCommand.cs |
 | ViewReset | 重置视图 |  | 待 P2–P5 | NeeView/Command/Commands/ViewResetCommand.cs |
@@ -169,32 +169,32 @@
 | SetBookOrderByRandom | 书籍随机排序 |  | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderByRandomCommand.cs |
 | TogglePageMode | 切换页面模式 |  | P1 Engine | NeeView/Command/Commands/TogglePageModeCommand.cs |
 | TogglePageModeReverse | 切换页面模式 (反向) |  | 待 P2–P5 | NeeView/Command/Commands/TogglePageModeReverseCommand.cs |
-| SetPageModeOne | SetPageModeOne | Ctrl+1 | P1 Engine | NeeView/Command/Commands/SetPageModeOneCommand.cs |
-| SetPageModeTwo | SetPageModeTwo | Ctrl+2 | P1 Engine | NeeView/Command/Commands/SetPageModeTwoCommand.cs |
+| SetPageModeOne | 单页显示 | Ctrl+1 | P1 Engine | NeeView/Command/Commands/SetPageModeOneCommand.cs |
+| SetPageModeTwo | 双页显示 | Ctrl+2 | P1 Engine | NeeView/Command/Commands/SetPageModeTwoCommand.cs |
 | ToggleIsPanorama | 全景模式 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleIsPanoramaCommand.cs |
 | TogglePageOrientation | 切换页面方向 |  | 待 P2–P5 | NeeView/Command/Commands/TogglePageOrientationCommand.cs |
 | SetPageOrientationHorizontal | 水平页面布局 |  | 待 P2–P5 | NeeView/Command/Commands/SetPageOrientationHorizontalCommand.cs |
 | SetPageOrientationVertical | 垂直页面布局 |  | 待 P2–P5 | NeeView/Command/Commands/SetPageOrientationVerticalCommand.cs |
 | ToggleBookReadOrder | 切换右开/左开 |  | P1 Engine | NeeView/Command/Commands/ToggleBookReadOrderCommand.cs |
-| SetBookReadOrderRight | SetBookReadOrderRight |  | P1 Engine | NeeView/Command/Commands/SetBookReadOrderRightCommand.cs |
-| SetBookReadOrderLeft | SetBookReadOrderLeft |  | P1 Engine | NeeView/Command/Commands/SetBookReadOrderLeftCommand.cs |
-| ToggleIsSupportedDividePage | ToggleIsSupportedDividePage |  | P1 Engine | NeeView/Command/Commands/ToggleIsSupportedDividePageCommand.cs |
-| ToggleIsSupportedWidePage | ToggleIsSupportedWidePage |  | P1 Engine | NeeView/Command/Commands/ToggleIsSupportedWidePageCommand.cs |
-| ToggleIsSupportedSingleFirstPage | ToggleIsSupportedSingleFirstPage |  | P1 Engine | NeeView/Command/Commands/ToggleIsSupportedSingleFirstPageCommand.cs |
-| ToggleIsSupportedSingleLastPage | ToggleIsSupportedSingleLastPage |  | P1 Engine | NeeView/Command/Commands/ToggleIsSupportedSingleLastPageCommand.cs |
-| ToggleIsRecursiveFolder | ToggleIsRecursiveFolder |  | 待 P2–P5 | NeeView/Command/Commands/ToggleIsRecursiveFolderCommand.cs |
+| SetBookReadOrderRight | 右开 (从右向左) |  | P1 Engine | NeeView/Command/Commands/SetBookReadOrderRightCommand.cs |
+| SetBookReadOrderLeft | 左开 (从左向右） |  | P1 Engine | NeeView/Command/Commands/SetBookReadOrderLeftCommand.cs |
+| ToggleIsSupportedDividePage | 分割横向页面 |  | P1 Engine | NeeView/Command/Commands/ToggleIsSupportedDividePageCommand.cs |
+| ToggleIsSupportedWidePage | 横向页面视为双页 |  | P1 Engine | NeeView/Command/Commands/ToggleIsSupportedWidePageCommand.cs |
+| ToggleIsSupportedSingleFirstPage | 首页单独显示 |  | P1 Engine | NeeView/Command/Commands/ToggleIsSupportedSingleFirstPageCommand.cs |
+| ToggleIsSupportedSingleLastPage | 尾页单独显示 |  | P1 Engine | NeeView/Command/Commands/ToggleIsSupportedSingleLastPageCommand.cs |
+| ToggleIsRecursiveFolder | 载入子文件夹 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleIsRecursiveFolderCommand.cs |
 | ToggleSortMode | 切换页面顺序 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleSortModeCommand.cs |
 | SetSortModeFileName | 文件名升序 |  | P1 Engine | NeeView/Command/Commands/SetSortModeFileNameCommand.cs |
 | SetSortModeFileNameDescending | 文件名降序 |  | P1 Engine | NeeView/Command/Commands/SetSortModeFileNameDescendingCommand.cs |
 | SetSortModeTimeStamp | 文件日期升序 |  | P1 Engine | NeeView/Command/Commands/SetSortModeTimeStampCommand.cs |
-| SetSortModeTimeStampDescending | 文件日期降序 |  | 待 P2–P5 | NeeView/Command/Commands/SetSortModeTimeStampDescendingCommand.cs |
+| SetSortModeTimeStampDescending | 文件日期降序 |  | P2 Engine 接入；Windows动态对照待验 | NeeView/Command/Commands/SetSortModeTimeStampDescendingCommand.cs |
 | SetSortModeSize | 文件大小升序 |  | P1 Engine | NeeView/Command/Commands/SetSortModeSizeCommand.cs |
-| SetSortModeSizeDescending | 文件大小降序 |  | 待 P2–P5 | NeeView/Command/Commands/SetSortModeSizeDescendingCommand.cs |
+| SetSortModeSizeDescending | 文件大小降序 |  | P2 Engine 接入；Windows动态对照待验 | NeeView/Command/Commands/SetSortModeSizeDescendingCommand.cs |
 | SetSortModeEntry | 文件登记时间升序 |  | 待 P2–P5 | NeeView/Command/Commands/SetSortModeEntryCommand.cs |
 | SetSortModeEntryDescending | 文件登记时间降序 |  | 待 P2–P5 | NeeView/Command/Commands/SetSortModeEntryDescendingCommand.cs |
 | SetSortModeRandom | 随机 |  | P1 Engine | NeeView/Command/Commands/SetSortModeRandomCommand.cs |
 | SetDefaultPageSetting | 重置页面设置 |  | 待 P2–P5 | NeeView/Command/Commands/SetDefaultPageSettingCommand.cs |
-| ToggleBookmark | 添加/删除书签 | Ctrl+D | 待 P2–P5 | NeeView/Command/Commands/ToggleBookmarkCommand.cs |
+| ToggleBookmark | 添加/删除书签 | Ctrl+D | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleBookmarkCommand.cs |
 | RegisterBookmark | 注册书签 |  | 待 P2–P5 | NeeView/Command/Commands/RegisterBookmarkCommand.cs |
 | NextPlaylist | 下一播放列表 |  | 待 P2–P5 | NeeView/Command/Commands/NextPlaylistCommand.cs |
 | PrevPlaylist | 上一个播放列表 |  | 待 P2–P5 | NeeView/Command/Commands/PrevPlaylistCommand.cs |

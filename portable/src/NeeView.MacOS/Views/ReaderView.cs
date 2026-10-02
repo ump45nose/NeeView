@@ -144,6 +144,30 @@ public sealed class ReaderView : Control, IDisposable
     public void ResetTransform() { _zoom = 1; _pan = default; InvalidateVisual(); }
     /// <summary>高精度滚动平移；分页导航由输入映射处理。</summary>
     public void Pan(Avalonia.Vector delta) { _pan += delta; InvalidateVisual(); }
+    /// <summary>导航器将图像内指定位置移到视口中心；页框及旋转仍由原引擎计算。</summary>
+    public void Navigate(Point point)
+    {
+        if (_frame is null || _operation?.Book?.CurrentPage is not { } page) return;
+        var sources = _frame.GetDirectedSources().ToArray();
+        var scale = _frame.Scale * _zoom;
+        var width = sources.Sum(e => e.Width) * scale + _frame.TotalSpan * _zoom;
+        double left = -width / 2;
+        foreach (var source in sources)
+        {
+            if (!source.IsDummy && ReferenceEquals(source.Page, page))
+            {
+                // 导航器展示主图片原图；双页需定位到该页，分割页先转换到当前裁剪区。
+                var crop = source.ViewSizeCalculator.GetViewBox();
+                var x = Math.Clamp((point.X - crop.X) / crop.Width, 0, 1);
+                var y = Math.Clamp((point.Y - crop.Y) / crop.Height, 0, 1);
+                var offset = new Avalonia.Vector(left + source.Width * scale * x, source.Height * scale * (y - .5));
+                var angle = _frame.Angle * Math.PI / 180;
+                _pan = new(-offset.X * Math.Cos(angle) + offset.Y * Math.Sin(angle), -offset.X * Math.Sin(angle) - offset.Y * Math.Cos(angle));
+                InvalidateVisual(); return;
+            }
+            left += source.Width * scale + _frame.Span * _zoom;
+        }
+    }
     /// <summary>视口变化后只请求可见帧，避免扫描目录。</summary>
     protected override async void OnSizeChanged(SizeChangedEventArgs e) { base.OnSizeChanged(e); await RefreshAsync(); }
     /// <summary>按下记录拖动起点，释放时才确认是否为翻页点击。</summary>
@@ -165,7 +189,11 @@ public sealed class ReaderView : Control, IDisposable
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e); e.Pointer.Capture(null);
-        if (!_dragged) GestureRequested?.Invoke(this, e.InitialPressMouseButton == MouseButton.Right ? "RightClick" : "LeftClick");
+        if (!_dragged)
+        {
+            var gesture = e.InitialPressMouseButton switch { MouseButton.Left => "LeftClick", MouseButton.Right => "RightClick", MouseButton.Middle => "MiddleClick", _ => null };
+            if (gesture is not null) GestureRequested?.Invoke(this, gesture);
+        }
         _pressed = null; _dragged = false;
     }
     /// <summary>释放当前需求和所有显示租约，晚到结果按 revision 拒绝。</summary>

@@ -3,7 +3,7 @@ using System.Text.Json;
 namespace NeeView;
 
 /// <summary>固定 Windows 命令元数据；暂未迁移命令保留名称和默认输入。</summary>
-public sealed record CommandDefinition(string Name, string Text, string Shortcut, string Source, string Stage);
+public sealed record CommandDefinition(string Name, string Text, string Shortcut, string Source, string Stage, string? MenuText = null);
 
 /// <summary>原命令表的 P1 登记，菜单和输入使用同一命令标识。</summary>
 public sealed class CommandTable
@@ -37,6 +37,11 @@ public sealed class CommandTable
         _actions["SetSortModeTimeStamp"] = () => operation.ApplySettingAsync(e => e.SortMode = PageSortMode.TimeStamp);
         _actions["SetSortModeSize"] = () => operation.ApplySettingAsync(e => e.SortMode = PageSortMode.Size);
         _actions["SetSortModeRandom"] = () => operation.ApplySettingAsync(e => e.SortMode = PageSortMode.Random);
+        _actions["SetSortModeTimeStampDescending"] = () => operation.ApplySettingAsync(e => e.SortMode = PageSortMode.TimeStampDescending);
+        _actions["SetSortModeSizeDescending"] = () => operation.ApplySettingAsync(e => e.SortMode = PageSortMode.SizeDescending);
+        // AutoRotate 的原判断仍在 PageFrameFactory；命令只切换原枚举。
+        foreach (var rotate in new[] { AutoRotateType.Left, AutoRotateType.Right, AutoRotateType.ForcedLeft, AutoRotateType.ForcedRight })
+            _actions["ToggleIsAutoRotate" + rotate] = () => operation.ApplySettingAsync(e => e.AutoRotate = e.AutoRotate == rotate ? AutoRotateType.None : rotate);
     }
     /// <summary>返回命令是否已迁移；不能用空实现冒充可执行命令。</summary>
     public bool IsAvailable(string name) => _actions.ContainsKey(name);

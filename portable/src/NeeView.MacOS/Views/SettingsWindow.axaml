@@ -1,13 +1,13 @@
-<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="NeeView.MacOS.Views.SettingsWindow" Width="800" Height="570" Title="选项" WindowStartupLocation="CenterOwner">
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="NeeView.MacOS.Views.SettingsWindow" Width="900" Height="620" Title="选项" x:CompileBindings="False" WindowStartupLocation="CenterOwner">
   <!-- 沿用原设置窗口左导航/搜索、右内容布局；高级页面保留迁移状态。 -->
   <Grid RowDefinitions="*,Auto" ColumnDefinitions="190,*">
     <Border Grid.Column="0" Classes="panel">
       <Grid RowDefinitions="Auto,*">
         <TextBox PlaceholderText="搜索设置" Margin="8" IsEnabled="False" ToolTip.Tip="完整设置搜索在 P2–P5 迁移" />
-        <ListBox Grid.Row="1" SelectedIndex="0"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="键鼠（P2）" IsEnabled="False" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
+        <ListBox Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
       </Grid>
     </Border>
-    <ScrollViewer Grid.Column="1">
+    <ScrollViewer x:Name="ReadingSettings" Grid.Column="1">
       <StackPanel Margin="24" Spacing="14">
         <TextBlock Text="书籍 / 阅读" FontSize="20" />
         <ComboBox x:Name="Scope" SelectedIndex="0" SelectionChanged="Scope_Changed"><ComboBoxItem Content="当前书籍" /><ComboBoxItem Content="默认阅读设置" /></ComboBox>
@@ -15,11 +15,18 @@
         <TextBlock Text="阅读方向" /><ComboBox x:Name="Order" SelectedIndex="0"><ComboBoxItem Content="从右向左" /><ComboBoxItem Content="从左向右" /></ComboBox>
         <CheckBox x:Name="Divide" Content="单页模式分割横向页面" /><CheckBox x:Name="Wide" Content="双页模式宽图独占一页" />
         <CheckBox x:Name="First" Content="首页单独显示" /><CheckBox x:Name="Last" Content="末页单独显示" />
-        <TextBlock x:Name="Message" TextWrapping="Wrap" />
+
       </StackPanel>
     </ScrollViewer>
+    <Grid x:Name="InputSettings" Grid.Column="1" RowDefinitions="Auto,Auto,*" Margin="16" IsVisible="False">
+      <TextBlock Text="命令 / 键鼠" FontSize="20" Margin="0,0,0,12" />
+      <TextBox Grid.Row="1" PlaceholderText="搜索命令" TextChanged="InputSearch_Changed" Margin="0,0,0,8" />
+      <ListBox x:Name="InputList" Grid.Row="2">
+        <ListBox.ItemTemplate><DataTemplate><Grid ColumnDefinitions="*,230" Margin="0,4"><StackPanel><TextBlock Text="{Binding Label}" /><TextBlock Text="{Binding Name}" FontSize="10" Opacity="0.6" /></StackPanel><TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" ToolTip.Tip="逗号分隔多个输入；空值解绑。Control 保留原值，Mac Command 使用 Meta。" /></Grid></DataTemplate></ListBox.ItemTemplate>
+      </ListBox>
+    </Grid>
     <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="16" Spacing="8">
-      <Button Content="取消" Click="Cancel_Click" /><Button Content="保存" Click="Save_Click" />
+      <TextBlock x:Name="Message" TextWrapping="Wrap" MaxWidth="560" VerticalAlignment="Center" /><Button Content="取消" Click="Cancel_Click" /><Button Content="保存" Click="Save_Click" />
     </StackPanel>
   </Grid>
 </Window>

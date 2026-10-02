@@ -10,9 +10,20 @@ public sealed class Config
     public BookConfig Book { get; set; } = new();
     public ViewConfig View { get; set; } = new();
     public PanelsConfig Panels { get; set; } = new();
+    public FilmStripConfig FilmStrip { get; set; } = new();
     public bool IsAddressBarEnabled { get; set; } = true;
     /// <summary>启动时装配唯一配置，读取前不初始化具体窗口。</summary>
     public static void SetCurrent(Config config) => Current = config;
+}
+
+/// <summary>来自原 FilmStripConfig 的胶片条显示与尺寸默认值；未迁入字段由原 JSON 保留。</summary>
+public sealed class FilmStripConfig
+{
+    public bool IsEnabled { get; set; }
+    public bool IsHideFilmStrip { get; set; }
+    public double ImageWidth { get; set; } = 96;
+    public bool IsVisibleNumber { get; set; }
+    public bool IsSelectedCenter { get; set; }
 }
 
 /// <summary>来自原 BookConfig 的分页参数及默认值。</summary>

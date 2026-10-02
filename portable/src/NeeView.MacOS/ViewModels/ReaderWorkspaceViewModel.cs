@@ -35,17 +35,34 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public bool LeftAutoHide => Config.Current.Panels.IsLeftAutoHide;
     public bool RightAutoHide => Config.Current.Panels.IsRightAutoHide;
     private bool _leftHovered, _rightHovered;
-    private bool _pageList;
-    public bool ShowPageList => _pageList;
-    public bool ShowFolderList => !_pageList;
-    public string LeftTitle => _pageList ? "页面列表" : "文件夹";
+    private string _leftPanel = "FolderPanel", _rightPanel = "FileInformationPanel";
+    public bool ShowPageList => _leftPanel == "PageListPanel";
+    public bool ShowFolderList => _leftPanel == "FolderPanel";
+    public bool ShowHistory => _leftPanel == "HistoryPanel";
+    public bool ShowInformation => _rightPanel == "FileInformationPanel";
+    public bool ShowBookmarks => _rightPanel == "BookmarkPanel";
+    public bool ShowNavigator => _rightPanel == "NavigatePanel";
+    public string LeftTitle => ShowPageList ? "页面列表" : ShowHistory ? "历史" : "文件夹";
+    public string RightTitle => ShowBookmarks ? "书签" : ShowNavigator ? "导航器" : "信息";
+    private string _historySearch = "";
+    public string HistorySearch { get => _historySearch; set { if (SetProperty(ref _historySearch, value)) OnPropertyChanged(nameof(History)); } }
+    public IReadOnlyList<HistoryEntry> History => SaveData.HistoryEntries.Where(e => e.Path.Contains(HistorySearch, StringComparison.CurrentCultureIgnoreCase)).ToArray();
+    public IReadOnlyList<BookmarkNode> Bookmarks => SaveData.BookmarkRoot.Children ?? [];
+    public bool IsBookmark => Operation.Book is { } book && SaveData.IsBookmark(book.Path);
+    public bool FilmStripVisible => Config.Current.FilmStrip.IsEnabled && (!Config.Current.FilmStrip.IsHideFilmStrip || _filmHovered) && Pages.Count > 0;
+    private bool _filmHovered;
     public event EventHandler? Refreshed;
     public event EventHandler? PanelsRefreshed;
 
     /// <summary>装配业务订阅；后台回报统一切 UI 线程。</summary>
-    public void Attach() { Operation.Changed += Operation_Changed; Refresh(); }
+    public void Attach() { Operation.Changed += Operation_Changed; SaveData.Changed += SaveData_Changed; Refresh(); }
     /// <summary>关闭窗口时解除订阅，避免旧窗口收到新书变化。</summary>
-    public void Detach() => Operation.Changed -= Operation_Changed;
+    public void Detach() { Operation.Changed -= Operation_Changed; SaveData.Changed -= SaveData_Changed; }
+    /// <summary>历史与书签回报只更新导航面板，不重新解码当前帧。</summary>
+    private void SaveData_Changed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() =>
+    {
+        OnPropertyChanged(nameof(History)); OnPropertyChanged(nameof(Bookmarks)); OnPropertyChanged(nameof(IsBookmark));
+    });
     /// <summary>界面只展示最新业务状态，排队回报不会携带旧书快照。</summary>
     private void Operation_Changed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(Refresh);
     /// <summary>刷新绑定；页面对象保持原身份，不创建另一套页面模型。</summary>
@@ -59,21 +76,26 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     /// <summary>切换已支持侧栏页面或显隐，业务阅读位置不变。</summary>
     public void SelectPanel(string name)
     {
-        if (name is "FolderPanel" or "PageListPanel")
+        if (name is "FolderPanel" or "PageListPanel" or "HistoryPanel")
         {
-            bool pageList = name == "PageListPanel";
-            Config.Current.Panels.IsLeftVisible = !Config.Current.Panels.IsLeftVisible || _pageList != pageList;
-            _pageList = pageList;
+            Config.Current.Panels.IsLeftVisible = !Config.Current.Panels.IsLeftVisible || _leftPanel != name;
+            _leftPanel = name;
         }
-        else Config.Current.Panels.IsRightVisible = !Config.Current.Panels.IsRightVisible;
+        else
+        {
+            Config.Current.Panels.IsRightVisible = !Config.Current.Panels.IsRightVisible || _rightPanel != name;
+            _rightPanel = name;
+        }
         RefreshPanels();
     }
     /// <summary>只通知侧栏绑定，不发布阅读刷新或重新申请图像。</summary>
     public void RefreshPanels()
     {
-        foreach (var name in new[] { nameof(LeftVisible), nameof(RightVisible), nameof(LeftAutoHide), nameof(RightAutoHide), nameof(ShowPageList), nameof(ShowFolderList), nameof(LeftTitle) }) OnPropertyChanged(name);
+        foreach (var name in new[] { nameof(LeftVisible), nameof(RightVisible), nameof(LeftAutoHide), nameof(RightAutoHide), nameof(ShowPageList), nameof(ShowFolderList), nameof(ShowHistory), nameof(LeftTitle), nameof(RightTitle), nameof(ShowBookmarks), nameof(ShowInformation), nameof(ShowNavigator), nameof(FilmStripVisible) }) OnPropertyChanged(name);
         PanelsRefreshed?.Invoke(this, EventArgs.Empty);
     }
     /// <summary>自动隐藏只改变窗口表现状态，不改变书籍和目录索引。</summary>
     public void Hover(bool left, bool value) { if (left) _leftHovered = value; else _rightHovered = value; RefreshPanels(); }
+    /// <summary>胶片条自动隐藏只改变表现，鼠标进入底栏后恢复。</summary>
+    public void HoverFilmStrip(bool value) { _filmHovered = value; OnPropertyChanged(nameof(FilmStripVisible)); }
 }
