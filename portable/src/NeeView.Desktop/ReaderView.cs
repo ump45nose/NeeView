@@ -92,7 +92,7 @@ public sealed class ReaderView : Control, IDisposable, IAsyncDisposable
         if (geometryChanged || snapshot.Options.Mode == ReaderMode.Paged && anchorChanged) Rebuild(true);
         else
         {
-            if (modeChanged || anchorChanged && snapshot.Anchor != _observed) ScrollRequested?.Invoke(_layout.RestoreY(snapshot.Anchor));
+            if (modeChanged || anchorChanged && snapshot.Anchor != _observed) RequestScrollY(_layout.RestoreY(snapshot.Anchor));
             UpdateDemands(); InvalidateVisual();
         }
     }
@@ -101,9 +101,11 @@ public sealed class ReaderView : Control, IDisposable, IAsyncDisposable
     {
         if (_disposed) return;
         var changed = Math.Abs(width - _viewportWidth) > 0.5 || Math.Abs(height - _viewportHeight) > 0.5;
+        // 程序恢复已预先记录目标坐标；宿主回报相同 offset 时不再从跨列可见项重写锚点。
+        var scrolled = Math.Abs(Math.Max(0, top) - _top) > 0.001;
         _viewportWidth = Math.Max(1, width); _viewportHeight = Math.Max(1, height); _top = Math.Max(0, top); _left = Math.Max(0, left);
         if (changed) Rebuild(true); else UpdateDemands();
-        if (observe && !_snapshot.Loading && _snapshot.Options.Mode != ReaderMode.Paged)
+        if (observe && scrolled && !changed && _layoutGeneration == _snapshot.Generation && !_snapshot.Loading && _snapshot.Options.Mode != ReaderMode.Paged)
         {
             var item = _layout.Visible(_top, _top + _viewportHeight).OrderBy(i => i.Bounds.Y).FirstOrDefault(i => i.Bounds.Bottom > _top);
             if (item is not null)
@@ -139,20 +141,22 @@ public sealed class ReaderView : Control, IDisposable, IAsyncDisposable
     {
         _layout = layout; _layoutGeneration = generation; Height = Math.Max(_viewportHeight, _layout.Height);
         Width = Math.Max(_viewportWidth, _layout.Items.Select(i => i.Bounds.X + i.Bounds.Width).DefaultIfEmpty(_viewportWidth).Max());
-        if (restore && _snapshot.Options.Mode != ReaderMode.Paged)
-        {
-            _top = Math.Clamp(_layout.RestoreY(_snapshot.Anchor), 0, Math.Max(0, _layout.Height - _viewportHeight));
-            ScrollRequested?.Invoke(_top);
-        }
-        else if (restore) { _top = 0; ScrollRequested?.Invoke(0); }
+        if (restore) RequestScrollY(_snapshot.Options.Mode == ReaderMode.Paged ? 0 : _layout.RestoreY(_snapshot.Anchor));
         if (_zoomFocus is { } focus && _layout.Items.FirstOrDefault(i => i.Page.Id == focus.Content) is { } focused)
         {
             _zoomFocus = null;
-            var x = Math.Max(0, focused.Bounds.X + focused.Bounds.Width * focus.X - focus.Screen.X);
-            _top = Math.Max(0, focused.Bounds.Y + focused.Bounds.Height * focus.Y - focus.Screen.Y);
+            var x = Math.Clamp(focused.Bounds.X + focused.Bounds.Width * focus.X - focus.Screen.X, 0, Math.Max(0, Width - _viewportWidth));
+            _top = Math.Clamp(focused.Bounds.Y + focused.Bounds.Height * focus.Y - focus.Screen.Y, 0, Math.Max(0, _layout.Height - _viewportHeight));
             PanRequested?.Invoke(x, _top);
         }
         UpdateDemands(); InvalidateVisual();
+    }
+    /// <summary>记录有效程序滚动目标并通知宿主；同值回报只更新显示，不覆盖阅读锚点。</summary>
+    /// <param name="top">希望恢复的纵向内容坐标，会裁剪到当前布局可滚动范围。</param>
+    private void RequestScrollY(double top)
+    {
+        _top = Math.Clamp(top, 0, Math.Max(0, _layout.Height - _viewportHeight));
+        ScrollRequested?.Invoke(_top);
     }
     /// <summary>输入目标倍数和内容坐标，缩放围绕指针命中的图片位置。</summary>
     public Task ZoomAtAsync(double zoom, Point point)

@@ -33,6 +33,40 @@ public static class TestAvaloniaBuilder
 }
 public sealed class UiTests
 {
+    /// <summary>程序恢复跨列锚点不能被当作用户滚动；真实滚动仍更新锚点并保留分类选择。</summary>
+    [AvaloniaFact]
+    public async Task ProgrammaticMasonryScrollKeepsAnchorAndUserScrollStillUpdatesIt()
+    {
+        await using var workspace = new TestWorkspace();
+        var directory = Path.Combine(workspace.Root, "mixed"); Directory.CreateDirectory(directory);
+        for (var number = 1; number <= 12; number++)
+            await File.WriteAllBytesAsync(Path.Combine(directory, $"{number:D3}.jpg"), [1], TestContext.Current.CancellationToken);
+        await using var session = workspace.Session();
+        await session.OpenAsync(new(directory), TestContext.Current.CancellationToken);
+        var pages = session.Snapshot.Index!.Pages.ToArray();
+        for (var index = 0; index < pages.Length; index++)
+            await session.ReportSizeAsync(pages[index].Id, index % 3 == 2 ? new(3840, 2160) : new(2160, 3840), session.Snapshot.Generation);
+        await session.SetOptionsAsync(session.Snapshot.Options with { Mode = ReaderMode.Masonry });
+        var anchor = new ReadingAnchor(pages[3].Id, 0, 0.25);
+        await session.LocateAsync(anchor, true);
+        await using var scheduler = new ImageScheduler(new FakeDecoder());
+        await using var viewer = new ReaderView(session, scheduler, new FakeDecoder());
+        var restored = new TaskCompletionSource<double>(TaskCreationOptions.RunContinuationsAsynchronously);
+        // 模拟宿主设置 ScrollViewer.Offset 后回报视口的真实事件链，不直接操作业务锚点。
+        viewer.ScrollRequested += top => { viewer.SetViewport(770, 600, top); restored.TrySetResult(top); };
+        viewer.SetViewport(770, 600, 0, false);
+        var offset = await restored.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+        await session.FlushAsync();
+        Assert.Equal(anchor, session.Snapshot.Anchor);
+
+        var userOffset = offset + 1000;
+        var visible = viewer.Layout.Visible(userOffset, userOffset + 600).OrderBy(item => item.Bounds.Y)
+            .First(item => item.Bounds.Bottom > userOffset);
+        viewer.SetViewport(770, 600, userOffset); await session.FlushAsync();
+        Assert.Equal(visible.Page.Id, session.Snapshot.Anchor!.Content);
+        Assert.NotEqual(anchor.Content, session.Snapshot.Anchor.Content);
+        Assert.Equal(anchor.Content, session.Snapshot.Selection);
+    }
     /// <summary>启动恢复读取晚到时，Finder/显式打开的新书不能被旧 LastSource 覆盖。</summary>
     [AvaloniaFact]
     public async Task ExplicitOpenWinsAgainstLateStartupRestore()
