@@ -129,7 +129,8 @@ public sealed class DockingScrollTests
             window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null); window.KeyRelease(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null); window.MouseUp(new(600, 400), MouseButton.Left);
             Assert.False(model.IsPanelDragging); Assert.Equal(2, model.Layout.Docks["Left"].Items[0].Count); Assert.Equal(0, refreshes);
             Config.Current.Panels.IsLeftAutoHide = false; model.RefreshPanels(); window.UpdateLayout();
-            var output = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../acceptance/p2-docking-layout.png"));
+            var phase = Environment.GetEnvironmentVariable("NEEVIEW_ACCEPTANCE_PHASE") ?? "p2-bookmark";
+            var output = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, $"../../../../../acceptance/{phase}-docking-layout.png"));
             using var image = new RenderTargetBitmap(new PixelSize(1200, 800)); image.Render(window); image.Save(output, PngBitmapEncoderOptions.Default);
         }
         finally { await window.PrepareShutdownAsync(); window.Close(); }

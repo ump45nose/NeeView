@@ -42,10 +42,12 @@ def main():
     parser.add_argument("--dotnet", default="dotnet")
     parser.add_argument("--macos-source", action="store_true", help="仅验证正式入口编译，需 macOS workload；不是应用构建")
     parser.add_argument("--macos", action="store_true", help="执行正式应用构建，需匹配的完整 Xcode")
-    parser.add_argument("--phase", choices=("p1", "p2", "p2-docking", "p2-selection", "p2-bookshelf"), default="p1", help="独立保存当前阶段的构建与测试证据")
+    parser.add_argument("--phase", choices=("p1", "p2", "p2-docking", "p2-selection", "p2-bookshelf", "p2-bookmark"), default="p1", help="独立保存当前阶段的构建与测试证据")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     env = os.environ.copy(); env.pop("DOTNET_ROOT", None)
+    # 测试截图使用当前节点标签，避免新一轮验证覆盖历史阶段证据。
+    env["NEEVIEW_ACCEPTANCE_PHASE"] = args.phase
     report = {"utc": datetime.now(timezone.utc).isoformat(), "steps": [], "scope": args.phase + " 原算法、资源、来源/导航及正式XAML Headless；不代表真机/Windows对照", "formal_app": "未执行"}
 
     def run(label, command):

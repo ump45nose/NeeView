@@ -38,7 +38,7 @@ public sealed partial class MainWindow : Window
         "LeftAutoHide", "RightAutoHide", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
-        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder"
+        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "RegisterBookmark"
     };
     /// <summary>由启动层接入原生事件；只消费主查看器区域，其余控件使用框架输入。</summary>
     public void AttachPlatformInput(IPlatformInput input)
@@ -77,6 +77,7 @@ public sealed partial class MainWindow : Window
         var slider = this.FindControl<Slider>("PageSliderView")!;
         slider.AddHandler(PointerPressedEvent, Slider_Pressed, RoutingStrategies.Tunnel);
         slider.AddHandler(PointerReleasedEvent, Slider_Released, RoutingStrategies.Tunnel, handledEventsToo: true);
+        AttachBookmarkInput();
         Closing += Window_Closing;
     }
     /// <summary>由唯一启动层传入已经装配的契约，不在控件中创建解码或存储实现。</summary>
@@ -170,7 +171,7 @@ public sealed partial class MainWindow : Window
     /// <summary>执行宿主命令或转交原阅读命令；错误显示给用户。</summary>
     public async Task ExecuteAsync(string name)
     {
-        if (_model is null) return;
+        if (_model is null || _preparing || _closedPrepared) return;
         try
         {
             switch (name)
@@ -219,6 +220,23 @@ public sealed partial class MainWindow : Window
                 case "HelpCommandList": await ShowCommandStatusAsync(); break;
                 case "ToggleBookmark":
                     if (_model.Operation.Book is { } marked) { await _model.Operation.SaveAsync(); await _model.SaveData.ToggleBookmarkAsync(marked); } break;
+                case "RegisterBookmark":
+                    if (_model.Operation.Book is { } register)
+                    {
+                        if (_preparing || _closedPrepared) break;
+                        var selected = _model.SelectedBookmark;
+                        var parent = selected?.IsFolder == true ? selected : selected is not null ? _model.SaveData.Bookmarks.ParentOf(selected) : null;
+                        parent ??= _model.SaveData.BookmarkRoot;
+                        var edit = new BookmarkPopupEdit(register.CreateMemento(), parent, selected);
+                        var choice = await new BookmarkRegistrationWindow(edit, _model.SaveData.BookmarkRoot, parent).ShowDialog<BookmarkRegistrationChoice?>(this);
+                        if (choice is not null && !_preparing && !_closedPrepared)
+                        {
+                            // 保存回滚会重建树容器；失败仍选中原节点，方便修正后重试。
+                            try { SelectBookmark(await _model.SaveData.ApplyBookmarkEditAsync(edit, choice.Parent, choice.Result)); }
+                            catch { if (selected is not null && _model.SaveData.BookmarkRoot.Walk().Contains(selected)) SelectBookmark(selected); throw; }
+                        }
+                    }
+                    break;
                 case "LoadRecentBook":
                     var recent = _model.SaveData.HistoryEntries.FirstOrDefault(e => e.Path != _model.Operation.Book?.Path);
                     if (recent is not null) await OpenAsync(recent.Path); break;
@@ -242,8 +260,17 @@ public sealed partial class MainWindow : Window
     {
         if (_preparing || _model is null) return;
         MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck);
+        // 书籍变化时立即发起同步；不能等图像解码后再覆盖用户已经进入的书架目录。
+        // 后续手动导航会由 Bookshelf 的原请求代次取消此次同步，图像与目录互不等待。
+        var folders = RefreshBookshelfAsync();
         await Viewer.RefreshAsync();
         await FilmStrip.RefreshAsync(); await NavigatorView.RefreshAsync();
+        await folders;
+    }
+    /// <summary>只在来源改变时同步书架，独立观察枚举失败和取消，不阻塞图像显示。</summary>
+    private async Task RefreshBookshelfAsync()
+    {
+        if (_preparing || _model is null) return;
         var book = _model.Operation.Book;
         if (book is null || ReferenceEquals(_folderBook, book)) return;
         _folderBook = book; _folders?.Cancel(); var pending = new CancellationTokenSource(); _folders = pending;
@@ -282,32 +309,60 @@ public sealed partial class MainWindow : Window
     }
     /// <summary>历史打开继续走原恢复策略，失败保持当前书籍。</summary>
     private async void History_DoubleTapped(object? sender, TappedEventArgs e) { if (sender is ListBox { SelectedItem: HistoryEntry entry }) await OpenAsync(entry.Path); }
-    /// <summary>文件夹保留展开交互，书籍节点双击打开。</summary>
-    private async void Bookmark_DoubleTapped(object? sender, TappedEventArgs e) { if (sender is TreeView { SelectedItem: BookmarkNode { IsFolder: false, Path: { } path } }) await OpenAsync(path); }
+    /// <summary>文件夹保留展开交互，只打开实际双击的书籍节点。</summary>
+    private async void Bookmark_DoubleTapped(object? sender, TappedEventArgs e)
+    {
+        // 展开箭头可能保持旧书籍选择；不能用 SelectedItem 将箭头双击误解释为重新打开书籍。
+        if (_preparing || _closedPrepared || e.Source is Visual source && source.GetVisualAncestors().Prepend(source).OfType<Button>().Any()) return;
+        if (BookmarkRow(e.Source)?.DataContext is BookmarkNode { IsFolder: false, Path: { } path }) await OpenAsync(path);
+    }
     /// <summary>在所选文件夹中创建节点；未选文件夹时使用根目录。</summary>
     private async void Bookmark_NewFolder(object? sender, RoutedEventArgs e)
     {
         if (_model is null) return;
         var parent = this.FindControl<TreeView>("BookmarkTree")!.SelectedItem as BookmarkNode;
         var name = await AskNameAsync("新建书签文件夹", "");
-        if (name is null) return;
-        try { await _model.SaveData.AddBookmarkFolderAsync(parent?.IsFolder == true ? parent : null, name); }
-        catch (Exception ex) { ShowError(ex.Message); }
+        if (name is null || _preparing || _closedPrepared) return;
+        try { SelectBookmark(await _model.SaveData.AddBookmarkFolderAsync(parent?.IsFolder == true ? parent : null, name)); }
+        catch (Exception ex) { if (parent is not null && _model.SaveData.BookmarkRoot.Walk().Contains(parent)) SelectBookmark(parent); ShowError(ex.Message); }
     }
     /// <summary>修改所选节点名称，取消不写入状态。</summary>
     private async void Bookmark_Rename(object? sender, RoutedEventArgs e)
     {
         if (_model is null || this.FindControl<TreeView>("BookmarkTree")!.SelectedItem is not BookmarkNode node) return;
         var name = await AskNameAsync("重命名书签", node.DisplayName);
-        if (name is null) return;
-        try { await _model.SaveData.RenameBookmarkAsync(node, name); } catch (Exception ex) { ShowError(ex.Message); }
+        if (name is null || _preparing || _closedPrepared) return;
+        try { SelectBookmark(await _model.SaveData.RenameBookmarkAsync(node, name)); }
+        catch (BookmarkMergeRequiredException merge)
+        {
+            // 合并预检回滚也会重建容器；取消确认后仍保留原节点及其展开祖先。
+            if (_model.SaveData.BookmarkRoot.Walk().Contains(node)) SelectBookmark(node);
+            if (!await ConfirmAsync("合并书签文件夹", $"合并到“{merge.Target.DisplayName}”？同名子文件夹会递归合并，名称和路径均相同的书签保留一份。", "合并")) return;
+            if (_preparing || _closedPrepared) return;
+            try { SelectBookmark(await _model.SaveData.RenameBookmarkAsync(node, name, confirmedTarget: merge.Target)); }
+            catch (Exception ex) { if (_model.SaveData.BookmarkRoot.Walk().Contains(node)) SelectBookmark(node); ShowError(ex.Message); }
+        }
+        catch (Exception ex) { if (_model.SaveData.BookmarkRoot.Walk().Contains(node)) SelectBookmark(node); ShowError(ex.Message); }
     }
     /// <summary>移除树记录；文件夹包含子项时明确确认范围。</summary>
     private async void Bookmark_Remove(object? sender, RoutedEventArgs e)
     {
-        if (_model is null || this.FindControl<TreeView>("BookmarkTree")!.SelectedItem is not BookmarkNode node) return;
-        if (!await ConfirmAsync("移除书签", $"移除“{node.DisplayName}”{(node.IsFolder ? "及其全部书签子项" : "")}？")) return;
-        try { await _model.SaveData.RemoveBookmarkAsync(node); } catch (Exception ex) { ShowError(ex.Message); }
+        if (_model is null) return;
+        var selected = this.FindControl<TreeView>("BookmarkTree")!.SelectedItems.OfType<BookmarkNode>().ToArray();
+        if (selected.Length == 0) return;
+        var message = selected.Length == 1 ? $"移除“{selected[0].DisplayName}”{(selected[0].IsFolder ? "及其全部书签子项" : "")}？" : $"移除选中的 {selected.Length} 项及文件夹内的全部书签？源文件不受影响。";
+        if (!await ConfirmAsync("移除书签", message)) return;
+        if (_preparing || _closedPrepared) return;
+        try { await _model.SaveData.RemoveBookmarksAsync(selected); }
+        catch (Exception ex)
+        {
+            if (!_preparing && !_closedPrepared)
+            {
+                var tree = this.FindControl<TreeView>("BookmarkTree")!; tree.SelectedItems.Clear();
+                foreach (var node in selected.Where(e => _model.SaveData.BookmarkRoot.Walk().Contains(e))) tree.SelectedItems.Add(node);
+            }
+            ShowError(ex.Message);
+        }
     }
     /// <summary>小型命名对话框仅返回用户文本，业务校验由 Engine 完成。</summary>
     private Task<string?> AskNameAsync(string title, string value)
@@ -316,12 +371,14 @@ public sealed partial class MainWindow : Window
         var dialog = new Window { Title = title, Width = 380, Height = 160, WindowStartupLocation = WindowStartupLocation.CenterOwner,
             Content = new StackPanel { Margin = new Thickness(16), Spacing = 12, Children = { input, new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 8, Children = { cancel, save } } } } };
         cancel.Click += (_, _) => dialog.Close(null); save.Click += (_, _) => { if (!string.IsNullOrWhiteSpace(input.Text)) dialog.Close(input.Text.Trim()); };
+        input.KeyDown += (_, e) => { if (e.Key == Key.Enter && !string.IsNullOrWhiteSpace(input.Text)) { e.Handled = true; dialog.Close(input.Text.Trim()); } };
+        dialog.Opened += (_, _) => { input.Focus(); input.SelectAll(); };
         return dialog.ShowDialog<string?>(this);
     }
     /// <summary>范围明确的确认对话框，关闭或取消返回 false。</summary>
-    private Task<bool> ConfirmAsync(string title, string message)
+    private Task<bool> ConfirmAsync(string title, string message, string acceptText = "移除")
     {
-        var cancel = new Button { Content = "取消" }; var accept = new Button { Content = "移除" };
+        var cancel = new Button { Content = "取消" }; var accept = new Button { Content = acceptText };
         var dialog = new Window { Title = title, Width = 380, Height = 160, WindowStartupLocation = WindowStartupLocation.CenterOwner,
             Content = new StackPanel { Margin = new Thickness(16), Spacing = 16, Children = { new TextBlock { Text = message, TextWrapping = Avalonia.Media.TextWrapping.Wrap }, new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 8, Children = { cancel, accept } } } } };
         cancel.Click += (_, _) => dialog.Close(false); accept.Click += (_, _) => dialog.Close(true);
@@ -471,7 +528,7 @@ public sealed partial class MainWindow : Window
         return new Window { Title = "命令迁移状态", Width = 680, Height = 600, Content = new ScrollViewer { Content = new TextBlock { Text = text, Margin = new Thickness(16) } } }.ShowDialog(this);
     }
     /// <summary>错误信息只改变表现，不覆盖当前阅读内容。</summary>
-    private void ShowError(string message) { if (!_preparing) this.FindControl<TextBlock>("StatusField")!.Text = message; }
+    private void ShowError(string message) { if (!_preparing && !_closedPrepared) this.FindControl<TextBlock>("StatusField")!.Text = message; }
     private void LeftRail_Entered(object? sender, PointerEventArgs e) => _model?.Hover(true, true);
     private void RightRail_Entered(object? sender, PointerEventArgs e) => _model?.Hover(false, true);
     /// <summary>延迟收起允许指针从图标栏进入相邻面板。</summary>
@@ -498,6 +555,7 @@ public sealed partial class MainWindow : Window
         try
         {
             _folders?.Cancel(); _sliderDragging = false;
+            CancelBookmarkDrag();
             if (_model is not null)
             {
                 var left = this.FindControl<Border>("LeftPanel")!.Bounds.Width;

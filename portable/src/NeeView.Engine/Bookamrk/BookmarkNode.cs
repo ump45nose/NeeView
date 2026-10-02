@@ -14,7 +14,8 @@ namespace NeeView;
         public string? Path { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? Color { get; set; }
+        public string? Color { get => _color; set => SetProperty(ref _color, value); }
+        private string? _color;
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public DateTime EntryTime { get; set; }

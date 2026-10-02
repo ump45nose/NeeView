@@ -50,15 +50,23 @@
             </ListBox>
           </Grid></Border>
       <Border Tag="FileInformationPanel"><ScrollViewer><TextBlock Text="{Binding Information}" TextWrapping="Wrap" Margin="10" /></ScrollViewer></Border>
-      <Border Tag="BookmarkPanel">          <Grid RowDefinitions="Auto,*">
-            <StackPanel Orientation="Horizontal" Spacing="4" Margin="8">
+      <Border Tag="BookmarkPanel">          <Grid RowDefinitions="Auto,*,Auto">
+            <WrapPanel Margin="8">
               <Button Content="★" ToolTip.Tip="切换当前书籍书签" Tag="ToggleBookmark" Click="Command_Click" />
-              <Button Content="新建" ToolTip.Tip="新建书签文件夹" Click="Bookmark_NewFolder" />
-              <Button Content="更名" Click="Bookmark_Rename" /><Button Content="移除" Click="Bookmark_Remove" />
-            </StackPanel>
-            <TreeView x:Name="BookmarkTree" Grid.Row="1" ItemsSource="{Binding Bookmarks}" DoubleTapped="Bookmark_DoubleTapped">
-              <TreeView.ItemTemplate><TreeDataTemplate ItemsSource="{Binding Children}"><TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Path}" /></TreeDataTemplate></TreeView.ItemTemplate>
+              <Button Content="添加" ToolTip.Tip="将当前书籍添加到所选文件夹" Tag="RegisterBookmark" Click="Command_Click" />
+              <Button Content="新建" IsEnabled="{Binding CanChooseBookmarkFolder}" ToolTip.Tip="新建书签文件夹" Click="Bookmark_NewFolder" />
+              <Button Content="更名" IsEnabled="{Binding IsSingleBookmarkSelection}" Click="Bookmark_Rename" /><Button Content="移除" Click="Bookmark_Remove" />
+              <Button Content="↑" IsEnabled="{Binding IsSingleBookmarkSelection}" Tag="-1" ToolTip.Tip="在同一文件夹上移" Click="Bookmark_Reorder" />
+              <Button Content="↓" IsEnabled="{Binding IsSingleBookmarkSelection}" Tag="1" ToolTip.Tip="在同一文件夹下移" Click="Bookmark_Reorder" />
+              <Button Content="移动…" IsEnabled="{Binding IsSingleBookmarkSelection}" Click="Bookmark_Move" /><Button Content="颜色…" IsEnabled="{Binding IsSingleBookmarkSelection}" Click="Bookmark_Color" />
+            </WrapPanel>
+            <TreeView x:Name="BookmarkTree" Grid.Row="1" ItemsSource="{Binding Bookmarks}" SelectionMode="Multiple" SelectedItem="{Binding SelectedBookmark, Mode=TwoWay}" DoubleTapped="Bookmark_DoubleTapped">
+              <TreeView.ItemTemplate><TreeDataTemplate ItemsSource="{Binding Children}"><StackPanel Orientation="Horizontal" Spacing="6"><TextBlock Text="■" IsVisible="{Binding IsFolder}" Foreground="{Binding Color, TargetNullValue='#8CA0AF'}" /><TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Path}" /></StackPanel></TreeDataTemplate></TreeView.ItemTemplate>
             </TreeView>
+            <StackPanel Grid.Row="2" Margin="8" Spacing="4">
+              <TextBlock x:Name="BookmarkDropHint" Text="拖到文件夹中间移入，行边缘调整顺序；空白移至根。" TextWrapping="Wrap" FontSize="10" Opacity="0.7" />
+              <Button Content="恢复上次移除" IsEnabled="{Binding CanRestoreBookmarks}" Click="Bookmark_Restore" />
+            </StackPanel>
           </Grid></Border>
       <Border Tag="NavigatePanel">          <Grid RowDefinitions="200,Auto">
             <local:ThumbnailView x:Name="Navigator" IsNavigator="True" />

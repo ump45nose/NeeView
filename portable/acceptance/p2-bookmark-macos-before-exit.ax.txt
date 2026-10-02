@@ -1,0 +1,132 @@
+Window: "漫画.cbz — NeeView", App: NeeView.
+0 standard window 漫画.cbz — NeeView, Secondary Actions: Raise
+	1 container WindowChrome, ID: AvaloniaWindowChrome
+	2 container
+		3 container Root
+			4 container
+				5 menu bar MenuBar
+					6 container
+						7 文件
+							8 container
+								9 unknown PART_Popup
+						10 显示
+							11 container
+								12 unknown PART_Popup
+						13 图像
+							14 container
+								15 unknown PART_Popup
+						16 跳转
+							17 container
+								18 unknown PART_Popup
+						19 页面
+							20 container
+								21 unknown PART_Popup
+						22 书籍
+							23 container
+								24 unknown PART_Popup
+						25 选项
+							26 container
+								27 unknown PART_Popup
+						28 帮助
+							29 container
+								30 unknown PART_Popup
+				31 text field (settable) Help: 打开图片、目录、ZIP / RAR / 7z, Value: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz, ID: AddressBar
+					32 container
+						33 container
+							34 scroll area PART_ScrollViewer
+								35 container
+			36 container SidePanelFrame
+				37 container LeftRailItems
+					38 button Avalonia.Controls.PathIcon, Help: 信息 / 页面列表（拖动可重排或组合）
+					39 button Avalonia.Controls.PathIcon, Help: 文件夹（拖动可重排或组合）
+					40 button Avalonia.Controls.PathIcon, Help: 历史（拖动可重排或组合）
+				41 container LeftDockHost
+					42 container
+						43 text 信息
+						44 scroll area
+							45 container
+								46 text 中文/003.png
+
+尺寸：1800 × 1000
+大小：11,296 字节
+
+来源：/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz
+
+					47 handle
+					48 container
+						49 text 页面列表
+						50 content list PageList
+							51 scroll area PART_ScrollViewer
+								52 container
+									53 container
+										54 row (selectable) 中文/001.png
+											55 text 中文/001.png
+										56 row (selectable) 中文/002.png
+											57 text 中文/002.png
+										58 row (selected) 中文/003.png
+											59 text 中文/003.png
+										60 row (selectable) 中文/004.png
+											61 text 中文/004.png
+										62 row (selectable) 中文/005.png
+											63 text 中文/005.png
+									64 scroll bar (settable, float) Value: 0, ID: PART_VerticalScrollBar
+										65 container
+											66 button Line up, ID: PART_LineUpButton
+											67 button Page up, ID: PART_PageUpButton
+											68 button Page down, ID: PART_PageDownButton
+											69 handle Position
+											70 button Line down, ID: PART_LineDownButton
+				71 handle
+				72 handle
+				73 container
+					74 text 书签
+					75 container
+						76 button ★, Help: 切换当前书籍书签
+						77 button 添加, Help: 将当前书籍添加到所选文件夹
+						78 button 新建, Help: 新建书签文件夹
+						79 button (disabled) 更名
+						80 button 移除
+						81 button (disabled) ↑, Help: 在同一文件夹上移
+						82 button (disabled) ↓, Help: 在同一文件夹下移
+						83 button (disabled) 移动…
+						84 button (disabled) 颜色…
+						85 outline BookmarkTree
+							86 scroll area
+								87 container
+									88 container
+										89 cell (selectable) 图片
+										90 cell (selectable)
+											91 container
+												92 container PART_Header
+													93 button Value: on, ID: PART_ExpandCollapseChevron
+													94 container
+														95 text ■
+														96 text P2Target
+												97 cell (selectable) P2Comic
+						98 text Value: 拖到文件夹中间移入，行边缘调整顺序；空白移至根。, ID: BookmarkDropHint
+						99 button 恢复上次移除
+				100 container RightRailItems
+					101 button Avalonia.Controls.PathIcon, Help: 导航器（拖动可重排或组合）
+					102 button Avalonia.Controls.PathIcon, Help: 图像效果（P5）（拖动可重排或组合）
+					103 button Avalonia.Controls.PathIcon, Help: 书签（拖动可重排或组合）
+					104 button Avalonia.Controls.PathIcon, Help: 播放列表（P5）（拖动可重排或组合）
+					105 button Avalonia.Controls.PathIcon, Help: 目标文件夹（P4）（拖动可重排或组合）
+			106 container
+				107 container DockPageSliderSocket
+					108 slider (settable, float) Value: 2, ID: PageSliderView
+						109 container PART_Track
+							110 button PART_DecreaseButton
+								111 container
+							112 button PART_IncreaseButton
+								113 container
+							114 handle thumb
+					115 text 3 / 6
+				116 text Value: 中文/003.png  ·  单页  ·  从右向左, ID: StatusField
+	117 close button
+	118 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	119 minimize button
+	120 text 漫画.cbz — NeeView
+121 menu bar
+	122 NeeView
+
+The focused UI element is 80 button 移除

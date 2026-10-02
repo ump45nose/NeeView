@@ -10,7 +10,10 @@ public sealed class SaveData(string directory)
     private JsonObject _setting = new();
     private JsonObject _history = new();
     private JsonObject _bookmarks = new();
-    public BookmarkNode BookmarkRoot { get; private set; } = new() { Children = [] };
+    public BookmarkCollection Bookmarks { get; private set; } = new(new() { Children = [] });
+    public BookmarkNode BookmarkRoot => Bookmarks.Items;
+    private BookmarkNodeMemento[] _removedBookmarks = [];
+    public bool CanRestoreBookmarks => _removedBookmarks.Any(e => BookmarkRoot.Walk().Contains(e.Parent));
     public IReadOnlyList<HistoryEntry> HistoryEntries { get; private set; } = [];
     public event EventHandler? Changed;
     public string DirectoryPath { get; } = directory;
@@ -23,7 +26,8 @@ public sealed class SaveData(string directory)
         _setting = await ReadAsync("UserSetting.json", token);
         _history = await ReadAsync("History.json", token);
         _bookmarks = await ReadAsync("Bookmark.json", token);
-        BookmarkRoot = _bookmarks["Nodes"]?.Deserialize<BookmarkNode>(Options) ?? new() { Children = [] };
+        Bookmarks = new(_bookmarks["Nodes"]?.Deserialize<BookmarkNode>(Options) ?? new() { Children = [] });
+        _removedBookmarks = [];
         if (!BookmarkRoot.IsFolder) throw new JsonException("Bookmark.Nodes 必须是根文件夹。");
         RefreshHistory();
         var raw = _setting["Config"] as JsonObject;
@@ -98,40 +102,107 @@ public sealed class SaveData(string directory)
         }
     }, token);
 
-    /// <summary>在指定原树文件夹中添加命名目录；空名称及过期节点返回错误。</summary>
-    public Task AddBookmarkFolderAsync(BookmarkNode? parent, string name, CancellationToken token = default) => EditBookmarkAsync(() =>
+    /// <summary>在所选文件夹新建目录，沿用原名称校验及同名递增规则。</summary>
+    /// <returns>保存成功的新节点。</returns>
+    public Task<BookmarkNode> AddBookmarkFolderAsync(BookmarkNode? parent, string name, CancellationToken token = default) =>
+        EditBookmarkAsync(() => Bookmarks.AddNewFolder(parent ?? BookmarkRoot, name), token);
+
+    /// <summary>将当前书籍注册到所选文件夹；同父路径重复时保留原节点。</summary>
+    public Task<BookmarkNode> RegisterBookmarkAsync(Book book, BookmarkNode? parent = null, CancellationToken token = default) =>
+        EditBookmarkAsync(() => Bookmarks.AddTo(parent ?? BookmarkRoot, book.CreateMemento()), token);
+
+    /// <summary>原登记弹窗 Add/Edit/Remove 在一次保存事务执行；弹窗取消不调用此入口。</summary>
+    /// <returns>实际保留节点；删除或没有目标时为 null。</returns>
+    public Task<BookmarkNode?> ApplyBookmarkEditAsync(BookmarkPopupEdit edit, BookmarkNode parent, BookmarkPopupResult result, CancellationToken token = default) => EditBookmarkAsync(() =>
     {
-        parent ??= BookmarkRoot;
         if (!parent.IsFolder || !BookmarkRoot.Walk().Contains(parent)) throw new InvalidOperationException("书签文件夹已失效。");
-        parent.Children!.Add(new() { Name = ValidateName(name), EntryTime = DateTime.Now, Children = [] });
+        switch (result)
+        {
+            case BookmarkPopupResult.Add:
+                var existing = parent.Children!.FirstOrDefault(e => !e.IsFolder && e.Path == edit.Memento.Path);
+                if (existing is not null) return existing;
+                var added = Bookmarks.AddTo(parent, edit.Memento); return Bookmarks.Rename(added, edit.Name, null);
+            case BookmarkPopupResult.Edit:
+                if (edit.Node is null) return null;
+                var moved = Bookmarks.MoveToChild(edit.Node, parent) ?? edit.Node;
+                return Bookmarks.Rename(moved, edit.Name, null);
+            case BookmarkPopupResult.Remove:
+                var node = parent.Children!.FirstOrDefault(e => !e.IsFolder && e.Path == edit.Memento.Path);
+                if (node is not null) _removedBookmarks = [Bookmarks.Remove(node)];
+                return null;
+            case BookmarkPopupResult.None: return null;
+            default: throw new ArgumentOutOfRangeException(nameof(result));
+        }
     }, token);
 
     /// <summary>重命名书籍或文件夹，保留 Path/Page/Props、颜色及未知字段。</summary>
-    public Task RenameBookmarkAsync(BookmarkNode node, string name, CancellationToken token = default) => EditBookmarkAsync(() =>
+    /// <param name="confirmedTarget">用户确认的合并目标；目标变化时必须重新确认。</param>
+    public Task<BookmarkNode> RenameBookmarkAsync(BookmarkNode node, string name, CancellationToken token = default, BookmarkNode? confirmedTarget = null) =>
+        EditBookmarkAsync(() => Bookmarks.Rename(node, name, confirmedTarget), token);
+
+    /// <summary>按原规则移入文件夹或移动到最终索引；失败恢复原层级和节点引用。</summary>
+    /// <param name="index">null 表示 MoveToChild；数字表示原 Move 的顺序插入。</param>
+    public Task<BookmarkNode?> MoveBookmarkAsync(BookmarkNode node, BookmarkNode parent, int? index = null, CancellationToken token = default) =>
+        EditBookmarkAsync(() => index.HasValue ? Bookmarks.Move(node, parent, index.Value) : Bookmarks.MoveToChild(node, parent), token);
+
+    /// <summary>仅为文件夹设置原 JSON 颜色，空值恢复默认；不引入界面颜色类型。</summary>
+    public Task SetBookmarkColorAsync(BookmarkNode node, string? color, CancellationToken token = default) => EditBookmarkAsync(() =>
     {
-        if (ReferenceEquals(node, BookmarkRoot) || !BookmarkRoot.Walk().Contains(node)) throw new InvalidOperationException("书签节点已失效。");
-        node.Name = ValidateName(name);
+        if (!node.IsFolder || !BookmarkRoot.Walk().Contains(node)) throw new InvalidOperationException("只能设置书签文件夹颜色。");
+        if (color is not null && (color.Length != 9 || color[0] != '#' || !uint.TryParse(color.AsSpan(1), System.Globalization.NumberStyles.HexNumber, null, out _)))
+            throw new ArgumentException("颜色必须为 #AARRGGBB。");
+        node.Color = color;
     }, token);
 
     /// <summary>删除指定书签节点或文件夹，仅更改书签记录，不删除源文件。</summary>
-    public Task RemoveBookmarkAsync(BookmarkNode node, CancellationToken token = default) => EditBookmarkAsync(() => RemoveNode(node), token);
+    public Task RemoveBookmarkAsync(BookmarkNode node, CancellationToken token = default) => RemoveBookmarksAsync([node], token);
+
+    /// <summary>一次事务移除选中批次；选中父级时子级由父级携带，恢复顺序沿用原逆序记录。</summary>
+    public Task RemoveBookmarksAsync(IEnumerable<BookmarkNode> nodes, CancellationToken token = default)
+    {
+        var selected = nodes.Distinct().ToArray();
+        return EditBookmarkAsync(() =>
+        {
+            // 保存失败不会替换上一批可恢复记录；单项也提供显式恢复，作为 Mac 表现扩展。
+            if (selected.Length == 0) return;
+            foreach (var node in selected) if (Bookmarks.ParentOf(node) is null) throw new InvalidOperationException("书签节点已失效。");
+            _removedBookmarks = selected.Where(node => !selected.Any(parent => parent != node && parent.Walk().Contains(node)))
+                .Select(Bookmarks.Remove).ToArray();
+        }, token);
+    }
+
+    /// <summary>按原逆序 memento 恢复上一批删除；原父级失效时不创建新路径。</summary>
+    /// <returns>保存成功后的实际恢复节点。</returns>
+    public Task<BookmarkNode?> RestoreBookmarksAsync(CancellationToken token = default) => EditBookmarkAsync(() =>
+    {
+        BookmarkNode? restored = null;
+        foreach (var memento in _removedBookmarks.Reverse()) if (Bookmarks.Restore(memento)) restored = memento.Node;
+        _removedBookmarks = []; return restored;
+    }, token);
 
     /// <summary>统一树编辑与文件提交；失败恢复编辑前数据供用户重试。</summary>
-    private async Task EditBookmarkAsync(Action edit, CancellationToken token)
+    private Task EditBookmarkAsync(Action edit, CancellationToken token) => EditBookmarkAsync(() => { edit(); return true; }, token);
+
+    /// <summary>串行执行树操作与三文件事务，返回值只在提交成功后交给调用方。</summary>
+    private async Task<T> EditBookmarkAsync<T>(Func<T> edit, CancellationToken token)
     {
         await _gate.WaitAsync(token);
         // 保留节点身份，失败后树控件的选择和调用方持有的节点仍可用于重试。
-        var previous = BookmarkRoot.Walk().Select(node => (Node: node, node.Name, Children: node.Children?.ToArray())).ToArray();
-        try { edit(); await WritePairAsync(token); }
+        var previous = BookmarkRoot.Walk().Concat(_removedBookmarks.SelectMany(e => e.Node.Walk())).Distinct()
+            .Select(node => (Node: node, node.Name, node.Color, Children: node.Children?.ToArray())).ToArray();
+        var removed = _removedBookmarks;
+        try { var result = edit(); await WritePairAsync(token); return result; }
         catch
         {
             foreach (var snapshot in previous)
             {
                 snapshot.Node.Name = snapshot.Name;
+                snapshot.Node.Color = snapshot.Color;
                 if (snapshot.Children is null) continue;
                 snapshot.Node.Children!.Clear();
                 foreach (var child in snapshot.Children) snapshot.Node.Children.Add(child);
             }
+            _removedBookmarks = removed;
             throw;
         }
         finally { _gate.Release(); Changed?.Invoke(this, EventArgs.Empty); }
@@ -139,12 +210,8 @@ public sealed class SaveData(string directory)
     /// <summary>定位父节点后移除，禁止移除根目录或不属于当前树的旧节点。</summary>
     private void RemoveNode(BookmarkNode node)
     {
-        var parent = BookmarkRoot.Walk().FirstOrDefault(e => e.Children?.Contains(node) == true);
-        if (parent is null) throw new InvalidOperationException("书签节点已失效。");
-        parent.Children!.Remove(node);
+        Bookmarks.Remove(node);
     }
-    /// <summary>统一命名校验，返回去除首尾空白的有效名称。</summary>
-    private static string ValidateName(string name) => string.IsNullOrWhiteSpace(name) ? throw new ArgumentException("名称不能为空。") : name.Trim();
 
     /// <summary>生成按访问时间倒序的只读历史；未知字段仍保留在权威 JSON 中。</summary>
     private void RefreshHistory() => HistoryEntries = (_history["Items"] as JsonArray)?.OfType<JsonObject>()

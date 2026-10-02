@@ -629,7 +629,7 @@
     "Text": "显示书签",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/FocusBookmarkListCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "待 P2：原书架书签位置与目录树互联；不得替换为聚焦独立书签树",
     "MenuText": "书签面板"
   },
   {
@@ -1411,7 +1411,7 @@
     "Text": "注册书签",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/RegisterBookmarkCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 第五批宿主适配；登记字段/动作接入，原Popup/标签/树选择器待迁"
   },
   {
     "Name": "NextPlaylist",

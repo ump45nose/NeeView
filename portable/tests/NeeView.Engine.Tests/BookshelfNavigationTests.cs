@@ -202,7 +202,8 @@ public sealed class BookshelfNavigationTests
             await operation.SaveAsync();
             using var screenshot = window.CaptureRenderedFrame(); Assert.NotNull(screenshot);
             var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../"));
-            screenshot!.Save(Path.Combine(root, "acceptance/p2-bookshelf-reading-layout.png"), PngBitmapEncoderOptions.Default);
+            var phase = Environment.GetEnvironmentVariable("NEEVIEW_ACCEPTANCE_PHASE") ?? "p2-bookmark";
+            screenshot!.Save(Path.Combine(root, $"acceptance/{phase}-reading-layout.png"), PngBitmapEncoderOptions.Default);
         }
         finally { await window.PrepareShutdownAsync(); window.Close(); }
     }

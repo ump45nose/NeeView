@@ -1,6 +1,6 @@
 # 完整命令迁移表
 
-固定基线 235 个实例；数量是登记清单，不代表功能覆盖率。当前包含 P1 与 P2 四批增量，阶段标记仅说明执行入口已接入，完整参数/手势及交互范围见验收记录。未迁入命令保留原菜单节点、键位和参数，禁用占位。原复杂手势可以原样保存，不意味着其执行已迁入。
+固定基线 235 个实例；数量是登记清单，不代表功能覆盖率。当前包含 P1 与 P2 五批增量，阶段标记仅说明执行入口已接入，完整参数/手势及交互范围见验收记录。未迁入命令保留原菜单节点、键位和参数，禁用占位。原复杂手势可以原样保存，不意味着其执行已迁入。
 
 | 原命令 | 文案 | 默认输入 | 当前实现 | 原出处 |
 |---|---|---|---|---|
@@ -86,7 +86,7 @@
 | FocusBookmarkSearchBox | 聚焦到书签搜索框 |  | 待 P2–P5 | NeeView/Command/Commands/FocusBookmarkSearchBoxCommand.cs |
 | FocusPageListSearchBox | 聚焦到页面列表搜索框 |  | 待 P2–P5 | NeeView/Command/Commands/FocusPageListSearchBoxCommand.cs |
 | FocusHistorySearchBox | 聚焦到历史记录搜索框 |  | 待 P2–P5 | NeeView/Command/Commands/FocusHistorySearchBoxCommand.cs |
-| FocusBookmarkList | 显示书签 |  | 待 P2–P5 | NeeView/Command/Commands/FocusBookmarkListCommand.cs |
+| FocusBookmarkList | 显示书签 |  | 待 P2：书架书签位置/目录树互联 | NeeView/Command/Commands/FocusBookmarkListCommand.cs |
 | FocusMainView | 聚焦到主视图 |  | 待 P2–P5 | NeeView/Command/Commands/FocusMainViewCommand.cs |
 | ToggleVisibleFilmStrip | 显示/隐藏幻灯条 |  | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleFilmStripCommand.cs |
 | ToggleHideFilmStrip | 启用/禁用自动隐藏幻灯条 |  | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleHideFilmStripCommand.cs |
@@ -195,7 +195,7 @@
 | SetSortModeRandom | 随机 |  | P1 Engine | NeeView/Command/Commands/SetSortModeRandomCommand.cs |
 | SetDefaultPageSetting | 重置页面设置 |  | 待 P2–P5 | NeeView/Command/Commands/SetDefaultPageSettingCommand.cs |
 | ToggleBookmark | 添加/删除书签 | Ctrl+D | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleBookmarkCommand.cs |
-| RegisterBookmark | 注册书签 |  | 待 P2–P5 | NeeView/Command/Commands/RegisterBookmarkCommand.cs |
+| RegisterBookmark | 注册书签 |  | P2 第五批宿主适配；完整范围见书签契约 | NeeView/Command/Commands/RegisterBookmarkCommand.cs |
 | NextPlaylist | 下一播放列表 |  | 待 P2–P5 | NeeView/Command/Commands/NextPlaylistCommand.cs |
 | PrevPlaylist | 上一个播放列表 |  | 待 P2–P5 | NeeView/Command/Commands/PrevPlaylistCommand.cs |
 | TogglePlaylistItem | 添加/删除播放列表项目 | Ctrl+M | 待 P2–P5 | NeeView/Command/Commands/TogglePlaylistItemCommand.cs |

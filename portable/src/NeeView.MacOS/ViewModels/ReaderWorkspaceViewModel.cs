@@ -66,6 +66,17 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public string HistorySearch { get => _historySearch; set { if (SetProperty(ref _historySearch, value)) OnPropertyChanged(nameof(History)); } }
     public IReadOnlyList<HistoryEntry> History => SaveData.HistoryEntries.Where(e => e.Path.Contains(HistorySearch, StringComparison.CurrentCultureIgnoreCase)).ToArray();
     public IReadOnlyList<BookmarkNode> Bookmarks => SaveData.BookmarkRoot.Children ?? [];
+    private BookmarkNode? _selectedBookmark;
+    public BookmarkNode? SelectedBookmark { get => _selectedBookmark; set => SetProperty(ref _selectedBookmark, value); }
+    public bool CanRestoreBookmarks => SaveData.CanRestoreBookmarks;
+    private int _bookmarkSelectionCount;
+    public int BookmarkSelectionCount
+    {
+        get => _bookmarkSelectionCount;
+        set { if (SetProperty(ref _bookmarkSelectionCount, value)) { OnPropertyChanged(nameof(IsSingleBookmarkSelection)); OnPropertyChanged(nameof(CanChooseBookmarkFolder)); } }
+    }
+    public bool IsSingleBookmarkSelection => BookmarkSelectionCount == 1;
+    public bool CanChooseBookmarkFolder => BookmarkSelectionCount <= 1;
     public bool IsBookmark => Operation.Book is { } book && SaveData.IsBookmark(book.Path);
     public bool FilmStripVisible => Config.Current.FilmStrip.IsEnabled && (!Config.Current.FilmStrip.IsHideFilmStrip || _filmHovered) && Pages.Count > 0;
     private bool _filmHovered;
@@ -97,7 +108,8 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     /// <summary>历史与书签回报只更新导航面板，不重新解码当前帧。</summary>
     private void SaveData_Changed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() =>
     {
-        OnPropertyChanged(nameof(History)); OnPropertyChanged(nameof(Bookmarks)); OnPropertyChanged(nameof(IsBookmark));
+        OnPropertyChanged(nameof(History)); OnPropertyChanged(nameof(Bookmarks)); OnPropertyChanged(nameof(IsBookmark)); OnPropertyChanged(nameof(CanRestoreBookmarks));
+        if (SelectedBookmark is not null && !SaveData.BookmarkRoot.Walk().Contains(SelectedBookmark)) SelectedBookmark = null;
     });
     /// <summary>界面只展示最新业务状态，排队回报不会携带旧书快照。</summary>
     private void Operation_Changed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(Refresh);

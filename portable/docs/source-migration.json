@@ -416,6 +416,60 @@
       "target": "src/NeeView.Backends/Content/ArchiveFactory.cs",
       "sha256": "0fd03cb96f291ac5c95c56ad9d0996213be1b4039f646f10a29de5ae8a56d5fa",
       "status": "原普通目录/支持归档候选及元数据适配，快捷方式/媒体/播放列表/分卷过滤未迁"
+    },
+    {
+      "source": "NeeView/Bookamrk/BookmarkCollection.cs",
+      "target": "src/NeeView.Engine/Bookamrk/BookmarkCollection.cs",
+      "sha256": "6f7832de6843494619f3533cd5dfd14776d64ea6f1f3d763d3da492d92d3fd57",
+      "status": "第五批迁入AddNewFolder/Move/MoveToChild/Merge/Restore，沿用JSON节点；循环移入/同父无操作返回null，过期节点报错"
+    },
+    {
+      "source": "NeeView/Bookamrk/BookmarkCollectionService.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.cs",
+      "sha256": "1eb2a63aff60c1596e1bcfdca9c1b365c1d1e23f69aa7011b49b291b13ec86ee",
+      "status": "第五批同父路径去重、重命名合并确认、仅文件夹颜色和逆序删除恢复；对话框在Mac，提交采用既有三JSON事务"
+    },
+    {
+      "source": "NeeView/Bookamrk/Bookmark.cs",
+      "target": "src/NeeView.Engine/Bookamrk/BookmarkCollection.cs",
+      "sha256": "15064b358e3795527399a570c1163fed7b29e1c10978f9a02808722c09b39d40",
+      "status": "保留Name+Path判等与默认名称；BookMemento读取仍共享History，未完整迁入Unit模型"
+    },
+    {
+      "source": "NeeView/Bookamrk/BookmarkFolder.cs",
+      "target": "src/NeeView.Engine/Bookamrk/BookmarkCollection.cs",
+      "sha256": "8d0462c1f05fcb5c6fea784d6d2bb008e512431d8baba80b8eb512c81eb9453c",
+      "status": "保留同名文件夹判等、EntryTime/Color；Color使用原字符串"
+    },
+    {
+      "source": "NeeView/Bookamrk/BookmarkTools.cs",
+      "target": "src/NeeView.Engine/Bookamrk/BookmarkCollection.cs",
+      "sha256": "fa533bbafa8b95021b99a4fb3998cebf07dc25edc220a922b75f09cb005cf7e5",
+      "status": "迁入名称trim与斜线替换；WPF属性窗口未迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Collections/Generic/TreeListNode.cs",
+      "target": "src/NeeView.Engine/Bookamrk/BookmarkCollection.cs",
+      "sha256": "5f34e109c8a175d725056b998a453611ff5e84aa302d3423625980a7e70a585f",
+      "status": "仅参考CloneChildren列表快照语义；沿用现有BookmarkNode/ObservableCollection，不新增通用树框架"
+    },
+    {
+      "source": "NeeView/AddressBar/BookmarkPopupEdit.cs",
+      "target": "src/NeeView.Engine/Bookamrk/BookmarkPopupEdit.cs",
+      "sha256": "ef02d15f9b407adf92616fbe3384247dcb5b848f1929bb7d983170d7422997c8",
+      "status": "迁入Name/同父查找/Edit/Add/Remove；异步保存至既有SaveData，合并后对真实保留节点操作"
+    },
+    {
+      "source": "NeeView/Command/Commands/RegisterBookmarkCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml.cs",
+      "sha256": "6f91fddbe011b7546c33626f2c14e6764d9f423f7e1a312d0f229eb4e2abdcdc",
+      "status": "打开名称及目标选择的登记窗口，取消不修改；原地址栏Popup宿主、标签与折叠树选择器仍待迁"
+    },
+    {
+      "source": "NeeView/Command/Commands/FocusBookmarkListCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml.cs",
+      "sha256": "70b6bfd3fe04040220aa70462903e8a15ca10b276c3e1409e11e0b16adda23ab",
+      "status": "核对原命令进入Bookshelf书签Query位置及目录树互联；当前保留禁用占位，不替换成独立书签面板聚焦"
     }
   ],
   "rule_references": [
@@ -516,6 +570,12 @@
       "target": "src/NeeView.Engine/Command/command-manifest.json",
       "sha256": "499108d4cf3b1b9c95dfc52eb4f53a128b73a364285665c5289b46895da5eb52",
       "status": "P2按原shared引用解析中文命令名与Menu文案，补齐此前只读直译遗漏"
+    },
+    {
+      "source": "NeeView/AddressBar/BookmarkPopupContent.xaml",
+      "target": "src/NeeView.MacOS/Views/BookmarkRegistrationWindow.axaml",
+      "sha256": "f2cb312106eec18cbbb60968275e2c5c8d5ff90260d3097233fa1897e857b8f8",
+      "status": "第五批转换名称/文件夹/完成-添加-移除布局；当前独立模态宿主，原标签、折叠树和地址栏Popup定位待迁"
     }
   ],
   "backend_reuse": [

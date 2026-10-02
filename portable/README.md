@@ -1,6 +1,6 @@
 # NeeView Mac
 
-基于 `ump45nose/NeeView` 46.3 分类 fork，独立维护 Mac 源码。保留原阅读/设置算法、命令名、JSON与窗口区域，集中替换WPF/Windows依赖。当前完成P2第四批可运行增量，P2尚未整体完成；原Windows工程保持不变作为固定参考。
+基于 `ump45nose/NeeView` 46.3 分类 fork，独立维护 Mac 源码。保留原阅读/设置算法、命令名、JSON与窗口区域，集中替换WPF/Windows依赖。当前实施P2第五批书签增量，P2尚未整体完成；原Windows工程保持不变作为固定参考。
 
 [整体架构](docs/architecture.md) · [前端边界](docs/frontend-boundaries.md) · [源码出处](docs/source-migration.json) · [命令表](docs/command-migration.md) · [布局表](docs/layout-migration.md) · [行为对照](docs/behavior-baseline.md) · [阶段验收](acceptance/stages.md)
 
@@ -14,7 +14,8 @@
 - P2首批：完整八组菜单及禁用占位、普通/固实RAR与7z、历史/书签树、可见胶片条/导航器、全部原命令键位编辑与AppKit手势桥接。
 - P2第二/三批：原侧栏拖拽组合/拆组、布局比例恢复、原NScroll滚动翻页、共享页选择/滑条联动、胶片条详情/三滚轮、指定页/步长与两种导航历史。
 - P2第四批：原普通书架目录/归档混合列表、默认排序及目录分组、独立浏览/同步/刷新、前后书阅读恢复与文件夹页分组导航。
-- 每目录参数、树/封面、真实Folder页/父书定位、完整书签/输入/标记等仍待迁；连续/瀑布流、fork分类、完整导入及高级内容待后续阶段。
+- P2第五批：原书签移动/递归合并、同名确认、颜色、登记编辑、批次删除/恢复；原JSON和节点引用保持。
+- 每目录参数、树/封面、真实Folder页/父书定位、完整书签导航/搜索/输入/标记等仍待迁；连续/瀑布流、fork分类、完整导入及高级内容待后续阶段。
 
 ## 开发与验证
 
@@ -23,13 +24,13 @@
 ```sh
 cd portable
 python3 scripts/validate.py --dotnet dotnet
-python3 scripts/validate.py --dotnet dotnet --phase p2-bookshelf --macos-source --macos
+python3 scripts/validate.py --dotnet dotnet --phase p2-bookmark --macos-source --macos
 dotnet run --project src/NeeView.MacOS/NeeView.MacOS.csproj -- /path/to/images-or-book.cbz
 ```
 
 本机隔离SDK为 `/Users/yuwk/.local/share/neeview-dotnet/dotnet`；PATH命中旧版本时传入该路径，脚本清除不匹配DOTNET_ROOT，不改系统SDK配置。
 
-validate串行执行Engine构建、原算法/正式XAML/真实来源/解码/资源测试。`--macos-source`是正式入口Library编译检查，**不产生可运行应用验收**；`--macos`是默认正式应用构建。结果按--phase分别保存，本批为acceptance/p2-bookshelf-validation.json，保留前批证据。默认bin/obj，失败不换输出目录。
+validate串行执行Engine构建、原算法/正式XAML/真实来源/解码/资源测试。`--macos-source`是正式入口Library编译检查，**不产生可运行应用验收**；`--macos`是默认正式应用构建。结果按--phase分别保存，本批为acceptance/p2-bookmark-validation.json，保留前批证据。默认bin/obj，失败不换输出目录。
 
 本机已安装Xcode27.0，正式.app构建与本地ad-hoc签名校验通过；目录/中文CBZ、原分页快捷键、窗口关闭重开、完整退出恢复与系统明确打开已完成真机验证，见[运行记录](acceptance/p1-macos-runtime.md)。最终开发应用位于`src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app`；RID子目录中的.app是SDK中间产物。CI只运行P1模块测试，未推送或远端执行。
 
@@ -50,6 +51,6 @@ python3 scripts/package_macos.py --dotnet dotnet --sign 'Developer ID Applicatio
 
 只发布正式ARM64.app，先要求完整Xcode。签名公证由用户环境凭据提供，脚本不创建/换号/改全局配置。依赖清单取实际发布输出并保留许可。P5才执行正式发布。
 
-78项自动测试、正式构建与本地签名输出见本批阶段记录；正式运行截图与Headless截图分别留证。组合/比例、页选择/历史、书架/排序保存、前后书及章节跳页已进行正式应用合成输入验收；Finder双击/拖放、全部菜单/原生对话框、真人触控板/IME/多屏/NAS、完整显示性能、Windows动态对照和用户新增交互验收仍需分别执行（总体布局已获用户认可）。旧macos-ui-2026-10-02.md和benchmark记录仅保留为重写方案历史，不作为本轮迁移通过证据。
+第四批78项自动测试保持历史证据；第五批构建/测试/运行状态见本批阶段记录；正式运行截图与Headless截图分别留证。组合/比例、页选择/历史、书架/排序保存、前后书及章节跳页已进行正式应用合成输入验收；Finder双击/拖放、全部菜单/原生对话框、真人触控板/IME/多屏/NAS、完整显示性能、Windows动态对照和用户新增交互验收仍需分别执行（总体布局已获用户认可）。旧macos-ui-2026-10-02.md和benchmark记录仅保留为重写方案历史，不作为本轮迁移通过证据。
 
-P2范围与未完成项见[首批及后续索引](docs/p2-reading-navigation.md)，第四批契约见[书架导航设计](docs/p2-bookshelf-navigation.md)，正式运行证据见[本批验收记录](acceptance/p2-bookshelf-macos-runtime.md)。菜单占位及侧栏组合已接入；完整细节仍按迁移清单推进。
+P2范围与未完成项见[首批及后续索引](docs/p2-reading-navigation.md)，第五批契约见[书签操作设计](docs/p2-bookmark-operations.md)，正式运行证据见[本批验收记录](acceptance/p2-bookmark-macos-runtime.md)。菜单占位及侧栏组合已接入；完整细节仍按迁移清单推进。

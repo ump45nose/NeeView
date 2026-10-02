@@ -13,6 +13,8 @@
 | 绘制、焦点、拖动、缩放 | Views/ReaderView.cs | 原 PageFrame、像素租约、revision |
 | 完整菜单数据/呈现 | Engine/Menu/default-menu.json、Views/MenuPresenter.cs | 原节点、顺序、禁用占位与稳定命令名 |
 | 菜单执行、键鼠、对话框、窗口关闭 | Views/MainWindow.axaml.cs | 稳定命令名、Engine/系统契约 |
+| 书签拖动、选择和对话框反馈 | Views/MainWindow.Bookmarks.cs | Engine.BookmarkCollection 与 SaveData；不编写集合/保存规则 |
+| 书签登记字段与按钮布局 | Views/BookmarkRegistrationWindow.axaml | 原 BookmarkPopupEdit；取消不提交，已确认目标需重新校验 |
 | 设置页导航/内容结构 | Views/SettingsWindow.axaml | 原 BookSettingConfig 和恢复策略 |
 | 具体后端及实例装配 | MacApp.cs | 唯一可引用 Backends 的启动装配点 |
 

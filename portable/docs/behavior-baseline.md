@@ -27,7 +27,7 @@
 | 普通书架与前后书 | Bookshelf/FolderList/FolderCollection、BookshelfFolderList、BookOperation.MoveBook | 原目录分组/13项排序/普通端点/随机循环；混合候选、失败重试和优先切书；每路径参数/持久随机种子待迁 |
 | 文件夹页导航 | Book/BookPageCollection.GetNextFolderIndex/GetPrevFolderIndex | 原文件名升降序目录分组；组内回首项/端点停止；不冒充子书/父书打开 |
 | 侧栏拖拽组合 | SidePanels/CustomLayoutPanelManager、SidePanelViewModel、SidePanelDropAcceptor、LayoutDockPanel | 原组模型、leader 整组移动/成员拆组、分半组合及 V2 JSON 适配；Headless/真机恢复通过；浮动/旧布局导入待迁移 |
-| 历史/书签 | Bookamrk/BookmarkCollection.cs、BookMemento、HistoryCollection | 原 JSON 树字段/顺序保留；访问排序、基础编辑和共享阅读状态接入，完整服务待迁入 |
+| 历史/书签 | Bookamrk/BookmarkCollection.cs、BookMemento、HistoryCollection | 原 JSON 树字段/顺序保留；访问排序、共享状态与原移动/递归合并/确认/颜色/删除恢复接入；完整导航/修复/原Popup宿主待迁，见p2-bookmark-operations.md |
 | 旧Profile/nvzip | SaveData | 待 P5，完整旧迁移规则待迁入 |
 
 [235条命令迁移表](command-migration.md) 与源码 manifest 一致，每条单独标记状态，不用命令数量计算功能覆盖率。[源码迁入表](source-migration.json) 区分完整算法与P1子集。
