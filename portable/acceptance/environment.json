@@ -1,5 +1,5 @@
 {
-  "utc": "2026-10-01T17:57:00.481683+00:00",
+  "utc": "2026-10-02T05:21:56.079453+00:00",
   "machine": "arm64",
   "os": "27.0.1",
   "cpu": "Apple M1 Pro",
@@ -9,6 +9,9 @@
   "xcode_path": "/Library/Developer/CommandLineTools",
   "valid_codesigning_identities": 0,
   "formal_host_build": "failed: 找不到有效的 Xcode 开发人员路径",
-  "latest_ui_validation": "blocked: Mac is locked",
-  "preview_signing": "ad-hoc only"
+  "latest_ui_validation": "passed: Preview 分项交互、重启位置/模式恢复与分类撤销；完整边界见 ui_report",
+  "preview_signing": "ad-hoc only",
+  "ui_code_commit": "f27d5817c46654b2adc81b8c2b0366921cd6967b",
+  "ui_report": "macos-ui-2026-10-02.md",
+  "formal_host_build_scope": "此前正式 Host 构建结果；本轮未重试，开发路径仍只有 CommandLineTools"
 }
