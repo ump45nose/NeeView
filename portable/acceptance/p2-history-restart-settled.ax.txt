@@ -1,0 +1,105 @@
+Window: "BookA — NeeView", App: NeeView.
+0 standard window BookA — NeeView, Secondary Actions: Raise
+	1 container WindowChrome, ID: AvaloniaWindowChrome
+	2 container
+		3 container Root
+			4 container
+				5 menu bar MenuBar
+					6 container
+						7 文件
+							8 container
+								9 unknown PART_Popup
+						10 显示
+							11 container
+								12 unknown PART_Popup
+						13 图像
+							14 container
+								15 unknown PART_Popup
+						16 跳转
+							17 container
+								18 unknown PART_Popup
+						19 页面
+							20 container
+								21 unknown PART_Popup
+						22 书籍
+							23 container
+								24 unknown PART_Popup
+						25 选项
+							26 container
+								27 unknown PART_Popup
+						28 帮助
+							29 container
+								30 unknown PART_Popup
+				31 text field (settable) Help: 打开图片、目录、ZIP / RAR / 7z, Value: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA, ID: AddressBar
+					32 container
+						33 container
+							34 scroll area PART_ScrollViewer
+								35 container
+			36 container SidePanelFrame
+				37 container LeftRailItems
+					38 button Avalonia.Controls.PathIcon, Help: 信息 / 页面列表（拖动可重排或组合）
+					39 button Avalonia.Controls.PathIcon, Help: 文件夹（拖动可重排或组合）
+					40 button Avalonia.Controls.PathIcon, Help: 历史（拖动可重排或组合）
+				41 container
+					42 text 历史
+					43 container
+						44 text /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same
+						45 button ⋯, Help: 历史列表菜单, ID: HistoryMoreButton
+						46 text field Help: 搜索历史, ID: HistorySearchBox
+							47 container
+								48 container
+									49 scroll area PART_ScrollViewer
+										50 container
+											51 container
+												52 text Value: 搜索历史, ID: PART_Placeholder
+						53 content list HistoryList
+							54 scroll area PART_ScrollViewer
+								55 container
+									56 container
+										57 row (selectable) Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA, HistoryRow { Entry = HistoryEntry { Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA, Page = 002.png, LastAccessTime = 03/10/2026 上午1:30:40, Name = BookA }, GroupHeader = 今天, Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA, Name = BookA, Page = 002.png, HasGroupHeader = True }
+											58 container /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA
+												59 text 今天
+												60 text BookA
+												61 text 002.png
+										62 row (selected) Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookB, HistoryRow { Entry = HistoryEntry { Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookB, Page = 005.png, LastAccessTime = 01/10/2026 上午1:24:08, Name = BookB }, GroupHeader = 2026年10月1日 星期四, Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookB, Name = BookB, Page = 005.png, HasGroupHeader = True }
+											63 container /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookB
+												64 text 2026年10月1日 星期四
+												65 text BookB
+												66 text 005.png
+										67 row (selectable) Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/缺失.cbz, HistoryRow { Entry = HistoryEntry { Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/缺失.cbz, Page = 001.png, LastAccessTime = 30/09/2026 上午1:24:08, Name = 缺失.cbz }, GroupHeader = 2026年9月30日 星期三, Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/缺失.cbz, Name = 缺失.cbz, Page = 001.png, HasGroupHeader = True }
+											68 container /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/缺失.cbz
+												69 text 2026年9月30日 星期三
+												70 text 缺失.cbz
+												71 text 001.png
+				72 handle
+				73 handle
+				74 container
+					75 text 导航器
+					76 container
+						77 button −
+						78 button 适合
+						79 button 100%
+						80 button +
+				81 container RightRailItems
+					82 button Avalonia.Controls.PathIcon, Help: 导航器（拖动可重排或组合）
+					83 button Avalonia.Controls.PathIcon, Help: 图像效果（P5）（拖动可重排或组合）
+					84 button Avalonia.Controls.PathIcon, Help: 书签（拖动可重排或组合）
+					85 button Avalonia.Controls.PathIcon, Help: 播放列表（P5）（拖动可重排或组合）
+					86 button Avalonia.Controls.PathIcon, Help: 目标文件夹（P4）（拖动可重排或组合）
+			87 container
+				88 container DockPageSliderSocket
+					89 slider (settable, float) Value: 1, ID: PageSliderView
+						90 container PART_Track
+							91 button PART_DecreaseButton
+								92 container
+							93 button PART_IncreaseButton
+								94 container
+							95 handle thumb
+					96 text 2 / 6
+				97 text Value: 002.png  ·  单页  ·  从右向左, ID: StatusField
+	98 close button
+	99 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	100 minimize button
+	101 text BookA — NeeView
+102 menu bar
+	103 NeeView

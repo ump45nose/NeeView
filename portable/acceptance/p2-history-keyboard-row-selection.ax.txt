@@ -1,0 +1,102 @@
+Window: "BookB — NeeView", App: NeeView.
+0 standard window BookB — NeeView, Secondary Actions: Raise
+	1 container WindowChrome, ID: AvaloniaWindowChrome
+	2 container
+		3 container PART_VisualLayerManager
+			4 container Root
+				5 container
+					6 menu bar MenuBar
+						7 container
+							8 文件
+								9 container
+									10 unknown PART_Popup
+							11 显示
+								12 container
+									13 unknown PART_Popup
+							14 图像
+								15 container
+									16 unknown PART_Popup
+							17 跳转
+								18 container
+									19 unknown PART_Popup
+							20 页面
+								21 container
+									22 unknown PART_Popup
+							23 书籍
+								24 container
+									25 unknown PART_Popup
+							26 选项
+								27 container
+									28 unknown PART_Popup
+							29 帮助
+								30 container
+									31 unknown PART_Popup
+					32 text field (settable) Help: 打开图片、目录、ZIP / RAR / 7z, Value: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookB, ID: AddressBar
+						33 container
+							34 container
+								35 scroll area PART_ScrollViewer
+									36 container
+				37 container SidePanelFrame
+					38 container LeftRailItems
+						39 button Avalonia.Controls.PathIcon, Help: 信息 / 页面列表（拖动可重排或组合）
+						40 button Avalonia.Controls.PathIcon, Help: 文件夹（拖动可重排或组合）
+						41 button Avalonia.Controls.PathIcon, Help: 历史（拖动可重排或组合）
+					42 container
+						43 text 历史
+						44 container
+							45 text /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same
+							46 button ⋯, Help: 历史列表菜单, ID: HistoryMoreButton
+							47 text field (settable) Help: 搜索历史, Value: Book, ID: HistorySearchBox
+								48 container
+									49 container
+										50 scroll area PART_ScrollViewer
+											51 container
+							52 content list HistoryList
+								53 scroll area PART_ScrollViewer
+									54 container
+										55 container
+											56 row (selected) Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA, HistoryRow { Entry = HistoryEntry { Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA, Page = 003.png, LastAccessTime = 03/10/2026 上午1:24:16, Name = BookA }, GroupHeader = 今天, Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA, Name = BookA, Page = 003.png, HasGroupHeader = True }
+												57 container /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA
+													58 text 今天
+													59 text BookA
+													60 text 003.png
+											61 row (selectable) Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookB, HistoryRow { Entry = HistoryEntry { Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookB, Page = 005.png, LastAccessTime = 01/10/2026 上午1:24:08, Name = BookB }, GroupHeader = 2026年10月1日 星期四, Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookB, Name = BookB, Page = 005.png, HasGroupHeader = True }
+												62 container /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookB
+													63 text 2026年10月1日 星期四
+													64 text BookB
+													65 text 005.png
+							66 text 2 / 5 项
+					67 handle
+					68 handle
+					69 container
+						70 text 导航器
+						71 container
+							72 button −
+							73 button 适合
+							74 button 100%
+							75 button +
+					76 container RightRailItems
+						77 button Avalonia.Controls.PathIcon, Help: 导航器（拖动可重排或组合）
+						78 button Avalonia.Controls.PathIcon, Help: 图像效果（P5）（拖动可重排或组合）
+						79 button Avalonia.Controls.PathIcon, Help: 书签（拖动可重排或组合）
+						80 button Avalonia.Controls.PathIcon, Help: 播放列表（P5）（拖动可重排或组合）
+						81 button Avalonia.Controls.PathIcon, Help: 目标文件夹（P4）（拖动可重排或组合）
+				82 container
+					83 container DockPageSliderSocket
+						84 slider (settable, float) Value: 4, ID: PageSliderView
+							85 container PART_Track
+								86 button PART_DecreaseButton
+									87 container
+								88 button PART_IncreaseButton
+									89 container
+								90 handle thumb
+						91 text 5 / 6
+					92 text Value: 005.png  ·  单页  ·  从右向左, ID: StatusField
+	93 close button
+	94 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	95 minimize button
+	96 text BookB — NeeView
+97 menu bar
+	98 NeeView
+
+The focused UI element is 56 row (selected) Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA, HistoryRow { Entry = HistoryEntry { Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA, Page = 003.png, LastAccessTime = 03/10/2026 上午1:24:16, Name = BookA }, GroupHeader = 今天, Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA, Name = BookA, Page = 003.png, HasGroupHeader = True }

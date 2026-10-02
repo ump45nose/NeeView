@@ -1,0 +1,55 @@
+{
+  "clear_items": 0,
+  "unknown_root_preserved": true,
+  "bookmark_semantics_preserved": true,
+  "source_files_byte_identical": true,
+  "cancel_history_byte_identical": true,
+  "clear_command_items_after_page_turn_and_exit": 0,
+  "startup_page_after_clear": "004.png",
+  "double_click_config_persisted": true,
+  "unknown_history_setting_preserved": true,
+  "restore_before_relaunch": {
+    "UserSetting.json": {
+      "bytes": 4248,
+      "sha256": "d4a0ff78a713540492e4e1d3eced6c04f49cdc13e422f8ce75ca96556d3d70d8",
+      "byte_identical": true
+    },
+    "History.json": {
+      "bytes": 2467,
+      "sha256": "9d848f5fba6961af989ddc6ccf592241a93ba7785c5ee26f1c91424068620454",
+      "byte_identical": true
+    },
+    "Bookmark.json": {
+      "bytes": 263,
+      "sha256": "0e605947c1d28342dbfb49dbbdf4a12dce22015bd1ed974a69848dbaa381e915",
+      "byte_identical": true
+    }
+  },
+  "temporary_shortcuts_removed": true,
+  "startup_fix": {
+    "no_history_initial_page": "004.png",
+    "cleared_exit_history_items": 0,
+    "saved_last_page": "003.png",
+    "saved_wide_page": false,
+    "saved_part": 1,
+    "restart_display_page": "003.png",
+    "restart_direction": "LeftToRight",
+    "final_restore_before_relaunch": {
+      "UserSetting.json": {
+        "bytes": 4434,
+        "sha256": "b3f90c3fe2a51e87d970dd929a2928e4c3a016cd13c4c43b261ac3e11abeff89",
+        "byte_identical": true
+      },
+      "History.json": {
+        "bytes": 2467,
+        "sha256": "641ecf63fe58187256fcb77f98b00d28250ed235f8ce6d96b65a4fd60985ce14",
+        "byte_identical": true
+      },
+      "Bookmark.json": {
+        "bytes": 263,
+        "sha256": "0e605947c1d28342dbfb49dbbdf4a12dce22015bd1ed974a69848dbaa381e915",
+        "byte_identical": true
+      }
+    }
+  }
+}

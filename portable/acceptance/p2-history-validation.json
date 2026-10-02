@@ -1,25 +1,25 @@
 {
-  "utc": "2026-10-02T16:57:13.417285+00:00",
+  "utc": "2026-10-02T17:37:52.836758+00:00",
   "steps": [
     {
       "name": "Engine 构建",
       "exit_code": 0,
-      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:00.91\n"
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:00.76\n"
     },
     {
       "name": "原算法与正式视图测试",
       "exit_code": 0,
-      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Engine.Tests -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/bin/Debug/net10.0/NeeView.Engine.Tests.dll\n/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/bin/Debug/net10.0/NeeView.Engine.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行\n总共 1 个测试文件与指定模式相匹配。\n警告: 正在覆盖结果文件: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/TestResults/engine.trx\n结果文件: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/TestResults/engine.trx\n\n已通过! - 失败:     0，通过:    99，已跳过:     0，总计:    99，持续时间: 10 s - NeeView.Engine.Tests.dll (net10.0)\n"
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Engine.Tests -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/bin/Debug/net10.0/NeeView.Engine.Tests.dll\n/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/bin/Debug/net10.0/NeeView.Engine.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行\n总共 1 个测试文件与指定模式相匹配。\n警告: 正在覆盖结果文件: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/TestResults/engine.trx\n结果文件: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/TestResults/engine.trx\n\n已通过! - 失败:     0，通过:   101，已跳过:     0，总计:   101，持续时间: 11 s - NeeView.Engine.Tests.dll (net10.0)\n"
     },
     {
       "name": "正式入口源码编译（Library检查）",
       "exit_code": 0,
-      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Backends -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Backends/bin/Debug/net10.0-macos/NeeView.Backends.dll\n  NeeView.MacOS -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:02.79\n"
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Backends -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Backends/bin/Debug/net10.0-macos/NeeView.Backends.dll\n  NeeView.MacOS -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:04.32\n"
     },
     {
       "name": "正式 Mac 应用构建",
       "exit_code": 0,
-      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Backends -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Backends/bin/Debug/net10.0-macos/NeeView.Backends.dll\n  检测到的签名标识:\n  \n    Code Signing Key: \"\" (-)\n    Provisioning Profile: \"\" () - no entitlements\n    Bundle Id: com.ump45nose.NeeView\n    App Id: com.ump45nose.NeeView\n  检测到的签名标识:\n  \n    Code Signing Key: \"\" (-)\n    Provisioning Profile: \"\" () - no entitlements\n    Bundle Id: com.ump45nose.NeeView\n    App Id: com.ump45nose.NeeView\n  NeeView.MacOS -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/osx-arm64/NeeView.MacOS.dll\n  优化程序集以调整大小可能会更改应用的行为。请务必在发布后进行测试。请参阅: https://aka.ms/dotnet-illink\n  正在优化程序集以调整大小。此过程可能需要一段时间。\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:08.85\n"
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Backends -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Backends/bin/Debug/net10.0-macos/NeeView.Backends.dll\n  检测到的签名标识:\n  \n    Code Signing Key: \"\" (-)\n    Provisioning Profile: \"\" () - no entitlements\n    Bundle Id: com.ump45nose.NeeView\n    App Id: com.ump45nose.NeeView\n  检测到的签名标识:\n  \n    Code Signing Key: \"\" (-)\n    Provisioning Profile: \"\" () - no entitlements\n    Bundle Id: com.ump45nose.NeeView\n    App Id: com.ump45nose.NeeView\n  NeeView.MacOS -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/osx-arm64/NeeView.MacOS.dll\n  优化程序集以调整大小可能会更改应用的行为。请务必在发布后进行测试。请参阅: https://aka.ms/dotnet-illink\n  正在优化程序集以调整大小。此过程可能需要一段时间。\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:09.96\n"
     },
     {
       "name": "正式 .app 本地签名校验",
@@ -36,12 +36,12 @@
       "NeeView.MacOS"
     ],
     "source_files": 45,
-    "partial_adapters": 42
+    "partial_adapters": 44
   },
   "tests": {
-    "total": "99",
-    "executed": "99",
-    "passed": "99",
+    "total": "101",
+    "executed": "101",
+    "passed": "101",
     "failed": "0",
     "error": "0",
     "timeout": "0",
@@ -57,11 +57,6 @@
     "pending": "0"
   },
   "app_bundle": "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app",
-  "screenshot_phase_regression": {
-    "command": "NEEVIEW_ACCEPTANCE_PHASE=p2-history dotnet test --filter FullyQualifiedName~BookmarkOperationTests",
-    "exit_code": 0,
-    "passed": 11,
-    "failed": 0,
-    "scope": "修正旧书签测试的截图标签后专项复测；输出p2-history-bookmark-layout.png，原第五批图片未变化"
-  }
+  "post_build_source_manifest_check": "补入FirstLoader/BookHub出处后在实际Mac重新静态核验通过，未再次构建",
+  "headless_snapshot_preservation": "历史p2-history-*-layout.png原样保留；本次重绘另存p2-history-startup-regression-*-layout.png"
 }

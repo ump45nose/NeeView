@@ -1,0 +1,183 @@
+[
+  {
+    "name": "initial",
+    "time": "2026-10-02T17:24:24.609Z",
+    "ax": "Window: \"BookA — NeeView\", App: NeeView.\n0 standard window BookA — NeeView, Secondary Actions: Raise\n\t1 container WindowChrome, ID: AvaloniaWindowChrome\n\t2 container\n\t\t3 container Root\n\t\t\t4 container\n\t\t\t\t5 menu bar MenuBar\n\t\t\t\t\t6 container\n\t\t\t\t\t\t7 文件\n\t\t\t\t\t\t\t8 container\n\t\t\t\t\t\t\t\t9 unknown PART_Popup\n\t\t\t\t\t\t10 显示\n\t\t\t\t\t\t\t11 container\n\t\t\t\t\t\t\t\t12 unknown PART_Popup\n\t\t\t\t\t\t13 图像\n\t\t\t\t\t\t\t14 container\n\t\t\t\t\t\t\t\t15 unknown PART_Popup\n\t\t\t\t\t\t16 跳转\n\t\t\t\t\t\t\t17 container\n\t\t\t\t\t\t\t\t18 unknown PART_Popup\n\t\t\t\t\t\t19 页面\n\t\t\t\t\t\t\t20 container\n\t\t\t\t\t\t\t\t21 unknown PART_Popup\n\t\t\t\t\t\t22 书籍\n\t\t\t\t\t\t\t23 container\n\t\t\t\t\t\t\t\t24 unknown PART_Popup\n\t\t\t\t\t\t25 选项\n\t\t\t\t\t\t\t26 container\n\t\t\t\t\t\t\t\t27 unknown PART_Popup\n\t\t\t\t\t\t28 帮助\n\t\t\t\t\t\t\t29 container\n\t\t\t\t\t\t\t\t30 unknown PART_Popup\n\t\t\t\t31 text field (settable) Help: 打开图片、目录、ZIP / RAR / 7z, Value: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA, ID: AddressBar\n\t\t\t\t\t32 container\n\t\t\t\t\t\t33 container\n\t\t\t\t\t\t\t34 scroll area PART_ScrollViewer\n\t\t\t\t\t\t\t\t35 container\n\t\t\t36 container SidePanelFrame\n\t\t\t\t37 container LeftRailItems\n\t\t\t\t\t38 button Avalonia.Controls.PathIcon, Help: 信息 / 页面列表（拖动可重排或组合）\n\t\t\t\t\t39 button Avalonia.Controls.PathIcon, Help: 文件夹（拖动可重排或组合）\n\t\t\t\t\t40 button Avalonia.Controls.PathIcon, Help: 历史（拖动可重排或组合）\n\t\t\t\t41 container\n\t\t\t\t\t42 text 历史\n\t\t\t\t\t43 container\n\t\t\t\t\t\t44 text 全部历史记录\n\t\t\t\t\t\t45 button ⋯, Help: 历史列表菜单, ID: HistoryMoreButton\n\t\t\t\t\t\t46 text field Help: 搜索历史, ID: HistorySearchBox\n\t\t\t\t\t\t\t47 container\n\t\t\t\t\t\t\t\t48 container\n\t\t\t\t\t\t\t\t\t49 scroll area PART_ScrollViewer\n\t\t\t\t\t\t\t\t\t\t50 container\n\t\t\t\t\t\t\t\t\t\t\t51 container\n\t\t\t\t\t\t\t\t\t\t\t\t52 text Value: 搜索历史, ID: PART_Placeholder\n\t\t\t\t\t\t53 content list HistoryList\n\t\t\t\t\t\t\t54 scroll area PART_ScrollViewer\n\t\t\t\t\t\t\t\t55 container\n\t\t\t\t\t\t\t\t\t56 container\n\t\t\t\t\t\t\t\t\t\t57 row (selected) Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA, HistoryRow { Entry = HistoryEntry { Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA, Page = 003.png, LastAccessTime = 03/10/2026 上午1:24:16, Name = BookA }, GroupHeader = , Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA, Name = BookA, Page = 003.png, HasGroupHeader = False }\n\t\t\t\t\t\t\t\t\t\t\t58 container /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookA\n\t\t\t\t\t\t\t\t\t\t\t\t59 text BookA\n\t\t\t\t\t\t\t\t\t\t\t\t60 text 003.png\n\t\t\t\t\t\t\t\t\t\t61 row (selectable) Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Other/BookC, HistoryRow { Entry = HistoryEntry { Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Other/BookC, Page = 002.png, LastAccessTime = 03/10/2026 上午12:24:08, Name = BookC }, GroupHeader = , Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Other/BookC, Name = BookC, Page = 002.png, HasGroupHeader = False }\n\t\t\t\t\t\t\t\t\t\t\t62 container /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Other/BookC\n\t\t\t\t\t\t\t\t\t\t\t\t63 text BookC\n\t\t\t\t\t\t\t\t\t\t\t\t64 text 002.png\n\t\t\t\t\t\t\t\t\t\t65 row (selectable) Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/中文漫画.cbz, HistoryRow { Entry = HistoryEntry { Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/中文漫画.cbz, Page = 中文/004.png, LastAccessTime = 02/10/2026 上午1:24:08, Name = 中文漫画.cbz }, GroupHeader = , Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/中文漫画.cbz, Name = 中文漫画.cbz, Page = 中文/004.png, HasGroupHeader = False }\n\t\t\t\t\t\t\t\t\t\t\t66 container /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/中文漫画.cbz\n\t\t\t\t\t\t\t\t\t\t\t\t67 text 中文漫画.cbz\n\t\t\t\t\t\t\t\t\t\t\t\t68 text 中文/004.png\n\t\t\t\t\t\t\t\t\t\t69 row (selectable) Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookB, HistoryRow { Entry = HistoryEntry { Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookB, Page = 005.png, LastAccessTime = 01/10/2026 上午1:24:08, Name = BookB }, GroupHeader = , Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookB, Name = BookB, Page = 005.png, HasGroupHeader = False }\n\t\t\t\t\t\t\t\t\t\t\t70 container /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/BookB\n\t\t\t\t\t\t\t\t\t\t\t\t71 text BookB\n\t\t\t\t\t\t\t\t\t\t\t\t72 text 005.png\n\t\t\t\t\t\t\t\t\t\t73 row (selectable) Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/缺失.cbz, HistoryRow { Entry = HistoryEntry { Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/缺失.cbz, Page = 001.png, LastAccessTime = 30/09/2026 上午1:24:08, Name = 缺失.cbz }, GroupHeader = , Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/缺失.cbz, Name = 缺失.cbz, Page = 001.png, HasGroupHeader = False }\n\t\t\t\t\t\t\t\t\t\t\t74 container /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-history-smoke/Same/缺失.cbz\n\t\t\t\t\t\t\t\t\t\t\t\t75 text 缺失.cbz\n\t\t\t\t\t\t\t\t\t\t\t\t76 text 001.png\n\t\t\t\t\t\t77 text 5 / 5 项\n\t\t\t\t78 handle\n\t\t\t\t79 handle\n\t\t\t\t80 container\n\t\t\t\t\t81 text 导航器\n\t\t\t\t\t82 container\n\t\t\t\t\t\t83 button −\n\t\t\t\t\t\t84 button 适合\n\t\t\t\t\t\t85 button 100%\n\t\t\t\t\t\t86 button +\n\t\t\t\t87 container RightRailItems\n\t\t\t\t\t88 button Avalonia.Controls.PathIcon, Help: 导航器（拖动可重排或组合）\n\t\t\t\t\t89 button Avalonia.Controls.PathIcon, Help: 图像效果（P5）（拖动可重排或组合）\n\t\t\t\t\t90 button Avalonia.Controls.PathIcon, Help: 书签（拖动可重排或组合）\n\t\t\t\t\t91 button Avalonia.Controls.PathIcon, Help: 播放列表（P5）（拖动可重排或组合）\n\t\t\t\t\t92 button Avalonia.Controls.PathIcon, Help: 目标文件夹（P4）（拖动可重排或组合）\n\t\t\t93 container\n\t\t\t\t94 container DockPageSliderSocket\n\t\t\t\t\t95 slider (settable, float) Value: 2, ID: PageSliderView\n\t\t\t\t\t\t96 container PART_Track\n\t\t\t\t\t\t\t97 button PART_DecreaseButton\n\t\t\t\t\t\t\t\t98 container\n\t\t\t\t\t\t\t99 button PART_IncreaseButton\n\t\t\t\t\t\t\t\t100 container\n\t\t\t\t\t\t\t101 handle thumb\n\t\t\t\t\t102 text 3 / 6\n\t\t\t\t103 text Value: 003.png  ·  单页  ·  从右向左, ID: StatusField\n\t104 close button\n\t105 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window\n\t106 minimize button\n\t107 text BookA — NeeView\n108 menu bar\n\t109 NeeView\n",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "single-click-bookc",
+    "time": "2026-10-02T17:24:36.566Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "prev-to-zip",
+    "time": "2026-10-02T17:24:44.133Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "next-to-bookc",
+    "time": "2026-10-02T17:24:49.207Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "menu-keyboard-probe",
+    "time": "2026-10-02T17:26:55.978Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "missing-source-keeps-bookb",
+    "time": "2026-10-02T17:27:11.643Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "current-folder-filter",
+    "time": "2026-10-02T17:27:20.065Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "folder-booka-selected",
+    "time": "2026-10-02T17:27:40.594Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "folder-prev-to-zip",
+    "time": "2026-10-02T17:27:41.535Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "search-text-isolation",
+    "time": "2026-10-02T17:28:11.194Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "search-prev-to-bookb",
+    "time": "2026-10-02T17:28:13.048Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "keyboard-row-selection",
+    "time": "2026-10-02T17:28:18.580Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "enter-restores-booka",
+    "time": "2026-10-02T17:28:26.006Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "items-count-hidden",
+    "time": "2026-10-02T17:28:40.040Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "search-hidden",
+    "time": "2026-10-02T17:28:47.671Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "focus-search-repeat",
+    "time": "2026-10-02T17:28:48.755Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "multi-selection",
+    "time": "2026-10-02T17:28:53.831Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "right-click-keeps-multiple",
+    "time": "2026-10-02T17:29:01.569Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "removed-current-and-zip",
+    "time": "2026-10-02T17:29:02.567Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "clear-confirm",
+    "time": "2026-10-02T17:29:32.830Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "clear-cancel",
+    "time": "2026-10-02T17:29:40.307Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "restart-settled",
+    "time": "2026-10-02T17:31:15.955Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "remove-current-again",
+    "time": "2026-10-02T17:31:20.239Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "removed-current-real-page-turn",
+    "time": "2026-10-02T17:31:24.338Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "clear-applied",
+    "time": "2026-10-02T17:31:34.046Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "double-mode-started",
+    "time": "2026-10-02T17:32:15.350Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "double-mode-single-select",
+    "time": "2026-10-02T17:32:21.122Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "double-mode-double-opens",
+    "time": "2026-10-02T17:32:22.262Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "clear-command-no-dialog",
+    "time": "2026-10-02T17:32:53.946Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "empty-context-no-action",
+    "time": "2026-10-02T17:33:03.488Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "clear-current-real-page-turn",
+    "time": "2026-10-02T17:33:04.945Z",
+    "phase": "history-initial-build"
+  },
+  {
+    "name": "fixed-startup-without-history",
+    "time": "2026-10-02T17:38:51.083Z",
+    "phase": "startup-fix-final"
+  },
+  {
+    "name": "fixed-clear-current",
+    "time": "2026-10-02T17:39:07.326Z",
+    "phase": "startup-fix-final"
+  },
+  {
+    "name": "fixed-clear-page-three",
+    "time": "2026-10-02T17:39:21.134Z",
+    "phase": "startup-fix-final"
+  },
+  {
+    "name": "fixed-restart-after-clear",
+    "time": "2026-10-02T17:39:56.570Z",
+    "phase": "startup-fix-final"
+  },
+  {
+    "name": "final-user-restored",
+    "time": "2026-10-02T17:40:34.072Z",
+    "phase": "startup-fix-final"
+  }
+]

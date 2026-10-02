@@ -38,8 +38,19 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
     public async Task OpenAsync(string path, CancellationToken token = default)
     { await OpenCoreAsync(path, token); }
 
+    /// <summary>沿用原 FirstLoader 显式传入 LastBook 的恢复链；不依赖历史列表中的记录。</summary>
+    /// <param name="token">取消启动或无窗口重开时的加载请求。</param>
+    public async Task RestoreLastAsync(CancellationToken token = default)
+    {
+        var last = saveData.GetLastBook();
+        if (saveData.LastBookPath is { } path)
+            await OpenCoreAsync(path, token, startupMemento: last.Memento, startupPart: last.Part);
+    }
+
     /// <summary>共享原加载链；历史重放可指定条目并保留访问顺序，返回是否实际提交新书。</summary>
-    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false)
+    /// <param name="startupMemento">原 FirstLoader 的显式启动快照，优先于历史和字段恢复策略。</param>
+    /// <param name="startupPart">启动快照中的 Mac 分割位置。</param>
+    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, int startupPart = 0)
     {
         ObjectDisposedException.ThrowIf(_disposed || _closing, this);
         var generation = Interlocked.Increment(ref _generation);
@@ -52,8 +63,10 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
         {
             source = await archives.OpenAsync(path, opening.Token);
             var entries = await source.GetEntriesAsync(opening.Token);
-            var restored = saveData.Find(source.Path);
-            var setting = Config.Current.BookSettingPolicy.Mix(Config.Current.BookSettingDefault, Config.Current.BookSetting, restored.Memento?.ToBookSetting(), false);
+            // 原 BookHub.LoadMainAsync 优先使用显式 BookMemento；只在普通打开时按字段混合历史。
+            var restored = startupMemento?.Path == source.Path ? (Memento: startupMemento, Part: startupPart) : saveData.Find(source.Path);
+            var setting = startupMemento?.Path == source.Path ? startupMemento.ToBookSetting()
+                : Config.Current.BookSettingPolicy.Mix(Config.Current.BookSettingDefault, Config.Current.BookSetting, restored.Memento?.ToBookSetting(), false);
             var book = new Book(source, entries.Where(e => !e.IsDirectory && ImageFormats.IsImage(e.EntryName)).Select(e => new Page(e)).ToList(), setting);
             book.SortSeed = restored.Memento?.SortSeed ?? 0; book.Sort(opening.Token);
             var requested = entryName ?? (ImageFormats.IsImage(path) ? System.IO.Path.GetFileName(path) : setting.Page);

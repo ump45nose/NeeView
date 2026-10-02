@@ -1,0 +1,13 @@
+Window: "清空历史记录", App: NeeView.
+0 standard window 清空历史记录, Secondary Actions: Raise
+	1 container WindowChrome, ID: AvaloniaWindowChrome
+	2 container
+		3 container
+			4 text 清空全部历史记录？此操作不删除文件和书签。
+			5 button 取消
+			6 button 清空
+	7 close button
+	8 zoom button
+	9 text 清空历史记录
+10 menu bar
+	11 NeeView

@@ -115,6 +115,39 @@ public sealed class HistoryListTests
         await operation.DisposeAsync(); Assert.Empty(state.HistoryEntries);
     }
 
+    /// <summary>原启动快照优先于缺失或过期历史；移除后退出仍保存完整快照供下次恢复。</summary>
+    /// <param name="staleHistory">是否预置与启动快照冲突的旧历史页与设置。</param>
+    [AvaloniaTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task StartupRestoresExplicitMementoWithoutHistoryDependency(bool staleHistory)
+    {
+        using var fixture = new Fixture(); await SeedAsync(fixture, staleHistory ? [fixture.Images] : []);
+        var last = new JsonObject { ["Path"] = fixture.Images, ["Page"] = "004.png", ["Props"] = "SinglePage LeftToRight FutureFlag",
+            ["MacIsSupportedWidePage"] = false, ["MacPagePart"] = 1 };
+        await File.WriteAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"),
+            new JsonObject { ["Config"] = new JsonObject { ["StartUp"] = new JsonObject { ["LastBookV2"] = last },
+                ["BookSettingPolicy"] = new JsonObject { ["Page"] = 0, ["PageMode"] = 0, ["BookReadOrder"] = 0 } } }.ToJsonString(), TestContext.Current.CancellationToken);
+        var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(1, state.GetLastBook().Part); Assert.False(state.GetLastBook().Memento!.IsSupportedWidePage);
+        var operation = fixture.Operation(state); var window = new MainWindow();
+        window.Bind(new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state), new BitmapFactory(new NeeView.Backends.MagickImageDecoder()), new TestPlatform()); window.Show();
+        try
+        {
+            // 正式窗口必须调用完整快照恢复；只传路径时此处会落到首图或旧历史页。
+            await window.RestoreLastAsync(); Assert.Equal("004.png", operation.Book!.CurrentPage!.EntryName);
+            Assert.Equal(PageMode.SinglePage, operation.Book.Setting.PageMode); Assert.Equal(PageReadOrder.LeftToRight, operation.Book.Setting.BookReadOrder);
+            Assert.False(operation.Book.Setting.IsSupportedWidePage);
+            await operation.SaveAsync(); await state.RemoveHistoryAsync([fixture.Images], TestContext.Current.CancellationToken);
+            await operation.JumpAsync(4); await operation.SaveAsync(); Assert.Empty(state.HistoryEntries);
+            var fresh = new SaveData(fixture.State); await fresh.LoadAsync(TestContext.Current.CancellationToken);
+            Assert.Equal("005.png", fresh.GetLastBook().Memento!.Page); Assert.False(fresh.GetLastBook().Memento!.IsSupportedWidePage);
+            await using var restarted = fixture.Operation(fresh); await restarted.RestoreLastAsync(TestContext.Current.CancellationToken);
+            Assert.Equal("005.png", restarted.Book!.CurrentPage!.EntryName);
+        }
+        finally { await window.PrepareShutdownAsync(); window.Close(); }
+    }
+
     /// <summary>正式视图多选删除/文本作用域、菜单占位/开关及导航刷新不触发正文。</summary>
     [AvaloniaFact]
     public async Task HistoryPanelUsesOriginalMenuAndSelectionScopes()

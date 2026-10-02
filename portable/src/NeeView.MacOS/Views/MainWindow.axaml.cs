@@ -172,8 +172,12 @@ public sealed partial class MainWindow : Window
     {
         if (_model is null) return; Viewer.ResetTransform(); await _model.Operation.OpenAsync(path);
     }
-    /// <summary>启动和无窗口重开恢复最后书籍。</summary>
-    public Task RestoreLastAsync() => _model?.SaveData.LastBookPath is { } path ? OpenAsync(path) : Task.CompletedTask;
+    /// <summary>启动和无窗口重开传入原完整快照，页面恢复不依赖已删除的历史项。</summary>
+    public async Task RestoreLastAsync()
+    {
+        if (_model is null) return;
+        Viewer.ResetTransform(); await _model.Operation.RestoreLastAsync();
+    }
     /// <summary>执行宿主命令或转交原阅读命令；错误显示给用户。</summary>
     public async Task ExecuteAsync(string name)
     {

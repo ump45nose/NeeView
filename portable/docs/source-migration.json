@@ -524,6 +524,18 @@
       "target": "src/NeeView.MacOS/Views/MainWindow.axaml.cs",
       "sha256": "bb2050f3298f53071080a39369693a0b6fa82e473a112d60d780d5e4d8baa996",
       "status": "明确显示历史面板并聚焦搜索，不切换关闭已打开面板"
+    },
+    {
+      "source": "NeeView/MainWindow/FirstLoader.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml.cs",
+      "sha256": "3a3f69ad7683b174038a2c241ebc5e2b8f13bf4e8c8276b663d138b2ed35090d",
+      "status": "第六批真机修复：启动/无窗口重开传完整LastBook到现有BookOperation；仅启动快照链，其他FirstLoader分支仍未完整迁入"
+    },
+    {
+      "source": "NeeView/BookHub/BookHub.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.cs",
+      "sha256": "4d33119203989d72ff6cebf6b8a29caa10c054db0f8d704ebd2cb605918760b6",
+      "status": "第六批真机修复：显式BookMemento优先于历史与普通恢复策略；保留页位置/设置/排序种子，不等同完整BookHub迁入"
     }
   ],
   "rule_references": [

@@ -59,6 +59,20 @@ public sealed class SaveData(string directory)
         var entry = (_history["Items"] as JsonArray)?.OfType<JsonObject>().FirstOrDefault(e => e["Path"]?.GetValue<string>() == path);
         if (entry is null && BookmarkRoot.Walk().FirstOrDefault(e => e.Path == path) is { } bookmark)
             entry = JsonSerializer.SerializeToNode(bookmark, Options)!.AsObject();
+        return ReadMemento(path, entry);
+    }
+
+    /// <summary>读取原启动快照；历史移除或存在旧记录时仍使用独立的 LastBookV2。</summary>
+    /// <returns>最后书籍的原设置与 Mac 分割位置；没有快照时返回空记录。</returns>
+    public (BookMemento? Memento, int Part) GetLastBook() => LastBookPath is { } path
+        ? ReadMemento(path, _setting["Config"]?["StartUp"]?["LastBookV2"] as JsonObject) : (null, 0);
+
+    /// <summary>共用原 Path/Page/Props 解析，不为启动恢复建立第二套状态模型。</summary>
+    /// <param name="path">记录所指向的真实书籍来源。</param>
+    /// <param name="entry">历史、书签或启动快照的只读 JSON 节点。</param>
+    /// <returns>可恢复的原 memento 与分割位置；缺少页面字段时 memento 为空。</returns>
+    private static (BookMemento? Memento, int Part) ReadMemento(string path, JsonObject? entry)
+    {
         if (entry is null) return (null, 0);
         var props = entry["Props"]?.GetValue<string>();
         // 新版未知 Props 仍保留在节点中，只将当前已识别 token 传入原解析器。
@@ -303,7 +317,8 @@ public sealed class SaveData(string directory)
                 // 原 KeepHistoryOrder：阅读位置仍更新，重放不改变访问排序或原数组位置。
                 if (!_suppressedHistoryPaths.Contains(book.Path) && (!keepHistoryOrder || old is null))
                 { if (old is not null) items.Remove(old); items.Insert(0, item); }
-                Object(config, "StartUp")["LastBookV2"] = new JsonObject { ["Path"] = book.Path, ["Page"] = memento.Page, ["Props"] = item["Props"]!.DeepClone() };
+                // LastBook 独立于可移除的历史记录，保留启动恢复所需的分割与宽图补值。
+                Object(config, "StartUp")["LastBookV2"] = new JsonObject { ["Path"] = book.Path, ["Page"] = memento.Page, ["Props"] = item["Props"]!.DeepClone(), ["MacPagePart"] = part, ["MacIsSupportedWidePage"] = memento.IsSupportedWidePage };
             }
             // 保留原 Format；新文件使用原名称和版本结构，避免添加另一套存储格式。
             _setting["Format"] ??= JsonValue.Create("NeeView.UserSetting/46.3.0");
