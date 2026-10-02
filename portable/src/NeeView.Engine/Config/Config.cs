@@ -11,6 +11,7 @@ public sealed class Config
     public ViewConfig View { get; set; } = new();
     public PanelsConfig Panels { get; set; } = new();
     public FilmStripConfig FilmStrip { get; set; } = new();
+    public SliderConfig Slider { get; set; } = new();
     public bool IsAddressBarEnabled { get; set; } = true;
     /// <summary>启动时装配唯一配置，读取前不初始化具体窗口。</summary>
     public static void SetCurrent(Config config) => Current = config;
@@ -21,9 +22,24 @@ public sealed class FilmStripConfig
 {
     public bool IsEnabled { get; set; }
     public bool IsHideFilmStrip { get; set; }
-    public double ImageWidth { get; set; } = 96;
+    private double _imageWidth = 96;
+    public double ImageWidth { get => _imageWidth; set => _imageWidth = double.IsFinite(value) ? Math.Round(Math.Max(value, 32), 5) : 96; }
     public bool IsVisibleNumber { get; set; }
     public bool IsSelectedCenter { get; set; }
+    public bool IsHideFilmStripInAutoHideMode { get; set; } = true;
+    public bool IsManipulationBoundaryFeedbackEnabled { get; set; } = true;
+    public bool IsVisiblePlaylistMark { get; set; }
+    public FilmStripMouseWheelAction MouseWheelAction { get; set; }
+    public bool IsDetailPopupEnabled { get; set; } = true;
+}
+public enum FilmStripMouseWheelAction { MoveSelection, MovePage, CommandDependent }
+public enum SliderDirection { LeftToRight, RightToLeft, SyncBookReadDirection }
+/// <summary>原滑条选择/方向/轮滚字段；其他原字段由 JSON 合并保留。</summary>
+public sealed class SliderConfig
+{
+    public SliderDirection SliderDirection { get; set; } = SliderDirection.SyncBookReadDirection;
+    public bool IsSliderLinkedFilmStrip { get; set; } = true;
+    public bool IsSyncPageMode { get; set; }
 }
 
 /// <summary>来自原 BookConfig 的分页参数及默认值。</summary>

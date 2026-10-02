@@ -22,7 +22,8 @@ public sealed partial class MainWindow : Window
     private Task? _shutdown;
     private CancellationTokenSource? _folders;
     private Book? _folderBook;
-    private CancellationTokenSource? _slider;
+    private bool _sliderDragging;
+    private bool _sliderUpdating;
     private double _wheel;
     private double _leftWidth, _rightWidth;
     private SidePanelPresenter? _sidePanels;
@@ -35,7 +36,7 @@ public sealed partial class MainWindow : Window
         "ViewScaleUp", "ViewScaleDown", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
         "LeftAutoHide", "RightAutoHide", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
-        "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "NextScrollPage", "PrevScrollPage"
+        "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage"
     };
     /// <summary>由启动层接入原生事件；只消费主查看器区域，其余控件使用框架输入。</summary>
     public void AttachPlatformInput(IPlatformInput input)
@@ -70,6 +71,10 @@ public sealed partial class MainWindow : Window
         DragDrop.SetAllowDrop(this, true);
         Viewer.GestureRequested += async (_, gesture) => await GestureAsync(gesture);
         Viewer.PointerWheelChanged += Viewer_Wheel;
+        // 滑条内部 Thumb 会处理指针事件；隧道路由保证释放确认不被模板吞掉。
+        var slider = this.FindControl<Slider>("PageSliderView")!;
+        slider.AddHandler(PointerPressedEvent, Slider_Pressed, RoutingStrategies.Tunnel);
+        slider.AddHandler(PointerReleasedEvent, Slider_Released, RoutingStrategies.Tunnel, handledEventsToo: true);
         Closing += Window_Closing;
     }
     /// <summary>由唯一启动层传入已经装配的契约，不在控件中创建解码或存储实现。</summary>
@@ -82,6 +87,8 @@ public sealed partial class MainWindow : Window
         FilmStrip.Attach(model.Operation, images); NavigatorView.Attach(model.Operation, images);
         _sidePanels = new(this, model);
         FilmStrip.PageRequested += async (_, index) => { try { await model.Operation.JumpAsync(index); } catch (Exception ex) { ShowError(ex.Message); } };
+        FilmStrip.FrameMoveRequested += async (_, direction) => { try { await model.Operation.MoveAsync(direction); } catch (Exception ex) { ShowError(ex.Message); } };
+        FilmStrip.GlobalWheelRequested += FilmStrip_GlobalWheel;
         NavigatorView.NavigateRequested += (_, point) => Viewer.Navigate(point);
         BuildMenus();
     }
@@ -99,6 +106,10 @@ public sealed partial class MainWindow : Window
             root.Children[1].Children!.Add(new(text, MenuElementType.Command, command));
         foreach (var (text, command) in new[] { ("放大", "ViewScaleUp"), ("缩小", "ViewScaleDown") })
             root.Children[2].Children!.Add(new(text, MenuElementType.Command, command));
+        // 原默认菜单未列出的定位命令追加到跳转组，原节点/占位和顺序完整保留。
+        root.Children[3].Children!.Add(new(null, MenuElementType.Separator, null));
+        foreach (var name in new[] { "JumpPage", "PrevHistoryPage", "NextHistoryPage", "PrevBookHistory", "NextBookHistory" })
+            root.Children[3].Children!.Add(new(null, MenuElementType.Command, name));
         MenuPresenter.Populate(this.FindControl<Menu>("MenuBar")!, root, _model.Commands, _model.SaveData, IsCommandAvailable, ExecuteAsync, GetCommandCheck);
     }
     /// <summary>原菜单绑定的勾选表现；只读取引擎配置，不在菜单中维护第二套状态。</summary>
@@ -180,13 +191,24 @@ public sealed partial class MainWindow : Window
                 case "ViewScaleDown": await Viewer.ZoomAsync(1 / 1.2); break;
                 case "NextScrollPage": await Viewer.ScrollToNextFrameAsync(1, _model.SaveData.GetScrollParameter(name)); break;
                 case "PrevScrollPage": await Viewer.ScrollToNextFrameAsync(-1, _model.SaveData.GetScrollParameter(name)); break;
+                case "NextSizePage": await _model.Operation.MoveSizeAsync(_model.SaveData.GetMoveSizeParameter().Size); break;
+                case "PrevSizePage": await _model.Operation.MoveSizeAsync(-_model.SaveData.GetMoveSizeParameter().Size); break;
+                case "JumpPage":
+                    if (_model.Operation.Book?.Pages.Count > 0)
+                    {
+                        var number = await AskPageNumberAsync();
+                        if (number is not null) await JumpPageAsync(number.Value);
+                    }
+                    break;
                 case "SetStretchModeUniform": Config.Current.View.StretchMode = PageStretchMode.Uniform; Viewer.ResetTransform(); await Viewer.RefreshAsync(); break;
                 case "SetStretchModeNone": Config.Current.View.StretchMode = PageStretchMode.None; Viewer.ResetTransform(); await Viewer.RefreshAsync(); break;
                 case "ToggleHideLeftPanel": Config.Current.Panels.IsLeftVisible = !Config.Current.Panels.IsLeftVisible; _model.RefreshPanels(); break;
                 case "ToggleHideRightPanel": Config.Current.Panels.IsRightVisible = !Config.Current.Panels.IsRightVisible; _model.RefreshPanels(); break;
                 case "LeftAutoHide": Config.Current.Panels.IsLeftAutoHide = !Config.Current.Panels.IsLeftAutoHide; _model.RefreshPanels(); break;
                 case "RightAutoHide": Config.Current.Panels.IsRightAutoHide = !Config.Current.Panels.IsRightAutoHide; _model.RefreshPanels(); break;
-                case "OpenOptionsWindow": await new SettingsWindow(_model, IsCommandAvailable).ShowDialog(this); BuildMenus(); break;
+                case "OpenOptionsWindow":
+                    await new SettingsWindow(_model, IsCommandAvailable).ShowDialog(this);
+                    _model.RefreshSelection(); _model.RefreshPanels(); await FilmStrip.RefreshAsync(); BuildMenus(); break;
                 case "HelpCommandList": await ShowCommandStatusAsync(); break;
                 case "ToggleBookmark":
                     if (_model.Operation.Book is { } marked) { await _model.Operation.SaveAsync(); await _model.SaveData.ToggleBookmarkAsync(marked); } break;
@@ -292,15 +314,55 @@ public sealed partial class MainWindow : Window
     private void FilmStrip_Entered(object? sender, PointerEventArgs e) => _model?.HoverFilmStrip(true);
     /// <summary>离开底栏恢复胶片条隐藏状态。</summary>
     private void FilmStrip_Exited(object? sender, PointerEventArgs e) => _model?.HoverFilmStrip(false);
-    /// <summary>滑条拖动防抖，连续位置变化不会排满导航队列。</summary>
+    /// <summary>按原命令的一起始页码定位，超出范围由 Engine 校正。</summary>
+    /// <param name="number">用户页码，1 为首页。</param>
+    public Task JumpPageAsync(int number) => _model?.Operation.JumpAsync((int)Math.Clamp((long)number - 1, 0, int.MaxValue)) ?? Task.CompletedTask;
+    /// <summary>指定页对话框只接受整数；取消与无效输入不会改动阅读位置。</summary>
+    private Task<int?> AskPageNumberAsync()
+    {
+        var input = new TextBox { Text = (_model!.PageIndex + 1).ToString(System.Globalization.CultureInfo.InvariantCulture) };
+        var message = new TextBlock { Text = $"页码（1–{_model.Pages.Count}），超出范围定位到首尾页。" };
+        var cancel = new Button { Content = "取消" }; var accept = new Button { Content = "跳转" };
+        var dialog = new Window { Title = "跳转到指定页", Width = 380, Height = 190, WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Content = new StackPanel { Margin = new Thickness(16), Spacing = 12, Children = { input, message, new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 8, Children = { cancel, accept } } } } };
+        // Enter 与按钮使用同一确认逻辑，焦点保持在输入作用域。
+        void Confirm() { if (int.TryParse(input.Text, out var number)) dialog.Close((int?)number); else message.Text = "请输入整数页码。"; }
+        cancel.Click += (_, _) => dialog.Close(null); accept.Click += (_, _) => Confirm();
+        input.KeyDown += (_, e) => { if (e.Key == Key.Enter) { e.Handled = true; Confirm(); } };
+        dialog.Opened += (_, _) => { input.Focus(); input.SelectAll(); };
+        return dialog.ShowDialog<int?>(this);
+    }
+    /// <summary>按下后开启原拖动选择，正文仍保持当前帧。</summary>
+    private void Slider_Pressed(object? sender, PointerPressedEventArgs e)
+    { if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) _sliderDragging = true; }
+    /// <summary>鼠标释放确认联动选择；取消/正文更新不会自动确认。</summary>
+    private async void Slider_Released(object? sender, PointerReleasedEventArgs e)
+    {
+        if (!_sliderDragging) return; _sliderDragging = false;
+        try { await CommitSliderAsync(); } catch (Exception ex) { ShowError(ex.Message); }
+    }
+    /// <summary>使用原双页对齐规则改变临时选择；未联动时立即定位。</summary>
+    public async Task PreviewSliderAsync(int index)
+    {
+        if (_model is null || _preparing || _model.Pages.Count == 0) return;
+        var operation = _model.Operation;
+        index = operation.FilmStrip.GetFixedSliderIndex(index, operation.Frame?.Elements.Count(e => !e.IsDummy) ?? 0);
+        operation.PageSelector.SetSelectedIndex(this, index, true);
+        if (!Config.Current.FilmStrip.IsEnabled || !Config.Current.Slider.IsSliderLinkedFilmStrip) await operation.JumpAsync(operation.PageSelector.SelectedIndex);
+    }
+    /// <summary>滑条释放或 Enter 将共用选择提交到原正文定位。</summary>
+    public Task CommitSliderAsync() => _model is not null && Config.Current.FilmStrip.IsEnabled && Config.Current.Slider.IsSliderLinkedFilmStrip
+        ? _model.Operation.JumpAsync(_model.Operation.PageSelector.SelectedIndex) : Task.CompletedTask;
+    /// <summary>程序绑定与用户拖动分开，避免选择回报形成重复跳页。</summary>
     private async void Slider_ValueChanged(object? sender, Avalonia.Controls.Primitives.RangeBaseValueChangedEventArgs e)
     {
-        if (_model is null || _preparing || Math.Abs(e.NewValue - _model.PageIndex) < .5) return;
-        _slider?.Cancel(); var pending = new CancellationTokenSource(); _slider = pending;
-        try { await Task.Delay(80, pending.Token); await _model.Operation.JumpAsync((int)Math.Round(e.NewValue)); }
-        catch (OperationCanceledException) { }
+        if (_model is null || _preparing || _sliderUpdating || Math.Abs(e.NewValue - _model.PageIndex) < .5) return;
+        // 绑定刷新不属于输入；焦点内的键盘调整与指针拖动才进入临时选择。
+        if (!_sliderDragging && FocusManager?.GetFocusedElement() != sender) return;
+        _sliderUpdating = true;
+        try { await PreviewSliderAsync((int)Math.Round(e.NewValue)); _model.RefreshSelection(); }
         catch (Exception ex) { ShowError(ex.Message); }
-        finally { if (ReferenceEquals(_slider, pending)) _slider = null; pending.Dispose(); }
+        finally { _sliderUpdating = false; }
     }
     /// <summary>系统 Command 键先处理；编辑控件隔离其余原快捷键。</summary>
     private async void Key_Down(object? sender, KeyEventArgs e)
@@ -312,6 +374,10 @@ public sealed partial class MainWindow : Window
         if (FocusManager?.GetFocusedElement() is TextBox) return;
         // 弹出菜单拥有方向键，不能让原阅读快捷键抢走菜单导航/选择。
         if (this.FindControl<Menu>("MenuBar")!.IsOpen || FocusManager?.GetFocusedElement() is MenuItem) return;
+        if (FocusManager?.GetFocusedElement() == FilmStrip && FilmStrip.HandleSelectionKey(e)) return;
+        if (FocusManager?.GetFocusedElement() == this.FindControl<Slider>("PageSliderView") && e.KeyModifiers == KeyModifiers.None && e.Key == Key.Enter)
+        { e.Handled = true; await CommitSliderAsync(); return; }
+        if (FocusManager?.GetFocusedElement() == this.FindControl<Slider>("PageSliderView") && e.KeyModifiers == KeyModifiers.None && e.Key is Key.Left or Key.Right or Key.Up or Key.Down) return;
         var matches = _model.Commands.Definitions.Where(d => _model.SaveData.GetShortcut(d.Name, d.Shortcut).Split(',').Any(s => MatchKey(s, e))).ToArray();
         if (matches.Length == 0) return; e.Handled = true;
         if (matches.Length > 1) { ShowError("快捷键冲突：" + string.Join("、", matches.Select(d => d.Text))); return; }
@@ -335,9 +401,26 @@ public sealed partial class MainWindow : Window
     private async Task GestureAsync(string gesture)
     {
         if (_model is null) return;
-        var matches = _model.Commands.Definitions.Where(d => _model.SaveData.GetShortcut(d.Name, d.Shortcut).Split(',').Contains(gesture, StringComparer.OrdinalIgnoreCase)).ToArray();
+        var matches = _model.Commands.Definitions.Where(d => _model.SaveData.GetShortcut(d.Name, d.Shortcut).Split(',')
+            .Any(s => string.Equals(s.Trim().Replace("Control+", "Ctrl+").Replace("Command+", "Meta+"), gesture, StringComparison.OrdinalIgnoreCase))).ToArray();
         if (matches.Length == 1) await ExecuteAsync(matches[0].Name);
         else if (matches.Length > 1) ShowError("输入冲突：" + string.Join("、", matches.Select(d => d.Text)));
+    }
+    /// <summary>命令依赖模式按原修饰键滚轮绑定执行，不绕过配置强制缩放/翻页。</summary>
+    private async void FilmStrip_GlobalWheel(object? sender, PointerWheelEventArgs e)
+    {
+        _wheel += e.Delta.Y; int steps = (int)_wheel; _wheel -= steps;
+        var modifiers = new List<string>();
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Control)) modifiers.Add("Ctrl");
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Meta)) modifiers.Add("Meta");
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Alt)) modifiers.Add("Alt");
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Shift)) modifiers.Add("Shift");
+        var buttons = e.GetCurrentPoint(FilmStrip).Properties;
+        if (buttons.IsLeftButtonPressed) modifiers.Add("LeftButton");
+        if (buttons.IsRightButtonPressed) modifiers.Add("RightButton");
+        if (buttons.IsMiddleButtonPressed) modifiers.Add("MiddleButton");
+        var wheel = string.Join('+', modifiers.Append(steps > 0 ? "WheelUp" : "WheelDown"));
+        for (int i = 0; i < Math.Abs(steps); i++) await GestureAsync(wheel);
     }
     /// <summary>普通滚轮按原绑定；正式 Mac 精确滚动由平台桥接提前消费。</summary>
     private async void Viewer_Wheel(object? sender, PointerWheelEventArgs e)
@@ -384,7 +467,7 @@ public sealed partial class MainWindow : Window
         _preparing = true;
         try
         {
-            _folders?.Cancel(); _slider?.Cancel();
+            _folders?.Cancel(); _sliderDragging = false;
             if (_model is not null)
             {
                 var left = this.FindControl<Border>("LeftPanel")!.Bounds.Width;

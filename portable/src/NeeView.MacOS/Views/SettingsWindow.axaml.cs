@@ -19,14 +19,16 @@ public sealed partial class SettingsWindow : Window
     {
         _model = model;
         _inputs = model.Commands.Definitions.Select(d => new ShortcutEdit(d, model.SaveData.GetShortcut(d.Name, d.Shortcut), available?.Invoke(d.Name) ?? model.Commands.IsAvailable(d.Name))).ToArray();
-        this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill();
+        this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm();
     }
     /// <summary>保持原左导航、右内容结构；只切换设置页面，不应用编辑。</summary>
     private void Navigation_Changed(object? sender, SelectionChangedEventArgs e)
     {
         if (!_initialized) return;
         if (this.FindControl<ScrollViewer>("ReadingSettings") is not { } reading || this.FindControl<Grid>("InputSettings") is not { } input) return;
-        reading.IsVisible = (sender as ListBox)?.SelectedIndex != 1; input.IsVisible = !reading.IsVisible;
+        var index = (sender as ListBox)?.SelectedIndex ?? 0;
+        reading.IsVisible = index == 0; input.IsVisible = index == 1;
+        this.FindControl<ScrollViewer>("FilmSettings")!.IsVisible = index == 2;
     }
     /// <summary>按名称及命令标识过滤编辑副本，未展示的键位也保留。</summary>
     private void InputSearch_Changed(object? sender, TextChangedEventArgs e)
@@ -58,6 +60,34 @@ public sealed partial class SettingsWindow : Window
         setting.IsSupportedSingleFirstPage = this.FindControl<CheckBox>("First")!.IsChecked == true;
         setting.IsSupportedSingleLastPage = this.FindControl<CheckBox>("Last")!.IsChecked == true;
     }
+    /// <summary>读取原胶片条、滑条及共享步长参数到编辑控件，取消不修改配置。</summary>
+    private void FillFilm()
+    {
+        var film = Config.Current.FilmStrip; var slider = Config.Current.Slider;
+        foreach (var (name, value) in new[] { ("FilmEnabled", film.IsEnabled), ("FilmHide", film.IsHideFilmStrip), ("FilmNumber", film.IsVisibleNumber), ("FilmCenter", film.IsSelectedCenter), ("FilmDetail", film.IsDetailPopupEnabled), ("SliderLinked", slider.IsSliderLinkedFilmStrip), ("SliderSync", slider.IsSyncPageMode) })
+            this.FindControl<CheckBox>(name)!.IsChecked = value;
+        this.FindControl<NumericUpDown>("FilmWidth")!.Value = (decimal)Math.Min(film.ImageWidth, (double)decimal.MaxValue / 2);
+        this.FindControl<ComboBox>("FilmWheel")!.SelectedIndex = (int)film.MouseWheelAction;
+        this.FindControl<ComboBox>("SliderOrder")!.SelectedIndex = (int)slider.SliderDirection;
+        this.FindControl<NumericUpDown>("MoveSize")!.Value = _model!.SaveData.GetMoveSizeParameter().Size;
+    }
+    /// <summary>只写当前已迁入字段；播放列表标记、全局自动隐藏等原字段保持原值。</summary>
+    private void ApplyFilm()
+    {
+        var film = Config.Current.FilmStrip; var slider = Config.Current.Slider;
+        film.IsEnabled = this.FindControl<CheckBox>("FilmEnabled")!.IsChecked == true;
+        film.IsHideFilmStrip = this.FindControl<CheckBox>("FilmHide")!.IsChecked == true;
+        film.IsVisibleNumber = this.FindControl<CheckBox>("FilmNumber")!.IsChecked == true;
+        film.IsSelectedCenter = this.FindControl<CheckBox>("FilmCenter")!.IsChecked == true;
+        film.IsDetailPopupEnabled = this.FindControl<CheckBox>("FilmDetail")!.IsChecked == true;
+        film.ImageWidth = (double)(this.FindControl<NumericUpDown>("FilmWidth")!.Value ?? 96);
+        film.MouseWheelAction = (FilmStripMouseWheelAction)Math.Max(0, this.FindControl<ComboBox>("FilmWheel")!.SelectedIndex);
+        slider.SliderDirection = (SliderDirection)Math.Max(0, this.FindControl<ComboBox>("SliderOrder")!.SelectedIndex);
+        slider.IsSliderLinkedFilmStrip = this.FindControl<CheckBox>("SliderLinked")!.IsChecked == true;
+        slider.IsSyncPageMode = this.FindControl<CheckBox>("SliderSync")!.IsChecked == true;
+        var size = (int)(this.FindControl<NumericUpDown>("MoveSize")!.Value ?? 10);
+        if (size != _model!.SaveData.GetMoveSizeParameter().Size) _model.SaveData.SetCommandParameter("PrevSizePage", new MoveSizePageCommandParameter { Size = size });
+    }
     /// <summary>设置应用成功并保存 JSON 后关闭；失败留在表单中。</summary>
     private async void Save_Click(object? sender, RoutedEventArgs e)
     {
@@ -70,6 +100,7 @@ public sealed partial class SettingsWindow : Window
             else Apply(Config.Current.BookSetting);
             // 只写用户修改的差分，避免一次保存就展开全部 235 条默认命令。
             foreach (var input in _inputs.Where(i => i.Value.Trim() != i.OriginalValue.Trim())) _model.SaveData.SetShortcut(input.Name, input.Value.Trim());
+            ApplyFilm();
             await _model.Operation.SaveAsync(); Close();
         }
         catch (Exception ex) { this.FindControl<TextBlock>("Message")!.Text = "保存失败：" + ex.Message; }

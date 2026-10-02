@@ -22,6 +22,10 @@ public sealed class CommandTable
         _actions["PrevOnePage"] = () => operation.MoveAsync(-1, true);
         _actions["FirstPage"] = () => operation.JumpAsync(0);
         _actions["LastPage"] = () => operation.JumpAsync((operation.Book?.Pages.Count ?? 1) - 1, true);
+        _actions["PrevHistoryPage"] = () => operation.NavigateHistoryAsync(-1);
+        _actions["NextHistoryPage"] = () => operation.NavigateHistoryAsync(1);
+        _actions["PrevBookHistory"] = () => operation.NavigateHistoryAsync(-1, true);
+        _actions["NextBookHistory"] = () => operation.NavigateHistoryAsync(1, true);
         _actions["SetPageModeOne"] = () => operation.ApplySettingAsync(e => e.PageMode = PageMode.SinglePage);
         _actions["SetPageModeTwo"] = () => operation.ApplySettingAsync(e => e.PageMode = PageMode.WidePage);
         _actions["TogglePageMode"] = () => operation.ApplySettingAsync(e => e.PageMode = e.PageMode.GetToggle(1, true));

@@ -13,6 +13,13 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
     private readonly object _closeSync = new();
     private Task? _closeTask;
     private CancellationTokenSource? _saving;
+    private readonly SemaphoreSlim _historyGate = new(1);
+    private bool _keepHistoryOrder;
+    private FilmStrip? _filmStrip;
+    public PageSelector PageSelector { get; } = new();
+    public FilmStrip FilmStrip => _filmStrip ??= new(PageSelector);
+    public PageHistory PageHistory { get; } = new();
+    public BookHubHistory BookHistory { get; } = new();
     public Book? Book { get; private set; }
     public PageFrame? Frame { get; private set; }
     public PagePosition Position { get; private set; } = PagePosition.Zero;
@@ -30,6 +37,10 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
 
     /// <summary>打开图片所在目录或来源；失败保持旧书，晚到来源只释放。</summary>
     public async Task OpenAsync(string path, CancellationToken token = default)
+    { await OpenCoreAsync(path, token); }
+
+    /// <summary>共享原加载链；历史重放可指定条目并保留访问顺序，返回是否实际提交新书。</summary>
+    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false)
     {
         ObjectDisposedException.ThrowIf(_disposed || _closing, this);
         var generation = Interlocked.Increment(ref _generation);
@@ -37,6 +48,7 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
         var opening = CancellationTokenSource.CreateLinkedTokenSource(token); _opening = opening;
         IsLoading = true; Error = null; Notify();
         Archive? source = null;
+        bool committed = false;
         try
         {
             source = await archives.OpenAsync(path, opening.Token);
@@ -45,23 +57,28 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
             var setting = Config.Current.BookSettingPolicy.Mix(Config.Current.BookSettingDefault, Config.Current.BookSetting, restored.Memento?.ToBookSetting(), false);
             var book = new Book(source, entries.Where(e => !e.IsDirectory && ImageFormats.IsImage(e.EntryName)).Select(e => new Page(e)).ToList(), setting);
             book.SortSeed = restored.Memento?.SortSeed ?? 0; book.Sort(opening.Token);
-            var requested = ImageFormats.IsImage(path) ? System.IO.Path.GetFileName(path) : setting.Page;
+            var requested = entryName ?? (ImageFormats.IsImage(path) ? System.IO.Path.GetFileName(path) : setting.Page);
             int index = book.Pages.FindIndex(e => e.EntryName == requested);
+            if (entryName is not null && index < 0) throw new FileNotFoundException("历史页面已不存在：" + entryName);
             index = Math.Max(0, index);
-            if (!ImageFormats.IsImage(path) && Config.Current.BookSettingPolicy.Page == BookSettingPageSelectMode.RestoreOrDefaultReset && index >= book.Pages.Count - (setting.PageMode == PageMode.WidePage && !setting.IsSupportedSingleLastPage ? 2 : 1)) index = 0;
+            if (entryName is null && !keepHistoryOrder && !ImageFormats.IsImage(path) && Config.Current.BookSettingPolicy.Page == BookSettingPageSelectMode.RestoreOrDefaultReset && index >= book.Pages.Count - (setting.PageMode == PageMode.WidePage && !setting.IsSupportedSingleLastPage ? 2 : 1)) index = 0;
             await ProbeAroundAsync(book, index, opening.Token);
             await _gate.WaitAsync(opening.Token);
             try
             {
                 opening.Token.ThrowIfCancellationRequested();
-                if (_disposed || _closing || generation != _generation) return;
-                await saveData.SaveAsync(Book, Position.Part, opening.Token);
+                if (_disposed || _closing || generation != _generation) return false;
+                await saveData.SaveAsync(Book, Position.Part, opening.Token, _keepHistoryOrder);
                 var old = Book; Book = book; source = null;
+                _keepHistoryOrder = keepHistoryOrder;
                 Config.Current.BookSetting = setting;
                 Context = new(setting, Config.Current);
-                Position = new(index, ImageFormats.IsImage(path) ? 0 : Math.Clamp(restored.Part, 0, 1));
+                Position = new(index, entryName is not null || ImageFormats.IsImage(path) ? 0 : Math.Clamp(restored.Part, 0, 1));
                 RebuildFrame(1);
                 if (old is not null) await old.DisposeAsync();
+                if (!replayBookHistory) BookHistory.Add(book.Path);
+                if (!replayPageHistory) RecordPageHistory();
+                committed = true;
                 ScheduleSave();
             }
             finally { _gate.Release(); }
@@ -75,6 +92,7 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
             if (ReferenceEquals(_opening, opening)) _opening = null;
             opening.Dispose();
         }
+        return committed;
     }
 
     /// <summary>保留 PageFrameBox 的帧步进与单页步进算法，I/O 前后检查书籍代次。</summary>
@@ -93,24 +111,111 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
             if (position.Index < 0 || position.Index >= Book.Pages.Count) return;
             await ProbeAroundAsync(Book, position.Index, CancellationToken.None);
             if (generation != _generation || _disposed || _closing) return;
-            Position = position; RebuildFrame(direction); ScheduleSave(); Notify();
+            Position = position; RebuildFrame(direction); RecordPageHistory(); ScheduleSave(); Notify();
         }
         finally { _gate.Release(); }
     }
 
     /// <summary>按条目索引定位，最后一页反向生成，保留原首尾页行为。</summary>
     public async Task JumpAsync(int index, bool backwards = false)
+    { await JumpCoreAsync(index, backwards, true); }
+
+    /// <summary>共用定位；历史重放不再追加自身，否则会截断原前进分支。</summary>
+    private async Task<bool> JumpCoreAsync(int index, bool backwards, bool recordHistory)
     {
         await _gate.WaitAsync();
         try
         {
-            if (_disposed || _closing || Book is null || Book.Pages.Count == 0 || IsLoading) return;
+            if (_disposed || _closing || Book is null || Book.Pages.Count == 0 || IsLoading) return false;
             var generation = _generation; index = Math.Clamp(index, 0, Book.Pages.Count - 1);
             await ProbeAroundAsync(Book, index, CancellationToken.None);
-            if (_disposed || _closing || generation != _generation) return;
-            Position = new(index, backwards ? 1 : 0); RebuildFrame(backwards ? -1 : 1); ScheduleSave(); Notify();
+            if (_disposed || _closing || generation != _generation) return false;
+            Position = new(index, backwards ? 1 : 0); RebuildFrame(backwards ? -1 : 1);
+            if (recordHistory) RecordPageHistory(); ScheduleSave(); Notify(); return true;
         }
         finally { _gate.Release(); }
+    }
+
+    /// <summary>原 MoveToNextStep 从范围最小索引计算并静态对齐；越过尾端反向生成。</summary>
+    /// <param name="delta">带方向的页数，不重复普通帧翻页。</param>
+    public async Task MoveSizeAsync(int delta)
+    {
+        if (delta == 0) return;
+        await _gate.WaitAsync();
+        try
+        {
+            if (_disposed || _closing || IsLoading || Book is null || Frame is null) return;
+            var generation = _generation;
+            var accessor = new BookContext(Book.Pages);
+            var requested = Frame.FrameRange.Min.Index + delta;
+            // 原算法先归一到周期内再静态对齐，之后还原周期；奇数页书籍不可直接对原索引对齐。
+            var index = Book.Pages.Count * accessor.NormalizeCycle(requested) + BookTools.WidwPageAlignment(accessor.NormalizeIndex(requested), Book.Setting);
+            bool backwards = index >= Book.Pages.Count;
+            if (!accessor.ContainsIndex(index))
+            {
+                int corrected = Math.Clamp(index, 0, Book.Pages.Count - 1);
+                // 原 CorrectPosition：未到终点时允许定位首尾；已显示该端点时终止，不重建分割页。
+                if ((backwards ? Frame.FrameRange.Max.Index : Frame.FrameRange.Min.Index) == corrected) return;
+                index = corrected;
+            }
+            await ProbeAroundAsync(Book, index, CancellationToken.None);
+            if (_disposed || _closing || generation != _generation) return;
+            Position = new(index, backwards ? 1 : 0); RebuildFrame(backwards ? -1 : 1);
+            RecordPageHistory(); ScheduleSave(); Notify();
+        }
+        finally { _gate.Release(); }
+    }
+
+    /// <summary>重放原页面或书籍打开历史；加载失败/被新打开取代时保留游标供重试。</summary>
+    /// <param name="direction">后退为 -1，前进为 1。</param>
+    /// <param name="bookOnly">true 按打开顺序，false 按书籍路径和页面条目名。</param>
+    public async Task NavigateHistoryAsync(int direction, bool bookOnly = false)
+    {
+        await _historyGate.WaitAsync();
+        try
+        {
+            if (_disposed || _closing || IsLoading) return;
+            if (bookOnly)
+            {
+                var path = BookHistory.GetTarget(direction); if (path is null) return;
+                if (await OpenCoreAsync(path, CancellationToken.None, keepHistoryOrder: true, replayBookHistory: true) && BookHistory.GetTarget(direction) == path)
+                    BookHistory.CommitMove(direction);
+            }
+            else
+            {
+                var target = PageHistory.GetTarget(direction); if (target is not { } unit || unit.IsEmpty()) return;
+                bool success;
+                if (Book?.Path == unit.BookAddress)
+                {
+                    int index = Book.Pages.FindIndex(p => p.EntryName == unit.PageName);
+                    if (index < 0) { Error = "历史页面已不存在：" + unit.PageName; Notify(); return; }
+                    success = await JumpCoreAsync(index, false, false);
+                }
+                else success = await OpenCoreAsync(unit.BookAddress, CancellationToken.None, unit.PageName, true, replayPageHistory: true);
+                if (success && PageHistory.GetTarget(direction) == unit) PageHistory.CommitMove(direction);
+            }
+        }
+        finally { _historyGate.Release(); }
+    }
+
+    /// <summary>悬停详情只探测该条目附近的元数据，来源/代次由既有操作锁保护。</summary>
+    public async Task<Page?> GetPageInformationAsync(int index, CancellationToken token)
+    {
+        await _gate.WaitAsync(token);
+        try
+        {
+            if (_disposed || _closing || IsLoading || Book is null || index < 0 || index >= Book.Pages.Count) return null;
+            var book = Book; var generation = _generation; await ProbeAroundAsync(book, index, token);
+            return generation == _generation && ReferenceEquals(book, Book) ? book.Pages[index] : null;
+        }
+        finally { _gate.Release(); }
+    }
+
+    /// <summary>原页面历史只登记当前真实显示帧中索引最小的页，空内容使用空记录。</summary>
+    private void RecordPageHistory()
+    {
+        var page = Frame?.Elements.Where(e => !e.IsDummy).Select(e => e.Page).MinBy(p => p.Index);
+        PageHistory.Add(page is null || Book is null ? PageHistoryUnit.Empty : new(Book.Path, page.EntryName));
     }
 
     /// <summary>设置或排序变化后保持当前条目，再生成原页框。</summary>
@@ -121,7 +226,7 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
         {
             if (_disposed || _closing || Book is null || IsLoading) return;
             var current = Book.CurrentPage; change(Book.Setting); Book.Sort(CancellationToken.None);
-            Position = new(current?.Index ?? 0, Position.Part); RebuildFrame(1); ScheduleSave(); Notify();
+            Position = new(current?.Index ?? 0, Position.Part); RebuildFrame(1); RecordPageHistory(); ScheduleSave(); Notify();
         }
         finally { _gate.Release(); }
     }
@@ -131,21 +236,22 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
     {
         if (_disposed || Context is null || size.Width <= 0 || size.Height <= 0) return;
         // 视口变化必须保留当前生成方向，否则反向分割页会被改成前半页。
-        Context.CanvasSize = size; Context.DeviceScale = Math.Max(1, scale); RebuildFrame(MoveDirection);
+        Context.CanvasSize = size; Context.DeviceScale = Math.Max(1, scale); RebuildFrame(MoveDirection, false);
     }
     /// <summary>立即保存，用于切书和正常退出。</summary>
-    public Task SaveAsync() => saveData.SaveAsync(Book, Position.Part);
+    public Task SaveAsync() => saveData.SaveAsync(Book, Position.Part, keepHistoryOrder: _keepHistoryOrder);
 
     /// <summary>使用完整迁入的 PageFrameFactory；半页位置在关闭分割时恢复整页。</summary>
-    private void RebuildFrame(int direction)
+    private void RebuildFrame(int direction, bool synchronizeSelection = true)
     {
         // PageFrame.Direction 是书籍阅读方向；移动方向独立保留，供分割生成与展示原点使用。
         MoveDirection = direction;
-        if (Book is null || Context is null || Book.Pages.Count == 0) { Frame = null; return; }
+        if (Book is null || Context is null || Book.Pages.Count == 0) { Frame = null; if (synchronizeSelection) PageSelector.Synchronize(Book, 0); return; }
         var page = Book.Pages[Math.Clamp(Position.Index, 0, Book.Pages.Count - 1)];
         if (!(Context.PageMode == PageMode.SinglePage && Context.IsSupportedDividePage && Maths.AspectRatioTools.IsLandscape(page.Content.PageDataSource.Size))) Position = new(page.Index, direction > 0 ? 0 : 1);
         Frame = new PageFrameFactory(Context, new BookContext(Book.Pages), new ContentSizeCalculator(Context)).CreatePageFrame(Position, direction);
         Book.CurrentPage = Frame?.Elements.FirstOrDefault(e => !e.IsDummy)?.Page;
+        if (synchronizeSelection) PageSelector.Synchronize(Book, Math.Max(0, Frame?.FrameRange.Min.Index ?? 0));
     }
     /// <summary>只探测当前及生成双页所需邻页，损坏页保留占位。</summary>
     private async Task ProbeAroundAsync(Book book, int index, CancellationToken token)
@@ -172,7 +278,7 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
     /// <summary>观察后台保存错误，不产生未观察任务异常。</summary>
     private async Task SaveLaterAsync(CancellationTokenSource pending)
     {
-        try { await Task.Delay(1000, pending.Token); await saveData.SaveAsync(Book, Position.Part, pending.Token); }
+        try { await Task.Delay(1000, pending.Token); await saveData.SaveAsync(Book, Position.Part, pending.Token, _keepHistoryOrder); }
         catch (OperationCanceledException) { }
         catch (Exception ex) { Error = "保存失败：" + ex.Message; Notify(); }
         finally { if (ReferenceEquals(_saving, pending)) _saving = null; pending.Dispose(); }

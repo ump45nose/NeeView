@@ -952,7 +952,7 @@
     "Text": "转到指定页面",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/JumpPageCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 原定位/共享步长宿主接入；具体范围见验收表"
   },
   {
     "Name": "JumpRandomPage",
@@ -966,14 +966,14 @@
     "Text": "后退指定页数",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/PrevSizePageCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 原定位/共享步长宿主接入；具体范围见验收表"
   },
   {
     "Name": "NextSizePage",
     "Text": "前进指定页数",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/NextSizePageCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 原定位/共享步长宿主接入；具体范围见验收表"
   },
   {
     "Name": "PrevFolderPage",
@@ -1008,14 +1008,14 @@
     "Text": "后退到上一页",
     "Shortcut": "Back",
     "Source": "NeeView/Command/Commands/PrevHistoryPageCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 原导航历史接入；具体范围见验收表"
   },
   {
     "Name": "NextHistoryPage",
     "Text": "前进到下一页",
     "Shortcut": "Shift+Back",
     "Source": "NeeView/Command/Commands/NextHistoryPageCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 原导航历史接入；具体范围见验收表"
   },
   {
     "Name": "ToggleBookLock",
@@ -1065,14 +1065,14 @@
     "Text": "后退到上一本书籍",
     "Shortcut": "Alt+Left",
     "Source": "NeeView/Command/Commands/PrevBookHistoryCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 原导航历史接入；具体范围见验收表"
   },
   {
     "Name": "NextBookHistory",
     "Text": "前进到下一本书籍",
     "Shortcut": "Alt+Right",
     "Source": "NeeView/Command/Commands/NextBookHistoryCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 原导航历史接入；具体范围见验收表"
   },
   {
     "Name": "MoveToParentBook",

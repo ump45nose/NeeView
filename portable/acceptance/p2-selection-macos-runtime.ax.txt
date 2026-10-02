@@ -1,0 +1,110 @@
+Window: "漫画.cbz — NeeView", App: NeeView.
+0 standard window 漫画.cbz — NeeView, Secondary Actions: Raise
+	1 container WindowChrome, ID: AvaloniaWindowChrome
+	2 container
+		3 container Root
+			4 container
+				5 menu bar MenuBar
+					6 container
+						7 文件
+							8 container
+								9 unknown PART_Popup
+						10 显示
+							11 container
+								12 unknown PART_Popup
+						13 图像
+							14 container
+								15 unknown PART_Popup
+						16 跳转
+							17 container
+								18 unknown PART_Popup
+						19 页面
+							20 container
+								21 unknown PART_Popup
+						22 书籍
+							23 container
+								24 unknown PART_Popup
+						25 选项
+							26 container
+								27 unknown PART_Popup
+						28 帮助
+							29 container
+								30 unknown PART_Popup
+				31 text field (settable) Help: 打开图片、目录、ZIP / RAR / 7z, Value: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz, ID: AddressBar
+					32 container
+						33 container
+							34 scroll area PART_ScrollViewer
+								35 container
+			36 container SidePanelFrame
+				37 container LeftRailItems
+					38 button Avalonia.Controls.PathIcon, Help: 信息 / 页面列表（拖动可重排或组合）
+					39 button Avalonia.Controls.PathIcon, Help: 文件夹（拖动可重排或组合）
+					40 button Avalonia.Controls.PathIcon, Help: 历史（拖动可重排或组合）
+				41 container LeftDockHost
+					42 container
+						43 text 信息
+						44 scroll area
+							45 container
+								46 text 中文/003.png
+
+尺寸：1800 × 1000
+大小：11,296 字节
+
+来源：/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz
+
+					47 handle
+					48 container
+						49 text 页面列表
+						50 content list PageList
+							51 scroll area PART_ScrollViewer
+								52 container
+									53 container
+										54 row (selectable) 中文/001.png
+											55 text 中文/001.png
+										56 row (selectable) 中文/002.png
+											57 text 中文/002.png
+										58 row (selected) 中文/003.png
+											59 text 中文/003.png
+										60 row (selectable) 中文/004.png
+											61 text 中文/004.png
+										62 row (selectable) 中文/005.png
+											63 text 中文/005.png
+									64 scroll bar (settable, float) Value: 0, ID: PART_VerticalScrollBar
+										65 container
+											66 button Line up, ID: PART_LineUpButton
+											67 button Page up, ID: PART_PageUpButton
+											68 button Page down, ID: PART_PageDownButton
+											69 handle Position
+											70 button Line down, ID: PART_LineDownButton
+				71 handle
+				72 handle
+				73 container
+					74 text 导航器
+					75 container
+						76 button −
+						77 button 适合
+						78 button 100%
+						79 button +
+				80 container RightRailItems
+					81 button Avalonia.Controls.PathIcon, Help: 导航器（拖动可重排或组合）
+					82 button Avalonia.Controls.PathIcon, Help: 图像效果（P5）（拖动可重排或组合）
+					83 button Avalonia.Controls.PathIcon, Help: 书签（拖动可重排或组合）
+					84 button Avalonia.Controls.PathIcon, Help: 播放列表（P5）（拖动可重排或组合）
+					85 button Avalonia.Controls.PathIcon, Help: 目标文件夹（P4）（拖动可重排或组合）
+			86 container
+				87 container DockPageSliderSocket
+					88 slider (settable, float) Value: 2, ID: PageSliderView
+						89 container PART_Track
+							90 button PART_DecreaseButton
+								91 container
+							92 button PART_IncreaseButton
+								93 container
+							94 handle thumb
+					95 text 3 / 6
+				96 text Value: 中文/003.png  ·  单页  ·  从右向左, ID: StatusField
+	97 close button
+	98 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	99 minimize button
+	100 text 漫画.cbz — NeeView
+101 menu bar
+	102 NeeView

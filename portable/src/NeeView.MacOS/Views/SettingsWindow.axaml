@@ -4,7 +4,7 @@
     <Border Grid.Column="0" Classes="panel">
       <Grid RowDefinitions="Auto,*">
         <TextBox PlaceholderText="搜索设置" Margin="8" IsEnabled="False" ToolTip.Tip="完整设置搜索在 P2–P5 迁移" />
-        <ListBox Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
+        <ListBox Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
       </Grid>
     </Border>
     <ScrollViewer x:Name="ReadingSettings" Grid.Column="1">
@@ -25,6 +25,18 @@
         <ListBox.ItemTemplate><DataTemplate><Grid ColumnDefinitions="*,230" Margin="0,4"><StackPanel><TextBlock Text="{Binding Label}" /><TextBlock Text="{Binding Name}" FontSize="10" Opacity="0.6" /></StackPanel><TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" ToolTip.Tip="逗号分隔多个输入；空值解绑。Control 保留原值，Mac Command 使用 Meta。" /></Grid></DataTemplate></ListBox.ItemTemplate>
       </ListBox>
     </Grid>
+    <ScrollViewer x:Name="FilmSettings" Grid.Column="1" IsVisible="False">
+      <StackPanel Margin="24" Spacing="14">
+        <TextBlock Text="胶片条 / 滑条" FontSize="20" />
+        <CheckBox x:Name="FilmEnabled" Content="显示胶片条" /><CheckBox x:Name="FilmHide" Content="自动隐藏胶片条" />
+        <TextBlock Text="缩略图宽度（DIP，最低 32）" /><NumericUpDown x:Name="FilmWidth" Minimum="32" Increment="8" FormatString="0.#####" />
+        <CheckBox x:Name="FilmNumber" Content="显示页码" /><CheckBox x:Name="FilmCenter" Content="所选图片居中（首尾保留空白）" /><CheckBox x:Name="FilmDetail" Content="悬停显示页面详情" />
+        <TextBlock Text="胶片条滚轮动作" /><ComboBox x:Name="FilmWheel"><ComboBoxItem Content="移动选择（点击或 Enter 确认）" /><ComboBoxItem Content="移动正文页" /><ComboBoxItem Content="使用命令绑定" /></ComboBox>
+        <TextBlock Text="胶片条与滑条方向" /><ComboBox x:Name="SliderOrder"><ComboBoxItem Content="从左向右" /><ComboBoxItem Content="从右向左" /><ComboBoxItem Content="跟随书籍阅读方向" /></ComboBox>
+        <CheckBox x:Name="SliderLinked" Content="滑条与胶片条联动（拖动预览，释放确认）" /><CheckBox x:Name="SliderSync" Content="滑条步进跟随页面模式" />
+        <TextBlock Text="指定页数步进（上一方向、下一方向共用）" /><NumericUpDown x:Name="MoveSize" Minimum="0" Maximum="1000" Increment="1" FormatString="0" />
+      </StackPanel>
+    </ScrollViewer>
     <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="16" Spacing="8">
       <TextBlock x:Name="Message" TextWrapping="Wrap" MaxWidth="560" VerticalAlignment="Center" /><Button Content="取消" Click="Cancel_Click" /><Button Content="保存" Click="Save_Click" />
     </StackPanel>

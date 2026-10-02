@@ -1,6 +1,6 @@
 # NeeView Mac 源码迁移架构
 
-P0/P1 已建立工程骨架、原窗口区域和目录/图片/ZIP 阅读链路。P2 首批接入完整菜单占位、RAR/7z、历史/书签、胶片条/导航器与输入设置；第二批接入原侧栏布局数据和拖拽组合、原 NScroll 滚动翻页。P2 尚未整体完成。Mac 独立维护；原 Windows 工程是固定行为参考，不参与 Mac 构建。
+P0/P1 已建立工程骨架、原窗口区域和目录/图片/ZIP 阅读链路。P2 首批接入完整菜单占位、RAR/7z、历史/书签、胶片条/导航器与输入设置；第二批接入原侧栏布局数据和拖拽组合、原 NScroll 滚动翻页；第三批接入原共享页选择、胶片条模式/详情、滑条联动、指定页/共享步长和两种导航历史。P2 尚未整体完成。Mac 独立维护；原 Windows 工程是固定行为参考，不参与 Mac 构建。
 
 ## 基线与技术栈
 
@@ -31,7 +31,7 @@ Book/Page/Archive/BookOperation 是原关系的 P1 子集适配，尚未完整�
 
 ## 打开与显示
 
-路径 → BookOperation → Archive/ArchiveEntry → 原设置 Mix/BookPageSort → 尺寸探测 → 原 PageFrameFactory → ReaderView 当前帧需求 → BitmapFactory → 后端解码 → 像素租约 → Avalonia Bitmap/绘制。胶片条及导航器共用同一 BitmapFactory，按可见窗口申请缩略规格。
+路径 → BookOperation → Archive/ArchiveEntry → 原设置 Mix/BookPageSort → 尺寸探测 → 原 PageFrameFactory → ReaderView 当前帧需求 → BitmapFactory → 后端解码 → 像素租约 → Avalonia Bitmap/绘制。胶片条及导航器共用同一 BitmapFactory，按可见窗口申请缩略规格。胶片条/滑条共用 PageSelector，临时选择不改变正文；200ms防抖和可见序列去重，点击/Enter或滑条释放才确认。
 
 图片定位到所在目录中的条目。目录/ZIP/RAR/7z 完整索引后显示，尚未提供渐进索引。窗口级 BookOperation 使用互斥保护导航、设置与提交；打开按代次裁决，失败保留旧书。切书先保存旧状态，替换成功后释放旧来源。分割位置使用原 PagePosition.Part，不另定义身份或锚点体系。
 
@@ -55,7 +55,9 @@ Book/Page/Archive/BookOperation 是原关系的 P1 子集适配，尚未完整�
 
 原 MainWindow/SidePanelFrame 的区域关系是布局基准，原 Colors/IconGeometries 是资源基准。顶部菜单/地址、左右图标栏/面板、中央查看器、底部滑条/状态和胶片条插槽已转换。九个原面板完整登记，历史、书签、导航器已启用。未迁移命令保留禁用菜单，未迁移面板可选择并显示阶段说明。用户已认可总体布局；第二批按原 LayoutPanel 关系接入跨栏重排、分割组合、成员拆组、组间比例/选择恢复与拖动自动隐藏锁定。Engine 只保存布局数据，SidePanelPresenter 负责 Avalonia 控件和拖放预览，主题可独立更改。原浮动窗口、旧 V0/V1 布局导入、完整自动隐藏细节及 Windows 动态对照仍待迁移/验证。
 
-滚动翻页从原 PageFrameBox/NScroll/ScrollResult 迁入五种模式、分段、终端吸附和换行停顿，普通滚轮命令到边界后才进入原帧导航。精确滚动仍走表现平移，由原 DragArea.SnapView 约束；书籍阅读方向与帧移动方向分别保留。全景 PagesAsOne、完整参数编辑和复杂鼠标组合仍待后续。详见 [P2 第二批契约](p2-docking-scroll.md)。
+滚动翻页从原 PageFrameBox/NScroll/ScrollResult 迁入五种模式、分段、终端吸附和换行停顿，普通滚轮命令到边界后才进入原帧导航。精确滚动仍走表现平移，由原 DragArea.SnapView 约束；书籍阅读方向与帧移动方向分别保留。全景 PagesAsOne、完整滚动参数编辑和复杂鼠标组合仍待后续。详见 [P2 第二批契约](p2-docking-scroll.md)。
+
+第三批契约见 [页选择与导航历史](p2-selection-navigation.md)。原100项环形历史按页面条目和书籍打开顺序分别保存于进程内；重放成功后提交游标，跨书保留访问排序。JSON仍是唯一持久化权威。
 
 [前端边界](frontend-boundaries.md)、[行为对照](behavior-baseline.md)、[完整命令表](command-migration.md)、[布局表](layout-migration.md)、[模块设计](modules/M01.md) 和 [阶段证据](../acceptance/stages.md) 是后续开发契约。P2 阅读导航剩余增量、P3 大量图片、P4 fork 分类、P5 兼容/高级内容/发布仍是目标，未继承旧重写方案的“通过”。
 

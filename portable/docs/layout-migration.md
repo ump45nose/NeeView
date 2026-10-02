@@ -7,7 +7,7 @@
 | DockMenuSocket / 地址栏 | MainWindow.axaml 顶部 Menu/AddressBar | 完整原八组默认菜单、地址打开；未迁移能力禁用占位，动态菜单配置待后续 |
 | SidePanelFrameView 左右栏 | SidePanelFrame 七列、左右rail | 原左3/右6入口、41 DIP栏/36 DIP图标，分隔拖动、显隐、基础自动隐藏 |
 | MainViewSocket | ReaderView | 原页框绘制、缩放/平移、当前帧和邻图预取 |
-| DockFilmStripSocket | 同名底部插槽 | 原位置可见胶片条、方向与选择定位、基础自动隐藏；完整预览模式待迁入 |
+| DockFilmStripSocket | 同名底部插槽 | 原位置可见胶片条、独立选择/确认、三滚轮、详情和首尾居中；播放列表标记/完整自动隐藏待迁入 |
 | DockPageSliderSocket | PageSliderView | 位置滑条与页码，导航防抖 |
 | DockStatusArea / 覆盖层 | 状态文本/MessageLayer | 当前条目、模式、方向、错误/加载 |
 | 设置左导航/搜索、右内容 | SettingsWindow.axaml | 当前/默认阅读设置、可搜索235命令键位编辑；其他页占位 |

@@ -57,9 +57,9 @@
     <Border x:Name="DockStatusArea" Grid.Row="2" Background="{DynamicResource BottomBar.Background}" PointerEntered="FilmStrip_Entered" PointerExited="FilmStrip_Exited">
       <StackPanel>
         <!-- 保持原底部插槽，可见窗口缩略图由共享工厂加载。 -->
-        <local:ThumbnailView x:Name="DockFilmStripSocket" Height="112" IsVisible="{Binding FilmStripVisible}" />
+        <local:ThumbnailView x:Name="DockFilmStripSocket" Height="{Binding FilmStripHeight}" IsVisible="{Binding FilmStripVisible}" />
         <Grid x:Name="DockPageSliderSocket" ColumnDefinitions="*,Auto" Margin="10,0">
-          <Slider x:Name="PageSliderView" Grid.Column="0" Minimum="0" Maximum="{Binding LastIndex}" Value="{Binding PageIndex}" SmallChange="1" IsSnapToTickEnabled="True" TickFrequency="1" ValueChanged="Slider_ValueChanged" />
+          <Slider x:Name="PageSliderView" Grid.Column="0" Minimum="0" Maximum="{Binding LastIndex}" Value="{Binding PageIndex, Mode=OneWay}" IsDirectionReversed="{Binding SliderReversed}" SmallChange="1" IsSnapToTickEnabled="True" TickFrequency="1" ValueChanged="Slider_ValueChanged" />
           <TextBlock Grid.Column="1" Text="{Binding PositionText}" VerticalAlignment="Center" Margin="12,0,0,0" />
         </Grid>
         <TextBlock x:Name="StatusField" Text="{Binding Status}" TextTrimming="CharacterEllipsis" FontSize="11" Margin="10,0,10,5" />

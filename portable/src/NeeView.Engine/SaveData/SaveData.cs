@@ -37,6 +37,7 @@ public sealed class SaveData(string directory)
             config.View = ReadBranch<ViewConfig>(raw, "View");
             config.Panels = ReadBranch<PanelsConfig>(raw, "Panels");
             config.FilmStrip = ReadBranch<FilmStripConfig>(raw, "FilmStrip");
+            config.Slider = ReadBranch<SliderConfig>(raw, "Slider");
         }
         Config.SetCurrent(config);
     }
@@ -71,6 +72,12 @@ public sealed class SaveData(string directory)
         options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
         return _setting["Commands"]?[name]?["Parameter"]?.Deserialize<ScrollPageCommandParameter>(options) ?? new();
     }
+
+    /// <summary>原相反方向的指定步长命令共享参数，NextSizePage 读取 PrevSizePage 的差分。</summary>
+    public MoveSizePageCommandParameter GetMoveSizeParameter() => _setting["Commands"]?["PrevSizePage"]?["Parameter"]?.Deserialize<MoveSizePageCommandParameter>(Options) ?? new();
+
+    /// <summary>更新已支持参数并保留原节点的未知字段；原差分快捷键不会被覆盖。</summary>
+    public void SetCommandParameter<T>(string name, T value) => Merge(Object(Object(Object(_setting, "Commands"), name), "Parameter"), JsonSerializer.SerializeToNode(value, Options)!.AsObject());
 
     /// <summary>编辑原 Commands 差分键位；空字符串表示解绑，未知参数保持。</summary>
     public void SetShortcut(string name, string value) => Object(Object(_setting, "Commands"), name)["ShortCutKey"] = value;
@@ -144,7 +151,7 @@ public sealed class SaveData(string directory)
             e["LastAccessTime"]?.GetValue<DateTime>() ?? DateTime.MinValue)).OrderByDescending(e => e.LastAccessTime).ToArray() ?? [];
 
     /// <summary>保存阅读状态与布局，已知字段合并进原节点后原子替换文件。</summary>
-    public async Task SaveAsync(Book? book, int part, CancellationToken token = default)
+    public async Task SaveAsync(Book? book, int part, CancellationToken token = default, bool keepHistoryOrder = false)
     {
         await _gate.WaitAsync(token);
         var previousSetting = _setting.DeepClone().AsObject();
@@ -152,7 +159,7 @@ public sealed class SaveData(string directory)
         try
         {
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 Merge(Object(config, branch), JsonSerializer.SerializeToNode(value, Options)!.AsObject());
@@ -167,11 +174,12 @@ public sealed class SaveData(string directory)
                 var unknownProps = FilterProps(item["Props"]?.GetValue<string>(), false);
                 item["Path"] = book.Path; item["Page"] = memento.Page;
                 item["Props"] = string.Join(' ', new[] { memento.ToPropertiesString(), unknownProps }.Where(e => !string.IsNullOrEmpty(e)));
-                item["LastAccessTime"] = DateTime.Now;
+                if (!keepHistoryOrder || old is null) item["LastAccessTime"] = DateTime.Now;
                 item["MacPagePart"] = part;
                 item["MacIsSupportedWidePage"] = memento.IsSupportedWidePage;
-                if (old is not null) items.Remove(old);
-                items.Insert(0, item);
+                // 原 KeepHistoryOrder：阅读位置仍更新，重放不改变访问排序或原数组位置。
+                if (!keepHistoryOrder || old is null)
+                { if (old is not null) items.Remove(old); items.Insert(0, item); }
                 Object(config, "StartUp")["LastBookV2"] = new JsonObject { ["Path"] = book.Path, ["Page"] = memento.Page, ["Props"] = item["Props"]!.DeepClone() };
             }
             // 保留原 Format；新文件使用原名称和版本结构，避免添加另一套存储格式。

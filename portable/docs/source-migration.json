@@ -258,6 +258,12 @@
       "target": "src/NeeView.Engine/MouseInput/DragArea.cs",
       "sha256": "0619c9eee509e9e5df153ba2607c41ecba348f70dfa96f088f2dd5c1aff93cae",
       "status": "原四边越界与SnapView边界吸附算法迁入；控件坐标辅助留在展示端"
+    },
+    {
+      "source": "NeeView/NeeView/Collections/HistoryLimitedCollection.cs",
+      "target": "src/NeeView.Engine/Collections/HistoryLimitedCollection.cs",
+      "sha256": "c66fcf78b686003a9a69444482aca289cac5b86748f85cab54867754fc458c6a",
+      "status": "迁入原环形容量、游标、分支截断和历史列表算法；移除调试生成器，补参数校验及中文注释"
     }
   ],
   "partial_adapters": [
@@ -307,7 +313,7 @@
       "source": "NeeView/Config/FilmStripConfig.cs",
       "target": "src/NeeView.Engine/Config/Config.cs",
       "sha256": "c333f557d6a29cbe331c03646c771cceeba14787aead6a0af472a8a9c2c5ac4e",
-      "status": "P2恢复IsEnabled/IsHideFilmStrip/ImageWidth/IsVisibleNumber/IsSelectedCenter原默认值；其余原字段保留JSON"
+      "status": "迁入十项原字段/默认、ImageWidth最低32且无setter上限；播放列表标记/全局自动隐藏/Windows边界反馈仅保存未执行"
     },
     {
       "source": "NeeView/Command/CommandParameters/ScrollPageCommandParameter.cs",
@@ -332,6 +338,42 @@
       "target": "src/NeeView.Engine/SidePanels/LayoutPanelManager.cs",
       "sha256": "9d079658a81e634909210174bb59ec79060cb618bd07412d2d5f93d549902bcc",
       "status": "保留Key与GridLength比例；控件/拖影分离到SidePanelPresenter，WindowPlacement原JSON保留"
+    },
+    {
+      "source": "NeeView/BookHub/PageHistory.cs",
+      "target": "src/NeeView.Engine/BookHub/PageHistory.cs",
+      "sha256": "0fd073947873b44b87d2147d4387a68d1939efd1bf57c2bf76e8ddf831a7aa3a",
+      "status": "迁入原100项书籍路径/最小显示页条目历史；异步成功后提交游标，失败保留重试，不迁入历史列表菜单"
+    },
+    {
+      "source": "NeeView/BookHub/BookHubHistory.cs",
+      "target": "src/NeeView.Engine/BookHub/PageHistory.cs",
+      "sha256": "2202cf2a67753961a987d90d559f0344d5511aeff9c1db804e6f32c716b365f3",
+      "status": "迁入原100项打开顺序历史、重放抑制追加和前进分支；QueryPath仅保留本阶段真实来源路径"
+    },
+    {
+      "source": "NeeView/PageSelect/PageSelector.cs",
+      "target": "src/NeeView.Engine/PageSelect/PageSelector.cs",
+      "sha256": "ec712e2769ff6571a961030e1bba31c03674dc96ed72f101dd15b74c74290235",
+      "status": "原共享临时选择/正文显示关系适配；胶片条和滑条共用，尚未完整迁入标记/媒体事件"
+    },
+    {
+      "source": "NeeView/PageSelect/PageSlider/PageSlider.cs",
+      "target": "src/NeeView.Engine/PageSelect/PageSelector.cs",
+      "sha256": "d675b580ceee158eea8e0f4102d6dd7e06b587eaaa362ca86c5f156c6911de35",
+      "status": "迁入原方向、双页静态对齐、首尾优先和IsSyncPageMode算法；联动释放确认由Mac宿主处理"
+    },
+    {
+      "source": "NeeView/Config/SliderConfig.cs",
+      "target": "src/NeeView.Engine/Config/Config.cs",
+      "sha256": "51b0dff55ddb4cb7b3c0f465d45c80562497b2a40a2a65a4fec1fb4951de47fb",
+      "status": "迁入原SliderDirection/IsSliderLinkedFilmStrip/IsSyncPageMode；其他配置原JSON合并保留"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/MoveSizePageCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/MoveSizePageCommandParameter.cs",
+      "sha256": "3e87663af36bd11e65cd7ef9f7539446668ce1e5f2d086647c4c68fb903c8ae3",
+      "status": "迁入原Size默认10及0至1000限幅；NextSizePage沿用PrevSizePage共享差分参数"
     }
   ],
   "rule_references": [
@@ -358,6 +400,30 @@
       "lines": "107-167,266-307",
       "target": "src/NeeView.Engine/SidePanels/LayoutPanelManager.cs",
       "status": "同组重排、跨组单成员移入、目标比例均分及方向分半算法"
+    },
+    {
+      "source": "NeeView/PageFrames/PageFrameBox.cs",
+      "lines": "1057-1094,868-903",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.cs",
+      "status": "原指定步长的NormalizeIndex/NormalizeCycle/静态对齐、CorrectPosition首尾终止；本阶段未开放循环页"
+    },
+    {
+      "source": "NeeView/Book/BookTools.cs",
+      "lines": "20-30",
+      "target": "src/NeeView.Engine/PageSelect/PageSelector.cs",
+      "status": "原WidwPageAlignment实际算法，保留特殊拼写"
+    },
+    {
+      "source": "NeeView/Command/Commands/JumpPageCommand.cs",
+      "lines": "23-34",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml.cs",
+      "status": "一起始页码/无参数可等待输入对话框；原命令名不变"
+    },
+    {
+      "source": "NeeView/PageSelect/PageSlider/PageSliderView.xaml.cs",
+      "lines": "124-142",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml.cs",
+      "status": "按下预览、鼠标释放提交原共享选择；正式Avalonia Thumb隧道事件适配"
     }
   ],
   "ui_sources": [
@@ -395,7 +461,7 @@
       "source": "NeeView/PageSelect/FilmStrip/FilmStrip.cs",
       "target": "src/NeeView.MacOS/Views/ThumbnailView.cs",
       "sha256": "3d5e56dfdb01201727a14eb48137a387792bfb8ca4b90d10ca52a3be73e455d3",
-      "status": "P2转换可见需求、阅读方向反转、选择定位关系；滚轮选择防抖/完整预览/更多配置待迁入"
+      "status": "原选择/可视方向/居中/中心优先需求算法在Engine，Mac适配200ms防抖、窗口去重、三滚轮、确认和详情；资源使用共享工厂"
     },
     {
       "source": "NeeView/Languages/shared.restext",
