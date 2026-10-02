@@ -12,6 +12,7 @@ public sealed class Config
     public PanelsConfig Panels { get; set; } = new();
     public FilmStripConfig FilmStrip { get; set; } = new();
     public SliderConfig Slider { get; set; } = new();
+    public BookshelfConfig Bookshelf { get; set; } = new();
     public bool IsAddressBarEnabled { get; set; } = true;
     /// <summary>启动时装配唯一配置，读取前不初始化具体窗口。</summary>
     public static void SetCurrent(Config config) => Current = config;
@@ -45,6 +46,7 @@ public sealed class SliderConfig
 /// <summary>来自原 BookConfig 的分页参数及默认值。</summary>
 public sealed class BookConfig
 {
+    public bool IsPrioritizeBookMove { get; set; }
     public double WideRatio { get; set; } = 1;
     public double DividePageRate { get; set; } = .5;
     public bool IsStaticWidePage { get; set; }
@@ -54,6 +56,12 @@ public sealed class BookConfig
     public FolderSortOrder FolderSortOrder { get; set; } = FolderSortOrder.First;
     public WidePageStretch WidePageStretch { get; set; } = WidePageStretch.UniformHeight;
     public double ContentsSpace { get; set; } = -1;
+}
+/// <summary>原 BookshelfConfig 普通书架默认排序；各路径参数、巡回及搜索后续迁入。</summary>
+public sealed class BookshelfConfig
+{
+    public FolderOrder DefaultFolderOrder { get; set; } = FolderOrder.FileName;
+    public FolderSortOrder FolderSortOrder { get; set; } = FolderSortOrder.First;
 }
 /// <summary>原查看器基础缩放选项。</summary>
 public sealed class ViewConfig

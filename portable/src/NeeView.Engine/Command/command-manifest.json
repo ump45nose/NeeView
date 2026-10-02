@@ -980,14 +980,14 @@
     "Text": "上一个文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/PrevFolderPageCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 普通书架/文件夹页导航接入；巡回及子书边界见验收表"
   },
   {
     "Name": "NextFolderPage",
     "Text": "下一个文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/NextFolderPageCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 普通书架/文件夹页导航接入；巡回及子书边界见验收表"
   },
   {
     "Name": "FirstPage",
@@ -1030,14 +1030,14 @@
     "Text": "上一本书籍",
     "Shortcut": "Up",
     "Source": "NeeView/Command/Commands/PrevBookCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 普通书架/文件夹页导航接入；巡回及子书边界见验收表"
   },
   {
     "Name": "NextBook",
     "Text": "下一本书籍",
     "Shortcut": "Down",
     "Source": "NeeView/Command/Commands/NextBookCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 普通书架/文件夹页导航接入；巡回及子书边界见验收表"
   },
   {
     "Name": "RandomBook",

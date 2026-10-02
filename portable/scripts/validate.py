@@ -42,7 +42,7 @@ def main():
     parser.add_argument("--dotnet", default="dotnet")
     parser.add_argument("--macos-source", action="store_true", help="仅验证正式入口编译，需 macOS workload；不是应用构建")
     parser.add_argument("--macos", action="store_true", help="执行正式应用构建，需匹配的完整 Xcode")
-    parser.add_argument("--phase", choices=("p1", "p2", "p2-docking", "p2-selection"), default="p1", help="独立保存当前阶段的构建与测试证据")
+    parser.add_argument("--phase", choices=("p1", "p2", "p2-docking", "p2-selection", "p2-bookshelf"), default="p1", help="独立保存当前阶段的构建与测试证据")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     env = os.environ.copy(); env.pop("DOTNET_ROOT", None)

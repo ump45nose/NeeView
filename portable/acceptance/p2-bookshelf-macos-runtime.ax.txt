@@ -1,0 +1,105 @@
+Window: "Book30-Chapters.cbz — NeeView", App: NeeView.
+0 standard window Book30-Chapters.cbz — NeeView, Secondary Actions: Raise
+	1 container WindowChrome, ID: AvaloniaWindowChrome
+	2 container
+		3 container Root
+			4 container
+				5 menu bar MenuBar
+					6 container
+						7 文件
+							8 container
+								9 unknown PART_Popup
+						10 显示
+							11 container
+								12 unknown PART_Popup
+						13 图像
+							14 container
+								15 unknown PART_Popup
+						16 跳转
+							17 container
+								18 unknown PART_Popup
+						19 页面
+							20 container
+								21 unknown PART_Popup
+						22 书籍
+							23 container
+								24 unknown PART_Popup
+						25 选项
+							26 container
+								27 unknown PART_Popup
+						28 帮助
+							29 container
+								30 unknown PART_Popup
+				31 text field (settable) Help: 打开图片、目录、ZIP / RAR / 7z, Value: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-bookshelf-smoke/Book30-Chapters.cbz, ID: AddressBar
+					32 container
+						33 container
+							34 scroll area PART_ScrollViewer
+								35 container
+			36 container SidePanelFrame
+				37 container LeftRailItems
+					38 button Avalonia.Controls.PathIcon, Help: 信息 / 页面列表（拖动可重排或组合）
+					39 button Avalonia.Controls.PathIcon, Help: 文件夹（拖动可重排或组合）
+					40 button Avalonia.Controls.PathIcon, Help: 历史（拖动可重排或组合）
+				41 container
+					42 text 文件夹
+					43 container
+						44 text /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-bookshelf-smoke
+						45 container
+							46 button 上一级, Help: 浏览书架父目录
+							47 button 进入, Help: 浏览选中目录，保留当前书籍
+							48 button 同步, Help: 同步到当前书籍所在书架
+							49 button 刷新, Help: 刷新列表并保存当前书架设置，保存失败可重试
+						50 pop up button Help: 普通书架默认排序, Value: FolderOrderChoice { Mode = FileName, Label = 文件名 }, ID: FolderOrderView
+							51 container
+								52 text 文件名
+								53 unknown PART_Popup
+						54 text
+						55 content list FolderList
+							56 scroll area PART_ScrollViewer
+								57 container
+									58 container
+										59 row (selectable) ▸ Book2, Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-bookshelf-smoke/Book2
+											60 text Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-bookshelf-smoke/Book2, Value: ▸ Book2
+										61 row (selectable) ▸ Book10, Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-bookshelf-smoke/Book10
+											62 text Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-bookshelf-smoke/Book10, Value: ▸ Book10
+										63 row (selectable) Book3.cbz, Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-bookshelf-smoke/Book3.cbz
+											64 text Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-bookshelf-smoke/Book3.cbz, Value: Book3.cbz
+										65 row (selectable) Book20.cbz, Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-bookshelf-smoke/Book20.cbz
+											66 text Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-bookshelf-smoke/Book20.cbz, Value: Book20.cbz
+										67 row (selected) Book30-Chapters.cbz, Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-bookshelf-smoke/Book30-Chapters.cbz
+											68 text Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p2-bookshelf-smoke/Book30-Chapters.cbz, Value: Book30-Chapters.cbz
+				69 handle
+				70 container MainViewSocket
+				71 handle
+				72 container
+					73 text 导航器
+					74 container
+						75 button −
+						76 button 适合
+						77 button 100%
+						78 button +
+				79 container RightRailItems
+					80 button Avalonia.Controls.PathIcon, Help: 导航器（拖动可重排或组合）
+					81 button Avalonia.Controls.PathIcon, Help: 图像效果（P5）（拖动可重排或组合）
+					82 button Avalonia.Controls.PathIcon, Help: 书签（拖动可重排或组合）
+					83 button Avalonia.Controls.PathIcon, Help: 播放列表（P5）（拖动可重排或组合）
+					84 button Avalonia.Controls.PathIcon, Help: 目标文件夹（P4）（拖动可重排或组合）
+			85 container
+				86 container DockPageSliderSocket
+					87 slider (settable, float) Value: 4, ID: PageSliderView
+						88 container PART_Track
+							89 button PART_DecreaseButton
+								90 container
+							91 button PART_IncreaseButton
+								92 container
+							93 handle thumb
+					94 text 5 / 6
+				95 text Value: Chapter3/005.png  ·  单页  ·  从右向左, ID: StatusField
+	96 close button
+	97 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	98 minimize button
+	99 text Book30-Chapters.cbz — NeeView
+100 menu bar
+	101 NeeView
+
+The focused UI element is 70 container MainViewSocket

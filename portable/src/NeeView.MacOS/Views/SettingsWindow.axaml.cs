@@ -20,6 +20,8 @@ public sealed partial class SettingsWindow : Window
         _model = model;
         _inputs = model.Commands.Definitions.Select(d => new ShortcutEdit(d, model.SaveData.GetShortcut(d.Name, d.Shortcut), available?.Invoke(d.Name) ?? model.Commands.IsAvailable(d.Name))).ToArray();
         this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm();
+        this.FindControl<ComboBox>("BookshelfGroup")!.SelectedIndex = (int)Config.Current.Bookshelf.FolderSortOrder;
+        this.FindControl<CheckBox>("PrioritizeBookMove")!.IsChecked = Config.Current.Book.IsPrioritizeBookMove;
     }
     /// <summary>保持原左导航、右内容结构；只切换设置页面，不应用编辑。</summary>
     private void Navigation_Changed(object? sender, SelectionChangedEventArgs e)
@@ -101,6 +103,10 @@ public sealed partial class SettingsWindow : Window
             // 只写用户修改的差分，避免一次保存就展开全部 235 条默认命令。
             foreach (var input in _inputs.Where(i => i.Value.Trim() != i.OriginalValue.Trim())) _model.SaveData.SetShortcut(input.Name, input.Value.Trim());
             ApplyFilm();
+            Config.Current.Bookshelf.FolderSortOrder = (FolderSortOrder)Math.Max(0, this.FindControl<ComboBox>("BookshelfGroup")!.SelectedIndex);
+            Config.Current.Book.IsPrioritizeBookMove = this.FindControl<CheckBox>("PrioritizeBookMove")!.IsChecked == true;
+            // 分组设置只重排已有元数据，不能重扫来源或意外重新洗牌。
+            _model.Operation.Bookshelf.Reorder();
             await _model.Operation.SaveAsync(); Close();
         }
         catch (Exception ex) { this.FindControl<TextBlock>("Message")!.Text = "保存失败：" + ex.Message; }

@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using NeeView;
 using NeeView.MacOS.ViewModels;
 namespace NeeView.MacOS.Views;
@@ -36,7 +37,8 @@ public sealed partial class MainWindow : Window
         "ViewScaleUp", "ViewScaleDown", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
         "LeftAutoHide", "RightAutoHide", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
-        "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage"
+        "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
+        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder"
     };
     /// <summary>由启动层接入原生事件；只消费主查看器区域，其余控件使用框架输入。</summary>
     public void AttachPlatformInput(IPlatformInput input)
@@ -181,7 +183,12 @@ public sealed partial class MainWindow : Window
                     if (folders.FirstOrDefault()?.TryGetLocalPath() is { } folder) await OpenAsync(folder); break;
                 case "ReLoad": if (_model.Operation.Book is { } reload) await OpenAsync(reload.Path); break;
                 case "ParentFolder":
-                    if (_model.Operation.Book is { } current && System.IO.Path.GetDirectoryName(current.Path) is { } parent) await OpenAsync(parent); break;
+                    await _model.Operation.Bookshelf.UpAsync(); break;
+                case "EnterBookshelfFolder": await _model.Operation.Bookshelf.EnterAsync(); break;
+                case "SyncBookshelfFolder":
+                    if (_model.Operation.Book is { } current) await _model.Operation.Bookshelf.SyncAsync(current, force: true); break;
+                case "RefreshBookshelfFolder":
+                    if (await _model.Operation.Bookshelf.RefreshAsync()) await _model.Operation.SaveAsync(); break;
                 case "OpenExplorer":
                     if (_model.Operation.Book is { } book) await _platform!.RevealAsync(book.CurrentPage?.ArchiveEntry.FilePath ?? book.Path); break;
                 case "CloseWindow": Close(); break;
@@ -242,8 +249,7 @@ public sealed partial class MainWindow : Window
         _folderBook = book; _folders?.Cancel(); var pending = new CancellationTokenSource(); _folders = pending;
         try
         {
-            var folders = await _model.Operation.GetFoldersAsync(pending.Token);
-            if (!_preparing && ReferenceEquals(_folderBook, book) && !pending.IsCancellationRequested) _model.SetFolders(folders);
+            await _model.Operation.Bookshelf.SyncAsync(book, pending.Token);
         }
         catch (OperationCanceledException) { }
         catch (Exception ex) { if (ReferenceEquals(_folderBook, book) && !pending.IsCancellationRequested) ShowError("目录暂不可访问：" + ex.Message); }
@@ -262,7 +268,18 @@ public sealed partial class MainWindow : Window
             try { await _model.Operation.JumpAsync(page.Index); } catch (Exception ex) { ShowError(ex.Message); }
     }
     /// <summary>目录双击统一打开，控件只持有只读条目。</summary>
-    private async void Folder_DoubleTapped(object? sender, TappedEventArgs e) { if (sender is ListBox { SelectedItem: FolderItem item }) await OpenAsync(item.Path); }
+    private async void Folder_DoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is ListBox { SelectedItem: FolderItem item })
+            try { await OpenAsync(item.Path); } catch (Exception ex) { ShowError(ex.Message); }
+    }
+    /// <summary>在已有元数据上应用原排序，绑定回报和程序同步不重复重排。</summary>
+    private async void FolderOrder_Changed(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_model is null || sender is not ComboBox { SelectedItem: FolderOrderChoice choice } || choice.Mode == _model.Operation.Bookshelf.FolderOrder) return;
+        try { _model.Operation.Bookshelf.ChangeOrder(choice.Mode); await _model.Operation.SaveAsync(); }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
     /// <summary>历史打开继续走原恢复策略，失败保持当前书籍。</summary>
     private async void History_DoubleTapped(object? sender, TappedEventArgs e) { if (sender is ListBox { SelectedItem: HistoryEntry entry }) await OpenAsync(entry.Path); }
     /// <summary>文件夹保留展开交互，书籍节点双击打开。</summary>
@@ -374,6 +391,19 @@ public sealed partial class MainWindow : Window
         if (FocusManager?.GetFocusedElement() is TextBox) return;
         // 弹出菜单拥有方向键，不能让原阅读快捷键抢走菜单导航/选择。
         if (this.FindControl<Menu>("MenuBar")!.IsOpen || FocusManager?.GetFocusedElement() is MenuItem) return;
+        if (FocusManager?.GetFocusedElement() is ComboBox && e.KeyModifiers == KeyModifiers.None && e.Key is Key.Up or Key.Down or Key.Left or Key.Right or Key.Enter or Key.Space) return;
+        // 普通列表拥有方向/定位键；选条目不能触发全局 Up/Down 书籍导航。
+        if (FocusManager?.GetFocusedElement() is Control focused && (focused is ListBox or TreeView || focused.GetVisualAncestors().Any(x => x is ListBox or TreeView)))
+        {
+            if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.Enter && this.FindControl<ListBox>("FolderList")!.IsKeyboardFocusWithin)
+            {
+                e.Handled = true;
+                if (_model.SelectedFolder is { } selected)
+                    try { await OpenAsync(selected.Path); } catch (Exception ex) { ShowError(ex.Message); }
+                return;
+            }
+            if (e.KeyModifiers == KeyModifiers.None && e.Key is Key.Up or Key.Down or Key.Left or Key.Right or Key.Home or Key.End or Key.PageUp or Key.PageDown) return;
+        }
         if (FocusManager?.GetFocusedElement() == FilmStrip && FilmStrip.HandleSelectionKey(e)) return;
         if (FocusManager?.GetFocusedElement() == this.FindControl<Slider>("PageSliderView") && e.KeyModifiers == KeyModifiers.None && e.Key == Key.Enter)
         { e.Handled = true; await CommitSliderAsync(); return; }

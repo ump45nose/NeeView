@@ -16,11 +16,25 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public string Title => Operation.Book is { } book ? $"{System.IO.Path.GetFileName(book.Path)} — NeeView" : "NeeView";
     private string _address = "";
     public string Address { get => _address; set => SetProperty(ref _address, value); }
-    public IReadOnlyList<Page> Pages => Operation.Book?.Pages ?? [];
+    public IReadOnlyList<Page> Pages => Operation.Book is { } book ? book.Pages : [];
     private Page? _selectedPage;
     public Page? SelectedPage { get => _selectedPage; set => SetProperty(ref _selectedPage, value); }
-    private IReadOnlyList<FolderItem> _folders = [];
-    public IReadOnlyList<FolderItem> Folders { get => _folders; private set => SetProperty(ref _folders, value); }
+    public IReadOnlyList<FolderItem> Folders => Operation.Bookshelf.Items;
+    public string FolderPlace => Operation.Bookshelf.Place ?? "";
+    public string FolderMessage => Operation.Bookshelf.Error ?? (Operation.Bookshelf.IsLoading ? "正在读取目录…" : "");
+    private bool _refreshingFolders;
+    private FolderItem? _selectedFolder;
+    public FolderItem? SelectedFolder
+    {
+        get => _selectedFolder;
+        set { if (SetProperty(ref _selectedFolder, value) && !_refreshingFolders) Operation.Bookshelf.Select(value); }
+    }
+    public static IReadOnlyList<FolderOrderChoice> FolderOrders { get; } =
+    [new(FolderOrder.FileName, "文件名"), new(FolderOrder.FileNameDescending, "文件名（降序）"),
+     new(FolderOrder.FileType, "类型"), new(FolderOrder.FileTypeDescending, "类型（降序）"),
+     new(FolderOrder.TimeStamp, "时间"), new(FolderOrder.TimeStampDescending, "时间（降序）"),
+     new(FolderOrder.Size, "大小"), new(FolderOrder.SizeDescending, "大小（降序）"), new(FolderOrder.Random, "随机")];
+    public FolderOrderChoice SelectedFolderOrder => FolderOrders.First(e => e.Mode == Operation.Bookshelf.FolderOrder);
     public int LastIndex => Math.Max(0, Pages.Count - 1);
     public double PageIndex => Operation.PageSelector.SelectedIndex;
     public bool SliderReversed => Operation.FilmStrip.IsSliderDirectionReversed;
@@ -59,9 +73,22 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public event EventHandler? PanelsRefreshed;
 
     /// <summary>装配业务订阅；后台回报统一切 UI 线程。</summary>
-    public void Attach() { Layout.Changed += Layout_Changed; Operation.Changed += Operation_Changed; Operation.PageSelector.SelectionChanged += Selection_Changed; SaveData.Changed += SaveData_Changed; Refresh(); }
+    public void Attach() { Layout.Changed += Layout_Changed; Operation.Changed += Operation_Changed; Operation.PageSelector.SelectionChanged += Selection_Changed; Operation.Bookshelf.Changed += Bookshelf_Changed; SaveData.Changed += SaveData_Changed; Refresh(); RefreshFolders(); }
     /// <summary>关闭窗口时解除订阅，避免旧窗口收到新书变化。</summary>
-    public void Detach() { Layout.Changed -= Layout_Changed; Operation.Changed -= Operation_Changed; Operation.PageSelector.SelectionChanged -= Selection_Changed; SaveData.Changed -= SaveData_Changed; }
+    public void Detach() { Layout.Changed -= Layout_Changed; Operation.Changed -= Operation_Changed; Operation.PageSelector.SelectionChanged -= Selection_Changed; Operation.Bookshelf.Changed -= Bookshelf_Changed; SaveData.Changed -= SaveData_Changed; }
+    /// <summary>目录回报只更新书架表现，不触发正文或缩略图加载。</summary>
+    private void Bookshelf_Changed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(RefreshFolders);
+    /// <summary>先替换集合再恢复选择；屏蔽列表 TwoWay 清空对引擎选择的回写。</summary>
+    private void RefreshFolders()
+    {
+        _refreshingFolders = true;
+        try
+        {
+            OnPropertyChanged(nameof(Folders)); OnPropertyChanged(nameof(FolderPlace)); OnPropertyChanged(nameof(FolderMessage));
+            SelectedFolder = Operation.Bookshelf.SelectedItem; OnPropertyChanged(nameof(SelectedFolderOrder));
+        }
+        finally { _refreshingFolders = false; }
+    }
     /// <summary>临时选择仅通知滑条及编号，不发布正文刷新或改变页面列表当前项。</summary>
     private void Selection_Changed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(RefreshSelection);
     /// <summary>配置改变时同步方向和选择表现，前端设置不重新扫描来源。</summary>
@@ -81,8 +108,6 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
         // 先替换列表来源，再恢复选择；反向顺序会被 ListBox 的 TwoWay 清空回报覆盖。
         OnPropertyChanged(""); SelectedPage = Operation.Book?.CurrentPage; Refreshed?.Invoke(this, EventArgs.Empty);
     }
-    /// <summary>接收后端列出的目录信息；表现层不直接枚举文件系统。</summary>
-    public void SetFolders(IReadOnlyList<FolderItem> folders) => Folders = folders;
     /// <summary>切换已支持侧栏页面或显隐，业务阅读位置不变。</summary>
     public void SelectPanel(string name)
     {
@@ -109,3 +134,5 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     /// <summary>胶片条自动隐藏只改变表现，鼠标进入底栏后恢复。</summary>
     public void HoverFilmStrip(bool value) { _filmHovered = value; OnPropertyChanged(nameof(FilmStripVisible)); }
 }
+/// <summary>原排序枚举的界面文案，展示顺序不改变 JSON 枚举值。</summary>
+public sealed record FolderOrderChoice(FolderOrder Mode, string Label);

@@ -1,6 +1,6 @@
 # 完整命令迁移表
 
-固定基线 235 个实例；数量是登记清单，不代表功能覆盖率。当前包含 P1 与 P2 三批增量，阶段标记仅说明执行入口已接入，完整参数/手势及交互范围见验收记录。未迁入命令保留原菜单节点、键位和参数，禁用占位。原复杂手势可以原样保存，不意味着其执行已迁入。
+固定基线 235 个实例；数量是登记清单，不代表功能覆盖率。当前包含 P1 与 P2 四批增量，阶段标记仅说明执行入口已接入，完整参数/手势及交互范围见验收记录。未迁入命令保留原菜单节点、键位和参数，禁用占位。原复杂手势可以原样保存，不意味着其执行已迁入。
 
 | 原命令 | 文案 | 默认输入 | 当前实现 | 原出处 |
 |---|---|---|---|---|
@@ -134,15 +134,15 @@
 | JumpRandomPage | 转到随机页面 |  | 待 P2–P5 | NeeView/Command/Commands/JumpRandomPageCommand.cs |
 | PrevSizePage | 后退指定页数 |  | P2 原定位/共享步长宿主接入；具体范围见验收表 | NeeView/Command/Commands/PrevSizePageCommand.cs |
 | NextSizePage | 前进指定页数 |  | P2 原定位/共享步长宿主接入；具体范围见验收表 | NeeView/Command/Commands/NextSizePageCommand.cs |
-| PrevFolderPage | 上一个文件夹 |  | 待 P2–P5 | NeeView/Command/Commands/PrevFolderPageCommand.cs |
-| NextFolderPage | 下一个文件夹 |  | 待 P2–P5 | NeeView/Command/Commands/NextFolderPageCommand.cs |
+| PrevFolderPage | 上一个文件夹 |  | P2 原文件夹页分组导航；仅文件名排序 | NeeView/Command/Commands/PrevFolderPageCommand.cs |
+| NextFolderPage | 下一个文件夹 |  | P2 原文件夹页分组导航；仅文件名排序 | NeeView/Command/Commands/NextFolderPageCommand.cs |
 | FirstPage | 转到首页 | Ctrl+Right | P1 Engine | NeeView/Command/Commands/FirstPageCommand.cs |
 | LastPage | 转到尾页 | Ctrl+Left | P1 Engine | NeeView/Command/Commands/LastPageCommand.cs |
 | PrevHistoryPage | 后退到上一页 | Back | P2 原导航历史接入；具体范围见验收表 | NeeView/Command/Commands/PrevHistoryPageCommand.cs |
 | NextHistoryPage | 前进到下一页 | Shift+Back | P2 原导航历史接入；具体范围见验收表 | NeeView/Command/Commands/NextHistoryPageCommand.cs |
 | ToggleBookLock | 书籍锁定状态 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleBookLockCommand.cs |
-| PrevBook | 上一本书籍 | Up | 待 P2–P5 | NeeView/Command/Commands/PrevBookCommand.cs |
-| NextBook | 下一本书籍 | Down | 待 P2–P5 | NeeView/Command/Commands/NextBookCommand.cs |
+| PrevBook | 上一本书籍 | Up | P2 原普通书架前后项；失败保留选择 | NeeView/Command/Commands/PrevBookCommand.cs |
+| NextBook | 下一本书籍 | Down | P2 原普通书架前后项；失败保留选择 | NeeView/Command/Commands/NextBookCommand.cs |
 | RandomBook | 随机排序书籍 |  | 待 P2–P5 | NeeView/Command/Commands/RandomBookCommand.cs |
 | PrevHistory | 后退到上一条历史记录 |  | 待 P2–P5 | NeeView/Command/Commands/PrevHistoryCommand.cs |
 | NextHistory | 前进到下一条历史记录 |  | 待 P2–P5 | NeeView/Command/Commands/NextHistoryCommand.cs |

@@ -264,6 +264,12 @@
       "target": "src/NeeView.Engine/Collections/HistoryLimitedCollection.cs",
       "sha256": "c66fcf78b686003a9a69444482aca289cac5b86748f85cab54867754fc458c6a",
       "status": "迁入原环形容量、游标、分支截断和历史列表算法；移除调试生成器，补参数校验及中文注释"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderOrder.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookshelf/FolderList/FolderOrder.cs",
+      "sha256": "cc65a4030edaeb6f3cd0403577c968d691e74483f6b9ed66cf93443435dacddd",
+      "status": "保留原枚举顺序与分类，移除文案注解；普通目录不开放路径/注册时间排序"
     }
   ],
   "partial_adapters": [
@@ -374,6 +380,42 @@
       "target": "src/NeeView.Engine/Command/MoveSizePageCommandParameter.cs",
       "sha256": "3e87663af36bd11e65cd7ef9f7539446668ce1e5f2d086647c4c68fb903c8ae3",
       "status": "迁入原Size默认10及0至1000限幅；NextSizePage沿用PrevSizePage共享差分参数"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderCollection.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookshelf/FolderList/FolderCollection.cs",
+      "sha256": "149c018a78d5c12e9203dd646ae1df2e8ed1472b4b225233e208dd650f14e3f3",
+      "status": "原普通排序：目录分组、自然文件名/类型/时间/大小及稳定随机种子；不含监视器与系统项"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderList.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookshelf/BookshelfFolderList.cs",
+      "sha256": "5854e9abf42991aa6117fb3f7c6516f6162f95dcd92f8f042960dc3b69452b90",
+      "status": "原GetFolderItem及普通前后移动；随机才循环，加载成功后提交选择；巡回/搜索/每路径参数待迁"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/BookshelfFolderList.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookshelf/BookshelfFolderList.cs",
+      "sha256": "dfde868f981158732fb33200c1ef83cda63a17714a67bb54771e02fac75c3a12",
+      "status": "原Sync普通来源父目录及独立位置/选择适配，后台枚举按代次拒绝晚到；目录树/书架历史待迁"
+    },
+    {
+      "source": "NeeView/Book/BookPageCollection.cs",
+      "target": "src/NeeView.Engine/Book/BookPageCollection.cs",
+      "sha256": "210071dd2f9cc86208196bcf3618f53a26035f6325e9438332f4ad4b66c57207",
+      "status": "原GetNextFolderIndex/GetPrevFolderIndex，仅文件名正反排序生效；增加越界保护，不含全原集合"
+    },
+    {
+      "source": "NeeView/Config/BookshelfConfig.cs",
+      "target": "src/NeeView.Engine/Config/Config.cs",
+      "sha256": "31ef017b9adced3508ccff93901b6246dd733338f1ed01d95295fe738a9c20dd",
+      "status": "原普通书架DefaultFolderOrder与FolderSortOrder字段；JSON未知字段保留"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderItemFactory.cs",
+      "target": "src/NeeView.Backends/Content/ArchiveFactory.cs",
+      "sha256": "0fd03cb96f291ac5c95c56ad9d0996213be1b4039f646f10a29de5ae8a56d5fa",
+      "status": "原普通目录/支持归档候选及元数据适配，快捷方式/媒体/播放列表/分卷过滤未迁"
     }
   ],
   "rule_references": [

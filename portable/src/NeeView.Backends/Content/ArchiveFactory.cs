@@ -6,6 +6,20 @@ namespace NeeView.Backends;
 /// <summary>原 Archive 工厂的 Mac 实现，目录、ZIP、RAR 与 7z 共用原来源关系。</summary>
 public sealed class ArchiveFactory : IArchiveFactory
 {
+    /// <summary>沿用原 FolderItemFactory 的普通目录/归档过滤；枚举元数据不递归也不解码封面。</summary>
+    public Task<IReadOnlyList<FolderItem>> ListBooksAsync(string path, CancellationToken token) => SourceIo.RunAsync<IReadOnlyList<FolderItem>>(() =>
+    {
+        var items = new List<FolderItem>();
+        foreach (var info in new DirectoryInfo(path).EnumerateFileSystemInfos())
+        {
+            token.ThrowIfCancellationRequested();
+            if (info.Name.StartsWith('.')) continue;
+            if (info is DirectoryInfo) items.Add(new(info.Name, info.FullName, true, -1, info.LastWriteTime));
+            else if (info is FileInfo file && ArchiveFormats.IsArchive(info.Name))
+                items.Add(new(info.Name, info.FullName, false, file.Length, file.LastWriteTime));
+        }
+        return items;
+    }, token);
     /// <summary>后台列出当前目录直接子目录，不随同目录翻页重复调用。</summary>
     public Task<IReadOnlyList<FolderItem>> ListFoldersAsync(string path, CancellationToken token) => SourceIo.RunAsync<IReadOnlyList<FolderItem>>(() =>
         new DirectoryInfo(path).EnumerateDirectories().Where(e => !e.Name.StartsWith('.')).Select(e => { token.ThrowIfCancellationRequested(); return new FolderItem(e.Name, e.FullName); }).OrderBy(e => e.Name, NaturalSort.Comparer).ToList(), token);
@@ -22,7 +36,7 @@ public sealed class ArchiveFactory : IArchiveFactory
         if (!File.Exists(path)) throw new FileNotFoundException("来源不存在。", path);
         if (System.Text.RegularExpressions.Regex.IsMatch(path, @"(?:\.part\d+\.rar|\.r\d{2}|\.\d{3})$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
             throw new NotSupportedException("分卷归档尚未迁移，请使用完整的单文件归档。");
-        if (System.IO.Path.GetExtension(path).ToLowerInvariant() is ".zip" or ".cbz" or ".rar" or ".cbr" or ".7z") return new CompressedArchive(path);
+        if (ArchiveFormats.IsArchive(path)) return new CompressedArchive(path);
         throw new NotSupportedException("支持目录、图片、ZIP/CBZ、RAR/CBR 和 7z；其他来源尚未迁移。");
     }, token);
 }

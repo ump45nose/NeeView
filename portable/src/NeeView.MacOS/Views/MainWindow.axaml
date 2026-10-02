@@ -23,8 +23,22 @@
     </Grid>
     <!-- 面板内容只定义一次；停靠排布与主题独立于各功能视图。 -->
     <Grid x:Name="PanelContentStore" IsVisible="False">
-      <Border Tag="FolderPanel"><Grid RowDefinitions="Auto,*"><Button Content="上一级" Margin="8" Tag="ParentFolder" Click="Command_Click" />          <ListBox x:Name="FolderList" Grid.Row="1" ItemsSource="{Binding Folders}" DoubleTapped="Folder_DoubleTapped">
-            <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" /></DataTemplate></ListBox.ItemTemplate>
+      <Border Tag="FolderPanel"><Grid RowDefinitions="Auto,Auto,Auto,*">
+          <StackPanel Margin="8" Spacing="6">
+            <TextBlock Text="{Binding FolderPlace}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding FolderPlace}" />
+            <WrapPanel>
+              <Button Content="上一级" Tag="ParentFolder" Click="Command_Click" ToolTip.Tip="浏览书架父目录" />
+              <Button Content="进入" Tag="EnterBookshelfFolder" Click="Command_Click" ToolTip.Tip="浏览选中目录，保留当前书籍" />
+              <Button Content="同步" Tag="SyncBookshelfFolder" Click="Command_Click" ToolTip.Tip="同步到当前书籍所在书架" />
+              <Button Content="刷新" Tag="RefreshBookshelfFolder" Click="Command_Click" ToolTip.Tip="刷新列表并保存当前书架设置，保存失败可重试" />
+            </WrapPanel>
+          </StackPanel>
+          <ComboBox x:Name="FolderOrderView" Grid.Row="1" Margin="8,0,8,6" ToolTip.Tip="普通书架默认排序" ItemsSource="{Binding FolderOrders}" SelectedItem="{Binding SelectedFolderOrder, Mode=OneWay}" SelectionChanged="FolderOrder_Changed">
+            <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>
+          </ComboBox>
+          <TextBlock Grid.Row="2" Text="{Binding FolderMessage}" TextWrapping="Wrap" Margin="8,0" />
+          <ListBox x:Name="FolderList" Grid.Row="3" ItemsSource="{Binding Folders}" SelectedItem="{Binding SelectedFolder, Mode=TwoWay}" DoubleTapped="Folder_DoubleTapped">
+            <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Path}" /></DataTemplate></ListBox.ItemTemplate>
           </ListBox></Grid></Border>
       <Border Tag="PageListPanel">          <ListBox x:Name="PageList"  ItemsSource="{Binding Pages}" SelectedItem="{Binding SelectedPage}" SelectionChanged="Page_SelectionChanged">
             <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding EntryName}" TextTrimming="CharacterEllipsis" /></DataTemplate></ListBox.ItemTemplate>

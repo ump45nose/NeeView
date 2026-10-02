@@ -16,6 +16,8 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
     private readonly SemaphoreSlim _historyGate = new(1);
     private bool _keepHistoryOrder;
     private FilmStrip? _filmStrip;
+    private BookshelfFolderList? _bookshelf;
+    public BookshelfFolderList Bookshelf => _bookshelf ??= new(archives);
     public PageSelector PageSelector { get; } = new();
     public FilmStrip FilmStrip => _filmStrip ??= new(PageSelector);
     public PageHistory PageHistory { get; } = new();
@@ -29,11 +31,6 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
     public bool IsLoading { get; private set; }
     public string? Error { get; private set; }
     public event EventHandler? Changed;
-
-    /// <summary>提供来源关联的目录导航信息，界面不访问文件系统。</summary>
-    public Task<IReadOnlyList<FolderItem>> GetFoldersAsync(CancellationToken token) => Book is null
-        ? Task.FromResult<IReadOnlyList<FolderItem>>([])
-        : archives.ListFoldersAsync(Book.Source.IsDirectory ? Book.Path : System.IO.Path.GetDirectoryName(Book.Path)!, token);
 
     /// <summary>打开图片所在目录或来源；失败保持旧书，晚到来源只释放。</summary>
     public async Task OpenAsync(string path, CancellationToken token = default)
@@ -111,7 +108,49 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
             if (position.Index < 0 || position.Index >= Book.Pages.Count) return;
             await ProbeAroundAsync(Book, position.Index, CancellationToken.None);
             if (generation != _generation || _disposed || _closing) return;
-            Position = position; RebuildFrame(direction); RecordPageHistory(); ScheduleSave(); Notify();
+            // 新导航已经提交，旧打开/书架边界提示不能继续遮蔽当前页面状态。
+            Error = null; Position = position; RebuildFrame(direction); RecordPageHistory(); ScheduleSave(); Notify();
+        }
+        finally { _gate.Release(); }
+    }
+
+    /// <summary>原 NextBook/PrevBook 按书架所选条目的前后项加载，失败不移动选择；普通模式在加载时不抢占。</summary>
+    /// <param name="direction">前一本 -1、后一本 +1。</param>
+    public async Task MoveBookAsync(int direction)
+    {
+        if (_disposed || _closing || (IsLoading && !Config.Current.Book.IsPrioritizeBookMove)) return;
+        await _historyGate.WaitAsync();
+        try
+        {
+            if (_disposed || _closing || Book is null || (IsLoading && !Config.Current.Book.IsPrioritizeBookMove)) return;
+            var book = Book; var generation = _generation;
+            // 不用当前页面推算兄弟书；有书架位置时遵循独立选择，无位置才按原 Sync 取得父目录。
+            if (Bookshelf.Place is null && !await Bookshelf.SyncAsync(book)) { Error = Bookshelf.Error; Notify(); return; }
+            if (_disposed || _closing || generation != _generation || !ReferenceEquals(book, Book)) return;
+            if (Bookshelf.IsLoading) return;
+            var item = Bookshelf.GetFolderItem(direction);
+            if (item is null) { Error = direction < 0 ? "已到书架首项，无法打开上一本书籍。" : "已到书架末项，无法打开下一本书籍。"; Notify(); return; }
+            if (await OpenCoreAsync(item.Path, CancellationToken.None)) Bookshelf.Select(item);
+        }
+        finally { _historyGate.Release(); }
+    }
+
+    /// <summary>沿用原 GetNextFolderIndex/GetPrevFolderIndex；仅文件名排序按条目目录分组跳页，不打开子书。</summary>
+    /// <param name="direction">前一组 -1、后一组 +1。</param>
+    public async Task MoveFolderPageAsync(int direction)
+    {
+        await _gate.WaitAsync();
+        try
+        {
+            if (_disposed || _closing || IsLoading || Book is null || Frame is null) return;
+            var generation = _generation;
+            int start = new BookContext(Book.Pages).NormalizeIndex(Frame.FrameRange.Min.Index);
+            int index = direction < 0 ? Book.Pages.GetPrevFolderIndex(start) : Book.Pages.GetNextFolderIndex(start);
+            if (index < 0) return;
+            await ProbeAroundAsync(Book, index, CancellationToken.None);
+            if (_disposed || _closing || generation != _generation) return;
+            // 原文件夹跳页无论前后均从目标目录首图正向生成，不复用上一帧的后半页。
+            Error = null; Position = new(index, 0); RebuildFrame(1); RecordPageHistory(); ScheduleSave(); Notify();
         }
         finally { _gate.Release(); }
     }
@@ -130,7 +169,8 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
             var generation = _generation; index = Math.Clamp(index, 0, Book.Pages.Count - 1);
             await ProbeAroundAsync(Book, index, CancellationToken.None);
             if (_disposed || _closing || generation != _generation) return false;
-            Position = new(index, backwards ? 1 : 0); RebuildFrame(backwards ? -1 : 1);
+            // 明确定位成功后恢复页面状态；失败和过期请求仍保留各自的错误处理。
+            Error = null; Position = new(index, backwards ? 1 : 0); RebuildFrame(backwards ? -1 : 1);
             if (recordHistory) RecordPageHistory(); ScheduleSave(); Notify(); return true;
         }
         finally { _gate.Release(); }
@@ -160,7 +200,7 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
             }
             await ProbeAroundAsync(Book, index, CancellationToken.None);
             if (_disposed || _closing || generation != _generation) return;
-            Position = new(index, backwards ? 1 : 0); RebuildFrame(backwards ? -1 : 1);
+            Error = null; Position = new(index, backwards ? 1 : 0); RebuildFrame(backwards ? -1 : 1);
             RecordPageHistory(); ScheduleSave(); Notify();
         }
         finally { _gate.Release(); }
@@ -305,6 +345,7 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
         {
             await SaveAsync();
             if (Book is not null) await Book.DisposeAsync();
+            _bookshelf?.Dispose();
             Book = null; Frame = null; _disposed = true;
         }
         finally
@@ -321,4 +362,12 @@ public static class ImageFormats
     private static readonly HashSet<string> Extensions = new(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tif", ".tiff", ".gif" };
     /// <summary>按扩展名识别候选图片，损坏文件仍保留索引。</summary>
     public static bool IsImage(string path) => Extensions.Contains(System.IO.Path.GetExtension(path));
+}
+
+/// <summary>当前已接入的普通归档类型，书架候选与来源工厂使用同一能力清单。</summary>
+public static class ArchiveFormats
+{
+    private static readonly HashSet<string> Extensions = new(StringComparer.OrdinalIgnoreCase) { ".zip", ".cbz", ".rar", ".cbr", ".7z" };
+    /// <summary>按扩展名识别归档候选，损坏或加密归档仍由加载入口明确报错。</summary>
+    public static bool IsArchive(string path) => Extensions.Contains(System.IO.Path.GetExtension(path));
 }

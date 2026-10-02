@@ -38,6 +38,7 @@ public sealed class SaveData(string directory)
             config.Panels = ReadBranch<PanelsConfig>(raw, "Panels");
             config.FilmStrip = ReadBranch<FilmStripConfig>(raw, "FilmStrip");
             config.Slider = ReadBranch<SliderConfig>(raw, "Slider");
+            config.Bookshelf = ReadBranch<BookshelfConfig>(raw, "Bookshelf");
         }
         Config.SetCurrent(config);
     }
@@ -159,7 +160,7 @@ public sealed class SaveData(string directory)
         try
         {
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 Merge(Object(config, branch), JsonSerializer.SerializeToNode(value, Options)!.AsObject());

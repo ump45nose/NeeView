@@ -8,7 +8,7 @@
 | 颜色、图标路径 | Styles/NeeViewResources.axaml | 原资源 key；颜色及路径来自原 XAML |
 | 间距、控件模板、外观 | Styles/NeeViewTheme.axaml | 样式类与资源引用 |
 | 胶片条显示、可见需求、详情与确认 | Views/ThumbnailView.cs | Engine.PageSelector/FilmStrip；200ms防抖、revision及共享像素租约 |
-| 页面/目录选择、侧栏显隐 | ViewModels/ReaderWorkspaceViewModel.cs | 原 Page 与 BookOperation；纯表现刷新不请求图片 |
+| 页面/书架选择、侧栏显隐 | ViewModels/ReaderWorkspaceViewModel.cs | 原 Page 与 BookOperation.Bookshelf；纯表现/书架刷新不请求图片 |
 | 面板拖放、组合、分隔与预览 | Views/SidePanelPresenter.cs | Engine.LayoutPanelManager 数据与原布局 JSON；不操作阅读业务 |
 | 绘制、焦点、拖动、缩放 | Views/ReaderView.cs | 原 PageFrame、像素租约、revision |
 | 完整菜单数据/呈现 | Engine/Menu/default-menu.json、Views/MenuPresenter.cs | 原节点、顺序、禁用占位与稳定命令名 |
@@ -16,7 +16,7 @@
 | 设置页导航/内容结构 | Views/SettingsWindow.axaml | 原 BookSettingConfig 和恢复策略 |
 | 具体后端及实例装配 | MacApp.cs | 唯一可引用 Backends 的启动装配点 |
 
-视图和表现模型不枚举目录、不解压、不调用 Magick/SharpCompress、不创建平台实现。目录信息由 BookOperation 契约获取；像素由 BitmapFactory 租用。侧栏 Hover/选择和临时页选择只通知表现属性，不发布阅读刷新。列表先更新来源再恢复当前Page，避免TwoWay回报抹掉选中项。Engine 不反向调用控件，也不保留 Avalonia Bitmap。
+视图和表现模型不枚举目录、不解压、不调用 Magick/SharpCompress、不创建平台实现。目录/归档候选由 BookOperation.Bookshelf 和 IArchiveFactory.ListBooksAsync 契约获取；像素由 BitmapFactory 租用。侧栏 Hover/选择和临时页选择只通知表现属性，不发布阅读刷新。列表先更新来源再恢复当前Page/FolderItem，避免TwoWay回报抹掉选中项。书架浏览位置/选中项独立于正文，只有打开成功才提交切书结果；默认排序控件不承担业务排序。Engine 不反向调用控件，也不保留 Avalonia Bitmap。
 
 主图是单绘制控件，不为每页创建图像控件；页面列表使用虚拟化 ListBox。主图及可见缩略图的显示 Bitmap 与像素租约归各查看器所有，先释放 Bitmap 再释放租约。切书/缩放/视口变化用 revision 拒绝旧请求；所有 UI 对象在 Dispatcher 线程修改。
 

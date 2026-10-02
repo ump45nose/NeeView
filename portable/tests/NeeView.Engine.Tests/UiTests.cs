@@ -97,7 +97,7 @@ public sealed class UiTests
             Assert.True(left.Bounds.Right < window.Viewer.Bounds.Left); Assert.True(window.Viewer.Bounds.Right < right.Bounds.Left);
             Assert.True(area.Bounds.Bottom <= bottom.Bounds.Top);
             Assert.Equal(5, window.FindControl<ListBox>("PageList")!.ItemCount);
-            var output = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../acceptance/p2-selection-reading-layout.png")); Directory.CreateDirectory(Path.GetDirectoryName(output)!);
+            var output = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../acceptance/p2-bookshelf-window-layout.png")); Directory.CreateDirectory(Path.GetDirectoryName(output)!);
             using var image = new RenderTargetBitmap(new PixelSize(1200, 800)); image.Render(window); image.Save(output, PngBitmapEncoderOptions.Default);
             Assert.True(new FileInfo(output).Length > 1000);
         }

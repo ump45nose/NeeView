@@ -35,10 +35,15 @@ public interface IArchiveFactory
     Task<Archive> OpenAsync(string path, CancellationToken token);
     /// <summary>列出直接子目录，用于 P1 基础导航。</summary>
     Task<IReadOnlyList<FolderItem>> ListFoldersAsync(string path, CancellationToken token);
+    /// <summary>列出普通书架的目录及已支持归档；只返回元数据，不打开每本书。</summary>
+    Task<IReadOnlyList<FolderItem>> ListBooksAsync(string path, CancellationToken token);
 }
 
 /// <summary>目录导航只读条目，使用真实文件系统路径。</summary>
-public sealed record FolderItem(string Name, string Path);
+public sealed record FolderItem(string Name, string Path, bool IsDirectory = true, long Length = -1, DateTime LastWriteTime = default)
+{
+    public string DisplayName => (IsDirectory ? "▸ " : "") + Name;
+}
 
 /// <summary>原图像工厂的解码替换点，返回可释放 BGRA8 预乘像素。</summary>
 public interface IImageDecoder

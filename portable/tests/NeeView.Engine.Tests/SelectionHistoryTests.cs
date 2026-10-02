@@ -300,5 +300,7 @@ public sealed class SelectionHistoryTests
         }
         /// <summary>真实枚举能力不参与延迟控制。</summary>
         public Task<IReadOnlyList<FolderItem>> ListFoldersAsync(string path, CancellationToken token) => _inner.ListFoldersAsync(path, token);
+        /// <summary>转发真实书架枚举；测试暂停只作用于指定来源加载。</summary>
+        public Task<IReadOnlyList<FolderItem>> ListBooksAsync(string path, CancellationToken token) => _inner.ListBooksAsync(path, token);
     }
 }

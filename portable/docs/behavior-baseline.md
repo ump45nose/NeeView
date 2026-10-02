@@ -24,6 +24,8 @@
 | 滑条联动 | PageSelect/PageSlider/PageSlider.cs、PageSliderView.xaml.cs | 原共享选择、方向/静态双页/同步步长，拖动预览释放确认；直接页号文本框/页标记待迁入 |
 | 指定页/指定步长 | JumpPageCommand.cs、MoveSizePageCommandParameter.cs、PageFrameBox.cs:1057-1094 | 一起始对话框、两方向共享参数，原周期对齐及端点终止；无循环页 |
 | 页面/打开导航历史 | BookHub/PageHistory.cs、BookHubHistory.cs、HistoryLimitedCollection.cs | 原100项环形/游标/分支；页面以路径+条目，打开顺序独立；失败异步重放不提交游标 |
+| 普通书架与前后书 | Bookshelf/FolderList/FolderCollection、BookshelfFolderList、BookOperation.MoveBook | 原目录分组/13项排序/普通端点/随机循环；混合候选、失败重试和优先切书；每路径参数/持久随机种子待迁 |
+| 文件夹页导航 | Book/BookPageCollection.GetNextFolderIndex/GetPrevFolderIndex | 原文件名升降序目录分组；组内回首项/端点停止；不冒充子书/父书打开 |
 | 侧栏拖拽组合 | SidePanels/CustomLayoutPanelManager、SidePanelViewModel、SidePanelDropAcceptor、LayoutDockPanel | 原组模型、leader 整组移动/成员拆组、分半组合及 V2 JSON 适配；Headless/真机恢复通过；浮动/旧布局导入待迁移 |
 | 历史/书签 | Bookamrk/BookmarkCollection.cs、BookMemento、HistoryCollection | 原 JSON 树字段/顺序保留；访问排序、基础编辑和共享阅读状态接入，完整服务待迁入 |
 | 旧Profile/nvzip | SaveData | 待 P5，完整旧迁移规则待迁入 |

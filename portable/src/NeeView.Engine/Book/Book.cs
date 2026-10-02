@@ -6,7 +6,7 @@ public sealed class Book(Archive source, List<Page> pages, BookSettingConfig set
 {
     public Archive Source { get; } = source;
     public string Path => Source.Path;
-    public List<Page> Pages { get; } = pages;
+    public BookPageCollection Pages { get; } = new(pages);
     public BookSettingConfig Setting { get; } = setting;
     public PageSortMode EffectiveSortMode { get; private set; }
     public int SortSeed { get; internal set; }
@@ -38,7 +38,7 @@ public sealed class Book(Archive source, List<Page> pages, BookSettingConfig set
             ? (Setting.SortMode.IsDescending() ? PageSortMode.FileNameDescending : PageSortMode.FileName)
             : Setting.SortMode;
         var result = BookPageSort.Sort(Pages, mode, SortSeed, token);
-        EffectiveSortMode = result.SortMode; SortSeed = result.SortSeed; Pages.Clear(); Pages.AddRange(result.Pages);
+        EffectiveSortMode = result.SortMode; Pages.SortMode = result.SortMode; SortSeed = result.SortSeed; Pages.Clear(); Pages.AddRange(result.Pages);
         for (int i = 0; i < Pages.Count; i++) Pages[i].Index = i;
     }
     /// <summary>书籍拥有来源，关闭后释放归档句柄。</summary>

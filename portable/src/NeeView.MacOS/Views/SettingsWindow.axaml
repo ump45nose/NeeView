@@ -15,7 +15,9 @@
         <TextBlock Text="阅读方向" /><ComboBox x:Name="Order" SelectedIndex="0"><ComboBoxItem Content="从右向左" /><ComboBoxItem Content="从左向右" /></ComboBox>
         <CheckBox x:Name="Divide" Content="单页模式分割横向页面" /><CheckBox x:Name="Wide" Content="双页模式宽图独占一页" />
         <CheckBox x:Name="First" Content="首页单独显示" /><CheckBox x:Name="Last" Content="末页单独显示" />
-
+        <TextBlock Text="书架（全局）" FontSize="16" Margin="0,8,0,0" />
+        <TextBlock Text="文件夹与归档排序" /><ComboBox x:Name="BookshelfGroup"><ComboBoxItem Content="混排" /><ComboBoxItem Content="文件夹在前" /><ComboBoxItem Content="文件夹在后" /></ComboBox>
+        <CheckBox x:Name="PrioritizeBookMove" Content="允许前后书命令取代正在加载的书籍" />
       </StackPanel>
     </ScrollViewer>
     <Grid x:Name="InputSettings" Grid.Column="1" RowDefinitions="Auto,Auto,*" Margin="16" IsVisible="False">
