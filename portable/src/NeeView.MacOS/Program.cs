@@ -8,6 +8,9 @@ public static class Program
     [STAThread]
     public static int Main(string[] args)
     {
+        // 将框架警告与异步启动错误写入标准错误，便于正式 Host 的本机验收留证。
+        System.Diagnostics.Trace.Listeners.Add(new System.Diagnostics.TextWriterTraceListener(Console.Error));
+        System.Diagnostics.Trace.AutoFlush = true;
         MacApp.InitialPaths = args;
         return AppBuilder.Configure<MacApp>().UsePlatformDetect().With(new MacOSPlatformOptions { ShowInDock = true }).LogToTrace().StartWithClassicDesktopLifetime(args);
     }

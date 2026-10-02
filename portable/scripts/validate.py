@@ -68,7 +68,11 @@ def main():
         if args.macos:
             report["formal_app"] = "构建失败或中断，详见步骤"
             run("正式 Mac 应用构建", [args.dotnet, "build", "src/NeeView.MacOS/NeeView.MacOS.csproj", "-m:1", "-p:RestoreLockedMode=true"])
-            report["formal_app"] = "构建通过；运行/签名/安装未执行"
+            # SDK 的 RID 子目录还包含签名前的中间 .app；只检查默认输出目录的最终成品。
+            app = root / "src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app"
+            run("正式 .app 本地签名校验", ["codesign", "--verify", "--deep", "--strict", "--verbose=2", app])
+            report["app_bundle"] = str(app)
+            report["formal_app"] = "构建及本地签名校验通过；运行见独立真机记录，Developer ID/公证/安装未执行"
     finally:
         (root / "acceptance").mkdir(exist_ok=True)
         (root / "acceptance/p1-validation.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")

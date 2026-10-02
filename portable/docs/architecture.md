@@ -47,7 +47,7 @@ Book/Page/Archive/BookOperation 是原关系的 P1 子集适配，尚未完整�
 
 `UserSetting.json`、`History.json` 是唯一权威数据，沿用 Path/Page/Props、差分键位和原设置枚举。未迁移配置及未知 Props 保留。Mac 用户目录为 `~/Library/Application Support/NeeView.Mac`；不修改 Windows Profile 或旧 NeeView.Portable 数据。
 
-保存先准备两个临时文件，再保留副本和小型提交标记，原子替换各文件；失败恢复旧完整状态，中断在下次启动恢复。阅读防抖一秒，切书和退出立即保存。关闭入口共享可等待任务，保存失败保持书籍/查看器并允许重试。
+保存先准备两个临时文件，再保留副本和小型提交标记，原子替换各文件；失败恢复旧完整状态，中断在下次启动恢复。阅读防抖一秒，切书和退出立即保存。关闭入口共享可等待任务，保存失败保持书籍/查看器并允许重试。非文件系统激活重建窗口时恢复最后书籍；明确打开文件优先于旧状态。该链路已在正式Mac应用中验证，见[运行记录](../acceptance/p1-macos-runtime.md)。
 
 原 Props 无法无歧义编码 IsWide=false，Mac 仅增加 `MacIsSupportedWidePage` 补值，`MacPagePart` 保存半页；原解析算法保持。完整旧版本迁移、路径映射、书签树与 .nvzip 导入在 P2/P5，当前不能宣称任意旧 Profile 可直接使用。
 
@@ -57,4 +57,4 @@ Book/Page/Archive/BookOperation 是原关系的 P1 子集适配，尚未完整�
 
 [前端边界](frontend-boundaries.md)、[行为对照](behavior-baseline.md)、[完整命令表](command-migration.md)、[布局表](layout-migration.md)、[模块设计](modules/M01.md) 和 [阶段证据](../acceptance/stages.md) 是后续开发契约。P2 阅读导航、P3 大量图片、P4 fork 分类、P5 兼容/高级内容/发布仍是目标，未继承旧重写方案的“通过”。
 
-优化只按测量热点独立修改并回归。代码删除必须说明 Windows 专属、不可达、重复或被替换的原因。构建串行、使用默认输出；不得通过 Preview 或改输出目录绕过 Xcode。编译、自动测试、运行、Windows 对照、用户验收、提交和发布分别报告。
+优化只按测量热点独立修改并回归。代码删除必须说明 Windows 专属、不可达、重复或被替换的原因。构建串行、使用默认输出；不得通过 Preview 或改输出目录绕过 Xcode。本机Xcode27.0已满足构建要求；开发Host明确使用ad-hoc签名和JIT权限，最终.app在默认输出目录，RID子目录的.app只是SDK中间产物。构建及本地签名校验写入p1-validation.json；真机运行单独留证。编译、自动测试、运行、Windows 对照、用户验收、提交和发布分别报告。

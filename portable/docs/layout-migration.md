@@ -25,4 +25,4 @@
 | NavigatePanel | 右rail导航器 | 待P2，禁用 |
 | ImageEffectPanel | 右rail效果 | 待P5，禁用 |
 
-Headless 测试检查区域顺序、栏宽、图像绘制、调整列宽/显隐保持、输入作用域及设置窗口装载。截图见 `../acceptance/p1-layout.png`。截图是正式XAML和Skia渲染的证据，未在正式Mac应用运行，不能替代原版动态对照或用户视觉验收。
+Headless 测试检查区域顺序、栏宽、图像绘制、调整列宽/显隐保持、输入作用域及设置窗口装载。截图见 `../acceptance/p1-layout.png`。正式Mac应用已启动和绘制，真机截图另存为 `../acceptance/p1-macos-runtime.png`；两类证据不能替代Windows动态对照或用户视觉验收。

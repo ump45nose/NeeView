@@ -28,7 +28,7 @@ dotnet run --project src/NeeView.MacOS/NeeView.MacOS.csproj -- /path/to/images-o
 
 validate串行执行Engine构建、原算法/正式XAML/真实目录ZIP/解码/资源测试。`--macos-source`是正式入口Library编译检查，**不产生可运行应用验收**；`--macos`是默认正式应用构建。结果分别记录在acceptance/p1-validation.json。默认bin/obj，失败不换输出目录。
 
-当前正式.app构建受完整Xcode缺失阻塞；Headless可验证真实正式视图源码和Skia图像绘制，但不代表Mac应用运行通过。CI只运行P1模块测试，未推送或远端执行。
+本机已安装Xcode27.0，正式.app构建与本地ad-hoc签名校验通过；目录/中文CBZ、原分页快捷键、窗口关闭重开、完整退出恢复与系统明确打开已完成真机验证，见[运行记录](acceptance/p1-macos-runtime.md)。最终开发应用位于`src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app`；RID子目录中的.app是SDK中间产物。CI只运行P1模块测试，未推送或远端执行。
 
 ## 数据与操作
 
@@ -47,4 +47,4 @@ python3 scripts/package_macos.py --dotnet dotnet --sign 'Developer ID Applicatio
 
 只发布正式ARM64.app，先要求完整Xcode。签名公证由用户环境凭据提供，脚本不创建/换号/改全局配置。依赖清单取实际发布输出并保留许可。P5才执行正式发布。
 
-27项自动测试与源码编译证据、Headless截图见阶段记录。Windows动态对照、正式应用运行、Finder事件/触控板/Retina/NAS、完整显示性能及用户视觉验收仍需各自执行。旧macos-ui-2026-10-02.md和benchmark记录仅保留为重写方案历史，不作为本轮迁移通过证据。
+27项自动测试、正式构建与本地签名输出见阶段记录；正式运行截图与Headless截图分别留证。系统打开事件已验证；Finder双击/拖放、菜单子项/原生打开对话框、触控板/多屏/NAS、完整显示性能、Windows动态对照和用户视觉验收仍需分别执行。旧macos-ui-2026-10-02.md和benchmark记录仅保留为重写方案历史，不作为本轮迁移通过证据。

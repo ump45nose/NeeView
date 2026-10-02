@@ -4,8 +4,8 @@
 
 | 阶段 | 本轮状态 | 交付/尚待验证 |
 |---|---|---|
-| P0迁移校准/骨架 | 源码已实施，运行门槛未满足 | 固定基线、38文件迁入清单、235命令、原左右3/6布局表、三项目、原位置测试；Mac正式启动和Windows动态对照待执行 |
-| P1核心阅读 | 源码/模块与Headless测试通过，未封板 | 目录/ZIP、原页框/单双/宽图/分割、缩放平移、导航信息、JSON恢复；正式.app运行与原版视觉对照待执行 |
+| P0迁移校准/骨架 | 源码、正式构建/启动通过；原版动态对照待验 | 固定基线、38文件迁入清单、235命令、原左右3/6布局表、三项目、原位置测试；正式Mac启动已验证 |
+| P1核心阅读 | 模块/Headless及核心真机流程通过，未封板 | 目录/ZIP、原页框/单双/宽图/分割、缩放平移、导航信息、JSON恢复；真机已验证打开/分页/退出恢复，完整交互与原版视觉对照待验 |
 | P2阅读导航 | 待实施 | RAR/7z、胶片条、历史/书签界面、完整命令/手势；既有归档夹具及许可保留 |
 | P3大量图片 | 待实施 | 原链路连续/瀑布流、缩略图、目录树/延迟加载、万条目性能 |
 | P4fork分类 | 待实施 | 原双区面板/数字/文件操作/UndoRedo，真实失败恢复 |
@@ -17,13 +17,14 @@
 - 资源/失败测试：共享请求取消、显示租约计费和预算回收、native晚到关闭清理、EXIF/透明/GIF/JPEG、不成功保存不销毁阅读器、双文件中断恢复。
 - 正式XAML/主题Headless：区域和栏宽、Skia真实像素绘制、文本/查看器作用域、侧栏不请求图片、列宽调整/隐藏保持、共享关闭任务、旧Control不变为Meta。
 - Engine/Backends与正式Mac入口源码Library检查通过。该检查不是正式.app或系统交互验收。
-- 默认正式Mac构建失败：SDK报告“找不到有效的Xcode开发人员路径”；本机仅CommandLineTools。没有增加长期Preview入口。
+- 本机Xcode27.0（27A266a），macOS27.0.1 ARM64；正式Mac构建及最终.app本地ad-hoc签名严格校验通过。没有增加Preview入口。
+- 正式运行：目录/单图定位、中文CBZ、Ctrl+1/2模式、原Left/Right帧导航、宽图独页、系统打开事件、Command+W保存/驻留/重开恢复、Command+Q退出、完整重启恢复及冷启动明确文件优先。修复非文件激活重建窗口不恢复旧书的问题；[详细记录](p1-macos-runtime.md)与[真机截图](p1-macos-runtime.png)分别留证。
 - 最新分步骤原始输出：p1-validation.json；TRX位于tests/NeeView.Engine.Tests/TestResults/engine.trx（构建输出，不提交）。
 - [布局截图](p1-layout.png)：正式XAML/原转换颜色图标/Skia绘制。尚未取得Windows固定截图动态对照，不能宣称布局细节全部一致。
 
 ## 未执行的验收
 
-正式.app启动/关闭/重开、Finder打开/拖放及定位、触控板/IME、Retina/多屏、NAS断线/权限/跨卷、长期进程/native内存、原Windows构建及动态阅读/分类回归、真实旧Profile导入、用户视觉验收均待执行。Developer ID、公证和干净安装未执行。无推送、远端CI或发布。
+Finder实际双击/拖放及定位、菜单子项/原生打开对话框、真实触控板/IME、多屏、NAS断线/权限/跨卷、长期进程/native内存、原Windows构建及动态阅读/分类回归、真实旧Profile导入、用户视觉验收均待执行。当前Retina屏上图像已显示，但像素1:1和多屏缩放未验。Developer ID、公证和干净安装未执行。无推送、远端CI或发布。
 
 性能目标仍为首图显示完成P95≤1秒、预取翻页显示P95≤100ms、缓存60Hz帧P95≤16.7ms。本轮未测完整显示帧；旧服务链路benchmark不得转作新实现性能结论。
 
@@ -31,4 +32,4 @@
 
 旧Core/Application/Content/Imaging/Persistence/Desktop/Platform.MacOS/Preview/Host及旧测试已退役；必要解码/原生系统资源代码迁入Backends，通用资源测试迁入新测试，RAR/7z夹具保留供P2。旧SQL没有继续参与产品，JSON是唯一权威状态。旧成果在Git历史，旧验收材料保留并标为历史，不维护两套实现。
 
-原NeeView Windows源码未修改。用户portable/.DS_Store保持原样且不提交。已验收源码增量自动本地提交；提交号通过git log核查。本阶段因正式运行门槛未满足，不标记整体P0/P1验收完成。
+原NeeView Windows源码未修改。用户portable/.DS_Store保持原样且不提交。已验收增量自动本地提交；提交号通过git log核查。正式运行门槛已满足，但完整交互、Windows动态对照及用户布局验收未完成，不标记整体P0/P1封板。

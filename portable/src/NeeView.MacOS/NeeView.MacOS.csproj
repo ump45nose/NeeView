@@ -8,6 +8,10 @@
     <RootNamespace>NeeView.MacOS</RootNamespace>
     <!-- 原配置依赖运行时类型与 JSON 反射；P1 不引入 AOT/裁剪改造。 -->
     <LinkMode>None</LinkMode>
+    <!-- SDK 调整原生库加载路径后必须重新签名；本地默认 ad-hoc，不需要开发者证书。 -->
+    <EnableCodeSigning Condition="'$(EnableCodeSigning)' == ''">true</EnableCodeSigning>
+    <CodesignKey Condition="'$(CodesignKey)' == ''">-</CodesignKey>
+    <CodesignEntitlements>../../scripts/entitlements.plist</CodesignEntitlements>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../NeeView.Engine/NeeView.Engine.csproj" />

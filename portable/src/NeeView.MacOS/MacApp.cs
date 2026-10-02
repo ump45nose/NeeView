@@ -49,7 +49,8 @@ public sealed partial class MacApp : Avalonia.Application
             {
                 // Finder 明确打开优先于启动默认恢复，即使激活先于窗口初始化完成。
                 if (e is FileActivatedEventArgs) _explicitOpen = true;
-                await OpenWindowAsync(false);
+                // 关闭窗口后的 Dock/Finder 重开恢复旧书；明确打开文件仍由下面的新请求决定。
+                await OpenWindowAsync(e is not FileActivatedEventArgs);
                 if (e is FileActivatedEventArgs files)
                 {
                     foreach (var file in files.Files) if (file.TryGetLocalPath() is { } path && _window is not null) await _window.OpenAsync(path);
