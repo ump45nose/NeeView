@@ -1,0 +1,45 @@
+using System.Reflection;
+using System.Text.Json;
+namespace NeeView;
+
+/// <summary>固定 Windows 命令元数据；暂未迁移命令保留名称和默认输入。</summary>
+public sealed record CommandDefinition(string Name, string Text, string Shortcut, string Source, string Stage);
+
+/// <summary>原命令表的 P1 登记，菜单和输入使用同一命令标识。</summary>
+public sealed class CommandTable
+{
+    private readonly Dictionary<string, Func<Task>> _actions = [];
+    public IReadOnlyList<CommandDefinition> Definitions { get; }
+    /// <summary>装配原阅读命令及已迁移设置命令；没有实现的命令不可执行。</summary>
+    public CommandTable(BookOperation operation)
+    {
+        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("NeeView.Command.command-manifest.json")!;
+        Definitions = JsonSerializer.Deserialize<List<CommandDefinition>>(stream)!;
+        // 来源：NextPage/PrevPage/NextOnePage/PrevOnePageCommand.Execute，保留帧与单页之别。
+        _actions["NextPage"] = () => operation.MoveAsync(1);
+        _actions["PrevPage"] = () => operation.MoveAsync(-1);
+        _actions["NextOnePage"] = () => operation.MoveAsync(1, true);
+        _actions["PrevOnePage"] = () => operation.MoveAsync(-1, true);
+        _actions["FirstPage"] = () => operation.JumpAsync(0);
+        _actions["LastPage"] = () => operation.JumpAsync((operation.Book?.Pages.Count ?? 1) - 1, true);
+        _actions["SetPageModeOne"] = () => operation.ApplySettingAsync(e => e.PageMode = PageMode.SinglePage);
+        _actions["SetPageModeTwo"] = () => operation.ApplySettingAsync(e => e.PageMode = PageMode.WidePage);
+        _actions["TogglePageMode"] = () => operation.ApplySettingAsync(e => e.PageMode = e.PageMode.GetToggle(1, true));
+        _actions["SetBookReadOrderRight"] = () => operation.ApplySettingAsync(e => e.BookReadOrder = PageReadOrder.RightToLeft);
+        _actions["SetBookReadOrderLeft"] = () => operation.ApplySettingAsync(e => e.BookReadOrder = PageReadOrder.LeftToRight);
+        _actions["ToggleBookReadOrder"] = () => operation.ApplySettingAsync(e => e.BookReadOrder = e.BookReadOrder.GetToggle());
+        _actions["ToggleIsSupportedDividePage"] = () => operation.ApplySettingAsync(e => e.IsSupportedDividePage = !e.IsSupportedDividePage);
+        _actions["ToggleIsSupportedWidePage"] = () => operation.ApplySettingAsync(e => e.IsSupportedWidePage = !e.IsSupportedWidePage);
+        _actions["ToggleIsSupportedSingleFirstPage"] = () => operation.ApplySettingAsync(e => e.IsSupportedSingleFirstPage = !e.IsSupportedSingleFirstPage);
+        _actions["ToggleIsSupportedSingleLastPage"] = () => operation.ApplySettingAsync(e => e.IsSupportedSingleLastPage = !e.IsSupportedSingleLastPage);
+        _actions["SetSortModeFileName"] = () => operation.ApplySettingAsync(e => e.SortMode = PageSortMode.FileName);
+        _actions["SetSortModeFileNameDescending"] = () => operation.ApplySettingAsync(e => e.SortMode = PageSortMode.FileNameDescending);
+        _actions["SetSortModeTimeStamp"] = () => operation.ApplySettingAsync(e => e.SortMode = PageSortMode.TimeStamp);
+        _actions["SetSortModeSize"] = () => operation.ApplySettingAsync(e => e.SortMode = PageSortMode.Size);
+        _actions["SetSortModeRandom"] = () => operation.ApplySettingAsync(e => e.SortMode = PageSortMode.Random);
+    }
+    /// <summary>返回命令是否已迁移；不能用空实现冒充可执行命令。</summary>
+    public bool IsAvailable(string name) => _actions.ContainsKey(name);
+    /// <summary>异步执行已登记命令，未知或未迁移命令返回能力错误。</summary>
+    public Task ExecuteAsync(string name) => _actions.TryGetValue(name, out var action) ? action() : throw new NotSupportedException($"命令 {name} 尚未迁移。");
+}

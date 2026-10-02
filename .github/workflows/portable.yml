@@ -1,4 +1,4 @@
-name: Portable checks
+name: NeeView Mac migration checks
 on:
   push:
     paths: ['portable/**', '.github/workflows/portable.yml']
@@ -7,23 +7,20 @@ on:
 permissions:
   contents: read
 jobs:
-  modules:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+  p1:
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-      # 每个 runner 内串行构建，正式 AppKit Host 和系统交互单独验收。
+      # 正式视图/后端源码在测试中直接编译；不增加 Preview 产品入口。
       - run: python3 portable/scripts/validate.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: portable-${{ matrix.os }}
+          name: neeview-mac-p1
           path: |
-            portable/acceptance/latest-validation.json
-            portable/tests/NeeView.Portable.Tests/TestResults/portable.trx
+            portable/acceptance/p1-validation.json
+            portable/acceptance/p1-layout.png
+            portable/tests/NeeView.Engine.Tests/TestResults/engine.trx

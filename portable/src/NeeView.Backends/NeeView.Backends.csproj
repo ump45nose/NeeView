@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-macos</TargetFramework>
+    <!-- 固定当前 workload 的 API 版本，Library 编译检查与 Exe 还原使用相同锁文件。 -->
+    <TargetPlatformVersion>27.0</TargetPlatformVersion>
+    <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
+    <RootNamespace>NeeView.Backends</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../NeeView.Engine/NeeView.Engine.csproj" />
+    <PackageReference Include="Magick.NET-Q8-AnyCPU" />
+    <PackageReference Include="SharpCompress" />
+  </ItemGroup>
+</Project>

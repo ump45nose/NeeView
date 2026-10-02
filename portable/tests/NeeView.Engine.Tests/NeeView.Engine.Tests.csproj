@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/NeeView.Engine/NeeView.Engine.csproj" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Avalonia.Headless.XUnit" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Skia" />
+    <PackageReference Include="Magick.NET-Q8-AnyCPU" />
+    <PackageReference Include="SharpCompress" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../src/NeeView.Backends/Content/**/*.cs" Link="Content/%(Filename)%(Extension)" />
+    <Compile Include="../../src/NeeView.Backends/Imaging/**/*.cs" Link="Imaging/%(Filename)%(Extension)" />
+    <Compile Include="../../src/NeeView.MacOS/Views/**/*.cs" Link="Views/%(Filename)%(Extension)" />
+    <Compile Include="../../src/NeeView.MacOS/ViewModels/**/*.cs" Link="ViewModels/%(Filename)%(Extension)" />
+    <AvaloniaResource Include="../../src/NeeView.MacOS/Views/**/*.axaml" Link="Views/%(Filename)%(Extension)" />
+    <AvaloniaResource Include="../../src/NeeView.MacOS/Styles/**/*.axaml" Link="Styles/%(Filename)%(Extension)" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

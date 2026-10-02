@@ -1,0 +1,108 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:NeeView.MacOS.Views" x:Class="NeeView.MacOS.Views.MainWindow"
+        Width="1200" Height="800" MinWidth="720" MinHeight="480" Title="{Binding Title}" x:CompileBindings="False">
+  <!-- 转换自 MainWindow.xaml/SidePanelFrameView.xaml。保持顶部、左右、中间、底部和覆盖层关系。 -->
+  <Grid x:Name="Root" RowDefinitions="Auto,*,Auto">
+    <Border x:Name="DockMenuSocket" Grid.Row="0" Background="{DynamicResource MenuBar.Background}">
+      <StackPanel>
+        <Menu x:Name="MenuBar">
+          <MenuItem Header="文件">
+            <MenuItem Header="打开…" Tag="LoadAs" InputGesture="Meta+O" Click="Command_Click" />
+            <MenuItem Header="打开目录…" Tag="OpenFolder" Click="Command_Click" />
+            <MenuItem Header="重新载入" Tag="ReLoad" Click="Command_Click" />
+            <MenuItem Header="在 Finder 中显示" Tag="OpenExplorer" Click="Command_Click" />
+            <Separator /><MenuItem Header="关闭窗口" Tag="CloseWindow" InputGesture="Meta+W" Click="Command_Click" />
+          </MenuItem>
+          <MenuItem Header="书籍">
+            <MenuItem Header="第一页" Tag="FirstPage" Click="Command_Click" /><MenuItem Header="最后一页" Tag="LastPage" Click="Command_Click" />
+            <MenuItem Header="排序">
+              <MenuItem Header="注册顺序（播放列表）" IsEnabled="False" />
+              <MenuItem Header="文件名" Tag="SetSortModeFileName" Click="Command_Click" />
+              <MenuItem Header="文件名降序" Tag="SetSortModeFileNameDescending" Click="Command_Click" />
+              <MenuItem Header="修改时间" Tag="SetSortModeTimeStamp" Click="Command_Click" />
+              <MenuItem Header="大小" Tag="SetSortModeSize" Click="Command_Click" />
+              <MenuItem Header="随机" Tag="SetSortModeRandom" Click="Command_Click" />
+            </MenuItem>
+            <MenuItem Header="书签（P2）" IsEnabled="False" />
+          </MenuItem>
+          <MenuItem Header="页面">
+            <MenuItem Header="上一页" Tag="PrevPage" Click="Command_Click" /><MenuItem Header="下一页" Tag="NextPage" Click="Command_Click" />
+            <MenuItem Header="上一张" Tag="PrevOnePage" Click="Command_Click" /><MenuItem Header="下一张" Tag="NextOnePage" Click="Command_Click" />
+            <Separator />
+            <MenuItem Header="单页" Tag="SetPageModeOne" Click="Command_Click" /><MenuItem Header="双页" Tag="SetPageModeTwo" Click="Command_Click" />
+            <MenuItem Header="从右向左" Tag="SetBookReadOrderRight" Click="Command_Click" /><MenuItem Header="从左向右" Tag="SetBookReadOrderLeft" Click="Command_Click" />
+            <Separator />
+            <MenuItem Header="分割横向页面" ToggleType="CheckBox" IsChecked="{Binding Divide, Mode=OneWay}" Tag="ToggleIsSupportedDividePage" Click="Command_Click" />
+            <MenuItem Header="宽图独占双页" ToggleType="CheckBox" IsChecked="{Binding Wide, Mode=OneWay}" Tag="ToggleIsSupportedWidePage" Click="Command_Click" />
+            <MenuItem Header="首页单独显示" ToggleType="CheckBox" IsChecked="{Binding FirstSingle, Mode=OneWay}" Tag="ToggleIsSupportedSingleFirstPage" Click="Command_Click" />
+            <MenuItem Header="末页单独显示" ToggleType="CheckBox" IsChecked="{Binding LastSingle, Mode=OneWay}" Tag="ToggleIsSupportedSingleLastPage" Click="Command_Click" />
+          </MenuItem>
+          <MenuItem Header="显示">
+            <MenuItem Header="适合窗口" Tag="SetStretchModeUniform" Click="Command_Click" /><MenuItem Header="100%" Tag="SetStretchModeNone" Click="Command_Click" />
+            <MenuItem Header="放大" Tag="ViewScaleUp" Click="Command_Click" /><MenuItem Header="缩小" Tag="ViewScaleDown" Click="Command_Click" />
+            <MenuItem Header="全屏" Tag="ToggleFullScreen" Click="Command_Click" />
+            <Separator /><MenuItem Header="左侧栏" Tag="ToggleHideLeftPanel" Click="Command_Click" /><MenuItem Header="右侧栏" Tag="ToggleHideRightPanel" Click="Command_Click" />
+            <MenuItem Header="左侧栏自动隐藏" ToggleType="CheckBox" IsChecked="{Binding LeftAutoHide, Mode=OneWay}" Tag="LeftAutoHide" Click="Command_Click" />
+            <MenuItem Header="右侧栏自动隐藏" ToggleType="CheckBox" IsChecked="{Binding RightAutoHide, Mode=OneWay}" Tag="RightAutoHide" Click="Command_Click" />
+          </MenuItem>
+          <MenuItem Header="设置"><MenuItem Header="选项…" Tag="OpenOptionsWindow" Click="Command_Click" /></MenuItem>
+          <MenuItem Header="帮助"><MenuItem Header="命令迁移状态…" Tag="HelpCommandList" Click="Command_Click" /></MenuItem>
+        </Menu>
+        <TextBox x:Name="AddressBar" Classes="address" Text="{Binding Address}" PlaceholderText="打开图片、目录或 ZIP / CBZ" KeyDown="Address_KeyDown" />
+      </StackPanel>
+    </Border>
+    <Grid x:Name="SidePanelFrame" Grid.Row="1" ColumnDefinitions="41,240,4,*,4,240,41">
+      <Border Grid.Column="0" Classes="rail" PointerEntered="LeftRail_Entered" PointerExited="LeftRail_Exited">
+        <StackPanel>
+          <Button Classes="panel-icon" Tag="FolderPanel" ToolTip.Tip="文件夹" Click="Panel_Click"><PathIcon Data="{DynamicResource g_folder_24px}" /></Button>
+          <Button Classes="panel-icon" Tag="PageListPanel" ToolTip.Tip="页面列表" Click="Panel_Click"><PathIcon Data="{DynamicResource g_photo_library_24px}" /></Button>
+          <Button Classes="panel-icon" Tag="HistoryPanel" ToolTip.Tip="历史（P2）" IsEnabled="False"><PathIcon Data="{DynamicResource g_history_24px}" /></Button>
+        </StackPanel>
+      </Border>
+      <Border x:Name="LeftPanel" Grid.Column="1" Classes="panel" IsVisible="{Binding LeftVisible}" PointerEntered="LeftRail_Entered" PointerExited="LeftRail_Exited">
+        <Grid RowDefinitions="Auto,Auto,*">
+          <TextBlock Classes="panel-title" Text="{Binding LeftTitle}" />
+          <Button Grid.Row="1" Content="上一级" HorizontalAlignment="Stretch" Margin="8,0,8,6" Tag="ParentFolder" Click="Command_Click" IsVisible="{Binding ShowFolderList}" />
+          <ListBox x:Name="FolderList" Grid.Row="2" ItemsSource="{Binding Folders}" DoubleTapped="Folder_DoubleTapped" IsVisible="{Binding ShowFolderList}">
+            <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" /></DataTemplate></ListBox.ItemTemplate>
+          </ListBox>
+          <ListBox x:Name="PageList" Grid.Row="2" ItemsSource="{Binding Pages}" SelectedItem="{Binding SelectedPage}" SelectionChanged="Page_SelectionChanged" IsVisible="{Binding ShowPageList}">
+            <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding EntryName}" TextTrimming="CharacterEllipsis" /></DataTemplate></ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+      </Border>
+      <GridSplitter Grid.Column="2" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" IsVisible="{Binding LeftVisible}" />
+      <local:ReaderView x:Name="MainViewSocket" Grid.Column="3" />
+      <GridSplitter Grid.Column="4" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" IsVisible="{Binding RightVisible}" />
+      <Border x:Name="RightPanel" Grid.Column="5" Classes="panel" IsVisible="{Binding RightVisible}" PointerEntered="RightRail_Entered" PointerExited="RightRail_Exited">
+        <Grid RowDefinitions="Auto,*">
+          <TextBlock Classes="panel-title" Text="信息" />
+
+          <ScrollViewer Grid.Row="1"><TextBlock Text="{Binding Information}" TextWrapping="Wrap" Margin="10" /></ScrollViewer>
+        </Grid>
+      </Border>
+      <Border Grid.Column="6" Classes="rail" PointerEntered="RightRail_Entered" PointerExited="RightRail_Exited">
+        <StackPanel>
+          <Button Classes="panel-icon" Tag="FileInformationPanel" ToolTip.Tip="信息" Click="Panel_Click"><PathIcon Data="{DynamicResource g_info_24px}" /></Button>
+          <Button Classes="panel-icon" Tag="NavigatePanel" ToolTip.Tip="导航器（P2）" IsEnabled="False"><PathIcon Data="{DynamicResource g_desktop_windows_24px}" /></Button>
+          <Button Classes="panel-icon" Tag="ImageEffectPanel" ToolTip.Tip="图像效果（P5）" IsEnabled="False"><PathIcon Data="{DynamicResource g_toy_24px}" /></Button>
+          <Button Classes="panel-icon" Tag="BookmarkPanel" ToolTip.Tip="书签（P2）" IsEnabled="False"><PathIcon Data="{DynamicResource g_star_24px}" /></Button>
+          <Button Classes="panel-icon" Tag="PlaylistPanel" ToolTip.Tip="播放列表（P5）" IsEnabled="False"><PathIcon Data="{DynamicResource g_playlist_24px}" /></Button>
+          <Button Classes="panel-icon" Tag="DestinationFolderPanel" ToolTip.Tip="目标文件夹（P4）" IsEnabled="False"><PathIcon Data="{DynamicResource g_recursive_folder_24px}" /></Button>
+        </StackPanel>
+      </Border>
+    </Grid>
+    <Border x:Name="DockStatusArea" Grid.Row="2" Background="{DynamicResource BottomBar.Background}">
+      <StackPanel>
+        <!-- 原 DockFilmStripSocket 位置保留；P2 接入真实缩略图，不伪造已完成功能。 -->
+        <Border x:Name="DockFilmStripSocket" Height="0" />
+        <Grid x:Name="DockPageSliderSocket" ColumnDefinitions="*,Auto" Margin="10,0">
+          <Slider x:Name="PageSliderView" Grid.Column="0" Minimum="0" Maximum="{Binding LastIndex}" Value="{Binding PageIndex}" SmallChange="1" IsSnapToTickEnabled="True" TickFrequency="1" ValueChanged="Slider_ValueChanged" />
+          <TextBlock Grid.Column="1" Text="{Binding PositionText}" VerticalAlignment="Center" Margin="12,0,0,0" />
+        </Grid>
+        <TextBlock x:Name="StatusField" Text="{Binding Status}" TextTrimming="CharacterEllipsis" FontSize="11" Margin="10,0,10,5" />
+      </StackPanel>
+    </Border>
+    <Border x:Name="MessageLayer" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,14" Padding="12,6" CornerRadius="3" Background="#D9222222" IsVisible="{Binding IsLoading}" IsHitTestVisible="False"><TextBlock Text="正在读取…" /></Border>
+  </Grid>
+</Window>

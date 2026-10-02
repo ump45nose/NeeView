@@ -1,58 +1,50 @@
-# NeeView macOS
+# NeeView Mac
 
-基于 `ump45nose/NeeView` 46.3 分类 fork 的独立跨平台工程。Windows 工程保持为行为参照。架构见 [整体架构](docs/architecture.md)，前端调整见 [独立边界](docs/frontend-boundaries.md)，模块契约见 [M01](docs/modules/M01.md) 至 [M10](docs/modules/M10.md)，实际证据见 [阶段验收](acceptance/stages.md)。
+基于 `ump45nose/NeeView` 46.3 分类 fork，独立维护 Mac 源码。保留原阅读/设置算法、命令名、JSON与窗口区域，集中替换WPF/Windows依赖。本轮仅P0/P1；原Windows工程保持不变作为固定参考。
 
-## 开发
+[整体架构](docs/architecture.md) · [前端边界](docs/frontend-boundaries.md) · [源码出处](docs/source-migration.json) · [命令表](docs/command-migration.md) · [布局表](docs/layout-migration.md) · [行为对照](docs/behavior-baseline.md) · [阶段验收](acceptance/stages.md)
 
-需要 .NET 10 SDK。正式 AppKit Host 还需要 macOS workload 和与 workload 匹配的完整 Xcode。
+## 当前增量
+
+- 三个生产项目：Engine、Backends、MacOS；唯一正式入口，没有Preview、第二个阅读内核或SQLite。
+- 原PagePosition/PageRange、设置Mix、排序、PageFrameFactory迁入；Book/Page/Archive/BookOperation为P1子集适配。
+- 图片/目录/ZIP/CBZ、单双页、方向、宽图/首页/末页/分割规则、缩放/平移、基础目录/页面导航和信息。
+- 顶部菜单/地址、原左右面板分组、中央查看器、底部滑条/状态；原颜色/图标资源，设置窗口左导航/右内容结构。
+- 原UserSetting/History的已支持分支、未知字段保留、位置/设置恢复和失败可重试保存。
+- RAR/7z、胶片条、书签、连续/瀑布流、fork分类、完整导入及高级内容尚未接入；清单保留，不沿用旧方案的通过状态。
+
+## 开发与验证
+
+需要.NET10 SDK；正式Host还需macOS workload及与其匹配的完整Xcode，验收平台macOS15+ / Apple Silicon。Mac API版本锁定27.0（当前workload 27.0.10722）；升级workload时同步核对Xcode与锁文件。
 
 ```sh
 cd portable
 python3 scripts/validate.py --dotnet dotnet
-python3 scripts/validate.py --dotnet dotnet --benchmarks
-dotnet run --project src/NeeView.Preview -- /path/to/images-or-book.cbz
-dotnet run --project src/NeeView.Preview -- --smoke /path/to/images-or-book.cbz
-dotnet workload install macos
-dotnet build src/NeeView.MacOS -m:1
+python3 scripts/validate.py --dotnet dotnet --macos-source --macos
+dotnet run --project src/NeeView.MacOS/NeeView.MacOS.csproj -- /path/to/images-or-book.cbz
 ```
 
-当前任务安装的隔离 SDK 路径为 `/Users/yuwk/.local/share/neeview-dotnet/dotnet`。若 PATH 优先命中旧版本，可用该绝对路径并清除不匹配的 `DOTNET_ROOT`，不修改系统 SDK 设置。
+本机隔离SDK为 `/Users/yuwk/.local/share/neeview-dotnet/dotnet`；PATH命中旧版本时传入该路径，脚本清除不匹配DOTNET_ROOT，不改系统SDK配置。
 
-Preview 用于共享界面、真实解码和保存恢复验证。正式 Host 使用 Foundation/AppKit 文件能力；本机没有完整 Xcode，所以正式应用构建和签名安装验收仍需补齐环境。
+validate串行执行Engine构建、原算法/正式XAML/真实目录ZIP/解码/资源测试。`--macos-source`是正式入口Library编译检查，**不产生可运行应用验收**；`--macos`是默认正式应用构建。结果分别记录在acceptance/p1-validation.json。默认bin/obj，失败不换输出目录。
 
-## 操作
+当前正式.app构建受完整Xcode缺失阻塞；Headless可验证真实正式视图源码和Skia图像绘制，但不代表Mac应用运行通过。CI只运行P1模块测试，未推送或远端执行。
 
-- 打开图片即浏览所在目录；支持目录及 ZIP/CBZ、RAR/CBR、7z。
-- 默认 Left 下一 frame、Right 上一 frame；单页/双页、方向、连续、瀑布流可以切换。
-- 瀑布流中点击图片明确选择分类对象，双击进入分页；导航列表可定位。
-- 手动目标目录前九项对应数字 1–9；目标列表双击分类。复制开关只影响数字/面板分类，原 `MoveToFolderAs` 固定移动。
-- 文本框和对话框隔离分类/阅读快捷键；主窗口文本框保留 Command 打开、关闭和退出。
-- 独立设置页编辑当前书籍、默认阅读、恢复策略、键位鼠标、侧栏和历史容量；冲突会报告。
-- 导入接受旧 `.nvzip` 或 Profile 路径，以 `Windows前缀 => macOS前缀` 配置映射；先预览再应用，源只读。
-- Command+W 关闭窗口，点击 Dock 可重开；Command+Q 保存并退出。
+## 数据与操作
 
-用户状态：`~/Library/Application Support/NeeView.Portable`；缓存：`~/Library/Caches/NeeView.Portable`。覆盖备份在用户数据的 `file-backups`；导入前备份在 `backups`。数据库迁移脚本位于 `src/NeeView.Persistence/Sql`。
+数据目录 `~/Library/Application Support/NeeView.Mac`，原 `UserSetting.json`、`History.json` 为权威数据。不修改旧Windows或NeeView.Portable目录，不直接自动导入旧状态。Mac仅补充半页/false-wide值；完整旧版本迁移和路径映射待P5。
 
-## 打包
+默认Left/左点击下一帧、Right/右点击上一帧；单张步进与帧步进分开。文本输入隔离阅读键，Command+O/W/Q用于打开/关闭/退出。未迁入滚动翻页不会改为普通翻页；当前滚轮可报告未迁移状态，高精度增量/修饰键用于平移/缩放。完整触控板适配待P2。
+
+目录和页面列表位于原左栏，信息位于原右栏；边栏可调整、显隐及基础自动隐藏。主题/布局调整入口见frontend-boundaries.md。
+
+## 发布与验收
 
 ```sh
-python3 scripts/package_macos.py --preview
-python3 scripts/package_macos.py
-python3 scripts/package_macos.py --sign 'Developer ID Application: …' --notary-profile NeeView
+python3 scripts/package_macos.py --dotnet dotnet
+python3 scripts/package_macos.py --dotnet dotnet --sign 'Developer ID Application: …' --notary-profile NeeView
 ```
 
-默认构建输出使用 SDK 目录；打包成品位于 `artifacts`。Preview 包带 `Preview` 名称，仅用于本机验证。正式签名路径需要有效证书及已配置的 notarytool keychain profile；脚本不会创建凭据或自动换号。依赖清单由实际 publish .deps.json 文件生成，并保留仓库许可与可取得的 NuGet 许可材料。
+只发布正式ARM64.app，先要求完整Xcode。签名公证由用户环境凭据提供，脚本不创建/换号/改全局配置。依赖清单取实际发布输出并保留许可。P5才执行正式发布。
 
-## 验收边界
-
-首版功能是逐模块实施的工程增量。2026-10-02 解锁后已完成 Preview 的阅读、重启恢复、设置、书签和分类等分项交互验收，见 [本机记录](acceptance/macos-ui-2026-10-02.md)。真实 IME/触控板、Retina、NAS/跨卷、实际异常中断、绘制性能 P95、Windows 行为对照、正式签名/公证/干净安装仍需各自执行验收，不能用编译或 Headless 测试替代。未支持的 PDF、媒体、密码/分卷/嵌套和旧脚本会明确提示或进入导入报告。
-
-## 前端调整
-
-主页面排布与工具栏位于 ReaderShell.axaml，宿主装配独立 ReaderNavigationPanel、ReaderDestinationPanel、ReaderView 和 SettingsWindow。命令与面板业务进入 ReaderWorkspaceViewModel，目录/书签数据由应用接口加载，控件不引用数据库或解压实现。颜色、间距、缩略图和设置页尺寸集中在 ReaderTheme.axaml，显示文本使用 ReaderLabels；其余面板可逐个替换为 XAML 模板，不影响阅读规则和文件操作。后台布局协调器只计算纯几何，与窗口和绘制独立。
-
-## 可复现证据
-
-validate.py 串行构建、测试、生成 12 张混合横竖 4K JPEG/CBZ、真实目录与归档解码、退出恢复；生成 acceptance/latest-validation.json。--benchmarks 额外生成四个服务链路报告，96 次采样，每次空像素缓存，OS 文件缓存未清空；不包含绘制帧。结束后强制 GC 数据仅为诊断。
-
-共享 net10.0 工程与 Preview 的 RuntimeIdentifiers 固定为 osx-arm64、osx-x64、linux-x64，发布不会改写开发锁文件。CI 已配置 macOS/Linux 模块及解码冒烟，当前未推送，远端尚未执行。自动脚本使用自己的临时状态目录，不导入或移动用户图片。
+27项自动测试与源码编译证据、Headless截图见阶段记录。Windows动态对照、正式应用运行、Finder事件/触控板/Retina/NAS、完整显示性能及用户视觉验收仍需各自执行。旧macos-ui-2026-10-02.md和benchmark记录仅保留为重写方案历史，不作为本轮迁移通过证据。

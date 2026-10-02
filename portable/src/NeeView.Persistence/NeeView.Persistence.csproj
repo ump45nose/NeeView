@@ -1,8 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup><RootNamespace>NeeView.Persistence</RootNamespace></PropertyGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Sql/*.sql" />
-    <ProjectReference Include="../NeeView.Application/NeeView.Application.csproj" />
-    <PackageReference Include="Microsoft.Data.Sqlite" />
-  </ItemGroup>
-</Project>

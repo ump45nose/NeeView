@@ -1,69 +1,24 @@
-# 前端边界与页面调整指南
+# 前端独立调整边界
 
-目标：页面布局、视觉、交互配置可以独立迭代，保持阅读规则和文件操作语义稳定。
+生产界面在唯一 `NeeView.MacOS` 项目内。XAML、主题、表现和绘制各有入口；界面变化不改阅读规则、排序、保存格式和文件操作语义。
 
-## 结构
-
-```mermaid
-flowchart TB
-  Window[MainWindow 宿主适配] --> Shell[ReaderShell.axaml 页面结构]
-  Shell -.命令事件.-> Window
-  Window --> Navigation[ReaderNavigationPanel]
-  Window --> Destinations[ReaderDestinationPanel]
-  Window --> Viewer[ReaderView]
-  Window --> Settings[SettingsWindow]
-  Navigation --> VM[ReaderWorkspaceViewModel]
-  Destinations --> VM
-  Window --> VM
-  Input[ReaderInputRouter] --> VM
-  VM --> App[Application 接口]
-  Viewer --> App
-  Viewer --> Geometry[ReaderLayoutCoordinator 后台几何]
-  Theme[ReaderTheme.axaml / ReaderLabels] -.表现资源.-> Shell
-  Theme -.样式类.-> Navigation
-  Theme -.样式类.-> Destinations
-  Theme -.样式类.-> Settings
-```
-
-Desktop 的编译依赖仅指向 Application；它不引用具体内容、解码、SQLite 或 macOS 适配项目。启动层负责注入实现。
-
-## 调整入口
-
-| 要调整的内容 | 修改位置 | 稳定边界 |
+| 调整 | 入口 | 保持的契约 |
 |---|---|---|
-| 侧栏/工具栏/底部导航位置 | ReaderShell.axaml | 保留命名插槽与按钮命令 Tag |
-| 页面/目录/历史/书签模板 | ReaderNavigationPanel | NavigationData、FolderNode、BookmarkNode |
-| 分类上下区和按钮外观 | ReaderDestinationPanel | DestinationData、SectionRatio、工作区动作 |
-| 设置页面布局 | SettingsWindow | SettingsSelection、AppSettings/ReaderOptions |
-| 主图绘制/占位/选择效果 | ReaderView、Styles/ReaderTheme.axaml | LayoutSnapshot 与像素租约 |
-| 间距、缩略图大小、设置页尺寸 | Styles/ReaderTheme.axaml | 稳定 reader-* 样式类与控件类型 |
-| 工具栏文案及枚举名称 | ReaderShell.axaml、ReaderLabels | 不更改存储枚举或命令字符串 |
-| 键鼠绑定规则 | ReaderInputRouter | ShortcutBinding 与 ExecuteAsync |
-| 书签/分类/目录表现逻辑 | ReaderWorkspaceViewModel.Panels | 应用接口与 IReaderDialogs |
+| 主窗口区域和面板排布 | Views/MainWindow.axaml | 原命名插槽、命令 Tag、区域关系 |
+| 颜色、图标路径 | Styles/NeeViewResources.axaml | 原资源 key；颜色及路径来自原 XAML |
+| 间距、控件模板、外观 | Styles/NeeViewTheme.axaml | 样式类与资源引用 |
+| 页面/目录选择、侧栏显隐 | ViewModels/ReaderWorkspaceViewModel.cs | 原 Page 与 BookOperation；纯表现刷新不请求图片 |
+| 绘制、焦点、拖动、缩放 | Views/ReaderView.cs | 原 PageFrame、像素租约、revision |
+| 菜单、键鼠、对话框、窗口关闭 | Views/MainWindow.axaml.cs | 稳定命令名、Engine/系统契约 |
+| 设置页导航/内容结构 | Views/SettingsWindow.axaml | 原 BookSettingConfig 和恢复策略 |
+| 具体后端及实例装配 | MacApp.cs | 唯一可引用 Backends 的启动装配点 |
 
-主页面结构已迁入 ReaderShell.axaml；ReaderShell 可无服务独立实例化，通过 CommandRequested 发布命令。MainWindow.cs 负责接口装配、事件适配与生命周期。控件不持有 MainWindow 引用，面板内也不通过全局 Application.MainWindow 寻找服务。ReaderPanelControls 捕获事件异常并交给 ViewModel。其余面板的构造式 UI 可以逐个改为 XAML，保持表现模型/数据契约不变。
+视图和表现模型不枚举目录、不解压、不调用 Magick/SharpCompress、不创建平台实现。目录信息由 BookOperation 契约获取；像素由 BitmapFactory 租用。侧栏 Hover/选择只通知表现属性，不发布阅读刷新。Engine 不反向调用控件，也不保留 Avalonia Bitmap。
 
-## 页面结构与样式入口
+主图是单绘制控件，不为每页创建图像控件；页面列表使用虚拟化 ListBox。显示 Bitmap 与像素租约归查看器所有，先释放 Bitmap 再释放租约。切书/缩放/视口变化用 revision 拒绝旧请求；所有 UI 对象在 Dispatcher 线程修改。
 
-- 主页面保留 AddressField、StatusField、PositionField、BodyGrid、ViewerScroll、NavigationHost、DestinationsHost 命名插槽。五列顺序是当前侧栏宽度保存契约；改变该契约时同步宿主适配，其他控件排布可在 XAML 单独调整。
-- 工具栏的 Tag 使用稳定命令标识，按钮的文字、顺序和外观可独立调整。Settings/Import 转交宿主交互，阅读按钮进入工作区命令服务。
-- 导航条目使用 reader-page-row、reader-page-name、reader-list-label、reader-information；分类使用 reader-destination-label、reader-section-title；按钮统一 reader-action。
-- 设置页使用 reader-settings、reader-settings-root、reader-settings-group、reader-policy-*、reader-option-choice 等样式类。缩略图尺寸与查看器色彩由 ReaderTheme.axaml 管理，不在事件代码设置局部值。
+主布局参照原 MainWindow.xaml、SidePanels/SidePanelFrameView.xaml、菜单和 Dock 插槽。41 DIP 侧栏、36 DIP 按钮及转换资源保留。当前为布局骨架，停靠重排、完整自动隐藏、胶片条与多数面板尚未迁入，详见 layout-migration.md。样式现代化应另做增量，先保留区域和操作流程。
 
-样式类定义外观，表现模型定义数据与动作；修改样式不需要修改命令、读取、数据库或文件操作服务。
+输入文本时不响应阅读/数字命令；Command+O/W/Q 仍是系统操作。旧 Control 只规范解析名称，不替换为 Command。未迁入命令不通过相近动作代替：滚动翻页当前禁用，完整实现属于 P2。
 
-## 生命周期契约
-
-- ReaderSession 的 Changed 只发布快照。主窗口同步切 UI 线程，再更新查看器和导航值。
-- 面板刷新使用窗口互斥、取消源和书籍代次；晚到结果不能更新关闭窗口或新书。
-- 同目录翻页/尺寸探测不会重复重建分类列表或扫描目录。
-- PanelsChanged 返回可等待 Task；SettingsChanged 在视图端投递 Dispatcher。
-- ReaderView 的任务、Bitmap 和像素租约属于控件；DisposeAsync 必须在 Dispatcher 仍运行时等待。
-- ReaderLayoutCoordinator 不依赖窗口；后台只计算纯几何，查看器按 revision/generation 接受结果并以最新锚点补偿。
-- IReaderDialogs 可用假实现替换；表现逻辑不依赖文件选择器/模态窗口。
-
-## 后续边界
-
-目前 MainWindow 保留文件选择器、导入预览和 settings 窗口装配；进一步替换宿主时可抽交互 presenter。查看器仍适配图像资源和绘制，后台布局协调器已独立；若增加多渲染后端，再抽渲染接口。不要为当前单一实现增加跨模块全局事件总线。
-
-这些是允许的后续独立调整，不要求修改 Core、Application 或持久化 schema。新视觉效果必须复核快捷键作用域、锚点补偿和资源释放。
+测试直接装载这些正式 XAML、主题和控件源码。Headless 截图用于检查布局与真实图像绘制，不能证明 Mac 手势、Retina、Finder 或 Windows 动态一致性。

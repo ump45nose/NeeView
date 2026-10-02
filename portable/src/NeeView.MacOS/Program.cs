@@ -1,7 +1,4 @@
 using Avalonia;
-using NeeView.Desktop;
-using NeeView.Host;
-using NeeView.Platform.MacOS;
 
 namespace NeeView.MacOS;
 
@@ -11,7 +8,7 @@ public static class Program
     [STAThread]
     public static int Main(string[] args)
     {
-        Composition.CreateAsync(new MacPlatformService()).GetAwaiter().GetResult(); DesktopApp.InitialPaths = args;
-        return AppBuilder.Configure<DesktopApp>().UsePlatformDetect().With(new MacOSPlatformOptions { ShowInDock = true }).LogToTrace().StartWithClassicDesktopLifetime(args);
+        MacApp.InitialPaths = args;
+        return AppBuilder.Configure<MacApp>().UsePlatformDetect().With(new MacOSPlatformOptions { ShowInDock = true }).LogToTrace().StartWithClassicDesktopLifetime(args);
     }
 }

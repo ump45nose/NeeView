@@ -5,11 +5,9 @@ import json
 import hashlib
 import os
 from pathlib import Path
-import plistlib
 import shutil
 import subprocess
 import xml.etree.ElementTree as ET
-import zipfile
 
 
 def run(argv, cwd):
@@ -64,7 +62,6 @@ def dependency_manifest(root, project, resources):
 def main():
     """发布、装配、签名、公证按顺序执行；无凭据时生成明确的开发成品。"""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--preview", action="store_true")
     parser.add_argument("--dotnet", default="dotnet")
     parser.add_argument("--sign")
     parser.add_argument("--notary-profile")
@@ -72,31 +69,21 @@ def main():
     if args.notary_profile and (not args.sign or not args.sign.startswith("Developer ID Application:")):
         raise RuntimeError("公证要求明确的 Developer ID Application 签名身份")
     root = Path(__file__).resolve().parents[1]
-    project = "NeeView.Preview" if args.preview else "NeeView.MacOS"
+    project = "NeeView.MacOS"
     project_dir = root / "src" / project
     run([args.dotnet, "publish", project_dir / f"{project}.csproj", "-c", "Release", "-r", "osx-arm64",
          "--self-contained", "true", "-m:1", "-p:RestoreLockedMode=true", "-p:EnableCodeSigning=false"], root)
     artifacts = root / "artifacts"
     artifacts.mkdir(exist_ok=True)
-    app = artifacts / ("NeeView Preview.app" if args.preview else "NeeView.app")
+    app = artifacts / "NeeView.app"
     if app.exists():
         shutil.rmtree(app)
-    if args.preview:
-        publish = project_dir / "bin/Release/net10.0/osx-arm64/publish"
-        executable_dir = app / "Contents/MacOS"
-        shutil.copytree(publish, executable_dir)
-        resources = app / "Contents/Resources"
-        resources.mkdir(parents=True)
-        plist = plistlib.loads((root / "src/NeeView.MacOS/Info.plist").read_bytes())
-        plist.update(CFBundleIdentifier="com.ump45nose.NeeView.Preview", CFBundleExecutable=project, CFBundleName="NeeView Preview")
-        (app / "Contents/Info.plist").write_bytes(plistlib.dumps(plist))
-    else:
-        candidates = list((project_dir / "bin/Release").rglob(f"{project}.app"))
-        if not candidates:
-            raise RuntimeError("SDK 未生成正式 .app，发布未完成")
-        shutil.copytree(candidates[0], app, symlinks=True)
-        resources = app / "Contents/Resources"
-        resources.mkdir(exist_ok=True)
+    candidates = list((project_dir / "bin/Release").rglob(f"{project}.app"))
+    if len(candidates) != 1:
+        raise RuntimeError("无法唯一定位 SDK 生成的正式 .app，发布未完成")
+    shutil.copytree(candidates[0], app, symlinks=True)
+    resources = app / "Contents/Resources"
+    resources.mkdir(exist_ok=True)
     dependency_manifest(root, project, resources)
     if args.sign:
         for binary in sorted(app.rglob("*"), key=lambda path: len(path.parts), reverse=True):
@@ -104,8 +91,6 @@ def main():
                 run(["codesign", "--force", "--timestamp", "--options", "runtime", "--sign", args.sign, "--entitlements", root / "scripts/entitlements.plist", binary], root)
         run(["codesign", "--force", "--timestamp", "--options", "runtime", "--entitlements", root / "scripts/entitlements.plist", "--sign", args.sign, app], root)
         run(["codesign", "--verify", "--deep", "--strict", app], root)
-    elif args.preview:
-        run(["codesign", "--force", "--deep", "--sign", "-", app], root)
     archive = app.with_suffix(".zip")
     if archive.exists():
         archive.unlink()

@@ -1,0 +1,325 @@
+{
+  "baseline": "c5c398d89",
+  "files": [
+    {
+      "source": "NeeView/Book/PagePosition.cs",
+      "target": "src/NeeView.Engine/Book/PagePosition.cs",
+      "sha256": "aad0d8acdfe0655f26a36565351f9c3810c189ad6eb0e0e8fe286ce9b701a1c2",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Book/PageRange.cs",
+      "target": "src/NeeView.Engine/Book/PageRange.cs",
+      "sha256": "626b28dcd122d50935b75b9579e81a216b1e5f10ea792dc45c9ea992ecb71206",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Book/PageMode.cs",
+      "target": "src/NeeView.Engine/Book/PageMode.cs",
+      "sha256": "e7d8a89bc8a66b67c983c720caaa91e8b9dfec4247cea8ca97e238aeeed1063f",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Book/PageReadOrder.cs",
+      "target": "src/NeeView.Engine/Book/PageReadOrder.cs",
+      "sha256": "2f4f90b994296325ae1efa2a7aef170f84b9c26e4157733ac715ed4f3bf0b2f7",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Book/PagePart.cs",
+      "target": "src/NeeView.Engine/Book/PagePart.cs",
+      "sha256": "f3d8415fecc27ee309f8b11d6c0e663379996249476844e887c32e4b60d520ec",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Book/PageTerminal.cs",
+      "target": "src/NeeView.Engine/Book/PageTerminal.cs",
+      "sha256": "a1db7913ef1cc36337cfc9f25202fe7d726dc1009ba3d920aa57a5951f488cd4",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Book/PageStretchMode.cs",
+      "target": "src/NeeView.Engine/Book/PageStretchMode.cs",
+      "sha256": "95b55ce4d43d569ba5c431a6a8914f44978bef1781dbbf0aa93df86457fb205f",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Book/WidePageStretch.cs",
+      "target": "src/NeeView.Engine/Book/WidePageStretch.cs",
+      "sha256": "13342f2487544674dbbcfa0dbe26193191586f2b496540a2ead847f0465e05f1",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Book/PageSortMode.cs",
+      "target": "src/NeeView.Engine/Book/PageSortMode.cs",
+      "sha256": "70ae48f4a62b3fdad3cadf3fbcdfdebbd2deb60aa9c076fb3826948b193fed13",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Book/IBookSetting.cs",
+      "target": "src/NeeView.Engine/Book/IBookSetting.cs",
+      "sha256": "37569a0af79a573be4fc3dc53d9e05a782a9e9d6c088b018571cab16ec77c563",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Book/IBookPageViewSetting.cs",
+      "target": "src/NeeView.Engine/Book/IBookPageViewSetting.cs",
+      "sha256": "114cce28dc7f4fc16bcf0e8dc5f1c13810e0cfd74fd06850aa39364c1dd68c5e",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Book/IBookPageAccessor.cs",
+      "target": "src/NeeView.Engine/Book/IBookPageAccessor.cs",
+      "sha256": "470c3f53183d017902cb4b25b77c6759eaf00936ed26cb3124cfdb69b5e4d607",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Book/BookPageAccessor.cs",
+      "target": "src/NeeView.Engine/Book/BookPageAccessor.cs",
+      "sha256": "efe5df25dedd2a4fbc539234acc39ed5a8ccc1b9ee6671aa85544fc99172cc4a",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Book/BookMemento.cs",
+      "target": "src/NeeView.Engine/Book/BookMemento.cs",
+      "sha256": "96674bafdab9ea9d49a1124a6b2ca0c71b4226a5dc73bc5541a45b93913201e6",
+      "status": "原Props/字段映射迁入；移除UI/注解辅助，Enum/Math使用.NET等价调用"
+    },
+    {
+      "source": "NeeView/Book/BookMementoExtensions.cs",
+      "target": "src/NeeView.Engine/Book/BookMementoExtensions.cs",
+      "sha256": "03164f0a548b2a3dffa35343a187acd162a274017a2b0a680073049a0447c7cd",
+      "status": "原Props/字段映射迁入；移除UI/注解辅助，Enum/Math使用.NET等价调用"
+    },
+    {
+      "source": "NeeView/Book/BookPageSort.cs",
+      "target": "src/NeeView.Engine/Book/BookPageSort.cs",
+      "sha256": "e4a15d37aaabc97b47656f13e7ccba3f292e1b23e08ab6f226f7c8e09cf934e5",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Book/PageComparer.cs",
+      "target": "src/NeeView.Engine/Book/PageComparer.cs",
+      "sha256": "41d98d9f03c20210a045364aed35722599ed3bd32d5b8a285a417b27753f3a65",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/BookSetting/BookSettingKey.cs",
+      "target": "src/NeeView.Engine/BookSetting/BookSettingKey.cs",
+      "sha256": "df6249048fc25f0aaa9580862bbe174eb6e8ba0eae9a08ae4dc323a3241e69d1",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/BookSetting/BookSettingSelectMode.cs",
+      "target": "src/NeeView.Engine/BookSetting/BookSettingSelectMode.cs",
+      "sha256": "341c705498c28529c3985d2db526f5eb4acf79c7e4ca0897a79c39785fdb493e",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/BookSetting/BookSettingConfigMap.cs",
+      "target": "src/NeeView.Engine/BookSetting/BookSettingConfigMap.cs",
+      "sha256": "c03e94d00796b9434e9a89c09b987f30ce9e8ede62a8936f57d5905e82d53324",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/BookSetting/BookSettingPolicyConfigMap.cs",
+      "target": "src/NeeView.Engine/BookSetting/BookSettingPolicyConfigMap.cs",
+      "sha256": "721102025934d6b8f50e10de1062a294ae80a8f013fe7a421de4d0574ecff807",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/BookSetting/BookSettingPolicyConfigExtensions.cs",
+      "target": "src/NeeView.Engine/BookSetting/BookSettingPolicyConfigExtensions.cs",
+      "sha256": "3460a6694d34ce440b85758840cd72280cf8844df006656e2242ea55c13f676a",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Config/BookSettingConfig.cs",
+      "target": "src/NeeView.Engine/Config/BookSettingConfig.cs",
+      "sha256": "5f4bd25a0131876b8b7b4cfc0ccb372591e943040625e57731c517d047a4c976",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Config/BookSettingPolicyConfig.cs",
+      "target": "src/NeeView.Engine/Config/BookSettingPolicyConfig.cs",
+      "sha256": "f9fbc56e76df38c6699641c35aecfe6bd79c2603fcf3fdfe1b7d0bd79486c021",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/Config/AutoRotatePolicy.cs",
+      "target": "src/NeeView.Engine/Config/AutoRotatePolicy.cs",
+      "sha256": "d2d69766f855320f86965cf22b4d5c9066b83655dba7612e88f098f985fda544",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/ContentCanvas/AutoRotateType.cs",
+      "target": "src/NeeView.Engine/ContentCanvas/AutoRotateType.cs",
+      "sha256": "d8a894b2722400aa5fade1edc06588d2e38278dea3595f8e2460e8f1ddc85535",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderSortOrder.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookshelf/FolderList/FolderSortOrder.cs",
+      "sha256": "73ad524d555247ab005290971cb406891c3177d1610c8d38f383dfd1f3fd895d",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/PageFrames/PageFrameFactory.cs",
+      "target": "src/NeeView.Engine/PageFrames/PageFrameFactory.cs",
+      "sha256": "98d333e7a881c540c262eb023a131ef53aff1c84cb9a5f4667264a97ec45366a",
+      "status": "原算法迁入；WPF几何/变换改为有限值与数值计算，展示订阅不进入Engine"
+    },
+    {
+      "source": "NeeView/PageFrames/PageFrameElement.cs",
+      "target": "src/NeeView.Engine/PageFrames/PageFrameElement.cs",
+      "sha256": "da588810774c25bcf4bf58d73ae8782654d20ddf0ef7df5dba639393a9e233f7",
+      "status": "原算法迁入；WPF几何/变换改为有限值与数值计算，展示订阅不进入Engine"
+    },
+    {
+      "source": "NeeView/PageFramesMath/AspectRatioTools.cs",
+      "target": "src/NeeView.Engine/PageFramesMath/AspectRatioTools.cs",
+      "sha256": "380ec45c5fb550f53f8b038283807986f45f4cd3fe4b2ccc824f0b720fa48308",
+      "status": "原算法迁入；WPF几何/变换改为有限值与数值计算，展示订阅不进入Engine"
+    },
+    {
+      "source": "NeeView/NeeView/Text/NaturalComparer.cs",
+      "target": "src/NeeView.Engine/NeeView/Text/NaturalComparer.cs",
+      "sha256": "46706da5769e3d9ee4bf8b2c7a1e06f3087959fc09dc1c6ee0f628ef926a0586",
+      "status": "原自然排序/字符归一迁入；Win32字符比较替换为.NET CurrentCulture，文化排序待对照"
+    },
+    {
+      "source": "NeeView/NeeView/Text/StringToken.cs",
+      "target": "src/NeeView.Engine/NeeView/Text/StringToken.cs",
+      "sha256": "68ba6d7d593355cc4025be6d48c58a44f02fad094a10a549cca918fe815a2c50",
+      "status": "原自然排序/字符归一迁入；Win32字符比较替换为.NET CurrentCulture，文化排序待对照"
+    },
+    {
+      "source": "NeeView/NeeView/Text/StringTokenParser.cs",
+      "target": "src/NeeView.Engine/NeeView/Text/StringTokenParser.cs",
+      "sha256": "ee6c06c5b4266397aab3eb0e557c3650377289005ea565e31328daca7a719043",
+      "status": "原自然排序/字符归一迁入；Win32字符比较替换为.NET CurrentCulture，文化排序待对照"
+    },
+    {
+      "source": "NeeView/NeeView/Text/KanaEmbedded.cs",
+      "target": "src/NeeView.Engine/NeeView/Text/KanaEmbedded.cs",
+      "sha256": "9d1fe8a5510b0aafacca5eb8e30ed55f684a8b3370a703a3c40741f60a39fbf1",
+      "status": "原自然排序/字符归一迁入；Win32字符比较替换为.NET CurrentCulture，文化排序待对照"
+    },
+    {
+      "source": "NeeView/NeeView/Text/StringNormalizeParser.cs",
+      "target": "src/NeeView.Engine/NeeView/Text/StringNormalizeParser.cs",
+      "sha256": "8a34a918510af3e3621ad2c876752fcfecb4dc400528cca92cfcf172c516e2b7",
+      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+    },
+    {
+      "source": "NeeView/PageFrames/PageFrame.cs",
+      "target": "src/NeeView.Engine/PageFrames/PageFrame.cs",
+      "sha256": "c7e8041ba39f223987d8e301597d57060dd483b26c7920c2d4c1c9d1c0b6104d",
+      "status": "原算法迁入；WPF几何/变换改为有限值与数值计算，展示订阅不进入Engine"
+    },
+    {
+      "source": "NeeView/PageFrames/ContentSizeCalcurator.cs",
+      "target": "src/NeeView.Engine/PageFrames/ContentSizeCalcurator.cs",
+      "sha256": "31555ab796bbef57ce7599c87502111cc75b972bc48ab9862a2c04e1049a3956",
+      "status": "原算法迁入；WPF几何/变换改为有限值与数值计算，展示订阅不进入Engine"
+    },
+    {
+      "source": "NeeView/PageFrames/IContentSizeCalculatorProfile.cs",
+      "target": "src/NeeView.Engine/PageFrames/IContentSizeCalculatorProfile.cs",
+      "sha256": "fb5e1175dfc073dc30c675bf92dc21af031e9808251e821c5e8febccb8fdd8f2",
+      "status": "原算法迁入；WPF几何/变换改为有限值与数值计算，展示订阅不进入Engine"
+    }
+  ],
+  "partial_adapters": [
+    {
+      "source": "NeeView/Book/Book.cs",
+      "target": "src/NeeView.Engine/Book/Book.cs",
+      "sha256": "46d62b0029539aa5730b330dbda08dfa3686cfd1e5b0f2e7a1d85a9137513663",
+      "status": "P1子集适配；原CreateMemento、排序与当前Page关系；媒体/标记待迁入"
+    },
+    {
+      "source": "NeeView/Page/Page.cs",
+      "target": "src/NeeView.Engine/Book/Page.cs",
+      "sha256": "b089520ac7ed118a7c11cf6f9d2e373d12333769450a3b4752676937e31940e2",
+      "status": "P1子集适配；原条目与尺寸关系，其他内容业务待迁入"
+    },
+    {
+      "source": "NeeView/BookOperation/BookOperation.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.cs",
+      "sha256": "f419c0c0d409727c7902d8b253fbdb9e69ffc405b79ab052d18d6a8b9f279f23",
+      "status": "P1编排适配；来源/保存/代次协调；不是完整原BookOperation"
+    },
+    {
+      "source": "NeeView/PageFrames/PageFrameContext.cs",
+      "target": "src/NeeView.Engine/PageFrames/PageFrameContext.cs",
+      "sha256": "82c53650f100db295fa932237a20ef9c1c252d9fe292b02d3c371ffed96b2d2e",
+      "status": "P1只读设置和分割/尺寸适配；高级裁剪/播放待迁入"
+    },
+    {
+      "source": "NeeView/Archiver/Archive.cs",
+      "target": "src/NeeView.Engine/Archiver/Archive.cs",
+      "sha256": "ba65b2fb43f8ad7cdc61650ce534935d50d7336c10ea772b7d077ea1c48417f1",
+      "status": "P1 Archive/Entry读取子集，SharpCompress后端；密码/嵌套待迁入"
+    }
+  ],
+  "rule_references": [
+    {
+      "source": "NeeView/PageFrames/PageFrameBox.cs",
+      "lines": "976-1050",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.cs",
+      "status": "原范围/帧与单页步进适配"
+    },
+    {
+      "source": "NeeView/Book/BookSourceFactory.cs",
+      "lines": "44-50",
+      "target": "src/NeeView.Engine/Book/Book.cs",
+      "status": "普通来源Entry回退到FileName"
+    }
+  ],
+  "ui_sources": [
+    {
+      "source": "NeeView/Styles/Colors.xaml",
+      "sha256": "411984c2aacd6c6bab43d7e78e9fd97959b53be878c13eed2fb21ec6de606d0c",
+      "target": "src/NeeView.MacOS/Styles/NeeViewResources.axaml",
+      "status": "转换原颜色资源"
+    },
+    {
+      "source": "NeeView/Styles/IconGeometries.xaml",
+      "sha256": "089433239eb1c335eb1e825a527a57775d14b1c76a72312122772524877a3088",
+      "target": "src/NeeView.MacOS/Styles/NeeViewResources.axaml",
+      "status": "转换原图标路径"
+    },
+    {
+      "source": "NeeView/MainWindow/MainWindow.xaml",
+      "sha256": "89594deb46b1bda8f49e6081ca319a14b46210b8a14ba5ca1da0925a6c079305",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml",
+      "status": "区域骨架转换；未完整转换控件/停靠行为"
+    },
+    {
+      "source": "NeeView/SidePanels/SidePanelFrameView.xaml",
+      "sha256": "367c8864265d2d1c1e66ddc6af9f783b2e8dcf934d7291b4ef2a3fbe30e893f1",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml",
+      "status": "41 DIP侧栏、36 DIP按钮及左右区域转换"
+    },
+    {
+      "source": "NeeView/SidePanels/CustomLayoutPanelManager.cs",
+      "sha256": "7f27c6804342028357f7f13ac046696918b752ec58ef3ec6869ec67c0ca1d5f8",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml",
+      "status": "原默认左3/右6分组和顺序；未迁移入口禁用"
+    }
+  ],
+  "backend_reuse": [
+    {
+      "source_commit": "858a54006616479518ad218b8cfe16416160c628",
+      "source": "portable/src/NeeView.Imaging/MagickImageDecoder.cs",
+      "target": "src/NeeView.Backends/Imaging/MagickImageDecoder.cs",
+      "status": "复用已验证解码资源逻辑，更换Engine契约"
+    },
+    {
+      "source_commit": "858a54006616479518ad218b8cfe16416160c628",
+      "source": "portable/src/NeeView.Platform.MacOS/MacPlatformService.cs",
+      "target": "src/NeeView.Backends/MacPlatformService.cs",
+      "status": "复用正式Foundation/AppKit系统调用"
+    }
+  ]
+}

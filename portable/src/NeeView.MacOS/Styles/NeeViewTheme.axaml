@@ -1,0 +1,19 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Styles.Resources>
+    <ResourceDictionary><ResourceDictionary.MergedDictionaries>
+      <ResourceInclude Source="NeeViewResources.axaml" />
+    </ResourceDictionary.MergedDictionaries></ResourceDictionary>
+  </Styles.Resources>
+  <!-- 保留原区域颜色和 41/36 DIP 图标栏尺寸；视觉调整集中在本文件。 -->
+  <Style Selector="Window"><Setter Property="Background" Value="{DynamicResource Window.Background}" /><Setter Property="Foreground" Value="{DynamicResource Window.Foreground}" /><Setter Property="FontSize" Value="13" /></Style>
+  <Style Selector="Border.panel"><Setter Property="Background" Value="{DynamicResource Panel.Background}" /><Setter Property="BorderBrush" Value="{DynamicResource Panel.Separator}" /><Setter Property="BorderThickness" Value="0,0,1,0" /></Style>
+  <Style Selector="Border.rail"><Setter Property="Background" Value="{DynamicResource SideBar.Background}" /><Setter Property="Width" Value="41" /></Style>
+  <Style Selector="Button.panel-icon"><Setter Property="Width" Value="36" /><Setter Property="Height" Value="36" /><Setter Property="Margin" Value="2" /><Setter Property="Padding" Value="7" /><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="CornerRadius" Value="2" /></Style>
+  <Style Selector="PathIcon"><Setter Property="Foreground" Value="{DynamicResource SideBar.Foreground}" /></Style>
+  <Style Selector="Menu"><Setter Property="Background" Value="{DynamicResource MenuBar.Background}" /><Setter Property="FontSize" Value="13" /></Style>
+  <Style Selector="TextBox.address"><Setter Property="Background" Value="{DynamicResource MenuBar.Address.Background}" /><Setter Property="BorderThickness" Value="0" /><Setter Property="MinHeight" Value="28" /><Setter Property="FontSize" Value="12" /><Setter Property="Padding" Value="8,4" /></Style>
+  <Style Selector="TextBlock.panel-title"><Setter Property="Margin" Value="10,8" /><Setter Property="Foreground" Value="{DynamicResource Panel.Header}" /></Style>
+  <Style Selector="ListBox"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /></Style>
+  <Style Selector="ListBoxItem"><Setter Property="Padding" Value="8,5" /><Setter Property="MinHeight" Value="28" /></Style>
+  <Style Selector="GridSplitter"><Setter Property="Background" Value="{DynamicResource Panel.Splitter}" /></Style>
+</Styles>

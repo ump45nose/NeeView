@@ -1,7 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup><RootNamespace>NeeView.Content</RootNamespace></PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="../NeeView.Application/NeeView.Application.csproj" />
-    <PackageReference Include="SharpCompress" />
-  </ItemGroup>
-</Project>

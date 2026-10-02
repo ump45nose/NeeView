@@ -7,7 +7,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <Version>0.1.0</Version>
-    <!-- 共享类库与开发 Host 固定同一还原图，发布传递 RID 时不改写 lock。 -->
-    <RuntimeIdentifiers Condition="'$(MSBuildProjectName)' != 'NeeView.MacOS' And '$(MSBuildProjectName)' != 'NeeView.Platform.MacOS'">osx-arm64;osx-x64;linux-x64</RuntimeIdentifiers>
+    <!-- Mac 只维护 Apple Silicon；固定 RID 还原图，发布不改写开发锁文件。 -->
+    <RuntimeIdentifiers>osx-arm64</RuntimeIdentifiers>
   </PropertyGroup>
 </Project>

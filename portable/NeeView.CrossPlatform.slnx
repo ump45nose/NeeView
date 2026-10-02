@@ -1,14 +1,10 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/NeeView.Core/NeeView.Core.csproj" />
-    <Project Path="src/NeeView.Application/NeeView.Application.csproj" />
-    <Project Path="src/NeeView.Content/NeeView.Content.csproj" />
-    <Project Path="src/NeeView.Imaging/NeeView.Imaging.csproj" />
-    <Project Path="src/NeeView.Persistence/NeeView.Persistence.csproj" />
-    <Project Path="src/NeeView.Desktop/NeeView.Desktop.csproj" />
-    <Project Path="src/NeeView.Preview/NeeView.Preview.csproj" />
-    <Project Path="src/NeeView.Platform.MacOS/NeeView.Platform.MacOS.csproj" />
+    <Project Path="src/NeeView.Engine/NeeView.Engine.csproj" />
+    <Project Path="src/NeeView.Backends/NeeView.Backends.csproj" />
     <Project Path="src/NeeView.MacOS/NeeView.MacOS.csproj" />
   </Folder>
-  <Folder Name="/tests/"><Project Path="tests/NeeView.Portable.Tests/NeeView.Portable.Tests.csproj" /></Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/NeeView.Engine.Tests/NeeView.Engine.Tests.csproj" />
+  </Folder>
 </Solution>

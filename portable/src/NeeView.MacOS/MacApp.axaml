@@ -1,0 +1,7 @@
+<Application xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:fluent="using:Avalonia.Themes.Fluent" x:Class="NeeView.MacOS.MacApp">
+  <Application.Styles>
+    <fluent:FluentTheme />
+    <!-- 静态编译主题入口，避免运行时资源路径与裁剪不一致。 -->
+    <StyleInclude Source="Styles/NeeViewTheme.axaml" />
+  </Application.Styles>
+</Application>
