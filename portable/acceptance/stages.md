@@ -219,3 +219,12 @@ P2继续查看器变换、页尾/锁定/帧方向、书架书签互联、历史�
 - 已离线检查[参数窗口](p2-view-transform-parameter-layout.png)和[旋转翻转卡片](p2-view-transform-transform-layout.png)。本批未启动正式应用或修改用户数据，见[静默记录](p2-view-transform-runtime.md)。原Windows、旧证据和用户.DS_Store保持。
 
 P2继续书籍锁定/页尾/帧方向/Unload、书架书签、历史策略/模板与浮动宿主；依设备验收与完整显示性能独立待验。本增量自动本地提交后继续，不推送发布。
+
+## P2 第十八批：原书籍控制
+
+- 原书籍锁定、五种页尾动作及三种下一书位置策略迁入唯一BookOperation；Unload可靠清除LastBook而保留历史，释放来源后服务继续可重开。
+- 弹窗回报核对书籍/代次/位置，重复页尾不重入；原帧方向与JSON设置接通，非默认动画下一增量完善。
+- 新增12项，最终全量 **298通过、0失败、0跳过**；Engine、正式Library、正式ARM64.app与本地ad-hoc严格签名均通过，见[p2-book-controls-validation.json](p2-book-controls-validation.json)。两项旧界面断言修正后全量重跑，默认输出串行。
+- 已离线查看[页尾对话框](p2-book-controls-page-end-layout.png)，未启动正式应用、未修改用户数据；见[静默记录](p2-book-controls-runtime.md)。原Windows、旧验收与用户.DS_Store保持。
+
+P2继续书架书签互联、历史、列表模板、浮动宿主及输入/动画；真实设备与Windows对照独立待验。本增量自动本地提交后继续，不推送发布。

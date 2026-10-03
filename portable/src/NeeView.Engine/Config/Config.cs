@@ -83,6 +83,10 @@ public sealed class SliderConfig
 /// <summary>来自原 BookConfig 的分页参数及默认值。</summary>
 public sealed class BookConfig
 {
+    public PageEndAction PageEndAction { get; set; }
+    public ResetNextBookPageMode ResetNextBookPageMode { get; set; } = ResetNextBookPageMode.Continue;
+    public bool IsNotifyPageLoop { get; set; }
+    public PageFrameOrientation Orientation { get; set; } = PageFrameOrientation.Horizontal;
     private int _bookThumbnailDepth = 2;
     public int BookThumbnailDepth { get => _bookThumbnailDepth; set => _bookThumbnailDepth = Math.Max(1, value); }
     public string BookThumbnailRegex { get; set; } = @"^folder\.jpg$";

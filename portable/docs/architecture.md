@@ -90,3 +90,5 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 第十六批契约见[原输入方案与鼠标组合](p2-mouse-input.md)。原A/B/C/默认方向/参数共享/运行反转进入Engine，鼠标事件和统一解析在Mac表现层；普通滚轮全部依绑定。表单保存通过原导航锁，失败原地回滚，成功仅阅读字段变化重建正文。P2剩余阅读控制、书架书签与列表完善继续开发。
 
 第十七批契约见[原查看器变换与参数编辑](p2-view-transform.md)。原变换图/参数/滚动约束归Engine，ReaderTransformPresenter提供唯一绘制与命中矩阵；共享/每页/跨书保持及BaseScale独立。参数表单草稿和主题与业务分开，未知字段与原数值保留，P2继续。
+
+第十八批见[p2-book-controls.md](p2-book-controls.md)。原锁定、五种页尾/下一书位置策略和可复用Unload归BookOperation；弹窗只回报选择，原循环页框/JSON保持。

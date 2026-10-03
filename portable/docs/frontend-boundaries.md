@@ -55,3 +55,5 @@
 第十六批MouseGestureSource只处理框架动作到原输入标识的转换，设置校验与执行共用；A/B/C和反转规则在Engine.DefaultInputScheme。SettingsWindow编辑副本经BookOperation.ApplyOptionsAsync提交，失败恢复原设置引用；外观与输入不重建阅读帧。布局/配色仍可单独调整，见[p2-mouse-input.md](p2-mouse-input.md)。
 
 第十七批ReaderTransformPresenter独立管理原变换图和唯一矩阵，ReaderView管理资源/输入；CommandParameterEdit管理克隆草稿，CommandParameterWindow只呈现字段。设置草稿最后进入原ApplyOptionsAsync，布局/主题不实现参数算法，详见[p2-view-transform.md](p2-view-transform.md)。
+
+第十八批MainWindow.BookControls只呈现原页尾三按钮，BookOperation在回报后核对身份/代次/位置；关闭释放回调，设置页不承担页尾规则。

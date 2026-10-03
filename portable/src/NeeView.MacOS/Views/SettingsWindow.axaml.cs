@@ -114,6 +114,10 @@ public sealed partial class SettingsWindow : Window
     private void FillView()
     {
         var c = Config.Current.View;
+        this.FindControl<ComboBox>("PageEndAction")!.SelectedIndex = (int)Config.Current.Book.PageEndAction;
+        this.FindControl<ComboBox>("ResetNextBookPageMode")!.SelectedIndex = (int)Config.Current.Book.ResetNextBookPageMode;
+        this.FindControl<ComboBox>("PageOrientation")!.SelectedIndex = (int)Config.Current.Book.Orientation;
+        this.FindControl<CheckBox>("NotifyPageLoop")!.IsChecked = Config.Current.Book.IsNotifyPageLoop;
         foreach (var (name, value) in new[] { ("BaseScaleEnabled", c.IsBaseScaleEnabled), ("KeepScale", c.IsKeepScale), ("KeepAngle", c.IsKeepAngle), ("KeepFlip", c.IsKeepFlip),
             ("KeepScaleBooks", c.IsKeepScaleBooks), ("KeepAngleBooks", c.IsKeepAngleBooks), ("KeepFlipBooks", c.IsKeepFlipBooks), ("KeepPageTransform", c.IsKeepPageTransform), ("ScaleStretchTracking", c.IsScaleStretchTracking) })
             this.FindControl<CheckBox>(name)!.IsChecked = value;
@@ -138,6 +142,10 @@ public sealed partial class SettingsWindow : Window
     private void ApplyView()
     {
         var c = Config.Current.View;
+        Config.Current.Book.PageEndAction = (PageEndAction)Math.Max(0, this.FindControl<ComboBox>("PageEndAction")!.SelectedIndex);
+        Config.Current.Book.ResetNextBookPageMode = (ResetNextBookPageMode)Math.Max(0, this.FindControl<ComboBox>("ResetNextBookPageMode")!.SelectedIndex);
+        Config.Current.Book.Orientation = (PageFrameOrientation)Math.Max(0, this.FindControl<ComboBox>("PageOrientation")!.SelectedIndex);
+        Config.Current.Book.IsNotifyPageLoop = this.FindControl<CheckBox>("NotifyPageLoop")!.IsChecked == true;
         bool Checked(string name) => this.FindControl<CheckBox>(name)!.IsChecked == true;
         c.IsBaseScaleEnabled = Checked("BaseScaleEnabled"); c.IsKeepScale = Checked("KeepScale"); c.IsKeepAngle = Checked("KeepAngle"); c.IsKeepFlip = Checked("KeepFlip");
         c.IsKeepScaleBooks = Checked("KeepScaleBooks"); c.IsKeepAngleBooks = Checked("KeepAngleBooks"); c.IsKeepFlipBooks = Checked("KeepFlipBooks");

@@ -28,6 +28,11 @@ public sealed class CommandTable
         _actions["NextPage"] = () => operation.MoveAsync(1);
         _actions["PrevPage"] = () => operation.MoveAsync(-1);
         _actions["NextOnePage"] = () => operation.MoveAsync(1, true);
+        _actions["Unload"] = () => operation.UnloadAsync();
+        _actions["ToggleBookLock"] = () => { operation.SetBookLock(!operation.IsBookLocked); return Task.CompletedTask; };
+        _actions["TogglePageOrientation"] = () => operation.SetOrientationAsync(Config.Current.Book.Orientation.GetToggle());
+        _actions["SetPageOrientationHorizontal"] = () => operation.SetOrientationAsync(PageFrameOrientation.Horizontal);
+        _actions["SetPageOrientationVertical"] = () => operation.SetOrientationAsync(PageFrameOrientation.Vertical);
         _actions["PrevOnePage"] = () => operation.MoveAsync(-1, true);
         _actions["FirstPage"] = () => operation.JumpAsync(0);
         _actions["LastPage"] = () => operation.JumpAsync((operation.Book?.Pages.Count ?? 1) - 1, true);

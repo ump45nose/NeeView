@@ -213,7 +213,8 @@ public sealed class MouseInputTests
             await window.OpenAsync(fixture.Images); Pump(window); var point = Center(window);
             window.MouseDown(point, MouseButton.Right); window.MouseUp(point, MouseButton.Right); await WaitAsync(() => window.Viewer.ContextMenu?.IsOpen == true);
             var menu = window.Viewer.ContextMenu!; Assert.Equal(8, menu.Items.Count);
-            Assert.Contains(menu.Items.OfType<MenuItem>().SelectMany(i => i.Items.OfType<MenuItem>()), i => i.Tag is string name && name == "Unload" && !i.IsEnabled);
+            Assert.Contains(menu.Items.OfType<MenuItem>().SelectMany(i => i.Items.OfType<MenuItem>()), i => i.Tag is string name && name == "Unload" && i.IsEnabled);
+            Assert.Contains(menu.Items.OfType<MenuItem>().SelectMany(i => i.Items.OfType<MenuItem>()), i => i.Tag is string name && name == "ToggleSlideShow" && !i.IsEnabled);
             menu.Close(); Pump(window); Assert.Null(window.Viewer.ContextMenu);
         }
         finally { window.Viewer.ContextMenu?.Close(); await window.PrepareShutdownAsync(); window.Close(); }

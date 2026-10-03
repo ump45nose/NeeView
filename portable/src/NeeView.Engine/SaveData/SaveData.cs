@@ -410,7 +410,7 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
     /// <summary>保存阅读状态与布局，已知字段合并进原节点后原子替换文件。</summary>
     /// <param name="historyLimits">设置表单的可选数量/期限副本；事务成功后才更新运行配置。</param>
     public async Task SaveAsync(Book? book, int part, CancellationToken token = default, bool keepHistoryOrder = false,
-        (int Size, TimeSpan Span)? historyLimits = null)
+        (int Size, TimeSpan Span)? historyLimits = null, bool clearLastBook = false)
     {
         await _gate.WaitAsync(token);
         var previousSetting = _setting.DeepClone().AsObject();
@@ -451,6 +451,7 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
                 // LastBook 独立于可移除的历史记录，保留启动恢复所需的分割与宽图补值。
                 Object(config, "StartUp")["LastBookV2"] = new JsonObject { ["Path"] = book.Path, ["Page"] = memento.Page, ["Props"] = item["Props"]!.DeepClone(), ["MacPagePart"] = part, ["MacIsSupportedWidePage"] = memento.IsSupportedWidePage };
             }
+            if (clearLastBook) Object(config, "StartUp").Remove("LastBookV2");
             // 保留原 Format；新文件使用原名称和版本结构，避免添加另一套存储格式。
             _setting["Format"] ??= JsonValue.Create("NeeView.UserSetting/46.3.0");
             _history["Format"] ??= JsonValue.Create("NeeView.History/46.3.0");

@@ -11,7 +11,8 @@ public sealed class PageFrameContext(BookSettingConfig setting, Config config) :
     public bool IsSupportedWidePage => setting.IsSupportedWidePage && FramePageSize == 2;
     public bool IsSupportedSingleFirstPage => setting.IsSupportedSingleFirstPage && FramePageSize == 2;
     public bool IsSupportedSingleLastPage => setting.IsSupportedSingleLastPage && FramePageSize == 2;
-    public bool IsLoopPage => false;
+    public bool IsLoopPage => config.Book.PageEndAction == PageEndAction.SeamlessLoop;
+    public PageFrameOrientation FrameOrientation => config.Book.Orientation;
     public bool IsStaticWidePage => config.Book.IsStaticWidePage && FramePageSize == 2;
     public bool IsInsertDummyPage => config.Book.IsInsertDummyPage;
     public bool IsInsertDummyFirstPage => config.Book.IsInsertDummyFirstPage;

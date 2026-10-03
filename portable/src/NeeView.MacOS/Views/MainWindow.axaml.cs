@@ -39,7 +39,7 @@ public sealed partial class MainWindow : Window
     {
         "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen",
         "ViewScaleUp", "ViewScaleDown", "ViewScrollUp", "ViewScrollDown", "ViewScrollLeft", "ViewScrollRight", "OpenContextMenu", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
-        "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff",
+        "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ToggleBookLock", "Unload", "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff",
         "ToggleViewFlipVertical", "ViewFlipVerticalOn", "ViewFlipVerticalOff", "ViewReset", "ViewScaleStretch", "ViewPresetScroll", "ViewScrollNTypeUp", "ViewScrollNTypeDown",
         "ToggleStretchMode", "ToggleStretchModeReverse", "SetStretchModeUniformToFill", "SetStretchModeUniformToSize", "SetStretchModeUniformToVertical", "SetStretchModeUniformToHorizontal", "ToggleStretchAllowScaleUp", "ToggleStretchAllowScaleDown",
         "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
@@ -108,6 +108,7 @@ public sealed partial class MainWindow : Window
     public void Bind(ReaderWorkspaceViewModel model, BitmapFactory images, IPlatformService platform)
     {
         _model = model; _images = images; _platform = platform; DataContext = model;
+        model.Operation.PageEndDialogAsync = ShowPageEndDialogAsync;
         // 编辑树保留宿主表现绑定；独立列表的 DataContext 可以独立更换。
         this.FindControl<TreeView>("BookmarkTree")!.DataContext = model;
         var bookmarks = this.FindControl<BookmarkListView>("BookmarkPanelList")!;
@@ -152,6 +153,7 @@ public sealed partial class MainWindow : Window
     /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
     public bool IsCommandAvailable(string name) => name switch
     {
+        "Unload" => _model?.Operation.CanUnload == true,
         "MoveToParentBook" => _model?.Operation.CanMoveToParentBook == true,
         "MoveToChildBook" => _model?.Operation.CanMoveToChildBook == true,
         "ToggleIsRecursiveFolder" => _model?.Operation.Book is not null && !_model.Operation.IsLoading,
@@ -179,6 +181,9 @@ public sealed partial class MainWindow : Window
     /// <summary>原菜单绑定的勾选表现；只读取引擎配置，不在菜单中维护第二套状态。</summary>
     private bool? GetCommandCheck(string name) => name switch
     {
+        "ToggleBookLock" => _model?.Operation.IsBookLocked,
+        "SetPageOrientationHorizontal" => Config.Current.Book.Orientation == PageFrameOrientation.Horizontal,
+        "SetPageOrientationVertical" => Config.Current.Book.Orientation == PageFrameOrientation.Vertical,
         var command when CommandTable.BookOrderCommands.TryGetValue(command, out var order) => _model?.Operation.Bookshelf.FolderOrder == order,
         "SetPageModeOne" => _model?.Operation.Book?.Setting.PageMode == PageMode.SinglePage,
         "SetPageModeTwo" => _model?.Operation.Book?.Setting.PageMode == PageMode.WidePage,
@@ -309,6 +314,9 @@ public sealed partial class MainWindow : Window
                 case "ToggleHidePanel":
                     bool hide = !(Config.Current.Panels.IsHideLeftPanel || Config.Current.Panels.IsHideRightPanel);
                     Config.Current.Panels.IsHideLeftPanel = hide; Config.Current.Panels.IsHideRightPanel = hide; _model.RefreshPanels(); break;
+                case "ToggleBookLock":
+                    _model.Operation.SetBookLock(_model.SaveData.GetCommandParameter<ToggleCommandParameter>(name).GetState(_model.Operation.IsBookLocked, fromMenu)); break;
+                case "Unload": await _model.Operation.UnloadAsync(); _model.Address = _model.Operation.Book?.Path ?? ""; break;
                 case "ViewScaleUp": case "ViewScaleDown": case "ViewBaseScaleUp": case "ViewBaseScaleDown":
                     await Viewer.ScaleAsync(name.EndsWith("Up") ? 1 : -1, _model.SaveData.GetCommandParameter<ViewScaleCommandParameter>(name), name.StartsWith("ViewBase")); break;
                 case "ViewRotateLeft": case "ViewRotateRight":
@@ -766,6 +774,7 @@ public sealed partial class MainWindow : Window
     {
         await Task.Yield();
         _preparing = true;
+        _pageEndDialog?.Close(PageEndAction.None);
         try
         {
             await this.FindControl<PlaylistView>("PlaylistPanelView")!.PrepareCloseAsync();
@@ -782,6 +791,7 @@ public sealed partial class MainWindow : Window
                 _sidePanels?.SaveWeights();
                 // 先完成可靠保存，再退订与释放显示资源；失败不能留下已销毁的阅读窗口。
                 await _model.Operation.DisposeAsync();
+                _model.Operation.PageEndDialogAsync = null;
                 _model.HistoryRefreshed -= History_Refreshed;
                 _model.Operation.MarkersChanged -= Model_MarkersChanged;
                 _model.Detach(); _model.Refreshed -= Model_Refreshed; _model.PanelsRefreshed -= Model_PanelsRefreshed; _model.ChromeRefreshed -= Model_ChromeRefreshed;

@@ -53,7 +53,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>共享原加载链；历史重放可指定条目并保留访问顺序，返回是否实际提交新书。</summary>
     /// <param name="startupMemento">原 FirstLoader 的显式启动快照，优先于历史和字段恢复策略。</param>
     /// <param name="startupPart">启动快照中的 Mac 分割位置。</param>
-    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, int startupPart = 0, Playlist? expectedPlaylist = null)
+    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, int startupPart = 0, Playlist? expectedPlaylist = null, int? terminalDirection = null)
     {
         ObjectDisposedException.ThrowIf(_disposed || _closing, this);
         var generation = Interlocked.Increment(ref _generation);
@@ -66,6 +66,8 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         try
         {
             source = await archives.OpenAsync(path, opening.Token);
+            // 原BookHub锁定允许同地址重载；由来源解析实际书籍地址，不能按图片路径猜测。
+            if (IsBookLocked && Book is { } locked && locked.Path != source.Path) return false;
             // 原 BookHub.LoadMainAsync 优先使用显式 BookMemento；只在普通打开时按字段混合历史。
             var restored = startupMemento?.Path == source.Path ? (Memento: startupMemento, Part: startupPart) : saveData.Find(source.Path);
             var setting = startupMemento?.Path == source.Path ? startupMemento.ToBookSetting()
@@ -84,24 +86,25 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                 index = book.Pages.FindIndex(e => e.EntryName.StartsWith(explicitEntry.TrimEnd('/') + "/", StringComparison.Ordinal));
             if (explicitEntry is not null && index < 0) throw new FileNotFoundException((entryName is not null ? "历史页面已不存在：" : "指定页面已不存在：") + explicitEntry);
             index = Math.Max(0, index);
-            if (explicitEntry is null && !keepHistoryOrder && !ImageFormats.IsImage(path) && Config.Current.BookSettingPolicy.Page == BookSettingPageSelectMode.RestoreOrDefaultReset && index >= book.Pages.Count - (setting.PageMode == PageMode.WidePage && !setting.IsSupportedSingleLastPage ? 2 : 1)) index = 0;
+            if (terminalDirection is not null) index = terminalDirection < 0 ? Math.Max(0, book.Pages.Count - 1) : 0;
+            else if (explicitEntry is null && !keepHistoryOrder && !ImageFormats.IsImage(path) && Config.Current.BookSettingPolicy.Page == BookSettingPageSelectMode.RestoreOrDefaultReset && index >= book.Pages.Count - (setting.PageMode == PageMode.WidePage && !setting.IsSupportedSingleLastPage ? 2 : 1)) index = 0;
             await ProbeAroundAsync(book, index, opening.Token);
             await _gate.WaitAsync(opening.Token);
             try
             {
                 opening.Token.ThrowIfCancellationRequested();
-                if (_disposed || _closing || generation != _generation || expectedPlaylist is not null && !ReferenceEquals(expectedPlaylist, _playlistHub?.Current)) return false;
+                if (_disposed || _closing || generation != _generation || IsBookLocked && Book is { } currentLocked && currentLocked.Path != book.Path || expectedPlaylist is not null && !ReferenceEquals(expectedPlaylist, _playlistHub?.Current)) return false;
                 await saveData.SaveAsync(Book, Position.Part, opening.Token, _keepHistoryOrder || keepHistoryOrder);
                 var old = Book;
                 // 与 Remove/Clear 串行提交：取消的打开不能解除抑制，新书提交后清空仍作用于新书。
                 if (!await saveData.BeginHistoryVisitAsync(book.Path, () =>
                 {
                     opening.Token.ThrowIfCancellationRequested();
-                    if (_disposed || _closing || generation != _generation || expectedPlaylist is not null && !ReferenceEquals(expectedPlaylist, _playlistHub?.Current)) return false;
+                    if (_disposed || _closing || generation != _generation || IsBookLocked && Book is { } commitLocked && commitLocked.Path != book.Path || expectedPlaylist is not null && !ReferenceEquals(expectedPlaylist, _playlistHub?.Current)) return false;
                     Book = book; source = null; collection = null; _keepHistoryOrder = keepHistoryOrder;
                     Config.Current.BookSetting = setting; Context = new(setting, Config.Current);
-                    Position = new(index, explicitEntry is not null || ImageFormats.IsImage(path) ? 0 : Math.Clamp(restored.Part, 0, 1));
-                    RebuildFrame(1); return true;
+                    Position = new(index, terminalDirection is not null ? terminalDirection < 0 ? 1 : 0 : explicitEntry is not null || ImageFormats.IsImage(path) ? 0 : Math.Clamp(restored.Part, 0, 1));
+                    RebuildFrame(terminalDirection < 0 ? -1 : 1); return true;
                 })) return false;
                 if (old is not null) await old.DisposeAsync();
                 if (!replayBookHistory) BookHistory.Add(book.Path);
@@ -127,6 +130,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>保留 PageFrameBox 的帧步进与单页步进算法，I/O 前后检查书籍代次。</summary>
     public async Task MoveAsync(int direction, bool onePage = false)
     {
+        Book? terminatedBook = null; long terminatedGeneration = 0; PagePosition terminatedPosition = default;
         await _gate.WaitAsync();
         try
         {
@@ -137,32 +141,41 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             var position = onePage && Context!.FramePageSize == 2
                 ? new PagePosition(range.Top(direction).Index + direction, direction > 0 ? 0 : 1)
                 : range.Next(direction);
-            if (position.Index < 0 || position.Index >= Book.Pages.Count) return;
-            await ProbeAroundAsync(Book, position.Index, CancellationToken.None);
-            if (generation != _generation || _disposed || _closing) return;
-            // 新导航已经提交，旧打开/书架边界提示不能继续遮蔽当前页面状态。
-            Error = null; Position = position; RebuildFrame(direction); RecordPageHistory(); ScheduleSave(); Notify();
+            if (Context!.IsLoopPage) position = new BookContext(Book.Pages).NormalizePosition(position);
+            else if (position.Index < 0 || position.Index >= Book.Pages.Count)
+            { terminatedBook = Book; terminatedGeneration = generation; terminatedPosition = Position; }
+            // 解锁后执行页尾动作，不能在导航锁里等待对话框或下一书。
+            if (terminatedBook is null)
+            {
+                await ProbeAroundAsync(Book, position.Index, CancellationToken.None);
+                if (generation != _generation || _disposed || _closing) return;
+                // 新导航已经提交，旧打开/书架边界提示不能继续遮蔽当前页面状态。
+                Error = null; Position = position; RebuildFrame(direction); RecordPageHistory(); ScheduleSave(); Notify();
+            }
         }
         finally { _gate.Release(); }
+        if (terminatedBook is not null) await HandlePageEndAsync(terminatedBook, terminatedGeneration, terminatedPosition, direction);
     }
 
     /// <summary>原 NextBook/PrevBook 按书架所选条目的前后项加载，失败不移动选择；普通模式在加载时不抢占。</summary>
     /// <param name="direction">前一本 -1、后一本 +1。</param>
-    public async Task MoveBookAsync(int direction)
+    public async Task MoveBookAsync(int direction, bool fromPageEnd = false, Book? expectedBook = null, long? expectedGeneration = null, PagePosition? expectedPosition = null)
     {
-        if (_disposed || _closing || (IsLoading && !Config.Current.Book.IsPrioritizeBookMove)) return;
+        if (_disposed || _closing || IsBookLocked || (IsLoading && !Config.Current.Book.IsPrioritizeBookMove)) return;
         await _historyGate.WaitAsync();
         try
         {
-            if (_disposed || _closing || Book is null || (IsLoading && !Config.Current.Book.IsPrioritizeBookMove)) return;
+            if (_disposed || _closing || IsBookLocked || Book is null || expectedBook is not null && !ReferenceEquals(expectedBook, Book) || expectedGeneration is not null && expectedGeneration != _generation || expectedPosition is not null && expectedPosition != Position || (IsLoading && !Config.Current.Book.IsPrioritizeBookMove)) return;
             var book = Book; var generation = _generation;
             // 不用当前页面推算兄弟书；有书架位置时遵循独立选择，无位置才按原 Sync 取得父目录。
             if (Bookshelf.Place is null && !await Bookshelf.SyncAsync(book)) { Error = Bookshelf.Error; Notify(); return; }
-            if (_disposed || _closing || generation != _generation || !ReferenceEquals(book, Book)) return;
+            if (_disposed || _closing || generation != _generation || !ReferenceEquals(book, Book) || expectedPosition is not null && expectedPosition != Position) return;
             if (Bookshelf.IsLoading) return;
             var item = Bookshelf.GetFolderItem(direction);
             if (item is null) { Error = direction < 0 ? "已到书架首项，无法打开上一本书籍。" : "已到书架末项，无法打开下一本书籍。"; Notify(); return; }
-            if (await OpenCoreAsync(item.Path, CancellationToken.None)) Bookshelf.Select(item);
+            int? terminal = fromPageEnd ? Config.Current.Book.ResetNextBookPageMode switch
+            { ResetNextBookPageMode.Reset => 1, ResetNextBookPageMode.Continue => direction, _ => null } : null;
+            if (await OpenCoreAsync(item.Path, CancellationToken.None, terminalDirection: terminal)) Bookshelf.Select(item);
         }
         finally { _historyGate.Release(); }
     }
@@ -195,12 +208,12 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     { await JumpCoreAsync(index, backwards, true, expectedBook); }
 
     /// <summary>共用定位；历史重放不再追加自身，否则会截断原前进分支。</summary>
-    private async Task<bool> JumpCoreAsync(int index, bool backwards, bool recordHistory, Book? expectedBook = null, Playlist? expectedPlaylist = null)
+    private async Task<bool> JumpCoreAsync(int index, bool backwards, bool recordHistory, Book? expectedBook = null, Playlist? expectedPlaylist = null, PagePosition? expectedPosition = null)
     {
         await _gate.WaitAsync();
         try
         {
-            if (_disposed || _closing || Book is null || Book.Pages.Count == 0 || IsLoading || expectedBook is not null && !ReferenceEquals(expectedBook, Book)) return false;
+            if (_disposed || _closing || Book is null || Book.Pages.Count == 0 || IsLoading || expectedBook is not null && !ReferenceEquals(expectedBook, Book) || expectedPosition is not null && expectedPosition != Position) return false;
             var generation = _generation; index = Math.Clamp(index, 0, Book.Pages.Count - 1);
             if (expectedPlaylist is not null && !ReferenceEquals(expectedPlaylist, _playlistHub?.Current)) return false;
             await ProbeAroundAsync(Book, index, CancellationToken.None);
@@ -217,6 +230,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     public async Task MoveSizeAsync(int delta)
     {
         if (delta == 0) return;
+        Book? terminatedBook = null; long terminatedGeneration = 0; PagePosition terminatedPosition = default;
         await _gate.WaitAsync();
         try
         {
@@ -227,19 +241,25 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             // 原算法先归一到周期内再静态对齐，之后还原周期；奇数页书籍不可直接对原索引对齐。
             var index = Book.Pages.Count * accessor.NormalizeCycle(requested) + BookTools.WidwPageAlignment(accessor.NormalizeIndex(requested), Book.Setting);
             bool backwards = index >= Book.Pages.Count;
-            if (!accessor.ContainsIndex(index))
+            if (Context!.IsLoopPage) { index = accessor.NormalizeIndex(index); backwards = false; }
+            else if (!accessor.ContainsIndex(index))
             {
                 int corrected = Math.Clamp(index, 0, Book.Pages.Count - 1);
                 // 原 CorrectPosition：未到终点时允许定位首尾；已显示该端点时终止，不重建分割页。
-                if ((backwards ? Frame.FrameRange.Max.Index : Frame.FrameRange.Min.Index) == corrected) return;
+                if ((backwards ? Frame.FrameRange.Max.Index : Frame.FrameRange.Min.Index) == corrected)
+                { terminatedBook = Book; terminatedGeneration = generation; terminatedPosition = Position; }
                 index = corrected;
             }
-            await ProbeAroundAsync(Book, index, CancellationToken.None);
-            if (_disposed || _closing || generation != _generation) return;
-            Error = null; Position = new(index, backwards ? 1 : 0); RebuildFrame(backwards ? -1 : 1);
-            RecordPageHistory(); ScheduleSave(); Notify();
+            if (terminatedBook is null)
+            {
+                await ProbeAroundAsync(Book, index, CancellationToken.None);
+                if (_disposed || _closing || generation != _generation) return;
+                Error = null; Position = new(index, backwards ? 1 : 0); RebuildFrame(backwards ? -1 : 1);
+                RecordPageHistory(); ScheduleSave(); Notify();
+            }
         }
         finally { _gate.Release(); }
+        if (terminatedBook is not null) await HandlePageEndAsync(terminatedBook, terminatedGeneration, terminatedPosition, Math.Sign(delta));
     }
 
     /// <summary>打开历史列表条目；保留访问排序，当前书籍不重复加载，失败保留旧书。</summary>

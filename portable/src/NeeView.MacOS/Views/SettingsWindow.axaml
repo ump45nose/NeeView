@@ -16,6 +16,10 @@
         <CheckBox x:Name="Divide" Content="单页模式分割横向页面" /><CheckBox x:Name="Wide" Content="双页模式宽图独占一页" />
         <CheckBox x:Name="First" Content="首页单独显示" /><CheckBox x:Name="Last" Content="末页单独显示" />
         <TextBlock Text="书籍基准缩放（独立于手工缩放）" /><NumericUpDown x:Name="BaseScale" Minimum="0.1" Maximum="2" Increment="0.05" FormatString="0.#####" />
+        <TextBlock Text="页尾动作" /><ComboBox x:Name="PageEndAction"><ComboBoxItem Content="停止并提示" /><ComboBoxItem Content="前后书" /><ComboBoxItem Content="循环本书" /><ComboBoxItem Content="无缝循环" /><ComboBoxItem Content="询问" /></ComboBox>
+        <TextBlock Text="页尾切书位置" /><ComboBox x:Name="ResetNextBookPageMode"><ComboBoxItem Content="恢复阅读位置" /><ComboBoxItem Content="始终从首页开始" /><ComboBoxItem Content="连续阅读（向前首页 / 向后末页）" /></ComboBox>
+        <CheckBox x:Name="NotifyPageLoop" Content="提示页面已循环" />
+        <TextBlock Text="页框移动方向" /><ComboBox x:Name="PageOrientation"><ComboBoxItem Content="水平" /><ComboBoxItem Content="垂直" /></ComboBox>
         <TextBlock Text="书架（全局）" FontSize="16" Margin="0,8,0,0" />
         <TextBlock Text="文件夹与归档排序" /><ComboBox x:Name="BookshelfGroup"><ComboBoxItem Content="混排" /><ComboBoxItem Content="文件夹在前" /><ComboBoxItem Content="文件夹在后" /></ComboBox>
         <CheckBox x:Name="PrioritizeBookMove" Content="允许前后书命令取代正在加载的书籍" />

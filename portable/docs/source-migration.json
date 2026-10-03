@@ -1136,6 +1136,42 @@
       "target": "src/NeeView.MacOS/Views/ReaderTransformPresenter.cs",
       "sha256": "1b61defff86cfb1f5033522a7c59d18fe4c723275cc63fd0e3bfac5aa0f9bd94",
       "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/BookHub/PageEndAction.cs",
+      "target": "src/NeeView.Engine/BookHub/PageEndAction.cs",
+      "sha256": "c15e0ea4c52c66deccd0c762279bd29fa46a3d8075408042a524eaca38c92a3b",
+      "status": "第十八批：原锁定/可复用Unload/页尾分派/NextBook首尾规则及关闭快照；移除窗口耦合"
+    },
+    {
+      "source": "NeeView/Config/ResetNextBookPageMode.cs",
+      "target": "src/NeeView.Engine/BookHub/PageEndAction.cs",
+      "sha256": "9e5f2909e4c1510c6fc7b9d3e8e34cc1d20999537e36f8cb10501f47509e8dfc",
+      "status": "第十八批：原锁定/可复用Unload/页尾分派/NextBook首尾规则及关闭快照；移除窗口耦合"
+    },
+    {
+      "source": "NeeView/Book/PageFrameOrientation.cs",
+      "target": "src/NeeView.Engine/Book/PageFrameOrientation.cs",
+      "sha256": "6bef0cd4278fab6db5a79df9a22990f26f4558aacec5643d443aaff9bdca9f7e",
+      "status": "第十八批：原锁定/可复用Unload/页尾分派/NextBook首尾规则及关闭快照；移除窗口耦合"
+    },
+    {
+      "source": "NeeView/BookOperation/BookPageTerminator.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Controls.cs",
+      "sha256": "7404e34f6bf1598ddae4619f00d6d0294c996775296e87f3ccedd42e5b127325",
+      "status": "第十八批：原锁定/可复用Unload/页尾分派/NextBook首尾规则及关闭快照；移除窗口耦合"
+    },
+    {
+      "source": "NeeView/BookHub/BookHub.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Controls.cs",
+      "sha256": "4d33119203989d72ff6cebf6b8a29caa10c054db0f8d704ebd2cb605918760b6",
+      "status": "第十八批：原锁定/可复用Unload/页尾分派/NextBook首尾规则及关闭快照；移除窗口耦合"
+    },
+    {
+      "source": "NeeView/MainView/PageFrameBoxPresenter.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.cs",
+      "sha256": "9cf0dcf55a93ae0a419dcfc4a6d73d55a100774c8953c9d9573468d694d55dae",
+      "status": "第十八批：原锁定/可复用Unload/页尾分派/NextBook首尾规则及关闭快照；移除窗口耦合"
     }
   ],
   "rule_references": [

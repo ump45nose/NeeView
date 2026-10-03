@@ -9,7 +9,7 @@
 | LoadAs | 打开文件 | Ctrl+O | P1 宿主适配 | NeeView/Command/Commands/LoadAsCommand.cs |
 | LoadRecentBook | 最近使用的书籍 |  | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/LoadRecentBookCommand.cs |
 | ReLoad | 重新载入 |  | P1 宿主适配 | NeeView/Command/Commands/ReLoadCommand.cs |
-| Unload | 关闭 |  | 待 P2–P5 | NeeView/Command/Commands/UnloadCommand.cs |
+| Unload | 关闭 |  | P2 第十八批：已接入原书籍控制 | NeeView/Command/Commands/UnloadCommand.cs |
 | OpenExplorer | 在资源管理器中打开 |  | P1 宿主适配 | NeeView/Command/Commands/OpenExplorerCommand.cs |
 | OpenExternalApp | 在外部应用中打开 (简单) |  | 待 P2–P5 | NeeView/Command/Commands/OpenExternalAppCommand.cs |
 | OpenExternalAppAs | 在外部应用中打开 |  | 待 P2–P5 | NeeView/Command/Commands/OpenExternalAppAsCommand.cs |
@@ -142,7 +142,7 @@
 | LastPage | 转到尾页 | Ctrl+Left | P1 Engine | NeeView/Command/Commands/LastPageCommand.cs |
 | PrevHistoryPage | 后退到上一页 | Back | P2 原导航历史接入；具体范围见验收表 | NeeView/Command/Commands/PrevHistoryPageCommand.cs |
 | NextHistoryPage | 前进到下一页 | Shift+Back | P2 原导航历史接入；具体范围见验收表 | NeeView/Command/Commands/NextHistoryPageCommand.cs |
-| ToggleBookLock | 书籍锁定状态 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleBookLockCommand.cs |
+| ToggleBookLock | 书籍锁定状态 |  | P2 第十八批：已接入原书籍控制 | NeeView/Command/Commands/ToggleBookLockCommand.cs |
 | PrevBook | 上一本书籍 | Up | P2 原普通书架前后项；失败保留选择 | NeeView/Command/Commands/PrevBookCommand.cs |
 | NextBook | 下一本书籍 | Down | P2 原普通书架前后项；失败保留选择 | NeeView/Command/Commands/NextBookCommand.cs |
 | RandomBook | 随机排序书籍 |  | P2 original per-directory order; batch 14 | NeeView/Command/Commands/RandomBookCommand.cs |
@@ -174,9 +174,9 @@
 | SetPageModeOne | 单页显示 | Ctrl+1 | P1 Engine | NeeView/Command/Commands/SetPageModeOneCommand.cs |
 | SetPageModeTwo | 双页显示 | Ctrl+2 | P1 Engine | NeeView/Command/Commands/SetPageModeTwoCommand.cs |
 | ToggleIsPanorama | 全景模式 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleIsPanoramaCommand.cs |
-| TogglePageOrientation | 切换页面方向 |  | 待 P2–P5 | NeeView/Command/Commands/TogglePageOrientationCommand.cs |
-| SetPageOrientationHorizontal | 水平页面布局 |  | 待 P2–P5 | NeeView/Command/Commands/SetPageOrientationHorizontalCommand.cs |
-| SetPageOrientationVertical | 垂直页面布局 |  | 待 P2–P5 | NeeView/Command/Commands/SetPageOrientationVerticalCommand.cs |
+| TogglePageOrientation | 切换页面方向 |  | P2 第十八批：已接入原书籍控制 | NeeView/Command/Commands/TogglePageOrientationCommand.cs |
+| SetPageOrientationHorizontal | 水平页面布局 |  | P2 第十八批：已接入原书籍控制 | NeeView/Command/Commands/SetPageOrientationHorizontalCommand.cs |
+| SetPageOrientationVertical | 垂直页面布局 |  | P2 第十八批：已接入原书籍控制 | NeeView/Command/Commands/SetPageOrientationVerticalCommand.cs |
 | ToggleBookReadOrder | 切换右开/左开 |  | P1 Engine | NeeView/Command/Commands/ToggleBookReadOrderCommand.cs |
 | SetBookReadOrderRight | 右开 (从右向左) |  | P1 Engine | NeeView/Command/Commands/SetBookReadOrderRightCommand.cs |
 | SetBookReadOrderLeft | 左开 (从左向右） |  | P1 Engine | NeeView/Command/Commands/SetBookReadOrderLeftCommand.cs |
