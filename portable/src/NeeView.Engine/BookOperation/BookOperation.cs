@@ -19,7 +19,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     private BookshelfFolderList? _bookshelf;
     private HistoryList? _historyList;
     public HistoryList HistoryList => _historyList ??= new(saveData);
-    public BookshelfFolderList Bookshelf => _bookshelf ??= new(archives, saveData.FolderConfigs);
+    public BookshelfFolderList Bookshelf => _bookshelf ??= new(archives, saveData.FolderConfigs, saveData);
     public PageSelector PageSelector { get; } = new();
     public FilmStrip FilmStrip => _filmStrip ??= new(PageSelector);
     public PageHistory PageHistory { get; } = new();
@@ -481,6 +481,8 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         try
         {
             if (_playlistHub is not null) await _playlistHub.FlushAsync();
+            if (_restoreBookshelf is not null) await _restoreBookshelf;
+            SaveLastBookshelf();
             await SaveAsync();
             if (Book is not null) await Book.DisposeAsync();
             _bookshelf?.Dispose(); HistoryList.Dispose();

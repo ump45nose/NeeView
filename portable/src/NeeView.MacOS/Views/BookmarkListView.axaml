@@ -10,6 +10,7 @@
       <Button x:Name="BookmarkRootButton" Content="根" Click="Root_Click" ToolTip.Tip="返回书签根目录" />
       <Button x:Name="BookmarkUpButton" Content="返回" IsEnabled="{Binding CanMoveToParent}" Click="Up_Click" />
       <Button x:Name="BookmarkSyncButton" Content="同步" Click="Sync_Click" ToolTip.Tip="定位当前书籍的书签，优先当前目录" />
+      <Button Content="刷新" Click="Refresh_Click" ToolTip.Tip="刷新列表及来源元数据" />
       <ComboBox x:Name="BookmarkOrder" ItemsSource="{Binding Orders}" SelectedItem="{Binding SelectedOrder, Mode=OneWay}" SelectionChanged="Order_Changed">
         <ComboBox.Styles><Style Selector="ComboBoxItem"><Setter Property="IsEnabled" Value="{Binding IsEnabled}" /></Style></ComboBox.Styles>
         <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>

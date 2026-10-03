@@ -6,7 +6,11 @@ public sealed class BookmarkFolderList : IDisposable
 {
     private readonly BookmarkCollection _collection;
     private BookmarkNode[] _ancestors = [];
-    private readonly Dictionary<BookmarkNode, int> _seeds = [];
+    private readonly FolderConfigCollection _folderConfigs;
+    private FolderParameter _parameter = null!;
+    private readonly Dictionary<BookmarkNode, (string? Path, FolderItem? Item)> _metadata = [];
+    private CancellationTokenSource? _metadataRequest;
+    private long _metadataRevision;
     private readonly Dictionary<BookmarkNode, BookmarkNode> _parents = [];
     private CancellationTokenSource? _searchRequest;
     private long _searchRevision;
@@ -21,18 +25,20 @@ public sealed class BookmarkFolderList : IDisposable
     public FolderOrder FolderOrder { get; private set; }
     public string FullPath { get; private set; } = "书签";
     public bool CanMoveToParent => !ReferenceEquals(Place, _collection.Items);
-    public string? CapabilityMessage => SupportsOrder(Config.Current.Bookmark.BookmarkFolderOrder) ? null : "此排序需要来源元数据，尚未迁移；当前按文件名显示，原配置保留。";
+    public Func<string, CancellationToken, Task<FolderItem?>>? ReadMetadataAsync { get; set; }
+    public string ParameterPath => GetTargetPath(Place);
+    public bool NeedsMetadata => _parameter.FolderOrder is FolderOrder.TimeStamp or FolderOrder.TimeStampDescending or FolderOrder.Size or FolderOrder.SizeDescending;
+    public string? CapabilityMessage => NeedsMetadata && ReadMetadataAsync is null ? "当前宿主未提供来源元数据；按名称显示，原排序配置保留。" : null;
 
     /// <summary>接收已加载的原集合；不读取文件、不持有窗口或图像资源。</summary>
     /// <param name="collection">由 SaveData 维护的唯一书签集合。</param>
-    public BookmarkFolderList(BookmarkCollection collection)
+    public BookmarkFolderList(BookmarkCollection collection, FolderConfigCollection? folderConfigs = null)
     {
-        _collection = collection; Place = collection.Items; Refresh();
+        _collection = collection; _folderConfigs = folderConfigs ?? new(); Place = collection.Items; Refresh();
     }
 
-    /// <summary>本批开放不需文件系统探测的原排序，时间/大小排序仍为能力占位。</summary>
-    public static bool SupportsOrder(FolderOrder mode) => Enum.IsDefined(mode) && mode is not
-        (FolderOrder.TimeStamp or FolderOrder.TimeStampDescending or FolderOrder.Size or FolderOrder.SizeDescending);
+    /// <summary>原完整书签排序枚举；元数据能力由实际宿主契约决定。</summary>
+    public static bool SupportsOrder(FolderOrder mode) => Enum.IsDefined(mode);
 
     /// <summary>选择必须属于当前列表；仅改变导航对象，不打开书籍。</summary>
     public void Select(BookmarkNode? node) => SelectedItem = node is not null && Items.Contains(node) ? node : null;
@@ -70,9 +76,9 @@ public sealed class BookmarkFolderList : IDisposable
     /// <summary>采用原默认排序字段；不支持的选择不覆盖旧配置。</summary>
     public void ChangeOrder(FolderOrder mode)
     {
-        if (!SupportsOrder(mode)) throw new NotSupportedException("此书签排序尚未迁移。");
-        Config.Current.Bookmark.BookmarkFolderOrder = mode;
-        if (mode == FolderOrder.Random) _seeds[Place] = Random.Shared.Next(1, int.MaxValue);
+        if (!SupportsOrder(mode) || ReadMetadataAsync is null && mode is FolderOrder.TimeStamp or FolderOrder.TimeStampDescending or FolderOrder.Size or FolderOrder.SizeDescending)
+            throw new NotSupportedException("当前宿主未提供来源元数据。");
+        _parameter.FolderOrder = mode;
         Refresh();
     }
 
@@ -80,7 +86,7 @@ public sealed class BookmarkFolderList : IDisposable
     public void Refresh()
     {
         // 节点/顺序变化使后台快照过期；调用方按已提交搜索重新申请，不扫描磁盘。
-        CancelSearch();
+        CancelSearch(); _metadataRevision++; _metadataRequest?.Cancel();
         var live = _collection.Items.Walk().ToHashSet();
         // 从同一批节点生成派生父级索引；路径比较不在每次比较中重新遍历整棵树。
         _parents.Clear();
@@ -91,10 +97,10 @@ public sealed class BookmarkFolderList : IDisposable
         for (BookmarkNode? parent = Place; parent is not null; parent = _parents.GetValueOrDefault(parent)) chain.Push(parent);
         _ancestors = chain.ToArray();
         FullPath = "书签" + string.Concat(_ancestors.Skip(1).Select(node => " / " + node.DisplayName));
-        foreach (var dead in _seeds.Keys.Where(node => !live.Contains(node)).ToArray()) _seeds.Remove(dead);
-        FolderOrder = SupportsOrder(Config.Current.Bookmark.BookmarkFolderOrder) ? Config.Current.Bookmark.BookmarkFolderOrder : FolderOrder.FileName;
-        if (!_seeds.TryGetValue(Place, out var seed)) _seeds[Place] = seed = Random.Shared.Next(1, int.MaxValue);
-        Items = Sort(_matches is null ? Place.Children ?? [] : _matches.Where(live.Contains), FolderOrder, Config.Current.Bookshelf.FolderSortOrder, seed);
+        foreach (var dead in _metadata.Keys.Where(node => !live.Contains(node) || node.Path != _metadata[node].Path).ToArray()) _metadata.Remove(dead);
+        _parameter = new(ParameterPath, _folderConfigs);
+        FolderOrder = SupportsOrder(_parameter.FolderOrder) && (!NeedsMetadata || ReadMetadataAsync is not null) ? _parameter.FolderOrder : FolderOrder.FileName;
+        Items = Sort(_matches is null ? Place.Children ?? [] : _matches.Where(live.Contains), FolderOrder, Config.Current.Bookshelf.FolderSortOrder, _parameter.Seed);
         if (SelectedItem is not null && !Items.Contains(SelectedItem)) SelectedItem = null;
     }
 
@@ -137,7 +143,42 @@ public sealed class BookmarkFolderList : IDisposable
     }
 
     /// <summary>面板释放只取消查询，唯一书签集合仍由 SaveData 维护。</summary>
-    public void Dispose() { _disposed = true; CancelSearch(); }
+    public void Dispose() { _disposed = true; CancelSearch(); _metadataRevision++; _metadataRequest?.Cancel(); }
+
+    /// <summary>原bookmark scheme只定位唯一树节点；不将虚拟路径交给文件系统。</summary>
+    public BookmarkNode? FindFolder(string path) => _collection.Items.Walk().FirstOrDefault(node => node.IsFolder && GetTargetPath(node) == path);
+    /// <summary>按需补排序元数据；后台只读已拍路径，取消/树变更后不提交晚到结果。</summary>
+    public async Task<bool> LoadMetadataAsync(CancellationToken token = default)
+    {
+        if (_disposed || !NeedsMetadata || ReadMetadataAsync is not { } read) return false;
+        _metadataRequest?.Cancel(); var request = CancellationTokenSource.CreateLinkedTokenSource(token); _metadataRequest = request;
+        var revision = _metadataRevision; var snapshot = Items.Where(node => !node.IsFolder && !_metadata.ContainsKey(node)).Select(node => (Node: node, Path: node.Path)).ToArray();
+        if (snapshot.Length == 0) { request.Dispose(); _metadataRequest = null; return false; }
+        try
+        {
+            var results = new Dictionary<BookmarkNode, (string?, FolderItem?)>();
+            var paths = new Dictionary<string, FolderItem?>(StringComparer.Ordinal);
+            foreach (var item in snapshot)
+            {
+                request.Token.ThrowIfCancellationRequested(); FolderItem? data = null;
+                if (item.Path is { Length: > 0 })
+                {
+                    if (!paths.TryGetValue(item.Path, out data)) paths[item.Path] = data = await read(item.Path, request.Token);
+                }
+                results[item.Node] = (item.Path, data);
+            }
+            request.Token.ThrowIfCancellationRequested();
+            if (_disposed || revision != _metadataRevision) return false;
+            foreach (var pair in results) _metadata[pair.Key] = pair.Value;
+            // 只补排序键，不调用会取消结构化查询的Refresh，两个后台需求可独立完成。
+            Items = Sort(_matches ?? (IEnumerable<BookmarkNode>)(Place.Children ?? []), FolderOrder, Config.Current.Bookshelf.FolderSortOrder, _parameter.Seed);
+            return true;
+        }
+        catch (OperationCanceledException) when (request.IsCancellationRequested) { return false; }
+        finally { if (ReferenceEquals(_metadataRequest, request)) _metadataRequest = null; request.Dispose(); }
+    }
+    /// <summary>显式刷新重新探测来源；纯选择/排序继续复用已知元数据。</summary>
+    public void InvalidateMetadata() { _metadataRevision++; _metadataRequest?.Cancel(); _metadata.Clear(); }
 
     /// <summary>保留原注册顺序不受目录分组影响；其他模式先分组再比较，随机种子在当前位置稳定。</summary>
     private IReadOnlyList<BookmarkNode> Sort(IEnumerable<BookmarkNode> source, FolderOrder mode, FolderSortOrder grouping, int seed)
@@ -172,13 +213,19 @@ public sealed class BookmarkFolderList : IDisposable
             FolderOrder.PathDescending => order.ThenByDescending(node => node, byPath),
             FolderOrder.FileType => order.ThenBy(node => node, byType),
             FolderOrder.FileTypeDescending => order.ThenByDescending(node => node, byType),
+            FolderOrder.TimeStamp => order.ThenBy(GetTime).ThenBy(node => node, byName),
+            FolderOrder.TimeStampDescending => order.ThenByDescending(GetTime).ThenBy(node => node, byName),
+            FolderOrder.Size => order.ThenBy(GetLength).ThenBy(node => node, byName),
+            FolderOrder.SizeDescending => order.ThenByDescending(GetLength).ThenBy(node => node, byName),
             FolderOrder.Random => order.ThenBy(_ => random.Next()),
             _ => order.ThenBy(node => node, byName)
         }).ToArray();
+        DateTime GetTime(BookmarkNode node) => node.IsFolder ? node.EntryTime : _metadata.GetValueOrDefault(node).Item?.LastWriteTime ?? default;
+        long GetLength(BookmarkNode node) => node.IsFolder ? -1 : _metadata.GetValueOrDefault(node).Item?.Length ?? -1;
     }
 
     /// <summary>原文件夹目标是 bookmark scheme，书籍目标仍是原 Path；仅用于排序，不访问磁盘。</summary>
-    private string GetTargetPath(BookmarkNode node)
+    public string GetTargetPath(BookmarkNode node)
     {
         if (!node.IsFolder) return node.Path ?? "";
         var names = new Stack<string>();

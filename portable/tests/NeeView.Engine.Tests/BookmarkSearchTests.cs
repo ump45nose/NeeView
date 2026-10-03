@@ -47,8 +47,9 @@ public sealed class BookmarkSearchTests
         list.Select(b0); list.ChangeOrder(FolderOrder.EntryTimeDescending); Assert.Equal(new[] { a1, b0, a0 }, list.Items); Assert.Same(b0, list.SelectedItem);
         await list.SearchAsync("", [], token: TestContext.Current.CancellationToken); Assert.Equal(new[] { b, a }, list.Items); Assert.Same(root, list.Place);
         list.SetPlace(a); Config.Current.Bookmark.IsSearchIncludeSubdirectories = false;
-        await list.SearchAsync("/bookmark", [], token: TestContext.Current.CancellationToken); Assert.Equal(new[] { a1, a0 }, list.Items);
+        await list.SearchAsync("/bookmark", [], token: TestContext.Current.CancellationToken); Assert.Equal(new[] { a0, a1 }, list.Items);
         Assert.True(list.MoveToParent()); Assert.Same(root, list.Place); Assert.Same(a, list.SelectedItem); Assert.Equal("", list.SearchKeyword);
+        Assert.Equal(FolderOrder.EntryTimeDescending, list.FolderOrder); Assert.Equal(new[] { b, a }, list.Items);
         Config.Current.Bookmark.IsSearchIncludeSubdirectories = false;
         await list.SearchAsync("/bookmark", [], token: TestContext.Current.CancellationToken); Assert.Empty(list.Items);
         Assert.Equal(new[] { a0, a1 }, a.Children);

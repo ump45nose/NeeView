@@ -23,6 +23,8 @@
         <TextBlock Text="书架（全局）" FontSize="16" Margin="0,8,0,0" />
         <TextBlock Text="文件夹与归档排序" /><ComboBox x:Name="BookshelfGroup"><ComboBoxItem Content="混排" /><ComboBoxItem Content="文件夹在前" /><ComboBoxItem Content="文件夹在后" /></ComboBox>
         <CheckBox x:Name="PrioritizeBookMove" Content="允许前后书命令取代正在加载的书籍" />
+        <CheckBox x:Name="OpenLastFolder" Content="启动时恢复上次书架位置" />
+        <CheckBox x:Name="OpenLastBookmarkFolder" Content="启动时恢复独立书签列表位置" />
         <TextBlock Text="查看器（全局）" FontSize="16" Margin="0,8,0,0" />
         <CheckBox x:Name="BaseScaleEnabled" Content="启用书籍基准缩放" />
         <TextBlock Text="缩放中心" /><ComboBox x:Name="ScaleCenter" />

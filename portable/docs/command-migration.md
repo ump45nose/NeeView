@@ -88,7 +88,7 @@
 | FocusBookmarkSearchBox | 聚焦到书签搜索框 |  | P2 原书签搜索焦点；范围见第十一批 | NeeView/Command/Commands/FocusBookmarkSearchBoxCommand.cs |
 | FocusPageListSearchBox | 聚焦到页面列表搜索框 |  | 待 P2–P5 | NeeView/Command/Commands/FocusPageListSearchBoxCommand.cs |
 | FocusHistorySearchBox | 聚焦到历史记录搜索框 |  | P2 原历史搜索聚焦/全选；范围见第十二批 | NeeView/Command/Commands/FocusHistorySearchBoxCommand.cs |
-| FocusBookmarkList | 显示书签 |  | 待 P2：书架书签位置/目录树互联 | NeeView/Command/Commands/FocusBookmarkListCommand.cs |
+| FocusBookmarkList | 显示书签 |  | 已接入 P2：原书架bookmark根与列表焦点；独立面板互联 | NeeView/Command/Commands/FocusBookmarkListCommand.cs |
 | FocusMainView | 聚焦到主视图 |  | 待 P2–P5 | NeeView/Command/Commands/FocusMainViewCommand.cs |
 | ToggleVisibleFilmStrip | 显示/隐藏幻灯条 |  | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleFilmStripCommand.cs |
 | ToggleHideFilmStrip | 启用/禁用自动隐藏幻灯条 |  | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleHideFilmStripCommand.cs |

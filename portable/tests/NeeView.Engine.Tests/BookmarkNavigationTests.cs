@@ -130,7 +130,7 @@ public sealed class BookmarkNavigationTests
         {
             model.ShowPanel("BookmarkPanel"); Dispatcher.UIThread.RunJobs(); window.UpdateLayout();
             var view = window.FindControl<BookmarkListView>("BookmarkPanelList")!; var list = view.FindControl<ListBox>("BookmarkItems")!;
-            Assert.False(window.FindControl<TreeView>("BookmarkTree")!.IsVisible); Assert.False(window.IsCommandAvailable("FocusBookmarkList"));
+            Assert.False(window.FindControl<TreeView>("BookmarkTree")!.IsVisible); Assert.True(window.IsCommandAvailable("FocusBookmarkList"));
             var refreshes = 0; model.Refreshed += (_, _) => refreshes++;
             list.SelectedItem = folder; Assert.True(list.Focus(), $"列表不可聚焦：visible={list.IsEffectivelyVisible}, bounds={list.Bounds}"); Assert.Same(folder, list.SelectedItem);
             window.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);
@@ -193,8 +193,10 @@ public sealed class BookmarkNavigationTests
             finally { Directory.Delete(setting + ".tmp"); }
             combo.SelectedItem = BookmarkListViewModel.Orders.Single(choice => choice.Mode == FolderOrder.EntryTime);
             await view.PrepareCloseAsync();
-            Assert.Equal(FolderOrder.EntryTime, Config.Current.Bookmark.BookmarkFolderOrder);
-            Assert.Equal((int)FolderOrder.EntryTime, JsonNode.Parse(await File.ReadAllTextAsync(setting, TestContext.Current.CancellationToken))!["Config"]!["Bookmark"]!["BookmarkFolderOrder"]!.GetValue<int>());
+            Assert.Equal(FolderOrder.FileName, Config.Current.Bookmark.BookmarkFolderOrder);
+            Assert.Equal(FolderOrder.EntryTime, view.Navigation!.FolderOrder);
+            var folders = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "Foldres.json"), TestContext.Current.CancellationToken))!["Folders"]!.AsArray();
+            Assert.Equal((int)FolderOrder.EntryTime, folders.Single(entry => entry!["Place"]!.GetValue<string>() == "bookmark:")!["Parameter"]!["FolderOrder"]!.GetValue<int>());
         }
         finally { view.Dispose(); window.Close(); }
     }

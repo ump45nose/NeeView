@@ -1172,6 +1172,36 @@
       "target": "src/NeeView.Engine/SaveData/SaveData.cs",
       "sha256": "9cf0dcf55a93ae0a419dcfc4a6d73d55a100774c8953c9d9573468d694d55dae",
       "status": "第十八批：原锁定/可复用Unload/页尾分派/NextBook首尾规则及关闭快照；移除窗口耦合"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/BookshelfFolderMemento.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookshelf/BookshelfFolderMemento.cs",
+      "sha256": "cbca1c8a42d99172ca550230e200fbdf5f031914dc2f41c741b973f189fd6908",
+      "status": "第十九批：原bookmark scheme/共享节点独立位置、每目录参数、元数据排序及启动列表快照；平台I/O异步化"
+    },
+    {
+      "source": "NeeView/Config/StartUpConfig.cs",
+      "target": "src/NeeView.Engine/Config/StartUpConfig.cs",
+      "sha256": "3b63ec096acbbc1aec243ba52859c6ac38fdcd15f2addfc96833f0a0b1684a46",
+      "status": "第十九批：原bookmark scheme/共享节点独立位置、每目录参数、元数据排序及启动列表快照；平台I/O异步化"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/BookmarkFolderCollection.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookmark/BookmarkFolderList.cs",
+      "sha256": "058a3d7d63a5d6648201ef17b5805c576c20b0d47a2617f470e2c83fd25e5911",
+      "status": "第十九批：原bookmark scheme/共享节点独立位置、每目录参数、元数据排序及启动列表快照；平台I/O异步化"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderListBox.xaml.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.BookshelfBookmarks.cs",
+      "sha256": "fca8d1f84099f586987498a47a38002675eb77c112a2beed683bfdfd42dc8334",
+      "status": "第十九批：原bookmark scheme/共享节点独立位置、每目录参数、元数据排序及启动列表快照；平台I/O异步化"
+    },
+    {
+      "source": "NeeView/SidePanels/SidePanelFrame.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.BookshelfBookmarks.cs",
+      "sha256": "5d094aa746f7ab1047c4a88cc73c4abf96f8c17bfa356ecc9caa74aa332d64e8",
+      "status": "第十九批：原bookmark scheme/共享节点独立位置、每目录参数、元数据排序及启动列表快照；平台I/O异步化"
     }
   ],
   "rule_references": [

@@ -228,3 +228,12 @@ P2继续书籍锁定/页尾/帧方向/Unload、书架书签、历史策略/模�
 - 已离线查看[页尾对话框](p2-book-controls-page-end-layout.png)，未启动正式应用、未修改用户数据；见[静默记录](p2-book-controls-runtime.md)。原Windows、旧验收与用户.DS_Store保持。
 
 P2继续书架书签互联、历史、列表模板、浮动宿主及输入/动画；真实设备与Windows对照独立待验。本增量自动本地提交后继续，不推送发布。
+
+## P2 第十九批：原书架书签互联
+
+- bookmark scheme、书签树、FocusBookmarkList与独立面板转交接入，共用原节点及Foldres参数，位置/选择独立；来源时间/大小按需读取，别名保持。
+- 原StartUp列表快照、两个恢复开关与独立面板同步选项沿JSON保存；参数失败回滚，晚到元数据不取消搜索。首次有效视口修复启动前打开的原点偏移。
+- 全量 **307通过、0失败、0跳过**；Engine、正式Library、正式ARM64.app及本地ad-hoc严格签名均通过，见[p2-bookshelf-bookmarks-validation.json](p2-bookshelf-bookmarks-validation.json)。默认输出串行。
+- 已离线审查[两个书签列表](p2-bookshelf-bookmarks-bookshelf-bookmarks-layout.png)，未启动正式应用或访问用户数据；见[静默记录](p2-bookshelf-bookmarks-runtime.md)。原Windows、旧证据及用户.DS_Store保持。
+
+P2继续历史、模板、浮动宿主与动画；依设备及Windows动态对照另验。本增量自动本地提交后继续，不推送发布。

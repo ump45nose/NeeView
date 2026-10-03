@@ -2,7 +2,7 @@
 namespace NeeView;
 
 /// <summary>独立书架位置、列表及选择；浏览目录不改变当前书籍，所有枚举由后端完成。</summary>
-public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCollection? folderConfigs = null) : IDisposable
+public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCollection? folderConfigs = null, SaveData? state = null) : IDisposable
 {
     private CancellationTokenSource? _request;
     private long _revision;
@@ -10,6 +10,20 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     private IReadOnlyList<FolderItem> _entries = [];
     private readonly FolderConfigCollection _folderConfigs = folderConfigs ?? new();
     private FolderParameter? _parameter;
+    private BookmarkFolderList? _bookmarks;
+    public bool IsBookmarkPlace => Place?.StartsWith("bookmark:", StringComparison.Ordinal) == true;
+    public BookmarkNode? BookmarkPlace => IsBookmarkPlace ? _bookmarks?.Place : null;
+    /// <summary>两个列表共享节点及目录参数，位置与选择各自独立；只订阅真实书签事务。</summary>
+    private BookmarkFolderList BookmarkList
+    {
+        get
+        {
+            if (_bookmarks is not null) return _bookmarks;
+            if (state is null) throw new NotSupportedException("当前书架未接入书签集合。");
+            state.BookmarksChanged += BookmarksChanged;
+            return _bookmarks = new(state.Bookmarks, _folderConfigs) { ReadMetadataAsync = archives.GetFileMetadataAsync };
+        }
+    }
     public string? Place { get; private set; }
     public IReadOnlyList<FolderItem> Items { get; private set; } = [];
     public FolderItem? SelectedItem { get; private set; }
@@ -23,14 +37,21 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     {
         if (_disposed || (item is not null && !Items.Contains(item))) return;
         SelectedItem = item; Changed?.Invoke(this, EventArgs.Empty);
+        if (IsBookmarkPlace) BookmarkList.Select(item?.Bookmark);
     }
 
     /// <summary>原同步以书籍来源的父目录为位置，并选择该书籍；同目录只更新选择。</summary>
     /// <param name="book">当前已提交书籍。</param>
     /// <param name="token">窗口或导航请求取消。</param>
     /// <param name="force">手动同步时重新枚举。</param>
-    public Task<bool> SyncAsync(Book book, CancellationToken token = default, bool force = false)
+    public Task<bool> SyncAsync(Book book, CancellationToken token = default, bool force = false, bool fileSystem = true)
     {
+        if (!fileSystem && IsBookmarkPlace)
+        {
+            var target = SelectedItem?.Path == book.Path ? SelectedItem : Items.FirstOrDefault(e => e.Path == book.Path);
+            if (target is not null) Select(target);
+            return Task.FromResult(true);
+        }
         var path = System.IO.Path.TrimEndingDirectorySeparator(book.Path);
         var parent = book.BookAddress.Place ?? path;
         return SetPlaceAsync(parent, book.Path, token, force);
@@ -45,17 +66,31 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     public async Task<bool> SetPlaceAsync(string place, string? selectedPath = null, CancellationToken token = default, bool force = false)
     {
         ObjectDisposedException.ThrowIf(_disposed, this); token.ThrowIfCancellationRequested();
-        place = System.IO.Path.GetFullPath(place);
+        bool bookmark = place.StartsWith("bookmark:", StringComparison.Ordinal);
+        if (!bookmark) place = System.IO.Path.GetFullPath(place);
         var revision = Interlocked.Increment(ref _revision);
         _request?.Cancel(); var pending = CancellationTokenSource.CreateLinkedTokenSource(token); _request = pending;
+        var oldPlace = _bookmarks?.Place ?? (bookmark ? state?.BookmarkRoot : null); var oldSelection = _bookmarks?.SelectedItem; bool committed = false;
         try
         {
             if (!force && Place == place)
             {
-                if (selectedPath is not null) SelectedItem = FindSelection(selectedPath);
-                Error = null; IsLoading = false; Changed?.Invoke(this, EventArgs.Empty); return true;
+                if (selectedPath is not null && SelectedItem?.Path != selectedPath) Select(FindSelection(selectedPath));
+                committed = true; Error = null; IsLoading = false; Changed?.Invoke(this, EventArgs.Empty); return true;
             }
             IsLoading = true; Error = null; Changed?.Invoke(this, EventArgs.Empty);
+            if (bookmark)
+            {
+                BookmarkList.Refresh();
+                if (force) BookmarkList.InvalidateMetadata();
+                var folder = BookmarkList.FindFolder(place) ?? throw new IOException("书签文件夹已不存在。");
+                var selected = oldSelection is not null && folder.Children?.Contains(oldSelection) == true && BookmarkList.GetTargetPath(oldSelection) == selectedPath
+                    ? oldSelection : folder.Children?.FirstOrDefault(node => BookmarkList.GetTargetPath(node) == selectedPath);
+                BookmarkList.SetPlace(folder, selected);
+                await BookmarkList.LoadMetadataAsync(pending.Token); pending.Token.ThrowIfCancellationRequested();
+                if (_disposed || revision != _revision) return false;
+                PublishBookmarks(); committed = true; return true;
+            }
             var entries = await archives.ListBooksAsync(place, pending.Token);
             pending.Token.ThrowIfCancellationRequested();
             if (_disposed || revision != _revision) return false;
@@ -69,6 +104,7 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
         catch (Exception ex) { if (revision == _revision) Error = "目录暂不可访问：" + ex.Message; return false; }
         finally
         {
+            if (bookmark && !committed && revision == _revision && oldPlace is not null) _bookmarks?.SetPlace(oldPlace, oldSelection);
             if (revision == _revision) { IsLoading = false; Changed?.Invoke(this, EventArgs.Empty); }
             if (ReferenceEquals(_request, pending)) _request = null; pending.Dispose();
         }
@@ -85,6 +121,8 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     /// <param name="reshuffle">用户重新选择随机时生成新种子；应用其他全局设置时保留随机次序。</param>
     public void ChangeOrder(FolderOrder mode, bool reshuffle = true)
     {
+        if (_disposed || IsLoading) return;
+        if (IsBookmarkPlace) { BookmarkList.ChangeOrder(mode); PublishBookmarks(); return; }
         if (_disposed || IsLoading || _parameter is null) return;
         mode = GetNormalOrder(mode);
         if (mode != FolderOrder.Random || reshuffle || _parameter.FolderOrder != mode) _parameter.FolderOrder = mode;
@@ -94,12 +132,14 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     public void ReloadParameter()
     {
         if (_disposed || IsLoading || Place is null) return;
+        if (IsBookmarkPlace) { BookmarkList.Refresh(); PublishBookmarks(); return; }
         _parameter = new(Place, _folderConfigs); FolderOrder = GetNormalOrder(_parameter.FolderOrder); Reorder();
     }
     /// <summary>应用全局目录分组时保持随机种子及未支持的原默认排序字段，只调整已提交集合。</summary>
     public void Reorder()
     {
         if (_disposed || IsLoading) return;
+        if (IsBookmarkPlace) { BookmarkList.Refresh(); PublishBookmarks(); return; }
         var path = SelectedItem?.Path;
         Items = FolderCollection.Sort(_entries, FolderOrder, Config.Current.Bookshelf.FolderSortOrder, _parameter?.Seed ?? 0, CancellationToken.None);
         SelectedItem = Items.FirstOrDefault(e => e.Path == path); Changed?.Invoke(this, EventArgs.Empty);
@@ -117,8 +157,17 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     }
 
     /// <summary>书架上一级只改变列表，保留原选中目录为定位目标。</summary>
-    public Task<bool> UpAsync(CancellationToken token = default) => Place is { } place && System.IO.Path.GetDirectoryName(System.IO.Path.TrimEndingDirectorySeparator(place)) is { } parent
-        ? SetPlaceAsync(parent, place, token) : Task.FromResult(false);
+    public Task<bool> UpAsync(CancellationToken token = default)
+    {
+        token.ThrowIfCancellationRequested();
+        if (IsBookmarkPlace)
+        {
+            if (!BookmarkList.MoveToParent()) return Task.FromResult(false);
+            return SetPlaceAsync(BookmarkList.ParameterPath, BookmarkList.SelectedItem is { } node ? BookmarkList.GetTargetPath(node) : null, token, true);
+        }
+        return Place is { } place && System.IO.Path.GetDirectoryName(System.IO.Path.TrimEndingDirectorySeparator(place)) is { } parent
+            ? SetPlaceAsync(parent, place, token) : Task.FromResult(false);
+    }
     /// <summary>进入选中目录只改变列表，归档通过打开命令加载。</summary>
     public Task<bool> EnterAsync(CancellationToken token = default) => SelectedItem is { IsDirectory: true } item
         ? SetPlaceAsync(item.Path, token: token) : Task.FromResult(false);
@@ -126,5 +175,25 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     public Task<bool> RefreshAsync(CancellationToken token = default) => Place is { } place
         ? SetPlaceAsync(place, SelectedItem?.Path, token, true) : Task.FromResult(false);
     /// <summary>窗口关闭取消枚举；后端晚到结果不能更新已关闭的集合。</summary>
-    public void Dispose() { _disposed = true; Interlocked.Increment(ref _revision); _request?.Cancel(); }
+    public void Dispose() { _disposed = true; Interlocked.Increment(ref _revision); _request?.Cancel(); _bookmarks?.Dispose(); if (state is not null) state.BookmarksChanged -= BookmarksChanged; }
+    /// <summary>列表重建保持原节点选择，普通目标Path只用于加载/历史，不作为别名身份。</summary>
+    private void PublishBookmarks()
+    {
+        Place = BookmarkList.ParameterPath; FolderOrder = BookmarkList.FolderOrder;
+        Items = BookmarkList.Items.Select(node => new FolderItem(node.DisplayName, BookmarkList.GetTargetPath(node), node.IsFolder) { Bookmark = node }).ToArray();
+        SelectedItem = Items.FirstOrDefault(item => ReferenceEquals(item.Bookmark, BookmarkList.SelectedItem));
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
+    /// <summary>书签事务提交/回滚后同步当前位置；阅读保存不重枚举。</summary>
+    private void BookmarksChanged(object? sender, EventArgs e)
+    {
+        if (_disposed || !IsBookmarkPlace) return;
+        if (IsLoading) _request?.Cancel();
+        BookmarkList.Refresh();
+        if (BookmarkList.FindFolder(Place!) is { } folder) BookmarkList.SetPlace(folder, SelectedItem?.Bookmark);
+        PublishBookmarks();
+    }
+    /// <summary>元数据排序的异步补齐，调用者观察错误；不打开书籍或图片。</summary>
+    public async Task RefreshBookmarkMetadataAsync(CancellationToken token = default)
+    { if (IsBookmarkPlace && await BookmarkList.LoadMetadataAsync(token)) PublishBookmarks(); }
 }

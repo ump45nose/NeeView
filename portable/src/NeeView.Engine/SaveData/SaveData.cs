@@ -65,6 +65,7 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
             config.Window = ReadBranch<WindowConfig>(raw, "Window");
             config.MenuBar = ReadBranch<MenuBarConfig>(raw, "MenuBar");
             config.Command = ReadBranch<CommandConfig>(raw, "Command");
+            config.StartUp = ReadBranch<StartUpConfig>(raw, "StartUp");
             // 原旧拼写与初期 Mac 字段只作读取别名；原新字段明确存在时优先。
             var auto = raw["AutoHide"]?.DeepClone().AsObject() ?? new JsonObject();
             if (auto["AutoHideHitTestMargin"] is { } margin)
@@ -420,7 +421,7 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
         try
         {
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "History", "Bookmark", "System", "Playlist", "AutoHide", "Window", "MenuBar", "Command" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "History", "Bookmark", "System", "Playlist", "AutoHide", "Window", "MenuBar", "Command", "StartUp" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 Merge(Object(config, branch), JsonSerializer.SerializeToNode(value, Options)!.AsObject());

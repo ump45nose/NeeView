@@ -23,6 +23,8 @@ public sealed partial class MainWindow : Window
     private Task? _shutdown;
     private CancellationTokenSource? _folders;
     private Book? _folderBook;
+    private string? _bookmarkOpenTarget;
+    private bool _restoredBookshelfHonored;
     private bool _sliderDragging;
     private bool _sliderUpdating;
     private readonly Dictionary<(object Scope, string Gesture), double> _wheelDeltas = [];
@@ -45,7 +47,7 @@ public sealed partial class MainWindow : Window
         "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
-        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkSearchBox", "ClearHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
+        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkList", "FocusBookmarkSearchBox", "ClearHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
     };
     /// <summary>由启动层接入原生事件；只消费主查看器区域，其余控件使用框架输入。</summary>
     public void AttachPlatformInput(IPlatformInput input)
@@ -112,7 +114,12 @@ public sealed partial class MainWindow : Window
         // 编辑树保留宿主表现绑定；独立列表的 DataContext 可以独立更换。
         this.FindControl<TreeView>("BookmarkTree")!.DataContext = model;
         var bookmarks = this.FindControl<BookmarkListView>("BookmarkPanelList")!;
-        bookmarks.OpenBookAsync = async node => { if (!_preparing && !_closedPrepared && node.Path is { } path) await OpenAsync(path); };
+        bookmarks.OpenBookAsync = async node =>
+        {
+            if (_preparing || _closedPrepared || node.Path is not { } path) return;
+            if (!Config.Current.Bookmark.IsSyncBookshelfEnabled) _bookmarkOpenTarget = path;
+            await OpenAsync(path);
+        };
         bookmarks.CurrentBookPath = () => model.Operation.Book?.Path;
         bookmarks.ReadMetadataAsync = model.Operation.GetFileMetadataAsync;
         bookmarks.SaveSettingsAsync = () => model.Operation.SaveAsync();
@@ -387,6 +394,7 @@ public sealed partial class MainWindow : Window
                     UpdateLayout(); var historySearch = this.FindControl<TextBox>("HistorySearchBox")!; historySearch.Focus(); historySearch.SelectAll(); break;
                 case "FocusBookmarkSearchBox":
                     _model.ShowPanel("BookmarkPanel"); this.FindControl<BookmarkListView>("BookmarkPanelList")!.FocusSearch(); break;
+                case "FocusBookmarkList": await FocusBookshelfBookmarksAsync(fromMenu); break;
                 case "OpenBookExplorer": if (_model.Operation.Book is { } source) await _platform!.RevealAsync(source.Path); break;
                 case "ToggleVisibleBookshelf": _model.SelectPanel("FolderPanel"); break;
                 case "ToggleVisiblePageList": _model.SelectPanel("PageListPanel"); break;
@@ -429,11 +437,16 @@ public sealed partial class MainWindow : Window
     {
         if (_preparing || _model is null) return;
         var book = _model.Operation.Book;
+        var restored = await _model.Operation.RestoreBookshelfAsync();
         if (book is null || ReferenceEquals(_folderBook, book)) return;
         _folderBook = book; _folders?.Cancel(); var pending = new CancellationTokenSource(); _folders = pending;
         try
         {
-            await _model.Operation.Bookshelf.SyncAsync(book, pending.Token);
+            if (restored && !_restoredBookshelfHonored && _model.Operation.Bookshelf.Place is not null) { _restoredBookshelfHonored = true; return; }
+            var preserve = _bookmarkOpenTarget == book.Path || _model.Operation.Bookshelf.IsBookmarkPlace && _model.Operation.Bookshelf.Items.Any(item => item.Path == book.Path);
+            _bookmarkOpenTarget = null;
+            if (preserve && !_model.Operation.Bookshelf.IsBookmarkPlace) return;
+            await _model.Operation.Bookshelf.SyncAsync(book, pending.Token, fileSystem: !preserve);
             if (!_preparing && !_closedPrepared) MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck);
         }
         catch (OperationCanceledException) { }
@@ -456,7 +469,7 @@ public sealed partial class MainWindow : Window
     private async void Folder_DoubleTapped(object? sender, TappedEventArgs e)
     {
         if (sender is ListBox { SelectedItem: FolderItem item })
-            try { await OpenAsync(item.Path); } catch (Exception ex) { ShowError(ex.Message); }
+            try { await OpenBookshelfItemAsync(item); } catch (Exception ex) { ShowError(ex.Message); }
     }
     /// <summary>在已有元数据上应用原排序，绑定回报和程序同步不重复重排。</summary>
     private async void FolderOrder_Changed(object? sender, SelectionChangedEventArgs e)
@@ -644,7 +657,7 @@ public sealed partial class MainWindow : Window
             {
                 e.Handled = true;
                 if (_model.SelectedFolder is { } selected)
-                    try { await OpenAsync(selected.Path); } catch (Exception ex) { ShowError(ex.Message); }
+                    try { await OpenBookshelfItemAsync(selected); } catch (Exception ex) { ShowError(ex.Message); }
                 return;
             }
             if (e.KeyModifiers == KeyModifiers.None && e.Key is Key.Up or Key.Down or Key.Left or Key.Right or Key.Home or Key.End or Key.PageUp or Key.PageDown) return;

@@ -44,8 +44,8 @@ public sealed class BookmarkListViewModel : ObservableObject, IDisposable
     [new(FolderOrder.FileName, "名称"), new(FolderOrder.FileNameDescending, "名称（降序）"),
      new(FolderOrder.Path, "路径"), new(FolderOrder.PathDescending, "路径（降序）"),
      new(FolderOrder.FileType, "类型"), new(FolderOrder.FileTypeDescending, "类型（降序）"),
-     new(FolderOrder.TimeStamp, "时间（待迁移）"), new(FolderOrder.TimeStampDescending, "时间降序（待迁移）"),
-     new(FolderOrder.Size, "大小（待迁移）"), new(FolderOrder.SizeDescending, "大小降序（待迁移）"),
+     new(FolderOrder.TimeStamp, "时间"), new(FolderOrder.TimeStampDescending, "时间（降序）"),
+     new(FolderOrder.Size, "大小"), new(FolderOrder.SizeDescending, "大小（降序）"),
      new(FolderOrder.EntryTime, "注册顺序"), new(FolderOrder.EntryTimeDescending, "注册顺序（逆序）"), new(FolderOrder.Random, "随机")];
     public BookmarkOrderChoice SelectedOrder => Orders.First(choice => choice.Mode == List.FolderOrder);
     public event EventHandler? Refreshed;
@@ -54,9 +54,14 @@ public sealed class BookmarkListViewModel : ObservableObject, IDisposable
     /// <summary>接入唯一已加载集合，只订阅书签事务回报，不因翻页保存重复重排。</summary>
     public BookmarkListViewModel(SaveData state)
     {
-        _state = state; List = new(state.Bookmarks); state.BookmarksChanged += Bookmarks_Changed;
+        _state = state; List = new(state.Bookmarks, state.FolderConfigs); state.BookmarksChanged += Bookmarks_Changed;
         state.Changed += State_Changed;
         _historyPaths = state.HistoryEntries.Select(entry => entry.Path).ToHashSet(StringComparer.Ordinal);
+        if (Config.Current.StartUp is { IsOpenLastBookmarkFolder: true, LastBookmarkFolder: { } last } && List.FindFolder(last.Path) is { } folder)
+        {
+            last.Register(state.FolderConfigs);
+            List.SetPlace(folder, folder.Children?.FirstOrDefault(node => List.GetTargetPath(node) == last.Select));
+        }
     }
     /// <summary>后台提交先回到 UI 线程；窗口已释放时忽略晚到回报。</summary>
     private void Bookmarks_Changed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() => Refresh(resetInput: false));
@@ -74,7 +79,7 @@ public sealed class BookmarkListViewModel : ObservableObject, IDisposable
     {
         if (_disposed) return;
         var hadPendingInput = _pendingSearch is not null; var place = List.Place;
-        CancelSearch(); List.Refresh(); resetInput |= !ReferenceEquals(place, List.Place);
+        CancelSearch(); List.ReadMetadataAsync = ReadMetadataAsync; List.Refresh(); resetInput |= !ReferenceEquals(place, List.Place);
         // 导航成功后的环境重置只改输入，不再次触发增量搜索或登记空历史。
         if (resetInput) { _keyword = List.SearchKeyword; SearchError = null; }
         Notify();
@@ -83,6 +88,27 @@ public sealed class BookmarkListViewModel : ObservableObject, IDisposable
         // 表现/集合变化不丢弃尚在等待的有效输入；无效草稿只重筛上一次有效表达式。
         if (!resetInput && SearchError is null && (hadPendingInput || Config.Current.System.IsIncrementalSearchEnabled)) query = Keyword.Trim();
         if (query.Length > 0 || List.SearchKeyword.Length > 0) _ = SearchCoreAsync(query, false, false, preserveDraft: !resetInput);
+        else TrackMetadata();
+    }
+
+    /// <summary>每目录排序进入原Foldres事务；保存失败恢复参数/选择，不改变全局默认。</summary>
+    public async Task ChangeOrderAsync(FolderOrder mode)
+    {
+        try { await _state.EditFolderParametersAsync(() => List.ChangeOrder(mode)); }
+        finally { List.Refresh(); Notify(); }
+        await LoadMetadataAsync();
+    }
+    /// <summary>后台补齐只重排列表；真实来源失败显示独立提示，不删除书签或改保存的排序。</summary>
+    private void TrackMetadata()
+    {
+        var task = LoadMetadataAsync(); _searches.Add(task);
+        _ = FinishAsync();
+        async Task FinishAsync() { try { await task; } finally { _searches.Remove(task); } }
+    }
+    private async Task LoadMetadataAsync()
+    {
+        try { if (await List.LoadMetadataAsync() && !_disposed && !_closing) Notify(); }
+        catch (Exception ex) { if (!_disposed && !_closing) { SearchError = "来源元数据暂不可访问：" + ex.Message; Notify(); } }
     }
 
     /// <summary>确认/失焦先登记语法有效的原历史再等待查询；逐次输入不登记。</summary>
@@ -133,6 +159,7 @@ public sealed class BookmarkListViewModel : ObservableObject, IDisposable
                 var submitted = await List.SearchAsync(keyword, _state.HistoryEntries.Select(entry => entry.Path), ReadMetadataAsync, pending.Token);
                 if (!submitted || _disposed || _closing || pending.IsCancellationRequested) return false;
                 SearchError = historyError ?? (preserveDraft ? priorError : null); Notify();
+                await LoadMetadataAsync();
                 return historyError is null;
             }
             catch (OperationCanceledException) when (pending.IsCancellationRequested) { return false; }
@@ -148,7 +175,12 @@ public sealed class BookmarkListViewModel : ObservableObject, IDisposable
     /// <summary>统一发布界面快照，搜索结果只更新列表，不请求正文资源。</summary>
     private void Notify() { if (!_disposed) { OnPropertyChanged(""); Refreshed?.Invoke(this, EventArgs.Empty); } }
     /// <summary>关闭取消并等待查询/确认历史，避免存储提前释放。</summary>
-    public async Task PrepareCloseAsync() { _closing = true; CancelSearch(); await Task.WhenAll(_searches.ToArray()); }
+    public async Task PrepareCloseAsync()
+    {
+        _closing = true; CancelSearch(); await Task.WhenAll(_searches.ToArray());
+        Config.Current.StartUp.LastBookmarkFolder = Config.Current.StartUp.IsOpenLastBookmarkFolder
+            ? BookshelfFolderMemento.Create(List.ParameterPath, List.SelectedItem is { } node ? List.GetTargetPath(node) : null, _state.FolderConfigs) : null;
+    }
     /// <summary>退出保存失败后重新允许输入。</summary>
     public void CancelClose() => _closing = false;
     /// <summary>关闭面板退订所有状态通知；唯一集合与 SaveData 继续由宿主维护。</summary>

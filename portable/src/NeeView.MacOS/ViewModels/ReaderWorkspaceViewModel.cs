@@ -29,12 +29,15 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
         get => _selectedFolder;
         set { if (SetProperty(ref _selectedFolder, value) && !_refreshingFolders) Operation.Bookshelf.Select(value); }
     }
-    public static IReadOnlyList<FolderOrderChoice> FolderOrders { get; } =
+    private static IReadOnlyList<FolderOrderChoice> NormalOrders { get; } =
     [new(FolderOrder.FileName, "文件名"), new(FolderOrder.FileNameDescending, "文件名（降序）"),
      new(FolderOrder.FileType, "类型"), new(FolderOrder.FileTypeDescending, "类型（降序）"),
      new(FolderOrder.TimeStamp, "时间"), new(FolderOrder.TimeStampDescending, "时间（降序）"),
      new(FolderOrder.Size, "大小"), new(FolderOrder.SizeDescending, "大小（降序）"), new(FolderOrder.Random, "随机")];
+    public IReadOnlyList<FolderOrderChoice> FolderOrders => Operation.Bookshelf.IsBookmarkPlace
+        ? BookmarkListViewModel.Orders.Select(e => new FolderOrderChoice(e.Mode, e.Label)).ToArray() : NormalOrders;
     public FolderOrderChoice SelectedFolderOrder => FolderOrders.First(e => e.Mode == Operation.Bookshelf.FolderOrder);
+    public bool IsBookmarkPlace => Operation.Bookshelf.IsBookmarkPlace;
     public int LastIndex => Math.Max(0, Pages.Count - 1);
     public double PageIndex => Operation.PageSelector.SelectedIndex;
     public bool SliderReversed => Operation.FilmStrip.IsSliderDirectionReversed;
@@ -131,6 +134,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
         try
         {
             OnPropertyChanged(nameof(Folders)); OnPropertyChanged(nameof(FolderPlace)); OnPropertyChanged(nameof(FolderMessage));
+            OnPropertyChanged(nameof(FolderOrders)); OnPropertyChanged(nameof(IsBookmarkPlace));
             SelectedFolder = Operation.Bookshelf.SelectedItem; OnPropertyChanged(nameof(SelectedFolderOrder));
         }
         finally { _refreshingFolders = false; }

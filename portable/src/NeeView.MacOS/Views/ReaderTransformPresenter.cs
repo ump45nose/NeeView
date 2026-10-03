@@ -37,6 +37,7 @@ internal sealed class ReaderTransformPresenter : IShareTransformContext, IDispos
         var previousFrame = Frame;
         var oldStretch = previousFrame is null ? 1 : CalcStretch(previousFrame, _lastViewport);
         var resize = _lastViewport != Viewport;
+        var firstLayout = (_lastViewport.Width <= 0 || _lastViewport.Height <= 0) && Viewport.Width > 0 && Viewport.Height > 0;
         var stretchRate = oldStretch > 0 ? Scale / oldStretch : 1;
         bool bookChanged = !ReferenceEquals(_book, book);
         if (bookChanged) { _map?.Dispose(); _map = book is null ? null : new(this); _book = book; _key = null; }
@@ -63,7 +64,8 @@ internal sealed class ReaderTransformPresenter : IShareTransformContext, IDispos
             Scale = CalcStretch(frame, Viewport) * stretchRate;
         }
         _lastViewport = Viewport;
-        return changed;
+        // 启动前打开会先收到零尺寸视口；首次真实布局必须重新定位，不能保留该临时原点。
+        return changed || firstLayout;
     }
     /// <summary>原重置清除整个书内变换图，不改变BaseScale。</summary>
     public void Reset() => _map?.Clear();

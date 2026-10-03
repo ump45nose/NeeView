@@ -101,6 +101,9 @@ public sealed partial class BookmarkListView : UserControl, IDisposable
         if (node.IsFolder) _model.List.SetPlace(node); else _model.List.Reveal(node);
         _model.Refresh(resetInput: true);
     }
+    /// <summary>普通书架转到独立面板：共享原目录/节点，保持两个列表的选择状态独立。</summary>
+    public void SetPlace(BookmarkNode folder, BookmarkNode? selected = null)
+    { if (!_disposed && !_closing && _model is not null && _model.List.SetPlace(folder, selected)) { _model.Refresh(resetInput: true); FocusSelection(); } }
     /// <summary>串行面板动作并跟踪实际任务；关闭等待已开始的动作，不接收新的输入。</summary>
     private async Task RunAsync(Func<Task> action)
     {
@@ -135,6 +138,8 @@ public sealed partial class BookmarkListView : UserControl, IDisposable
     private void Up_Click(object? sender, RoutedEventArgs e) { if (_model is not null && !_busy && !_closing) { _model.List.MoveToParent(); _model.Refresh(resetInput: true); FocusSelection(); } }
     /// <summary>同步当前书籍按原当前目录优先规则；未找到不离开当前位置。</summary>
     private void Sync_Click(object? sender, RoutedEventArgs e) { if (_model is not null && !_busy && !_closing) { _model.List.Sync(CurrentBookPath?.Invoke()); _model.Refresh(resetInput: true); FocusSelection(); } }
+    private void Refresh_Click(object? sender, RoutedEventArgs e)
+    { if (_model is not null && !_busy && !_closing) { _model.List.InvalidateMetadata(); _model.Refresh(); } }
     /// <summary>改动排序后等待既有保存；失败恢复原配置和值，允许原地重试。</summary>
     private async void Order_Changed(object? sender, SelectionChangedEventArgs e)
     {
@@ -143,9 +148,7 @@ public sealed partial class BookmarkListView : UserControl, IDisposable
         if (!choice.IsEnabled) { _model.Refresh(); return; }
         await RunAsync(async () =>
         {
-            var before = Config.Current.Bookmark.BookmarkFolderOrder;
-            try { _model.List.ChangeOrder(choice.Mode); _model.Refresh(); if (SaveSettingsAsync is { } save) await save(); }
-            catch { Config.Current.Bookmark.BookmarkFolderOrder = before; _model.Refresh(); throw; }
+            await _model.ChangeOrderAsync(choice.Mode);
         });
     }
     /// <summary>沿原更多菜单开放搜索配置；模板、书架互联与修复继续保留能力占位。</summary>
@@ -162,7 +165,8 @@ public sealed partial class BookmarkListView : UserControl, IDisposable
         var menu = new ContextMenu { ItemsSource = new Control[] { tree, count, new Separator(),
             search, recursive, incremental, keep,
             new MenuItem { Header = "Normal / Banner / Thumbnail 模板（待迁移）", IsEnabled = false },
-            new MenuItem { Header = "同步书架选项 / 路径修复 / 移除无效（待迁移）", IsEnabled = false } } };
+            SearchOption("打开书签时同步书架", Config.Current.Bookmark.IsSyncBookshelfEnabled, "sync"),
+            new MenuItem { Header = "路径修复 / 移除无效（待迁移）", IsEnabled = false } } };
         menu.Open(this.FindControl<Button>("BookmarkMore")!);
     }
 
@@ -183,6 +187,7 @@ public sealed partial class BookmarkListView : UserControl, IDisposable
             "recursive" => Config.Current.Bookmark.IsSearchIncludeSubdirectories,
             "incremental" => Config.Current.System.IsIncrementalSearchEnabled,
             "keep" => Config.Current.History.IsKeepSearchHistory,
+            "sync" => Config.Current.Bookmark.IsSyncBookshelfEnabled,
             _ => throw new ArgumentException("未知搜索配置。", nameof(option))
         };
         try { Set(value); if (SaveSettingsAsync is { } save) await save(); _model.Refresh(); }
@@ -196,6 +201,7 @@ public sealed partial class BookmarkListView : UserControl, IDisposable
                 case "recursive": Config.Current.Bookmark.IsSearchIncludeSubdirectories = enabled; break;
                 case "incremental": Config.Current.System.IsIncrementalSearchEnabled = enabled; break;
                 case "keep": Config.Current.History.IsKeepSearchHistory = enabled; break;
+                case "sync": Config.Current.Bookmark.IsSyncBookshelfEnabled = enabled; break;
             }
         }
     });

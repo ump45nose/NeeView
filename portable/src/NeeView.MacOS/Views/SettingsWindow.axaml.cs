@@ -42,6 +42,8 @@ public sealed partial class SettingsWindow : Window
         this.FindControl<CheckBox>("LimitHorizontalWheel")!.IsChecked = Config.Current.Command.IsHorizontalWheelLimitedOnce;
         this.FindControl<ComboBox>("BookshelfGroup")!.SelectedIndex = (int)Config.Current.Bookshelf.FolderSortOrder;
         this.FindControl<CheckBox>("PrioritizeBookMove")!.IsChecked = Config.Current.Book.IsPrioritizeBookMove;
+        this.FindControl<CheckBox>("OpenLastFolder")!.IsChecked = Config.Current.StartUp.IsOpenLastFolder;
+        this.FindControl<CheckBox>("OpenLastBookmarkFolder")!.IsChecked = Config.Current.StartUp.IsOpenLastBookmarkFolder;
         _historySettings = new(Config.Current.History);
         this.FindControl<ScrollViewer>("HistorySettings")!.DataContext = _historySettings;
     }
@@ -260,6 +262,8 @@ public sealed partial class SettingsWindow : Window
                 foreach (var parameter in _parameters.Values) parameter.Apply(_model.SaveData);
                 Config.Current.Bookshelf.FolderSortOrder = (FolderSortOrder)Math.Max(0, this.FindControl<ComboBox>("BookshelfGroup")!.SelectedIndex);
                 Config.Current.Book.IsPrioritizeBookMove = this.FindControl<CheckBox>("PrioritizeBookMove")!.IsChecked == true;
+                Config.Current.StartUp.IsOpenLastFolder = this.FindControl<CheckBox>("OpenLastFolder")!.IsChecked == true;
+                Config.Current.StartUp.IsOpenLastBookmarkFolder = this.FindControl<CheckBox>("OpenLastBookmarkFolder")!.IsChecked == true;
             }, _historySettings!.GetLimits());
             _saving = false; Close();
         }

@@ -57,3 +57,5 @@
 第十七批ReaderTransformPresenter独立管理原变换图和唯一矩阵，ReaderView管理资源/输入；CommandParameterEdit管理克隆草稿，CommandParameterWindow只呈现字段。设置草稿最后进入原ApplyOptionsAsync，布局/主题不实现参数算法，详见[p2-view-transform.md](p2-view-transform.md)。
 
 第十八批MainWindow.BookControls只呈现原页尾三按钮，BookOperation在回报后核对身份/代次/位置；关闭释放回调，设置页不承担页尾规则。
+
+第十九批MainWindow.BookshelfBookmarks只负责焦点/树选择/面板转交；虚拟位置和每目录排序在原BookshelfFolderList/BookmarkFolderList，元数据通过Engine后端契约。两个列表选择独立，主题不参与地址解析或保存。
