@@ -93,6 +93,7 @@ public sealed partial class MainWindow : Window
         var history = this.FindControl<ListBox>("HistoryList")!;
         history.AddHandler(PointerPressedEvent, History_Pressed, RoutingStrategies.Tunnel);
         history.AddHandler(PointerReleasedEvent, History_Released, RoutingStrategies.Bubble, handledEventsToo: true);
+        this.FindControl<TextBox>("HistorySearchBox")!.AddHandler(KeyDownEvent, HistorySearch_KeyDown, RoutingStrategies.Tunnel);
         Closing += Window_Closing;
     }
     /// <summary>由唯一启动层传入已经装配的契约，不在控件中创建解码或存储实现。</summary>
@@ -315,7 +316,7 @@ public sealed partial class MainWindow : Window
                 case "ClearHistory": if (!_model.Operation.IsLoading) await _model.SaveData.ClearHistoryAsync(); break;
                 case "FocusHistorySearchBox":
                     Config.Current.History.IsVisibleSearchBox = true; _model.RefreshHistory(); _model.ShowPanel("HistoryPanel");
-                    this.FindControl<TextBox>("HistorySearchBox")!.Focus(); break;
+                    UpdateLayout(); var historySearch = this.FindControl<TextBox>("HistorySearchBox")!; historySearch.Focus(); historySearch.SelectAll(); break;
                 case "FocusBookmarkSearchBox":
                     _model.ShowPanel("BookmarkPanel"); this.FindControl<BookmarkListView>("BookmarkPanelList")!.FocusSearch(); break;
                 case "OpenBookExplorer": if (_model.Operation.Book is { } source) await _platform!.RevealAsync(source.Path); break;
@@ -674,6 +675,7 @@ public sealed partial class MainWindow : Window
         {
             await this.FindControl<PlaylistView>("PlaylistPanelView")!.PrepareCloseAsync();
             await this.FindControl<BookmarkListView>("BookmarkPanelList")!.PrepareCloseAsync();
+            if (_model is not null) await _model.HistorySearch.PrepareCloseAsync();
             _folders?.Cancel(); _sliderDragging = false; PageNumber.CancelEdit();
             CancelBookmarkDrag();
             if (_model is not null)
@@ -695,7 +697,7 @@ public sealed partial class MainWindow : Window
         }
         finally
         {
-            if (!_closedPrepared) { this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); this.FindControl<BookmarkListView>("BookmarkPanelList")!.CancelClose(); }
+            if (!_closedPrepared) { this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); this.FindControl<BookmarkListView>("BookmarkPanelList")!.CancelClose(); _model?.HistorySearch.CancelClose(); }
             _preparing = false; _shutdown = null;
         }
     }

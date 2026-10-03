@@ -30,7 +30,7 @@
 | 文件夹页导航 | Book/BookPageCollection.GetNextFolderIndex/GetPrevFolderIndex | 原文件名升降序目录分组；组内回首项/端点停止；不冒充子书/父书打开 |
 | 侧栏拖拽组合 | SidePanels/CustomLayoutPanelManager、SidePanelViewModel、SidePanelDropAcceptor、LayoutDockPanel | 原组模型、leader 整组移动/成员拆组、分半组合及 V2 JSON 适配；Headless/真机恢复通过；浮动/旧布局导入待迁移 |
 | 历史/书签 | Bookamrk/BookmarkCollection.cs、BookMemento、HistoryCollection | 原 JSON 树字段/顺序保留；访问排序、共享状态与原移动/递归合并/确认/颜色/删除恢复接入；完整导航/修复/原Popup宿主待迁，见p2-bookmark-operations.md |
-| 历史列表导航/管理 | HistoryList、HistoryListViewModel、HistoryListBox、BookHistoryCollection | 原过滤后前后规则、KeepHistoryOrder/SkipSamePlace、日期/四开关、单或双击、批次移除和全部清空；搜索语法/样式/无效清理待迁 |
+| 历史列表导航/管理 | HistoryList、HistoryListViewModel、HistoryListBox、BookHistoryCollection | 原过滤后前后规则、KeepHistoryOrder/SkipSamePlace、日期/四开关、单或双击、批次移除和全部清空；搜索语法/表达式历史由第十二批接入；样式/无效清理待迁 |
 | 原五区自动隐藏与显示锁 | MainWindowModel/Controller/ViewModel、AutoHideBehavior、MainWindow.xaml.cs | 原资格、覆盖插槽、内容余量、滑条/胶片条联动、延迟/边缘/焦点/弹出层/捕获及显示锁；Mac焦点适配，见p2-autohide.md |
 | 全屏与置顶 | 原WindowConfig/窗口控制命令 | Mac实际WindowState/Topmost；全屏取消恢复上一普通/最大化状态，FullDesktop等占位 |
 | 旧Profile/nvzip | SaveData | 待 P5，完整旧迁移规则待迁入 |
@@ -38,3 +38,5 @@
 [235条命令迁移表](command-migration.md) 与源码 manifest 一致，每条单独标记状态，不用命令数量计算功能覆盖率。[源码迁入表](source-migration.json) 区分完整算法与P1子集。
 
 P2第十一批原书签查询对照：固定依赖gitlink的原解析器/匹配测试迁入，保留Default/Date/Size/Book Profiles、名称匹配、递归范围、父级局部索引注册排序与有效语法确认即登记历史。日期/大小探测采用现有后台来源能力，原访问历史成员单独更新；未将简单Contains当作原搜索。见[p2-bookmark-search.md](p2-bookmark-search.md)和独立静默验收记录，Windows动态样本待验。
+
+P2第十二批历史查询对照：原BookHistory.GetValue使用书名/LastAccessTime/真实文件大小/书签成员/恒真历史标志；原HistoryList逐项SearcherFilter与当前直接父目录过滤的先后保留。有效确认先登记BookHistorySearchHistory，坏语法/来源失败保持旧结果，未将书签树规则或路径Contains替代历史搜索。见[p2-history-search.md](p2-history-search.md)。

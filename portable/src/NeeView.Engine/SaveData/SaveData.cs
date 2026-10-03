@@ -19,7 +19,9 @@ public sealed class SaveData(string directory)
     public bool CanRestoreBookmarks => _removedBookmarks.Any(e => BookmarkRoot.Walk().Contains(e.Parent));
     public IReadOnlyList<HistoryEntry> HistoryEntries { get; private set; } = [];
     public HistoryStringCollection BookmarkSearchHistory { get; } = new();
+    public HistoryStringCollection BookHistorySearchHistory { get; } = new();
     public event EventHandler? BookmarkSearchHistoryChanged;
+    public event EventHandler? BookHistorySearchHistoryChanged;
     public event EventHandler? Changed;
     /// <summary>仅书签编辑提交或回滚后回报；阅读进度保存不触发书签列表重排。</summary>
     public event EventHandler? BookmarksChanged;
@@ -81,28 +83,45 @@ public sealed class SaveData(string directory)
         Playlists = new(config.Playlist);
         Config.SetCurrent(config);
         BookmarkSearchHistory.Replace(_history["BookmarkSearchHistory"]?.Deserialize<string[]>(Options));
+        BookHistorySearchHistory.Replace(_history["BookHistorySearchHistory"]?.Deserialize<string[]>(Options));
     }
 
     /// <summary>原书签搜索历史追加/删除；复用三文件事务，失败恢复同一集合供重试。</summary>
     /// <param name="keyword">已规范化的有效关键字；空白不登记。</param>
     /// <param name="remove">删除指定历史，而非追加至首位。</param><param name="token">窗口关闭或调用方取消。</param>
-    public async Task EditBookmarkSearchHistoryAsync(string keyword, bool remove = false, CancellationToken token = default)
+    public Task EditBookmarkSearchHistoryAsync(string keyword, bool remove = false, CancellationToken token = default) =>
+        EditSearchHistoryAsync(BookmarkSearchHistory, keyword, remove, token, () => BookmarkSearchHistoryChanged?.Invoke(this, EventArgs.Empty));
+
+    /// <summary>编辑原BookHistorySearchHistory；与书签表达式历史独立，使用同一可靠保存事务。</summary>
+    /// <param name="keyword">已Trim的有效表达式。</param><param name="remove">删除指定表达式。</param><param name="token">排队/保存取消。</param>
+    public Task EditBookHistorySearchHistoryAsync(string keyword, bool remove = false, CancellationToken token = default) =>
+        EditSearchHistoryAsync(BookHistorySearchHistory, keyword, remove, token, () => BookHistorySearchHistoryChanged?.Invoke(this, EventArgs.Empty));
+
+    /// <summary>共用原字符串历史的追加/删除及原地回滚，避免复制第二套事务。</summary>
+    /// <param name="history">本次模块的原集合。</param><param name="keyword">非空表达式。</param><param name="remove">删除开关。</param>
+    /// <param name="token">等待与保存取消。</param><param name="notify">提交或回滚后的模块通知。</param>
+    private async Task EditSearchHistoryAsync(HistoryStringCollection history, string keyword, bool remove, CancellationToken token, Action notify)
     {
         if (string.IsNullOrWhiteSpace(keyword)) return;
         await _gate.WaitAsync(token);
-        var previous = BookmarkSearchHistory.ToArray(); var raw = _history.DeepClone().AsObject();
+        var previous = history.ToArray(); var raw = _history.DeepClone().AsObject();
         try
         {
-            if (remove) BookmarkSearchHistory.Remove(keyword); else BookmarkSearchHistory.Append(keyword);
-            WriteBookmarkSearchHistory(); await WritePairAsync(token);
+            if (remove) history.Remove(keyword); else history.Append(keyword);
+            WriteSearchHistories(); await WritePairAsync(token);
         }
-        catch { _history = raw; BookmarkSearchHistory.Replace(previous); throw; }
-        finally { _gate.Release(); BookmarkSearchHistoryChanged?.Invoke(this, EventArgs.Empty); }
+        catch { _history = raw; history.Replace(previous); throw; }
+        finally { _gate.Release(); notify(); }
     }
 
-    /// <summary>沿原 History.IsKeepSearchHistory 控制已迁书签历史；其他模块未知字段保留。</summary>
-    private void WriteBookmarkSearchHistory() => _history["BookmarkSearchHistory"] = Config.Current.History.IsKeepSearchHistory && BookmarkSearchHistory.Count > 0
-        ? JsonSerializer.SerializeToNode(BookmarkSearchHistory, Options) : null;
+    /// <summary>沿原统一保存开关写入已迁两组历史；未迁书架/页面历史及未知字段保留。</summary>
+    private void WriteSearchHistories()
+    {
+        _history["BookmarkSearchHistory"] = Config.Current.History.IsKeepSearchHistory && BookmarkSearchHistory.Count > 0
+            ? JsonSerializer.SerializeToNode(BookmarkSearchHistory, Options) : null;
+        _history["BookHistorySearchHistory"] = Config.Current.History.IsKeepSearchHistory && BookHistorySearchHistory.Count > 0
+            ? JsonSerializer.SerializeToNode(BookHistorySearchHistory, Options) : null;
+    }
 
     /// <summary>按原 Path/Page/Props 恢复；Page 是条目名，不是数字页码。</summary>
     public (BookMemento? Memento, int Part) Find(string path)
@@ -385,7 +404,7 @@ public sealed class SaveData(string directory)
             // 保留原 Format；新文件使用原名称和版本结构，避免添加另一套存储格式。
             _setting["Format"] ??= JsonValue.Create("NeeView.UserSetting/46.3.0");
             _history["Format"] ??= JsonValue.Create("NeeView.History/46.3.0");
-            WriteBookmarkSearchHistory();
+            WriteSearchHistories();
             await WritePairAsync(token);
             RefreshHistory();
         }
@@ -497,5 +516,5 @@ public sealed class SaveData(string directory)
 /// <summary>原 History.Items 的只读投影；位置仍为条目名，路径是书籍定位。</summary>
 public sealed record HistoryEntry(string Path, string? Page, DateTime LastAccessTime)
 {
-    public string Name => System.IO.Path.GetFileName(Path.TrimEnd(System.IO.Path.DirectorySeparatorChar));
+    public string Name => LoosePath.GetFileName(Path);
 }

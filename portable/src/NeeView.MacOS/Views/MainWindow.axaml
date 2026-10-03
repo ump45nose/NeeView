@@ -43,17 +43,23 @@
       <Border Tag="PageListPanel">          <ListBox x:Name="PageList"  ItemsSource="{Binding Pages}" SelectedItem="{Binding SelectedPage}" SelectionChanged="Page_SelectionChanged">
             <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding EntryName}" TextTrimming="CharacterEllipsis" /></DataTemplate></ListBox.ItemTemplate>
           </ListBox></Border>
-      <Border Tag="HistoryPanel">          <Grid RowDefinitions="Auto,Auto,*,Auto">
+      <Border Tag="HistoryPanel">          <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
             <Grid ColumnDefinitions="*,Auto" Margin="8,4">
               <TextBlock Text="{Binding HistoryPlace}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip.Tip="{Binding HistoryPlace}" />
               <Button x:Name="HistoryMoreButton" Grid.Column="1" Content="⋯" Click="History_More" ToolTip.Tip="历史列表菜单" />
             </Grid>
-            <TextBox x:Name="HistorySearchBox" Grid.Row="1" Text="{Binding HistorySearch}" IsVisible="{Binding HistorySearchVisible}" PlaceholderText="搜索历史" Margin="8,0,8,4" />
-            <ListBox x:Name="HistoryList" Grid.Row="2" Focusable="True" ItemsSource="{Binding History}" SelectionMode="Multiple" SelectedItem="{Binding SelectedHistory, Mode=TwoWay}" DoubleTapped="History_DoubleTapped" KeyDown="History_KeyDown">
+            <!-- 结构/主题仅消费独立搜索表现，不在控件中解析查询或读取来源。 -->
+            <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" IsVisible="{Binding HistorySearchVisible}" Margin="8,0,8,4">
+              <TextBox x:Name="HistorySearchBox" Text="{Binding HistorySearch.Keyword, Mode=TwoWay}" LostFocus="HistorySearch_LostFocus" PlaceholderText="搜索历史" />
+              <Button Grid.Column="1" Content="×" Click="HistorySearch_Clear" ToolTip.Tip="清空搜索" Padding="6,0" />
+              <Button x:Name="HistorySearchHistoryButton" Grid.Column="2" Content="▾" Click="HistorySearch_History" ToolTip.Tip="搜索历史" Padding="6,0" />
+            </Grid>
+            <TextBlock x:Name="HistorySearchError" Grid.Row="2" Text="{Binding HistorySearch.Error}" TextWrapping="Wrap" Margin="8,0" FontSize="10" Foreground="#D9957C" />
+            <ListBox x:Name="HistoryList" Grid.Row="3" Focusable="True" ItemsSource="{Binding History}" SelectionMode="Multiple" SelectedItem="{Binding SelectedHistory, Mode=TwoWay}" DoubleTapped="History_DoubleTapped" KeyDown="History_KeyDown">
               <ListBox.ContextMenu><ContextMenu Opening="History_ContextOpening"><MenuItem Header="打开书籍" Click="History_Open" /><Separator /><MenuItem Header="移除所选历史记录" Click="History_Remove" /></ContextMenu></ListBox.ContextMenu>
               <ListBox.ItemTemplate><DataTemplate><StackPanel ToolTip.Tip="{Binding Path}"><TextBlock Text="{Binding GroupHeader}" IsVisible="{Binding HasGroupHeader}" FontWeight="SemiBold" Margin="0,6,0,4" /><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" /><TextBlock Text="{Binding Page}" FontSize="10" Opacity="0.6" /></StackPanel></DataTemplate></ListBox.ItemTemplate>
             </ListBox>
-            <TextBlock Grid.Row="3" Text="{Binding HistoryCount}" IsVisible="{Binding HistoryCountVisible}" Margin="8,4" FontSize="10" Opacity="0.7" />
+            <TextBlock Grid.Row="4" Text="{Binding HistoryCount}" IsVisible="{Binding HistoryCountVisible}" Margin="8,4" FontSize="10" Opacity="0.7" />
           </Grid></Border>
       <Border Tag="FileInformationPanel"><ScrollViewer><TextBlock Text="{Binding Information}" TextWrapping="Wrap" Margin="10" /></ScrollViewer></Border>
       <Border Tag="BookmarkPanel">          <Grid RowDefinitions="Auto,*,Auto">

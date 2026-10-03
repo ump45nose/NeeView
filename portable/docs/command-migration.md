@@ -2,7 +2,7 @@
 
 固定基线 235 个实例；数量是登记清单，不代表功能覆盖率。当前包含 P1 与 P2 十一批增量，阶段标记仅说明执行入口已接入，完整参数/手势及交互范围见验收记录。未迁入命令保留原菜单节点、键位和参数，禁用占位。原复杂手势可以原样保存，不意味着其执行已迁入。
 
-第七批底部直接页号进入既有JumpAsync；第八批接通原全局播放列表与页标记；第九批接通自动隐藏和窗口显示控制；第十/十一批接通书签列表导航和结构化搜索焦点。已支持入口仍以具体模块契约和验收表为准，不能把登记数视为完整功能覆盖率。
+第七批底部直接页号进入既有JumpAsync；第八批接通原全局播放列表与页标记；第九批接通自动隐藏和窗口显示控制；第十/十一批接通书签导航和结构化搜索；第十二批接通历史结构化搜索与原焦点全选。已支持入口仍以具体模块契约和验收表为准，不能把登记数视为完整功能覆盖率。
 
 | 原命令 | 文案 | 默认输入 | 当前实现 | 原出处 |
 |---|---|---|---|---|
@@ -87,7 +87,7 @@
 | FocusFolderSearchBox | 聚焦到书架搜索框 |  | 待 P2–P5 | NeeView/Command/Commands/FocusFolderSearchBoxCommand.cs |
 | FocusBookmarkSearchBox | 聚焦到书签搜索框 |  | P2 原书签搜索焦点；范围见第十一批 | NeeView/Command/Commands/FocusBookmarkSearchBoxCommand.cs |
 | FocusPageListSearchBox | 聚焦到页面列表搜索框 |  | 待 P2–P5 | NeeView/Command/Commands/FocusPageListSearchBoxCommand.cs |
-| FocusHistorySearchBox | 聚焦到历史记录搜索框 |  | P2 原历史面板焦点；具体范围见验收表 | NeeView/Command/Commands/FocusHistorySearchBoxCommand.cs |
+| FocusHistorySearchBox | 聚焦到历史记录搜索框 |  | P2 原历史搜索聚焦/全选；范围见第十二批 | NeeView/Command/Commands/FocusHistorySearchBoxCommand.cs |
 | FocusBookmarkList | 显示书签 |  | 待 P2：书架书签位置/目录树互联 | NeeView/Command/Commands/FocusBookmarkListCommand.cs |
 | FocusMainView | 聚焦到主视图 |  | 待 P2–P5 | NeeView/Command/Commands/FocusMainViewCommand.cs |
 | ToggleVisibleFilmStrip | 显示/隐藏幻灯条 |  | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleFilmStripCommand.cs |

@@ -399,7 +399,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             if (_playlistHub is not null) await _playlistHub.FlushAsync();
             await SaveAsync();
             if (Book is not null) await Book.DisposeAsync();
-            _bookshelf?.Dispose();
+            _bookshelf?.Dispose(); HistoryList.Dispose();
             if (_playlistHub is not null) _playlistHub.Changed -= Playlist_Changed;
             Book = null; Frame = null; _disposed = true;
         }

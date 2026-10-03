@@ -43,3 +43,5 @@
 后续检查遵循[静默优先验证流程](validation-workflow.md)：常规构建/Headless后台执行，真实焦点/键鼠与系统窗口验收单独安排，不改变产品焦点行为来制造测试通过。
 
 第十一批的搜索输入/清空/历史下拉/错误布局在 BookmarkListView.axaml(.cs)，输入草稿和任务表现由独立 BookmarkListViewModel 管理。原 Profile/匹配/递归在 Engine.SearchBookmarkFolderCollection 和 BookmarkFolderList，历史事务在 SaveData；控件不读取目录或用户JSON。稳定命令 FocusBookmarkSearchBox 只显示并聚焦本面板，搜索框 Enter/数字/Delete 与阅读键路由隔离。详见[p2-bookmark-search.md](p2-bookmark-search.md)。
+
+第十二批历史搜索输入、清空、历史菜单和错误区域在MainWindow.axaml/MainWindow.History，草稿、确认、500ms合并及取消由独立HistorySearchViewModel管理。窗口表现只转交已提交列表，不在UI执行匹配或I/O；前后历史导航使用同一Engine.HistoryList结果。切换增量取消未确认输入，保存失败回滚菜单选项。详见[p2-history-search.md](p2-history-search.md)。

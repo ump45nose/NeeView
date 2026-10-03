@@ -8,7 +8,7 @@ Engine.HistoryList 计算只读过滤列表、前后目标及日期分组名；S
 
 ## 契约、状态与资源生命周期
 
-- GetViewItems 按原访问时间倒序，IsCurrentFolder 仅匹配当前书籍的直接父目录，不递归；无当前书时显示全部。普通文本搜索沿用当前路径子串能力，原 Date/Size/Book 搜索语法尚未迁入。
+- GetViewItems 按原访问时间倒序，IsCurrentFolder 仅匹配当前书籍的直接父目录，不递归；无当前书时显示全部。原路径子串子集已由第十二批替换为名称/Date/Size/Book结构化查询，见[p2-history-search.md](p2-history-search.md)。
 - GetTarget(-1) 是较旧项，GetTarget(1) 是较新项；当前书不在筛选序列时，后退选择首项、前进无目标，首尾不循环。目标使用原 Path，不按数组下标持久化。
 - OpenHistoryAsync 使用 KeepHistoryOrder/SkipSamePlace。当前书不重复加载；成功恢复原 Page 条目与 Props；失败保留旧书，目标仍可重试。PrevHistory/NextHistory 使用此过滤序列，不替代 PrevHistoryPage/NextHistoryPage 和 PrevBookHistory/NextBookHistory 的进程游标。
 - RemoveHistoryAsync 对选中路径精确比较，多选先复制批次；ClearHistoryAsync 清空全部访问条目，不受显示过滤限制。源图片、压缩包、书签、搜索历史和未知根字段保留。
@@ -39,4 +39,4 @@ History 配置仅迁入 IsGroupBy/IsCurrentFolder/IsVisibleItemsCount/IsVisibleS
 
 ## 未迁移与扩展点
 
-无效历史清理暂不启用，不能用 File.Exists 的 false 将断线 NAS/权限问题误判为应删除记录；后续接入原 ArchiveEntryUtility 的可靠存在检查与有界后台任务。ClearHistoryInPlace 依赖书架查询位置，继续占位。完整结构化搜索/搜索历史交互、四种显示模板/缩略图、原保留策略/自动清理和动态日期跨日回报后续迁入。页标记依赖播放列表，书签查询与书架互联、直接页号文本框（已有 JumpPage 对话框）、真实子书/父书、完整输入及自动隐藏仍是后续目标。
+无效历史清理暂不启用，不能用 File.Exists 的 false 将断线 NAS/权限问题误判为应删除记录；后续接入原 ArchiveEntryUtility 的可靠存在检查与有界后台任务。ClearHistoryInPlace 依赖书架查询位置，继续占位。结构化搜索/搜索历史由第十二批接入；四种显示模板/缩略图、原保留策略/自动清理和动态日期跨日回报后续迁入。页标记依赖播放列表，书签查询与书架互联、直接页号文本框（已有 JumpPage 对话框）、真实子书/父书、完整输入及自动隐藏仍是后续目标。

@@ -29,8 +29,8 @@ public sealed class HistoryListTests
         Assert.Null(list.GetTarget(1)); Assert.Equal("/comics/old.cbz", list.GetTarget(-1)!.Path);
         list.Address = "/comics/old.cbz"; Assert.Null(list.GetTarget(-1)); Assert.Equal("/comics/new.cbz", list.GetTarget(1)!.Path);
         list.Address = "/comics/missing.cbz"; Assert.Equal("/comics/new.cbz", list.GetTarget(-1)!.Path); Assert.Null(list.GetTarget(1));
-        list.SearchKeyword = "OLD"; Assert.Equal("/comics/old.cbz", Assert.Single(list.GetViewItems()).Path);
-        Config.Current.History.IsCurrentFolder = false; list.SearchKeyword = ""; Assert.Equal(4, list.GetViewItems().Count);
+        await list.SearchAsync("OLD", token: TestContext.Current.CancellationToken); Assert.Equal("/comics/old.cbz", Assert.Single(list.GetViewItems()).Path);
+        Config.Current.History.IsCurrentFolder = false; await list.SearchAsync("", token: TestContext.Current.CancellationToken); Assert.Equal(4, list.GetViewItems().Count);
         var today = new DateTime(2026, 10, 3);
         Assert.Equal("今天", HistoryList.GetGroupName(today.AddHours(23), today)); Assert.Equal("昨天", HistoryList.GetGroupName(today.AddDays(-1), today));
         Assert.NotEqual("昨天", HistoryList.GetGroupName(today.AddDays(-2), today));
@@ -164,7 +164,7 @@ public sealed class HistoryListTests
             var refreshes = 0; model.Refreshed += (_, _) => refreshes++;
             var more = window.FindControl<Button>("HistoryMoreButton")!; more.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             var menu = more.ContextMenu!; var items = menu.Items.OfType<MenuItem>().ToArray();
-            Assert.Equal(10, items.Length); Assert.All(items.Take(4), item => Assert.False(item.IsEnabled)); Assert.False(items[8].IsEnabled);
+            Assert.Equal(12, items.Length); Assert.All(items.Take(4), item => Assert.False(item.IsEnabled)); Assert.False(items.Single(item => item.Header?.ToString()?.StartsWith("移除无效历史记录") == true).IsEnabled);
             items[4].RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)); Dispatcher.UIThread.RunJobs(); menu.Close();
             Assert.True(Config.Current.History.IsGroupBy); Assert.Equal(0, refreshes); Assert.True(model.History[0].HasGroupHeader);
             window.UpdateLayout();

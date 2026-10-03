@@ -487,13 +487,13 @@
       "source": "NeeView/SidePanels/History/HistoryList.cs",
       "target": "src/NeeView.Engine/SidePanels/History/HistoryList.cs",
       "sha256": "d03256719e12ae1f3b11462a0c8a25e52b2e58cc2518e4daedadb21b176bce49",
-      "status": "原直接父目录过滤、日期分组、过滤后前后列表目标；WPF集合视图移到表现，结构化搜索待迁"
+      "status": "原直接父目录/日期分组/过滤后导航及原结构化搜索；后台快照与取消，语法/来源失败保留旧结果"
     },
     {
       "source": "NeeView/BookHistory/BookHistoryCollection.cs",
       "target": "src/NeeView.Engine/SaveData/SaveData.cs",
       "sha256": "addd035b3f7540da5b0851c2b79fbef2bbf880518c39bf553c75f654342fbece",
-      "status": "原Remove/Clear集合行为适配现有JSON事务；当前记录移除后位置保存不重新登记，显式新访问才恢复；无效清理/保留限制待迁"
+      "status": "原Remove/Clear、BookmarkSearchHistory/BookHistorySearchHistory适配既有三JSON事务；失败原地回滚；保留限制/无效清理待迁"
     },
     {
       "source": "NeeView/SidePanels/History/HistoryListViewModel.cs",
@@ -781,7 +781,7 @@
       "source": "NeeView/SidePanels/Bookshelf/FolderList/BookSearchProfile.cs",
       "target": "src/NeeView.Engine/Search/BookSearchProfile.cs",
       "sha256": "663ad74ea670909d080ae4157c73e5a682d3a5c2e7998e0e1851578bb41183c8",
-      "status": "只迁入原书签实际注册的Book Profile，保留/bookmark和/history"
+      "status": "保留原/bookmark和/history；书签/历史共用原Default/Date/Size/Book Profile组合"
     },
     {
       "source": "NeeView/SearchBox/SearchBoxModel.cs",
@@ -806,6 +806,36 @@
       "target": "src/NeeView.Engine/Search/SearchBookmarkFolderCollection.cs",
       "sha256": "7ec942452dd647877dad8c873ad99a107ce67cc5362ad275fe29c7c12ae7cb32",
       "status": "原五属性GetValue：名称、文件时间/大小、是否书籍书签、真实访问历史"
+    },
+    {
+      "source": "NeeView/BookHistory/BookHistory.cs",
+      "target": "src/NeeView.Engine/Search/SearchHistoryCollection.cs",
+      "sha256": "b7a5d98ddcb1aac82e534d7e65babbfe4c90d23e9323736919aa660c945ca9e3",
+      "status": "原GetValue：名称/访问日期/真实大小/书签/历史；大小后台按需探测，目录与缺失-1"
+    },
+    {
+      "source": "NeeView/SidePanels/History/HistoryList.cs",
+      "target": "src/NeeView.Engine/Search/SearchHistoryCollection.cs",
+      "sha256": "d03256719e12ae1f3b11462a0c8a25e52b2e58cc2518e4daedadb21b176bce49",
+      "status": "原SearcherFilter逐项布尔判断顺序迁入；不采用书签Union语义"
+    },
+    {
+      "source": "NeeView/Archiver/LoosePath.cs",
+      "target": "src/NeeView.Engine/Archiver/LoosePath.cs",
+      "sha256": "eea5d96dcd0ef6f3c52112a5fffc451219e57510ee823d6ee9891379719856d5",
+      "status": "原GetDirectoryName/GetFileName子集；明确盘符/UNC按原双分隔符解析，Mac合法反斜杠保留；不代替P5路径映射"
+    },
+    {
+      "source": "NeeView/SearchBox/SearchBoxModel.cs",
+      "target": "src/NeeView.MacOS/ViewModels/HistorySearchViewModel.cs",
+      "sha256": "109910eabd7cbf0e2d42621256587f0b9cb6aacad2b52e8f6a8d192f78ef8986",
+      "status": "原Trim/Analyze/增量/确认历史流程与独立草稿表现；可等待保存/取消适配"
+    },
+    {
+      "source": "NeeView/SearchBox/SearchBox.xaml.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.History.cs",
+      "sha256": "ee2f137957702284ce90f06e9226be47235015ca5a2d701f240ec321ce4eb14f",
+      "status": "原Enter/失焦确认与500ms输入合并；真实文本作用域与关闭等待适配"
     }
   ],
   "rule_references": [
@@ -948,6 +978,18 @@
       "target": "src/NeeView.MacOS/Views/BookmarkListView.axaml",
       "sha256": "d93e2cfa905c52e76fecca341eb5217f3d457470a9a0d5c9650d4ac00e5bb66b",
       "status": "原搜索输入/清空/历史/错误反馈区域转换；不复刻WPF模板"
+    },
+    {
+      "source": "NeeView/SidePanels/History/HistoryListView.xaml",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml",
+      "sha256": "48e4faf94d59b365ce0202825a688d4720947d334e8c906bf1237e5820d9b771",
+      "status": "原历史搜索输入/清空/历史/错误区域转换，正文和原面板插槽保持"
+    },
+    {
+      "source": "NeeView/SearchBox/SearchBox.xaml",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml",
+      "sha256": "d93e2cfa905c52e76fecca341eb5217f3d457470a9a0d5c9650d4ac00e5bb66b",
+      "status": "原历史搜索输入/清空/历史/错误区域转换，正文和原面板插槽保持"
     }
   ],
   "backend_reuse": [

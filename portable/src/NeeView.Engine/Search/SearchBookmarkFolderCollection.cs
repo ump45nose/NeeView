@@ -6,7 +6,7 @@ namespace NeeView;
 public static class SearchBookmarkFolderCollection
 {
     /// <summary>创建原书签 Profile；缓存只属于单次请求，避免常驻字符串无限累积。</summary>
-    public static Searcher CreateSearcher() => new(new SearchContext().AddProfile(new DateSearchProfile()).AddProfile(new SizeSearchProfile()).AddProfile(new BookSearchProfile()));
+    public static Searcher CreateSearcher() => BookSearchProfile.CreateSearcher();
 
     /// <summary>先解析有效语法，错误抛出；不使用原 Search(string) 的异常返回全量路径。</summary>
     /// <param name="keyword">搜索框 Trim 后的原表达式。</param><returns>原解析器的查询键。</returns>

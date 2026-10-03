@@ -10,6 +10,36 @@ namespace NeeView.MacOS.Views;
 public sealed partial class MainWindow
 {
     private HistoryRow? _historyClickRow;
+    /// <summary>Enter确认历史查询，数字/Delete/Backspace仍属于文本作用域。</summary>
+    private async void HistorySearch_KeyDown(object? sender, KeyEventArgs e)
+    { if (e.Key == Key.Enter && e.KeyModifiers == KeyModifiers.None) { e.Handled = true; await SearchHistoryAsync(); } }
+    /// <summary>原失焦确认语义；正常关闭不登记未确认的草稿。</summary>
+    private async void HistorySearch_LostFocus(object? sender, RoutedEventArgs e) => await SearchHistoryAsync();
+    /// <summary>统一可等待搜索入口；错误在独立模型展示，不打开当前选中项。</summary>
+    /// <param name="recordHistory">Enter/失焦确认true，后台重筛false。</param>
+    public async Task SearchHistoryAsync(bool recordHistory = true)
+    { if (_model is not null && !_preparing && !_closedPrepared) await _model.HistorySearch.SearchAsync(recordHistory); }
+    /// <summary>清空输入，增量关闭时沿原规则等待确认，不额外清空访问记录。</summary>
+    private void HistorySearch_Clear(object? sender, RoutedEventArgs e)
+    { if (_model is not null && !_preparing && !_closedPrepared) { _model.HistorySearch.Keyword = ""; this.FindControl<TextBox>("HistorySearchBox")!.Focus(); } }
+    /// <summary>原表达式历史选择/单项删除；菜单仅消费表现集合，保存经原事务完成。</summary>
+    private void HistorySearch_History(object? sender, RoutedEventArgs e)
+    {
+        if (_model is null || _preparing || _closedPrepared || sender is not Button button) return;
+        var model = _model.HistorySearch; var menu = new ContextMenu();
+        foreach (var keyword in model.History.ToArray())
+        {
+            var delete = new Button { Content = "×", Padding = new Thickness(4, 0) }; ToolTip.SetTip(delete, "删除搜索历史");
+            var row = new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 6,
+                Children = { new TextBlock { Text = keyword, MaxWidth = 190, TextTrimming = Avalonia.Media.TextTrimming.CharacterEllipsis }, delete } };
+            var item = new MenuItem { Header = row };
+            item.Click += async (_, _) => { if (_preparing || _closedPrepared) return; model.Keyword = keyword; await SearchHistoryAsync(); };
+            delete.Click += async (_, args) => { args.Handled = true; menu.Close(); await model.RemoveHistoryAsync(keyword); };
+            menu.Items.Add(item);
+        }
+        if (menu.Items.Count == 0) menu.Items.Add(new MenuItem { Header = "无搜索历史", IsEnabled = false });
+        button.ContextMenu = menu; menu.Open(button);
+    }
     /// <summary>导航面板刷新只更新命令边界，不请求正文资源。</summary>
     private void History_Refreshed(object? sender, EventArgs e)
     { if (!_preparing && !_closedPrepared) RefreshHistoryCommandStates(); }
@@ -111,6 +141,8 @@ public sealed partial class MainWindow
         menu.Items.Add(new Separator());
         AddToggle("显示项目数", Config.Current.History.IsVisibleItemsCount, value => Config.Current.History.IsVisibleItemsCount = value);
         AddToggle("显示搜索框", Config.Current.History.IsVisibleSearchBox, value => Config.Current.History.IsVisibleSearchBox = value);
+        AddToggle("逐次搜索", Config.Current.System.IsIncrementalSearchEnabled, value => Config.Current.System.IsIncrementalSearchEnabled = value);
+        AddToggle("保存搜索历史", Config.Current.History.IsKeepSearchHistory, value => Config.Current.History.IsKeepSearchHistory = value);
         menu.Items.Add(new Separator());
         menu.Items.Add(new MenuItem { Header = "移除无效历史记录 · 尚未迁移", IsEnabled = false });
         var clear = new MenuItem { Header = "清空全部历史记录…", IsEnabled = _model.SaveData.HistoryEntries.Count > 0 };
@@ -129,7 +161,8 @@ public sealed partial class MainWindow
             {
                 if (_preparing || _closedPrepared) return;
                 set(!current); _model.RefreshHistory();
-                try { await _model.Operation.SaveAsync(); } catch (Exception ex) { ShowError(ex.Message); }
+                try { await _model.Operation.SaveAsync(); }
+                catch (Exception ex) { set(current); _model.RefreshHistory(); ShowError(ex.Message); }
             };
             menu.Items.Add(item);
         }

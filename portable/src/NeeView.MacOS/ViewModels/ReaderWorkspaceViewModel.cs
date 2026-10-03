@@ -82,7 +82,8 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public bool ShowPlaylist => IsPanelVisible("PlaylistPanel");
     /// <summary>跨栏后按实际组选择与栏显隐计算面板状态。</summary>
     public bool IsPanelVisible(string name) => Layout.Find(name) is { } found && ReferenceEquals(Layout.Docks[found.Side].SelectedItem, found.Group) && (found.Side == "Left" ? LeftVisible : RightVisible);
-    public string HistorySearch { get => Operation.HistoryList.SearchKeyword; set { if (value == HistorySearch) return; Operation.HistoryList.SearchKeyword = value; OnPropertyChanged(); RefreshHistory(); } }
+    public HistorySearchViewModel HistorySearch { get; } = new(saveData, operation.HistoryList) { ReadMetadataAsync = operation.GetFileMetadataAsync };
+    private bool _historySearchAttached;
     private IReadOnlyList<HistoryRow> _historyRows = [];
     public IReadOnlyList<HistoryRow> History => _historyRows;
     private HistoryRow? _selectedHistory;
@@ -90,7 +91,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public bool HistorySearchVisible => Config.Current.History.IsVisibleSearchBox;
     public bool HistoryCountVisible => Config.Current.History.IsVisibleItemsCount;
     public string HistoryPlace => Operation.HistoryList.FilterPath ?? "全部历史记录";
-    public string HistoryCount => $"{History.Count} / {SaveData.HistoryEntries.Count} 项";
+    public string HistoryCount => HistorySearch.IsSearching ? "搜索中…" : $"{History.Count} / {SaveData.HistoryEntries.Count} 项";
     private Book? _historyBook;
     public event EventHandler? HistoryRefreshed;
     public IReadOnlyList<BookmarkNode> Bookmarks => SaveData.BookmarkRoot.Children ?? [];
@@ -114,9 +115,11 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public event EventHandler? PanelsRefreshed;
 
     /// <summary>装配业务订阅；后台回报统一切 UI 线程。</summary>
-    public void Attach() { Layout.Changed += Layout_Changed; Operation.Changed += Operation_Changed; Operation.MarkersChanged += Markers_Changed; Operation.PageSelector.SelectionChanged += Selection_Changed; Operation.Bookshelf.Changed += Bookshelf_Changed; SaveData.Changed += SaveData_Changed; Refresh(); RefreshFolders(); }
+    public void Attach() { _historySearchAttached = true; HistorySearch.Refreshed += HistorySearch_Refreshed; Layout.Changed += Layout_Changed; Operation.Changed += Operation_Changed; Operation.MarkersChanged += Markers_Changed; Operation.PageSelector.SelectionChanged += Selection_Changed; Operation.Bookshelf.Changed += Bookshelf_Changed; SaveData.Changed += SaveData_Changed; Refresh(); RefreshFolders(); }
     /// <summary>关闭窗口时解除订阅，避免旧窗口收到新书变化。</summary>
-    public void Detach() { Layout.Changed -= Layout_Changed; Operation.Changed -= Operation_Changed; Operation.MarkersChanged -= Markers_Changed; Operation.PageSelector.SelectionChanged -= Selection_Changed; Operation.Bookshelf.Changed -= Bookshelf_Changed; SaveData.Changed -= SaveData_Changed; }
+    public void Detach() { _historySearchAttached = false; HistorySearch.Refreshed -= HistorySearch_Refreshed; HistorySearch.Dispose(); Layout.Changed -= Layout_Changed; Operation.Changed -= Operation_Changed; Operation.MarkersChanged -= Markers_Changed; Operation.PageSelector.SelectionChanged -= Selection_Changed; Operation.Bookshelf.Changed -= Bookshelf_Changed; SaveData.Changed -= SaveData_Changed; }
+    /// <summary>搜索只刷新导航面板，排队通知在旧窗口退订后丢弃。</summary>
+    private void HistorySearch_Refreshed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() => { if (_historySearchAttached) RefreshHistory(); });
     /// <summary>全局列表编辑只更新标记绑定，不发布正文 Refreshed。</summary>
     private void Markers_Changed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() => { OnPropertyChanged(nameof(MarkerIndices)); OnPropertyChanged(nameof(IsPlaylistMarked)); });
     /// <summary>目录回报只更新书架表现，不触发正文或缩略图加载。</summary>
@@ -157,9 +160,10 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
         // 先替换列表来源，再恢复选择；反向顺序会被 ListBox 的 TwoWay 清空回报覆盖。
         OnPropertyChanged(""); SelectedPage = Operation.Book?.CurrentPage; RefreshHistory(); Refreshed?.Invoke(this, EventArgs.Empty);
     }
-    /// <summary>复用未变化的历史展示行，保留列表选择；分组与筛选不刷新正文或读取文件。</summary>
+    /// <summary>复用未变化的历史展示行，保留选择；必要查询由独立模型交给后台，不刷新正文。</summary>
     public void RefreshHistory()
     {
+        HistorySearch.RefreshEnvironment();
         var selectedPath = !ReferenceEquals(_historyBook, Operation.Book) ? Operation.Book?.Path : SelectedHistory?.Path;
         _historyBook = Operation.Book;
         var old = _historyRows.GroupBy(row => row.Path, StringComparer.Ordinal).ToDictionary(group => group.Key, group => group.First(), StringComparer.Ordinal);
