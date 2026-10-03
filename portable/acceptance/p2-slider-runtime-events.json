@@ -1,0 +1,161 @@
+{
+  "date": "2026-10-03",
+  "device": "macOS ARM64",
+  "events": [
+    {
+      "name": "p2-slider-initial",
+      "ax": "p2-slider-initial.ax.txt",
+      "screenshot": null,
+      "build": "slider-initial",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-enter-five",
+      "ax": "p2-slider-enter-five.ax.txt",
+      "screenshot": "p2-slider-enter-five.png",
+      "build": "slider-initial",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-escape-two",
+      "ax": "p2-slider-escape-two.ax.txt",
+      "screenshot": "p2-slider-escape-two.png",
+      "build": "slider-initial",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-invalid-keeps-two",
+      "ax": "p2-slider-invalid-keeps-two.ax.txt",
+      "screenshot": null,
+      "build": "slider-initial",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-zero-to-first",
+      "ax": "p2-slider-zero-to-first.ax.txt",
+      "screenshot": null,
+      "build": "slider-initial",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-large-to-last",
+      "ax": "p2-slider-large-to-last.ax.txt",
+      "screenshot": null,
+      "build": "slider-initial",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-blur-three",
+      "ax": "p2-slider-blur-three.ax.txt",
+      "screenshot": null,
+      "build": "slider-initial",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-chinese-path-input-failed",
+      "ax": "p2-slider-chinese-path-input-failed.ax.txt",
+      "screenshot": null,
+      "build": "slider-initial",
+      "kind": "tool-input-exploration"
+    },
+    {
+      "name": "p2-slider-open-chinese-zip",
+      "ax": "p2-slider-open-chinese-zip.ax.txt",
+      "screenshot": null,
+      "build": "slider-initial",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-zip-four",
+      "ax": "p2-slider-zip-four.ax.txt",
+      "screenshot": "p2-slider-zip-four.png",
+      "build": "slider-initial",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-double-mode",
+      "ax": "p2-slider-double-mode.ax.txt",
+      "screenshot": null,
+      "build": "slider-initial",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-double-raw-two",
+      "ax": "p2-slider-double-raw-two.ax.txt",
+      "screenshot": "p2-slider-double-raw-two.png",
+      "build": "slider-initial",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-settings-cancel-right",
+      "ax": "p2-slider-settings-cancel-right.ax.txt",
+      "screenshot": null,
+      "build": "slider-initial",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-final-thin-left",
+      "ax": "p2-slider-final-thin-left.ax.txt",
+      "screenshot": "p2-slider-final-thin-left.png",
+      "build": "slider-theme-final",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-final-settings-selected",
+      "ax": "p2-slider-final-settings-selected.ax.txt",
+      "screenshot": "p2-slider-final-settings-selected.png",
+      "build": "slider-theme-final",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-final-left-opacity-rtl",
+      "ax": "p2-slider-final-left-opacity-rtl.ax.txt",
+      "screenshot": "p2-slider-final-left-opacity-rtl.png",
+      "build": "slider-theme-final",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-final-rtl-number-three",
+      "ax": "p2-slider-final-rtl-number-three.ax.txt",
+      "screenshot": "p2-slider-final-rtl-number-three.png",
+      "build": "slider-theme-final",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-final-number-none",
+      "ax": "p2-slider-final-number-none.ax.txt",
+      "screenshot": "p2-slider-final-number-none.png",
+      "build": "slider-theme-final",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-final-disabled",
+      "ax": "p2-slider-final-disabled.ax.txt",
+      "screenshot": "p2-slider-final-disabled.png",
+      "build": "slider-theme-final",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-final-enabled-left",
+      "ax": "p2-slider-final-enabled-left.ax.txt",
+      "screenshot": "p2-slider-final-enabled-left.png",
+      "build": "slider-theme-final",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-final-restart-preserved",
+      "ax": "p2-slider-final-restart-preserved.ax.txt",
+      "screenshot": "p2-slider-final-restart-preserved.png",
+      "build": "slider-theme-final",
+      "kind": "runtime-observation"
+    },
+    {
+      "name": "p2-slider-final-user-restored",
+      "ax": "p2-slider-final-user-restored.ax.txt",
+      "screenshot": "p2-slider-final-user-restored.png",
+      "build": "slider-theme-final",
+      "kind": "runtime-observation"
+    }
+  ],
+  "scope": "首次版本覆盖输入/中文ZIP/双页/取消；最终主题版本重点复测15DIP滑块、表现设置、反向视觉、数字输入、隐藏开关、重启及用户状态还原。"
+}

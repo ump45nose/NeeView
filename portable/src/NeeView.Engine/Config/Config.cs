@@ -36,12 +36,25 @@ public sealed class FilmStripConfig
 }
 public enum FilmStripMouseWheelAction { MoveSelection, MovePage, CommandDependent }
 public enum SliderDirection { LeftToRight, RightToLeft, SyncBookReadDirection }
+/// <summary>沿用原滑条页号位置枚举，JSON 数值顺序保持 None/Left/Right。</summary>
+public enum SliderIndexLayout { None, Left, Right }
+/// <summary>原滑条滚轮动作：直接移动正文帧或交由原命令绑定。</summary>
+public enum SliderMouseWheelAction { MovePage, CommandDependent }
 /// <summary>原滑条选择/方向/轮滚字段；其他原字段由 JSON 合并保留。</summary>
 public sealed class SliderConfig
 {
+    public bool IsEnabled { get; set; } = true;
+    public SliderIndexLayout SliderIndexLayout { get; set; } = SliderIndexLayout.Right;
+    private double _thickness = 25;
+    /// <summary>原厚度范围 15–50 DIP；拒绝非有限配置，按原精度舍入。</summary>
+    public double Thickness { get => _thickness; set => _thickness = double.IsFinite(value) ? Math.Round(Math.Clamp(value, 15, 50), 5) : 25; }
+    private double _opacity = 1;
+    /// <summary>保存原透明度字段；显示端限制到合法范围，避免损坏配置影响窗口。</summary>
+    public double Opacity { get => _opacity; set => _opacity = double.IsFinite(value) ? Math.Round(value, 5) : 1; }
     public SliderDirection SliderDirection { get; set; } = SliderDirection.SyncBookReadDirection;
     public bool IsSliderLinkedFilmStrip { get; set; } = true;
     public bool IsSyncPageMode { get; set; }
+    public SliderMouseWheelAction MouseWheelAction { get; set; }
 }
 
 /// <summary>来自原 BookConfig 的分页参数及默认值。</summary>

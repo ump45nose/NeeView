@@ -36,11 +36,17 @@
         <TextBlock Text="胶片条滚轮动作" /><ComboBox x:Name="FilmWheel"><ComboBoxItem Content="移动选择（点击或 Enter 确认）" /><ComboBoxItem Content="移动正文页" /><ComboBoxItem Content="使用命令绑定" /></ComboBox>
         <TextBlock Text="胶片条与滑条方向" /><ComboBox x:Name="SliderOrder"><ComboBoxItem Content="从左向右" /><ComboBoxItem Content="从右向左" /><ComboBoxItem Content="跟随书籍阅读方向" /></ComboBox>
         <CheckBox x:Name="SliderLinked" Content="滑条与胶片条联动（拖动预览，释放确认）" /><CheckBox x:Name="SliderSync" Content="滑条步进跟随页面模式" />
+        <CheckBox x:Name="SliderEnabled" Content="显示页面滑条" />
+        <TextBlock Text="滑条页号位置（点击页号可直接编辑）" /><ComboBox x:Name="SliderIndexLayout"><ComboBoxItem Content="不显示" /><ComboBoxItem Content="左侧" /><ComboBoxItem Content="右侧" /></ComboBox>
+        <TextBlock Text="滑条厚度（DIP，15–50）" /><NumericUpDown x:Name="SliderThickness" Minimum="15" Maximum="50" Increment="1" FormatString="0.#####" />
+        <TextBlock Text="滑条不透明度（0–1）" /><NumericUpDown x:Name="SliderOpacity" Minimum="0" Maximum="1" Increment="0.05" FormatString="0.#####" />
+        <TextBlock Text="滑条滚轮动作" /><ComboBox x:Name="SliderWheel"><ComboBoxItem Content="移动正文页" /><ComboBoxItem Content="使用命令绑定" /></ComboBox>
+        <CheckBox Content="滑条自动隐藏（后续迁移）" IsEnabled="False" /><CheckBox Content="显示播放列表标记（后续迁移）" IsEnabled="False" />
         <TextBlock Text="指定页数步进（上一方向、下一方向共用）" /><NumericUpDown x:Name="MoveSize" Minimum="0" Maximum="1000" Increment="1" FormatString="0" />
       </StackPanel>
     </ScrollViewer>
     <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="16" Spacing="8">
-      <TextBlock x:Name="Message" TextWrapping="Wrap" MaxWidth="560" VerticalAlignment="Center" /><Button Content="取消" Click="Cancel_Click" /><Button Content="保存" Click="Save_Click" />
+      <TextBlock x:Name="Message" TextWrapping="Wrap" MaxWidth="560" VerticalAlignment="Center" /><Button x:Name="CancelSettings" Content="取消" Click="Cancel_Click" /><Button x:Name="SaveSettings" Content="保存" Click="Save_Click" />
     </StackPanel>
   </Grid>
 </Window>

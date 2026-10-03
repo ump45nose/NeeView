@@ -1,0 +1,152 @@
+Window: "选项", App: NeeView.
+0 standard window 选项, Secondary Actions: Raise
+	1 container WindowChrome, ID: AvaloniaWindowChrome
+	2 container
+		3 container
+			4 container
+				5 text field (disabled) Help: 完整设置搜索在 P2–P5 迁移, Placeholder: 搜索设置
+					6 container
+						7 container
+							8 scroll area (disabled) PART_ScrollViewer
+								9 container
+									10 container
+										11 text Value: 搜索设置, ID: PART_Placeholder
+				12 content list
+					13 scroll area PART_ScrollViewer
+						14 container
+							15 container
+								16 row (selectable) 书籍 / 阅读
+									17 text 书籍 / 阅读
+								18 row (selectable) 命令 / 键鼠
+									19 text 命令 / 键鼠
+								20 row (selected) 胶片条 / 滑条
+									21 text 胶片条 / 滑条
+								22 row (selectable, disabled) 图像效果（P5）
+									23 text 图像效果（P5）
+								24 row (selectable, disabled) 导入旧配置（P5）
+									25 text 导入旧配置（P5）
+			26 scroll area FilmSettings
+				27 container
+					28 container
+						29 text 胶片条 / 滑条
+						30 checkbox 显示胶片条, Value: on, ID: FilmEnabled
+							31 container RootGrid
+								32 container
+									33 container
+						34 checkbox 自动隐藏胶片条, Value: off, ID: FilmHide
+							35 container RootGrid
+								36 container
+									37 container
+						38 text 缩略图宽度（DIP，最低 32）
+						39 stepper (settable, float) Value: 128, ID: FilmWidth
+							40 container
+								41 container PART_SpinnerPanel
+									42 button Avalonia.Controls.PathIcon, ID: PART_IncreaseButton
+									43 button Avalonia.Controls.PathIcon, ID: PART_DecreaseButton
+								44 text field (settable) Value: 128, ID: PART_TextBox
+									45 container
+										46 container
+											47 scroll area PART_ScrollViewer
+												48 container
+						49 checkbox 显示页码, Value: on, ID: FilmNumber
+							50 container RootGrid
+								51 container
+									52 container
+						53 checkbox 所选图片居中（首尾保留空白）, Value: on, ID: FilmCenter
+							54 container RootGrid
+								55 container
+									56 container
+						57 checkbox 悬停显示页面详情, Value: on, ID: FilmDetail
+							58 container RootGrid
+								59 container
+									60 container
+						61 text 胶片条滚轮动作
+						62 pop up button Value: 移动选择（点击或 Enter 确认）, ID: FilmWheel
+							63 container
+								64 text 移动选择（点击或 Enter 确认）
+								65 unknown PART_Popup
+						66 text 胶片条与滑条方向
+						67 pop up button Value: 跟随书籍阅读方向, ID: SliderOrder
+							68 container
+								69 text 跟随书籍阅读方向
+								70 unknown PART_Popup
+						71 checkbox 滑条与胶片条联动（拖动预览，释放确认）, Value: on, ID: SliderLinked
+							72 container RootGrid
+								73 container
+									74 container
+						75 checkbox 滑条步进跟随页面模式, Value: off, ID: SliderSync
+							76 container RootGrid
+								77 container
+									78 container
+						79 checkbox 显示页面滑条, Value: on, ID: SliderEnabled
+							80 container RootGrid
+								81 container
+									82 container
+						83 text 滑条页号位置（点击页号可直接编辑）
+						84 pop up button Value: 左侧, ID: SliderIndexLayout
+							85 container
+								86 text 左侧
+								87 unknown PART_Popup
+						88 text 滑条厚度（DIP，15–50）
+						89 stepper (settable, float) Value: 37, ID: SliderThickness
+							90 container
+								91 container PART_SpinnerPanel
+									92 button Avalonia.Controls.PathIcon, ID: PART_IncreaseButton
+									93 button Avalonia.Controls.PathIcon, ID: PART_DecreaseButton
+								94 text field (settable) Value: 37, ID: PART_TextBox
+									95 container
+										96 container
+											97 scroll area PART_ScrollViewer
+												98 container
+						99 text 滑条不透明度（0–1）
+						100 stepper (settable, float) Value: 0.65, ID: SliderOpacity
+							101 container
+								102 container PART_SpinnerPanel
+									103 button Avalonia.Controls.PathIcon, ID: PART_IncreaseButton
+									104 button Avalonia.Controls.PathIcon, ID: PART_DecreaseButton
+								105 text field (settable) Value: 0.65, ID: PART_TextBox
+									106 container
+										107 container
+											108 scroll area PART_ScrollViewer
+												109 container
+						110 text 滑条滚轮动作
+						111 pop up button Value: 移动正文页, ID: SliderWheel
+							112 container
+								113 text 移动正文页
+								114 unknown PART_Popup
+						115 checkbox (disabled) 滑条自动隐藏（后续迁移）, Value: off
+							116 container RootGrid
+								117 container
+									118 container
+						119 checkbox (disabled) 显示播放列表标记（后续迁移）, Value: off
+							120 container RootGrid
+								121 container
+									122 container
+						123 text 指定页数步进（上一方向、下一方向共用）
+						124 stepper (settable, float) Value: 2, ID: MoveSize
+							125 container
+								126 container PART_SpinnerPanel
+									127 button Avalonia.Controls.PathIcon, ID: PART_IncreaseButton
+									128 button Avalonia.Controls.PathIcon, ID: PART_DecreaseButton
+								129 text field (settable) Value: 2, ID: PART_TextBox
+									130 container
+										131 container
+											132 scroll area PART_ScrollViewer
+												133 container
+					134 scroll bar (settable, float) Value: 1, ID: PART_VerticalScrollBar
+						135 container
+							136 button Line up, ID: PART_LineUpButton
+							137 button Page up, ID: PART_PageUpButton
+							138 button Page down, ID: PART_PageDownButton
+							139 handle Position
+							140 button Line down, ID: PART_LineDownButton
+			141 text Message
+			142 button 取消, ID: CancelSettings
+			143 button 保存, ID: SaveSettings
+	144 close button
+	145 zoom button
+	146 text 选项
+147 menu bar
+	148 NeeView
+
+The focused UI element is 67 pop up button Value: 跟随书籍阅读方向, ID: SliderOrder

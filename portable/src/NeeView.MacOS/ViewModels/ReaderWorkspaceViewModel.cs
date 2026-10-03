@@ -38,6 +38,12 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public int LastIndex => Math.Max(0, Pages.Count - 1);
     public double PageIndex => Operation.PageSelector.SelectedIndex;
     public bool SliderReversed => Operation.FilmStrip.IsSliderDirectionReversed;
+    public object? SliderSource => Operation.Book;
+    public bool SliderVisible => Config.Current.Slider.IsEnabled && Pages.Count > 0;
+    public bool SliderNumberVisible => Config.Current.Slider.SliderIndexLayout != SliderIndexLayout.None;
+    public int SliderNumberColumn => Config.Current.Slider.SliderIndexLayout == SliderIndexLayout.Left ? 0 : 2;
+    public double SliderThickness => Config.Current.Slider.Thickness;
+    public double SliderOpacity => Math.Clamp(Config.Current.Slider.Opacity, 0, 1);
     public double FilmStripHeight => Config.Current.FilmStrip.ImageWidth + 16;
     public string PositionText => Pages.Count == 0 ? "0 / 0" : $"{PageIndex + 1} / {Pages.Count}";
     public bool IsLoading => Operation.IsLoading;
@@ -112,7 +118,11 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     private void Selection_Changed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(RefreshSelection);
     /// <summary>配置改变时同步方向和选择表现，前端设置不重新扫描来源。</summary>
     public void RefreshSelection()
-    { OnPropertyChanged(nameof(PageIndex)); OnPropertyChanged(nameof(PositionText)); OnPropertyChanged(nameof(SliderReversed)); OnPropertyChanged(nameof(FilmStripHeight)); }
+    {
+        OnPropertyChanged(nameof(PageIndex)); OnPropertyChanged(nameof(PositionText)); OnPropertyChanged(nameof(SliderReversed)); OnPropertyChanged(nameof(FilmStripHeight));
+        OnPropertyChanged(nameof(SliderVisible)); OnPropertyChanged(nameof(SliderNumberVisible)); OnPropertyChanged(nameof(SliderNumberColumn));
+        OnPropertyChanged(nameof(SliderThickness)); OnPropertyChanged(nameof(SliderOpacity));
+    }
     /// <summary>历史与书签回报只更新导航面板，不重新解码当前帧。</summary>
     private void SaveData_Changed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() =>
     {

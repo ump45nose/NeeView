@@ -62,6 +62,16 @@ public sealed partial class SettingsWindow : Window
         setting.IsSupportedSingleFirstPage = this.FindControl<CheckBox>("First")!.IsChecked == true;
         setting.IsSupportedSingleLastPage = this.FindControl<CheckBox>("Last")!.IsChecked == true;
     }
+    /// <summary>只调整胶片条/滑条时不重建原正文帧，保持表现设置与阅读规则分离。</summary>
+    /// <param name="setting">当前书籍真实阅读设置。</param>
+    /// <returns>表单内任一已迁入阅读字段是否改变。</returns>
+    private bool HasReadingChanges(BookSettingConfig setting) =>
+        (int)setting.PageMode != this.FindControl<ComboBox>("Mode")!.SelectedIndex ||
+        (int)setting.BookReadOrder != this.FindControl<ComboBox>("Order")!.SelectedIndex ||
+        setting.IsSupportedDividePage != (this.FindControl<CheckBox>("Divide")!.IsChecked == true) ||
+        setting.IsSupportedWidePage != (this.FindControl<CheckBox>("Wide")!.IsChecked == true) ||
+        setting.IsSupportedSingleFirstPage != (this.FindControl<CheckBox>("First")!.IsChecked == true) ||
+        setting.IsSupportedSingleLastPage != (this.FindControl<CheckBox>("Last")!.IsChecked == true);
     /// <summary>读取原胶片条、滑条及共享步长参数到编辑控件，取消不修改配置。</summary>
     private void FillFilm()
     {
@@ -71,6 +81,11 @@ public sealed partial class SettingsWindow : Window
         this.FindControl<NumericUpDown>("FilmWidth")!.Value = (decimal)Math.Min(film.ImageWidth, (double)decimal.MaxValue / 2);
         this.FindControl<ComboBox>("FilmWheel")!.SelectedIndex = (int)film.MouseWheelAction;
         this.FindControl<ComboBox>("SliderOrder")!.SelectedIndex = (int)slider.SliderDirection;
+        this.FindControl<CheckBox>("SliderEnabled")!.IsChecked = slider.IsEnabled;
+        this.FindControl<ComboBox>("SliderIndexLayout")!.SelectedIndex = (int)slider.SliderIndexLayout;
+        this.FindControl<NumericUpDown>("SliderThickness")!.Value = (decimal)slider.Thickness;
+        this.FindControl<NumericUpDown>("SliderOpacity")!.Value = (decimal)Math.Clamp(slider.Opacity, 0, 1);
+        this.FindControl<ComboBox>("SliderWheel")!.SelectedIndex = (int)slider.MouseWheelAction;
         this.FindControl<NumericUpDown>("MoveSize")!.Value = _model!.SaveData.GetMoveSizeParameter().Size;
     }
     /// <summary>只写当前已迁入字段；播放列表标记、全局自动隐藏等原字段保持原值。</summary>
@@ -87,6 +102,11 @@ public sealed partial class SettingsWindow : Window
         slider.SliderDirection = (SliderDirection)Math.Max(0, this.FindControl<ComboBox>("SliderOrder")!.SelectedIndex);
         slider.IsSliderLinkedFilmStrip = this.FindControl<CheckBox>("SliderLinked")!.IsChecked == true;
         slider.IsSyncPageMode = this.FindControl<CheckBox>("SliderSync")!.IsChecked == true;
+        slider.IsEnabled = this.FindControl<CheckBox>("SliderEnabled")!.IsChecked == true;
+        slider.SliderIndexLayout = (SliderIndexLayout)Math.Max(0, this.FindControl<ComboBox>("SliderIndexLayout")!.SelectedIndex);
+        slider.Thickness = (double)(this.FindControl<NumericUpDown>("SliderThickness")!.Value ?? 25);
+        slider.Opacity = (double)(this.FindControl<NumericUpDown>("SliderOpacity")!.Value ?? 1);
+        slider.MouseWheelAction = (SliderMouseWheelAction)Math.Max(0, this.FindControl<ComboBox>("SliderWheel")!.SelectedIndex);
         var size = (int)(this.FindControl<NumericUpDown>("MoveSize")!.Value ?? 10);
         if (size != _model!.SaveData.GetMoveSizeParameter().Size) _model.SaveData.SetCommandParameter("PrevSizePage", new MoveSizePageCommandParameter { Size = size });
     }
@@ -98,7 +118,8 @@ public sealed partial class SettingsWindow : Window
         {
             ValidateInputs(_inputs);
             if (this.FindControl<ComboBox>("Scope")!.SelectedIndex == 1) Apply(Config.Current.BookSettingDefault);
-            else if (_model.Operation.Book is not null) await _model.Operation.ApplySettingAsync(Apply);
+            else if (_model.Operation.Book is { } book)
+            { if (HasReadingChanges(book.Setting)) await _model.Operation.ApplySettingAsync(Apply); }
             else Apply(Config.Current.BookSetting);
             // 只写用户修改的差分，避免一次保存就展开全部 235 条默认命令。
             foreach (var input in _inputs.Where(i => i.Value.Trim() != i.OriginalValue.Trim())) _model.SaveData.SetShortcut(input.Name, input.Value.Trim());

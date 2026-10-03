@@ -26,11 +26,13 @@ public sealed partial class MainWindow : Window
     private bool _sliderDragging;
     private bool _sliderUpdating;
     private double _wheel;
+    private double _sliderWheel;
     private double _leftWidth, _rightWidth;
     private SidePanelPresenter? _sidePanels;
     public ReaderView Viewer => this.FindControl<ReaderView>("MainViewSocket")!;
     private ThumbnailView FilmStrip => this.FindControl<ThumbnailView>("DockFilmStripSocket")!;
     private ThumbnailView NavigatorView => this.FindControl<ThumbnailView>("Navigator")!;
+    private SliderTextBox PageNumber => this.FindControl<SliderTextBox>("PageNumberView")!;
     private static readonly HashSet<string> HostCommands = new(StringComparer.Ordinal)
     {
         "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen",
@@ -77,6 +79,9 @@ public sealed partial class MainWindow : Window
         var slider = this.FindControl<Slider>("PageSliderView")!;
         slider.AddHandler(PointerPressedEvent, Slider_Pressed, RoutingStrategies.Tunnel);
         slider.AddHandler(PointerReleasedEvent, Slider_Released, RoutingStrategies.Tunnel, handledEventsToo: true);
+        slider.AddHandler(PointerWheelChangedEvent, Slider_Wheel, RoutingStrategies.Tunnel, handledEventsToo: true);
+        PageNumber.ReturnFocusRequested += (_, _) => Viewer.Focus();
+        PageNumber.NavigationFailed += (_, ex) => ShowError(ex.Message);
         AttachBookmarkInput();
         // 历史列表模板会消费按下事件；隧道记录命中行，释放按原单/双击配置打开。
         var history = this.FindControl<ListBox>("HistoryList")!;
@@ -98,6 +103,13 @@ public sealed partial class MainWindow : Window
         FilmStrip.FrameMoveRequested += async (_, direction) => { try { await model.Operation.MoveAsync(direction); } catch (Exception ex) { ShowError(ex.Message); } };
         FilmStrip.GlobalWheelRequested += FilmStrip_GlobalWheel;
         NavigatorView.NavigateRequested += (_, point) => Viewer.Navigate(point);
+        PageNumber.RequestPageAsync = async (source, index) =>
+        {
+            if (_preparing || _closedPrepared || !ReferenceEquals(source, model.Operation.Book)) return;
+            // 原 SelectedIndexRaw 绕过滑块的双页对齐；互斥内再次核对来源，避免旧输入跳新书。
+            await model.Operation.JumpAsync(index, expectedBook: source as Book);
+            if (!_preparing && !_closedPrepared) model.RefreshSelection();
+        };
         BuildMenus();
     }
     /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
@@ -430,6 +442,17 @@ public sealed partial class MainWindow : Window
         if (!_sliderDragging) return; _sliderDragging = false;
         try { await CommitSliderAsync(); } catch (Exception ex) { ShowError(ex.Message); }
     }
+    /// <summary>原滑条滚轮默认直接移动正文帧，命令模式复用键鼠绑定入口。</summary>
+    private async void Slider_Wheel(object? sender, PointerWheelEventArgs e)
+    {
+        e.Handled = true;
+        if (_model is null || _preparing || _closedPrepared) return;
+        if (Config.Current.Slider.MouseWheelAction == SliderMouseWheelAction.CommandDependent)
+        { FilmStrip_GlobalWheel(sender, e); return; }
+        _sliderWheel += e.Delta.Y; var steps = (int)_sliderWheel; _sliderWheel -= steps;
+        try { for (int i = 0; i < Math.Abs(steps); i++) await _model.Operation.MoveAsync(steps > 0 ? -1 : 1); }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
     /// <summary>使用原双页对齐规则改变临时选择；未联动时立即定位。</summary>
     public async Task PreviewSliderAsync(int index)
     {
@@ -524,7 +547,7 @@ public sealed partial class MainWindow : Window
         if (e.KeyModifiers.HasFlag(KeyModifiers.Meta)) modifiers.Add("Meta");
         if (e.KeyModifiers.HasFlag(KeyModifiers.Alt)) modifiers.Add("Alt");
         if (e.KeyModifiers.HasFlag(KeyModifiers.Shift)) modifiers.Add("Shift");
-        var buttons = e.GetCurrentPoint(FilmStrip).Properties;
+        var buttons = e.GetCurrentPoint(sender as Control ?? FilmStrip).Properties;
         if (buttons.IsLeftButtonPressed) modifiers.Add("LeftButton");
         if (buttons.IsRightButtonPressed) modifiers.Add("RightButton");
         if (buttons.IsMiddleButtonPressed) modifiers.Add("MiddleButton");
@@ -576,7 +599,7 @@ public sealed partial class MainWindow : Window
         _preparing = true;
         try
         {
-            _folders?.Cancel(); _sliderDragging = false;
+            _folders?.Cancel(); _sliderDragging = false; PageNumber.CancelEdit();
             CancelBookmarkDrag();
             if (_model is not null)
             {

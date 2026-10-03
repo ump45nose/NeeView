@@ -373,7 +373,7 @@
       "source": "NeeView/Config/SliderConfig.cs",
       "target": "src/NeeView.Engine/Config/Config.cs",
       "sha256": "51b0dff55ddb4cb7b3c0f465d45c80562497b2a40a2a65a4fec1fb4951de47fb",
-      "status": "迁入原SliderDirection/IsSliderLinkedFilmStrip/IsSyncPageMode；其他配置原JSON合并保留"
+      "status": "原方向/联动/双页同步及第七批显示、页号位置、厚度、透明度、滚轮字段；自动隐藏/播放列表字段继续原JSON保留"
     },
     {
       "source": "NeeView/Command/CommandParameters/MoveSizePageCommandParameter.cs",
@@ -536,6 +536,30 @@
       "target": "src/NeeView.Engine/BookOperation/BookOperation.cs",
       "sha256": "4d33119203989d72ff6cebf6b8a29caa10c054db0f8d704ebd2cb605918760b6",
       "status": "第六批真机修复：显式BookMemento优先于历史与普通恢复策略；保留页位置/设置/排序种子，不等同完整BookHub迁入"
+    },
+    {
+      "source": "NeeView/PageSelect/PageSlider/SliderTextBox.cs",
+      "target": "src/NeeView.MacOS/Views/SliderTextBox.axaml.cs",
+      "sha256": "85059e03a6976efabf1c4571c82508110e280ac1f9d239d0ba162d6260b78e41",
+      "status": "第七批原点击/获焦编辑、Enter/失焦提交、Escape转正文、数字转换及单页滚轮；异步来源校验与NaN拒绝为Mac适配"
+    },
+    {
+      "source": "NeeView/PageSelect/PageSlider/PageSliderViewModel.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml.cs",
+      "sha256": "0e9c073b62deeb795c650d887823c60c62725f16624c08539b8adfadfffef6bb",
+      "status": "第七批原滑条滚轮MovePage/CommandDependent及页号位置/显示；不含全局自动隐藏和播放列表"
+    },
+    {
+      "source": "NeeView/Setting/SettingPageSlider.cs",
+      "target": "src/NeeView.MacOS/Views/SettingsWindow.axaml.cs",
+      "sha256": "6c8f4993bb36e46e45c96b742837e26e6c856a52a86cf88b24a34114f506aace",
+      "status": "第七批原厚度/透明度/页号位置/轮滚与现有方向/同步字段；前端设置不重建正文"
+    },
+    {
+      "source": "NeeView/PageSelect/PageSlider/SliderIndexLayout.cs",
+      "target": "src/NeeView.Engine/Config/Config.cs",
+      "sha256": "3aa61a3d5865b6bce60f46efde33f80e80ef041350127817797dff7726df3571",
+      "status": "保留原None/Left/Right枚举顺序与JSON数值，移除UI文案注解"
     }
   ],
   "rule_references": [
@@ -642,6 +666,18 @@
       "target": "src/NeeView.MacOS/Views/BookmarkRegistrationWindow.axaml",
       "sha256": "f2cb312106eec18cbbb60968275e2c5c8d5ff90260d3097233fa1897e857b8f8",
       "status": "第五批转换名称/文件夹/完成-添加-移除布局；当前独立模态宿主，原标签、折叠树和地址栏Popup定位待迁"
+    },
+    {
+      "source": "NeeView/PageSelect/PageSlider/PageSliderView.xaml",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml",
+      "sha256": "bd0c1f84eafda5910e1b61ff0150ba1f1ab0d1b4049fa86cbea5037f4ec02dc0",
+      "status": "第七批原滑条与可编辑页号左右位置，标记层/自动隐藏仍待迁移"
+    },
+    {
+      "source": "NeeView/Styles/Generic.xaml",
+      "target": "src/NeeView.MacOS/Views/SliderTextBox.axaml",
+      "sha256": "9099adb3861fde633778f272223e9c0a876e49cdb73ebc03c1a7d7326dd3d602",
+      "status": "第七批仅SliderTextBox显示/编辑模板，独立XAML与主题，不等同完整Generic迁入"
     }
   ],
   "backend_reuse": [

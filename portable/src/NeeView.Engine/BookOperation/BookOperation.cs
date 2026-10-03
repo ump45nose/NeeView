@@ -176,16 +176,19 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
     }
 
     /// <summary>按条目索引定位，最后一页反向生成，保留原首尾页行为。</summary>
-    public async Task JumpAsync(int index, bool backwards = false)
-    { await JumpCoreAsync(index, backwards, true); }
+    /// <param name="index">原书籍排序后的零起始索引。</param>
+    /// <param name="backwards">是否按反向入口生成目标帧。</param>
+    /// <param name="expectedBook">可选输入来源；排队期间切书时拒绝旧控件的定位。</param>
+    public async Task JumpAsync(int index, bool backwards = false, Book? expectedBook = null)
+    { await JumpCoreAsync(index, backwards, true, expectedBook); }
 
     /// <summary>共用定位；历史重放不再追加自身，否则会截断原前进分支。</summary>
-    private async Task<bool> JumpCoreAsync(int index, bool backwards, bool recordHistory)
+    private async Task<bool> JumpCoreAsync(int index, bool backwards, bool recordHistory, Book? expectedBook = null)
     {
         await _gate.WaitAsync();
         try
         {
-            if (_disposed || _closing || Book is null || Book.Pages.Count == 0 || IsLoading) return false;
+            if (_disposed || _closing || Book is null || Book.Pages.Count == 0 || IsLoading || expectedBook is not null && !ReferenceEquals(expectedBook, Book)) return false;
             var generation = _generation; index = Math.Clamp(index, 0, Book.Pages.Count - 1);
             await ProbeAroundAsync(Book, index, CancellationToken.None);
             if (_disposed || _closing || generation != _generation) return false;

@@ -8,6 +8,7 @@
 | 颜色、图标路径 | Styles/NeeViewResources.axaml | 原资源 key；颜色及路径来自原 XAML |
 | 间距、控件模板、外观 | Styles/NeeViewTheme.axaml | 样式类与资源引用 |
 | 胶片条显示、可见需求、详情与确认 | Views/ThumbnailView.cs | Engine.PageSelector/FilmStrip；200ms防抖、revision及共享像素租约 |
+| 底部页号显示、编辑、焦点与转换 | Views/SliderTextBox.axaml(.cs) | 来源身份＋原始索引回调；宿主进入唯一 BookOperation.JumpAsync，控件不修改书籍/配置 |
 | 页面/书架选择、侧栏显隐 | ViewModels/ReaderWorkspaceViewModel.cs | 原 Page 与 BookOperation.Bookshelf；纯表现/书架刷新不请求图片 |
 | 面板拖放、组合、分隔与预览 | Views/SidePanelPresenter.cs | Engine.LayoutPanelManager 数据与原布局 JSON；不操作阅读业务 |
 | 绘制、焦点、拖动、缩放 | Views/ReaderView.cs | 原 PageFrame、像素租约、revision |
@@ -29,3 +30,5 @@
 测试直接装载这些正式 XAML、主题和控件源码。Headless 截图用于检查布局与真实图像绘制，不能证明 Mac 手势、Retina、Finder 或 Windows 动态一致性。
 
 第六批历史列表由 Engine.HistoryList/SaveData 管理过滤、导航和编辑，HistoryRow/MainWindow.History 管理分组显示、焦点、多选及菜单。历史主题/布局调整不触发阅读解码或修改访问顺序；四种显示模板与无效清理保留禁用入口。
+
+第七批滑条页号结构、输入反馈与主题分开；ReaderWorkspaceViewModel提供位置/显隐/尺寸/透明度，SettingsWindow只改表现字段时不调用ApplySettingAsync。原SliderConfig字段写回现有JSON，未知/未迁字段继续合并保留。Fluent轨道留白/滑块尺寸使用主题资源覆盖，15–50 DIP内不裁切，不维护第二套Slider模板。原页标记/自动隐藏待完整播放列表和窗口控制迁入，入口保持占位；见[p2-slider-input.md](p2-slider-input.md)。

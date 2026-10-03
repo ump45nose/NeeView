@@ -1,0 +1,63 @@
+{
+  "utc": "2026-10-03",
+  "after_exit": {
+    "page": "003.png",
+    "slider": {
+      "SliderDirection": 2,
+      "IsSliderLinkedFilmStrip": true,
+      "IsSyncPageMode": false,
+      "IsEnabled": true,
+      "SliderIndexLayout": 1,
+      "Thickness": 37,
+      "Opacity": 0.65,
+      "MouseWheelAction": 0,
+      "FutureSliderProbe": "keep"
+    },
+    "temporary_fields_preserved": true
+  },
+  "source_png_matches": {
+    "002.png": true,
+    "003.png": true,
+    "001.png": true,
+    "004.png": true,
+    "005.png": true,
+    "006.png": true
+  },
+  "zip_entries_match_png": true,
+  "restoration": {
+    "UserSetting.json": {
+      "byte_equal": true,
+      "sha256": "ba2d2a89aa333d145c4fee28406f89f0cab65840b234e995761446dc6d7d03b6",
+      "backup_sha256": "ba2d2a89aa333d145c4fee28406f89f0cab65840b234e995761446dc6d7d03b6"
+    },
+    "History.json": {
+      "byte_equal": true,
+      "sha256": "1cf91f22c22bf89accb8a96eb4593a9a83bfeddf185ba024655a0a70aafb3810",
+      "backup_sha256": "1cf91f22c22bf89accb8a96eb4593a9a83bfeddf185ba024655a0a70aafb3810"
+    },
+    "Bookmark.json": {
+      "byte_equal": true,
+      "sha256": "0e605947c1d28342dbfb49dbbdf4a12dce22015bd1ed974a69848dbaa381e915",
+      "backup_sha256": "0e605947c1d28342dbfb49dbbdf4a12dce22015bd1ed974a69848dbaa381e915"
+    }
+  },
+  "restarted_without_json_change": {
+    "page": "003.png",
+    "evidence": "p2-slider-final-restart-preserved.ax.txt"
+  },
+  "restored_startup": {
+    "LastBookV2": {
+      "Path": "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz",
+      "Page": "中文/003.png",
+      "Props": "IsWide",
+      "MacPagePart": 0,
+      "MacIsSupportedWidePage": true
+    }
+  },
+  "final_user_running": {
+    "page": "中文/003.png",
+    "panels_equal_backup": true,
+    "temporary_slider_field_removed": true,
+    "evidence": "p2-slider-final-user-restored.ax.txt"
+  }
+}

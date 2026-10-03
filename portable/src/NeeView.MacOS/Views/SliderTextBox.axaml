@@ -1,0 +1,8 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="NeeView.MacOS.Views.SliderTextBox" MinWidth="60">
+  <!-- 转换原 SliderTextBox 模板；结构与主题可单独调整，控件不调用阅读业务。 -->
+  <Grid x:Name="NumberRoot" Focusable="True" Background="Transparent" PointerPressed="Number_Pressed" GotFocus="Number_Focused">
+    <Border Classes="slider-number-frame" BorderThickness="1" BorderBrush="Transparent"><TextBlock x:Name="NumberDisplay" VerticalAlignment="Center" HorizontalAlignment="Center" /></Border>
+    <TextBox x:Name="NumberInput" Classes="slider-number" IsVisible="False" KeyDown="Input_KeyDown" LostFocus="Input_LostFocus" GotFocus="Input_Focused" PointerWheelChanged="Input_Wheel" />
+  </Grid>
+</UserControl>
