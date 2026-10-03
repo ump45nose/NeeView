@@ -45,3 +45,5 @@
 第十一批的搜索输入/清空/历史下拉/错误布局在 BookmarkListView.axaml(.cs)，输入草稿和任务表现由独立 BookmarkListViewModel 管理。原 Profile/匹配/递归在 Engine.SearchBookmarkFolderCollection 和 BookmarkFolderList，历史事务在 SaveData；控件不读取目录或用户JSON。稳定命令 FocusBookmarkSearchBox 只显示并聚焦本面板，搜索框 Enter/数字/Delete 与阅读键路由隔离。详见[p2-bookmark-search.md](p2-bookmark-search.md)。
 
 第十二批历史搜索输入、清空、历史菜单和错误区域在MainWindow.axaml/MainWindow.History，草稿、确认、500ms合并及取消由独立HistorySearchViewModel管理。窗口表现只转交已提交列表，不在UI执行匹配或I/O；前后历史导航使用同一Engine.HistoryList结果。切换增量取消未确认输入，保存失败回滚菜单选项。详见[p2-history-search.md](p2-history-search.md)。
+
+第十三批HistorySettingsViewModel持有原候选值及自定义值草稿，SettingsWindow只负责历史设置区域和导航。历史更多菜单共用原设置窗口，实际限制/临时排除/提交回滚在Engine；视图不扫描历史来源、运行集合不裁剪。保存禁用重入和关闭，不因历史外观或策略变更重建正文，见[p2-history-retention.md](p2-history-retention.md)。

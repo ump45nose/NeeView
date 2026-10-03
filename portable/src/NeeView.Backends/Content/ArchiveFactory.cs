@@ -6,6 +6,8 @@ namespace NeeView.Backends;
 /// <summary>原 Archive 工厂的 Mac 实现，目录、ZIP、RAR 与 7z 共用原来源关系。</summary>
 public sealed class ArchiveFactory : IArchiveFactory
 {
+    /// <summary>应用独占的解压临时根；启动装配将此目录交给历史保存排除，非系统临时根。</summary>
+    public static string TemporaryDirectory => System.IO.Path.Combine(System.IO.Path.GetTempPath(), "NeeView.Mac");
     /// <summary>原书签 GetFileSystemInfo 替换点；仅后台探测指定路径，不枚举或解压。</summary>
     /// <param name="path">文件系统原定位。</param><param name="token">有界 I/O 的取消令牌。</param>
     /// <returns>真实时间及大小；缺失或非文件系统定位返回空。</returns>
@@ -215,7 +217,7 @@ public sealed class CompressedArchive : Archive
             string? cachedPath = null;
             if (RequiresSequential)
             {
-                _cacheDirectory ??= System.IO.Path.Combine(System.IO.Path.GetTempPath(), "NeeView.Mac", Guid.NewGuid().ToString("N"));
+                _cacheDirectory ??= System.IO.Path.Combine(ArchiveFactory.TemporaryDirectory, Guid.NewGuid().ToString("N"));
                 Directory.CreateDirectory(_cacheDirectory);
                 TrimSolidCache(Math.Max(0, entry.Length));
                 cachedPath = System.IO.Path.Combine(_cacheDirectory, Guid.NewGuid().ToString("N"));
@@ -224,7 +226,7 @@ public sealed class CompressedArchive : Archive
             else if (entry.Length <= 32L * 1024 * 1024) output = new MemoryStream();
             else
             {
-                var directory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "NeeView.Mac"); Directory.CreateDirectory(directory);
+                var directory = ArchiveFactory.TemporaryDirectory; Directory.CreateDirectory(directory);
                 output = new FileStream(System.IO.Path.Combine(directory, Guid.NewGuid().ToString("N")), FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 81920, FileOptions.DeleteOnClose);
             }
             try

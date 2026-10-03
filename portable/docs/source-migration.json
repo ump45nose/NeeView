@@ -481,7 +481,7 @@
       "source": "NeeView/Config/HistoryConfig.cs",
       "target": "src/NeeView.Engine/Config/HistoryConfig.cs",
       "sha256": "727986b8c0d9dc0abb92f91869d9b6e231bf4c512892827088ba5e4cefd0d76d",
-      "status": "原历史列表四开关及默认值；显示样式/保留策略/高级搜索原JSON字段保留，行为待迁"
+      "status": "原历史显示/搜索开关及LimitSize/LimitSpan默认和归一；显示模板、登记策略、自动清理与保存开关仍待迁"
     },
     {
       "source": "NeeView/SidePanels/History/HistoryList.cs",
@@ -493,7 +493,7 @@
       "source": "NeeView/BookHistory/BookHistoryCollection.cs",
       "target": "src/NeeView.Engine/SaveData/SaveData.cs",
       "sha256": "addd035b3f7540da5b0851c2b79fbef2bbf880518c39bf553c75f654342fbece",
-      "status": "原Remove/Clear、BookmarkSearchHistory/BookHistorySearchHistory适配既有三JSON事务；失败原地回滚；保留限制/无效清理待迁"
+      "status": "原Remove/Clear、两组表达式历史及CreateMemento/fromLoad限制适配三JSON事务；运行集合无限，写出副本先排除应用临时根，失败回滚"
     },
     {
       "source": "NeeView/SidePanels/History/HistoryListViewModel.cs",
@@ -836,6 +836,12 @@
       "target": "src/NeeView.MacOS/Views/MainWindow.History.cs",
       "sha256": "ee2f137957702284ce90f06e9226be47235015ca5a2d701f240ec321ce4eb14f",
       "status": "原Enter/失焦确认与500ms输入合并；真实文本作用域与关闭等待适配"
+    },
+    {
+      "source": "NeeView/BookHistory/BookHistoryCollection.cs",
+      "target": "src/NeeView.Engine/BookHistory/BookHistoryCollection.cs",
+      "sha256": "addd035b3f7540da5b0851c2b79fbef2bbf880518c39bf553c75f654342fbece",
+      "status": "迁入原Limit的数量优先/严格TakeWhile；IBookHistory约束改时间选择器、可注入时钟，极大期限防日期溢出"
     }
   ],
   "rule_references": [
@@ -990,6 +996,18 @@
       "target": "src/NeeView.MacOS/Views/MainWindow.axaml",
       "sha256": "d93e2cfa905c52e76fecca341eb5217f3d457470a9a0d5c9650d4ac00e5bb66b",
       "status": "原历史搜索输入/清空/历史/错误区域转换，正文和原面板插槽保持"
+    },
+    {
+      "source": "NeeView/Setting/SettingPageHistory.cs",
+      "target": "src/NeeView.MacOS/ViewModels/HistorySettingsViewModel.cs",
+      "sha256": "9b54a9b7c0e7b66a4379f79c3b8e34afff27465ac046d741d014a7b80544aefc",
+      "status": "迁入原数量/期限候选表与精确自定义值；独立草稿不裁剪或保存"
+    },
+    {
+      "source": "NeeView/Setting/SettingPageHistory.cs",
+      "target": "src/NeeView.MacOS/Views/SettingsWindow.axaml",
+      "sha256": "9b54a9b7c0e7b66a4379f79c3b8e34afff27465ac046d741d014a7b80544aefc",
+      "status": "原左导航/右历史设置区域与保留限制说明，未迁登记/清理保留禁用占位"
     }
   ],
   "backend_reuse": [

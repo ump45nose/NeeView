@@ -164,8 +164,10 @@ public sealed class HistoryListTests
             var refreshes = 0; model.Refreshed += (_, _) => refreshes++;
             var more = window.FindControl<Button>("HistoryMoreButton")!; more.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             var menu = more.ContextMenu!; var items = menu.Items.OfType<MenuItem>().ToArray();
-            Assert.Equal(12, items.Length); Assert.All(items.Take(4), item => Assert.False(item.IsEnabled)); Assert.False(items.Single(item => item.Header?.ToString()?.StartsWith("移除无效历史记录") == true).IsEnabled);
-            items[4].RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)); Dispatcher.UIThread.RunJobs(); menu.Close();
+            // 能力入口可渐进增加；验证原占位和真实动作，而非把项目总数当作功能契约。
+            Assert.All(items.Take(4), item => Assert.False(item.IsEnabled)); Assert.False(items.Single(item => item.Header?.ToString()?.StartsWith("移除无效历史记录") == true).IsEnabled);
+            Assert.Contains(items, item => Equals(item.Header, "历史记录设置…") && item.IsEnabled);
+            items.Single(item => Equals(item.Header, "按日期分组")).RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)); Dispatcher.UIThread.RunJobs(); menu.Close();
             Assert.True(Config.Current.History.IsGroupBy); Assert.Equal(0, refreshes); Assert.True(model.History[0].HasGroupHeader);
             window.UpdateLayout();
             var phase = Environment.GetEnvironmentVariable("NEEVIEW_ACCEPTANCE_PHASE") ?? "p2-history";

@@ -29,7 +29,7 @@ Engine.HistoryList 计算只读过滤列表、前后目标及日期分组名；S
 | 清空确认 | HistoryListViewModel.RemoveAll / ClearHistoryCommand | 面板菜单先确认、取消不写；原 ClearHistory 命令直接清空，加载中不执行 |
 | 搜索焦点 | FocusHistorySearchBox / SidePanelFrame | 明确显示历史面板并聚焦，已显示时不切换关闭 |
 
-History 配置仅迁入 IsGroupBy/IsCurrentFolder/IsVisibleItemsCount/IsVisibleSearchBox 四字段。显示样式、保存/保留期限及未知配置仍保留在原 JSON，不能把字段往返当作相应策略已执行。列表稳定行复用保留未变化的选择；过滤后不再显示的项不作为隐藏删除目标。右击已有多选成员保留批次，右击其他行选择该行，右击空白清空旧选择并禁用菜单。
+History 配置仅迁入 IsGroupBy/IsCurrentFolder/IsVisibleItemsCount/IsVisibleSearchBox 四字段。显示样式和其他保存策略仍保留；数量/保留期限由第十三批按原文件/载入边界接入，见[p2-history-retention.md](p2-history-retention.md)。不能把未知字段往返当作相应策略已执行。列表稳定行复用保留未变化的选择；过滤后不再显示的项不作为隐藏删除目标。右击已有多选成员保留批次，右击其他行选择该行，右击空白清空旧选择并禁用菜单。
 
 ## 错误与验证
 
@@ -39,4 +39,4 @@ History 配置仅迁入 IsGroupBy/IsCurrentFolder/IsVisibleItemsCount/IsVisibleS
 
 ## 未迁移与扩展点
 
-无效历史清理暂不启用，不能用 File.Exists 的 false 将断线 NAS/权限问题误判为应删除记录；后续接入原 ArchiveEntryUtility 的可靠存在检查与有界后台任务。ClearHistoryInPlace 依赖书架查询位置，继续占位。结构化搜索/搜索历史由第十二批接入；四种显示模板/缩略图、原保留策略/自动清理和动态日期跨日回报后续迁入。页标记依赖播放列表，书签查询与书架互联、直接页号文本框（已有 JumpPage 对话框）、真实子书/父书、完整输入及自动隐藏仍是后续目标。
+无效历史清理暂不启用，不能用 File.Exists 的 false 将断线 NAS/权限问题误判为应删除记录；后续接入原 ArchiveEntryUtility 的可靠存在检查与有界后台任务。ClearHistoryInPlace 依赖书架查询位置，继续占位。结构化搜索/搜索历史由第十二批接入；四种显示模板/缩略图、其余保存/登记策略、自动清理和动态日期跨日回报后续迁入。页标记依赖播放列表，书签查询与书架互联、直接页号文本框（已有 JumpPage 对话框）、真实子书/父书、完整输入及自动隐藏仍是后续目标。

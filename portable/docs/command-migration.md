@@ -241,3 +241,5 @@
 | FocusNextApp | 切换到下一个 NeeView | Ctrl+Tab | 待 P2–P5 | NeeView/Command/Commands/FocusNextAppCommand.cs |
 | StretchWindow | 调整窗口大小 |  | 待 P2–P5 | NeeView/Command/Commands/StretchWindowCommand.cs |
 | OpenConsole | 打开脚本控制台 |  | 待 P2–P5 | NeeView/Command/Commands/OpenConsoleCommand.cs |
+
+第十三批不新增命令；OpenOptionsWindow的同一设置窗口增加历史页，面板更多菜单可直接定位。ClearHistory、RemoveUnlinkedHistory等迁移状态不因保留限制接入而混同，见[p2-history-retention.md](p2-history-retention.md)。

@@ -233,6 +233,18 @@ public sealed partial class MainWindow : Window
         if (_model is null) return;
         Viewer.ResetTransform(); await _model.Operation.RestoreLastAsync();
     }
+    /// <summary>菜单与历史面板共用原设置窗口；关闭后只刷新表现，不另建阅读入口。</summary>
+    /// <param name="history">是否定位到历史记录设置页面。</param>
+    private async Task ShowOptionsAsync(bool history = false)
+    {
+        if (_model is null || _preparing || _closedPrepared) return;
+        var settings = new SettingsWindow(_model, IsCommandAvailable);
+        if (history) settings.SelectHistoryPage();
+        await settings.ShowDialog(this);
+        if (_preparing || _closedPrepared) return;
+        _model.RefreshSelection(); _model.RefreshPanels(); await FilmStrip.RefreshAsync(); BuildMenus();
+    }
+
     /// <summary>执行宿主命令或转交原阅读命令；错误显示给用户。</summary>
     public async Task ExecuteAsync(string name, bool fromMenu = false)
     {
@@ -288,8 +300,7 @@ public sealed partial class MainWindow : Window
                 case "ToggleHideLeftPanel": Config.Current.Panels.IsHideLeftPanel = !Config.Current.Panels.IsHideLeftPanel; _model.RefreshPanels(); break;
                 case "ToggleHideRightPanel": Config.Current.Panels.IsHideRightPanel = !Config.Current.Panels.IsHideRightPanel; _model.RefreshPanels(); break;
                 case "OpenOptionsWindow":
-                    await new SettingsWindow(_model, IsCommandAvailable).ShowDialog(this);
-                    _model.RefreshSelection(); _model.RefreshPanels(); await FilmStrip.RefreshAsync(); BuildMenus(); break;
+                    await ShowOptionsAsync(); break;
                 case "HelpCommandList": await ShowCommandStatusAsync(); break;
                 case "ToggleBookmark":
                     if (_model.Operation.Book is { } marked) { await _model.Operation.SaveAsync(); await _model.SaveData.ToggleBookmarkAsync(marked); } break;

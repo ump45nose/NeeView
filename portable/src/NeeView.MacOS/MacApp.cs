@@ -81,7 +81,7 @@ public sealed partial class MacApp : Avalonia.Application
         try
         {
             var directory = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile), "Library", "Application Support", "NeeView.Mac");
-            var state = new SaveData(directory); await state.LoadAsync();
+            var state = new SaveData(directory, Backends.ArchiveFactory.TemporaryDirectory); await state.LoadAsync();
             var decoder = new MagickImageDecoder(); var operation = new BookOperation(new Backends.ArchiveFactory(), decoder, state);
             var images = new BitmapFactory(decoder); var model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state);
             _window = new MainWindow(); _window.Bind(model, images, new MacPlatformService());

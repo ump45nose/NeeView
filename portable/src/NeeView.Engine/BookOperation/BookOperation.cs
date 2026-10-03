@@ -332,6 +332,12 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>立即保存，用于切书和正常退出。</summary>
     public Task SaveAsync() => saveData.SaveAsync(Book, Position.Part, keepHistoryOrder: _keepHistoryOrder);
 
+    /// <summary>保存设置表单的历史限制副本；不改阅读规则或重建帧，成功后才应用配置。</summary>
+    /// <param name="historyLimits">原数量及期限；保留当前书与LastBook启动快照。</param>
+    /// <returns>唯一SaveData事务的完成或失败。</returns>
+    public Task SaveAsync((int Size, TimeSpan Span) historyLimits) =>
+        saveData.SaveAsync(Book, Position.Part, keepHistoryOrder: _keepHistoryOrder, historyLimits: historyLimits);
+
     /// <summary>使用完整迁入的 PageFrameFactory；半页位置在关闭分割时恢复整页。</summary>
     private void RebuildFrame(int direction, bool synchronizeSelection = true)
     {

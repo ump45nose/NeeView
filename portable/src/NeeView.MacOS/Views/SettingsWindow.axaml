@@ -4,7 +4,7 @@
     <Border Grid.Column="0" Classes="panel">
       <Grid RowDefinitions="Auto,*">
         <TextBox PlaceholderText="搜索设置" Margin="8" IsEnabled="False" ToolTip.Tip="完整设置搜索在 P2–P5 迁移" />
-        <ListBox Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
+        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
       </Grid>
     </Border>
     <ScrollViewer x:Name="ReadingSettings" Grid.Column="1">
@@ -65,6 +65,28 @@
         <TextBlock Text="焦点锁定" /><ComboBox x:Name="FocusLock"><ComboBoxItem Content="无" /><ComboBoxItem Content="逻辑焦点" /><ComboBoxItem Content="文本逻辑焦点" /><ComboBoxItem Content="实际焦点" /><ComboBoxItem Content="文本实际焦点" /></ComboBox>
         <TextBlock Text="上边缘与侧栏冲突" /><ComboBox x:Name="TopConflict"><ComboBoxItem Content="允许同时弹出" /><ComboBoxItem Content="仅最边缘触发" /><ComboBoxItem Content="禁止同时弹出" /></ComboBox>
         <TextBlock Text="下边缘与侧栏冲突" /><ComboBox x:Name="BottomConflict"><ComboBoxItem Content="允许同时弹出" /><ComboBoxItem Content="仅最边缘触发" /><ComboBoxItem Content="禁止同时弹出" /></ComboBox>
+      </StackPanel>
+    </ScrollViewer>
+    <ScrollViewer x:Name="HistorySettings" Grid.Column="1" IsVisible="False">
+      <!-- 原历史设置区域；候选与草稿由独立表现模型持有，限制算法在Engine。 -->
+      <StackPanel Margin="24" Spacing="14">
+        <TextBlock Text="历史记录" FontSize="20" />
+        <TextBlock Text="保存限制" FontSize="16" />
+        <TextBlock Text="设置保存在文件中的历史记录上限。应用程序运行期间的历史记录不受限制。" TextWrapping="Wrap" />
+        <TextBlock Text="数量限制" />
+        <ComboBox x:Name="HistoryLimitSize" ItemsSource="{Binding SizeChoices}" SelectedItem="{Binding SelectedSize, Mode=TwoWay}">
+          <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBlock Text="保留期限" />
+        <ComboBox x:Name="HistoryLimitSpan" ItemsSource="{Binding SpanChoices}" SelectedItem="{Binding SelectedSpan, Mode=TwoWay}">
+          <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBlock Text="数量为 0 时不保存访问条目。书签、搜索历史与最后阅读位置独立保留；下次启动按限制载入。" TextWrapping="Wrap" />
+        <TextBlock Text="登记与清理" FontSize="16" Margin="0,8,0,0" />
+        <TextBlock Text="按浏览页数 / 播放时间登记 · 尚未迁移" Opacity="0.5" />
+        <TextBlock Text="启动时自动移除无效历史 · 尚未迁移" Opacity="0.5" />
+        <TextBlock Text="最近打开书籍数量 · 尚未迁移" Opacity="0.5" />
+        <TextBlock Text="保存页面浏览记录 · 尚未迁移" Opacity="0.5" />
       </StackPanel>
     </ScrollViewer>
     <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="16" Spacing="8">

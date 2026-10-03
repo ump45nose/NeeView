@@ -3,10 +3,13 @@ using System.Text.Json.Nodes;
 namespace NeeView;
 
 /// <summary>沿用 UserSetting/History JSON 和 BookMemento；原始节点保留未迁移字段。</summary>
-public sealed class SaveData(string directory)
+/// <param name="directory">独立Mac用户状态目录。</param>
+/// <param name="temporaryDirectory">启动层提供的应用临时根；不会排除整个系统临时目录。</param>
+public sealed class SaveData(string directory, string? temporaryDirectory = null)
 {
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true, PropertyNameCaseInsensitive = true, AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip };
     private readonly SemaphoreSlim _gate = new(1);
+    private readonly string? _temporaryDirectory = temporaryDirectory is null ? null : System.IO.Path.TrimEndingDirectorySeparator(System.IO.Path.GetFullPath(temporaryDirectory));
     private JsonObject _setting = new();
     private JsonObject _history = new();
     private JsonObject _bookmarks = new();
@@ -41,7 +44,6 @@ public sealed class SaveData(string directory)
         _suppressedHistoryPaths.Clear();
         _activeHistoryPath = null;
         if (!BookmarkRoot.IsFolder) throw new JsonException("Bookmark.Nodes 必须是根文件夹。");
-        RefreshHistory();
         var raw = _setting["Config"] as JsonObject;
         var config = new Config();
         if (raw is not null)
@@ -82,6 +84,10 @@ public sealed class SaveData(string directory)
         config.Playlist.DefaultFolder = System.IO.Path.Combine(DirectoryPath, "Playlists");
         Playlists = new(config.Playlist);
         Config.SetCurrent(config);
+        // 原Restore(fromLoad:true)先按已加载配置限制；只改本次内存，不写回来源文件。
+        if (_history["Items"] is JsonArray loadedItems)
+            _history["Items"] = CreateLimitedHistoryItems(loadedItems, config.History, sort: false);
+        RefreshHistory();
         BookmarkSearchHistory.Replace(_history["BookmarkSearchHistory"]?.Deserialize<string[]>(Options));
         BookHistorySearchHistory.Replace(_history["BookHistorySearchHistory"]?.Deserialize<string[]>(Options));
     }
@@ -366,11 +372,15 @@ public sealed class SaveData(string directory)
             e["LastAccessTime"]?.GetValue<DateTime>() ?? DateTime.MinValue)).OrderByDescending(e => e.LastAccessTime).ToArray() ?? [];
 
     /// <summary>保存阅读状态与布局，已知字段合并进原节点后原子替换文件。</summary>
-    public async Task SaveAsync(Book? book, int part, CancellationToken token = default, bool keepHistoryOrder = false)
+    /// <param name="historyLimits">设置表单的可选数量/期限副本；事务成功后才更新运行配置。</param>
+    public async Task SaveAsync(Book? book, int part, CancellationToken token = default, bool keepHistoryOrder = false,
+        (int Size, TimeSpan Span)? historyLimits = null)
     {
         await _gate.WaitAsync(token);
         var previousSetting = _setting.DeepClone().AsObject();
         var previousHistory = _history.DeepClone().AsObject();
+        var historyConfig = historyLimits is { } limits
+            ? new HistoryConfig { LimitSize = limits.Size, LimitSpan = limits.Span } : Config.Current.History;
         try
         {
             var config = Object(_setting, "Config");
@@ -379,6 +389,9 @@ public sealed class SaveData(string directory)
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 Merge(Object(config, branch), JsonSerializer.SerializeToNode(value, Options)!.AsObject());
             }
+            // 仅覆盖本次编辑的两字段；配置在等待/失败时不暴露给防抖和其他保存。
+            Object(config, "History")["LimitSize"] = historyConfig.LimitSize;
+            Object(config, "History")["LimitSpan"] = JsonSerializer.SerializeToNode(historyConfig.LimitSpan, Options);
             // 退役的 Mac 别名统一归入原字段，避免下一次加载出现两套相反的权威值。
             Object(config, "Panels").Remove("IsLeftAutoHide"); Object(config, "Panels").Remove("IsRightAutoHide");
             config.Remove("IsAddressBarEnabled");
@@ -405,7 +418,12 @@ public sealed class SaveData(string directory)
             _setting["Format"] ??= JsonValue.Create("NeeView.UserSetting/46.3.0");
             _history["Format"] ??= JsonValue.Create("NeeView.History/46.3.0");
             WriteSearchHistories();
-            await WritePairAsync(token);
+            await WritePairAsync(token, historyConfig);
+            if (historyLimits.HasValue)
+            {
+                Config.Current.History.LimitSize = historyConfig.LimitSize;
+                Config.Current.History.LimitSpan = historyConfig.LimitSpan;
+            }
             RefreshHistory();
         }
         // 文件事务失败时恢复同一权威内存状态；用户尚未保存的表单/Config 可继续重试。
@@ -444,7 +462,9 @@ public sealed class SaveData(string directory)
         return string.Join(' ', (props ?? "").Split([' ', ','], StringSplitOptions.RemoveEmptyEntries).Where(e => names.Contains(e.Split('=')[0]) == known));
     }
     /// <summary>先写完三个临时文件，再保留回滚副本；记录存在时启动恢复旧完整状态。</summary>
-    private async Task WritePairAsync(CancellationToken token)
+    /// <param name="token">准备阶段取消；提交开始后完成或回滚。</param>
+    /// <param name="historyConfig">本次设置副本；其他调用使用已提交配置。</param>
+    private async Task WritePairAsync(CancellationToken token, HistoryConfig? historyConfig = null)
     {
         Directory.CreateDirectory(DirectoryPath);
         string[] names = ["History.json", "UserSetting.json", "Bookmark.json"];
@@ -452,7 +472,11 @@ public sealed class SaveData(string directory)
         try
         {
             // 准备阶段不改动权威文件；任一序列化或权限失败均可直接重试。
-            await WriteTemporaryAsync(names[0], _history, token);
+            // 原CreateMemento只限制写出的副本；本进程集合、Find和历史导航保持完整。
+            var preparedHistory = _history.DeepClone().AsObject();
+            if (_history["Items"] is JsonArray items)
+                preparedHistory["Items"] = CreateLimitedHistoryItems(items, historyConfig ?? Config.Current.History, sort: true);
+            await WriteTemporaryAsync(names[0], preparedHistory, token);
             await WriteTemporaryAsync(names[1], _setting, token);
             // 在副本上准备书签文件，提交失败不能污染权威内存节点。
             var preparedBookmarks = _bookmarks.DeepClone().AsObject();
@@ -488,6 +512,23 @@ public sealed class SaveData(string directory)
                 if (!File.Exists(marker) && File.Exists(path + ".save-backup")) File.Delete(path + ".save-backup");
             }
         }
+    }
+    /// <summary>共用原Limit生成JSON副本，保留幸存条目的Page/Props与未知字段。</summary>
+    /// <param name="items">权威运行集合或原磁盘序列。</param><param name="config">原数量/期限配置。</param>
+    /// <param name="sort">保存按原倒序；加载遵循原文件已排序约定。</param>
+    /// <returns>不与原节点共享父级的保留数组。</returns>
+    private JsonArray CreateLimitedHistoryItems(JsonArray items, HistoryConfig config, bool sort)
+    {
+        var source = items.OfType<JsonObject>();
+        if (sort)
+        {
+            // 原CreateMemento在数量限制前排除应用临时来源，保留同前缀的普通用户目录。
+            if (_temporaryDirectory is not null) source = source.Where(item => item["Path"]?.GetValue<string>() is not { } path ||
+                (path != _temporaryDirectory && !path.StartsWith(_temporaryDirectory + System.IO.Path.DirectorySeparatorChar, StringComparison.Ordinal)));
+            source = source.OrderByDescending(item => item["LastAccessTime"]?.GetValue<DateTime>() ?? DateTime.MinValue);
+        }
+        return new JsonArray(BookHistoryCollection.Limit(source, config.LimitSize, config.LimitSpan,
+            item => item["LastAccessTime"]?.GetValue<DateTime>() ?? DateTime.MinValue).Select(item => item.DeepClone()).ToArray());
     }
     /// <summary>恢复未完成的保存，兼容旧双文件标记；损坏标记保留恢复材料。</summary>
     private void RecoverInterruptedSave()

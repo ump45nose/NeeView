@@ -12,6 +12,8 @@ public sealed partial class SettingsWindow : Window
     private ReaderWorkspaceViewModel? _model;
     private IReadOnlyList<ShortcutEdit> _inputs = [];
     private bool _initialized;
+    private bool _saving;
+    private HistorySettingsViewModel? _historySettings;
     /// <summary>独立加载布局，不依赖具体存储或解码后端。</summary>
     public SettingsWindow() { AvaloniaXamlLoader.Load(this); _initialized = true; }
     /// <summary>传入业务表现模型，编辑副本直到用户保存。</summary>
@@ -22,7 +24,11 @@ public sealed partial class SettingsWindow : Window
         this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm(); FillAutoHide();
         this.FindControl<ComboBox>("BookshelfGroup")!.SelectedIndex = (int)Config.Current.Bookshelf.FolderSortOrder;
         this.FindControl<CheckBox>("PrioritizeBookMove")!.IsChecked = Config.Current.Book.IsPrioritizeBookMove;
+        _historySettings = new(Config.Current.History);
+        this.FindControl<ScrollViewer>("HistorySettings")!.DataContext = _historySettings;
     }
+    /// <summary>历史面板的设置入口定位同一设置窗口，不复制第二套表单。</summary>
+    public void SelectHistoryPage() => this.FindControl<ListBox>("SettingsNavigation")!.SelectedIndex = 4;
     /// <summary>保持原左导航、右内容结构；只切换设置页面，不应用编辑。</summary>
     private void Navigation_Changed(object? sender, SelectionChangedEventArgs e)
     {
@@ -32,6 +38,7 @@ public sealed partial class SettingsWindow : Window
         reading.IsVisible = index == 0; input.IsVisible = index == 1;
         this.FindControl<ScrollViewer>("FilmSettings")!.IsVisible = index == 2;
         this.FindControl<ScrollViewer>("AutoHideSettings")!.IsVisible = index == 3;
+        this.FindControl<ScrollViewer>("HistorySettings")!.IsVisible = index == 4;
     }
     /// <summary>按名称及命令标识过滤编辑副本，未展示的键位也保留。</summary>
     private void InputSearch_Changed(object? sender, TextChangedEventArgs e)
@@ -153,7 +160,10 @@ public sealed partial class SettingsWindow : Window
     /// <summary>设置应用成功并保存 JSON 后关闭；失败留在表单中。</summary>
     private async void Save_Click(object? sender, RoutedEventArgs e)
     {
-        if (_model is null) return;
+        if (_model is null || _saving) return;
+        _saving = true;
+        this.FindControl<Button>("SaveSettings")!.IsEnabled = false;
+        this.FindControl<Button>("CancelSettings")!.IsEnabled = false;
         try
         {
             ValidateInputs(_inputs);
@@ -168,10 +178,22 @@ public sealed partial class SettingsWindow : Window
             Config.Current.Book.IsPrioritizeBookMove = this.FindControl<CheckBox>("PrioritizeBookMove")!.IsChecked == true;
             // 分组设置只重排已有元数据，不能重扫来源或意外重新洗牌。
             _model.Operation.Bookshelf.Reorder();
-            await _model.Operation.SaveAsync(); Close();
+            // 历史限制副本在唯一保存锁中提交；失败及取消不改运行配置，重试保留表单。
+            await _model.Operation.SaveAsync(_historySettings!.GetLimits());
+            _saving = false; Close();
         }
         catch (Exception ex) { this.FindControl<TextBlock>("Message")!.Text = "保存失败：" + ex.Message; }
+        finally
+        {
+            _saving = false;
+            this.FindControl<Button>("SaveSettings")!.IsEnabled = true;
+            this.FindControl<Button>("CancelSettings")!.IsEnabled = true;
+        }
     }
+    /// <summary>保存中的关闭不能丢弃尚未完成的事务；失败后允许取消或重试。</summary>
+    /// <param name="e">系统关闭或父窗口关闭请求。</param>
+    protected override void OnClosing(WindowClosingEventArgs e)
+    { if (_saving) e.Cancel = true; base.OnClosing(e); }
     /// <summary>保存前校验键位与冲突；不自动将旧 Control 转成 Command。</summary>
     internal static void ValidateInputs(IEnumerable<ShortcutEdit> inputs)
     {

@@ -143,6 +143,13 @@ public sealed partial class MainWindow
         AddToggle("显示搜索框", Config.Current.History.IsVisibleSearchBox, value => Config.Current.History.IsVisibleSearchBox = value);
         AddToggle("逐次搜索", Config.Current.System.IsIncrementalSearchEnabled, value => Config.Current.System.IsIncrementalSearchEnabled = value);
         AddToggle("保存搜索历史", Config.Current.History.IsKeepSearchHistory, value => Config.Current.History.IsKeepSearchHistory = value);
+        var settings = new MenuItem { Header = "历史记录设置…" };
+        settings.Click += async (_, _) =>
+        {
+            if (_preparing || _closedPrepared) return;
+            try { await ShowOptionsAsync(history: true); } catch (Exception ex) { ShowError(ex.Message); }
+        };
+        menu.Items.Add(settings);
         menu.Items.Add(new Separator());
         menu.Items.Add(new MenuItem { Header = "移除无效历史记录 · 尚未迁移", IsEnabled = false });
         var clear = new MenuItem { Header = "清空全部历史记录…", IsEnabled = _model.SaveData.HistoryEntries.Count > 0 };
