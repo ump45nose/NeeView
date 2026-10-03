@@ -944,6 +944,66 @@
       "target": "src/NeeView.Engine/FolderConfig/FolderConfigCollection.cs",
       "sha256": "cf44b4078c876c0747faeba8a743f802ac6a3d240ab7a99b6509919d94b9c3eb",
       "status": "原GetThumbnailTarget精确名称及相对书籍路径；编辑/重命名后续迁入"
+    },
+    {
+      "source": "NeeView/Config/CommandConfig.cs",
+      "target": "src/NeeView.Engine/Config/CommandConfig.cs",
+      "sha256": "f68ab4826b9df79c21561ab44e8c27fd47a6a9acf8161ed6f554765e080fbcff",
+      "status": "Original A/B/C, preset direction and reverse settings; access key details pending"
+    },
+    {
+      "source": "NeeView/Command/CommandTable.cs",
+      "target": "src/NeeView.Engine/Command/DefaultInputScheme.cs",
+      "sha256": "ec00189e3b532ee2150e7f3e98d859fe752e010e91af56c8f5c9a4fbd5109cb6",
+      "status": "Original CreateDefaultMemento and SetShare: six pairs, presets, wheel swap"
+    },
+    {
+      "source": "NeeView/Command/CommandTools.cs",
+      "target": "src/NeeView.Engine/Command/DefaultInputScheme.cs",
+      "sha256": "6155762ad4bb9640d334d1474541e2f49a7b3ae2beb41738c954fc26a9ebf17c",
+      "status": "Original ResolveCommand with slider direction and source-specific reverse permission"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters.cs",
+      "target": "src/NeeView.Engine/Command/ReversibleCommandParameter.cs",
+      "sha256": "9fb08a5fc71bab670fd98306cf2e592ef60a4801c9aad9dcf0743efc9bd1a23d",
+      "status": "Original IsReverse default and shared parameter owner"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/ViewScrollCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/ViewScrollCommandParameter.cs",
+      "sha256": "c6f17be39e53f3b7b0e7754137dcc6fb9023b9a29c0a883dbd4e0ec68681d2b6",
+      "status": "Original four-way scroll rate and cross-axis option"
+    },
+    {
+      "source": "NeeView/InputGesture/MouseExGesture.cs",
+      "target": "src/NeeView.MacOS/Views/MouseGestureSource.cs",
+      "sha256": "1c23decbb538ab55f8cbdb9abf6398140ede19907e006bef894841eee517e66b",
+      "status": "ChangedButton, ClickCount and exact modifier sets; Avalonia additional button events"
+    },
+    {
+      "source": "NeeView/InputGesture/MouseGestureSourceConverter.cs",
+      "target": "src/NeeView.MacOS/Views/MouseGestureSource.cs",
+      "sha256": "6cd23338fcbcbadbf2926c2999d32a80fe792922d3216f7ecce03a079dadcac2",
+      "status": "Action and modifier parsing with normalized aliases and unknown rejection"
+    },
+    {
+      "source": "NeeView/InputGesture/MouseWheelGesture.cs",
+      "target": "src/NeeView.MacOS/Views/MouseGestureSource.cs",
+      "sha256": "0f2c8cf5ea836392aa8a2cf04b6218392d6aa748846687d1bc96c4ff47d69bf4",
+      "status": "Exact wheel modifier sets"
+    },
+    {
+      "source": "NeeView/Command/RoutedCommandTable.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml.cs",
+      "sha256": "30ce0e482a06ae7f76e79d3ad19daf8b8d743981534b0e4564d7662ca85c47d1",
+      "status": "Extended press priority, configured wheel, notches, horizontal limit and reverse permission"
+    },
+    {
+      "source": "NeeView/MainView/ViewTransformControl.cs",
+      "target": "src/NeeView.MacOS/Views/ReaderView.cs",
+      "sha256": "a91075c9d356ff8cf7bedc1ea9071d590c427daf9cefd774066874a3408c002e",
+      "status": "Original four-way and boundary cross-axis scroll; full transforms pending"
     }
   ],
   "rule_references": [

@@ -14,6 +14,7 @@ public sealed partial class SettingsWindow : Window
     private bool _initialized;
     private bool _saving;
     private HistorySettingsViewModel? _historySettings;
+    private bool _resetInputDefaults;
     /// <summary>独立加载布局，不依赖具体存储或解码后端。</summary>
     public SettingsWindow() { AvaloniaXamlLoader.Load(this); _initialized = true; }
     /// <summary>传入业务表现模型，编辑副本直到用户保存。</summary>
@@ -22,6 +23,12 @@ public sealed partial class SettingsWindow : Window
         _model = model;
         _inputs = model.Commands.Definitions.Select(d => new ShortcutEdit(d, model.SaveData.GetShortcut(d.Name, d.Shortcut), available?.Invoke(d.Name) ?? model.Commands.IsAvailable(d.Name))).ToArray();
         this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm(); FillAutoHide();
+        this.FindControl<ComboBox>("InputScheme")!.SelectedIndex = (int)Config.Current.Command.PresetInputScheme;
+        this.FindControl<ComboBox>("InputReadOrder")!.SelectedIndex = (int)Config.Current.Command.PresetPageReadOrder;
+        this.FindControl<CheckBox>("ReversePageMove")!.IsChecked = Config.Current.Command.IsReversePageMove;
+        this.FindControl<CheckBox>("ReversePageWheel")!.IsChecked = Config.Current.Command.IsReversePageMoveWheel;
+        this.FindControl<CheckBox>("ReverseHorizontalWheel")!.IsChecked = Config.Current.Command.IsReversePageMoveHorizontalWheel;
+        this.FindControl<CheckBox>("LimitHorizontalWheel")!.IsChecked = Config.Current.Command.IsHorizontalWheelLimitedOnce;
         this.FindControl<ComboBox>("BookshelfGroup")!.SelectedIndex = (int)Config.Current.Bookshelf.FolderSortOrder;
         this.FindControl<CheckBox>("PrioritizeBookMove")!.IsChecked = Config.Current.Book.IsPrioritizeBookMove;
         _historySettings = new(Config.Current.History);
@@ -47,6 +54,24 @@ public sealed partial class SettingsWindow : Window
         var text = (sender as TextBox)?.Text ?? "";
         if (this.FindControl<ListBox>("InputList") is { } list) list.ItemsSource = _inputs.Where(i => i.Label.Contains(text, StringComparison.CurrentCultureIgnoreCase) || i.Name.Contains(text, StringComparison.OrdinalIgnoreCase)).ToArray();
     }
+    /// <summary>从原A/B/C与方向构造默认键位草稿，只有保存成功才成为配置。</summary>
+    private void InputDefaults_Click(object? sender, RoutedEventArgs e)
+    {
+        var candidate = GetInputConfig();
+        foreach (var input in _inputs) input.Value = DefaultInputScheme.GetShortcut(input.Name, input.Definition.Shortcut, candidate);
+        _resetInputDefaults = true;
+    }
+    /// <summary>默认方案是应用默认键位按钮的参数，切换下拉框不改现有自定义键位。</summary>
+    private CommandConfig GetInputConfig()
+    {
+        var old = Config.Current.Command;
+        return new() { PresetInputScheme = (InputScheme)Math.Max(0, this.FindControl<ComboBox>("InputScheme")!.SelectedIndex),
+            PresetPageReadOrder = (PageReadOrder)Math.Max(0, this.FindControl<ComboBox>("InputReadOrder")!.SelectedIndex),
+            IsAccessKeyEnabled = old.IsAccessKeyEnabled, IsReversePageMove = this.FindControl<CheckBox>("ReversePageMove")!.IsChecked == true,
+            IsReversePageMoveWheel = this.FindControl<CheckBox>("ReversePageWheel")!.IsChecked == true,
+            IsReversePageMoveHorizontalWheel = this.FindControl<CheckBox>("ReverseHorizontalWheel")!.IsChecked == true,
+            IsHorizontalWheelLimitedOnce = this.FindControl<CheckBox>("LimitHorizontalWheel")!.IsChecked == true };
+    }
     /// <summary>切换当前书籍和默认设置的编辑作用域。</summary>
     private void Scope_Changed(object? sender, SelectionChangedEventArgs e) { if (_model is not null) Fill(); }
     /// <summary>从原设置类型填入表单，页面模式和方向枚举值保持原顺序。</summary>
@@ -70,16 +95,6 @@ public sealed partial class SettingsWindow : Window
         setting.IsSupportedSingleFirstPage = this.FindControl<CheckBox>("First")!.IsChecked == true;
         setting.IsSupportedSingleLastPage = this.FindControl<CheckBox>("Last")!.IsChecked == true;
     }
-    /// <summary>只调整胶片条/滑条时不重建原正文帧，保持表现设置与阅读规则分离。</summary>
-    /// <param name="setting">当前书籍真实阅读设置。</param>
-    /// <returns>表单内任一已迁入阅读字段是否改变。</returns>
-    private bool HasReadingChanges(BookSettingConfig setting) =>
-        (int)setting.PageMode != this.FindControl<ComboBox>("Mode")!.SelectedIndex ||
-        (int)setting.BookReadOrder != this.FindControl<ComboBox>("Order")!.SelectedIndex ||
-        setting.IsSupportedDividePage != (this.FindControl<CheckBox>("Divide")!.IsChecked == true) ||
-        setting.IsSupportedWidePage != (this.FindControl<CheckBox>("Wide")!.IsChecked == true) ||
-        setting.IsSupportedSingleFirstPage != (this.FindControl<CheckBox>("First")!.IsChecked == true) ||
-        setting.IsSupportedSingleLastPage != (this.FindControl<CheckBox>("Last")!.IsChecked == true);
     /// <summary>读取原胶片条、滑条及共享步长参数到编辑控件，取消不修改配置。</summary>
     private void FillFilm()
     {
@@ -167,22 +182,26 @@ public sealed partial class SettingsWindow : Window
         try
         {
             ValidateInputs(_inputs);
-            if (this.FindControl<ComboBox>("Scope")!.SelectedIndex == 1) Apply(Config.Current.BookSettingDefault);
-            else if (_model.Operation.Book is { } book)
-            { if (HasReadingChanges(book.Setting)) await _model.Operation.ApplySettingAsync(Apply); }
-            else Apply(Config.Current.BookSetting);
-            // 只写用户修改的差分，避免一次保存就展开全部 235 条默认命令。
-            foreach (var input in _inputs.Where(i => i.Value.Trim() != i.OriginalValue.Trim())) _model.SaveData.SetShortcut(input.Name, input.Value.Trim());
-            ApplyFilm(); ApplyAutoHide();
-            Config.Current.Bookshelf.FolderSortOrder = (FolderSortOrder)Math.Max(0, this.FindControl<ComboBox>("BookshelfGroup")!.SelectedIndex);
-            Config.Current.Book.IsPrioritizeBookMove = this.FindControl<CheckBox>("PrioritizeBookMove")!.IsChecked == true;
-            // 分组设置只重排已有元数据，不能重扫来源或意外重新洗牌。
-            _model.Operation.Bookshelf.Reorder();
-            // 历史限制副本在唯一保存锁中提交；失败及取消不改运行配置，重试保留表单。
-            await _model.Operation.SaveAsync(_historySettings!.GetLimits());
+            await _model.Operation.ApplyOptionsAsync(() =>
+            {
+                var inputConfig = GetInputConfig();
+                if (!_resetInputDefaults) { inputConfig.PresetInputScheme = Config.Current.Command.PresetInputScheme; inputConfig.PresetPageReadOrder = Config.Current.Command.PresetPageReadOrder; }
+                Config.Current.Command = inputConfig;
+                if (this.FindControl<ComboBox>("Scope")!.SelectedIndex == 1) Apply(Config.Current.BookSettingDefault);
+                else Apply(_model.Operation.Book?.Setting ?? Config.Current.BookSetting);
+                // 只写用户修改的差分，避免一次保存就展开全部235条默认命令。
+                foreach (var input in _inputs.Where(i => _resetInputDefaults || i.Value.Trim() != i.OriginalValue.Trim()))
+                    _model.SaveData.SetShortcutDifference(input.Name, input.Value.Trim(), input.Definition.Shortcut);
+                ApplyFilm(); ApplyAutoHide();
+                Config.Current.Bookshelf.FolderSortOrder = (FolderSortOrder)Math.Max(0, this.FindControl<ComboBox>("BookshelfGroup")!.SelectedIndex);
+                Config.Current.Book.IsPrioritizeBookMove = this.FindControl<CheckBox>("PrioritizeBookMove")!.IsChecked == true;
+            }, _historySettings!.GetLimits());
             _saving = false; Close();
         }
-        catch (Exception ex) { this.FindControl<TextBlock>("Message")!.Text = "保存失败：" + ex.Message; }
+        catch (Exception ex)
+        {
+            this.FindControl<TextBlock>("Message")!.Text = "保存失败：" + ex.Message;
+        }
         finally
         {
             _saving = false;
@@ -202,10 +221,8 @@ public sealed partial class SettingsWindow : Window
         foreach (var raw in input.Value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
             var shortcut = raw;
-            var mouseTokens = raw.Split('+');
-            bool isMouse = mouseTokens[^1] is "LeftClick" or "RightClick" or "MiddleClick" or "WheelUp" or "WheelDown"
-                && mouseTokens[..^1].All(t => t is "Ctrl" or "Control" or "Meta" or "Command" or "Alt" or "Shift" or "LeftButton" or "RightButton" or "MiddleButton");
-            if (isMouse) shortcut = raw.Replace("Control+", "Ctrl+").Replace("Command+", "Meta+");
+            bool isMouse = MouseGestureSource.TryNormalize(raw, out var mouseShortcut);
+            if (isMouse) shortcut = mouseShortcut;
             else
             {
                 try

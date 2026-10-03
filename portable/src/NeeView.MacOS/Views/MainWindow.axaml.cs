@@ -25,7 +25,7 @@ public sealed partial class MainWindow : Window
     private Book? _folderBook;
     private bool _sliderDragging;
     private bool _sliderUpdating;
-    private double _wheel;
+    private readonly Dictionary<(object Scope, string Gesture), double> _wheelDeltas = [];
     private double _sliderWheel;
     private double _leftWidth, _rightWidth;
     private SidePanelPresenter? _sidePanels;
@@ -38,7 +38,7 @@ public sealed partial class MainWindow : Window
     private static readonly HashSet<string> HostCommands = new(StringComparer.Ordinal)
     {
         "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen",
-        "ViewScaleUp", "ViewScaleDown", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
+        "ViewScaleUp", "ViewScaleDown", "ViewScrollUp", "ViewScrollDown", "ViewScrollLeft", "ViewScrollRight", "OpenContextMenu", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
         "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
@@ -79,7 +79,7 @@ public sealed partial class MainWindow : Window
         AddHandler(KeyDownEvent, Key_Down, RoutingStrategies.Tunnel);
         AddHandler(DragDrop.DropEvent, Drop);
         DragDrop.SetAllowDrop(this, true);
-        Viewer.GestureRequested += async (_, gesture) => await GestureAsync(gesture);
+        Viewer.TryGestureRequested = TryHandleGesture;
         Viewer.ChildBookRequested += async (_, page) =>
         {
             if (_model is not null && !_preparing && !_closedPrepared)
@@ -299,6 +299,9 @@ public sealed partial class MainWindow : Window
                     Config.Current.Panels.IsHideLeftPanel = hide; Config.Current.Panels.IsHideRightPanel = hide; _model.RefreshPanels(); break;
                 case "ViewScaleUp": await Viewer.ZoomAsync(1.2); break;
                 case "ViewScaleDown": await Viewer.ZoomAsync(1 / 1.2); break;
+                case "ViewScrollUp": case "ViewScrollDown": case "ViewScrollLeft": case "ViewScrollRight":
+                    Viewer.ScrollView(name, _model.SaveData.GetCommandParameter<ViewScrollCommandParameter>(name)); break;
+                case "OpenContextMenu": OpenViewerContextMenu(); break;
                 case "NextScrollPage": await Viewer.ScrollToNextFrameAsync(1, _model.SaveData.GetScrollParameter(name)); break;
                 case "PrevScrollPage": await Viewer.ScrollToNextFrameAsync(-1, _model.SaveData.GetScrollParameter(name)); break;
                 case "NextSizePage": await _model.Operation.MoveSizeAsync(_model.SaveData.GetMoveSizeParameter().Size); break;
@@ -614,7 +617,7 @@ public sealed partial class MainWindow : Window
         var matches = _model.Commands.Definitions.Where(d => _model.SaveData.GetShortcut(d.Name, d.Shortcut).Split(',').Any(s => MatchKey(s, e))).ToArray();
         if (matches.Length == 0) return; e.Handled = true;
         if (matches.Length > 1) { ShowError("快捷键冲突：" + string.Join("、", matches.Select(d => d.Text))); return; }
-        await ExecuteAsync(matches[0].Name);
+        await ExecuteInputAsync(matches[0].Name, true);
     }
     /// <summary>只规范数字键名称，旧 Control 不转换为 Command。</summary>
     internal static bool MatchKey(string value, KeyEventArgs e)
@@ -631,39 +634,72 @@ public sealed partial class MainWindow : Window
         catch (ArgumentException) { return false; }
     }
     /// <summary>鼠标手势按原差分绑定匹配，冲突不会静默覆盖。</summary>
-    private async Task GestureAsync(string gesture)
+    private async Task GestureAsync(string gesture, bool allowReverse = true)
     {
-        if (_model is null) return;
-        var matches = _model.Commands.Definitions.Where(d => _model.SaveData.GetShortcut(d.Name, d.Shortcut).Split(',')
-            .Any(s => string.Equals(s.Trim().Replace("Control+", "Ctrl+").Replace("Command+", "Meta+"), gesture, StringComparison.OrdinalIgnoreCase))).ToArray();
-        if (matches.Length == 1) await ExecuteAsync(matches[0].Name);
+        var matches = GetGestureMatches(gesture);
+        if (matches.Length == 1) await ExecuteInputAsync(matches[0].Name, allowReverse);
         else if (matches.Length > 1) ShowError("输入冲突：" + string.Join("、", matches.Select(d => d.Text)));
+    }
+    /// <summary>仅输入路径应用原按滑条方向的成对交换；菜单执行保留明确命令含义。</summary>
+    private Task ExecuteInputAsync(string name, bool allowReverse)
+    {
+        if (_model is null) return Task.CompletedTask;
+        var parameter = _model.SaveData.GetCommandParameter<ReversibleCommandParameter>(name);
+        var resolved = DefaultInputScheme.ResolveCommand(name, Config.Current.Command, !_model.SliderReversed, allowReverse, parameter.IsReverse);
+        return ExecuteAsync(resolved);
+    }
+    /// <summary>使用同一规范解析匹配修饰集合；未知动作不被普通点击代替。</summary>
+    private CommandDefinition[] GetGestureMatches(string gesture)
+    {
+        if (_model is null || _preparing || _closedPrepared || !MouseGestureSource.TryNormalize(gesture, out var normalized)) return [];
+        return _model.Commands.Definitions.Where(d => _model.SaveData.GetShortcut(d.Name, d.Shortcut).Split(',')
+            .Any(s => MouseGestureSource.TryNormalize(s, out var candidate) && candidate == normalized)).ToArray();
+    }
+    /// <summary>按下阶段先裁决Handled，执行仍走统一异步命令入口。</summary>
+    private bool TryHandleGesture(string gesture)
+    {
+        if (GetGestureMatches(gesture).Length == 0) return false;
+        _ = GestureAsync(gesture); return true;
     }
     /// <summary>命令依赖模式按原修饰键滚轮绑定执行，不绕过配置强制缩放/翻页。</summary>
     private async void FilmStrip_GlobalWheel(object? sender, PointerWheelEventArgs e)
     {
-        _wheel += e.Delta.Y; int steps = (int)_wheel; _wheel -= steps;
-        var modifiers = new List<string>();
-        if (e.KeyModifiers.HasFlag(KeyModifiers.Control)) modifiers.Add("Ctrl");
-        if (e.KeyModifiers.HasFlag(KeyModifiers.Meta)) modifiers.Add("Meta");
-        if (e.KeyModifiers.HasFlag(KeyModifiers.Alt)) modifiers.Add("Alt");
-        if (e.KeyModifiers.HasFlag(KeyModifiers.Shift)) modifiers.Add("Shift");
-        var buttons = e.GetCurrentPoint(sender as Control ?? FilmStrip).Properties;
-        if (buttons.IsLeftButtonPressed) modifiers.Add("LeftButton");
-        if (buttons.IsRightButtonPressed) modifiers.Add("RightButton");
-        if (buttons.IsMiddleButtonPressed) modifiers.Add("MiddleButton");
-        var wheel = string.Join('+', modifiers.Append(steps > 0 ? "WheelUp" : "WheelDown"));
-        for (int i = 0; i < Math.Abs(steps); i++) await GestureAsync(wheel);
+        await DispatchWheelAsync(sender as Control ?? FilmStrip, e);
+    }
+    /// <summary>两轴/输入作用域/修饰分别积累；一次多格滚轮不丢步，也不跨修饰拼接。</summary>
+    private async Task DispatchWheelAsync(Control scope, PointerWheelEventArgs e)
+    {
+        var properties = e.GetCurrentPoint(scope).Properties;
+        foreach (var (delta, negative, positive, horizontal) in new[] { (e.Delta.Y, "WheelDown", "WheelUp", false), (e.Delta.X, "WheelLeft", "WheelRight", true) })
+        {
+            if (delta == 0) continue;
+            var gesture = MouseGestureSource.Create(delta < 0 ? negative : positive, e.KeyModifiers, properties);
+            if (!MouseGestureSource.TryNormalize(gesture, out var normalized)) continue;
+            var key = ((object)scope, normalized[..normalized.LastIndexOf("Wheel", StringComparison.Ordinal)] + (horizontal ? "Horizontal" : "Vertical"));
+            var total = _wheelDeltas.GetValueOrDefault(key) + delta; var signedSteps = (int)total; _wheelDeltas[key] = total - signedSteps;
+            if (signedSteps == 0) continue;
+            gesture = MouseGestureSource.Create(signedSteps < 0 ? negative : positive, e.KeyModifiers, properties);
+            var steps = horizontal && Config.Current.Command.IsHorizontalWheelLimitedOnce ? Math.Min(Math.Abs(signedSteps), 1) : Math.Abs(signedSteps);
+            if (ReferenceEquals(scope, Viewer) && GetGestureMatches(gesture).Length > 0) Viewer.SuppressPendingClick(properties);
+            for (int i = 0; i < steps; i++) await GestureAsync(gesture, horizontal ? Config.Current.Command.IsReversePageMoveHorizontalWheel : Config.Current.Command.IsReversePageMoveWheel);
+        }
+    }
+    /// <summary>查看器菜单复用原完整菜单树和占位；右键方案调用同一命令入口。</summary>
+    private void OpenViewerContextMenu()
+    {
+        if (_model is null) return;
+        var menu = new Menu(); MenuPresenter.Populate(menu, MenuTree.CreateDefault(), _model.Commands, _model.SaveData, IsCommandAvailable, name => ExecuteAsync(name, true), GetCommandCheck);
+        var items = menu.Items.Cast<object>().ToArray(); menu.Items.Clear();
+        Viewer.ContextMenu?.Close();
+        var context = new ContextMenu { ItemsSource = items }; Viewer.ContextMenu = context;
+        context.Closed += (_, _) => { if (ReferenceEquals(Viewer.ContextMenu, context)) Viewer.ContextMenu = null; };
+        context.Open(Viewer);
     }
     /// <summary>普通滚轮按原绑定；正式 Mac 精确滚动由平台桥接提前消费。</summary>
     private async void Viewer_Wheel(object? sender, PointerWheelEventArgs e)
     {
         e.Handled = true;
-        if (e.KeyModifiers.HasFlag(KeyModifiers.Control) || e.KeyModifiers.HasFlag(KeyModifiers.Meta)) { await Viewer.ZoomAsync(Math.Pow(1.15, e.Delta.Y), e.GetPosition(Viewer)); return; }
-        if (Math.Abs(e.Delta.X) > 0) { Viewer.Pan(new(e.Delta.X * 24, 0)); return; }
-        _wheel += e.Delta.Y;
-        if (Math.Abs(_wheel) < 1) return;
-        var direction = Math.Sign(_wheel); _wheel -= direction; await GestureAsync(direction > 0 ? "WheelUp" : "WheelDown");
+        await DispatchWheelAsync(Viewer, e);
     }
     /// <summary>Finder 拖入使用与菜单相同的打开链路。</summary>
     private async void Drop(object? sender, DragEventArgs e) { if (e.DataTransfer.TryGetFiles()?.FirstOrDefault()?.TryGetLocalPath() is { } path) { e.Handled = true; await OpenAsync(path); } }

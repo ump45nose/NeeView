@@ -5,4 +5,5 @@ public sealed class MoveSizePageCommandParameter
 {
     private int _size = 10;
     public int Size { get => _size; set => _size = Math.Clamp(value, 0, 1000); }
+    public bool IsReverse { get; set; } = true;
 }

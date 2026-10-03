@@ -103,10 +103,10 @@
 | ToggleSlideShow | 幻灯片播放/停止 | F5 | 待 P2–P5 | NeeView/Command/Commands/ToggleSlideShowCommand.cs |
 | ViewScrollNTypeUp | N 字形滚动↑ |  | 待 P2–P5 | NeeView/Command/Commands/ViewScrollNTypeUpCommand.cs |
 | ViewScrollNTypeDown | N 字形滚动↓ |  | 待 P2–P5 | NeeView/Command/Commands/ViewScrollNTypeDownCommand.cs |
-| ViewScrollUp | 滚动↑ |  | 待 P2–P5 | NeeView/Command/Commands/ViewScrollUpCommand.cs |
-| ViewScrollDown | 滚动↓ |  | 待 P2–P5 | NeeView/Command/Commands/ViewScrollDownCommand.cs |
-| ViewScrollLeft | 滚动← |  | 待 P2–P5 | NeeView/Command/Commands/ViewScrollLeftCommand.cs |
-| ViewScrollRight | 滚动→ |  | 待 P2–P5 | NeeView/Command/Commands/ViewScrollRightCommand.cs |
+| ViewScrollUp | 滚动↑ |  | P2 第十六批宿主适配 | NeeView/Command/Commands/ViewScrollUpCommand.cs |
+| ViewScrollDown | 滚动↓ |  | P2 第十六批宿主适配 | NeeView/Command/Commands/ViewScrollDownCommand.cs |
+| ViewScrollLeft | 滚动← |  | P2 第十六批宿主适配 | NeeView/Command/Commands/ViewScrollLeftCommand.cs |
+| ViewScrollRight | 滚动→ |  | P2 第十六批宿主适配 | NeeView/Command/Commands/ViewScrollRightCommand.cs |
 | ViewPresetScroll | 预设滚动 |  | 待 P2–P5 | NeeView/Command/Commands/ViewPresetScrollCommand.cs |
 | ViewScaleUp | 放大 | RightButton+WheelUp | P1 宿主适配 | NeeView/Command/Commands/ViewScaleUpCommand.cs |
 | ViewScaleDown | 缩小 | RightButton+WheelDown | P1 宿主适配 | NeeView/Command/Commands/ViewScaleDownCommand.cs |
@@ -231,7 +231,7 @@
 | HelpScript | 显示脚本帮助 |  | 待 P2–P5 | NeeView/Command/Commands/HelpScriptCommand.cs |
 | HelpMainMenu | 显示主菜单帮助 |  | 待 P2–P5 | NeeView/Command/Commands/HelpMainMenuCommand.cs |
 | HelpSearchOption | 搜索选项帮助 |  | 待 P2–P5 | NeeView/Command/Commands/HelpSearchOptionCommand.cs |
-| OpenContextMenu | 打开上下文菜单 |  | 待 P2–P5 | NeeView/Command/Commands/OpenContextMenuCommand.cs |
+| OpenContextMenu | 打开上下文菜单 |  | P2 第十六批宿主适配 | NeeView/Command/Commands/OpenContextMenuCommand.cs |
 | ExportBackup | 导出设置 |  | 待 P2–P5 | NeeView/Command/Commands/ExportBackupCommand.cs |
 | ImportBackup | 导入设置 |  | 待 P2–P5 | NeeView/Command/Commands/ImportBackupCommand.cs |
 | ReloadSetting | 重新载入设置 |  | 待 P2–P5 | NeeView/Command/Commands/ReloadSettingCommand.cs |

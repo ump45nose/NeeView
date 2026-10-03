@@ -346,6 +346,53 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     public Task SaveAsync((int Size, TimeSpan Span) historyLimits) =>
         saveData.SaveAsync(Book, Position.Part, keepHistoryOrder: _keepHistoryOrder, historyLimits: historyLimits);
 
+    /// <summary>设置表单在原导航锁内应用/保存；失败恢复已知字段及命令，保持原对象引用。</summary>
+    /// <param name="apply">同步应用经过验证的表单草稿，不能嵌套调用导航入口。</param>
+    /// <param name="historyLimits">原文件保留限制；成功提交后由SaveData应用。</param>
+    public async Task ApplyOptionsAsync(Action apply, (int Size, TimeSpan Span) historyLimits)
+    {
+        await _gate.WaitAsync();
+        try
+        {
+            if (_disposed || _closing || IsLoading) throw new InvalidOperationException("当前不能应用设置，请等待书籍加载完成。");
+            _saving?.Cancel();
+            await saveData.SynchronizeWritesAsync();
+            var snapshot = System.Text.Json.JsonSerializer.Deserialize<Config>(System.Text.Json.JsonSerializer.Serialize(Config.Current))!;
+            var commands = saveData.CaptureCommandSettings();
+            var reading = Book?.Setting is { } setting ? (BookSettingConfig)setting.Clone() : null;
+            try
+            {
+                apply(); await SaveAsync(historyLimits);
+            }
+            catch
+            {
+                // Context及面板可能持有分支对象，逐字段恢复而非替换Config单例。
+                foreach (var branch in typeof(Config).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance).Where(p => p.PropertyType.IsClass && p.CanWrite))
+                    CopySettingFields(branch.GetValue(snapshot)!, branch.GetValue(Config.Current)!);
+                saveData.RestoreCommandSettings(commands);
+                if (reading is not null && Book is { } book) { CopySettingFields(reading, book.Setting); book.Setting.Page = reading.Page; }
+                throw;
+            }
+            Bookshelf.Reorder();
+            if (reading is not null && Book is { } current && System.Text.Json.JsonSerializer.Serialize(reading) != System.Text.Json.JsonSerializer.Serialize(current.Setting))
+            {
+                var page = current.CurrentPage; current.Sort(CancellationToken.None); Position = new(page?.Index ?? 0, Position.Part);
+                RebuildFrame(MoveDirection); RecordPageHistory(); Notify();
+            }
+        }
+        finally { _gate.Release(); }
+    }
+    /// <summary>设置回滚只复制已声明的可写字段；不丢失BookSetting绑定/上下文引用。</summary>
+    private static void CopySettingFields(object source, object target)
+    {
+        foreach (var property in source.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+            .Where(p => p.CanRead && p.CanWrite && !Attribute.IsDefined(p, typeof(System.Text.Json.Serialization.JsonIgnoreAttribute))))
+        {
+            try { property.SetValue(target, property.GetValue(source)); }
+            catch (System.Reflection.TargetInvocationException ex) { throw new InvalidOperationException($"设置回滚失败：{source.GetType().Name}.{property.Name}：{ex.InnerException?.Message}", ex.InnerException ?? ex); }
+        }
+    }
+
     /// <summary>使用完整迁入的 PageFrameFactory；半页位置在关闭分割时恢复整页。</summary>
     private void RebuildFrame(int direction, bool synchronizeSelection = true)
     {

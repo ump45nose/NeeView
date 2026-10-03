@@ -20,10 +20,19 @@
         <CheckBox x:Name="PrioritizeBookMove" Content="允许前后书命令取代正在加载的书籍" />
       </StackPanel>
     </ScrollViewer>
-    <Grid x:Name="InputSettings" Grid.Column="1" RowDefinitions="Auto,Auto,*" Margin="16" IsVisible="False">
+    <Grid x:Name="InputSettings" Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto,*" Margin="16" IsVisible="False">
       <TextBlock Text="命令 / 键鼠" FontSize="20" Margin="0,0,0,12" />
-      <TextBox Grid.Row="1" PlaceholderText="搜索命令" TextChanged="InputSearch_Changed" Margin="0,0,0,8" />
-      <ListBox x:Name="InputList" Grid.Row="2">
+      <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
+        <ComboBox x:Name="InputScheme"><ComboBoxItem Content="A · 标准" /><ComboBoxItem Content="B · 滚轮翻页" /><ComboBoxItem Content="C · 点击翻页" /></ComboBox>
+        <ComboBox x:Name="InputReadOrder"><ComboBoxItem Content="从右向左" /><ComboBoxItem Content="从左向右" /></ComboBox>
+        <Button x:Name="InputDefaults" Content="应用默认键位" Click="InputDefaults_Click" ToolTip.Tip="替换键位编辑副本；保存后生效。命令参数保留。" />
+      </StackPanel>
+      <StackPanel Grid.Row="2" Margin="0,0,0,8">
+        <CheckBox x:Name="ReversePageMove" Content="按滑条方向交换成对的按键 / 点击操作" />
+        <StackPanel Orientation="Horizontal" Spacing="12"><CheckBox x:Name="ReversePageWheel" Content="垂直滚轮也交换" /><CheckBox x:Name="ReverseHorizontalWheel" Content="水平滚轮也交换" /><CheckBox x:Name="LimitHorizontalWheel" Content="水平滚轮每次最多一步" /></StackPanel>
+      </StackPanel>
+      <TextBox Grid.Row="3" PlaceholderText="搜索命令" TextChanged="InputSearch_Changed" Margin="0,0,0,8" />
+      <ListBox x:Name="InputList" Grid.Row="4">
         <ListBox.ItemTemplate><DataTemplate><Grid ColumnDefinitions="*,230" Margin="0,4"><StackPanel><TextBlock Text="{Binding Label}" /><TextBlock Text="{Binding Name}" FontSize="10" Opacity="0.6" /></StackPanel><TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" ToolTip.Tip="逗号分隔多个输入；空值解绑。Control 保留原值，Mac Command 使用 Meta。" /></Grid></DataTemplate></ListBox.ItemTemplate>
       </ListBox>
     </Grid>

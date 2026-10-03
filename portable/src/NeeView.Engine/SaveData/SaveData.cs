@@ -64,6 +64,7 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
             config.Playlist = ReadBranch<PlaylistConfig>(raw, "Playlist");
             config.Window = ReadBranch<WindowConfig>(raw, "Window");
             config.MenuBar = ReadBranch<MenuBarConfig>(raw, "MenuBar");
+            config.Command = ReadBranch<CommandConfig>(raw, "Command");
             // 原旧拼写与初期 Mac 字段只作读取别名；原新字段明确存在时优先。
             var auto = raw["AutoHide"]?.DeepClone().AsObject() ?? new JsonObject();
             if (auto["AutoHideHitTestMargin"] is { } margin)
@@ -165,15 +166,13 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
     public string GetShortcut(string name, string fallback)
     {
         var item = _setting["Commands"]?[name];
-        return item?["ShortCutKey"]?.GetValue<string>() ?? fallback;
+        return item?["ShortCutKey"]?.GetValue<string>() ?? DefaultInputScheme.GetShortcut(name, fallback, Config.Current.Command);
     }
 
     /// <summary>读取原滚动命令差分 Parameter；缺省使用原参数，未知字段不写回。</summary>
     public ScrollPageCommandParameter GetScrollParameter(string name)
     {
-        var options = new JsonSerializerOptions(Options);
-        options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
-        return _setting["Commands"]?[name]?["Parameter"]?.Deserialize<ScrollPageCommandParameter>(options) ?? new();
+        return GetCommandParameter<ScrollPageCommandParameter>(name);
     }
 
     /// <summary>原相反方向的指定步长命令共享参数，NextSizePage 读取 PrevSizePage 的差分。</summary>
@@ -184,14 +183,38 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
     {
         var options = new JsonSerializerOptions(Options);
         options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
-        return _setting["Commands"]?[name]?["Parameter"]?.Deserialize<T>(options) ?? new();
+        var owner = DefaultInputScheme.GetParameterOwner(name);
+        // 早期Mac各方向独立写出的参数仅作读取兼容；原共享节点明确存在时优先。
+        return (_setting["Commands"]?[owner]?["Parameter"] ?? _setting["Commands"]?[name]?["Parameter"])?.Deserialize<T>(options) ?? new();
     }
 
     /// <summary>更新已支持参数并保留原节点的未知字段；原差分快捷键不会被覆盖。</summary>
-    public void SetCommandParameter<T>(string name, T value) => Merge(Object(Object(Object(_setting, "Commands"), name), "Parameter"), JsonSerializer.SerializeToNode(value, Options)!.AsObject());
+    public void SetCommandParameter<T>(string name, T value) => Merge(Object(Object(Object(_setting, "Commands"), DefaultInputScheme.GetParameterOwner(name)), "Parameter"), JsonSerializer.SerializeToNode(value, Options)!.AsObject());
 
     /// <summary>编辑原 Commands 差分键位；空字符串表示解绑，未知参数保持。</summary>
     public void SetShortcut(string name, string value) => Object(Object(_setting, "Commands"), name)["ShortCutKey"] = value;
+
+    /// <summary>输入表单专用回滚点；原命令参数/未知字段和配置仍属于唯一JSON链。</summary>
+    public sealed class CommandSettingsSnapshot
+    {
+        internal JsonNode? Commands { get; init; }
+        internal CommandConfig Config { get; init; } = null!;
+    }
+    /// <summary>在表单应用前保留输入字段，保存失败后可取消或同草稿重试。</summary>
+    public CommandSettingsSnapshot CaptureCommandSettings() => new() { Commands = _setting["Commands"]?.DeepClone(), Config = Config.Current.Command };
+    /// <summary>等待此前已进入保存事务的写入/取消清理完成，表单随后才能拍快照及编辑。</summary>
+    public async Task SynchronizeWritesAsync()
+    { await _gate.WaitAsync(); _gate.Release(); }
+    /// <summary>恢复输入编辑前的原节点；不读取文件，也不修改其他配置。</summary>
+    public void RestoreCommandSettings(CommandSettingsSnapshot snapshot)
+    { _setting["Commands"] = snapshot.Commands?.DeepClone(); Config.Current.Command = snapshot.Config; }
+    /// <summary>保存方案的已改键位；值等于该方案默认时恢复差分省略，未知参数保留。</summary>
+    public void SetShortcutDifference(string name, string value, string baseline)
+    {
+        var item = Object(Object(_setting, "Commands"), name);
+        if (value == DefaultInputScheme.GetShortcut(name, baseline, Config.Current.Command)) item.Remove("ShortCutKey");
+        else item["ShortCutKey"] = value;
+    }
 
     /// <summary>按原书籍路径查询书签，不把当前页面独立注册为另一本书。</summary>
     public bool IsBookmark(string path) => BookmarkRoot.Walk().Any(e => !e.IsFolder && e.Path == path);
@@ -397,7 +420,7 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
         try
         {
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "History", "Bookmark", "System", "Playlist", "AutoHide", "Window", "MenuBar" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "History", "Bookmark", "System", "Playlist", "AutoHide", "Window", "MenuBar", "Command" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 Merge(Object(config, branch), JsonSerializer.SerializeToNode(value, Options)!.AsObject());

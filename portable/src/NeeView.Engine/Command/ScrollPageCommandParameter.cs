@@ -21,6 +21,7 @@ public sealed class ScrollPageCommandParameter : IScrollNTypeParameter
     public double LineBreakStopTime { get => _stopTime; set => _stopTime = Math.Round(value, 5); }
     public LineBreakStopMode LineBreakStopMode { get; set; } = LineBreakStopMode.Line;
     public bool PagesAsOne { get; set; }
+    public bool IsReverse { get; set; } = true;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool IsNScroll { get => false; set => ScrollType = value ? NScrollType.NType : NScrollType.Diagonal; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]

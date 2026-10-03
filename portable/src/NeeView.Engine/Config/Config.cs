@@ -20,6 +20,7 @@ public sealed class Config
     public AutoHideConfig AutoHide { get; set; } = new();
     public WindowConfig Window { get; set; } = new();
     public MenuBarConfig MenuBar { get; set; } = new();
+    public CommandConfig Command { get; set; } = new();
     /// <summary>早期 Mac 字段兼容入口；真实配置沿用原 MenuBar 分支。</summary>
     [System.Text.Json.Serialization.JsonIgnore]
     public bool IsAddressBarEnabled { get => MenuBar.IsAddressBarEnabled; set => MenuBar.IsAddressBarEnabled = value; }

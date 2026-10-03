@@ -33,13 +33,16 @@ public sealed class ReaderView : Control, IDisposable
     private Avalonia.Vector _initialPan;
     private bool _dragged;
     private bool _bookCardPressed;
+    private string? _pendingClick;
+    private readonly HashSet<MouseButton> _suppressedButtons = [];
     private bool _disposed;
     private Book? _displayBook;
     private PageRange? _displayRange;
     private readonly PageFrames.PageFrameScrollControl _scrollControl = new();
     private readonly SemaphoreSlim _scrollGate = new(1);
     private string? _loadError;
-    public event EventHandler<string>? GestureRequested;
+    /// <summary>同步裁决是否命中命令；宿主异步执行，命中后阻止普通点击/拖动。</summary>
+    public Func<string, bool>? TryGestureRequested { get; set; }
     public event EventHandler<Page>? ChildBookRequested;
     public event EventHandler? DisplayCompleted;
     public int DisplayCount => _images.Count;
@@ -171,6 +174,21 @@ public sealed class ReaderView : Control, IDisposable
     public void ResetTransform() { _zoom = 1; _pan = default; InvalidateVisual(); }
     /// <summary>高精度滚动平移；分页导航由输入映射处理。</summary>
     public void Pan(Avalonia.Vector delta) { _pan += delta; ClampPan(); InvalidateVisual(); }
+    /// <summary>按原四向滚动先移动指定轴，到边界后按阅读方向尝试跨轴。</summary>
+    public void ScrollView(string command, ViewScrollCommandParameter parameter)
+    {
+        if (_frame is null) return;
+        var dx = Bounds.Width * parameter.Scroll; var dy = Bounds.Height * parameter.Scroll;
+        var readDirection = _operation?.Context?.ReadOrder == PageReadOrder.LeftToRight ? 1 : -1;
+        var horizontal = command is "ViewScrollLeft" or "ViewScrollRight";
+        var sign = command is "ViewScrollLeft" or "ViewScrollUp" ? 1 : -1;
+        var old = _pan; Pan(horizontal ? new(dx * sign, 0) : new(0, dy * sign));
+        if (parameter.AllowCrossScroll && (horizontal ? old.X == _pan.X : old.Y == _pan.Y))
+            Pan(horizontal ? new(0, dy * sign * readDirection) : new(dx * sign * readDirection, 0));
+    }
+    /// <summary>组合滚轮消费当前按下动作，释放时不追加普通点击。</summary>
+    public void SuppressPendingClick(PointerPointProperties properties)
+    { _suppressedButtons.UnionWith(MouseGestureSource.HeldButtons(properties)); _pendingClick = null; _pressed = null; }
     /// <summary>沿用原 DragArea.SnapView，精确滚动和拖动不允许把图片完全推出视口。</summary>
     private void ClampPan()
     {
@@ -246,18 +264,42 @@ public sealed class ReaderView : Control, IDisposable
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e); Focus();
+        var properties = e.GetCurrentPoint(this).Properties;
+        var button = MouseGestureSource.ChangedButton(properties);
+        // 所有按钮都持有本次输入，避免移出控件后的释放丢失；捕获转移会取消待确认动作。
+        if (button != MouseButton.None) e.Pointer.Capture(this);
+        var action = MouseGestureSource.ClickAction(button, e.ClickCount);
+        var gesture = action is null ? null : MouseGestureSource.Create(action, e.KeyModifiers, properties, button);
+        // 原扩展组合/双击优先在按下阶段匹配，不能随后再触发第一次普通释放。
+        if (gesture is not null && (gesture.Contains('+') || e.ClickCount >= 2 || button is MouseButton.XButton1 or MouseButton.XButton2)
+            && TryGestureRequested?.Invoke(gesture) == true)
+        {
+            _suppressedButtons.UnionWith(MouseGestureSource.HeldButtons(properties));
+            _pendingClick = null; _pressed = null; _dragged = false; e.Handled = true; return;
+        }
         if (GetBookPageAt(e.GetPosition(this)) is { } page)
         {
             _bookCardPressed = true; e.Handled = true;
-            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed && e.ClickCount == 2) ChildBookRequested?.Invoke(this, page);
+            if (button == MouseButton.Left && e.ClickCount >= 2) ChildBookRequested?.Invoke(this, page);
             return;
         }
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) { _pressed = e.GetPosition(this); _initialPan = _pan; _dragged = false; e.Pointer.Capture(this); }
+        _pendingClick = gesture;
+        if (button == MouseButton.Left) { _pressed = e.GetPosition(this); _initialPan = _pan; _dragged = false; }
     }
     /// <summary>拖动大图只修改表现变换。</summary>
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
+        // Avalonia在已有按钮按下时把额外按钮变化送入PointerMoved；按更新种类补原ChangedButton事件。
+        var properties = e.GetCurrentPoint(this).Properties;
+        var changed = MouseGestureSource.ChangedButton(properties);
+        if (changed != MouseButton.None && MouseGestureSource.ClickAction(changed, 1) is { } action)
+        {
+            var gesture = MouseGestureSource.Create(action, e.KeyModifiers, properties, changed);
+            if (TryGestureRequested?.Invoke(gesture) == true)
+            { SuppressPendingClick(properties); _dragged = false; e.Handled = true; }
+            return;
+        }
         if (_pressed is not { } start) return;
         var position = e.GetPosition(this); var delta = new Avalonia.Vector(position.X - start.X, position.Y - start.Y);
         if (delta.Length > 4) _dragged = true;
@@ -266,14 +308,16 @@ public sealed class ReaderView : Control, IDisposable
     /// <summary>未拖动的左右点击送入原快捷键映射。</summary>
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
-        base.OnPointerReleased(e); e.Pointer.Capture(null);
-        if (!_dragged && !_bookCardPressed)
-        {
-            var gesture = e.InitialPressMouseButton switch { MouseButton.Left => "LeftClick", MouseButton.Right => "RightClick", MouseButton.Middle => "MiddleClick", _ => null };
-            if (gesture is not null) GestureRequested?.Invoke(this, gesture);
-        }
-        _pressed = null; _dragged = false; _bookCardPressed = false;
+        base.OnPointerReleased(e);
+        var suppressed = _suppressedButtons.Remove(e.InitialPressMouseButton);
+        if (!suppressed && !_dragged && !_bookCardPressed && new Avalonia.Rect(Bounds.Size).Contains(e.GetPosition(this)) && _pendingClick is { } gesture)
+            e.Handled |= TryGestureRequested?.Invoke(gesture) == true;
+        _pressed = null; _dragged = false; _bookCardPressed = false; _pendingClick = null;
+        if (!MouseGestureSource.HeldButtons(e.GetCurrentPoint(this).Properties).Any()) e.Pointer.Capture(null);
     }
+    /// <summary>捕获丢失取消未确认点击/拖动，旧指针不作用于新控件。</summary>
+    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+    { base.OnPointerCaptureLost(e); _pressed = null; _dragged = false; _pendingClick = null; _bookCardPressed = false; _suppressedButtons.Clear(); }
     /// <summary>按原封面按钮区域命中书籍页，单击不翻页，双击打开实际命中项。</summary>
     private Page? GetBookPageAt(Point point)
     {
