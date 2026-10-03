@@ -85,6 +85,9 @@ public sealed partial class MainWindow : Window
         AddHandler(DragDrop.DropEvent, Drop);
         DragDrop.SetAllowDrop(this, true);
         Viewer.TryGestureRequested = TryHandleGesture;
+        Viewer.CanStartMouseSequence = () => !_preparing && !_closedPrepared && _model?.Operation.IsLoading == false && !WindowInteraction.HasDialog(this) && !this.FindControl<Menu>("MenuBar")!.IsOpen && Viewer.ContextMenu?.IsOpen != true;
+        Viewer.MouseSequenceText = sequence => FindMouseSequence(sequence)?.Text;
+        Viewer.TryMouseSequenceRequested = sequence => { var command = FindMouseSequence(sequence); if (command is null) return false; _ = ExecuteInputAsync(command.Name, true); return true; };
         Viewer.ChildBookRequested += async (_, page) =>
         {
             if (_model is not null && !_preparing && !_closedPrepared)
@@ -640,7 +643,7 @@ public sealed partial class MainWindow : Window
         if (e.Handled || _model is null) return;
         var inputWindow = sender as Window ?? this;
         var focusedElement = inputWindow.FocusManager?.GetFocusedElement();
-        if (e.Key == Key.Escape && _sidePanels?.CancelDrag() == true) { e.Handled = true; return; }
+        if (e.Key == Key.Escape && (Viewer.CancelMouseSequence() || _sidePanels?.CancelDrag() == true)) { e.Handled = true; return; }
         if (e.KeyModifiers == KeyModifiers.Meta && e.Key is Key.O or Key.W or Key.Q)
         { e.Handled = true; if (e.Key == Key.W && inputWindow is FloatingPanelWindow) inputWindow.Close(); else await ExecuteAsync(e.Key == Key.O ? "LoadAs" : e.Key == Key.W ? "CloseWindow" : "CloseApplication"); return; }
         if (focusedElement is TextBox) return;
@@ -694,6 +697,9 @@ public sealed partial class MainWindow : Window
         }
         catch (ArgumentException) { return false; }
     }
+    /// <summary>沿原方向字典登记顺序后项覆盖；精确匹配且保留未迁命令能力提示。</summary>
+    private CommandDefinition? FindMouseSequence(MouseSequence sequence) => sequence.IsEmpty || _model is null ? null
+        : _model.Commands.Definitions.LastOrDefault(d => _model.SaveData.GetMouseGesture(d.Name, d.MouseGesture) == sequence);
     /// <summary>鼠标手势按原差分绑定匹配，冲突不会静默覆盖。</summary>
     private async Task GestureAsync(string gesture, bool allowReverse = true)
     {

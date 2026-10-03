@@ -100,3 +100,5 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 第二十一批迁入原列表四模板/共享Profile、稳定路径可见封面及真正虚拟缩略网格；仍共用唯一来源/BitmapFactory和原三列表JSON，见[p2-list-templates.md](p2-list-templates.md)。
 
 第二十二批迁入原Windows.Panels/WindowPlacement及浮动/停靠/关闭/重开；唯一内容与输入在表现端适配，主退出失败恢复同一宿主，见[p2-floating.md](p2-floating.md)。
+
+第二十三批接入原方向序列、235命令的MouseGesture默认元数据及原差分配对，表现层处理捕获/提示，见[p2-direction-gestures.md](p2-direction-gestures.md)。

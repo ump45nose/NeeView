@@ -236,6 +236,8 @@ public sealed class MouseInputTests
                 screenshot!.Save(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, $"../../../../../acceptance/{phase}-input-settings-layout.png")), Avalonia.Media.Imaging.PngBitmapEncoderOptions.Default);
             }
             settings.FindControl<ComboBox>("InputScheme")!.SelectedIndex = 1; settings.FindControl<ComboBox>("InputReadOrder")!.SelectedIndex = 1;
+            settings.FindControl<CheckBox>("GestureEnabled")!.IsChecked = false;
+            settings.FindControl<NumericUpDown>("GestureDistance")!.Value = 50;
             settings.FindControl<CheckBox>("FilmEnabled")!.IsChecked = true; settings.FindControl<CheckBox>("AutoNormal")!.IsChecked = true;
             settings.FindControl<ComboBox>("Mode")!.SelectedIndex = 1;
             settings.FindControl<Button>("InputDefaults")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); Assert.Equal(old, state.GetShortcut("NextPage", ""));
@@ -243,9 +245,10 @@ public sealed class MouseInputTests
             settings.FindControl<Button>("SaveSettings")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             await WaitAsync(() => settings.FindControl<TextBlock>("Message")!.Text?.StartsWith("保存失败") == true);
             Assert.True(Config.Current.Command.PresetInputScheme == InputScheme.TypeA, settings.FindControl<TextBlock>("Message")!.Text); Assert.Equal(old, state.GetShortcut("NextPage", ""));
+            Assert.True(Config.Current.Mouse.IsGestureEnabled); Assert.Equal(30, Config.Current.Mouse.GestureMinimumDistance); Assert.Equal("L", state.GetMouseGesture("NextPage", "").ToString());
             Assert.False(Config.Current.FilmStrip.IsEnabled); Assert.Equal(oldAuto, Config.Current.Window.IsAutoHideInNormal); Assert.Equal(PageMode.SinglePage, operation.Book!.Setting.PageMode);
             Directory.Delete(blocker); settings.FindControl<Button>("SaveSettings")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await WaitAsync(() => !settings.IsVisible);
-            Assert.Equal("Right,WheelDown", state.GetShortcut("NextPage", ""));
+            Assert.Equal("Right,WheelDown", state.GetShortcut("NextPage", "")); Assert.Equal("R", state.GetMouseGesture("NextPage", "").ToString()); Assert.False(Config.Current.Mouse.IsGestureEnabled); Assert.Equal(50, Config.Current.Mouse.GestureMinimumDistance);
             var fresh = new SaveData(fixture.State); await fresh.LoadAsync(TestContext.Current.CancellationToken); Assert.Equal(InputScheme.TypeB, Config.Current.Command.PresetInputScheme); Assert.Equal("Right,WheelDown", fresh.GetShortcut("NextPage", ""));
         }
         finally

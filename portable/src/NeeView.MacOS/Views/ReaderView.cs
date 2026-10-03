@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -42,6 +43,13 @@ public sealed class ReaderView : Control, IDisposable
     private bool _bookCardPressed;
     private string? _pendingClick;
     private readonly HashSet<MouseButton> _suppressedButtons = [];
+    private readonly MouseSequenceBuilder _sequence = new();
+    private bool _sequenceActive;
+    private string _sequenceHint = "";
+    public Func<bool>? CanStartMouseSequence { get; set; }
+    public Func<MouseSequence, bool>? TryMouseSequenceRequested { get; set; }
+    public Func<MouseSequence, string?>? MouseSequenceText { get; set; }
+    public string MouseSequenceHint => _sequenceHint;
     private bool _disposed;
     private Book? _displayBook;
     private PageRange? _displayRange;
@@ -57,10 +65,17 @@ public sealed class ReaderView : Control, IDisposable
     /// <summary>当前页的资源结果；空封面是正常状态，错误不会遮蔽同帧其他页。</summary>
     public string? GetPageError(Page page) => _pageErrors.GetValueOrDefault(page);
 
+    /// <summary>表现层持有序列进度与焦点取消，不拥有命令业务。</summary>
+    public ReaderView()
+    {
+        LostFocus += (_, _) => CancelMouseSequence();
+        _sequence.GestureProgressed += (_, e) => { _sequenceHint = e.Sequence.IsEmpty ? "" : (MouseSequenceText?.Invoke(e.Sequence) is { } text ? text + "\n" : "") + e.Sequence.GetDisplayString(); InvalidateVisual(); };
+    }
     /// <summary>只装配业务和像素边界；没有解码器或文件系统依赖。</summary>
     public void Attach(BookOperation operation, CoreBitmapFactory factory)
     {
         _operation = operation; _factory = factory; Focusable = true;
+
     }
     /// <summary>状态变化触发当前可见帧需求；版本隔离旧解码结果。</summary>
     public async Task RefreshAsync()
@@ -119,6 +134,7 @@ public sealed class ReaderView : Control, IDisposable
         var transformChanged = _transform.Synchronize(_operation.Book, _frame);
         if (transformChanged || !ReferenceEquals(_displayBook, _operation.Book) || _displayRange != _frame?.FrameRange)
         {
+            CancelMouseSequence();
             _displayBook = _operation.Book; _displayRange = _frame?.FrameRange;
             AlignPageOrigin(_operation.MoveDirection);
             _scrollLock.SetLock(Config.Current.View.MovementConstraint.IsLockStart);
@@ -146,7 +162,8 @@ public sealed class ReaderView : Control, IDisposable
             DrawText(context, _operation?.Book is null ? "NeeView\n打开图片、目录或 ZIP / CBZ" : "这个来源没有可阅读的图片", new(30, 30)); return;
         }
         using var clip = context.PushClip(new Avalonia.Rect(Bounds.Size));
-        using var transform = context.PushTransform(_transform.GetMatrix());
+        using (context.PushTransform(_transform.GetMatrix()))
+        {
         foreach (var (source, target) in _transform.GetTargets())
         {
             if (source.IsDummy) context.FillRectangle(Brushes.White, target);
@@ -165,6 +182,8 @@ public sealed class ReaderView : Control, IDisposable
                 DrawText(context, source.Page.Content.Error ?? _pageErrors.GetValueOrDefault(source.Page) ?? _loadError ?? "正在加载…", target.TopLeft + new Avalonia.Vector(12, 12));
             }
         }
+        }
+        if (_sequenceHint.Length > 0) { context.FillRectangle(new SolidColorBrush(Color.FromArgb(210, 24, 24, 24)), new Avalonia.Rect(12, 12, 220, 58)); DrawText(context, _sequenceHint, new(24, 20)); }
         if (_loadError is not null) DrawText(context, _loadError, new(12, 12));
     }
     /// <summary>错误和空书籍保持可操作，文本不改变来源索引。</summary>
@@ -268,7 +287,7 @@ public sealed class ReaderView : Control, IDisposable
     }
     /// <summary>组合滚轮消费当前按下动作，释放时不追加普通点击。</summary>
     public void SuppressPendingClick(PointerPointProperties properties)
-    { _suppressedButtons.UnionWith(MouseGestureSource.HeldButtons(properties)); _pendingClick = null; _pressed = null; }
+    { CancelMouseSequence(); _suppressedButtons.UnionWith(MouseGestureSource.HeldButtons(properties)); _pendingClick = null; _pressed = null; }
     /// <summary>沿用原 DragArea.SnapView，精确滚动和拖动不允许把图片完全推出视口。</summary>
     private void ClampPan()
     {
@@ -330,6 +349,8 @@ public sealed class ReaderView : Control, IDisposable
         base.OnPointerPressed(e); Focus(); _pointer = e.GetPosition(this);
         var properties = e.GetCurrentPoint(this).Properties;
         var button = MouseGestureSource.ChangedButton(properties);
+        if (_sequenceActive && button == MouseButton.Left && !_sequence.IsEmpty)
+        { CompleteMouseSequence(properties, true); e.Handled = true; return; }
         // 所有按钮都持有本次输入，避免移出控件后的释放丢失；捕获转移会取消待确认动作。
         if (button != MouseButton.None) e.Pointer.Capture(this);
         var action = MouseGestureSource.ClickAction(button, e.ClickCount);
@@ -338,16 +359,19 @@ public sealed class ReaderView : Control, IDisposable
         if (gesture is not null && (gesture.Contains('+') || e.ClickCount >= 2 || button is MouseButton.XButton1 or MouseButton.XButton2)
             && TryGestureRequested?.Invoke(gesture) == true)
         {
-            _suppressedButtons.UnionWith(MouseGestureSource.HeldButtons(properties));
+            CancelMouseSequence(); _suppressedButtons.UnionWith(MouseGestureSource.HeldButtons(properties));
             _pendingClick = null; _pressed = null; _dragged = false; e.Handled = true; return;
         }
-        if (GetBookPageAt(e.GetPosition(this)) is { } page)
+        if (button == MouseButton.Left && GetBookPageAt(e.GetPosition(this)) is { } page)
         {
             _bookCardPressed = true; e.Handled = true;
             if (button == MouseButton.Left && e.ClickCount >= 2) ChildBookRequested?.Invoke(this, page);
             return;
         }
         _pendingClick = gesture;
+        if (button == MouseButton.Right && e.ClickCount == 1 && e.KeyModifiers == KeyModifiers.None
+            && MouseGestureSource.HeldButtons(properties).SequenceEqual([MouseButton.Right]) && Config.Current.Mouse.IsGestureEnabled && CanStartMouseSequence?.Invoke() != false)
+        { _sequenceActive = true; _sequence.Reset(new(_pointer!.Value.X, _pointer.Value.Y)); }
         if (button == MouseButton.Left) { _pressed = e.GetPosition(this); _initialPan = _pan; _dragged = false; }
     }
     /// <summary>拖动大图只修改表现变换。</summary>
@@ -357,11 +381,20 @@ public sealed class ReaderView : Control, IDisposable
         // Avalonia在已有按钮按下时把额外按钮变化送入PointerMoved；按更新种类补原ChangedButton事件。
         var properties = e.GetCurrentPoint(this).Properties;
         var changed = MouseGestureSource.ChangedButton(properties);
+        if (_sequenceActive && changed == MouseButton.Left && !_sequence.IsEmpty)
+        { CompleteMouseSequence(properties, true); e.Handled = true; return; }
         if (changed != MouseButton.None && MouseGestureSource.ClickAction(changed, 1) is { } action)
         {
             var gesture = MouseGestureSource.Create(action, e.KeyModifiers, properties, changed);
             if (TryGestureRequested?.Invoke(gesture) == true)
             { SuppressPendingClick(properties); _dragged = false; e.Handled = true; }
+            return;
+        }
+        if (_sequenceActive)
+        {
+            if (!Config.Current.Mouse.IsGestureEnabled || CanStartMouseSequence?.Invoke() == false) { CancelMouseSequence(); _pendingClick = null; return; }
+            _sequence.Move(new(_pointer!.Value.X, _pointer.Value.Y));
+            if (!_sequence.IsEmpty) { _pendingClick = null; e.Handled = true; }
             return;
         }
         if (_pressed is not { } start) return;
@@ -373,6 +406,9 @@ public sealed class ReaderView : Control, IDisposable
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
+        if (_sequenceActive && !_sequence.IsEmpty)
+        { CompleteMouseSequence(e.GetCurrentPoint(this).Properties, false); e.Handled = true; }
+        else CancelMouseSequence(false);
         var suppressed = _suppressedButtons.Remove(e.InitialPressMouseButton);
         if (!suppressed && !_dragged && !_bookCardPressed && new Avalonia.Rect(Bounds.Size).Contains(e.GetPosition(this)) && _pendingClick is { } gesture)
             e.Handled |= TryGestureRequested?.Invoke(gesture) == true;
@@ -381,7 +417,20 @@ public sealed class ReaderView : Control, IDisposable
     }
     /// <summary>捕获丢失取消未确认点击/拖动，旧指针不作用于新控件。</summary>
     protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
-    { base.OnPointerCaptureLost(e); _pressed = null; _dragged = false; _pendingClick = null; _bookCardPressed = false; _suppressedButtons.Clear(); }
+    { base.OnPointerCaptureLost(e); CancelMouseSequence(); _pressed = null; _dragged = false; _pendingClick = null; _bookCardPressed = false; _suppressedButtons.Clear(); }
+    /// <summary>释放或已有方向时左键终止；未知序列也不能退化为右击翻页。</summary>
+    private void CompleteMouseSequence(PointerPointProperties properties, bool click)
+    {
+        if (click) _sequence.AddClick();
+        var sequence = _sequence.ToMouseSequence(); var enabled = Config.Current.Mouse.IsGestureEnabled && CanStartMouseSequence?.Invoke() != false;
+        SuppressPendingClick(properties);
+        if (enabled) TryMouseSequenceRequested?.Invoke(sequence);
+    }
+    /// <summary>捕获/焦点/书籍变化与Escape取消方向序列；不执行命令。</summary>
+    public bool CancelMouseSequence(bool cancelClick = true)
+    {
+        bool active = _sequenceActive; if (active && cancelClick) _pendingClick = null; _sequenceActive = false; _sequence.Reset(default); return active;
+    }
     /// <summary>按原封面按钮区域命中书籍页，单击不翻页，双击打开实际命中项。</summary>
     private Page? GetBookPageAt(Point point)
     {
@@ -397,7 +446,7 @@ public sealed class ReaderView : Control, IDisposable
     /// <summary>释放当前需求和所有显示租约，晚到结果按 revision 拒绝。</summary>
     public void Dispose()
     {
-        if (_disposed) return; _disposed = true; ++_revision; _request?.Cancel(); _request = null;
+        if (_disposed) return; CancelMouseSequence(); _disposed = true; ++_revision; _request?.Cancel(); _request = null;
         foreach (var item in _images.Values) item.Dispose(); _images.Clear(); _pageErrors.Clear();
         _transform.Dispose();
     }

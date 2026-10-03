@@ -48,3 +48,5 @@ P2第十五批对照：原BookSourceFactory/ArchiveEntryCollection的三模式�
 P2第二十一批对照：原HistoryListBox四模板、PanelListItemProfile/PanelThumbnailItemSize及FolderListConfig默认Content保持；History.LastAccessTime不替换为文件时间。原相对封面bookPath基准、单图RequestedEntryName及有限自然首图选择共用；真正网格虚拟化替换原WPF VirtualizingWrapPanel，Windows动态待验。
 
 P2第二十二批：原LayoutPanelManager/WindowManager/WindowPlacement关系迁入；关闭保留位置、停靠清除位置、浮动独立成员、打开集合与JSON恢复经过固定样本和正式Headless验证。Windows动态/真实多屏捕获仍待验，见[p2-floating.md](p2-floating.md)。
+
+- P2第二十三批：原MouseSequence/MouseSequenceBuilder、CommandTable.CreateDefaultMemento与Commands.MouseGesture差分迁入；释放/C终端/轮滚取消/配对与回滚自动对照通过，Windows动态和真机捕获待验。

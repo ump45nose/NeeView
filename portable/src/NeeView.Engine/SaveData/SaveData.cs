@@ -66,6 +66,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             config.Window = ReadBranch<WindowConfig>(raw, "Window");
             config.MenuBar = ReadBranch<MenuBarConfig>(raw, "MenuBar");
             config.Command = ReadBranch<CommandConfig>(raw, "Command");
+            config.Mouse = ReadBranch<MouseConfig>(raw, "Mouse");
             config.StartUp = ReadBranch<StartUpConfig>(raw, "StartUp");
             // 原旧拼写与初期 Mac 字段只作读取别名；原新字段明确存在时优先。
             var auto = raw["AutoHide"]?.DeepClone().AsObject() ?? new JsonObject();
@@ -171,6 +172,17 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         return item?["ShortCutKey"]?.GetValue<string>() ?? DefaultInputScheme.GetShortcut(name, fallback, Config.Current.Command);
     }
 
+    /// <summary>原独立方向手势差分；空字符串解绑，缺省沿原方案配对。</summary>
+    public MouseSequence GetMouseGesture(string name, string fallback) => new(_setting["Commands"]?[name]?["MouseGesture"]?.GetValue<string>()
+        ?? DefaultInputScheme.GetMouseGesture(name, fallback, Config.Current.Command));
+    /// <summary>只写修改的方向手势；默认值省略，未知参数和键位保留。</summary>
+    public void SetMouseGestureDifference(string name, string value, string baseline)
+    {
+        var item = Object(Object(_setting, "Commands"), name);
+        var normalized = new MouseSequence(value).ToString();
+        if (normalized == DefaultInputScheme.GetMouseGesture(name, baseline, Config.Current.Command)) item.Remove("MouseGesture");
+        else item["MouseGesture"] = normalized;
+    }
     /// <summary>读取原滚动命令差分 Parameter；缺省使用原参数，未知字段不写回。</summary>
     public ScrollPageCommandParameter GetScrollParameter(string name)
     {
@@ -426,7 +438,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         try
         {
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "History", "Bookmark", "System", "Playlist", "AutoHide", "Window", "MenuBar", "Command", "StartUp" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "History", "Bookmark", "System", "Playlist", "AutoHide", "Window", "MenuBar", "Command", "Mouse", "StartUp" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 Merge(Object(config, branch), JsonSerializer.SerializeToNode(value, Options)!.AsObject());

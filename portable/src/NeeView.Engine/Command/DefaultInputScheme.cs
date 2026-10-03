@@ -13,7 +13,7 @@ public static class DefaultInputScheme
         ["NextFolderPage"] = "PrevFolderPage", ["PrevFolderPage"] = "NextFolderPage",
         ["FirstPage"] = "LastPage", ["LastPage"] = "FirstPage"
     };
-    private static readonly IReadOnlyDictionary<string, string> Baseline = LoadBaseline();
+    private static readonly IReadOnlyDictionary<string, CommandDefinition> Baseline = LoadBaseline();
     /// <summary>原SetShare参数关系；键位各自独立，参数仅保留一份。</summary>
     public static string GetParameterOwner(string name) => name switch
     {
@@ -31,17 +31,23 @@ public static class DefaultInputScheme
         allowReverse && parameterReverse && config.IsReversePageMove && sliderLeftToRight != (config.PresetPageReadOrder != PageReadOrder.RightToLeft)
             && Pairs.TryGetValue(name, out var partner) ? partner : name;
     /// <summary>只加载已有原命令清单，不增加平行登记表。</summary>
-    private static IReadOnlyDictionary<string, string> LoadBaseline()
+    private static IReadOnlyDictionary<string, CommandDefinition> LoadBaseline()
     {
         using var stream = typeof(CommandTable).Assembly.GetManifestResourceStream("NeeView.Command.command-manifest.json")!;
-        return System.Text.Json.JsonSerializer.Deserialize<List<CommandDefinition>>(stream)!.ToDictionary(d => d.Name, d => d.Shortcut);
+        return System.Text.Json.JsonSerializer.Deserialize<List<CommandDefinition>>(stream)!.ToDictionary(d => d.Name, d => d);
     }
     /// <summary>按原先方案覆写、再配对交换及滚轮交换的顺序返回默认键位。</summary>
     public static string GetShortcut(string name, string fallback, CommandConfig config)
     {
         var target = config.PresetPageReadOrder != PageReadOrder.RightToLeft && Pairs.TryGetValue(name, out var partner) ? partner : name;
-        var value = GetSchemeShortcut(target, Baseline.GetValueOrDefault(target, fallback), config.PresetInputScheme);
+        var value = GetSchemeShortcut(target, Baseline.GetValueOrDefault(target)?.Shortcut ?? fallback, config.PresetInputScheme);
         return target == name ? value : value.Replace("WheelUp", "****").Replace("WheelDown", "WheelUp").Replace("****", "WheelDown");
+    }
+    /// <summary>原默认方向只交换配对手势，不修改方向字母或自定义序列。</summary>
+    public static string GetMouseGesture(string name, string fallback, CommandConfig config)
+    {
+        var target = config.PresetPageReadOrder != PageReadOrder.RightToLeft && Pairs.TryGetValue(name, out var partner) ? partner : name;
+        return Baseline.GetValueOrDefault(target)?.MouseGesture ?? fallback;
     }
     /// <summary>原方案只改变对应命令，其他235项默认定义保持。</summary>
     private static string GetSchemeShortcut(string name, string fallback, InputScheme scheme) => (scheme, name) switch

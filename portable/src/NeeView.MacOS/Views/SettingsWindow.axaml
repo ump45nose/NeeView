@@ -52,9 +52,9 @@
         <CheckBox x:Name="ReversePageMove" Content="按滑条方向交换成对的按键 / 点击操作" />
         <StackPanel Orientation="Horizontal" Spacing="12"><CheckBox x:Name="ReversePageWheel" Content="垂直滚轮也交换" /><CheckBox x:Name="ReverseHorizontalWheel" Content="水平滚轮也交换" /><CheckBox x:Name="LimitHorizontalWheel" Content="水平滚轮每次最多一步" /></StackPanel>
       </StackPanel>
-      <TextBox Grid.Row="3" PlaceholderText="搜索命令" TextChanged="InputSearch_Changed" Margin="0,0,0,8" />
+      <StackPanel Grid.Row="3" Spacing="6"><StackPanel Orientation="Horizontal" Spacing="12"><CheckBox x:Name="GestureEnabled" Content="启用右键方向手势" /><TextBlock Text="最小距离 (DIP)" VerticalAlignment="Center" /><NumericUpDown x:Name="GestureDistance" Minimum="5" Maximum="200" Increment="5" Width="130" /></StackPanel><TextBox PlaceholderText="搜索命令" TextChanged="InputSearch_Changed" Margin="0,0,0,8" /></StackPanel>
       <ListBox x:Name="InputList" Grid.Row="4">
-        <ListBox.ItemTemplate><DataTemplate><Grid ColumnDefinitions="*,210,Auto" Margin="0,4"><StackPanel><TextBlock Text="{Binding Label}" /><TextBlock Text="{Binding Name}" FontSize="10" Opacity="0.6" /></StackPanel><TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" ToolTip.Tip="逗号分隔多个输入；空值解绑。Control 保留原值，Mac Command 使用 Meta。" /><Button Grid.Column="2" Content="参数…" Margin="8,0,0,0" IsEnabled="{Binding HasParameters}" Click="Parameter_Click" /></Grid></DataTemplate></ListBox.ItemTemplate>
+        <ListBox.ItemTemplate><DataTemplate><Grid ColumnDefinitions="*,180,90,Auto" Margin="0,4"><StackPanel><TextBlock Text="{Binding Label}" /><TextBlock Text="{Binding Name}" FontSize="10" Opacity="0.6" /></StackPanel><TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" ToolTip.Tip="逗号分隔多个输入；空值解绑。Control 保留原值，Mac Command 使用 Meta。" /><TextBox Grid.Column="2" Margin="6,0,0,0" Text="{Binding MouseGesture, Mode=TwoWay}" ToolTip.Tip="方向手势：U 上、R 右、D 下、L 左、C 点击；空值解绑。" /><Button Grid.Column="3" Content="参数…" Margin="8,0,0,0" IsEnabled="{Binding HasParameters}" Click="Parameter_Click" /></Grid></DataTemplate></ListBox.ItemTemplate>
       </ListBox>
     </Grid>
     <ScrollViewer x:Name="FilmSettings" Grid.Column="1" IsVisible="False">

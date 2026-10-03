@@ -318,6 +318,36 @@
       "target": "src/NeeView.Engine/Config/ViewVerticalOrigin.cs",
       "sha256": "eea7706baddd112ef878ce37778f30ab46717fa008cccb5cd56bc55bbf50738e",
       "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/MouseInput/MouseSequence.cs",
+      "target": "src/NeeView.Engine/MouseInput/MouseSequence.cs",
+      "sha256": "c72e1deda83ada18c3fa93a1bdef0e9d6c731af51f37363e059fb3f66ba17c6f",
+      "status": "原方向序列/转换/距离及夹角算法迁入；WPF值与文案适配"
+    },
+    {
+      "source": "NeeView/MouseInput/MouseDirectionConverter.cs",
+      "target": "src/NeeView.Engine/MouseInput/MouseDirectionConverter.cs",
+      "sha256": "8ca0b9825087be01f9a48e949200221c91710ea6b5b4772a75eacbfcdbc3434c",
+      "status": "原方向序列/转换/距离及夹角算法迁入；WPF值与文案适配"
+    },
+    {
+      "source": "NeeView/MouseInput/MouseGestureEventArgs.cs",
+      "target": "src/NeeView.Engine/MouseInput/MouseGestureEventArgs.cs",
+      "sha256": "1c372579c26ed28434d32ce7c86d8413188806f71091912608f851895a489389",
+      "status": "原方向序列/转换/距离及夹角算法迁入；WPF值与文案适配"
+    },
+    {
+      "source": "NeeView/MouseInput/MouseSequenceBuilder.cs",
+      "target": "src/NeeView.Engine/MouseInput/MouseSequenceBuilder.cs",
+      "sha256": "98bf6d649cf48ec1d627f05aaaf4de2ff232f57f6e153f3680196851a7e97964",
+      "status": "原方向序列/转换/距离及夹角算法迁入；WPF值与文案适配"
+    },
+    {
+      "source": "NeeView/MouseInput/MouseDirection.cs",
+      "target": "src/NeeView.Engine/MouseInput/MouseDirection.cs",
+      "sha256": "28685855ea08d6e2828d7319fb850d13d57b072b67bc79290dd94b2c7b449ec2",
+      "status": "原方向序列/转换/距离及夹角算法迁入；WPF值与文案适配"
     }
   ],
   "partial_adapters": [

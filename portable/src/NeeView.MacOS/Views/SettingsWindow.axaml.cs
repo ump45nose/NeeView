@@ -32,8 +32,10 @@ public sealed partial class SettingsWindow : Window
     public SettingsWindow(ReaderWorkspaceViewModel model, Func<string, bool>? available = null) : this()
     {
         _model = model;
-        _inputs = model.Commands.Definitions.Select(d => new ShortcutEdit(d, model.SaveData.GetShortcut(d.Name, d.Shortcut), available?.Invoke(d.Name) ?? model.Commands.IsAvailable(d.Name))).ToArray();
+        _inputs = model.Commands.Definitions.Select(d => new ShortcutEdit(d, model.SaveData.GetShortcut(d.Name, d.Shortcut), available?.Invoke(d.Name) ?? model.Commands.IsAvailable(d.Name), model.SaveData.GetMouseGesture(d.Name, d.MouseGesture).ToString())).ToArray();
         this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm(); FillAutoHide(); FillView();
+        this.FindControl<CheckBox>("GestureEnabled")!.IsChecked = Config.Current.Mouse.IsGestureEnabled;
+        FillNumber("GestureDistance", Config.Current.Mouse.GestureMinimumDistance, 5, 200);
         this.FindControl<ComboBox>("InputScheme")!.SelectedIndex = (int)Config.Current.Command.PresetInputScheme;
         this.FindControl<ComboBox>("InputReadOrder")!.SelectedIndex = (int)Config.Current.Command.PresetPageReadOrder;
         this.FindControl<CheckBox>("ReversePageMove")!.IsChecked = Config.Current.Command.IsReversePageMove;
@@ -71,7 +73,7 @@ public sealed partial class SettingsWindow : Window
     private void InputDefaults_Click(object? sender, RoutedEventArgs e)
     {
         var candidate = GetInputConfig();
-        foreach (var input in _inputs) input.Value = DefaultInputScheme.GetShortcut(input.Name, input.Definition.Shortcut, candidate);
+        foreach (var input in _inputs) { input.Value = DefaultInputScheme.GetShortcut(input.Name, input.Definition.Shortcut, candidate); input.MouseGesture = DefaultInputScheme.GetMouseGesture(input.Name, input.Definition.MouseGesture, candidate); }
         _resetInputDefaults = true;
     }
     /// <summary>默认方案是应用默认键位按钮的参数，切换下拉框不改现有自定义键位。</summary>
@@ -247,7 +249,7 @@ public sealed partial class SettingsWindow : Window
         this.FindControl<Button>("CancelSettings")!.IsEnabled = false;
         try
         {
-            ValidateInputs(_inputs);
+            ValidateInputs(_inputs); ValidateMouseGestures(_inputs);
             await _model.Operation.ApplyOptionsAsync(() =>
             {
                 var inputConfig = GetInputConfig();
@@ -258,6 +260,10 @@ public sealed partial class SettingsWindow : Window
                 // 只写用户修改的差分，避免一次保存就展开全部235条默认命令。
                 foreach (var input in _inputs.Where(i => _resetInputDefaults || i.Value.Trim() != i.OriginalValue.Trim()))
                     _model.SaveData.SetShortcutDifference(input.Name, input.Value.Trim(), input.Definition.Shortcut);
+                foreach (var input in _inputs.Where(i => _resetInputDefaults || i.MouseGesture.Trim() != i.OriginalMouseGesture.Trim()))
+                    _model.SaveData.SetMouseGestureDifference(input.Name, input.MouseGesture.Trim(), input.Definition.MouseGesture);
+                Config.Current.Mouse.IsGestureEnabled = this.FindControl<CheckBox>("GestureEnabled")!.IsChecked == true;
+                Config.Current.Mouse.GestureMinimumDistance = (double)(this.FindControl<NumericUpDown>("GestureDistance")!.Value ?? 30);
                 ApplyFilm(); ApplyAutoHide(); ApplyView(); _historySettings!.ApplyPolicy(Config.Current.History);
                 foreach (var parameter in _parameters.Values) parameter.Apply(_model.SaveData);
                 Config.Current.Bookshelf.FolderSortOrder = (FolderSortOrder)Math.Max(0, this.FindControl<ComboBox>("BookshelfGroup")!.SelectedIndex);
@@ -314,6 +320,22 @@ public sealed partial class SettingsWindow : Window
                 if (!unchanged) throw new ArgumentException($"输入冲突：{shortcut} 同时绑定到 {previous.Label}、{input.Label}。");
             }
             seen[shortcut] = input;
+        }
+    }
+    /// <summary>手势独立校验；已有冲突沿原后登记覆盖，新增冲突明确提示。</summary>
+    internal static void ValidateMouseGestures(IEnumerable<ShortcutEdit> inputs)
+    {
+        var seen = new Dictionary<MouseSequence, ShortcutEdit>();
+        foreach (var input in inputs)
+        {
+            var raw = input.MouseGesture.Trim();
+            if (raw.Any(c => !"URDLCurdlc".Contains(c)) && raw != input.OriginalMouseGesture)
+                throw new ArgumentException($"{input.Label} 的方向手势“{raw}”无法识别。请使用 U/R/D/L/C。");
+            var sequence = new MouseSequence(raw); if (sequence.IsEmpty) continue;
+            if (seen.TryGetValue(sequence, out var previous) && previous.Name != input.Name
+                && (previous.MouseGesture != previous.OriginalMouseGesture || raw != input.OriginalMouseGesture))
+                throw new ArgumentException($"手势冲突：{sequence.GetDisplayString()} 同时绑定到 {previous.Label}、{input.Label}。");
+            seen[sequence] = input;
         }
     }
     /// <summary>取消不写入配置。</summary>
