@@ -15,4 +15,5 @@ public sealed class HistoryConfig
     public bool IsVisibleItemsCount { get; set; } = true;
     public bool IsVisibleSearchBox { get; set; } = true;
     public bool IsKeepSearchHistory { get; set; } = true;
+    public bool IsKeepFolderStatus { get; set; } = true;
 }

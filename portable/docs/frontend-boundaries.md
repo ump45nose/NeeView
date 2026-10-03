@@ -47,3 +47,5 @@
 第十二批历史搜索输入、清空、历史菜单和错误区域在MainWindow.axaml/MainWindow.History，草稿、确认、500ms合并及取消由独立HistorySearchViewModel管理。窗口表现只转交已提交列表，不在UI执行匹配或I/O；前后历史导航使用同一Engine.HistoryList结果。切换增量取消未确认输入，保存失败回滚菜单选项。详见[p2-history-search.md](p2-history-search.md)。
 
 第十三批HistorySettingsViewModel持有原候选值及自定义值草稿，SettingsWindow只负责历史设置区域和导航。历史更多菜单共用原设置窗口，实际限制/临时排除/提交回滚在Engine；视图不扫描历史来源、运行集合不裁剪。保存禁用重入和关闭，不因历史外观或策略变更重建正文，见[p2-history-retention.md](p2-history-retention.md)。
+
+第十四批书架排序控件调用Engine.ChangeFolderOrderAsync，编辑的是原当前目录参数；枚举、种子、JSON归一及事务不进入界面。原排序菜单勾选与执行共用CommandTable.BookOrderCommands。布局及主题不变，失败后原选择/排序恢复，见[p2-folder-parameters.md](p2-folder-parameters.md)。

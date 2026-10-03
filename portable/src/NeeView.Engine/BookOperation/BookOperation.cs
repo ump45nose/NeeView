@@ -19,7 +19,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     private BookshelfFolderList? _bookshelf;
     private HistoryList? _historyList;
     public HistoryList HistoryList => _historyList ??= new(saveData);
-    public BookshelfFolderList Bookshelf => _bookshelf ??= new(archives);
+    public BookshelfFolderList Bookshelf => _bookshelf ??= new(archives, saveData.FolderConfigs);
     public PageSelector PageSelector { get; } = new();
     public FilmStrip FilmStrip => _filmStrip ??= new(PageSelector);
     public PageHistory PageHistory { get; } = new();

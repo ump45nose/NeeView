@@ -842,6 +842,36 @@
       "target": "src/NeeView.Engine/BookHistory/BookHistoryCollection.cs",
       "sha256": "addd035b3f7540da5b0851c2b79fbef2bbf880518c39bf553c75f654342fbece",
       "status": "迁入原Limit的数量优先/严格TakeWhile；IBookHistory约束改时间选择器、可注入时钟，极大期限防日期溢出"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderParameter.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookshelf/FolderParameter.cs",
+      "sha256": "bd6f0e51941b89600dd32ed7258eb0531545663d76a337299ffba2d7346c47de",
+      "status": "Original path parameter, random seed and default normalization; injected original collection"
+    },
+    {
+      "source": "NeeView/FolderConfig/FolderConfigCollection.cs",
+      "target": "src/NeeView.Engine/FolderConfig/FolderConfigCollection.cs",
+      "sha256": "3878eb830250c3a8ae0893089a001e8f7c7c66d63c5faae886778cf96cdca378",
+      "status": "Original parameter inheritance and CreateMemento; unknown JSON and thumbnails retained in four-file transaction"
+    },
+    {
+      "source": "NeeView/SaveData/SaveDataProfile.cs",
+      "target": "src/NeeView.Engine/FolderConfig/FolderConfigCollection.cs",
+      "sha256": "6727692ad5246b9171f71a7bdcf81d508e459737d9faee72c39794724b8bb22f",
+      "status": "Preserve original FolderConfigFileName=Foldres.json; full profile import remains P5"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderOrderClass.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Bookshelf.cs",
+      "sha256": "542d3c9d14cd34aceb4fb3d880d5b3937b4bba597e8b256c70fe5159d4243eb6",
+      "status": "Original Normal supported order map and enum sequence"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderList.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Bookshelf.cs",
+      "sha256": "5854e9abf42991aa6117fb3f7c6516f6162f95dcd92f8f042960dc3b69452b90",
+      "status": "Original SetFolderOrder/ToggleFolderOrder/MoveRandomFolder; no global default mutation"
     }
   ],
   "rule_references": [

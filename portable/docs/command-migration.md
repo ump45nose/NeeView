@@ -145,7 +145,7 @@
 | ToggleBookLock | 书籍锁定状态 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleBookLockCommand.cs |
 | PrevBook | 上一本书籍 | Up | P2 原普通书架前后项；失败保留选择 | NeeView/Command/Commands/PrevBookCommand.cs |
 | NextBook | 下一本书籍 | Down | P2 原普通书架前后项；失败保留选择 | NeeView/Command/Commands/NextBookCommand.cs |
-| RandomBook | 随机排序书籍 |  | 待 P2–P5 | NeeView/Command/Commands/RandomBookCommand.cs |
+| RandomBook | 随机排序书籍 |  | P2 original per-directory order; batch 14 | NeeView/Command/Commands/RandomBookCommand.cs |
 | PrevHistory | 后退到上一条历史记录 |  | P2 原过滤后历史列表导航；具体范围见验收表 | NeeView/Command/Commands/PrevHistoryCommand.cs |
 | NextHistory | 前进到下一条历史记录 |  | P2 原过滤后历史列表导航；具体范围见验收表 | NeeView/Command/Commands/NextHistoryCommand.cs |
 | PrevBookHistory | 后退到上一本书籍 | Alt+Left | P2 原导航历史接入；具体范围见验收表 | NeeView/Command/Commands/PrevBookHistoryCommand.cs |
@@ -155,20 +155,20 @@
 | ToggleMediaPlay | 视频播放/停止 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleMediaPlayCommand.cs |
 | PrevMediaPosition | 视频倒带 |  | 待 P2–P5 | NeeView/Command/Commands/PrevMediaPositionCommand.cs |
 | NextMediaPosition | 视频快进 |  | 待 P2–P5 | NeeView/Command/Commands/NextMediaPositionCommand.cs |
-| ToggleBookOrder | 切换书籍顺序 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleBookOrderCommand.cs |
-| SetBookOrderByFileNameA | 书名升序 |  | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderByFileNameACommand.cs |
-| SetBookOrderByFileNameD | 书名降序 |  | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderByFileNameDCommand.cs |
+| ToggleBookOrder | 切换书籍顺序 |  | P2 original per-directory order; batch 14 | NeeView/Command/Commands/ToggleBookOrderCommand.cs |
+| SetBookOrderByFileNameA | 书名升序 |  | P2 original per-directory order; batch 14 | NeeView/Command/Commands/SetBookOrderByFileNameACommand.cs |
+| SetBookOrderByFileNameD | 书名降序 |  | P2 original per-directory order; batch 14 | NeeView/Command/Commands/SetBookOrderByFileNameDCommand.cs |
 | SetBookOrderByPathA | 书籍路径升序 |  | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderByPathACommand.cs |
 | SetBookOrderByPathD | 书籍路径降序 |  | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderByPathDCommand.cs |
-| SetBookOrderByFileTypeA | 书籍文件类型升序 |  | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderByFileTypeACommand.cs |
-| SetBookOrderByFileTypeD | 书籍文件类型降序 |  | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderByFileTypeDCommand.cs |
-| SetBookOrderByTimeStampA | 书籍日期升序 |  | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderByTimeStampACommand.cs |
-| SetBookOrderByTimeStampD | 书籍日期降序 |  | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderByTimeStampDCommand.cs |
+| SetBookOrderByFileTypeA | 书籍文件类型升序 |  | P2 original per-directory order; batch 14 | NeeView/Command/Commands/SetBookOrderByFileTypeACommand.cs |
+| SetBookOrderByFileTypeD | 书籍文件类型降序 |  | P2 original per-directory order; batch 14 | NeeView/Command/Commands/SetBookOrderByFileTypeDCommand.cs |
+| SetBookOrderByTimeStampA | 书籍日期升序 |  | P2 original per-directory order; batch 14 | NeeView/Command/Commands/SetBookOrderByTimeStampACommand.cs |
+| SetBookOrderByTimeStampD | 书籍日期降序 |  | P2 original per-directory order; batch 14 | NeeView/Command/Commands/SetBookOrderByTimeStampDCommand.cs |
 | SetBookOrderByEntryTimeA | 书籍登记时间升序 |  | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderByEntryTimeACommand.cs |
 | SetBookOrderByEntryTimeD | 书籍登记时间降序 |  | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderByEntryTimeDCommand.cs |
-| SetBookOrderBySizeA | 书籍大小升序 |  | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderBySizeACommand.cs |
-| SetBookOrderBySizeD | 书籍大小降序 |  | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderBySizeDCommand.cs |
-| SetBookOrderByRandom | 书籍随机排序 |  | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderByRandomCommand.cs |
+| SetBookOrderBySizeA | 书籍大小升序 |  | P2 original per-directory order; batch 14 | NeeView/Command/Commands/SetBookOrderBySizeACommand.cs |
+| SetBookOrderBySizeD | 书籍大小降序 |  | P2 original per-directory order; batch 14 | NeeView/Command/Commands/SetBookOrderBySizeDCommand.cs |
+| SetBookOrderByRandom | 书籍随机排序 |  | P2 original per-directory order; batch 14 | NeeView/Command/Commands/SetBookOrderByRandomCommand.cs |
 | TogglePageMode | 切换页面模式 |  | P1 Engine | NeeView/Command/Commands/TogglePageModeCommand.cs |
 | TogglePageModeReverse | 切换页面模式 (反向) |  | 待 P2–P5 | NeeView/Command/Commands/TogglePageModeReverseCommand.cs |
 | SetPageModeOne | 单页显示 | Ctrl+1 | P1 Engine | NeeView/Command/Commands/SetPageModeOneCommand.cs |

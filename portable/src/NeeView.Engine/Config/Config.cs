@@ -95,6 +95,7 @@ public sealed class BookConfig
 public sealed class BookshelfConfig
 {
     public FolderOrder DefaultFolderOrder { get; set; } = FolderOrder.FileName;
+    public FolderOrder PlaylistFolderOrder { get; set; }
     public FolderSortOrder FolderSortOrder { get; set; } = FolderSortOrder.First;
 }
 /// <summary>原查看器基础缩放选项。</summary>

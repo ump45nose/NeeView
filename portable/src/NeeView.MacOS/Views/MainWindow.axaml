@@ -33,7 +33,7 @@
               <Button Content="刷新" Tag="RefreshBookshelfFolder" Click="Command_Click" ToolTip.Tip="刷新列表并保存当前书架设置，保存失败可重试" />
             </WrapPanel>
           </StackPanel>
-          <ComboBox x:Name="FolderOrderView" Grid.Row="1" Margin="8,0,8,6" ToolTip.Tip="普通书架默认排序" ItemsSource="{Binding FolderOrders}" SelectedItem="{Binding SelectedFolderOrder, Mode=OneWay}" SelectionChanged="FolderOrder_Changed">
+          <ComboBox x:Name="FolderOrderView" Grid.Row="1" Margin="8,0,8,6" ToolTip.Tip="当前目录排序；各目录独立保存" ItemsSource="{Binding FolderOrders}" SelectedItem="{Binding SelectedFolderOrder, Mode=OneWay}" SelectionChanged="FolderOrder_Changed">
             <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>
           </ComboBox>
           <TextBlock Grid.Row="2" Text="{Binding FolderMessage}" TextWrapping="Wrap" Margin="8,0" />

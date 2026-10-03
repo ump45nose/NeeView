@@ -10,6 +10,15 @@ public sealed class CommandTable
 {
     private readonly Dictionary<string, Func<Task>> _actions = [];
     public IReadOnlyList<CommandDefinition> Definitions { get; }
+    /// <summary>原普通书架排序命令；执行与菜单勾选共用，其他来源能力后续扩展。</summary>
+    public static IReadOnlyDictionary<string, FolderOrder> BookOrderCommands { get; } = new Dictionary<string, FolderOrder>
+    {
+        ["SetBookOrderByFileNameA"] = FolderOrder.FileName, ["SetBookOrderByFileNameD"] = FolderOrder.FileNameDescending,
+        ["SetBookOrderByFileTypeA"] = FolderOrder.FileType, ["SetBookOrderByFileTypeD"] = FolderOrder.FileTypeDescending,
+        ["SetBookOrderByTimeStampA"] = FolderOrder.TimeStamp, ["SetBookOrderByTimeStampD"] = FolderOrder.TimeStampDescending,
+        ["SetBookOrderBySizeA"] = FolderOrder.Size, ["SetBookOrderBySizeD"] = FolderOrder.SizeDescending,
+        ["SetBookOrderByRandom"] = FolderOrder.Random
+    };
     /// <summary>装配原阅读命令及已迁移设置命令；没有实现的命令不可执行。</summary>
     public CommandTable(BookOperation operation)
     {
@@ -30,6 +39,9 @@ public sealed class CommandTable
         _actions["NextHistory"] = () => operation.MoveHistoryListAsync(1);
         _actions["PrevBook"] = () => operation.MoveBookAsync(-1);
         _actions["NextBook"] = () => operation.MoveBookAsync(1);
+        _actions["RandomBook"] = operation.RandomBookAsync;
+        _actions["ToggleBookOrder"] = operation.ToggleFolderOrderAsync;
+        foreach (var pair in BookOrderCommands) _actions[pair.Key] = () => operation.ChangeFolderOrderAsync(pair.Value);
         _actions["PrevFolderPage"] = () => operation.MoveFolderPageAsync(-1);
         _actions["NextFolderPage"] = () => operation.MoveFolderPageAsync(1);
         _actions["TogglePlaylistItem"] = () => operation.TogglePlaylistItemAsync();

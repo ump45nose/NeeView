@@ -30,6 +30,7 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
     public event EventHandler? BookmarksChanged;
     public string DirectoryPath { get; } = directory;
     public PlaylistHub Playlists { get; private set; } = null!;
+    public FolderConfigCollection FolderConfigs { get; } = new();
     public string? LastBookPath => _setting["Config"]?["StartUp"]?["LastBookV2"]?["Path"]?.GetValue<string>();
 
     /// <summary>加载原命名文件并恢复 P1 已支持配置；损坏文件不覆盖。</summary>
@@ -84,6 +85,7 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
         config.Playlist.DefaultFolder = System.IO.Path.Combine(DirectoryPath, "Playlists");
         Playlists = new(config.Playlist);
         Config.SetCurrent(config);
+        FolderConfigs.Restore(await ReadAsync(FolderConfigCollection.FileName, token));
         // 原Restore(fromLoad:true)先按已加载配置限制；只改本次内存，不写回来源文件。
         if (_history["Items"] is JsonArray loadedItems)
             _history["Items"] = CreateLimitedHistoryItems(loadedItems, config.History, sort: false);
@@ -340,6 +342,17 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
     /// <summary>清空全部访问记录，保留搜索历史与未知根字段；不受界面过滤限制。</summary>
     public Task<int> ClearHistoryAsync(CancellationToken token = default) => EditHistoryAsync(null, token);
 
+    /// <summary>串行编辑原目录参数并提交统一文件事务；失败恢复集合供同路径重试。</summary>
+    /// <param name="edit">仅修改目录参数/现有书架排序，不进行外部I/O。</param><param name="token">准备阶段取消。</param>
+    public async Task EditFolderParametersAsync(Action edit, CancellationToken token = default)
+    {
+        await _gate.WaitAsync(token);
+        var previous = FolderConfigs.CreateMemento(forSave: false);
+        try { edit(); await WritePairAsync(token); }
+        catch { FolderConfigs.Restore(previous); throw; }
+        finally { _gate.Release(); }
+    }
+
     /// <summary>串行修改历史与三文件事务；选中删除和清空使用同一失败回滚。</summary>
     private async Task<int> EditHistoryAsync(HashSet<string>? paths, CancellationToken token)
     {
@@ -461,13 +474,13 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
         var names = new HashSet<string> { "SinglePage", "WidePage", "RightToLeft", "LeftToRight", "IsDivide", "IsSingleFirst", "IsSingleLast", "IsWide", "IsRecursive", "Sort", "Rot", "Base", "Seed", "Fx" };
         return string.Join(' ', (props ?? "").Split([' ', ','], StringSplitOptions.RemoveEmptyEntries).Where(e => names.Contains(e.Split('=')[0]) == known));
     }
-    /// <summary>先写完三个临时文件，再保留回滚副本；记录存在时启动恢复旧完整状态。</summary>
+    /// <summary>先准备原四个JSON文件，再保留回滚副本；中断恢复旧完整状态。</summary>
     /// <param name="token">准备阶段取消；提交开始后完成或回滚。</param>
     /// <param name="historyConfig">本次设置副本；其他调用使用已提交配置。</param>
     private async Task WritePairAsync(CancellationToken token, HistoryConfig? historyConfig = null)
     {
         Directory.CreateDirectory(DirectoryPath);
-        string[] names = ["History.json", "UserSetting.json", "Bookmark.json"];
+        string[] names = ["History.json", "UserSetting.json", "Bookmark.json", FolderConfigCollection.FileName];
         var marker = System.IO.Path.Combine(DirectoryPath, ".save-pending.json");
         try
         {
@@ -483,6 +496,7 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
             preparedBookmarks["Format"] ??= JsonValue.Create("NeeView.Bookmark/46.3.0");
             preparedBookmarks["Nodes"] = JsonSerializer.SerializeToNode(BookmarkRoot, Options);
             await WriteTemporaryAsync(names[2], preparedBookmarks, token);
+            await WriteTemporaryAsync(names[3], FolderConfigs.CreateMemento(), token);
             var previous = new JsonObject();
             foreach (var name in names)
             {
@@ -536,7 +550,7 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
         var marker = System.IO.Path.Combine(DirectoryPath, ".save-pending.json");
         if (!File.Exists(marker)) return;
         var previous = JsonNode.Parse(File.ReadAllText(marker))!.AsObject();
-        foreach (var name in new[] { "History.json", "UserSetting.json", "Bookmark.json" }.Where(previous.ContainsKey))
+        foreach (var name in new[] { "History.json", "UserSetting.json", "Bookmark.json", FolderConfigCollection.FileName }.Where(previous.ContainsKey))
         {
             var path = System.IO.Path.Combine(DirectoryPath, name);
             if (previous[name]!.GetValue<bool>()) File.Copy(path + ".save-backup", path, true);

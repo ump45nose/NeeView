@@ -163,6 +163,7 @@ public sealed partial class MainWindow : Window
     /// <summary>原菜单绑定的勾选表现；只读取引擎配置，不在菜单中维护第二套状态。</summary>
     private bool? GetCommandCheck(string name) => name switch
     {
+        var command when CommandTable.BookOrderCommands.TryGetValue(command, out var order) => _model?.Operation.Bookshelf.FolderOrder == order,
         "SetPageModeOne" => _model?.Operation.Book?.Setting.PageMode == PageMode.SinglePage,
         "SetPageModeTwo" => _model?.Operation.Book?.Setting.PageMode == PageMode.WidePage,
         "SetBookReadOrderRight" => _model?.Operation.Book?.Setting.BookReadOrder == PageReadOrder.RightToLeft,
@@ -376,6 +377,7 @@ public sealed partial class MainWindow : Window
         try
         {
             await _model.Operation.Bookshelf.SyncAsync(book, pending.Token);
+            if (!_preparing && !_closedPrepared) MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck);
         }
         catch (OperationCanceledException) { }
         catch (Exception ex) { if (ReferenceEquals(_folderBook, book) && !pending.IsCancellationRequested) ShowError("目录暂不可访问：" + ex.Message); }
@@ -403,7 +405,7 @@ public sealed partial class MainWindow : Window
     private async void FolderOrder_Changed(object? sender, SelectionChangedEventArgs e)
     {
         if (_model is null || sender is not ComboBox { SelectedItem: FolderOrderChoice choice } || choice.Mode == _model.Operation.Bookshelf.FolderOrder) return;
-        try { _model.Operation.Bookshelf.ChangeOrder(choice.Mode); await _model.Operation.SaveAsync(); }
+        try { await _model.Operation.ChangeFolderOrderAsync(choice.Mode); MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck); }
         catch (Exception ex) { ShowError(ex.Message); }
     }
     /// <summary>历史打开继续走原恢复策略，失败保持当前书籍。</summary>

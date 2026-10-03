@@ -2,13 +2,14 @@
 namespace NeeView;
 
 /// <summary>独立书架位置、列表及选择；浏览目录不改变当前书籍，所有枚举由后端完成。</summary>
-public sealed class BookshelfFolderList(IArchiveFactory archives) : IDisposable
+public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCollection? folderConfigs = null) : IDisposable
 {
     private CancellationTokenSource? _request;
     private long _revision;
     private bool _disposed;
     private IReadOnlyList<FolderItem> _entries = [];
-    private int _seed;
+    private readonly FolderConfigCollection _folderConfigs = folderConfigs ?? new();
+    private FolderParameter? _parameter;
     public string? Place { get; private set; }
     public IReadOnlyList<FolderItem> Items { get; private set; } = [];
     public FolderItem? SelectedItem { get; private set; }
@@ -58,10 +59,10 @@ public sealed class BookshelfFolderList(IArchiveFactory archives) : IDisposable
             var entries = await archives.ListBooksAsync(place, pending.Token);
             pending.Token.ThrowIfCancellationRequested();
             if (_disposed || revision != _revision) return false;
-            int seed = Place == place ? _seed : Random.Shared.Next(1, int.MaxValue);
-            var mode = GetNormalOrder(Config.Current.Bookshelf.DefaultFolderOrder);
-            var items = FolderCollection.Sort(entries, mode, Config.Current.Bookshelf.FolderSortOrder, seed, pending.Token);
-            _entries = entries; _seed = seed; Place = place; Items = items; FolderOrder = mode;
+            var parameter = new FolderParameter(place, _folderConfigs);
+            var mode = GetNormalOrder(parameter.FolderOrder);
+            var items = FolderCollection.Sort(entries, mode, Config.Current.Bookshelf.FolderSortOrder, parameter.Seed, pending.Token);
+            _entries = entries; _parameter = parameter; Place = place; Items = items; FolderOrder = mode;
             SelectedItem = Items.FirstOrDefault(e => e.Path == selectedPath); return true;
         }
         catch (OperationCanceledException) when (pending.IsCancellationRequested) { return false; }
@@ -81,18 +82,23 @@ public sealed class BookshelfFolderList(IArchiveFactory archives) : IDisposable
     /// <param name="reshuffle">用户重新选择随机时生成新种子；应用其他全局设置时保留随机次序。</param>
     public void ChangeOrder(FolderOrder mode, bool reshuffle = true)
     {
-        if (_disposed || IsLoading) return;
+        if (_disposed || IsLoading || _parameter is null) return;
         mode = GetNormalOrder(mode);
-        if (mode == FolderOrder.Random && reshuffle) _seed = Random.Shared.Next(1, int.MaxValue);
-        Config.Current.Bookshelf.DefaultFolderOrder = mode;
+        if (mode != FolderOrder.Random || reshuffle || _parameter.FolderOrder != mode) _parameter.FolderOrder = mode;
         FolderOrder = mode; Reorder();
+    }
+    /// <summary>失败回滚或全局默认修改后重新恢复原路径参数，不枚举来源。</summary>
+    public void ReloadParameter()
+    {
+        if (_disposed || IsLoading || Place is null) return;
+        _parameter = new(Place, _folderConfigs); FolderOrder = GetNormalOrder(_parameter.FolderOrder); Reorder();
     }
     /// <summary>应用全局目录分组时保持随机种子及未支持的原默认排序字段，只调整已提交集合。</summary>
     public void Reorder()
     {
         if (_disposed || IsLoading) return;
         var path = SelectedItem?.Path;
-        Items = FolderCollection.Sort(_entries, FolderOrder, Config.Current.Bookshelf.FolderSortOrder, _seed, CancellationToken.None);
+        Items = FolderCollection.Sort(_entries, FolderOrder, Config.Current.Bookshelf.FolderSortOrder, _parameter?.Seed ?? 0, CancellationToken.None);
         SelectedItem = Items.FirstOrDefault(e => e.Path == path); Changed?.Invoke(this, EventArgs.Empty);
     }
 

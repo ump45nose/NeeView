@@ -82,3 +82,5 @@ Book/Page/Archive/BookOperation 是原关系的 P1 子集适配，尚未完整�
 第十二批契约见[原历史列表结构化搜索](p2-history-search.md)。原BookHistory五属性及逐项SearcherFilter在后台快照执行，访问时间不替换为文件修改时间；日期/名称/布尔属性不读取来源。大小沿现有来源接口，缺失/目录为-1。HistorySearchViewModel独立管理500ms输入、确认历史与关闭，GetViewItems同时服务面板和前后导航，JSON仍为唯一权威。
 
 第十三批契约见[原历史文件保留限制](p2-history-retention.md)。原Limit与CreateMemento/fromLoad边界迁入，三文件事务只裁剪写出副本；LastBook及表达式历史独立。设置候选锁内提交，成功后才改运行配置；现有归档临时根由启动层注入，保存前排除应用临时来源，普通系统临时目录保留。其他历史保存/登记/无效清理策略继续待迁。
+
+第十四批契约见[原每目录参数](p2-folder-parameters.md)。FolderParameter/FolderConfigCollection迁入当前普通书架，目录排序与种子按路径保存，不再改全局默认。原特殊拼写Foldres.json接入同一四文件事务，旧双/三文件标记兼容；关闭保留仅影响写出副本，未知参数/缩略字段保持。原普通排序命令、切换与RandomBook分别接通，不创建平行配置或第二阅读内核。
