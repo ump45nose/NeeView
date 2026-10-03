@@ -20,6 +20,13 @@
         <TextBlock Text="页尾切书位置" /><ComboBox x:Name="ResetNextBookPageMode"><ComboBoxItem Content="恢复阅读位置" /><ComboBoxItem Content="始终从首页开始" /><ComboBoxItem Content="连续阅读（向前首页 / 向后末页）" /></ComboBox>
         <CheckBox x:Name="NotifyPageLoop" Content="提示页面已循环" />
         <TextBlock Text="页框移动方向" /><ComboBox x:Name="PageOrientation"><ComboBoxItem Content="水平" /><ComboBoxItem Content="垂直" /></ComboBox>
+        <TextBlock Text="翻页过渡" /><ComboBox x:Name="PageMoveType"><ComboBoxItem Content="滚动" /><ComboBoxItem Content="淡入淡出" /></ComboBox>
+        <TextBlock Text="翻页时长（秒，0 为立即）" /><NumericUpDown x:Name="PageMoveDuration" Minimum="0" Maximum="1" Increment="0.1" FormatString="0.#####" />
+        <TextBlock Text="命令滚动时长（秒）" /><NumericUpDown x:Name="ScrollDuration" Minimum="0" Maximum="1" Increment="0.1" FormatString="0.#####" />
+        <CheckBox x:Name="HoverScroll" Content="指针悬停滚动（禁用四向 / N 型滚动命令）" />
+        <TextBlock Text="悬停滚动灵敏度 / 时长" /><NumericUpDown x:Name="HoverSensitivity" Minimum="1" Maximum="10" Increment="0.1" /><NumericUpDown x:Name="HoverDuration" Minimum="0" Maximum="1" Increment="0.1" />
+        <CheckBox x:Name="MouseWheelScroll" Content="无修饰滚轮连续滚动（优先于滚轮命令）" />
+        <TextBlock Text="连续滚轮灵敏度 / 时长" /><NumericUpDown x:Name="WheelSensitivity" Minimum="0" Maximum="2" Increment="0.1" /><NumericUpDown x:Name="WheelDuration" Minimum="0" Maximum="1" Increment="0.1" />
         <TextBlock Text="书架（全局）" FontSize="16" Margin="0,8,0,0" />
         <TextBlock Text="文件夹与归档排序" /><ComboBox x:Name="BookshelfGroup"><ComboBoxItem Content="混排" /><ComboBoxItem Content="文件夹在前" /><ComboBoxItem Content="文件夹在后" /></ComboBox>
         <CheckBox x:Name="PrioritizeBookMove" Content="允许前后书命令取代正在加载的书籍" />

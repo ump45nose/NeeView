@@ -67,3 +67,5 @@
 第二十二批浮窗结构在FloatingPanelWindow.axaml，SidePanelPresenter负责唯一内容父级、同一输入路由及屏幕坐标；Engine保存原浮动/位置JSON，非模态宿主不锁住主查看器，见[p2-floating.md](p2-floating.md)。
 
 方向手势由Engine原序列判定，ReaderView仅捕获/提示，MainWindow转交原命令；方向编辑独立于键位文本，主题不改变命令语义。
+
+ReaderMotionPresenter只插值表现点与透明度；退出帧不复制页面/像素且受原工厂租约预算，XAML可独立调整动画编辑布局。

@@ -50,3 +50,5 @@ P2第二十一批对照：原HistoryListBox四模板、PanelListItemProfile/Pane
 P2第二十二批：原LayoutPanelManager/WindowManager/WindowPlacement关系迁入；关闭保留位置、停靠清除位置、浮动独立成员、打开集合与JSON恢复经过固定样本和正式Headless验证。Windows动态/真实多屏捕获仍待验，见[p2-floating.md](p2-floating.md)。
 
 - P2第二十三批：原MouseSequence/MouseSequenceBuilder、CommandTable.CreateDefaultMemento与Commands.MouseGesture差分迁入；释放/C终端/轮滚取消/配对与回滚自动对照通过，Windows动态和真机捕获待验。
+
+- P2第二十四批：原PageChangeType/Duration、PageFrameContainerLayout方向及静态1间距，Scroll/Fade、取消、Hover/连续轮滚优先通过自动对照；全景/幻灯片专有策略为后续阶段，Windows动态待验。

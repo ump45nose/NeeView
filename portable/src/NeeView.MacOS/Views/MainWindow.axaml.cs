@@ -43,7 +43,7 @@ public sealed partial class MainWindow : Window
         "ViewScaleUp", "ViewScaleDown", "ViewScrollUp", "ViewScrollDown", "ViewScrollLeft", "ViewScrollRight", "OpenContextMenu", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
         "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ToggleBookLock", "Unload", "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff",
         "ToggleViewFlipVertical", "ViewFlipVerticalOn", "ViewFlipVerticalOff", "ViewReset", "ViewScaleStretch", "ViewPresetScroll", "ViewScrollNTypeUp", "ViewScrollNTypeDown",
-        "ToggleStretchMode", "ToggleStretchModeReverse", "SetStretchModeUniformToFill", "SetStretchModeUniformToSize", "SetStretchModeUniformToVertical", "SetStretchModeUniformToHorizontal", "ToggleStretchAllowScaleUp", "ToggleStretchAllowScaleDown",
+        "ToggleStretchMode", "ToggleStretchModeReverse", "SetStretchModeUniformToFill", "SetStretchModeUniformToSize", "SetStretchModeUniformToVertical", "SetStretchModeUniformToHorizontal", "ToggleStretchAllowScaleUp", "ToggleStretchAllowScaleDown", "ToggleHoverScroll",
         "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
@@ -233,6 +233,7 @@ public sealed partial class MainWindow : Window
         "SetStretchModeUniformToSize" => Config.Current.View.StretchMode == PageStretchMode.UniformToSize,
         "SetStretchModeUniformToVertical" => Config.Current.View.StretchMode == PageStretchMode.UniformToVertical,
         "SetStretchModeUniformToHorizontal" => Config.Current.View.StretchMode == PageStretchMode.UniformToHorizontal,
+        "ToggleHoverScroll" => Config.Current.Mouse.IsHoverScroll,
         "ToggleStretchAllowScaleUp" => Config.Current.View.AllowStretchScaleUp,
         "ToggleStretchAllowScaleDown" => Config.Current.View.AllowStretchScaleDown,
         "ToggleViewFlipHorizontal" => Viewer.IsFlipHorizontal,
@@ -340,6 +341,7 @@ public sealed partial class MainWindow : Window
                     Viewer.Flip(horizontal, _model.SaveData.GetCommandParameter<ToggleCommandParameter>(name).GetState(horizontal ? Viewer.IsFlipHorizontal : Viewer.IsFlipVertical, fromMenu)); break;
                 case "ViewFlipHorizontalOn": case "ViewFlipHorizontalOff": case "ViewFlipVerticalOn": case "ViewFlipVerticalOff":
                     Viewer.Flip(name.Contains("Horizontal"), name.EndsWith("On")); break;
+                case "ToggleHoverScroll": Config.Current.Mouse.IsHoverScroll = _model.SaveData.GetCommandParameter<ToggleCommandParameter>(name).GetState(Config.Current.Mouse.IsHoverScroll, fromMenu); await Viewer.RefreshAsync(); break;
                 case "ViewReset": Viewer.ResetTransform(); await Viewer.RefreshAsync(); break;
                 case "ViewScaleStretch": await Viewer.StretchAsync(); break;
                 case "ViewPresetScroll": Viewer.ScrollToPreset(_model.SaveData.GetCommandParameter<ViewPresetScrollCommandParameter>(name)); break;
@@ -766,7 +768,7 @@ public sealed partial class MainWindow : Window
     private async void Viewer_Wheel(object? sender, PointerWheelEventArgs e)
     {
         e.Handled = true;
-        await DispatchWheelAsync(Viewer, e);
+        if (!Viewer.TryWheelScroll(e)) await DispatchWheelAsync(Viewer, e);
     }
     /// <summary>Finder 拖入使用与菜单相同的打开链路。</summary>
     private async void Drop(object? sender, DragEventArgs e) { if (e.DataTransfer.TryGetFiles()?.FirstOrDefault()?.TryGetLocalPath() is { } path) { e.Handled = true; await OpenAsync(path); } }

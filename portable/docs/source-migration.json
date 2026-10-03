@@ -348,6 +348,12 @@
       "target": "src/NeeView.Engine/MouseInput/MouseDirection.cs",
       "sha256": "28685855ea08d6e2828d7319fb850d13d57b072b67bc79290dd94b2c7b449ec2",
       "status": "原方向序列/转换/距离及夹角算法迁入；WPF值与文案适配"
+    },
+    {
+      "source": "NeeView/Config/PageMoveType.cs",
+      "target": "src/NeeView.Engine/Config/PageMoveType.cs",
+      "sha256": "5d7fd3f58add2ed2a10fdd322cc4fb65ff602dedc8bf086eb364ea7019255850",
+      "status": "原分页过渡枚举迁入"
     }
   ],
   "partial_adapters": [
@@ -1292,6 +1298,12 @@
       "target": "src/NeeView.Engine/SidePanels/WindowPlacement.cs",
       "sha256": "849f6fac27b8310886e1e91d39478971a44aa3a77a17ebccba793baed396b80b",
       "status": "原枚举值保持；Windows FullDesktop保留数据，不作为Mac浮窗恢复状态"
+    },
+    {
+      "source": "NeeView/PageFrames/PageFrameContainerLayout.cs",
+      "target": "src/NeeView.Engine/PageFrames/PageFrameContainerLayout.cs",
+      "sha256": "52a81bdcb9f2837cdd3d3ec4bdc8f44ac5b06f7f5a4358927b5c1f9a53b6a803",
+      "status": "原Layout方向/间距/位置分支迁入； linked容器/250ms几何宿主由表现快照替换"
     }
   ],
   "rule_references": [

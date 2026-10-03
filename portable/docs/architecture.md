@@ -102,3 +102,5 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 第二十二批迁入原Windows.Panels/WindowPlacement及浮动/停靠/关闭/重开；唯一内容与输入在表现端适配，主退出失败恢复同一宿主，见[p2-floating.md](p2-floating.md)。
 
 第二十三批接入原方向序列、235命令的MouseGesture默认元数据及原差分配对，表现层处理捕获/提示，见[p2-direction-gestures.md](p2-direction-gestures.md)。
+
+第二十四批接入原Scroll/Fade方向/时长与Hover/连续滚轮，单个退出帧共用现有显示租约，插值仅归表现，见[p2-animation.md](p2-animation.md)。

@@ -117,7 +117,13 @@ public sealed partial class SettingsWindow : Window
     /// <summary>原查看器配置独立于书籍表单作用域，只有保存后生效。</summary>
     private void FillView()
     {
-        var c = Config.Current.View;
+        var c = Config.Current.View; var mouse=Config.Current.Mouse;
+        this.FindControl<ComboBox>("PageMoveType")!.SelectedIndex=(int)c.PageMoveType;
+        FillNumber("PageMoveDuration",c.PageMoveDuration,0,1); FillNumber("ScrollDuration",c.ScrollDuration,0,1);
+        this.FindControl<CheckBox>("HoverScroll")!.IsChecked=mouse.IsHoverScroll;
+        this.FindControl<CheckBox>("MouseWheelScroll")!.IsChecked=mouse.IsMouseWheelScrollEnabled;
+        FillNumber("HoverSensitivity",mouse.HoverScrollSensitivity,1,10); FillNumber("HoverDuration",mouse.HoverScrollDuration,0,1);
+        FillNumber("WheelSensitivity",mouse.MouseWheelScrollSensitivity,0,2); FillNumber("WheelDuration",mouse.MouseWheelScrollDuration,0,1);
         this.FindControl<ComboBox>("PageEndAction")!.SelectedIndex = (int)Config.Current.Book.PageEndAction;
         this.FindControl<ComboBox>("ResetNextBookPageMode")!.SelectedIndex = (int)Config.Current.Book.ResetNextBookPageMode;
         this.FindControl<ComboBox>("PageOrientation")!.SelectedIndex = (int)Config.Current.Book.Orientation;
@@ -145,7 +151,12 @@ public sealed partial class SettingsWindow : Window
     /// <summary>写原View字段，取消不进入；命令参数由共享参数草稿独立应用。</summary>
     private void ApplyView()
     {
-        var c = Config.Current.View;
+        var c = Config.Current.View; var mouse=Config.Current.Mouse;
+        c.PageMoveType=(PageMoveType)Math.Max(0,this.FindControl<ComboBox>("PageMoveType")!.SelectedIndex);
+        c.PageMoveDuration=(double)(this.FindControl<NumericUpDown>("PageMoveDuration")!.Value??0); c.ScrollDuration=(double)(this.FindControl<NumericUpDown>("ScrollDuration")!.Value??.2m);
+        mouse.IsHoverScroll=this.FindControl<CheckBox>("HoverScroll")!.IsChecked==true; mouse.IsMouseWheelScrollEnabled=this.FindControl<CheckBox>("MouseWheelScroll")!.IsChecked==true;
+        mouse.HoverScrollSensitivity=(double)(this.FindControl<NumericUpDown>("HoverSensitivity")!.Value??2); mouse.HoverScrollDuration=(double)(this.FindControl<NumericUpDown>("HoverDuration")!.Value??.5m);
+        mouse.MouseWheelScrollSensitivity=(double)(this.FindControl<NumericUpDown>("WheelSensitivity")!.Value??1); mouse.MouseWheelScrollDuration=(double)(this.FindControl<NumericUpDown>("WheelDuration")!.Value??.2m);
         Config.Current.Book.PageEndAction = (PageEndAction)Math.Max(0, this.FindControl<ComboBox>("PageEndAction")!.SelectedIndex);
         Config.Current.Book.ResetNextBookPageMode = (ResetNextBookPageMode)Math.Max(0, this.FindControl<ComboBox>("ResetNextBookPageMode")!.SelectedIndex);
         Config.Current.Book.Orientation = (PageFrameOrientation)Math.Max(0, this.FindControl<ComboBox>("PageOrientation")!.SelectedIndex);

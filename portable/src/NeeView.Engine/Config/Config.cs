@@ -141,6 +141,8 @@ public sealed class ViewConfig
     public double AngleFrequency { get => _angleFrequency; set => _angleFrequency = double.IsFinite(value) ? Math.Round(Math.Max(0, value), 5) : 0; }
     public MovementConstraint MovementConstraint { get; set; } = MovementConstraint.LockUntilResized;
     public double ScrollDuration { get; set; } = .2;
+    public PageMoveType PageMoveType { get; set; }
+    public double PageMoveDuration { get; set; }
     /// <summary>旧原字段只作读取转换，保存继续使用两个独立方向。</summary>
     [System.Text.Json.Serialization.JsonPropertyName("ViewOrigin"), System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public int ViewOriginLegacy

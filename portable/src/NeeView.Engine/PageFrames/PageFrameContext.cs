@@ -13,6 +13,12 @@ public sealed class PageFrameContext(BookSettingConfig setting, Config config) :
     public bool IsSupportedSingleLastPage => setting.IsSupportedSingleLastPage && FramePageSize == 2;
     public bool IsLoopPage => config.Book.PageEndAction == PageEndAction.SeamlessLoop;
     public PageFrameOrientation FrameOrientation => config.Book.Orientation;
+    public double FrameMargin => 1; // 原静态分页帧间距；全景 FrameSpace 在 P3 接入。
+    public TimeSpan ScrollDuration => SafeDuration(config.View.ScrollDuration);
+    public TimeSpan PageChangeDuration => SafeDuration(config.View.PageMoveDuration);
+    public PageMoveType PageChangeType => PageChangeDuration == TimeSpan.Zero ? PageMoveType.Scroll : config.View.PageMoveType;
+    /// <summary>非有限/负损坏配置无动画；合法原数值不截断为编辑范围。</summary>
+    public static TimeSpan SafeDuration(double seconds) => double.IsFinite(seconds) && seconds > 0 && seconds < TimeSpan.MaxValue.TotalSeconds ? TimeSpan.FromSeconds(seconds) : TimeSpan.Zero;
     public bool IsStaticWidePage => config.Book.IsStaticWidePage && FramePageSize == 2;
     public bool IsInsertDummyPage => config.Book.IsInsertDummyPage;
     public bool IsInsertDummyFirstPage => config.Book.IsInsertDummyFirstPage;
