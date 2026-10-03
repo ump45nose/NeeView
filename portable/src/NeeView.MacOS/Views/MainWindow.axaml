@@ -66,11 +66,16 @@
               <Button Content="↓" IsEnabled="{Binding IsSingleBookmarkSelection}" Tag="1" ToolTip.Tip="在同一文件夹下移" Click="Bookmark_Reorder" />
               <Button Content="移动…" IsEnabled="{Binding IsSingleBookmarkSelection}" Click="Bookmark_Move" /><Button Content="颜色…" IsEnabled="{Binding IsSingleBookmarkSelection}" Click="Bookmark_Color" />
             </WrapPanel>
-            <TreeView x:Name="BookmarkTree" Grid.Row="1" ItemsSource="{Binding Bookmarks}" SelectionMode="Multiple" SelectedItem="{Binding SelectedBookmark, Mode=TwoWay}" DoubleTapped="Bookmark_DoubleTapped">
+            <local:BookmarkListView x:Name="BookmarkPanelList" Grid.Row="1">
+            <local:BookmarkListView.TreeContent>
+            <!-- 导航栏在上，编辑树在固定插槽；拖动提示换行不能使命中行在释放前移动。 -->
+            <TreeView x:Name="BookmarkTree" Height="180" IsVisible="{Binding BookmarkTreeVisible}" ItemsSource="{Binding Bookmarks}" SelectionMode="Multiple" SelectedItem="{Binding SelectedBookmark, Mode=TwoWay}" DoubleTapped="Bookmark_DoubleTapped">
               <TreeView.ItemTemplate><TreeDataTemplate ItemsSource="{Binding Children}"><StackPanel Orientation="Horizontal" Spacing="6"><TextBlock Text="■" IsVisible="{Binding IsFolder}" Foreground="{Binding Color, TargetNullValue='#8CA0AF'}" /><TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Path}" /></StackPanel></TreeDataTemplate></TreeView.ItemTemplate>
             </TreeView>
+            </local:BookmarkListView.TreeContent>
+            </local:BookmarkListView>
             <StackPanel Grid.Row="2" Margin="8" Spacing="4">
-              <TextBlock x:Name="BookmarkDropHint" Text="拖到文件夹中间移入，行边缘调整顺序；空白移至根。" TextWrapping="Wrap" FontSize="10" Opacity="0.7" />
+              <TextBlock x:Name="BookmarkDropHint" IsVisible="{Binding BookmarkTreeVisible}" Text="拖到文件夹中间移入，行边缘调整顺序；空白移至根。" TextWrapping="Wrap" FontSize="10" Opacity="0.7" />
               <Button Content="恢复上次移除" IsEnabled="{Binding CanRestoreBookmarks}" Click="Bookmark_Restore" />
             </StackPanel>
           </Grid></Border>

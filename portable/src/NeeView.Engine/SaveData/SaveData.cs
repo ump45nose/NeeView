@@ -19,6 +19,8 @@ public sealed class SaveData(string directory)
     public bool CanRestoreBookmarks => _removedBookmarks.Any(e => BookmarkRoot.Walk().Contains(e.Parent));
     public IReadOnlyList<HistoryEntry> HistoryEntries { get; private set; } = [];
     public event EventHandler? Changed;
+    /// <summary>仅书签编辑提交或回滚后回报；阅读进度保存不触发书签列表重排。</summary>
+    public event EventHandler? BookmarksChanged;
     public string DirectoryPath { get; } = directory;
     public PlaylistHub Playlists { get; private set; } = null!;
     public string? LastBookPath => _setting["Config"]?["StartUp"]?["LastBookV2"]?["Path"]?.GetValue<string>();
@@ -50,6 +52,7 @@ public sealed class SaveData(string directory)
             config.Slider = ReadBranch<SliderConfig>(raw, "Slider");
             config.Bookshelf = ReadBranch<BookshelfConfig>(raw, "Bookshelf");
             config.History = ReadBranch<HistoryConfig>(raw, "History");
+            config.Bookmark = ReadBranch<BookmarkConfig>(raw, "Bookmark");
             config.Playlist = ReadBranch<PlaylistConfig>(raw, "Playlist");
             config.Window = ReadBranch<WindowConfig>(raw, "Window");
             config.MenuBar = ReadBranch<MenuBarConfig>(raw, "MenuBar");
@@ -256,7 +259,7 @@ public sealed class SaveData(string directory)
             _removedBookmarks = removed;
             throw;
         }
-        finally { _gate.Release(); Changed?.Invoke(this, EventArgs.Empty); }
+        finally { _gate.Release(); Changed?.Invoke(this, EventArgs.Empty); BookmarksChanged?.Invoke(this, EventArgs.Empty); }
     }
     /// <summary>定位父节点后移除，禁止移除根目录或不属于当前树的旧节点。</summary>
     private void RemoveNode(BookmarkNode node)
@@ -327,7 +330,7 @@ public sealed class SaveData(string directory)
         try
         {
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "History", "Playlist", "AutoHide", "Window", "MenuBar" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "History", "Bookmark", "Playlist", "AutoHide", "Window", "MenuBar" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 Merge(Object(config, branch), JsonSerializer.SerializeToNode(value, Options)!.AsObject());

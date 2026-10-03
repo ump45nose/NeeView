@@ -41,3 +41,5 @@ Engine.BookmarkCollection 对现有 BookmarkNode/Children 执行原集合算法�
 原 BookmarkFolderList 的路径导航/书架互联、列表排序/搜索/递归搜索、Normal/Content/Banner/Thumbnail、监视/链接修复与移除无效、属性完整窗口尚未迁入。FocusBookmarkList 原本进入书架书签位置并联动目录树，当前继续禁用占位。登记当前采用独立模态宿主；原地址栏 Popup 定位、标签和折叠树选择器待迁，不宣称完整原弹窗已经转换。拖动多项/自动滚屏/外部新条目插入待后续。JSON 版本迁移、Profile/.nvzip 和 Windows 路径映射仍在 P5。
 
 Windows 动态对照、真人触控板/IME、NAS、长期 native 内存、完整显示 P95、Developer ID/公证/安装未由本批自动测试证明。
+
+第十批已补齐目录进入/返回、当前位置同步、无磁盘探测排序及列表与编辑树节点联动，见[p2-bookmark-navigation.md](p2-bookmark-navigation.md)。以上历史第五批未迁项须结合第十批范围理解；搜索/模板/完整树布局/书架互联仍待迁，不把第十批自动验证追认为第五批真机结果。

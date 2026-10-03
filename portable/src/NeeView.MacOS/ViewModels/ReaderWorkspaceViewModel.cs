@@ -94,6 +94,9 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     private Book? _historyBook;
     public event EventHandler? HistoryRefreshed;
     public IReadOnlyList<BookmarkNode> Bookmarks => SaveData.BookmarkRoot.Children ?? [];
+    public bool BookmarkTreeVisible => Config.Current.Bookmark.IsFolderTreeVisible;
+    /// <summary>只通知树显示，不重建正文或改变书签业务。</summary>
+    public void RefreshBookmarkTree() => OnPropertyChanged(nameof(BookmarkTreeVisible));
     private BookmarkNode? _selectedBookmark;
     public BookmarkNode? SelectedBookmark { get => _selectedBookmark; set => SetProperty(ref _selectedBookmark, value); }
     public bool CanRestoreBookmarks => SaveData.CanRestoreBookmarks;

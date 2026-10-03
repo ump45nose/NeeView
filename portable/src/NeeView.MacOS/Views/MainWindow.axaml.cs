@@ -99,6 +99,22 @@ public sealed partial class MainWindow : Window
     public void Bind(ReaderWorkspaceViewModel model, BitmapFactory images, IPlatformService platform)
     {
         _model = model; _images = images; _platform = platform; DataContext = model;
+        // 编辑树保留宿主表现绑定；独立列表的 DataContext 可以独立更换。
+        this.FindControl<TreeView>("BookmarkTree")!.DataContext = model;
+        var bookmarks = this.FindControl<BookmarkListView>("BookmarkPanelList")!;
+        bookmarks.OpenBookAsync = async node => { if (!_preparing && !_closedPrepared && node.Path is { } path) await OpenAsync(path); };
+        bookmarks.CurrentBookPath = () => model.Operation.Book?.Path;
+        bookmarks.SaveSettingsAsync = () => model.Operation.SaveAsync();
+        bookmarks.Failed += (_, message) => ShowError(message);
+        bookmarks.TreeVisibilityUpdated += (_, _) => model.RefreshBookmarkTree();
+        bookmarks.SelectionUpdated += (_, _) =>
+        {
+            if (_preparing || _closedPrepared) return;
+            if (_bookmarkTreeSelection && this.FindControl<TreeView>("BookmarkTree")!.IsKeyboardFocusWithin) return;
+            _bookmarkTreeSelection = false;
+            model.SelectedBookmark = bookmarks.SelectedNodes.FirstOrDefault(); model.BookmarkSelectionCount = bookmarks.SelectedNodes.Count;
+        };
+        bookmarks.Attach(model.SaveData);
         var playlist = this.FindControl<PlaylistView>("PlaylistPanelView")!;
         playlist.Failed += (_, message) => ShowError(message); playlist.Attach(model.Operation);
         model.Operation.MarkersChanged += Model_MarkersChanged;
@@ -281,7 +297,7 @@ public sealed partial class MainWindow : Window
                         if (_preparing || _closedPrepared) break;
                         var selected = _model.SelectedBookmark;
                         var parent = selected?.IsFolder == true ? selected : selected is not null ? _model.SaveData.Bookmarks.ParentOf(selected) : null;
-                        parent ??= _model.SaveData.BookmarkRoot;
+                        parent ??= this.FindControl<BookmarkListView>("BookmarkPanelList")!.Navigation?.Place ?? _model.SaveData.BookmarkRoot;
                         var edit = new BookmarkPopupEdit(register.CreateMemento(), parent, selected);
                         var choice = await new BookmarkRegistrationWindow(edit, _model.SaveData.BookmarkRoot, parent).ShowDialog<BookmarkRegistrationChoice?>(this);
                         if (choice is not null && !_preparing && !_closedPrepared)
@@ -385,11 +401,14 @@ public sealed partial class MainWindow : Window
         if (_preparing || _closedPrepared || e.Source is Visual source && source.GetVisualAncestors().Prepend(source).OfType<Button>().Any()) return;
         if (BookmarkRow(e.Source)?.DataContext is BookmarkNode { IsFolder: false, Path: { } path }) await OpenAsync(path);
     }
-    /// <summary>在所选文件夹中创建节点；未选文件夹时使用根目录。</summary>
+    /// <summary>原列表在当前浏览目录新建；编辑树采用所选文件夹或书签的真实父级。</summary>
     private async void Bookmark_NewFolder(object? sender, RoutedEventArgs e)
     {
         if (_model is null) return;
-        var parent = this.FindControl<TreeView>("BookmarkTree")!.SelectedItem as BookmarkNode;
+        var parent = _model.SelectedBookmark;
+        parent = _bookmarkTreeSelection && parent is not null
+            ? parent.IsFolder ? parent : _model.SaveData.Bookmarks.ParentOf(parent)
+            : this.FindControl<BookmarkListView>("BookmarkPanelList")!.Navigation?.Place;
         var name = await AskNameAsync("新建书签文件夹", "");
         if (name is null || _preparing || _closedPrepared) return;
         try { SelectBookmark(await _model.SaveData.AddBookmarkFolderAsync(parent?.IsFolder == true ? parent : null, name)); }
@@ -398,7 +417,7 @@ public sealed partial class MainWindow : Window
     /// <summary>修改所选节点名称，取消不写入状态。</summary>
     private async void Bookmark_Rename(object? sender, RoutedEventArgs e)
     {
-        if (_model is null || this.FindControl<TreeView>("BookmarkTree")!.SelectedItem is not BookmarkNode node) return;
+        if (_model?.SelectedBookmark is not BookmarkNode node) return;
         var name = await AskNameAsync("重命名书签", node.DisplayName);
         if (name is null || _preparing || _closedPrepared) return;
         try { SelectBookmark(await _model.SaveData.RenameBookmarkAsync(node, name)); }
@@ -417,7 +436,8 @@ public sealed partial class MainWindow : Window
     private async void Bookmark_Remove(object? sender, RoutedEventArgs e)
     {
         if (_model is null) return;
-        var selected = this.FindControl<TreeView>("BookmarkTree")!.SelectedItems.OfType<BookmarkNode>().ToArray();
+        var selected = SelectedBookmarkNodes();
+        var fromTree = _bookmarkTreeSelection;
         if (selected.Length == 0) return;
         var message = selected.Length == 1 ? $"移除“{selected[0].DisplayName}”{(selected[0].IsFolder ? "及其全部书签子项" : "")}？" : $"移除选中的 {selected.Length} 项及文件夹内的全部书签？源文件不受影响。";
         if (!await ConfirmAsync("移除书签", message)) return;
@@ -427,8 +447,12 @@ public sealed partial class MainWindow : Window
         {
             if (!_preparing && !_closedPrepared)
             {
-                var tree = this.FindControl<TreeView>("BookmarkTree")!; tree.SelectedItems.Clear();
-                foreach (var node in selected.Where(e => _model.SaveData.BookmarkRoot.Walk().Contains(e))) tree.SelectedItems.Add(node);
+                if (fromTree)
+                {
+                    var tree = this.FindControl<TreeView>("BookmarkTree")!; tree.SelectedItems.Clear();
+                    foreach (var node in selected.Where(e => _model.SaveData.BookmarkRoot.Walk().Contains(e))) tree.SelectedItems.Add(node);
+                }
+                else this.FindControl<BookmarkListView>("BookmarkPanelList")!.RestoreSelection(selected);
             }
             ShowError(ex.Message);
         }
@@ -530,6 +554,10 @@ public sealed partial class MainWindow : Window
         // 普通列表拥有方向/定位键；选条目不能触发全局 Up/Down 书籍导航。
         if (FocusManager?.GetFocusedElement() is Control focused && (focused is ListBox or TreeView || focused.GetVisualAncestors().Any(x => x is ListBox or TreeView)))
         {
+            var bookmarkList = this.FindControl<BookmarkListView>("BookmarkPanelList")!;
+            if (bookmarkList.IsKeyboardFocusWithin && e.KeyModifiers == KeyModifiers.None && e.Key is Key.Enter or Key.Back) return;
+            if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.Delete && (bookmarkList.IsKeyboardFocusWithin || this.FindControl<TreeView>("BookmarkTree")!.IsKeyboardFocusWithin))
+            { e.Handled = true; Bookmark_Remove(this, new RoutedEventArgs()); return; }
             if (e.KeyModifiers == KeyModifiers.None && e.Key is Key.Enter or Key.Delete && this.FindControl<PlaylistView>("PlaylistPanelView")!.IsKeyboardFocusWithin) return;
             if (e.KeyModifiers == KeyModifiers.None && e.Key is Key.Enter or Key.Delete && this.FindControl<ListBox>("HistoryList")!.IsKeyboardFocusWithin)
             {
@@ -642,6 +670,7 @@ public sealed partial class MainWindow : Window
         try
         {
             await this.FindControl<PlaylistView>("PlaylistPanelView")!.PrepareCloseAsync();
+            await this.FindControl<BookmarkListView>("BookmarkPanelList")!.PrepareCloseAsync();
             _folders?.Cancel(); _sliderDragging = false; PageNumber.CancelEdit();
             CancelBookmarkDrag();
             if (_model is not null)
@@ -658,8 +687,13 @@ public sealed partial class MainWindow : Window
                 _model.Detach(); _model.Refreshed -= Model_Refreshed; _model.PanelsRefreshed -= Model_PanelsRefreshed; _model.ChromeRefreshed -= Model_ChromeRefreshed;
             }
             this.FindControl<PlaylistView>("PlaylistPanelView")!.Dispose();
+            this.FindControl<BookmarkListView>("BookmarkPanelList")!.Dispose();
             _autoHide?.Dispose(); _sidePanels?.Dispose(); _platformInput?.Dispose(); FilmStrip.Dispose(); NavigatorView.Dispose(); Viewer.Dispose(); _images?.Dispose(); _closedPrepared = true;
         }
-        finally { if (!_closedPrepared) this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); _preparing = false; _shutdown = null; }
+        finally
+        {
+            if (!_closedPrepared) { this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); this.FindControl<BookmarkListView>("BookmarkPanelList")!.CancelClose(); }
+            _preparing = false; _shutdown = null;
+        }
     }
 }

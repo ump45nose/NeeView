@@ -716,6 +716,54 @@
       "target": "src/NeeView.MacOS/Views/AutoHidePresenter.cs",
       "sha256": "0e4ca5d27a4a7e4ebc4f3bbd225e052d90f4b051c44b6a54c38b0510392bfeba",
       "status": "原SidePanelMargin及ConflictTop/BottomMargin安全余量随覆盖资格计算，不改变正文区域"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookmark/BookmarkFolderList.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookmark/BookmarkFolderList.cs",
+      "sha256": "a2fd6aba136159e3fe714be41487aa6affc4ede1d41234f3c8e9e517bc01bbaf",
+      "status": "书签目录进入/返回/同步、普通条目索引与无磁盘探测排序子集；搜索、元数据、书架互联待迁"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/BookmarkFolderCollection.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookmark/BookmarkFolderList.cs",
+      "sha256": "058a3d7d63a5d6648201ef17b5805c576c20b0d47a2617f470e2c83fd25e5911",
+      "status": "书签目录进入/返回/同步、普通条目索引与无磁盘探测排序子集；搜索、元数据、书架互联待迁"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderCollection.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookmark/BookmarkFolderList.cs",
+      "sha256": "149c018a78d5c12e9203dd646ae1df2e8ed1472b4b225233e208dd650f14e3f3",
+      "status": "书签目录进入/返回/同步、普通条目索引与无磁盘探测排序子集；搜索、元数据、书架互联待迁"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderItem.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookmark/BookmarkFolderList.cs",
+      "sha256": "7ec942452dd647877dad8c873ad99a107ce67cc5362ad275fe29c7c12ae7cb32",
+      "status": "书签目录进入/返回/同步、普通条目索引与无磁盘探测排序子集；搜索、元数据、书架互联待迁"
+    },
+    {
+      "source": "NeeView/Bookamrk/BookmarkCollectionService.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookmark/BookmarkFolderList.cs",
+      "sha256": "1eb2a63aff60c1596e1bcfdca9c1b365c1d1e23f69aa7011b49b291b13ec86ee",
+      "status": "书签目录进入/返回/同步、普通条目索引与无磁盘探测排序子集；搜索、元数据、书架互联待迁"
+    },
+    {
+      "source": "NeeView/Config/BookmarkConfig.cs",
+      "target": "src/NeeView.Engine/Config/BookmarkConfig.cs",
+      "sha256": "eea51e2110e1df6c43625a5c7216252cbe7ffee38150cdfc0972cee9597a6de5",
+      "status": "原 Bookmark 排序/数量/树默认值子集；未知配置保留，搜索和完整树布局待迁"
+    },
+    {
+      "source": "NeeView/Config/FolderListConfig.cs",
+      "target": "src/NeeView.Engine/Config/BookmarkConfig.cs",
+      "sha256": "bd44775a5a94f7e83e2163e62f97a76981151f0df75215bdea30dd803625674e",
+      "status": "原 Bookmark 排序/数量/树默认值子集；未知配置保留，搜索和完整树布局待迁"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderListBox.xaml.cs",
+      "target": "src/NeeView.MacOS/Views/BookmarkListView.axaml.cs",
+      "sha256": "fca8d1f84099f586987498a47a38002675eb77c112a2beed683bfdfd42dc8334",
+      "status": "原列表打开/单双击/Enter的Mac表现适配；不包含完整拖放和所有列表命令"
     }
   ],
   "rule_references": [
@@ -846,6 +894,12 @@
       "target": "src/NeeView.MacOS/Views/PlaylistView.axaml.cs",
       "sha256": "6ffdd5648688236db7348d50a2c7e9393a4518da5ffa620440771729b355aa02",
       "status": "原更多菜单保留；未迁模板/文件删除更名/无效清理/OpenAsBook禁用占位"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookmark/BookmarkListView.xaml",
+      "target": "src/NeeView.MacOS/Views/BookmarkListView.axaml",
+      "sha256": "ac7629a44c480b1fb52db915037b0ed6005db1946d07d2aa2fbfb195c6954924",
+      "status": "原地址/返回/同步/排序/列表区域转换；原搜索和模板保留占位，树完整布局待迁"
     }
   ],
   "backend_reuse": [

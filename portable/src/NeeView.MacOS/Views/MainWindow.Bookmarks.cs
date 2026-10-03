@@ -13,6 +13,11 @@ public sealed partial class MainWindow
     private Avalonia.Point _bookmarkDragStart;
     private IPointer? _bookmarkPointer;
     private bool _bookmarkDragging;
+    private bool _bookmarkTreeSelection;
+    /// <summary>书签列表和编辑树共享原节点，删除读取实际操作区域的批次。</summary>
+    private BookmarkNode[] SelectedBookmarkNodes() => _bookmarkTreeSelection
+        ? this.FindControl<TreeView>("BookmarkTree")!.SelectedItems.OfType<BookmarkNode>().ToArray()
+        : this.FindControl<BookmarkListView>("BookmarkPanelList")!.SelectedNodes.ToArray();
     private const string BookmarkDragHelp = "拖到文件夹中间移入，行边缘调整顺序；空白移至根。";
 
     /// <summary>挂接树的内部指针输入，不引入跨进程文件拖放或第二套树模型。</summary>
@@ -29,7 +34,12 @@ public sealed partial class MainWindow
             if (!ReferenceEquals(e.Source, tree)) return;
             _bookmarkDrag = null; _bookmarkDragging = false; _bookmarkPointer = null; SetBookmarkHint(BookmarkDragHelp);
         };
-        tree.SelectionChanged += (_, _) => { if (_model is not null) _model.BookmarkSelectionCount = tree.SelectedItems.Count; };
+        tree.SelectionChanged += (_, _) =>
+        {
+            if (_model is null || !tree.IsKeyboardFocusWithin) return;
+            _bookmarkTreeSelection = true; _model.BookmarkSelectionCount = tree.SelectedItems.Count;
+            this.FindControl<BookmarkListView>("BookmarkPanelList")!.SyncTreeSelection(tree.SelectedItem as BookmarkNode);
+        };
         tree.KeyDown += (_, e) => { if (e.Key == Key.Escape && _bookmarkDrag is not null) { e.Handled = true; CancelBookmarkDrag(); } };
     }
 
@@ -48,6 +58,7 @@ public sealed partial class MainWindow
     private void Bookmark_Pressed(object? sender, PointerPressedEventArgs e)
     {
         if (sender is not TreeView tree || !e.GetCurrentPoint(tree).Properties.IsLeftButtonPressed) return;
+        _bookmarkTreeSelection = true;
         // 展开箭头要自行持有按下/释放，树级捕获会让按钮丢失点击；只从节点正文开始拖动。
         if (e.Source is Visual source && source.GetVisualAncestors().Prepend(source).OfType<Button>().Any()) return;
         _bookmarkDrag = BookmarkRow(e.Source)?.DataContext as BookmarkNode;
@@ -121,6 +132,7 @@ public sealed partial class MainWindow
         for (var parent = node is null ? null : _model.SaveData.Bookmarks.ParentOf(node); parent is not null; parent = _model.SaveData.Bookmarks.ParentOf(parent)) parents.Push(parent);
         while (parents.TryPop(out var parent)) if (tree.ContainerFromItem(parent) is TreeViewItem row) { row.IsExpanded = true; tree.UpdateLayout(); }
         tree.SelectedItem = node;
+        this.FindControl<BookmarkListView>("BookmarkPanelList")!.Reveal(node);
     }
 
     /// <summary>更新拖动提示，不发布阅读刷新或解码请求。</summary>

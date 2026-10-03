@@ -188,6 +188,8 @@ public sealed class BookmarkOperationTests
         using var fixture = new Fixture(); var state = new SaveData(fixture.State); await state.LoadAsync(token: TestContext.Current.CancellationToken);
         var source = await state.AddBookmarkFolderAsync(null, "源", token: TestContext.Current.CancellationToken); var target = await state.AddBookmarkFolderAsync(null, "目标", token: TestContext.Current.CancellationToken);
         var operation = fixture.Operation(state); var images = new BitmapFactory(new NeeView.Backends.MagickImageDecoder());
+        // 原列表与可选树并存；本测试专门验树拖动，显式启用原树显示字段。
+        Config.Current.Bookmark.IsFolderTreeVisible = true;
         var model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state);
         var window = new MainWindow(); window.Bind(model, images, new TestPlatform()); window.Show();
         try
@@ -226,6 +228,8 @@ public sealed class BookmarkOperationTests
             window.MouseMove(end, RawInputModifiers.LeftMouseButton);
             Assert.Same(tree, pointer!.Captured);
             Assert.StartsWith("移入：", window.FindControl<TextBlock>("BookmarkDropHint")!.Text);
+            var localEnd = window.TranslatePoint(end, tree)!.Value;
+            Assert.True(new Avalonia.Rect(tree.Bounds.Size).Contains(localEnd), $"拖动目标超出树视口：{localEnd}, {tree.Bounds}");
             window.MouseUp(end, MouseButton.Left);
             for (var i = 0; i < 60 && state.Bookmarks.ParentOf(source) != target; i++) await Task.Delay(20, TestContext.Current.CancellationToken);
             Assert.Same(target, state.Bookmarks.ParentOf(source)); Assert.Equal(0, operation.Book!.CurrentPage!.Index); Assert.Equal(0, refreshes);

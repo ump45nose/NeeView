@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="NeeView.MacOS.Views.BookmarkListView" x:CompileBindings="False">
+  <!-- 从原 BookmarkListView 的地址/返回/同步/排序/列表区域转换；树编辑由现有宿主保留。 -->
+  <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+    <Grid ColumnDefinitions="*,Auto" Margin="8,4">
+      <TextBlock Text="{Binding Place}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Place}" VerticalAlignment="Center" />
+      <Button x:Name="BookmarkMore" Grid.Column="1" Content="⋯" Click="More_Click" ToolTip.Tip="书签列表菜单" />
+    </Grid>
+    <WrapPanel Grid.Row="1" Margin="8,0,8,4">
+      <Button x:Name="BookmarkRootButton" Content="根" Click="Root_Click" ToolTip.Tip="返回书签根目录" />
+      <Button x:Name="BookmarkUpButton" Content="返回" IsEnabled="{Binding CanMoveToParent}" Click="Up_Click" />
+      <Button x:Name="BookmarkSyncButton" Content="同步" Click="Sync_Click" ToolTip.Tip="定位当前书籍的书签，优先当前目录" />
+      <ComboBox x:Name="BookmarkOrder" ItemsSource="{Binding Orders}" SelectedItem="{Binding SelectedOrder, Mode=OneWay}" SelectionChanged="Order_Changed">
+        <ComboBox.Styles><Style Selector="ComboBoxItem"><Setter Property="IsEnabled" Value="{Binding IsEnabled}" /></Style></ComboBox.Styles>
+        <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>
+      </ComboBox>
+    </WrapPanel>
+    <TextBlock Grid.Row="2" Text="{Binding CapabilityMessage}" TextWrapping="Wrap" Margin="8,0" FontSize="10" />
+    <DockPanel Grid.Row="3">
+    <ContentControl x:Name="BookmarkTreeHost" DockPanel.Dock="Top" />
+    <ListBox x:Name="BookmarkItems" Focusable="True" SelectionMode="Multiple" SelectionChanged="Item_Changed" DoubleTapped="Item_DoubleTapped">
+      <ListBox.ContextMenu><ContextMenu><MenuItem Header="打开 / 进入文件夹" Click="Open_Click" /></ContextMenu></ListBox.ContextMenu>
+      <ListBox.ItemTemplate><DataTemplate><StackPanel Margin="0,2" ToolTip.Tip="{Binding Path}">
+        <StackPanel Orientation="Horizontal" Spacing="6"><TextBlock Text="■" IsVisible="{Binding IsFolder}" Foreground="{Binding Color, TargetNullValue='#8CA0AF'}" /><TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" /></StackPanel>
+        <TextBlock Text="{Binding Page}" Opacity="0.6" FontSize="10" />
+      </StackPanel></DataTemplate></ListBox.ItemTemplate>
+    </ListBox>
+    </DockPanel>
+    <TextBlock Grid.Row="4" Text="{Binding Count}" IsVisible="{Binding CountVisible}" FontSize="10" Margin="8,4" Opacity="0.7" />
+  </Grid>
+</UserControl>
