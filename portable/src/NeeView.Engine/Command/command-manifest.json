@@ -541,7 +541,7 @@
     "Text": "显示/隐藏播放列表面板",
     "Shortcut": "M",
     "Source": "NeeView/Command/Commands/ToggleVisiblePlaylistCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁",
     "MenuText": "播放列表面板"
   },
   {
@@ -1418,21 +1418,21 @@
     "Text": "下一播放列表",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/NextPlaylistCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁"
   },
   {
     "Name": "PrevPlaylist",
     "Text": "上一个播放列表",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/PrevPlaylistCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁"
   },
   {
     "Name": "TogglePlaylistItem",
     "Text": "添加/删除播放列表项目",
     "Shortcut": "Ctrl+M",
     "Source": "NeeView/Command/Commands/TogglePlaylistItemCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁",
     "MenuText": "添加到播放列表"
   },
   {
@@ -1440,28 +1440,28 @@
     "Text": "上一个播放列表项目",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/PrevPlaylistItemCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁"
   },
   {
     "Name": "NextPlaylistItem",
     "Text": "下一个播放列表项目",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/NextPlaylistItemCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁"
   },
   {
     "Name": "PrevPlaylistItemInBook",
     "Text": "书籍中的上一个播放列表项目",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/PrevPlaylistItemInBookCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁"
   },
   {
     "Name": "NextPlaylistItemInBook",
     "Text": "书籍中的下一个播放列表项目",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/NextPlaylistItemInBookCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁"
   },
   {
     "Name": "SetEffectProfile",

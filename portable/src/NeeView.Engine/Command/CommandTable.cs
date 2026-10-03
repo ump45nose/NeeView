@@ -32,6 +32,13 @@ public sealed class CommandTable
         _actions["NextBook"] = () => operation.MoveBookAsync(1);
         _actions["PrevFolderPage"] = () => operation.MoveFolderPageAsync(-1);
         _actions["NextFolderPage"] = () => operation.MoveFolderPageAsync(1);
+        _actions["TogglePlaylistItem"] = () => operation.TogglePlaylistItemAsync();
+        _actions["PrevPlaylistItemInBook"] = () => operation.MovePlaylistItemInBookAsync(-1);
+        _actions["NextPlaylistItemInBook"] = () => operation.MovePlaylistItemInBookAsync(1);
+        _actions["PrevPlaylistItem"] = () => operation.MovePlaylistItemAsync(-1);
+        _actions["NextPlaylistItem"] = () => operation.MovePlaylistItemAsync(1);
+        _actions["PrevPlaylist"] = () => operation.Playlists.MovePlaylistAsync(-1);
+        _actions["NextPlaylist"] = () => operation.Playlists.MovePlaylistAsync(1);
         _actions["SetPageModeOne"] = () => operation.ApplySettingAsync(e => e.PageMode = PageMode.SinglePage);
         _actions["SetPageModeTwo"] = () => operation.ApplySettingAsync(e => e.PageMode = PageMode.WidePage);
         _actions["TogglePageMode"] = () => operation.ApplySettingAsync(e => e.PageMode = e.PageMode.GetToggle(1, true));

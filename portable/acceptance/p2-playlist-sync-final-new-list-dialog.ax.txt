@@ -1,0 +1,18 @@
+Window: "新建播放列表", App: NeeView.
+0 standard window 新建播放列表, Secondary Actions: Raise
+	1 container WindowChrome, ID: AvaloniaWindowChrome
+	2 container
+		3 container PART_VisualLayerManager
+			4 container
+				5 text field (settable) 新播放列表
+					6 container
+						7 container
+							8 scroll area PART_ScrollViewer
+								9 container
+				10 button 确定
+				11 button 取消
+	12 close button
+	13 zoom button (disabled)
+	14 text 新建播放列表
+15 menu bar
+	16 NeeView

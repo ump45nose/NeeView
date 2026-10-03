@@ -39,7 +39,7 @@ public sealed partial class MainWindow : Window
         "ViewScaleUp", "ViewScaleDown", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
         "LeftAutoHide", "RightAutoHide", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
-        "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
+        "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
         "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "RegisterBookmark", "FocusHistorySearchBox", "ClearHistory"
     };
     /// <summary>由启动层接入原生事件；只消费主查看器区域，其余控件使用框架输入。</summary>
@@ -93,6 +93,9 @@ public sealed partial class MainWindow : Window
     public void Bind(ReaderWorkspaceViewModel model, BitmapFactory images, IPlatformService platform)
     {
         _model = model; _images = images; _platform = platform; DataContext = model;
+        var playlist = this.FindControl<PlaylistView>("PlaylistPanelView")!;
+        playlist.Failed += (_, message) => ShowError(message); playlist.Attach(model.Operation);
+        model.Operation.MarkersChanged += Model_MarkersChanged;
         model.HistoryRefreshed += History_Refreshed;
         Viewer.Attach(model.Operation, images); model.Refreshed += Model_Refreshed;
         model.PanelsRefreshed += Model_PanelsRefreshed;
@@ -130,7 +133,7 @@ public sealed partial class MainWindow : Window
         root.Children[3].Children!.Add(new(null, MenuElementType.Separator, null));
         foreach (var name in new[] { "JumpPage", "PrevHistoryPage", "NextHistoryPage", "PrevBookHistory", "NextBookHistory" })
             root.Children[3].Children!.Add(new(null, MenuElementType.Command, name));
-        MenuPresenter.Populate(this.FindControl<Menu>("MenuBar")!, root, _model.Commands, _model.SaveData, IsCommandAvailable, ExecuteAsync, GetCommandCheck);
+        MenuPresenter.Populate(this.FindControl<Menu>("MenuBar")!, root, _model.Commands, _model.SaveData, IsCommandAvailable, name => ExecuteAsync(name, true), GetCommandCheck);
         RefreshHistoryCommandStates();
     }
     /// <summary>原菜单绑定的勾选表现；只读取引擎配置，不在菜单中维护第二套状态。</summary>
@@ -145,6 +148,8 @@ public sealed partial class MainWindow : Window
         "ToggleIsSupportedSingleFirstPage" => _model?.FirstSingle,
         "ToggleIsSupportedSingleLastPage" => _model?.LastSingle,
         "ToggleBookmark" => _model?.IsBookmark,
+        "TogglePlaylistItem" => _model?.IsPlaylistMarked,
+        "ToggleVisiblePlaylist" => _model?.ShowPlaylist,
         "ToggleVisibleBookshelf" => _model?.ShowFolderList,
         "ToggleVisiblePageList" => _model?.ShowPageList,
         "ToggleVisibleHistoryList" => _model?.ShowHistory,
@@ -191,7 +196,7 @@ public sealed partial class MainWindow : Window
         Viewer.ResetTransform(); await _model.Operation.RestoreLastAsync();
     }
     /// <summary>执行宿主命令或转交原阅读命令；错误显示给用户。</summary>
-    public async Task ExecuteAsync(string name)
+    public async Task ExecuteAsync(string name, bool fromMenu = false)
     {
         if (_model is null || _preparing || _closedPrepared) return;
         try
@@ -273,6 +278,9 @@ public sealed partial class MainWindow : Window
                 case "ToggleVisibleFileInfo": _model.SelectPanel("FileInformationPanel"); break;
                 case "ToggleVisibleBookmarkList": _model.SelectPanel("BookmarkPanel"); break;
                 case "ToggleVisibleNavigator": _model.SelectPanel("NavigatePanel"); break;
+                case "ToggleVisiblePlaylist": _model.SelectPanel("PlaylistPanel"); break;
+                case "TogglePlaylistItem": await _model.Operation.TogglePlaylistItemAsync(fromMenu); break;
+                case "PrevPlaylist": case "NextPlaylist": await _model.Commands.ExecuteAsync(name); await _model.Operation.SaveAsync(); break;
                 case "ToggleVisibleFilmStrip": Config.Current.FilmStrip.IsEnabled = !Config.Current.FilmStrip.IsEnabled; _model.RefreshPanels(); await FilmStrip.RefreshAsync(); break;
                 case "ToggleHideFilmStrip": Config.Current.FilmStrip.IsHideFilmStrip = !Config.Current.FilmStrip.IsHideFilmStrip; _model.RefreshPanels(); break;
                 default: await _model.Commands.ExecuteAsync(name); break;
@@ -280,7 +288,11 @@ public sealed partial class MainWindow : Window
         }
         catch (Exception ex) { ShowError(ex.Message); }
         MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck);
+        RefreshHistoryCommandStates();
     }
+    /// <summary>标记回报只刷新菜单，显示控件自行重绘，不触发正文解码。</summary>
+    private void Model_MarkersChanged(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() =>
+    { if (!_preparing && !_closedPrepared) { MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck); RefreshHistoryCommandStates(); } });
     /// <summary>业务回报刷新查看器；只在来源改变时更新目录导航。</summary>
     private async void Model_Refreshed(object? sender, EventArgs e)
     {
@@ -490,6 +502,7 @@ public sealed partial class MainWindow : Window
         // 普通列表拥有方向/定位键；选条目不能触发全局 Up/Down 书籍导航。
         if (FocusManager?.GetFocusedElement() is Control focused && (focused is ListBox or TreeView || focused.GetVisualAncestors().Any(x => x is ListBox or TreeView)))
         {
+            if (e.KeyModifiers == KeyModifiers.None && e.Key is Key.Enter or Key.Delete && this.FindControl<PlaylistView>("PlaylistPanelView")!.IsKeyboardFocusWithin) return;
             if (e.KeyModifiers == KeyModifiers.None && e.Key is Key.Enter or Key.Delete && this.FindControl<ListBox>("HistoryList")!.IsKeyboardFocusWithin)
             {
                 e.Handled = true;
@@ -599,6 +612,7 @@ public sealed partial class MainWindow : Window
         _preparing = true;
         try
         {
+            await this.FindControl<PlaylistView>("PlaylistPanelView")!.PrepareCloseAsync();
             _folders?.Cancel(); _sliderDragging = false; PageNumber.CancelEdit();
             CancelBookmarkDrag();
             if (_model is not null)
@@ -611,10 +625,12 @@ public sealed partial class MainWindow : Window
                 // 先完成可靠保存，再退订与释放显示资源；失败不能留下已销毁的阅读窗口。
                 await _model.Operation.DisposeAsync();
                 _model.HistoryRefreshed -= History_Refreshed;
+                _model.Operation.MarkersChanged -= Model_MarkersChanged;
                 _model.Detach(); _model.Refreshed -= Model_Refreshed; _model.PanelsRefreshed -= Model_PanelsRefreshed;
             }
+            this.FindControl<PlaylistView>("PlaylistPanelView")!.Dispose();
             _sidePanels?.Dispose(); _platformInput?.Dispose(); FilmStrip.Dispose(); NavigatorView.Dispose(); Viewer.Dispose(); _images?.Dispose(); _closedPrepared = true;
         }
-        finally { _preparing = false; _shutdown = null; }
+        finally { if (!_closedPrepared) this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); _preparing = false; _shutdown = null; }
     }
 }

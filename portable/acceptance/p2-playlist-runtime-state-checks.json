@@ -1,0 +1,57 @@
+{
+  "exited": true,
+  "selected_file_short_path": "验收列表.nvpls",
+  "default_item_count": 4,
+  "default_paths": [
+    "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz/中文/003.png",
+    "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/图片/001.png",
+    "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz/中文/不存在.png",
+    "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/图片/005.png"
+  ],
+  "future_root_preserved": true,
+  "future_item_preserved": true,
+  "new_list_item_count": 1,
+  "no_own_temp_files": true,
+  "source_hashes_preserved": {
+    "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz": true,
+    "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/图片/001.png": true,
+    "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/图片/002.png": true,
+    "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/图片/003.png": true,
+    "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/图片/004.png": true,
+    "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/图片/005.png": true,
+    "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/图片/006.png": true
+  },
+  "deleted_batch_disk_count": 2,
+  "restored_user_files": {
+    "UserSetting.json": {
+      "bytes_match": true,
+      "sha256": "1481aa7051e00091c4e11875c89b628f9b2169865ed0caadc78f305634005597"
+    },
+    "History.json": {
+      "bytes_match": true,
+      "sha256": "abb5522a0111825bc52cc17a5ce8960c8812c4c8e0909ea982b99d7bc55ee502"
+    },
+    "Bookmark.json": {
+      "bytes_match": true,
+      "sha256": "0e605947c1d28342dbfb49dbbdf4a12dce22015bd1ed974a69848dbaa381e915"
+    }
+  },
+  "original_playlist_directory_unchanged": true,
+  "original_playlist_file_count": 0,
+  "restart_selected_list_verified": true,
+  "last_book_snapshot": {
+    "Path": "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz",
+    "Page": "中文/003.png",
+    "Props": "IsWide",
+    "MacPagePart": 0,
+    "MacIsSupportedWidePage": true
+  },
+  "final_user_reading": {
+    "path": "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz",
+    "page": "中文/003.png",
+    "temporary_shortcuts_removed": true,
+    "temporary_playlist_config_removed": true,
+    "original_default_folder_still_absent": true,
+    "application_left_running": true
+  }
+}

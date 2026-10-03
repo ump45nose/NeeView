@@ -8,6 +8,8 @@ public sealed class Page(ArchiveEntry entry)
     public int Index { get; internal set; }
     public int EntryIndex => ArchiveEntry.Id;
     public string EntryName => ArchiveEntry.EntryName;
+    public string EntryFullName => ArchiveEntry.SystemPath;
+    public bool IsMarked { get; internal set; }
     public int PageType => ArchiveEntry.IsDirectory ? 1 : 0;
     public PageContent Content { get; } = new();
     /// <summary>供原 PageComparer 比较归档目录和文件名，逻辑路径使用 '/'。</summary>

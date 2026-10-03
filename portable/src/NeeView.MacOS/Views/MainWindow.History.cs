@@ -21,6 +21,10 @@ public sealed partial class MainWindow
             "PrevHistory" => _model?.Operation.IsLoading == false && _model.Operation.HistoryList.GetTarget(-1) is not null,
             "NextHistory" => _model?.Operation.IsLoading == false && _model.Operation.HistoryList.GetTarget(1) is not null,
             "ClearHistory" => _model?.Operation.IsLoading == false,
+            "TogglePlaylistItem" => _model?.Operation.IsLoading == false && _model.Operation.Book?.CurrentPage is not null && _model.Operation.Playlists.Current is not null,
+            "PrevPlaylistItemInBook" => _model?.Operation.CanMovePlaylistItemInBook(-1) == true,
+            "NextPlaylistItemInBook" => _model?.Operation.CanMovePlaylistItemInBook(1) == true,
+            "PrevPlaylistItem" or "NextPlaylistItem" => _model?.Operation.IsLoading == false && _model.Operation.Playlists.Current is not null,
             _ => true
         }));
 

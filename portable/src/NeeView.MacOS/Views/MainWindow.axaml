@@ -79,7 +79,7 @@
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4" Margin="8"><Button Content="−" Tag="ViewScaleDown" Click="Command_Click" /><Button Content="适合" Tag="SetStretchModeUniform" Click="Command_Click" /><Button Content="100%" Tag="SetStretchModeNone" Click="Command_Click" /><Button Content="+" Tag="ViewScaleUp" Click="Command_Click" /></StackPanel>
           </Grid></Border>
       <Border Tag="ImageEffectPanel"><TextBlock Text="图像效果将在 P5 迁入。" TextWrapping="Wrap" Margin="10" /></Border>
-      <Border Tag="PlaylistPanel"><TextBlock Text="播放列表将在 P5 迁入。" TextWrapping="Wrap" Margin="10" /></Border>
+      <Border Tag="PlaylistPanel"><local:PlaylistView x:Name="PlaylistPanelView" /></Border>
       <Border Tag="DestinationFolderPanel"><TextBlock Text="目标文件夹分类将在 P4 迁入。" TextWrapping="Wrap" Margin="10" /></Border>
     </Grid>
     <Border x:Name="DockStatusArea" Grid.Row="2" Background="{DynamicResource BottomBar.Background}" PointerEntered="FilmStrip_Entered" PointerExited="FilmStrip_Exited">
@@ -88,6 +88,7 @@
         <local:ThumbnailView x:Name="DockFilmStripSocket" Height="{Binding FilmStripHeight}" IsVisible="{Binding FilmStripVisible}" />
         <Grid x:Name="DockPageSliderSocket" ColumnDefinitions="Auto,*,Auto" Margin="10,0" Height="{Binding SliderThickness}" Opacity="{Binding SliderOpacity}" IsVisible="{Binding SliderVisible}">
           <Slider x:Name="PageSliderView" Grid.Column="1" MinHeight="0" Minimum="0" Maximum="{Binding LastIndex}" Value="{Binding PageIndex, Mode=OneWay}" IsDirectionReversed="{Binding SliderReversed}" SmallChange="1" IsSnapToTickEnabled="True" TickFrequency="1" ValueChanged="Slider_ValueChanged" />
+          <local:PageMarkersView x:Name="PageMarkers" Grid.Column="1" Margin="6,0" IsHitTestVisible="False" Indices="{Binding MarkerIndices}" Maximum="{Binding LastIndex}" IsReversed="{Binding SliderReversed}" IsVisible="{Binding SliderMarksVisible}" />
           <!-- 页号编辑/焦点反馈独立于窗口、主题及原正文定位规则。 -->
           <local:SliderTextBox x:Name="PageNumberView" Grid.Column="{Binding SliderNumberColumn}" IsVisible="{Binding SliderNumberVisible}" Margin="8,0" Value="{Binding PageIndex, Mode=OneWay}" Maximum="{Binding LastIndex}" SourceKey="{Binding SliderSource}" />
         </Grid>

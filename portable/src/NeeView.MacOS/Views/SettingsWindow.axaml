@@ -41,7 +41,8 @@
         <TextBlock Text="滑条厚度（DIP，15–50）" /><NumericUpDown x:Name="SliderThickness" Minimum="15" Maximum="50" Increment="1" FormatString="0.#####" />
         <TextBlock Text="滑条不透明度（0–1）" /><NumericUpDown x:Name="SliderOpacity" Minimum="0" Maximum="1" Increment="0.05" FormatString="0.#####" />
         <TextBlock Text="滑条滚轮动作" /><ComboBox x:Name="SliderWheel"><ComboBoxItem Content="移动正文页" /><ComboBoxItem Content="使用命令绑定" /></ComboBox>
-        <CheckBox Content="滑条自动隐藏（后续迁移）" IsEnabled="False" /><CheckBox Content="显示播放列表标记（后续迁移）" IsEnabled="False" />
+        <CheckBox Content="滑条自动隐藏（后续迁移）" IsEnabled="False" />
+        <CheckBox x:Name="SliderMarks" Content="滑条显示播放列表标记" /><CheckBox x:Name="FilmMarks" Content="胶片条显示播放列表标记" />
         <TextBlock Text="指定页数步进（上一方向、下一方向共用）" /><NumericUpDown x:Name="MoveSize" Minimum="0" Maximum="1000" Increment="1" FormatString="0" />
       </StackPanel>
     </ScrollViewer>

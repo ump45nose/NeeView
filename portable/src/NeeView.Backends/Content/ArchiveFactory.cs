@@ -27,10 +27,23 @@ public sealed class ArchiveFactory : IArchiveFactory
     public Task<Archive> OpenAsync(string path, CancellationToken token) => SourceIo.RunAsync<Archive>(() =>
     {
         token.ThrowIfCancellationRequested(); path = System.IO.Path.GetFullPath(path);
+        // 原归档内逻辑路径：只在完整路径不存在时回溯真实归档，尊重名称含 .cbz 的普通目录。
+        if (!File.Exists(path) && !Directory.Exists(path))
+        {
+            var parent = System.IO.Path.GetDirectoryName(path);
+            while (!string.IsNullOrEmpty(parent))
+            {
+                token.ThrowIfCancellationRequested();
+                if (File.Exists(parent) && ArchiveFormats.IsArchive(parent))
+                    return new CompressedArchive(parent) { RequestedEntryName = System.IO.Path.GetRelativePath(parent, path).Replace('\\', '/') };
+                if (Directory.Exists(parent)) break;
+                parent = System.IO.Path.GetDirectoryName(parent);
+            }
+        }
         if (ImageFormats.IsImage(path))
         {
             if (!File.Exists(path)) throw new FileNotFoundException("图片不存在。", path);
-            path = System.IO.Path.GetDirectoryName(path)!;
+            return new FolderArchive(System.IO.Path.GetDirectoryName(path)!) { RequestedEntryName = System.IO.Path.GetFileName(path) };
         }
         if (Directory.Exists(path)) return new FolderArchive(path);
         if (!File.Exists(path)) throw new FileNotFoundException("来源不存在。", path);

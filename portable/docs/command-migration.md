@@ -77,7 +77,7 @@
 | ToggleVisibleBookshelf | 显示/隐藏书架 | B | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleBookshelfCommand.cs |
 | ToggleVisiblePageList | 显示/隐藏页面列表面板 | P | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisiblePageListCommand.cs |
 | ToggleVisibleBookmarkList | 显示/隐藏书签面板 | D | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleBookmarkListCommand.cs |
-| ToggleVisiblePlaylist | 显示/隐藏播放列表面板 | M | 待 P2–P5 | NeeView/Command/Commands/ToggleVisiblePlaylistCommand.cs |
+| ToggleVisiblePlaylist | 显示/隐藏播放列表面板 | M | P2 第八批原列表/标记子集 | NeeView/Command/Commands/ToggleVisiblePlaylistCommand.cs |
 | ToggleVisibleHistoryList | 显示/隐藏历史记录面板 | H | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleHistoryListCommand.cs |
 | ToggleVisibleFileInfo | 显示/隐藏信息面板 | I | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleFileInfoCommand.cs |
 | ToggleVisibleNavigator | 显示/隐藏导航面板 | N | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleNavigatorCommand.cs |
@@ -198,13 +198,13 @@
 | SetDefaultPageSetting | 重置页面设置 |  | 待 P2–P5 | NeeView/Command/Commands/SetDefaultPageSettingCommand.cs |
 | ToggleBookmark | 添加/删除书签 | Ctrl+D | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleBookmarkCommand.cs |
 | RegisterBookmark | 注册书签 |  | P2 第五批宿主适配；完整范围见书签契约 | NeeView/Command/Commands/RegisterBookmarkCommand.cs |
-| NextPlaylist | 下一播放列表 |  | 待 P2–P5 | NeeView/Command/Commands/NextPlaylistCommand.cs |
-| PrevPlaylist | 上一个播放列表 |  | 待 P2–P5 | NeeView/Command/Commands/PrevPlaylistCommand.cs |
-| TogglePlaylistItem | 添加/删除播放列表项目 | Ctrl+M | 待 P2–P5 | NeeView/Command/Commands/TogglePlaylistItemCommand.cs |
-| PrevPlaylistItem | 上一个播放列表项目 |  | 待 P2–P5 | NeeView/Command/Commands/PrevPlaylistItemCommand.cs |
-| NextPlaylistItem | 下一个播放列表项目 |  | 待 P2–P5 | NeeView/Command/Commands/NextPlaylistItemCommand.cs |
-| PrevPlaylistItemInBook | 书籍中的上一个播放列表项目 |  | 待 P2–P5 | NeeView/Command/Commands/PrevPlaylistItemInBookCommand.cs |
-| NextPlaylistItemInBook | 书籍中的下一个播放列表项目 |  | 待 P2–P5 | NeeView/Command/Commands/NextPlaylistItemInBookCommand.cs |
+| NextPlaylist | 下一播放列表 |  | P2 第八批原列表/标记子集 | NeeView/Command/Commands/NextPlaylistCommand.cs |
+| PrevPlaylist | 上一个播放列表 |  | P2 第八批原列表/标记子集 | NeeView/Command/Commands/PrevPlaylistCommand.cs |
+| TogglePlaylistItem | 添加/删除播放列表项目 | Ctrl+M | P2 第八批原列表/标记子集 | NeeView/Command/Commands/TogglePlaylistItemCommand.cs |
+| PrevPlaylistItem | 上一个播放列表项目 |  | P2 第八批原列表/标记子集 | NeeView/Command/Commands/PrevPlaylistItemCommand.cs |
+| NextPlaylistItem | 下一个播放列表项目 |  | P2 第八批原列表/标记子集 | NeeView/Command/Commands/NextPlaylistItemCommand.cs |
+| PrevPlaylistItemInBook | 书籍中的上一个播放列表项目 |  | P2 第八批原列表/标记子集 | NeeView/Command/Commands/PrevPlaylistItemInBookCommand.cs |
+| NextPlaylistItemInBook | 书籍中的下一个播放列表项目 |  | P2 第八批原列表/标记子集 | NeeView/Command/Commands/NextPlaylistItemInBookCommand.cs |
 | SetEffectProfile | 设置效果配置 |  | 待 P2–P5 | NeeView/Command/Commands/SetEffectProfileCommand.cs |
 | NextEffectProfile | 下一个效果配置 |  | 待 P2–P5 | NeeView/Command/CommandTable.cs |
 | PrevEffectProfile | 前一个效果配置 |  | 待 P2–P5 | NeeView/Command/CommandTable.cs |

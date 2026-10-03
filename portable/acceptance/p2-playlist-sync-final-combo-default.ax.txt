@@ -1,0 +1,146 @@
+Window: "漫画.cbz — NeeView", App: NeeView.
+0 standard window 漫画.cbz — NeeView, Secondary Actions: Raise
+	1 container WindowChrome, ID: AvaloniaWindowChrome
+	2 container
+		3 container PART_VisualLayerManager
+			4 container Root
+				5 container
+					6 menu bar MenuBar
+						7 container
+							8 文件
+								9 container
+									10 unknown PART_Popup
+							11 显示
+								12 container
+									13 unknown PART_Popup
+							14 图像
+								15 container
+									16 unknown PART_Popup
+							17 跳转
+								18 container
+									19 unknown PART_Popup
+							20 页面
+								21 container
+									22 unknown PART_Popup
+							23 书籍
+								24 container
+									25 unknown PART_Popup
+							26 选项
+								27 container
+									28 unknown PART_Popup
+							29 帮助
+								30 container
+									31 unknown PART_Popup
+					32 text field (settable) Help: 打开图片、目录、ZIP / RAR / 7z, Value: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz, ID: AddressBar
+						33 container
+							34 container
+								35 scroll area PART_ScrollViewer
+									36 container
+				37 container SidePanelFrame
+					38 container LeftRailItems
+						39 button Avalonia.Controls.PathIcon, Help: 信息 / 页面列表（拖动可重排或组合）
+						40 button Avalonia.Controls.PathIcon, Help: 文件夹（拖动可重排或组合）
+						41 button Avalonia.Controls.PathIcon, Help: 历史（拖动可重排或组合）
+					42 container LeftDockHost
+						43 container
+							44 text 信息
+							45 scroll area
+								46 container
+									47 text 中文/003.png
+
+尺寸：1800 × 1000
+大小：11,296 字节
+
+来源：/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz
+
+						48 handle
+						49 container
+							50 text 页面列表
+							51 content list PageList
+								52 scroll area PART_ScrollViewer
+									53 container
+										54 container
+											55 row (selectable) 中文/001.png
+												56 text 中文/001.png
+											57 row (selectable) 中文/002.png
+												58 text 中文/002.png
+											59 row (selected) 中文/003.png
+												60 text 中文/003.png
+											61 row (selectable) 中文/004.png
+												62 text 中文/004.png
+											63 row (selectable) 中文/005.png
+												64 text 中文/005.png
+											65 row (selectable) 中文/006.png
+												66 text 中文/006.png
+										67 scroll bar (settable, float) Value: 0, ID: PART_VerticalScrollBar
+											68 container
+												69 button Line up, ID: PART_LineUpButton
+												70 button Page up, ID: PART_PageUpButton
+												71 button Page down, ID: PART_PageDownButton
+												72 handle Position
+												73 button Line down, ID: PART_LineDownButton
+					74 handle
+					75 handle
+					76 container
+						77 text 播放列表
+						78 unknown PlaylistPanelView
+							79 container
+								80 container
+									81 button ⋯, Help: 播放列表设置, ID: PlaylistMore
+									82 pop up button Value: Default, ID: PlaylistFiles
+										83 container
+											84 text Default
+											85 unknown PART_Popup
+												86 window Secondary Actions: Raise
+													87 container
+														88 scroll area
+															89 container
+																90 container
+																	91 (selected) Default
+																		92 text Default
+																	93 Pagemark
+																		94 text Pagemark
+																	95 验收列表
+																		96 text 验收列表
+								97 text
+								98 button ＋, Help: 登记所选页面, ID: PlaylistAdd
+								99 button −, Help: 移除选中项, ID: PlaylistRemove
+								100 button (disabled) 恢复, ID: PlaylistRestore
+								101 button ↑, Help: 上移登记项
+								102 button ↓, Help: 下移登记项
+								103 content list PlaylistItems
+									104 scroll area PART_ScrollViewer
+										105 container
+											106 container
+												107 row (selected) PlaylistRow { Item = NeeView.PlaylistItem, GroupHeader = , Name = 目录首图, Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/图片/001.png, HasGroupHeader = False }
+													108 text Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/图片/001.png, Value: 目录首图
+												109 row (selectable) PlaylistRow { Item = NeeView.PlaylistItem, GroupHeader = , Name = 失效条目, Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz/中文/不存在.png, HasGroupHeader = False }
+													110 text Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz/中文/不存在.png, Value: 失效条目
+												111 row (selectable) PlaylistRow { Item = NeeView.PlaylistItem, GroupHeader = , Name = 003.png, Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz/中文/003.png, HasGroupHeader = False }
+													112 text Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz/中文/003.png, Value: 003.png
+												113 row (selectable) PlaylistRow { Item = NeeView.PlaylistItem, GroupHeader = , Name = 005.png, Path = /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/图片/005.png, HasGroupHeader = False }
+													114 text Help: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/图片/005.png, Value: 005.png
+					115 container RightRailItems
+						116 button Avalonia.Controls.PathIcon, Help: 导航器（拖动可重排或组合）
+						117 button Avalonia.Controls.PathIcon, Help: 图像效果（P5）（拖动可重排或组合）
+						118 button Avalonia.Controls.PathIcon, Help: 书签（拖动可重排或组合）
+						119 button Avalonia.Controls.PathIcon, Help: 播放列表（拖动可重排或组合）
+						120 button Avalonia.Controls.PathIcon, Help: 目标文件夹（P4）（拖动可重排或组合）
+				121 container
+					122 container DockPageSliderSocket
+						123 slider (settable, float) Value: 2, ID: PageSliderView
+							124 container PART_Track
+								125 button PART_DecreaseButton
+									126 container
+								127 button PART_IncreaseButton
+									128 container
+								129 handle thumb
+						130 unknown PageNumberView
+							131 text Value: 3 / 6, ID: NumberDisplay
+					132 text Value: 中文/003.png  ·  单页  ·  从右向左, ID: StatusField
+	133 close button
+	134 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	135 minimize button
+	136 text 漫画.cbz — NeeView
+137 menu bar
+	138 NeeView

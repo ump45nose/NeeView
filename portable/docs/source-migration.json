@@ -560,6 +560,96 @@
       "target": "src/NeeView.Engine/Config/Config.cs",
       "sha256": "3aa61a3d5865b6bce60f46efde33f80e80ef041350127817797dff7726df3571",
       "status": "保留原None/Left/Right枚举顺序与JSON数值，移除UI文案注解"
+    },
+    {
+      "source": "NeeView/Playlist/PlaylistSource.cs",
+      "target": "src/NeeView.Engine/Playlist/PlaylistSource.cs",
+      "sha256": "d347e9af82f187b97ff52e3be13c567d77eb88ce177fcc02c2d7b17ecf02faf5",
+      "status": "原Format/Items与未知字段，路径修复/FileResolver待迁"
+    },
+    {
+      "source": "NeeView/Playlist/PlaylistSourceItem.cs",
+      "target": "src/NeeView.Engine/Playlist/PlaylistSource.cs",
+      "sha256": "f0258528273ea4d4f48144213e7f9c0688388ca71bf1a16a8ea066d4af3f6a87",
+      "status": "原Path/Name/Invalid及名称省略，去除WPF属性注解"
+    },
+    {
+      "source": "NeeView/Playlist/Playlist.cs",
+      "target": "src/NeeView.Engine/Playlist/PlaylistSource.cs",
+      "sha256": "2b414ba484dd5067d34518339912e3a951f7eb744413a4c02a75e9cde68fdb79",
+      "status": "原去重/插入/删除逆序恢复/单项Move/Path排序子集；批量重排/拖入待迁"
+    },
+    {
+      "source": "NeeView/Playlist/PlaylistHub.cs",
+      "target": "src/NeeView.Engine/Playlist/PlaylistHub.cs",
+      "sha256": "66d22fb6172366cba7343ab716d41a1d29047231708c3b998671c4f1b7e8a7e4",
+      "status": "原文件选择/Default首项/自然排序/循环关系；监视、文件管理待迁"
+    },
+    {
+      "source": "NeeView/Playlist/PlaylistSourceTools.cs",
+      "target": "src/NeeView.Engine/Playlist/PlaylistHub.cs",
+      "sha256": "17c4c51f9a14db8d0b8ee7cae6d9614b7a526f581fd9271b6c8fb12fa46c7cb9",
+      "status": "v1/v2读写替换；Mac即时原子提交/回滚/提交前指纹，完整路径修复待迁"
+    },
+    {
+      "source": "NeeView/Playlist/PlaylistSourceValidator.cs",
+      "target": "src/NeeView.Engine/Playlist/PlaylistHub.cs",
+      "sha256": "c69a4468b0ae1e49d527136b78d76adc7b0e32172ae542488f246976eeb40f7f",
+      "status": "原45 alpha错版本修正；WindowsUNC/旧路径映射待P5"
+    },
+    {
+      "source": "NeeView/Config/PlaylistConfig.cs",
+      "target": "src/NeeView.Engine/Config/PlaylistConfig.cs",
+      "sha256": "679f04e02c510fc9aea521430eb88bd5fee304fb01c2fe688a5cbc16faaa3178",
+      "status": "原JSON字段/短路径与默认规则；Mac路径精确比较，属性界面待迁"
+    },
+    {
+      "source": "NeeView/Book/BookPageMarker.cs",
+      "target": "src/NeeView.Engine/Book/BookPageMarker.cs",
+      "sha256": "3b7bfd5dc2958f45b305d6fdde5ab2a97168add611760088f2d776666348649d",
+      "status": "原SetMarkers及书内首尾/循环算法；来源删除回报待P4"
+    },
+    {
+      "source": "NeeView/BookOperation/BookPlaylist.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookPlaylist.cs",
+      "sha256": "3ea50c3df8eeaff9638654838930efc1746c0996f37c5519295cdebc8a16ed95",
+      "status": "原书籍/全局列表路径关系、CanRegister/Find/Collect；媒体/临时来源待迁"
+    },
+    {
+      "source": "NeeView/BookOperation/BookPlaylistControl.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Playlist.cs",
+      "sha256": "6b071a954944d28e0f07146a503501046d1ab105f1607f178c36ecce072e9d9a",
+      "status": "原当前主图片切换、参数、标记更新；WPF调度/展示替换"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/ToggleCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/PlaylistCommandParameters.cs",
+      "sha256": "fd05680485c1ab800299d528ebfaeb0cc09848a0ccac8b8116dfd9fcb2bb33bc",
+      "status": "原Toggle/On/Off与菜单忽略参数；WPF属性编辑待迁"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/MovePlaylistItemInBookCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/PlaylistCommandParameters.cs",
+      "sha256": "f2d40ec4ed33a5e862cc8eeab5be71f45f85f9c287c5d0c2ea31d8fa0bccd6da",
+      "status": "原IsLoop/IsIncludeTerminal默认false"
+    },
+    {
+      "source": "NeeView/SidePanels/Playlist/PlaylistListBoxViewModel.cs",
+      "target": "src/NeeView.MacOS/ViewModels/PlaylistViewModel.cs",
+      "sha256": "7459bb3137802b61b0981b55b57c88e027abec84a205573fd9fa0d334bdde849",
+      "status": "原过滤/分组/显示顺序与前后导航关系；高级模板/搜索/修复待迁"
+    },
+    {
+      "source": "NeeView/BookOperation/BookPageControl.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Playlist.cs",
+      "sha256": "d056a5f5228670abebc4d67e3230074509dcec64365c538f6e33f6e68cce5b66",
+      "status": "AddCurrentPage取已生效SelectedPages首项，未确认PageSelector不改目标"
+    },
+    {
+      "source": "NeeView/PageFrames/BookContext.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.cs",
+      "sha256": "42289d6353cbefe4f39078663a06dbbfc92cb6568e2fa4a764c83e5d06d743a6",
+      "status": "原SelectedRange.CollectPositions升序设置主页，修正反向双页视觉元素首项误用"
     }
   ],
   "rule_references": [
@@ -678,6 +768,18 @@
       "target": "src/NeeView.MacOS/Views/SliderTextBox.axaml",
       "sha256": "9099adb3861fde633778f272223e9c0a876e49cdb73ebc03c1a7d7326dd3d602",
       "status": "第七批仅SliderTextBox显示/编辑模板，独立XAML与主题，不等同完整Generic迁入"
+    },
+    {
+      "source": "NeeView/SidePanels/Playlist/PlaylistView.xaml",
+      "target": "src/NeeView.MacOS/Views/PlaylistView.axaml",
+      "sha256": "5d5754d20242b6b860cb59537200856fe5f6657ee7cebfffb23c74623163d1ff",
+      "status": "原组合框/更多/过滤/列表区域转换，独立前端"
+    },
+    {
+      "source": "NeeView/SidePanels/Playlist/PlaylistViewModel.cs",
+      "target": "src/NeeView.MacOS/Views/PlaylistView.axaml.cs",
+      "sha256": "6ffdd5648688236db7348d50a2c7e9393a4518da5ffa620440771729b355aa02",
+      "status": "原更多菜单保留；未迁模板/文件删除更名/无效清理/OpenAsBook禁用占位"
     }
   ],
   "backend_reuse": [

@@ -11,6 +11,8 @@ public sealed class Book(Archive source, List<Page> pages, BookSettingConfig set
     public PageSortMode EffectiveSortMode { get; private set; }
     public int SortSeed { get; internal set; }
     public Page? CurrentPage { get; internal set; }
+    private BookPageMarker? _marker;
+    public BookPageMarker Marker => _marker ??= new(this);
 
     /// <summary>来自原 Book.CreateMemento；保持各字段与 Path/Page/Props 的关系。</summary>
     public BookMemento CreateMemento() => new()

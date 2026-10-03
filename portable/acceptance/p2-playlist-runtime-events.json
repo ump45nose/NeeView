@@ -1,0 +1,235 @@
+{
+  "phase": "p2-playlist",
+  "builds": [
+    "initial-toggle",
+    "selection-fix",
+    "focus-fix",
+    "selection-sync-final"
+  ],
+  "events": [
+    {
+      "name": "failure-toggle-selection",
+      "utc": "2026-10-03T14:05:27.795Z",
+      "ax": "p2-playlist-failure-toggle-selection.ax.txt",
+      "screenshot": "p2-playlist-failure-toggle-selection.png",
+      "build": "initial-toggle",
+      "result": "缺陷复现，已修复"
+    },
+    {
+      "name": "failure-focus-loss",
+      "utc": "2026-10-03T14:07:36.762Z",
+      "ax": "p2-playlist-failure-focus-loss.ax.txt",
+      "screenshot": null,
+      "build": "selection-fix",
+      "result": "缺陷复现，已修复"
+    },
+    {
+      "name": "failure-navigation-highlight",
+      "utc": "2026-10-03T14:16:13.591Z",
+      "ax": "p2-playlist-failure-navigation-highlight.ax.txt",
+      "screenshot": "p2-playlist-failure-navigation-highlight.png",
+      "build": "focus-fix",
+      "result": "缺陷复现，已修复"
+    },
+    {
+      "name": "sync-final-directory-open",
+      "utc": "2026-10-03T14:17:29.163Z",
+      "ax": "p2-playlist-sync-final-directory-open.ax.txt",
+      "screenshot": null,
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-next-item",
+      "utc": "2026-10-03T14:17:30.352Z",
+      "ax": "p2-playlist-sync-final-next-item.ax.txt",
+      "screenshot": "p2-playlist-sync-final-next-item.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-prev-item",
+      "utc": "2026-10-03T14:17:31.277Z",
+      "ax": "p2-playlist-sync-final-prev-item.ax.txt",
+      "screenshot": "p2-playlist-sync-final-prev-item.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-down-selects-only",
+      "utc": "2026-10-03T14:17:40.237Z",
+      "ax": "p2-playlist-sync-final-down-selects-only.ax.txt",
+      "screenshot": null,
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-enter-opens-selection",
+      "utc": "2026-10-03T14:17:41.187Z",
+      "ax": "p2-playlist-sync-final-enter-opens-selection.ax.txt",
+      "screenshot": null,
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-prev-mark-in-book",
+      "utc": "2026-10-03T14:17:42.395Z",
+      "ax": "p2-playlist-sync-final-prev-mark-in-book.ax.txt",
+      "screenshot": "p2-playlist-sync-final-prev-mark-in-book.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-next-mark-in-book",
+      "utc": "2026-10-03T14:17:43.286Z",
+      "ax": "p2-playlist-sync-final-next-mark-in-book.ax.txt",
+      "screenshot": "p2-playlist-sync-final-next-mark-in-book.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-mark-off",
+      "utc": "2026-10-03T14:17:49.310Z",
+      "ax": "p2-playlist-sync-final-mark-off.ax.txt",
+      "screenshot": "p2-playlist-sync-final-mark-off.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-mark-on",
+      "utc": "2026-10-03T14:17:50.201Z",
+      "ax": "p2-playlist-sync-final-mark-on.ax.txt",
+      "screenshot": "p2-playlist-sync-final-mark-on.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-archive-reopen",
+      "utc": "2026-10-03T14:17:51.303Z",
+      "ax": "p2-playlist-sync-final-archive-reopen.ax.txt",
+      "screenshot": "p2-playlist-sync-final-archive-reopen.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-missing-keeps-book",
+      "utc": "2026-10-03T14:18:00.744Z",
+      "ax": "p2-playlist-sync-final-missing-keeps-book.ax.txt",
+      "screenshot": "p2-playlist-sync-final-missing-keeps-book.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-multiselect",
+      "utc": "2026-10-03T14:18:09.843Z",
+      "ax": "p2-playlist-sync-final-multiselect.ax.txt",
+      "screenshot": null,
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-delete-batch",
+      "utc": "2026-10-03T14:18:10.986Z",
+      "ax": "p2-playlist-sync-final-delete-batch.ax.txt",
+      "screenshot": "p2-playlist-sync-final-delete-batch.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-restore-batch",
+      "utc": "2026-10-03T14:18:29.519Z",
+      "ax": "p2-playlist-sync-final-restore-batch.ax.txt",
+      "screenshot": "p2-playlist-sync-final-restore-batch.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-next-file-pagemark",
+      "utc": "2026-10-03T14:18:30.385Z",
+      "ax": "p2-playlist-sync-final-next-file-pagemark.ax.txt",
+      "screenshot": "p2-playlist-sync-final-next-file-pagemark.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-file-wrap-default",
+      "utc": "2026-10-03T14:18:31.267Z",
+      "ax": "p2-playlist-sync-final-file-wrap-default.ax.txt",
+      "screenshot": "p2-playlist-sync-final-file-wrap-default.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-new-list-dialog",
+      "utc": "2026-10-03T14:19:12.864Z",
+      "ax": "p2-playlist-sync-final-new-list-dialog.ax.txt",
+      "screenshot": "p2-playlist-sync-final-new-list-dialog.png",
+      "build": "selection-sync-final",
+      "result": "观察到新建对话框；不是分组开关证明"
+    },
+    {
+      "name": "sync-final-create-list",
+      "utc": "2026-10-03T14:19:34.009Z",
+      "ax": "p2-playlist-sync-final-create-list.ax.txt",
+      "screenshot": "p2-playlist-sync-final-create-list.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-add-current",
+      "utc": "2026-10-03T14:19:45.513Z",
+      "ax": "p2-playlist-sync-final-add-current.ax.txt",
+      "screenshot": "p2-playlist-sync-final-add-current.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-prev-file",
+      "utc": "2026-10-03T14:19:46.436Z",
+      "ax": "p2-playlist-sync-final-prev-file.ax.txt",
+      "screenshot": null,
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-combo-default",
+      "utc": "2026-10-03T14:20:09.340Z",
+      "ax": "p2-playlist-sync-final-combo-default.ax.txt",
+      "screenshot": "p2-playlist-sync-final-combo-default.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-move-up",
+      "utc": "2026-10-03T14:20:19.593Z",
+      "ax": "p2-playlist-sync-final-move-up.ax.txt",
+      "screenshot": "p2-playlist-sync-final-move-up.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-selected-file-before-exit",
+      "utc": "2026-10-03T14:20:40.208Z",
+      "ax": "p2-playlist-sync-final-selected-file-before-exit.ax.txt",
+      "screenshot": "p2-playlist-sync-final-selected-file-before-exit.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "sync-final-restart-selected-list",
+      "utc": "2026-10-03T14:21:10.425Z",
+      "ax": "p2-playlist-sync-final-restart-selected-list.ax.txt",
+      "screenshot": "p2-playlist-sync-final-restart-selected-list.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    },
+    {
+      "name": "final-user-restored",
+      "utc": "2026-10-03T14:21:51.231Z",
+      "ax": "p2-playlist-final-user-restored.ax.txt",
+      "screenshot": "p2-playlist-final-user-restored.png",
+      "build": "selection-sync-final",
+      "result": "观察结果见AX及运行记录"
+    }
+  ]
+}

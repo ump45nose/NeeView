@@ -3,7 +3,7 @@ using NeeView.PageFrames;
 namespace NeeView;
 
 /// <summary>原 BookOperation 的 P1 编排边界；展示与文件后端从构造参数接入。</summary>
-public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decoder, SaveData saveData) : IAsyncDisposable
+public sealed partial class BookOperation(IArchiveFactory archives, IImageDecoder decoder, SaveData saveData) : IAsyncDisposable
 {
     private readonly SemaphoreSlim _gate = new(1);
     private CancellationTokenSource? _opening;
@@ -50,7 +50,7 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
     /// <summary>共享原加载链；历史重放可指定条目并保留访问顺序，返回是否实际提交新书。</summary>
     /// <param name="startupMemento">原 FirstLoader 的显式启动快照，优先于历史和字段恢复策略。</param>
     /// <param name="startupPart">启动快照中的 Mac 分割位置。</param>
-    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, int startupPart = 0)
+    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, int startupPart = 0, Playlist? expectedPlaylist = null)
     {
         ObjectDisposedException.ThrowIf(_disposed || _closing, this);
         var generation = Interlocked.Increment(ref _generation);
@@ -69,27 +69,28 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
                 : Config.Current.BookSettingPolicy.Mix(Config.Current.BookSettingDefault, Config.Current.BookSetting, restored.Memento?.ToBookSetting(), false);
             var book = new Book(source, entries.Where(e => !e.IsDirectory && ImageFormats.IsImage(e.EntryName)).Select(e => new Page(e)).ToList(), setting);
             book.SortSeed = restored.Memento?.SortSeed ?? 0; book.Sort(opening.Token);
-            var requested = entryName ?? (ImageFormats.IsImage(path) ? System.IO.Path.GetFileName(path) : setting.Page);
+            var explicitEntry = entryName ?? source.RequestedEntryName;
+            var requested = explicitEntry ?? (ImageFormats.IsImage(path) ? System.IO.Path.GetFileName(path) : setting.Page);
             int index = book.Pages.FindIndex(e => e.EntryName == requested);
-            if (entryName is not null && index < 0) throw new FileNotFoundException("历史页面已不存在：" + entryName);
+            if (explicitEntry is not null && index < 0) throw new FileNotFoundException((entryName is not null ? "历史页面已不存在：" : "指定页面已不存在：") + explicitEntry);
             index = Math.Max(0, index);
-            if (entryName is null && !keepHistoryOrder && !ImageFormats.IsImage(path) && Config.Current.BookSettingPolicy.Page == BookSettingPageSelectMode.RestoreOrDefaultReset && index >= book.Pages.Count - (setting.PageMode == PageMode.WidePage && !setting.IsSupportedSingleLastPage ? 2 : 1)) index = 0;
+            if (explicitEntry is null && !keepHistoryOrder && !ImageFormats.IsImage(path) && Config.Current.BookSettingPolicy.Page == BookSettingPageSelectMode.RestoreOrDefaultReset && index >= book.Pages.Count - (setting.PageMode == PageMode.WidePage && !setting.IsSupportedSingleLastPage ? 2 : 1)) index = 0;
             await ProbeAroundAsync(book, index, opening.Token);
             await _gate.WaitAsync(opening.Token);
             try
             {
                 opening.Token.ThrowIfCancellationRequested();
-                if (_disposed || _closing || generation != _generation) return false;
+                if (_disposed || _closing || generation != _generation || expectedPlaylist is not null && !ReferenceEquals(expectedPlaylist, _playlistHub?.Current)) return false;
                 await saveData.SaveAsync(Book, Position.Part, opening.Token, _keepHistoryOrder || keepHistoryOrder);
                 var old = Book;
                 // 与 Remove/Clear 串行提交：取消的打开不能解除抑制，新书提交后清空仍作用于新书。
                 if (!await saveData.BeginHistoryVisitAsync(book.Path, () =>
                 {
                     opening.Token.ThrowIfCancellationRequested();
-                    if (_disposed || _closing || generation != _generation) return false;
+                    if (_disposed || _closing || generation != _generation || expectedPlaylist is not null && !ReferenceEquals(expectedPlaylist, _playlistHub?.Current)) return false;
                     Book = book; source = null; _keepHistoryOrder = keepHistoryOrder;
                     Config.Current.BookSetting = setting; Context = new(setting, Config.Current);
-                    Position = new(index, entryName is not null || ImageFormats.IsImage(path) ? 0 : Math.Clamp(restored.Part, 0, 1));
+                    Position = new(index, explicitEntry is not null || ImageFormats.IsImage(path) ? 0 : Math.Clamp(restored.Part, 0, 1));
                     RebuildFrame(1); return true;
                 })) return false;
                 if (old is not null) await old.DisposeAsync();
@@ -183,15 +184,16 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
     { await JumpCoreAsync(index, backwards, true, expectedBook); }
 
     /// <summary>共用定位；历史重放不再追加自身，否则会截断原前进分支。</summary>
-    private async Task<bool> JumpCoreAsync(int index, bool backwards, bool recordHistory, Book? expectedBook = null)
+    private async Task<bool> JumpCoreAsync(int index, bool backwards, bool recordHistory, Book? expectedBook = null, Playlist? expectedPlaylist = null)
     {
         await _gate.WaitAsync();
         try
         {
             if (_disposed || _closing || Book is null || Book.Pages.Count == 0 || IsLoading || expectedBook is not null && !ReferenceEquals(expectedBook, Book)) return false;
             var generation = _generation; index = Math.Clamp(index, 0, Book.Pages.Count - 1);
+            if (expectedPlaylist is not null && !ReferenceEquals(expectedPlaylist, _playlistHub?.Current)) return false;
             await ProbeAroundAsync(Book, index, CancellationToken.None);
-            if (_disposed || _closing || generation != _generation) return false;
+            if (_disposed || _closing || generation != _generation || expectedPlaylist is not null && !ReferenceEquals(expectedPlaylist, _playlistHub?.Current)) return false;
             // 明确定位成功后恢复页面状态；失败和过期请求仍保留各自的错误处理。
             Error = null; Position = new(index, backwards ? 1 : 0); RebuildFrame(backwards ? -1 : 1);
             if (recordHistory) RecordPageHistory(); ScheduleSave(); Notify(); return true;
@@ -330,13 +332,15 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
     /// <summary>使用完整迁入的 PageFrameFactory；半页位置在关闭分割时恢复整页。</summary>
     private void RebuildFrame(int direction, bool synchronizeSelection = true)
     {
+        RefreshMarkers();
         // PageFrame.Direction 是书籍阅读方向；移动方向独立保留，供分割生成与展示原点使用。
         MoveDirection = direction;
         if (Book is null || Context is null || Book.Pages.Count == 0) { Frame = null; if (synchronizeSelection) PageSelector.Synchronize(Book, 0); return; }
         var page = Book.Pages[Math.Clamp(Position.Index, 0, Book.Pages.Count - 1)];
         if (!(Context.PageMode == PageMode.SinglePage && Context.IsSupportedDividePage && Maths.AspectRatioTools.IsLandscape(page.Content.PageDataSource.Size))) Position = new(page.Index, direction > 0 ? 0 : 1);
         Frame = new PageFrameFactory(Context, new BookContext(Book.Pages), new ContentSizeCalculator(Context)).CreatePageFrame(Position, direction);
-        Book.CurrentPage = Frame?.Elements.FirstOrDefault(e => !e.IsDummy)?.Page;
+        // 原 BookContext.SelectedRange.CollectPositions 按索引升序；主图片不随视觉左右或反向生成改变。
+        Book.CurrentPage = Frame?.Elements.Where(e => !e.IsDummy).Select(e => e.Page).MinBy(page => page.Index);
         if (synchronizeSelection) PageSelector.Synchronize(Book, Math.Max(0, Frame?.FrameRange.Min.Index ?? 0));
     }
     /// <summary>只探测当前及生成双页所需邻页，损坏页保留占位。</summary>
@@ -389,9 +393,11 @@ public sealed class BookOperation(IArchiveFactory archives, IImageDecoder decode
         await _gate.WaitAsync();
         try
         {
+            if (_playlistHub is not null) await _playlistHub.FlushAsync();
             await SaveAsync();
             if (Book is not null) await Book.DisposeAsync();
             _bookshelf?.Dispose();
+            if (_playlistHub is not null) _playlistHub.Changed -= Playlist_Changed;
             Book = null; Frame = null; _disposed = true;
         }
         finally

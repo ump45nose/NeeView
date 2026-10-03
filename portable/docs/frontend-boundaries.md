@@ -16,6 +16,8 @@
 | 菜单执行、键鼠、对话框、窗口关闭 | Views/MainWindow.axaml.cs | 稳定命令名、Engine/系统契约 |
 | 书签拖动、选择和对话框反馈 | Views/MainWindow.Bookmarks.cs | Engine.BookmarkCollection 与 SaveData；不编写集合/保存规则 |
 | 书签登记字段与按钮布局 | Views/BookmarkRegistrationWindow.axaml | 原 BookmarkPopupEdit；取消不提交，已确认目标需重新校验 |
+| 播放列表结构、行选择、焦点与输入 | Views/PlaylistView.axaml(.cs)、ViewModels/PlaylistViewModel.cs | 原 PlaylistHub 当前文件/条目及集合；不枚举目录或写文件 |
+| 滑条及胶片条页标记 | Views/PageMarkersView.cs、Views/ThumbnailView.cs | 原 BookPageMarker 页索引；标记变化只重绘，不申请正文资源 |
 | 设置页导航/内容结构 | Views/SettingsWindow.axaml | 原 BookSettingConfig 和恢复策略 |
 | 具体后端及实例装配 | MacApp.cs | 唯一可引用 Backends 的启动装配点 |
 
@@ -31,4 +33,6 @@
 
 第六批历史列表由 Engine.HistoryList/SaveData 管理过滤、导航和编辑，HistoryRow/MainWindow.History 管理分组显示、焦点、多选及菜单。历史主题/布局调整不触发阅读解码或修改访问顺序；四种显示模板与无效清理保留禁用入口。
 
-第七批滑条页号结构、输入反馈与主题分开；ReaderWorkspaceViewModel提供位置/显隐/尺寸/透明度，SettingsWindow只改表现字段时不调用ApplySettingAsync。原SliderConfig字段写回现有JSON，未知/未迁字段继续合并保留。Fluent轨道留白/滑块尺寸使用主题资源覆盖，15–50 DIP内不裁切，不维护第二套Slider模板。原页标记/自动隐藏待完整播放列表和窗口控制迁入，入口保持占位；见[p2-slider-input.md](p2-slider-input.md)。
+第七批滑条页号结构、输入反馈与主题分开；ReaderWorkspaceViewModel提供位置/显隐/尺寸/透明度，SettingsWindow只改表现字段时不调用ApplySettingAsync。原SliderConfig字段写回现有JSON，未知/未迁字段继续合并保留。Fluent轨道留白/滑块尺寸使用主题资源覆盖，15–50 DIP内不裁切，不维护第二套Slider模板；见[p2-slider-input.md](p2-slider-input.md)。第八批接入全局播放列表页标记，完整自动隐藏仍待窗口控制迁入。
+
+第八批列表行引用与业务条目身份分开，集合刷新恢复选中容器焦点；普通方向键只选行，Enter/Delete在列表隧道消费。前后登记命令更新Hub当前项时回显新高亮，当前项仍在选中批次中则保留多选。关闭先禁止新动作并等待已授权编辑；尚在采集路径/文字的对话框返回后禁止续写。主题、标记绘制及面板排序不重建正文，详见[p2-playlist.md](p2-playlist.md)。

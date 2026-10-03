@@ -14,6 +14,7 @@ public sealed class Config
     public SliderConfig Slider { get; set; } = new();
     public BookshelfConfig Bookshelf { get; set; } = new();
     public HistoryConfig History { get; set; } = new();
+    public PlaylistConfig Playlist { get; set; } = new();
     public bool IsAddressBarEnabled { get; set; } = true;
     /// <summary>启动时装配唯一配置，读取前不初始化具体窗口。</summary>
     public static void SetCurrent(Config config) => Current = config;
@@ -55,6 +56,7 @@ public sealed class SliderConfig
     public bool IsSliderLinkedFilmStrip { get; set; } = true;
     public bool IsSyncPageMode { get; set; }
     public SliderMouseWheelAction MouseWheelAction { get; set; }
+    public bool IsVisiblePlaylistMark { get; set; }
 }
 
 /// <summary>来自原 BookConfig 的分页参数及默认值。</summary>

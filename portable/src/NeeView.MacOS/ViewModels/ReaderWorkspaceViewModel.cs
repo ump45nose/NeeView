@@ -38,6 +38,9 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public int LastIndex => Math.Max(0, Pages.Count - 1);
     public double PageIndex => Operation.PageSelector.SelectedIndex;
     public bool SliderReversed => Operation.FilmStrip.IsSliderDirectionReversed;
+    public IReadOnlyList<int> MarkerIndices => Operation.Book?.Marker.Markers.Select(page => page.Index).ToArray() ?? [];
+    public bool SliderMarksVisible => Config.Current.Slider.IsVisiblePlaylistMark;
+    public bool IsPlaylistMarked => Operation.Book?.CurrentPage?.IsMarked == true;
     public object? SliderSource => Operation.Book;
     public bool SliderVisible => Config.Current.Slider.IsEnabled && Pages.Count > 0;
     public bool SliderNumberVisible => Config.Current.Slider.SliderIndexLayout != SliderIndexLayout.None;
@@ -66,6 +69,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public bool ShowInformation => IsPanelVisible("FileInformationPanel");
     public bool ShowBookmarks => IsPanelVisible("BookmarkPanel");
     public bool ShowNavigator => IsPanelVisible("NavigatePanel");
+    public bool ShowPlaylist => IsPanelVisible("PlaylistPanel");
     /// <summary>跨栏后按实际组选择与栏显隐计算面板状态。</summary>
     public bool IsPanelVisible(string name) => Layout.Find(name) is { } found && ReferenceEquals(Layout.Docks[found.Side].SelectedItem, found.Group) && (found.Side == "Left" ? LeftVisible : RightVisible);
     public string HistorySearch { get => Operation.HistoryList.SearchKeyword; set { if (value == HistorySearch) return; Operation.HistoryList.SearchKeyword = value; OnPropertyChanged(); RefreshHistory(); } }
@@ -98,9 +102,11 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public event EventHandler? PanelsRefreshed;
 
     /// <summary>装配业务订阅；后台回报统一切 UI 线程。</summary>
-    public void Attach() { Layout.Changed += Layout_Changed; Operation.Changed += Operation_Changed; Operation.PageSelector.SelectionChanged += Selection_Changed; Operation.Bookshelf.Changed += Bookshelf_Changed; SaveData.Changed += SaveData_Changed; Refresh(); RefreshFolders(); }
+    public void Attach() { Layout.Changed += Layout_Changed; Operation.Changed += Operation_Changed; Operation.MarkersChanged += Markers_Changed; Operation.PageSelector.SelectionChanged += Selection_Changed; Operation.Bookshelf.Changed += Bookshelf_Changed; SaveData.Changed += SaveData_Changed; Refresh(); RefreshFolders(); }
     /// <summary>关闭窗口时解除订阅，避免旧窗口收到新书变化。</summary>
-    public void Detach() { Layout.Changed -= Layout_Changed; Operation.Changed -= Operation_Changed; Operation.PageSelector.SelectionChanged -= Selection_Changed; Operation.Bookshelf.Changed -= Bookshelf_Changed; SaveData.Changed -= SaveData_Changed; }
+    public void Detach() { Layout.Changed -= Layout_Changed; Operation.Changed -= Operation_Changed; Operation.MarkersChanged -= Markers_Changed; Operation.PageSelector.SelectionChanged -= Selection_Changed; Operation.Bookshelf.Changed -= Bookshelf_Changed; SaveData.Changed -= SaveData_Changed; }
+    /// <summary>全局列表编辑只更新标记绑定，不发布正文 Refreshed。</summary>
+    private void Markers_Changed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() => { OnPropertyChanged(nameof(MarkerIndices)); OnPropertyChanged(nameof(IsPlaylistMarked)); });
     /// <summary>目录回报只更新书架表现，不触发正文或缩略图加载。</summary>
     private void Bookshelf_Changed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(RefreshFolders);
     /// <summary>先替换集合再恢复选择；屏蔽列表 TwoWay 清空对引擎选择的回写。</summary>
@@ -122,6 +128,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
         OnPropertyChanged(nameof(PageIndex)); OnPropertyChanged(nameof(PositionText)); OnPropertyChanged(nameof(SliderReversed)); OnPropertyChanged(nameof(FilmStripHeight));
         OnPropertyChanged(nameof(SliderVisible)); OnPropertyChanged(nameof(SliderNumberVisible)); OnPropertyChanged(nameof(SliderNumberColumn));
         OnPropertyChanged(nameof(SliderThickness)); OnPropertyChanged(nameof(SliderOpacity));
+        OnPropertyChanged(nameof(SliderMarksVisible)); OnPropertyChanged(nameof(MarkerIndices));
     }
     /// <summary>历史与书签回报只更新导航面板，不重新解码当前帧。</summary>
     private void SaveData_Changed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() =>
@@ -182,7 +189,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     /// <summary>只通知侧栏绑定，不发布阅读刷新或重新申请图像。</summary>
     public void RefreshPanels()
     {
-        foreach (var name in new[] { nameof(LeftVisible), nameof(RightVisible), nameof(LeftAutoHide), nameof(RightAutoHide), nameof(ShowPageList), nameof(ShowFolderList), nameof(ShowHistory), nameof(ShowBookmarks), nameof(ShowInformation), nameof(ShowNavigator), nameof(FilmStripVisible) }) OnPropertyChanged(name);
+        foreach (var name in new[] { nameof(LeftVisible), nameof(RightVisible), nameof(LeftAutoHide), nameof(RightAutoHide), nameof(ShowPageList), nameof(ShowFolderList), nameof(ShowHistory), nameof(ShowBookmarks), nameof(ShowInformation), nameof(ShowNavigator), nameof(ShowPlaylist), nameof(FilmStripVisible) }) OnPropertyChanged(name);
         PanelsRefreshed?.Invoke(this, EventArgs.Empty);
     }
     /// <summary>自动隐藏只改变窗口表现状态，不改变书籍和目录索引。</summary>

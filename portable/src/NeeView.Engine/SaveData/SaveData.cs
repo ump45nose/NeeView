@@ -20,6 +20,7 @@ public sealed class SaveData(string directory)
     public IReadOnlyList<HistoryEntry> HistoryEntries { get; private set; } = [];
     public event EventHandler? Changed;
     public string DirectoryPath { get; } = directory;
+    public PlaylistHub Playlists { get; private set; } = null!;
     public string? LastBookPath => _setting["Config"]?["StartUp"]?["LastBookV2"]?["Path"]?.GetValue<string>();
 
     /// <summary>加载原命名文件并恢复 P1 已支持配置；损坏文件不覆盖。</summary>
@@ -49,7 +50,10 @@ public sealed class SaveData(string directory)
             config.Slider = ReadBranch<SliderConfig>(raw, "Slider");
             config.Bookshelf = ReadBranch<BookshelfConfig>(raw, "Bookshelf");
             config.History = ReadBranch<HistoryConfig>(raw, "History");
+            config.Playlist = ReadBranch<PlaylistConfig>(raw, "Playlist");
         }
+        config.Playlist.DefaultFolder = System.IO.Path.Combine(DirectoryPath, "Playlists");
+        Playlists = new(config.Playlist);
         Config.SetCurrent(config);
     }
 
@@ -100,6 +104,14 @@ public sealed class SaveData(string directory)
 
     /// <summary>原相反方向的指定步长命令共享参数，NextSizePage 读取 PrevSizePage 的差分。</summary>
     public MoveSizePageCommandParameter GetMoveSizeParameter() => _setting["Commands"]?["PrevSizePage"]?["Parameter"]?.Deserialize<MoveSizePageCommandParameter>(Options) ?? new();
+
+    /// <summary>读取原命令差分参数，缺失值用原默认值，兼容数值及字符串枚举。</summary>
+    public T GetCommandParameter<T>(string name) where T : class, new()
+    {
+        var options = new JsonSerializerOptions(Options);
+        options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        return _setting["Commands"]?[name]?["Parameter"]?.Deserialize<T>(options) ?? new();
+    }
 
     /// <summary>更新已支持参数并保留原节点的未知字段；原差分快捷键不会被覆盖。</summary>
     public void SetCommandParameter<T>(string name, T value) => Merge(Object(Object(Object(_setting, "Commands"), name), "Parameter"), JsonSerializer.SerializeToNode(value, Options)!.AsObject());
@@ -296,7 +308,7 @@ public sealed class SaveData(string directory)
         try
         {
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "History" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "History", "Playlist" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 Merge(Object(config, branch), JsonSerializer.SerializeToNode(value, Options)!.AsObject());

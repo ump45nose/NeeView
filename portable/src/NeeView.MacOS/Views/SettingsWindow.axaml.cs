@@ -82,6 +82,8 @@ public sealed partial class SettingsWindow : Window
         this.FindControl<ComboBox>("FilmWheel")!.SelectedIndex = (int)film.MouseWheelAction;
         this.FindControl<ComboBox>("SliderOrder")!.SelectedIndex = (int)slider.SliderDirection;
         this.FindControl<CheckBox>("SliderEnabled")!.IsChecked = slider.IsEnabled;
+        this.FindControl<CheckBox>("SliderMarks")!.IsChecked = slider.IsVisiblePlaylistMark;
+        this.FindControl<CheckBox>("FilmMarks")!.IsChecked = film.IsVisiblePlaylistMark;
         this.FindControl<ComboBox>("SliderIndexLayout")!.SelectedIndex = (int)slider.SliderIndexLayout;
         this.FindControl<NumericUpDown>("SliderThickness")!.Value = (decimal)slider.Thickness;
         this.FindControl<NumericUpDown>("SliderOpacity")!.Value = (decimal)Math.Clamp(slider.Opacity, 0, 1);
@@ -103,6 +105,8 @@ public sealed partial class SettingsWindow : Window
         slider.IsSliderLinkedFilmStrip = this.FindControl<CheckBox>("SliderLinked")!.IsChecked == true;
         slider.IsSyncPageMode = this.FindControl<CheckBox>("SliderSync")!.IsChecked == true;
         slider.IsEnabled = this.FindControl<CheckBox>("SliderEnabled")!.IsChecked == true;
+        slider.IsVisiblePlaylistMark = this.FindControl<CheckBox>("SliderMarks")!.IsChecked == true;
+        film.IsVisiblePlaylistMark = this.FindControl<CheckBox>("FilmMarks")!.IsChecked == true;
         slider.SliderIndexLayout = (SliderIndexLayout)Math.Max(0, this.FindControl<ComboBox>("SliderIndexLayout")!.SelectedIndex);
         slider.Thickness = (double)(this.FindControl<NumericUpDown>("SliderThickness")!.Value ?? 25);
         slider.Opacity = (double)(this.FindControl<NumericUpDown>("SliderOpacity")!.Value ?? 1);

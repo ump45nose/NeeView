@@ -46,13 +46,17 @@ public sealed class ThumbnailView : Control, IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         if (_operation is not null) _operation.PageSelector.SelectionChanged -= Selection_Changed;
+        if (_operation is not null) _operation.MarkersChanged -= Markers_Changed;
         // 控件重绑也必须结束旧请求和租约，不能让旧工厂晚到结果混入新操作实例。
         ++_revision; _request?.Cancel(); ClearDetail();
         foreach (var image in _images.Values) image.Dispose(); _images.Clear();
         _requestedPages = []; _targetSize = 0; _loadTask = Task.CompletedTask; _displayBook = null; _offset = 0;
         _operation = operation; _factory = factory; Focusable = true;
         if (!IsNavigator) operation.PageSelector.SelectionChanged += Selection_Changed;
+        if (!IsNavigator) operation.MarkersChanged += Markers_Changed;
     }
+    /// <summary>播放列表变化仅重绘已显示缩略图，不发起新解码或改变选择。</summary>
+    private void Markers_Changed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() => { if (!_disposed) InvalidateVisual(); });
     /// <summary>临时选择只更新胶片条，不请求正文图像；后台回报切 UI 线程。</summary>
     private void Selection_Changed(object? sender, EventArgs e)
     {
@@ -146,6 +150,11 @@ public sealed class ThumbnailView : Control, IDisposable
             if (IsNavigator || page.Index == _operation.PageSelector.SelectedIndex) context.DrawRectangle(null, new Pen(Brushes.DodgerBlue, 2), cell);
             if (!IsNavigator && Config.Current.FilmStrip.IsVisibleNumber)
                 context.DrawText(new FormattedText((page.Index + 1).ToString(), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("sans-serif"), 11, Brushes.White), cell.TopLeft);
+            if (!IsNavigator && Config.Current.FilmStrip.IsVisiblePlaylistMark && page.IsMarked)
+            {
+                var brush = this.TryFindResource("PlaylistMarkBrush", out var resource) && resource is IBrush theme ? theme : Brushes.Gold;
+                context.FillRectangle(brush, new Avalonia.Rect(cell.Right - 8, cell.Top + 2, 6, 10));
+            }
         }
     }
     /// <summary>命中有效图像槽，居中留白不能转换成首尾页。</summary>
@@ -241,6 +250,7 @@ public sealed class ThumbnailView : Control, IDisposable
     {
         if (_disposed) return; _disposed = true; ++_revision; _request?.Cancel(); ClearDetail();
         if (_operation is not null) _operation.PageSelector.SelectionChanged -= Selection_Changed;
+        if (_operation is not null) _operation.MarkersChanged -= Markers_Changed;
         foreach (var image in _images.Values) image.Dispose(); _images.Clear();
     }
 }

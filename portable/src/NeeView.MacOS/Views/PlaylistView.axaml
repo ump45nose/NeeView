@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="NeeView.MacOS.Views.PlaylistView" x:CompileBindings="False">
+  <!-- 原 PlaylistView：上部组合框/更多/过滤，下部条目；主题不参与登记和导航规则。 -->
+  <DockPanel Margin="0,2">
+    <StackPanel DockPanel.Dock="Top">
+      <DockPanel Margin="6,2">
+        <Button x:Name="PlaylistMore" DockPanel.Dock="Right" Width="28" Content="⋯" Click="More_Click" ToolTip.Tip="播放列表设置" />
+        <ComboBox x:Name="PlaylistFiles" SelectionChanged="File_Changed">
+          <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Name}" /></DataTemplate></ComboBox.ItemTemplate>
+        </ComboBox>
+      </DockPanel>
+      <TextBlock Text="{Binding FilterMessage}" TextWrapping="Wrap" Margin="8,2" FontSize="11" />
+    </StackPanel>
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="4" Margin="6,4">
+      <Button x:Name="PlaylistAdd" Content="＋" ToolTip.Tip="登记所选页面" IsEnabled="{Binding CanAdd}" Click="Add_Click" />
+      <Button x:Name="PlaylistRemove" Content="−" ToolTip.Tip="移除选中项" Click="Remove_Click" />
+      <Button x:Name="PlaylistRestore" Content="恢复" IsEnabled="{Binding CanRestore}" Click="Restore_Click" />
+      <Button Content="↑" Tag="-1" Click="Move_Click" ToolTip.Tip="上移登记项" /><Button Content="↓" Tag="1" Click="Move_Click" ToolTip.Tip="下移登记项" />
+    </StackPanel>
+    <ListBox x:Name="PlaylistItems" SelectionMode="Multiple" SelectionChanged="Item_Changed" DoubleTapped="Item_DoubleTapped">
+      <ListBox.ItemTemplate><DataTemplate>
+        <StackPanel Spacing="3" Margin="2">
+          <TextBlock Text="{Binding GroupHeader}" IsVisible="{Binding HasGroupHeader}" FontWeight="Bold" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,2" />
+          <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Path}" />
+        </StackPanel>
+      </DataTemplate></ListBox.ItemTemplate>
+      <ListBox.ContextMenu><ContextMenu Opening="Context_Opening">
+        <MenuItem Header="打开" Click="Open_Click" /><MenuItem Header="更改登记名称…" Click="Rename_Click" /><Separator />
+        <MenuItem Header="移除所选登记项" Click="Remove_Click" /><MenuItem Header="恢复移除项" Click="Restore_Click" />
+      </ContextMenu></ListBox.ContextMenu>
+    </ListBox>
+  </DockPanel>
+</UserControl>
