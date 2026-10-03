@@ -29,7 +29,7 @@
     "Text": "关闭",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/UnloadCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -343,7 +343,7 @@
     "Text": "删除当前位置的历史记录",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ClearHistoryInPlaceCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -351,7 +351,7 @@
     "Text": "删除无效的历史记录",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/RemoveUnlinkedHistoryCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -359,7 +359,7 @@
     "Text": "切换拉伸",
     "Shortcut": "LeftButton+WheelDown",
     "Source": "NeeView/Command/Commands/ToggleStretchModeCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -367,7 +367,7 @@
     "Text": "切换拉伸 (反向)",
     "Shortcut": "LeftButton+WheelUp",
     "Source": "NeeView/Command/Commands/ToggleStretchModeReverseCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -391,7 +391,7 @@
     "Text": "铺满整个窗口",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetStretchModeUniformToFillCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -399,7 +399,7 @@
     "Text": "适应窗口区域",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetStretchModeUniformToSizeCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -407,7 +407,7 @@
     "Text": "适应窗口高度",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetStretchModeUniformToVerticalCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -415,7 +415,7 @@
     "Text": "适应窗口宽度",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetStretchModeUniformToHorizontalCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -423,7 +423,7 @@
     "Text": "允许放大",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleStretchAllowScaleUpCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -431,7 +431,7 @@
     "Text": "允许缩小",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleStretchAllowScaleDownCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -684,7 +684,7 @@
     "Text": "聚焦到书签搜索框",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/FocusBookmarkSearchBoxCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MenuText": "书签搜索框",
     "MouseGesture": ""
   },
@@ -711,7 +711,7 @@
     "Text": "显示书签",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/FocusBookmarkListCommand.cs",
-    "Stage": "待 P2：原书架书签位置与目录树互联；不得替换为聚焦独立书签树",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MenuText": "书签面板",
     "MouseGesture": ""
   },
@@ -826,7 +826,7 @@
     "Text": "N 字形滚动↑",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewScrollNTypeUpCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -834,7 +834,7 @@
     "Text": "N 字形滚动↓",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewScrollNTypeDownCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -842,7 +842,7 @@
     "Text": "滚动↑",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewScrollUpCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -850,7 +850,7 @@
     "Text": "滚动↓",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewScrollDownCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -858,7 +858,7 @@
     "Text": "滚动←",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewScrollLeftCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -866,7 +866,7 @@
     "Text": "滚动→",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewScrollRightCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -874,7 +874,7 @@
     "Text": "预设滚动",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewPresetScrollCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -898,7 +898,7 @@
     "Text": "拉伸",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewScaleStretchCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -906,7 +906,7 @@
     "Text": "放大基准比例",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewBaseScaleUpCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -914,7 +914,7 @@
     "Text": "缩小基准比例",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewBaseScaleDownCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -922,7 +922,7 @@
     "Text": "左旋",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewRotateLeftCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -930,7 +930,7 @@
     "Text": "右旋",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewRotateRightCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -974,7 +974,7 @@
     "Text": "左右翻转",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleViewFlipHorizontalCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -982,7 +982,7 @@
     "Text": "允许左右翻转",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewFlipHorizontalOnCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -990,7 +990,7 @@
     "Text": "取消左右翻转",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewFlipHorizontalOffCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -998,7 +998,7 @@
     "Text": "上下翻转",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleViewFlipVerticalCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1006,7 +1006,7 @@
     "Text": "允许上下翻转",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewFlipVerticalOnCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1014,7 +1014,7 @@
     "Text": "取消上下翻转",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewFlipVerticalOffCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1022,7 +1022,7 @@
     "Text": "重置视图",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewResetCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1158,7 +1158,7 @@
     "Text": "书籍锁定状态",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleBookLockCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MenuText": "书籍锁定",
     "MouseGesture": ""
   },
@@ -1183,7 +1183,7 @@
     "Text": "随机排序书籍",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/RandomBookCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1223,7 +1223,7 @@
     "Text": "打开父文件夹",
     "Shortcut": "Alt+Up",
     "Source": "NeeView/Command/Commands/MoveToParentBookCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1231,7 +1231,7 @@
     "Text": "打开本书",
     "Shortcut": "Alt+Down",
     "Source": "NeeView/Command/Commands/MoveToChildBookCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1263,7 +1263,7 @@
     "Text": "切换书籍顺序",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleBookOrderCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1271,7 +1271,7 @@
     "Text": "书名升序",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByFileNameACommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1279,7 +1279,7 @@
     "Text": "书名降序",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByFileNameDCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1303,7 +1303,7 @@
     "Text": "书籍文件类型升序",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByFileTypeACommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1311,7 +1311,7 @@
     "Text": "书籍文件类型降序",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByFileTypeDCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1319,7 +1319,7 @@
     "Text": "书籍日期升序",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByTimeStampACommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1327,7 +1327,7 @@
     "Text": "书籍日期降序",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByTimeStampDCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1351,7 +1351,7 @@
     "Text": "书籍大小升序",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderBySizeACommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1359,7 +1359,7 @@
     "Text": "书籍大小降序",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderBySizeDCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1367,7 +1367,7 @@
     "Text": "书籍随机排序",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByRandomCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1383,7 +1383,7 @@
     "Text": "切换页面模式 (反向)",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/TogglePageModeReverseCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1415,7 +1415,7 @@
     "Text": "切换页面方向",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/TogglePageOrientationCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1423,7 +1423,7 @@
     "Text": "水平页面布局",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetPageOrientationHorizontalCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MenuText": "水平",
     "MouseGesture": ""
   },
@@ -1432,7 +1432,7 @@
     "Text": "垂直页面布局",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetPageOrientationVerticalCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MenuText": "垂直",
     "MouseGesture": ""
   },
@@ -1497,7 +1497,7 @@
     "Text": "载入子文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsRecursiveFolderCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {
@@ -1777,7 +1777,7 @@
     "Text": "启用/禁用悬浮滚动",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleHoverScrollCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MenuText": "悬停滚动",
     "MouseGesture": ""
   },
@@ -1890,7 +1890,7 @@
     "Text": "打开上下文菜单",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/OpenContextMenuCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MouseGesture": ""
   },
   {

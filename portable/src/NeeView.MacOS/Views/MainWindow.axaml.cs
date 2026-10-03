@@ -47,7 +47,7 @@ public sealed partial class MainWindow : Window
         "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
-        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkList", "FocusBookmarkSearchBox", "ClearHistory", "ClearHistoryInPlace", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
+        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkList", "FocusBookmarkSearchBox", "ClearHistory", "ClearHistoryInPlace", "RemoveUnlinkedHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
     };
     /// <summary>由启动层接入原生事件；只消费主查看器区域，其余控件使用框架输入。</summary>
     public void AttachPlatformInput(IPlatformInput input)
@@ -397,6 +397,7 @@ public sealed partial class MainWindow : Window
                 case "LoadRecentBook":
                     var recent = _model.SaveData.HistoryEntries.FirstOrDefault(e => e.Path != _model.Operation.Book?.Path);
                     if (recent is not null) await OpenAsync(recent.Path); break;
+                case "RemoveUnlinkedHistory": await CleanupHistoryAsync(); break;
                 case "ClearHistoryInPlace":
                     if (await ConfirmAsync("清理当前位置历史", "移除当前书架列表真实目标的历史记录？不会删除文件或书签。", "移除") && !_preparing && !_closedPrepared)
                         await _model.Operation.ClearHistoryInPlaceAsync(); break;

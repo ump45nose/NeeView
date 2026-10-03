@@ -1,8 +1,8 @@
-# P2 首批阅读与导航实施记录
+# P2 阅读与导航实施索引
 
-日期：2026-10-02。承接用户已认可的总体布局，保留三项目及原 Book/Page/BookOperation/Command/Config/SaveData/Archive 关系。本批为可运行增量，P2 仍在实施中。
+更新：2026-10-04。P2开发范围完成，整体验收未封板。保留三项目及原 Book/Page/BookOperation/Command/Config/SaveData/Archive 关系。当前范围与验收边界见[收尾清单](p2-completion-checklist.md)；下面保留首批出处，并索引后续实际实现。
 
-## 本批范围
+## 首批范围与出处
 
 完整原八组菜单树与禁用占位；普通/固实 RAR、7z；访问历史搜索/打开；原书签树字段和基础文件夹/更名/移除；可见胶片条与单页导航器；全部原命令的键位编辑；官方 AppKit 精确滚动与捏合桥接。源文件出处在 source-migration.json，契约和生命周期在 M02–M06/M08。
 
@@ -17,10 +17,20 @@
 
 原依据：CustomLayoutPanelManager.cs:37-53、SidePanelFrameView.xaml:74-98/134-160、SidePanelIcon.xaml:44、SidePanelViewModel.cs:19-35/212-228/257-269、LayoutDockPanel、SidePanelDropAcceptor。首批只有固定七列和宽度拖动；第二批有独立原布局模型和实际拖放测试，不能把首批证据算作拖拽通过。
 
-## P2 尚待完成
+## 后续实施契约
 
-原 NScroll 分页滚动/停顿/五模式及差分参数已在第二批接入，全景 PagesAsOne 和完整参数编辑仍待后续。第三批已接入胶片条选择确认、防抖/去重、详情、三滚轮与滑条联动，以及指定页/步长和两种导航历史，见 [第三批契约](p2-selection-navigation.md)。第四批接入普通书架、前后书和文件夹页，见 [第四批契约](p2-bookshelf-navigation.md)。第五批已迁入原书签集合操作、登记编辑与删除恢复，见 [第五批契约](p2-bookmark-operations.md)。第六批接入原历史列表导航/菜单和多选移除，见 [第六批契约](p2-history-list.md)。JumpPage 对话框已在第三批接入；直接页号文本框仍待迁。P2 剩余包括页标记/直接页号文本框/完整历史显示与搜索、完整输入作用域/鼠标组合、完整书签导航/搜索及真实子书/父书定位。浮动面板/旧布局导入与完整自动隐藏细节仍在清单中。真实鼠标/触控板/IME、NAS、长期内存和原 Windows 动态对照分别验收。各项未完成能力不冒充已迁移。
+| 批次 | 迁移功能与设计 |
+|---|---|
+| 2–3 | [侧栏组合/原NScroll](p2-docking-scroll.md)、[共享页选择/胶片条/滑条/指定页及两种导航历史](p2-selection-navigation.md) |
+| 4–6 | [书架/前后书/文件夹页](p2-bookshelf-navigation.md)、[书签集合/登记/恢复](p2-bookmark-operations.md)、[历史导航/管理](p2-history-list.md) |
+| 7–9 | [直接页号/滑条](p2-slider-input.md)、[全局播放列表/页标记](p2-playlist.md)、[五区自动隐藏/显示锁/全屏](p2-autohide.md) |
+| 10–13 | [书签目录/排序](p2-bookmark-navigation.md)、[书签搜索](p2-bookmark-search.md)、[历史搜索](p2-history-search.md)、[原数量/期限限制](p2-history-retention.md) |
+| 14–17 | [每目录参数/种子](p2-folder-parameters.md)、[真实Folder/Archive页/父子书/递归](p2-book-hierarchy.md)、[A/B/C/鼠标组合](p2-mouse-input.md)、[变换/BaseScale/分页参数](p2-view-transform.md) |
+| 18–21 | [页尾/锁定/Unload](p2-book-controls.md)、[书架书签互联](p2-bookshelf-bookmarks.md)、[历史登记/可靠清理](p2-history-policy.md)、[四列表模板/可见封面](p2-list-templates.md) |
+| 22–25 | [单面板浮动宿主](p2-floating.md)、[原方向手势](p2-direction-gestures.md)、[Scroll/Fade/Hover/连续轮滚](p2-animation.md)、[资源测量/优化和原命令参数收尾](p2-resources.md) |
+
+各批文档记录当时的改造与证据；早期“待迁”不作为当前状态，当前状态以整体架构、收尾清单、命令/布局表及模块契约为准。没有第二阅读内核、数据库、事件总线或Preview入口。P3连续/瀑布流/完整目录树/逐页缩略完善，P4分类，P5完整旧数据导入/高级内容/发布独立推进。旧V0/V1布局导入、高级树布局、主视图浮动等原能力继续明确占位。
 
 ## 验证
 
-构建/自动测试原始输出见 ../acceptance/p2-validation.json；正式运行见 ../acceptance/p2-macos-runtime.md；阶段状态见 ../acceptance/stages.md。首图/翻页/完整帧 P95 仍为待测目标，未以服务耗时替代显示完成性能。
+最终串行构建、355项自动回归、Headless软件渲染与本地签名原始输出见[p2-completion-validation.json](../acceptance/p2-completion-validation.json)，静默收尾及设备边界见[收尾记录](../acceptance/p2-completion-runtime.md)。首批及早期正式运行证据保留，不继承为新增交互已验。固定软件完整帧已测，真实鼠标/触控板/IME/Retina/多屏、Finder/NAS、长期native、屏幕性能、Windows动态对照及用户新增交互验收仍待集中进行。默认静默，不抢用户焦点。

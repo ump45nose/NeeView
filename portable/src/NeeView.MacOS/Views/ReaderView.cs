@@ -17,10 +17,13 @@ namespace NeeView.MacOS.Views;
 /// <summary>原 MainView 的绘制适配；页框与分割规则由迁入的 Engine 计算。</summary>
 public sealed class ReaderView : Control, IDisposable
 {
-    private sealed class Display(Bitmap bitmap, BitmapLease lease) : IDisposable
+    private sealed class Display(Bitmap bitmap, BitmapLease lease, DecodeRequest request, long length, DateTime version) : IDisposable
     {
         private int _references = 1;
         public Bitmap Bitmap { get; } = bitmap;
+        /// <summary>同一图片及解码规格/来源版本可复用显示缓冲；Folder封面仍按原选择重新请求。</summary>
+        public bool CanReuse(Page page, DecodeRequest candidate) => page.IsImage && request == candidate
+            && length == page.ArchiveEntry.Length && version == page.ArchiveEntry.LastWriteTime;
         public Display Retain() { ++_references; return this; }
         /// <summary>同一显示资源可被当前帧和短暂退出帧共用，字节预算只登记一次。</summary>
         public void Dispose() { if (--_references != 0) return; Bitmap.Dispose(); lease.Dispose(); }
@@ -77,6 +80,8 @@ public sealed class ReaderView : Control, IDisposable
     public event EventHandler<Page>? ChildBookRequested;
     public event EventHandler? DisplayCompleted;
     public int DisplayCount => _images.Count;
+    /// <summary>资源测量计数，仅观察成功创建的显示缓冲，不作为页面完成事件。</summary>
+    internal int BitmapCreationCount { get; private set; }
     /// <summary>当前页的资源结果；空封面是正常状态，错误不会遮蔽同帧其他页。</summary>
     public string? GetPageError(Page page) => _pageErrors.GetValueOrDefault(page);
 
@@ -113,8 +118,10 @@ public sealed class ReaderView : Control, IDisposable
         {
             foreach (var page in sources)
             {
+                var specification=GetRequest(page);
+                if (_images.TryGetValue(page,out var displayed) && displayed.CanReuse(page,specification)) continue;
                 BitmapLease lease;
-                try { lease = await _factory.GetAsync(page, GetRequest(page), request.Token); }
+                try { lease = await _factory.GetAsync(page, specification, request.Token); }
                 catch (EmptyArchivePageException) { if (revision == _revision) _pageErrors[page] = ""; continue; }
                 catch (Exception ex) when (ex is not OperationCanceledException)
                 { if (revision == _revision) _pageErrors[page] = ex.Message; continue; }
@@ -130,7 +137,8 @@ public sealed class ReaderView : Control, IDisposable
                 catch { bitmap?.Dispose(); lease.Dispose(); throw; }
                 finally { handle.Free(); }
                 if (_images.Remove(page, out var old)) old.Dispose();
-                _pageErrors.Remove(page); _images[page] = new(bitmap, lease); InvalidateVisual();
+                BitmapCreationCount++;
+                _pageErrors.Remove(page); _images[page] = new(bitmap, lease, specification, page.ArchiveEntry.Length, page.ArchiveEntry.LastWriteTime); InvalidateVisual();
             }
             if (_disposed || revision != _revision || request.IsCancellationRequested) return;
             InvalidateVisual();

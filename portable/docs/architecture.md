@@ -1,6 +1,6 @@
 # NeeView Mac 源码迁移架构
 
-P0/P1 已建立工程骨架、原窗口区域和目录/图片/ZIP 阅读链路。P2 首批接入完整菜单占位、RAR/7z、历史/书签、胶片条/导航器与输入设置；第二批接入原侧栏布局数据和拖拽组合、原 NScroll 滚动翻页；第三批接入原共享页选择、胶片条模式/详情、滑条联动、指定页/共享步长和两种导航历史；第四批接入原普通书架排序、目录/归档混合列表、前后书及文件夹页分组导航。第五批迁入原书签集合移动/合并、登记编辑与删除恢复；第六批迁入原历史列表过滤导航、日期分组、多选移除/清空和菜单；第七批迁入原底部可编辑页号、滑条表现设置及滚轮；第八批接入原全局播放列表格式、编辑、页标记/跨书导航与面板；第九批接入原窗口自动隐藏、覆盖区域、显示锁与全屏控制；第十批接入原书签列表目录导航、同步和无磁盘探测排序；第十一批接入原结构化书签查询、递归范围、搜索历史和焦点命令；第十二批接入原历史列表结构化搜索、原表达式历史与独立输入表现；第十三批接入原历史文件数量/期限限制和独立设置页，运行中集合保持无限。第十四批接入原每目录参数/种子与书籍排序；第十五批接入真实目录/归档页、按需封面与父子书/递归加载。P2 尚未整体完成。Mac 独立维护；原 Windows 工程是固定行为参考，不参与 Mac 构建。
+P0/P1 已建立工程骨架、原窗口区域和目录/图片/ZIP 阅读链路。P2 开发范围已收尾：RAR/7z、历史/书签及结构化搜索、胶片条/导航器、原分页/变换/页尾规则、常用书架/父子书导航、播放列表/页标记、键鼠/方向手势、动画、侧栏拖拽组合/自动隐藏/浮动及资源优化均进入同一产品链路。完整 235 条命令保留，138 个执行入口接入、97 个继续占位；数量不代表功能覆盖率。详见[开发收尾清单](p2-completion-checklist.md)。真机、Windows 动态、长期原生内存和用户新增交互验收仍待完成，P2 不标记整体验收封板。Mac 独立维护；原 Windows 工程是固定行为参考，不参与 Mac 构建。
 
 ## 基线与技术栈
 
@@ -39,7 +39,7 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 
 来源属于 Book，流属于请求；解码像素由 BitmapFactory 缓存，显示 Bitmap 与租约由 ReaderView 所有。显示 Bitmap 先释放，再归还像素租约。视图按 revision 拒绝晚到结果；取消等待不取消其他消费者共享的解码；没有消费者时取消排队需求，原生晚到结果只清理。
 
-像素和实际显示缓冲统一计入 512 MiB 目标预算。等待者和显示租约保护资源；无引用资源按 LRU 回收。预算不等于进程 RSS 上限，临时/native 工作单独限额。解码并发 2，背景槽 1，待处理需求上限512；P2 首批接入独立 64 MiB 缩略图缓存预算，共用原工厂和解码槽。
+像素和实际显示缓冲统一计入 512 MiB 目标预算。等待者和显示租约保护资源；无引用资源按 LRU 回收，预算内不排序完整缓存。ReaderView 对同一图片/解码规格/来源版本复用显示缓冲；目录/归档封面和新来源仍走原请求。动画最多保留一个退出帧，复用租约、不复制像素，仍计预算。预算不等于进程 RSS 上限，临时/native 工作单独限额。解码并发 2，背景槽 1，待处理需求上限512；缩略图独立 64 MiB 预算，共用原工厂和解码槽。短期固定 JPEG/目录/ZIP 软件完整帧测量见[p2-resources.md](p2-resources.md)，不外推真机帧率或长期 native 稳定性。
 
 文件系统后台槽 2，队列和执行等待各 15 秒超时；不能中断的系统调用仍占槽到真正结束。ZIP/RAR/7z 解压在后台持有来源互斥。非固实大条目用 DeleteOnClose 随机临时文件；固实及 7z 使用独立顺序读取实例和每来源 2 GiB LRU 磁盘缓存，关闭清理。7z 索引顺序不同于 Reader 顺序，按名称及同名序号定位。尚无跨来源总预算和崩溃遗留缓存回收；重复同名 7z 的物理顺序映射尚待专门夹具。目录和压缩包不长期持有所有图片流。
 
@@ -53,43 +53,43 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 
 ## 界面与迁移目标
 
-原 MainWindow/SidePanelFrame 的区域关系是布局基准，原 Colors/IconGeometries 是资源基准。顶部菜单/地址、左右图标栏/面板、中央查看器、底部滑条/状态和胶片条插槽已转换。九个原面板完整登记，历史、书签、导航器已启用。未迁移命令保留禁用菜单，未迁移面板可选择并显示阶段说明。用户已认可总体布局；第二批按原 LayoutPanel 关系接入跨栏重排、分割组合、成员拆组、组间比例/选择恢复与拖动自动隐藏锁定。Engine 只保存布局数据，SidePanelPresenter 负责 Avalonia 控件和拖放预览，主题可独立更改。原浮动窗口、旧 V0/V1 布局导入、高级窗口/输入细节及 Windows 动态对照仍待迁移/验证。
+原 MainWindow/SidePanelFrame 的区域关系是布局基准，原 Colors/IconGeometries 是资源基准。顶部菜单/地址、左右图标栏/面板、中央查看器、底部滑条/状态和胶片条插槽已转换。九个原面板完整登记；未迁移命令保留禁用菜单，分类/效果等面板保留阶段说明。用户已认可总体布局；原 LayoutPanel 关系下的跨栏重排、分割组合、成员拆组、比例/选择恢复、拖动自动隐藏锁定及单面板浮动/停靠/关闭/重开已接入。Engine 只保存布局数据，SidePanelPresenter 负责 Avalonia 控件、浮窗及拖放预览，主题可独立更改。旧 V0/V1 布局导入、高级窗口/输入细节及 Windows 动态对照仍待迁移/验证。
 
-滚动翻页从原 PageFrameBox/NScroll/ScrollResult 迁入五种模式、分段、终端吸附和换行停顿，普通滚轮命令到边界后才进入原帧导航。精确滚动仍走表现平移，由原 DragArea.SnapView 约束；书籍阅读方向与帧移动方向分别保留。全景 PagesAsOne、完整滚动参数编辑和复杂鼠标组合仍待后续。详见 [P2 第二批契约](p2-docking-scroll.md)。
+滚动翻页从原 PageFrameBox/NScroll/ScrollResult 迁入五种模式、分段、终端吸附和换行停顿，普通滚轮命令到边界后才进入原帧导航。精确滚动仍走表现平移，由原 DragArea.SnapView 约束；书籍阅读方向与帧移动方向分别保留。完整分页滚动参数、鼠标组合和方向手势已接入；全景 PagesAsOne 在 P3。详见 [P2 第二批契约](p2-docking-scroll.md)、[参数与变换](p2-view-transform.md)、[方向手势](p2-direction-gestures.md)。
 
 第三批契约见 [页选择与导航历史](p2-selection-navigation.md)。原100项环形历史按页面条目和书籍打开顺序分别保存于进程内；重放成功后提交游标，跨书保留访问排序。JSON仍是唯一持久化权威。
 
-第四批契约见 [普通书架与文件夹页导航](p2-bookshelf-navigation.md)。BookshelfFolderList 独立维护浏览位置和选择，后台只枚举目录/归档元数据；重排及翻页不重扫。普通前后书采用原分组排序，成功打开后提交选择；文件夹页只按当前书页面目录组跳页。全局默认排序及分组沿用原 JSON；每目录参数、持久随机种子、真实 Folder 页及父书定位仍待迁。
+第四批契约见 [普通书架与文件夹页导航](p2-bookshelf-navigation.md)。BookshelfFolderList 独立维护浏览位置和选择，后台枚举目录/归档元数据；重排及翻页不重扫。普通前后书采用原分组排序，成功打开后提交选择；文件夹页只按当前书页面目录组跳页。全局默认排序及分组沿用原 JSON；每目录参数、持久随机种子、真实 Folder 页及父书定位分别由第十四/十五批接入。完整目录树和大量图片延迟加载在 P3。
 
-第五批契约见 [书签集合操作](p2-bookmark-operations.md)。BookmarkCollection只操作原JSON节点；SaveData串行保存与失败原地回滚，Mac视图独立管理对话框/选择/拖动。登记命令保留打开编辑界面的含义，完整原Popup宿主与书签导航/搜索仍待迁。
+第五批契约见 [书签集合操作](p2-bookmark-operations.md)。BookmarkCollection只操作原JSON节点；SaveData串行保存与失败原地回滚，Mac视图独立管理对话框/选择/拖动。登记命令保留打开编辑界面的含义，Mac异步编辑窗替换原Popup宿主；书签目录/搜索和书架联动由后续批次接入，高级树排布/修复等继续占位。
 
-第六批契约见 [历史列表导航与管理](p2-history-list.md)。沿用原 KeepHistoryOrder/SkipSamePlace 和过滤后前后语义，当前记录移除后同进程位置保存不重新登记；启动/重开按原 FirstLoader 显式传入完整 LastBook 快照，不依赖历史记录存在，成功恢复仍开始新访问。History 四开关保存到原 JSON，原搜索语法/显示模板/无效清理仍待迁。正式运行、修复后重启及101项回归见独立阶段证据。
+第六批契约见 [历史列表导航与管理](p2-history-list.md)。沿用原 KeepHistoryOrder/SkipSamePlace 和过滤后前后语义，当前记录移除后同进程位置保存不重新登记；启动/重开按原 FirstLoader 显式传入完整 LastBook 快照，不依赖历史记录存在，成功恢复仍开始新访问。History 四开关保存到原 JSON，原搜索语法、四模板和可靠无效清理均已接入。各批正式运行和静默回归分别留证。
 
 第七批契约见 [底部页号与滑条设置](p2-slider-input.md)。独立 SliderTextBox 表现控件保留一起始转换、Enter/失焦及 Escape 提交，原始索引进入唯一 BookOperation.JumpAsync，不走双页滑块对齐；来源身份在原互斥中再次核对。滑条显示、SliderIndexLayout、厚度、透明度及滚轮写回原 JSON，纯外观保存不重建正文。主题资源修复15 DIP薄滑条裁切。原46.3页标记属于全局播放列表/Pagemark.nvpls，后续随原链路迁入，不新增每本书标记体系；当时完整自动隐藏/全局显隐为禁用占位，现由第九批接通。107项测试、正式构建与本地签名及真机重启/数据还原分别留证。
 
-[前端边界](frontend-boundaries.md)、[行为对照](behavior-baseline.md)、[完整命令表](command-migration.md)、[布局表](layout-migration.md)、[模块设计](modules/M01.md) 和 [阶段证据](../acceptance/stages.md) 是后续开发契约。P2 阅读导航剩余增量、P3 大量图片、P4 fork 分类、P5 兼容/高级内容/发布仍是目标，未继承旧重写方案的“通过”。
+[前端边界](frontend-boundaries.md)、[行为对照](behavior-baseline.md)、[完整命令表](command-migration.md)、[布局表](layout-migration.md)、[模块设计](modules/M01.md) 和 [阶段证据](../acceptance/stages.md) 是后续开发契约。P2 开发完成与整体验收分开；P3 大量图片、P4 fork 分类、P5 兼容/高级内容/发布仍是后续目标，未继承旧重写方案的“通过”。
 
 优化只按测量热点独立修改并回归。代码删除必须说明 Windows 专属、不可达、重复或被替换的原因。构建串行、使用默认输出；不得通过 Preview 或改输出目录绕过 Xcode。本机Xcode27.0已满足构建要求；开发Host明确使用ad-hoc签名和JIT权限，最终.app在默认输出目录，RID子目录的.app只是SDK中间产物。构建及本地签名校验写入p1-validation.json；真机运行单独留证。编译、自动测试、运行、Windows 对照、用户验收、提交和发布分别报告。
 
 第八批契约见 [原播放列表与全局页标记](p2-playlist.md)。PlaylistHub沿原Default首项、真实文件自然顺序和选择关系，保留v1/v2、未知字段及别名省略规则；Mac编辑采用即时可等待的原子保存和原地回滚。BookPlaylist/BookPageMarker映射当前全局列表，书内标记和过滤/分组后的跨书列表导航独立，归档逻辑目标共用唯一加载链。主图片按原SelectedRange索引升序确定，未确认的PageSelector不改变登记对象。PlaylistView与表现模型独立，标记回报只更新绘制/菜单；未迁模板/文件管理/修复/PlaylistArchive保持占位。提交前指纹检查不提供跨进程互斥保证，完整监视后续迁入。最终121项测试、正式构建/本地签名及真机导航、编辑、列表重启和数据还原分别留证；当前清单45文件/63子集适配，数量不代表覆盖率，P2未封板。
 
-第九批契约见 [原窗口自动隐藏与显示控制](p2-autohide.md)。AutoHide/Window/MenuBar及原Panels/Slider字段沿用原JSON；早期Mac别名只读取，保存收归原字段。AutoHidePresenter独立管理五区的延迟、真实焦点/弹出层/捕获和一次显示锁，40ms背景计时不扫描页面。自动隐藏区域覆盖正文，弹出/收起不改变视口；原滑条与胶片条宿主联动及侧栏内容边角余量保留。原窗口显示命令接入，重复Mac入口退出；原生精确手势按实际控件命中排除覆盖层。FullDesktop、窗口位置/多屏、完整输入及浮动窗口仍待迁入。构建、自动回归、正式运行及用户验收分别记录。
+第九批契约见 [原窗口自动隐藏与显示控制](p2-autohide.md)。AutoHide/Window/MenuBar及原Panels/Slider字段沿用原JSON；早期Mac别名只读取，保存收归原字段。AutoHidePresenter独立管理五区的延迟、真实焦点/弹出层/捕获和一次显示锁，40ms背景计时不扫描页面。自动隐藏区域覆盖正文，弹出/收起不改变视口；原滑条与胶片条宿主联动及侧栏内容边角余量保留。已迁窗口显示命令接入，原生精确手势按实际控件命中排除覆盖层。常用输入与侧栏浮动/位置保存后续已接入；FullDesktop、主视图浮动及高级窗口细节保留占位，多屏/真实焦点待验。构建、自动回归、正式运行及用户验收分别记录。
 
-第十批契约见[书签列表目录导航与排序](p2-bookmark-navigation.md)。BookmarkFolderList 共用原 BookmarkCollection/BookmarkNode；独立 BookmarkListViewModel/BookmarkListView 显示位置和有序子项，既有编辑树保留。书签事务专属回报避免阅读保存重复排序，编辑和加载继续进入原 SaveData/BookOperation。原结构化搜索已由第十一批接入；来源元数据排序、完整树布局与书架 bookmark scheme 互联仍保留占位。本批默认静默，正式窗口运行另行验收。
+第十批契约见[书签列表目录导航与排序](p2-bookmark-navigation.md)。BookmarkFolderList 共用原 BookmarkCollection/BookmarkNode；独立 BookmarkListViewModel/BookmarkListView 显示位置和有序子项，既有编辑树保留。书签事务专属回报避免阅读保存重复排序，编辑和加载继续进入原 SaveData/BookOperation。结构化搜索、来源元数据排序与书架 bookmark scheme 互联后续已接入；完整树布局继续占位。本批默认静默，正式窗口运行另行验收。
 
 第十一批契约见[原书签结构化搜索](p2-bookmark-search.md)。原 NeeLaboratory.IO.Search 以固定 gitlink 源码内嵌 Engine，仍只有三个生产项目；未迁入无用队列或诊断宿主。单次快照查询及原字符串历史复用唯一节点/JSON；日期大小按需经来源接口读取，正则250ms单项超时是明确的运行预算改造。表现模型取消/重筛与原阅读控制独立；搜索框和历史菜单可单独调整。完整库测试、正式XAML、构建/本地签名及真机各自留证，本批默认静默。
 
 第十二批契约见[原历史列表结构化搜索](p2-history-search.md)。原BookHistory五属性及逐项SearcherFilter在后台快照执行，访问时间不替换为文件修改时间；日期/名称/布尔属性不读取来源。大小沿现有来源接口，缺失/目录为-1。HistorySearchViewModel独立管理500ms输入、确认历史与关闭，GetViewItems同时服务面板和前后导航，JSON仍为唯一权威。
 
-第十三批契约见[原历史文件保留限制](p2-history-retention.md)。原Limit与CreateMemento/fromLoad边界迁入，三文件事务只裁剪写出副本；LastBook及表达式历史独立。设置候选锁内提交，成功后才改运行配置；现有归档临时根由启动层注入，保存前排除应用临时来源，普通系统临时目录保留。其他历史保存/登记/无效清理策略继续待迁。
+第十三批契约见[原历史文件保留限制](p2-history-retention.md)。原Limit与CreateMemento/fromLoad边界迁入，保存事务只裁剪写出副本；LastBook及表达式历史独立。设置候选锁内提交，成功后才改运行配置；现有归档临时根由启动层注入，保存前排除应用临时来源，普通系统临时目录保留。历史保存/登记/可靠无效清理由第二十批接入，原 RemoveUnlinkedHistory 命令在收尾接通既有清理流程。
 
 第十四批契约见[原每目录参数](p2-folder-parameters.md)。FolderParameter/FolderConfigCollection迁入当前普通书架，目录排序与种子按路径保存，不再改全局默认。原特殊拼写Foldres.json接入同一四文件事务，旧双/三文件标记兼容；关闭保留仅影响写出副本，未知参数/缩略字段保持。原普通排序命令、切换与RandomBook分别接通，不创建平行配置或第二阅读内核。
 
 第十五批契约见[真实书籍页与父子书](p2-book-hierarchy.md)。原三收集模式/目录递归/空书籍页、原480×640非图像页框及按需封面接入唯一链；ZIP逻辑目录保留物理ID且书架不误用DirectoryInfo。真实父子导航和递归切换按条目定位，失败保留旧书；Mac合法反斜杠保持。独立卡片绘制和主题不承担封面选择，逐页错误不终止同帧/胶片条。嵌套压缩仍明确留P5。
 
-第十六批契约见[原输入方案与鼠标组合](p2-mouse-input.md)。原A/B/C/默认方向/参数共享/运行反转进入Engine，鼠标事件和统一解析在Mac表现层；普通滚轮全部依绑定。表单保存通过原导航锁，失败原地回滚，成功仅阅读字段变化重建正文。P2剩余阅读控制、书架书签与列表完善继续开发。
+第十六批契约见[原输入方案与鼠标组合](p2-mouse-input.md)。原A/B/C/默认方向/参数共享/运行反转进入Engine，鼠标事件和统一解析在Mac表现层；普通滚轮全部依绑定。表单保存通过原导航锁，失败原地回滚，成功仅阅读字段变化重建正文。后续原方向序列、动画与 Hover/连续轮滚沿同一边界接入。
 
-第十七批契约见[原查看器变换与参数编辑](p2-view-transform.md)。原变换图/参数/滚动约束归Engine，ReaderTransformPresenter提供唯一绘制与命中矩阵；共享/每页/跨书保持及BaseScale独立。参数表单草稿和主题与业务分开，未知字段与原数值保留，P2继续。
+第十七批契约见[原查看器变换与参数编辑](p2-view-transform.md)。原变换图/参数/滚动约束归Engine，ReaderTransformPresenter提供唯一绘制与命中矩阵；共享/每页/跨书保持及BaseScale独立。参数表单草稿和主题与业务分开，未知字段与原数值保留。
 
 第十八批见[p2-book-controls.md](p2-book-controls.md)。原锁定、五种页尾/下一书位置策略和可复用Unload归BookOperation；弹窗只回报选择，原循环页框/JSON保持。
 
@@ -104,3 +104,5 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 第二十三批接入原方向序列、235命令的MouseGesture默认元数据及原差分配对，表现层处理捕获/提示，见[p2-direction-gestures.md](p2-direction-gestures.md)。
 
 第二十四批接入原Scroll/Fade方向/时长与Hover/连续滚轮，单个退出帧共用现有显示租约，插值仅归表现，见[p2-animation.md](p2-animation.md)。
+
+第二十五批完成预算内免排序和同规格显示缓冲复用、原无效历史清理入口、正反向单双页切换及共享循环参数，固定夹具测量与 P2 收尾证据见[p2-resources.md](p2-resources.md)。没有增加第二工厂、状态模型或长期 Preview 路线。

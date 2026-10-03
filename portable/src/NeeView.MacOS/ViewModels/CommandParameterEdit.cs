@@ -22,6 +22,7 @@ public sealed class CommandParameterEdit(string owner, object value)
         "PrevScrollPage" => typeof(ScrollPageCommandParameter),
         "PrevSizePage" => typeof(MoveSizePageCommandParameter),
         "ToggleStretchMode" => typeof(ToggleStretchModeCommandParameter),
+        "TogglePageMode" => typeof(TogglePageModeCommandParameter),
         "SetStretchModeUniform" => typeof(StretchModeCommandParameter),
         "ToggleViewFlipHorizontal" or "ToggleViewFlipVertical" or "TogglePlaylistItem" or "ToggleBookLock" => typeof(ToggleCommandParameter),
         "PrevPlaylistItemInBook" => typeof(MovePlaylistItemInBookCommandParameter),

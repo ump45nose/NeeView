@@ -354,6 +354,12 @@
       "target": "src/NeeView.Engine/Config/PageMoveType.cs",
       "sha256": "5d7fd3f58add2ed2a10fdd322cc4fb65ff602dedc8bf086eb364ea7019255850",
       "status": "原分页过渡枚举迁入"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/TogglePageModeCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/TogglePageModeCommandParameter.cs",
+      "sha256": "df17b850874c90483afb7dd25fc86f38963b34f6335e5d2b5a590efe83046d74",
+      "status": "保留原 IsLoop 默认 true；移除 WPF 属性编辑注解/通知，正反命令共用原 JSON 参数，独立 Mac 草稿编辑"
     }
   ],
   "partial_adapters": [

@@ -26,13 +26,13 @@
 
 主图是单绘制控件，不为每页创建图像控件；页面列表使用虚拟化 ListBox。主图及可见缩略图的显示 Bitmap 与像素租约归各查看器所有，先释放 Bitmap 再释放租约。切书/缩放/视口变化用 revision 拒绝旧请求；所有 UI 对象在 Dispatcher 线程修改。
 
-主布局参照原 MainWindow.xaml、SidePanels/SidePanelFrameView.xaml、菜单和 Dock 插槽。41 DIP 侧栏、36 DIP 按钮及转换资源保留。胶片条、历史、书签和导航器已接入首批业务。SidePanelPresenter 复用九个唯一内容控件，按 Engine 的组顺序/方向排布；拖放预览、指针捕获、分隔条与原图标资源归表现端。布局改变只触发 PanelsRefreshed，不请求主图。完整浮动窗口和高级窗口/输入细节仍待后续，详见 layout-migration.md。样式现代化应另做增量，先保留区域和操作流程。
+主布局参照原 MainWindow.xaml、SidePanels/SidePanelFrameView.xaml、菜单和 Dock 插槽。41 DIP 侧栏、36 DIP 按钮及转换资源保留。SidePanelPresenter 复用九个唯一内容控件，按 Engine 的组顺序/方向排布；拖放预览、指针捕获、分隔条、单面板浮窗与原图标资源归表现端。布局改变只触发 PanelsRefreshed，不请求主图。侧栏浮动/关闭/重开/停靠已接入，高级窗口/输入细节仍待后续，详见 layout-migration.md。样式现代化应另做增量，保留区域和操作流程。
 
-输入设置使用编辑副本，可搜索全部原命令；原复杂绑定保留，新增不可解析输入及冲突阻止保存。输入文本时不响应阅读/数字命令；Command+O/W/Q 仍是系统操作。旧 Control 只规范解析名称，不替换为 Command。PrevScrollPage/NextScrollPage 调用 Engine 的原 NScroll 计算，ReaderView 应用向量或进入原帧导航；参数从原 Commands 差分读取，完整滚动参数编辑及全景作用待后续。指定页对话框、共享步长和历史命令也进入同一正文入口；胶片条/滑条布局及主题不处理历史或阅读规则。正式 AppKit 桥接依据 HasPreciseScrollingDeltas，按窗口身份和查看器区域消费精确滚动/捏合；平移使用原 SnapView 防止图片移出视口，真实触控板待用户验收。
+输入设置使用编辑副本，可搜索全部原命令；新增不可解析输入及冲突阻止保存。输入文本时不响应阅读/数字命令；Command+O/W/Q 仍是系统操作。旧 Control 只规范解析名称，不替换为 Command。PrevScrollPage/NextScrollPage 调用 Engine 的原 NScroll 计算，ReaderView 应用向量或进入原帧导航；完整分页滚动参数、鼠标组合/方向手势及正反单双页共享循环参数从原 Commands 差分读取。全景作用在 P3。指定页对话框、共享步长和历史命令也进入同一正文入口；胶片条/滑条布局及主题不处理历史或阅读规则。正式 AppKit 桥接依据 HasPreciseScrollingDeltas，按窗口身份和查看器区域消费精确滚动/捏合；平移使用原 SnapView 防止图片移出视口，真实触控板待用户验收。
 
 测试直接装载这些正式 XAML、主题和控件源码。Headless 截图用于检查布局与真实图像绘制，不能证明 Mac 手势、Retina、Finder 或 Windows 动态一致性。
 
-第六批历史列表由 Engine.HistoryList/SaveData 管理过滤、导航和编辑，HistoryRow/MainWindow.History 管理分组显示、焦点、多选及菜单。历史主题/布局调整不触发阅读解码或修改访问顺序；四种显示模板与无效清理保留禁用入口。
+历史列表由 Engine.HistoryList/SaveData 管理过滤、导航和编辑，HistoryRow/MainWindow.History 管理分组显示、焦点、多选及菜单。四种显示模板和可靠无效清理已接通；主题/布局调整不触发阅读解码或修改访问顺序。原 RemoveUnlinkedHistory 转交既有异步清理，不在菜单中实现存在检测。
 
 第七批滑条页号结构、输入反馈与主题分开；ReaderWorkspaceViewModel提供位置/显隐/尺寸/透明度，SettingsWindow只改表现字段时不调用ApplySettingAsync。原SliderConfig字段写回现有JSON，未知/未迁字段继续合并保留。Fluent轨道留白/滑块尺寸使用主题资源覆盖，15–50 DIP内不裁切，不维护第二套Slider模板；见[p2-slider-input.md](p2-slider-input.md)。第八批接入全局播放列表页标记，五区自动隐藏由第九批窗口控制迁入。
 
@@ -69,3 +69,5 @@
 方向手势由Engine原序列判定，ReaderView仅捕获/提示，MainWindow转交原命令；方向编辑独立于键位文本，主题不改变命令语义。
 
 ReaderMotionPresenter只插值表现点与透明度；退出帧不复制页面/像素且受原工厂租约预算，XAML可独立调整动画编辑布局。
+
+P2 资源收尾：ReaderView 只在同一真实图片/解码规格/来源版本时复用显示缓冲，Folder/Archive 封面仍走原选择请求。新来源/新 Page 不复用旧书显示资源。缓存是否回收仍由 Engine.BitmapFactory 决定；颜色、模板或动画布局调整不修改缓存/版本规则。

@@ -13,7 +13,7 @@
 | 当前图打开、排序后保持条目 | Book/Book.cs、BookHub/BookHub.cs | 原 Page 对象和 EntryName，不使用另一套身份数据库 |
 | History/Props | Book/BookMemento.cs、SaveData/SaveDataProfile.cs | 保留 Path/Page/Props 和未知字段；Mac只补半页与false-wide值 |
 | 差分快捷键 | Command/CommandElement.cs、CommandTable.cs | Commands[name].ShortCutKey，null恢复默认、空串禁用；Control保持 |
-| 滚动翻页 | BookPageMoveControl、PageFrameBox.ScrollToNextFrame、PageFrames/NScroll.cs、DragArea.SnapView | 原五模式、分段/终端吸附、计时与停顿顺序迁入；分页接通，全景/完整参数编辑待后续，真鼠标待验 |
+| 滚动翻页 | BookPageMoveControl、PageFrameBox.ScrollToNextFrame、PageFrames/NScroll.cs、DragArea.SnapView | 原五模式、分段/终端吸附、计时与停顿顺序迁入；分页及完整分页参数编辑接通，全景在P3，真鼠标待验 |
 | 九数字分类、固定移动 | MoveToDestinationFolderCommand、MoveToFolderAsCommand | 元数据保留，业务待P4 |
 | 两区分类和移动历史 | SidePanels/DestinationFolder、DestinationFolder/DestinationMoveService.cs | 完整目标登记；待P4，不能继承旧测试通过状态 |
 | 原窗口/九面板/设置 | MainWindow.xaml、SidePanelFrameView.xaml、Options | 布局壳及核心面板转换；见layout-migration.md，Windows截图待验证 |
@@ -26,11 +26,11 @@
 | 原页标记 | PlaylistItemCollection、Playlist/Pagemark.nvpls、TogglePlaylistItem/PrevPlaylistItem/NextPlaylistItem | 46.3属于全局播放列表，格式/编辑/导航及标记绘制迁入；完整文件监视/修复待迁，不新增Book私有标记 |
 | 指定页/指定步长 | JumpPageCommand.cs、MoveSizePageCommandParameter.cs、PageFrameBox.cs:1057-1094 | 一起始对话框、两方向共享参数，原周期对齐及端点终止；无循环页 |
 | 页面/打开导航历史 | BookHub/PageHistory.cs、BookHubHistory.cs、HistoryLimitedCollection.cs | 原100项环形/游标/分支；页面以路径+条目，打开顺序独立；失败异步重放不提交游标 |
-| 普通书架与前后书 | Bookshelf/FolderList/FolderCollection、BookshelfFolderList、BookOperation.MoveBook | 原目录分组/13项排序/普通端点/随机循环；混合候选、失败重试和优先切书；每路径参数/持久随机种子待迁 |
+| 普通书架与前后书 | Bookshelf/FolderList/FolderCollection、BookshelfFolderList、BookOperation.MoveBook | 原目录分组/普通排序/端点/随机循环；混合候选、失败重试和优先切书；每路径参数/持久随机种子已迁，高级排序命令保留占位 |
 | 文件夹页导航 | Book/BookPageCollection.GetNextFolderIndex/GetPrevFolderIndex | 原文件名升降序目录分组；组内回首项/端点停止；不冒充子书/父书打开 |
-| 侧栏拖拽组合 | SidePanels/CustomLayoutPanelManager、SidePanelViewModel、SidePanelDropAcceptor、LayoutDockPanel | 原组模型、leader 整组移动/成员拆组、分半组合及 V2 JSON 适配；Headless/真机恢复通过；浮动/旧布局导入待迁移 |
-| 历史/书签 | Bookamrk/BookmarkCollection.cs、BookMemento、HistoryCollection | 原 JSON 树字段/顺序保留；访问排序、共享状态与原移动/递归合并/确认/颜色/删除恢复接入；完整导航/修复/原Popup宿主待迁，见p2-bookmark-operations.md |
-| 历史列表导航/管理 | HistoryList、HistoryListViewModel、HistoryListBox、BookHistoryCollection | 原过滤后前后规则、KeepHistoryOrder/SkipSamePlace、日期/四开关、单或双击、批次移除和全部清空；搜索语法/表达式历史由第十二批接入；样式/无效清理待迁 |
+| 侧栏拖拽组合 | SidePanels/CustomLayoutPanelManager、SidePanelViewModel、SidePanelDropAcceptor、LayoutDockPanel | 原组模型、leader 整组移动/成员拆组、分半组合及 V2 JSON 适配；组合Headless/早期真机恢复通过；侧栏浮动已接，旧布局导入待迁移 |
+| 历史/书签 | Bookamrk/BookmarkCollection.cs、BookMemento、HistoryCollection | 原 JSON 树字段/顺序保留；访问排序、共享状态、移动/递归合并/确认/颜色/删除恢复、目录导航/搜索/书架联动接入；Mac异步编辑宿主适配，修复及高级树布局继续占位 |
+| 历史列表导航/管理 | HistoryList、HistoryListViewModel、HistoryListBox、BookHistoryCollection | 原过滤后前后规则、KeepHistoryOrder/SkipSamePlace、日期/四开关、单或双击、批次移除和全部清空；结构化搜索/表达式历史、四模板、登记/保留策略及可靠无效清理已接入 |
 | 原五区自动隐藏与显示锁 | MainWindowModel/Controller/ViewModel、AutoHideBehavior、MainWindow.xaml.cs | 原资格、覆盖插槽、内容余量、滑条/胶片条联动、延迟/边缘/焦点/弹出层/捕获及显示锁；Mac焦点适配，见p2-autohide.md |
 | 全屏与置顶 | 原WindowConfig/窗口控制命令 | Mac实际WindowState/Topmost；全屏取消恢复上一普通/最大化状态，FullDesktop等占位 |
 | 旧Profile/nvzip | SaveData | 待 P5，完整旧迁移规则待迁入 |
@@ -52,3 +52,5 @@ P2第二十二批：原LayoutPanelManager/WindowManager/WindowPlacement关系迁
 - P2第二十三批：原MouseSequence/MouseSequenceBuilder、CommandTable.CreateDefaultMemento与Commands.MouseGesture差分迁入；释放/C终端/轮滚取消/配对与回滚自动对照通过，Windows动态和真机捕获待验。
 
 - P2第二十四批：原PageChangeType/Duration、PageFrameContainerLayout方向及静态1间距，Scroll/Fade、取消、Hover/连续轮滚优先通过自动对照；全景/幻灯片专有策略为后续阶段，Windows动态待验。
+
+- P2收尾：TogglePageMode/TogglePageModeReverseCommand.Execute 的 +1/-1 与 TogglePageModeCommandParameter.IsLoop 默认 true 迁入；两方向共享原差分参数，非循环首末停止、循环与重载绑定自动验证。RemoveUnlinkedHistory 转交既有可靠清理流程；源文件、参数出处与运行清单分别留证。

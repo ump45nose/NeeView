@@ -184,6 +184,8 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
     {
         var main = _cache.Values.Concat(_retired).Where(e => !e.IsThumbnail).Sum(e => e.Image.ByteCount + e.DisplayBytes);
         var thumbnails = _cache.Values.Concat(_retired).Where(e => e.IsThumbnail).Sum(e => e.Image.ByteCount + e.DisplayBytes);
+        // 未超预算时无需分配/排序完整LRU；保留原回收顺序和租约保护。
+        if (main <= Budget && thumbnails <= ThumbnailBudget) return;
         foreach (var pair in _cache.OrderBy(e => e.Value.Used).ToArray())
         {
             var entry = pair.Value;

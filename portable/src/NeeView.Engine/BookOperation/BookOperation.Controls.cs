@@ -28,6 +28,11 @@ public sealed partial class BookOperation
     /// <summary>页框方向是帧之间的滚动轴，双页仍按原书籍方向横排；不替换阅读方向。</summary>
     public Task SetOrientationAsync(PageFrameOrientation orientation) => ApplyGlobalReadingAsync(() => Config.Current.Book.Orientation = orientation);
     public Task SetPageEndActionAsync(PageEndAction action) => ApplyGlobalReadingAsync(() => Config.Current.Book.PageEndAction = action);
+    /// <summary>按原顺序正向或反向切换页面模式，共享原 JSON 的循环参数。</summary>
+    /// <param name="direction">正向为 1，反向为 -1。</param>
+    /// <returns>原设置和页框更新完成的任务。</returns>
+    public Task TogglePageModeAsync(int direction) => ApplySettingAsync(setting =>
+        setting.PageMode = setting.PageMode.GetToggle(direction, saveData.GetCommandParameter<TogglePageModeCommandParameter>("TogglePageMode").IsLoop));
     private async Task ApplyGlobalReadingAsync(Action change)
     {
         await _gate.WaitAsync();
