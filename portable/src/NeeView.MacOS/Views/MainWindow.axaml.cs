@@ -80,6 +80,11 @@ public sealed partial class MainWindow : Window
         AddHandler(DragDrop.DropEvent, Drop);
         DragDrop.SetAllowDrop(this, true);
         Viewer.GestureRequested += async (_, gesture) => await GestureAsync(gesture);
+        Viewer.ChildBookRequested += async (_, page) =>
+        {
+            if (_model is not null && !_preparing && !_closedPrepared)
+                try { await _model.Operation.OpenChildBookAsync(page, _model.Operation.Book); } catch (Exception ex) { ShowError(ex.Message); }
+        };
         Viewer.PointerWheelChanged += Viewer_Wheel;
         // 滑条内部 Thumb 会处理指针事件；隧道路由保证释放确认不被模板吞掉。
         var slider = this.FindControl<Slider>("PageSliderView")!;
@@ -142,7 +147,15 @@ public sealed partial class MainWindow : Window
         UpdatePanelColumns(); BuildMenus();
     }
     /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
-    public bool IsCommandAvailable(string name) => HostCommands.Contains(name) || _model?.Commands.IsAvailable(name) == true;
+    public bool IsCommandAvailable(string name) => name switch
+    {
+        "MoveToParentBook" => _model?.Operation.CanMoveToParentBook == true,
+        "MoveToChildBook" => _model?.Operation.CanMoveToChildBook == true,
+        "ToggleIsRecursiveFolder" => _model?.Operation.Book is not null && !_model.Operation.IsLoading,
+        _ => IsCommandImplemented(name)
+    };
+    /// <summary>配置/占位说明读取迁移状态，不能把当前无目标误标成尚未迁移。</summary>
+    private bool IsCommandImplemented(string name) => HostCommands.Contains(name) || _model?.Commands.IsAvailable(name) == true;
     /// <summary>迁入完整菜单后追加 Mac 打开目录及已有交互，保持原八组顺序。</summary>
     private void BuildMenus()
     {
@@ -157,7 +170,7 @@ public sealed partial class MainWindow : Window
         root.Children[3].Children!.Add(new(null, MenuElementType.Separator, null));
         foreach (var name in new[] { "JumpPage", "PrevHistoryPage", "NextHistoryPage", "PrevBookHistory", "NextBookHistory" })
             root.Children[3].Children!.Add(new(null, MenuElementType.Command, name));
-        MenuPresenter.Populate(this.FindControl<Menu>("MenuBar")!, root, _model.Commands, _model.SaveData, IsCommandAvailable, name => ExecuteAsync(name, true), GetCommandCheck);
+        MenuPresenter.Populate(this.FindControl<Menu>("MenuBar")!, root, _model.Commands, _model.SaveData, IsCommandImplemented, name => ExecuteAsync(name, true), GetCommandCheck);
         RefreshHistoryCommandStates();
     }
     /// <summary>原菜单绑定的勾选表现；只读取引擎配置，不在菜单中维护第二套状态。</summary>
@@ -172,6 +185,7 @@ public sealed partial class MainWindow : Window
         "ToggleIsSupportedWidePage" => _model?.Wide,
         "ToggleIsSupportedSingleFirstPage" => _model?.FirstSingle,
         "ToggleIsSupportedSingleLastPage" => _model?.LastSingle,
+        "ToggleIsRecursiveFolder" => _model?.Operation.Book?.Setting.IsRecursiveFolder == true,
         "ToggleBookmark" => _model?.IsBookmark,
         "TogglePlaylistItem" => _model?.IsPlaylistMarked,
         "ToggleVisiblePlaylist" => _model?.ShowPlaylist,
@@ -239,7 +253,7 @@ public sealed partial class MainWindow : Window
     private async Task ShowOptionsAsync(bool history = false)
     {
         if (_model is null || _preparing || _closedPrepared) return;
-        var settings = new SettingsWindow(_model, IsCommandAvailable);
+        var settings = new SettingsWindow(_model, IsCommandImplemented);
         if (history) settings.SelectHistoryPage();
         await settings.ShowDialog(this);
         if (_preparing || _closedPrepared) return;
@@ -360,6 +374,7 @@ public sealed partial class MainWindow : Window
         if (_preparing || _model is null) return;
         MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck);
         // 书籍变化时立即发起同步；不能等图像解码后再覆盖用户已经进入的书架目录。
+        RefreshHistoryCommandStates();
         // 后续手动导航会由 Bookshelf 的原请求代次取消此次同步，图像与目录互不等待。
         _autoHide?.Refresh(); UpdatePanelColumns();
         var folders = RefreshBookshelfAsync();
@@ -655,7 +670,7 @@ public sealed partial class MainWindow : Window
     /// <summary>显示完整基线命令及迁移状态，已登记数量不当作功能覆盖率。</summary>
     private Task ShowCommandStatusAsync()
     {
-        var text = string.Join('\n', _model!.Commands.Definitions.Select(d => $"{d.Text}  [{d.Name}]  {(IsCommandAvailable(d.Name) ? "已接入，详见验收记录" : d.Stage)}  {_model.SaveData.GetShortcut(d.Name, d.Shortcut)}"));
+        var text = string.Join('\n', _model!.Commands.Definitions.Select(d => $"{d.Text}  [{d.Name}]  {(IsCommandImplemented(d.Name) ? "已接入，详见验收记录" : d.Stage)}  {_model.SaveData.GetShortcut(d.Name, d.Shortcut)}"));
         return new Window { Title = "命令迁移状态", Width = 680, Height = 600, Content = new ScrollViewer { Content = new TextBlock { Text = text, Margin = new Thickness(16) } } }.ShowDialog(this);
     }
     /// <summary>错误信息只改变表现，不覆盖当前阅读内容。</summary>

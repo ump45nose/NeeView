@@ -29,6 +29,14 @@ public sealed class FolderConfigCollection
     }
     /// <summary>读取精确路径记录；路径不统一转换大小写，不扫描或猜测外部移动。</summary>
     public FolderParameterMemento GetFolderParameter(string path) => _folders.GetValueOrDefault(path)?["Parameter"]?.Deserialize<FolderParameterMemento>(Options) ?? new();
+    /// <summary>原FolderConfigTools/GetThumbnail：精确书籍名称查找，相对目标基于书籍路径展开。</summary>
+    public string? GetThumbnailTarget(string bookPath)
+    {
+        var parent = System.IO.Path.GetDirectoryName(bookPath); if (parent is null) return null;
+        var name = System.IO.Path.GetFileName(bookPath);
+        if (_folders.GetValueOrDefault(parent)?["Thumbs"] is not JsonObject thumbs || thumbs[name]?.GetValue<string>() is not { Length: > 0 } target) return null;
+        return System.IO.Path.IsPathFullyQualified(target) ? target : System.IO.Path.GetFullPath(System.IO.Path.Combine(bookPath, target));
+    }
     /// <summary>登记原参数并保留未迁字段；默认省略仅影响已识别字段。</summary>
     public void SetFolderParameter(string path, FolderParameterMemento parameter)
     {

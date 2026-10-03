@@ -9,6 +9,9 @@
       <x:Double x:Key="SliderHorizontalThumbWidth">14</x:Double><x:Double x:Key="SliderHorizontalThumbHeight">14</x:Double>
       <CornerRadius x:Key="SliderThumbCornerRadius">7</CornerRadius>
       <SolidColorBrush x:Key="PlaylistMarkBrush" Color="#FFC94A" />
+      <SolidColorBrush x:Key="ArchivePage.Background" Color="#EEE" />
+      <SolidColorBrush x:Key="ArchivePage.Foreground" Color="#222" />
+      <SolidColorBrush x:Key="ArchivePage.CoverBorder" Color="LightGray" />
     </ResourceDictionary>
   </Styles.Resources>
   <!-- 保留原区域颜色和 41/36 DIP 图标栏尺寸；视觉调整集中在本文件。 -->

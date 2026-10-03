@@ -42,3 +42,5 @@ P2第十一批原书签查询对照：固定依赖gitlink的原解析器/匹配�
 P2第十二批历史查询对照：原BookHistory.GetValue使用书名/LastAccessTime/真实文件大小/书签成员/恒真历史标志；原HistoryList逐项SearcherFilter与当前直接父目录过滤的先后保留。有效确认先登记BookHistorySearchHistory，坏语法/来源失败保持旧结果，未将书签树规则或路径Contains替代历史搜索。见[p2-history-search.md](p2-history-search.md)。
 
 P2第十三批原历史限制对照：BookHistoryCollection.CreateMemento/Restore/Limit和SettingPageHistory保留文件/载入限制、运行集合无限、先数量后严格TakeWhile、保序不刷新日期与默认无限。设置候选三文件成功后应用；极大期限防溢出、临时目录边界检查为明确适配。见[p2-history-retention.md](p2-history-retention.md)，Windows动态对照待验。
+
+P2第十五批对照：原BookSourceFactory/ArchiveEntryCollection的三模式、WherePageAll、shortcut及坏子书规则接入；BookAddress/RequestLoadParent以真实相对条目返回，MoveToChildBook用当前主页。原ArchivePageUtility指定目标/regex/首图/Take(depth)与包内整前缀范围保留，非图像页框480×640。卡片采用原ArchivePageControl上3/下1结构和等比封面，Windows动态像素对照待验。详见[p2-book-hierarchy.md](p2-book-hierarchy.md)。

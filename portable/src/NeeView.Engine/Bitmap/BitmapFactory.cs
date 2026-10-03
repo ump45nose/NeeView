@@ -51,7 +51,7 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
                 work = new Pending { Cancellation = CancellationTokenSource.CreateLinkedTokenSource(_lifetime.Token) }; _pending[key] = work;
                 // 任务返回的像素在等待者取得租约前也受保护，其他请求的 Trim 不能回收。
                 var pending = work;
-                work.Task = Task.Run(() => LoadAsync(key, entry, request, background, pending));
+                work.Task = Task.Run(() => LoadAsync(key, page, request, background, pending));
                 _ = ObserveAsync(work.Task);
             }
             work.Consumers++;
@@ -90,13 +90,16 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
         try { await task; } catch { /* 实际等待者收到错误；无人等待的任务仍需观察。 */ }
     }
     /// <summary>按需读取及解码；背景任务最多占一个解码槽。</summary>
-    private async Task<Entry> LoadAsync(Key key, ArchiveEntry entry, DecodeRequest request, bool background, Pending pending)
+    private async Task<Entry> LoadAsync(Key key, Page page, DecodeRequest request, bool background, Pending pending)
     {
         bool backgroundHeld = false, decodeHeld = false;
         try
         {
             if (background) { await _backgroundSlot.WaitAsync(pending.Cancellation.Token); backgroundHeld = true; }
             await _decodeSlots.WaitAsync(pending.Cancellation.Token); decodeHeld = true;
+            if (!page.IsImage && !page.PageType.IsFolder()) throw new NotSupportedException("这个文件类型的查看器尚未迁移。");
+            await using var cover = page.PageType.IsFolder() ? await ArchivePageUtility.GetSelectedPageAsync(page, pending.Cancellation.Token) : null;
+            var entry = cover is not null ? cover.Entry ?? throw new EmptyArchivePageException() : page.ArchiveEntry;
             await using var stream = await entry.Archive.OpenEntryAsync(entry, pending.Cancellation.Token);
             var image = await decoder.DecodeAsync(stream, request, pending.Cancellation.Token);
             var result = new Entry(image, request.IsThumbnail);

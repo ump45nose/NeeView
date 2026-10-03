@@ -150,8 +150,8 @@
 | NextHistory | 前进到下一条历史记录 |  | P2 原过滤后历史列表导航；具体范围见验收表 | NeeView/Command/Commands/NextHistoryCommand.cs |
 | PrevBookHistory | 后退到上一本书籍 | Alt+Left | P2 原导航历史接入；具体范围见验收表 | NeeView/Command/Commands/PrevBookHistoryCommand.cs |
 | NextBookHistory | 前进到下一本书籍 | Alt+Right | P2 原导航历史接入；具体范围见验收表 | NeeView/Command/Commands/NextBookHistoryCommand.cs |
-| MoveToParentBook | 打开父文件夹 | Alt+Up | 待 P2–P5 | NeeView/Command/Commands/MoveToParentBookCommand.cs |
-| MoveToChildBook | 打开本书 | Alt+Down | 待 P2–P5 | NeeView/Command/Commands/MoveToChildBookCommand.cs |
+| MoveToParentBook | 打开父文件夹 | Alt+Up | P2 原父子书/递归加载链；范围见第十五批 | NeeView/Command/Commands/MoveToParentBookCommand.cs |
+| MoveToChildBook | 打开本书 | Alt+Down | P2 原父子书/递归加载链；范围见第十五批 | NeeView/Command/Commands/MoveToChildBookCommand.cs |
 | ToggleMediaPlay | 视频播放/停止 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleMediaPlayCommand.cs |
 | PrevMediaPosition | 视频倒带 |  | 待 P2–P5 | NeeView/Command/Commands/PrevMediaPositionCommand.cs |
 | NextMediaPosition | 视频快进 |  | 待 P2–P5 | NeeView/Command/Commands/NextMediaPositionCommand.cs |
@@ -184,7 +184,7 @@
 | ToggleIsSupportedWidePage | 横向页面视为双页 |  | P1 Engine | NeeView/Command/Commands/ToggleIsSupportedWidePageCommand.cs |
 | ToggleIsSupportedSingleFirstPage | 首页单独显示 |  | P1 Engine | NeeView/Command/Commands/ToggleIsSupportedSingleFirstPageCommand.cs |
 | ToggleIsSupportedSingleLastPage | 尾页单独显示 |  | P1 Engine | NeeView/Command/Commands/ToggleIsSupportedSingleLastPageCommand.cs |
-| ToggleIsRecursiveFolder | 载入子文件夹 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleIsRecursiveFolderCommand.cs |
+| ToggleIsRecursiveFolder | 载入子文件夹 |  | P2 原父子书/递归加载链；范围见第十五批 | NeeView/Command/Commands/ToggleIsRecursiveFolderCommand.cs |
 | ToggleSortMode | 切换页面顺序 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleSortModeCommand.cs |
 | SetSortModeFileName | 文件名升序 |  | P1 Engine | NeeView/Command/Commands/SetSortModeFileNameCommand.cs |
 | SetSortModeFileNameDescending | 文件名降序 |  | P1 Engine | NeeView/Command/Commands/SetSortModeFileNameDescendingCommand.cs |

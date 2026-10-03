@@ -30,6 +30,8 @@ public sealed class Config
 /// <summary>原 SystemConfig 搜索分支；其余系统设置仍在原 JSON 中保留。</summary>
 public sealed class SystemConfig
 {
+    public BookPageCollectMode BookPageCollectMode { get; set; } = BookPageCollectMode.ImageAndBook;
+    public ArchiveEntryCollectionMode ArchiveRecursiveMode { get; set; } = ArchiveEntryCollectionMode.IncludeSubArchives;
     public bool IsIncrementalSearchEnabled { get; set; } = true;
     private int _searchHistorySize = 8;
     /// <summary>沿用原非负上限，零表示不保留搜索历史。</summary>
@@ -80,6 +82,9 @@ public sealed class SliderConfig
 /// <summary>来自原 BookConfig 的分页参数及默认值。</summary>
 public sealed class BookConfig
 {
+    private int _bookThumbnailDepth = 2;
+    public int BookThumbnailDepth { get => _bookThumbnailDepth; set => _bookThumbnailDepth = Math.Max(1, value); }
+    public string BookThumbnailRegex { get; set; } = @"^folder\.jpg$";
     public bool IsPrioritizeBookMove { get; set; }
     public double WideRatio { get; set; } = 1;
     public double DividePageRate { get; set; } = .5;

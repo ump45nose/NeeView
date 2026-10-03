@@ -5,6 +5,7 @@ namespace NeeView;
 public abstract class Archive(string path) : IAsyncDisposable
 {
     public string Path { get; } = path;
+    public virtual string RootArchivePath => Path;
     /// <summary>来源解析的显式图片条目，普通历史恢复不能覆盖该定位。</summary>
     public string? RequestedEntryName { get; init; }
     public virtual bool IsDirectory => false;
@@ -28,8 +29,13 @@ public sealed class ArchiveEntry(Archive archive)
     public long Length { get; init; }
     public DateTime LastWriteTime { get; init; }
     public bool IsDirectory { get; init; }
+    public bool IsShortcut { get; init; }
     public string? FilePath { get; init; }
     /// <summary>原 SystemPath：真实文件或归档加内部条目，绝不指向解压缓存。</summary>
     public string SystemPath => FilePath ?? System.IO.Path.Combine(Archive.Path, EntryName.TrimStart('/'));
+    /// <summary>原已支持的图片候选；损坏图片仍保留页面。</summary>
+    public bool IsImage() => !IsDirectory && ImageFormats.IsImage(EntryName);
+    /// <summary>原书籍候选：目录或已接入的压缩格式。</summary>
+    public bool IsBook() => IsDirectory || ArchiveFormats.IsArchive(EntryName);
     public override string ToString() => EntryName;
 }

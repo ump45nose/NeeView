@@ -61,20 +61,27 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         var opening = CancellationTokenSource.CreateLinkedTokenSource(token); _opening = opening;
         IsLoading = true; Error = null; Notify();
         Archive? source = null;
+        ArchiveEntryCollection? collection = null;
         bool committed = false;
         try
         {
             source = await archives.OpenAsync(path, opening.Token);
-            var entries = await source.GetEntriesAsync(opening.Token);
             // 原 BookHub.LoadMainAsync 优先使用显式 BookMemento；只在普通打开时按字段混合历史。
             var restored = startupMemento?.Path == source.Path ? (Memento: startupMemento, Part: startupPart) : saveData.Find(source.Path);
             var setting = startupMemento?.Path == source.Path ? startupMemento.ToBookSetting()
                 : Config.Current.BookSettingPolicy.Mix(Config.Current.BookSettingDefault, Config.Current.BookSetting, restored.Memento?.ToBookSetting(), false);
-            var book = new Book(source, entries.Where(e => !e.IsDirectory && ImageFormats.IsImage(e.EntryName)).Select(e => new Page(e)).ToList(), setting);
+            collection = new(source, archives, setting.IsRecursiveFolder);
+            var pages = await BookSourceFactory.CreatePageCollectionAsync(collection, Config.Current.System.BookPageCollectMode, archives, opening.Token, saveData.FolderConfigs);
+            var book = new Book(source, pages, setting) { Entries = collection };
             book.SortSeed = restored.Memento?.SortSeed ?? 0; book.Sort(opening.Token);
             var explicitEntry = entryName ?? source.RequestedEntryName;
             var requested = explicitEntry ?? (ImageFormats.IsImage(path) ? System.IO.Path.GetFileName(path) : setting.Page);
             int index = book.Pages.FindIndex(e => e.EntryName == requested);
+            // 原父书定位允许当前子书位于一个展示的归档项内；优先精确名称，再定位该真实祖先书项。
+            if (index < 0 && explicitEntry is not null) index = book.Pages.FindIndex(e => e.PageType.IsFolder() && explicitEntry.StartsWith(e.EntryName.TrimEnd('/') + "/", StringComparison.Ordinal));
+            // 原递归切换由书籍项进入其第一项，反向切换则由上面的真实祖先定位收敛。
+            if (index < 0 && explicitEntry is not null && startupMemento is not null)
+                index = book.Pages.FindIndex(e => e.EntryName.StartsWith(explicitEntry.TrimEnd('/') + "/", StringComparison.Ordinal));
             if (explicitEntry is not null && index < 0) throw new FileNotFoundException((entryName is not null ? "历史页面已不存在：" : "指定页面已不存在：") + explicitEntry);
             index = Math.Max(0, index);
             if (explicitEntry is null && !keepHistoryOrder && !ImageFormats.IsImage(path) && Config.Current.BookSettingPolicy.Page == BookSettingPageSelectMode.RestoreOrDefaultReset && index >= book.Pages.Count - (setting.PageMode == PageMode.WidePage && !setting.IsSupportedSingleLastPage ? 2 : 1)) index = 0;
@@ -91,7 +98,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                 {
                     opening.Token.ThrowIfCancellationRequested();
                     if (_disposed || _closing || generation != _generation || expectedPlaylist is not null && !ReferenceEquals(expectedPlaylist, _playlistHub?.Current)) return false;
-                    Book = book; source = null; _keepHistoryOrder = keepHistoryOrder;
+                    Book = book; source = null; collection = null; _keepHistoryOrder = keepHistoryOrder;
                     Config.Current.BookSetting = setting; Context = new(setting, Config.Current);
                     Position = new(index, explicitEntry is not null || ImageFormats.IsImage(path) ? 0 : Math.Clamp(restored.Part, 0, 1));
                     RebuildFrame(1); return true;
@@ -108,7 +115,8 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         catch (Exception ex) { if (generation == _generation) Error = ex.Message; }
         finally
         {
-            if (source is not null) await source.DisposeAsync();
+            if (collection is not null) await collection.DisposeAsync();
+            else if (source is not null) await source.DisposeAsync();
             if (generation == _generation) { IsLoading = false; Notify(); }
             if (ReferenceEquals(_opening, opening)) _opening = null;
             opening.Dispose();
@@ -360,7 +368,8 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             if (page.Content.HasSize) continue;
             try
             {
-                await using var stream = await book.Source.OpenEntryAsync(page.ArchiveEntry, token);
+                if (!page.IsImage) { page.Content.HasSize = true; continue; }
+                await using var stream = await page.ArchiveEntry.Archive.OpenEntryAsync(page.ArchiveEntry, token);
                 var info = await decoder.ProbeAsync(stream, token);
                 page.Content.PageDataSource = new(info.Size);
             }

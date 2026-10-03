@@ -5,6 +5,8 @@ namespace NeeView;
 public sealed class Book(Archive source, List<Page> pages, BookSettingConfig setting) : IAsyncDisposable
 {
     public Archive Source { get; } = source;
+    public BookAddress BookAddress { get; } = BookAddress.Create(source);
+    public ArchiveEntryCollection? Entries { get; init; }
     public string Path => Source.Path;
     public BookPageCollection Pages { get; } = new(pages);
     public BookSettingConfig Setting { get; } = setting;
@@ -44,5 +46,5 @@ public sealed class Book(Archive source, List<Page> pages, BookSettingConfig set
         for (int i = 0; i < Pages.Count; i++) Pages[i].Index = i;
     }
     /// <summary>书籍拥有来源，关闭后释放归档句柄。</summary>
-    public ValueTask DisposeAsync() => Source.DisposeAsync();
+    public ValueTask DisposeAsync() => Entries?.DisposeAsync() ?? Source.DisposeAsync();
 }

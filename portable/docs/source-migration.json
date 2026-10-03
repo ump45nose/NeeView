@@ -276,6 +276,12 @@
       "target": "src/NeeView.Engine/BookHistory/HistoryStringCollection.cs",
       "sha256": "ebce41a51423db37ef5afb953189c23c889146e438d90c8ad1ec6c9110c95cc9",
       "status": "原字符串历史去重/前置/限制/删除源码迁入"
+    },
+    {
+      "source": "NeeView/Page/PageType.cs",
+      "target": "src/NeeView.Engine/Book/PageType.cs",
+      "sha256": "064e1a524fbf5ac73fea75007fd4187f1c67d02f8cf7bdd860a1fc5e9d504a1d",
+      "status": "P2原枚举数值与IsFolder迁入"
     }
   ],
   "partial_adapters": [
@@ -872,6 +878,72 @@
       "target": "src/NeeView.Engine/BookOperation/BookOperation.Bookshelf.cs",
       "sha256": "5854e9abf42991aa6117fb3f7c6516f6162f95dcd92f8f042960dc3b69452b90",
       "status": "Original SetFolderOrder/ToggleFolderOrder/MoveRandomFolder; no global default mutation"
+    },
+    {
+      "source": "NeeView/Book/BookSourceFactory.cs",
+      "target": "src/NeeView.Engine/Book/BookSourceFactory.cs",
+      "sha256": "e3ccfba2076ec30d2389759cc8fe90340a3586970af706c7adf0dd3b66dd15e2",
+      "status": "原三种收集模式和WherePageAll判断迁入；当前支持目录/归档内目录，嵌套压缩P5"
+    },
+    {
+      "source": "NeeView/Archiver/ArchiveEntryCollection.cs",
+      "target": "src/NeeView.Engine/Book/BookSourceFactory.cs",
+      "sha256": "6b3906245a09390e5ad1ffeb893e5f7e7676e81937a649fab0aeb7536957ee76",
+      "status": "原递归来源所属关系/shortcut/失败子书/展平；来源按集合反向关闭"
+    },
+    {
+      "source": "NeeView/Archiver/ArchiveEntryCollectionMode.cs",
+      "target": "src/NeeView.Engine/Book/BookSourceFactory.cs",
+      "sha256": "8a225c96f522ba60c073c0fa6182700ee4e8b966d2f51825b797d5dd9aae3e8e",
+      "status": "保留原三模式枚举数值"
+    },
+    {
+      "source": "NeeView/Book/BookPageCollectMode.cs",
+      "target": "src/NeeView.Engine/Book/BookSourceFactory.cs",
+      "sha256": "9bdabe083acb88cec673b0c2d39c0ee5ab2fc09ba95cbfc46f7414e0a847c086",
+      "status": "保留原Image/ImageAndBook/All枚举数值"
+    },
+    {
+      "source": "NeeView/BookHub/BookAddress.cs",
+      "target": "src/NeeView.Engine/Book/BookAddress.cs",
+      "sha256": "87d5270001b8eddff6729866b0bc149e6f8e6effe6f83e970678dc59575dfaeb",
+      "status": "原已支持普通/归档父级与相对定位；嵌套归档虚拟Scheme未迁"
+    },
+    {
+      "source": "NeeView/BookHub/BookHub.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Hierarchy.cs",
+      "sha256": "4d33119203989d72ff6cebf6b8a29caa10c054db0f8d704ebd2cb605918760b6",
+      "status": "原RequestLoadParent真实相对条目定位；不用书架Up替代"
+    },
+    {
+      "source": "NeeView/BookOperation/BookOperation.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Hierarchy.cs",
+      "sha256": "f419c0c0d409727c7902d8b253fbdb9e69ffc405b79ab052d18d6a8b9f279f23",
+      "status": "原当前主Folder/Archive页MoveToChildBook及递归重新加载；封面按钮核对所属书籍"
+    },
+    {
+      "source": "NeeView/Page/ArchivePageUtility.cs",
+      "target": "src/NeeView.Engine/Book/ArchivePageUtility.cs",
+      "sha256": "c6c41b50d25ca320b537ef6305543d66fdf7256d1ec672ae0c372cb5c345582a",
+      "status": "原指定封面/regex/首图与有限子书选择；请求级来源所有权适配，媒体P5"
+    },
+    {
+      "source": "NeeView/Archiver/ArchiveEntryUtility.cs",
+      "target": "src/NeeView.Engine/Book/ArchivePageUtility.cs",
+      "sha256": "01ae8c774e5c7512ca56b2d6075902fc57061aafe528360387bf01a1c973179b",
+      "status": "原CreateFirstImageArchiveEntryAsync首图/Take(depth)/包内整前缀范围，严格目录边界和250ms匹配预算适配"
+    },
+    {
+      "source": "NeeView/Page/ArchivePageContent.cs",
+      "target": "src/NeeView.Engine/Book/Page.cs",
+      "sha256": "73b7dce1301fdad459b0acf251c9b2482216ee8e308dc9129d27b951bda6e990",
+      "status": "原非图像480×640页框/IsFileContent及正常空封面状态；不把Folder交给图像探测"
+    },
+    {
+      "source": "NeeView/FolderConfig/FolderConfigTools.cs",
+      "target": "src/NeeView.Engine/FolderConfig/FolderConfigCollection.cs",
+      "sha256": "cf44b4078c876c0747faeba8a743f802ac6a3d240ab7a99b6509919d94b9c3eb",
+      "status": "原GetThumbnailTarget精确名称及相对书籍路径；编辑/重命名后续迁入"
     }
   ],
   "rule_references": [
@@ -1038,6 +1110,18 @@
       "target": "src/NeeView.MacOS/Views/SettingsWindow.axaml",
       "sha256": "9b54a9b7c0e7b66a4379f79c3b8e34afff27465ac046d741d014a7b80544aefc",
       "status": "原左导航/右历史设置区域与保留限制说明，未迁登记/清理保留禁用占位"
+    },
+    {
+      "source": "NeeView/ViewContents/ArchivePageControl.xaml",
+      "target": "src/NeeView.MacOS/Views/ArchivePageRenderer.cs",
+      "sha256": "db5eaa4741d7673119f79cd5d5ae216a60c3dec6ffb127dd731d070d234e7a1c",
+      "status": "原上3/下1封面/信息卡片、叠页和Uniform转换；未执行Windows像素对照"
+    },
+    {
+      "source": "NeeView/ViewContents/ArchivePageControl.xaml.cs",
+      "target": "src/NeeView.MacOS/Views/ReaderView.cs",
+      "sha256": "3e45129bc329ab277e53cad01461b3663c4dd02e3dd08239c0d7501a52c6e672",
+      "status": "原封面单击隔离/双击实际书籍；框架Pointer及可等待加载适配"
     }
   ],
   "backend_reuse": [

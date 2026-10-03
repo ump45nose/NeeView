@@ -49,3 +49,5 @@
 第十三批HistorySettingsViewModel持有原候选值及自定义值草稿，SettingsWindow只负责历史设置区域和导航。历史更多菜单共用原设置窗口，实际限制/临时排除/提交回滚在Engine；视图不扫描历史来源、运行集合不裁剪。保存禁用重入和关闭，不因历史外观或策略变更重建正文，见[p2-history-retention.md](p2-history-retention.md)。
 
 第十四批书架排序控件调用Engine.ChangeFolderOrderAsync，编辑的是原当前目录参数；枚举、种子、JSON归一及事务不进入界面。原排序菜单勾选与执行共用CommandTable.BookOrderCommands。布局及主题不变，失败后原选择/排序恢复，见[p2-folder-parameters.md](p2-folder-parameters.md)。
+
+第十五批ArchivePageRenderer独立转换原封面/叠页/文件信息区，主题使用ArchivePage资源。ReaderView只命中封面并发出实际Page动作，Engine核对所属Book并加载；封面选择/目录递归/父级定位均在Engine，控件不访问文件。空封面/未知文件逐页处理，其他可见需求继续。详见[p2-book-hierarchy.md](p2-book-hierarchy.md)。

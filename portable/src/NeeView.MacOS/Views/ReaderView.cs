@@ -21,6 +21,7 @@ public sealed class ReaderView : Control, IDisposable
         public void Dispose() { Bitmap.Dispose(); Lease.Dispose(); }
     }
     private readonly Dictionary<Page, Display> _images = [];
+    private readonly Dictionary<Page, string> _pageErrors = [];
     private BookOperation? _operation;
     private CoreBitmapFactory? _factory;
     private CancellationTokenSource? _request;
@@ -31,6 +32,7 @@ public sealed class ReaderView : Control, IDisposable
     private Point? _pressed;
     private Avalonia.Vector _initialPan;
     private bool _dragged;
+    private bool _bookCardPressed;
     private bool _disposed;
     private Book? _displayBook;
     private PageRange? _displayRange;
@@ -38,7 +40,11 @@ public sealed class ReaderView : Control, IDisposable
     private readonly SemaphoreSlim _scrollGate = new(1);
     private string? _loadError;
     public event EventHandler<string>? GestureRequested;
+    public event EventHandler<Page>? ChildBookRequested;
     public event EventHandler? DisplayCompleted;
+    public int DisplayCount => _images.Count;
+    /// <summary>当前页的资源结果；空封面是正常状态，错误不会遮蔽同帧其他页。</summary>
+    public string? GetPageError(Page page) => _pageErrors.GetValueOrDefault(page);
 
     /// <summary>只装配业务和像素边界；没有解码器或文件系统依赖。</summary>
     public void Attach(BookOperation operation, CoreBitmapFactory factory)
@@ -60,12 +66,17 @@ public sealed class ReaderView : Control, IDisposable
         ClampPan();
         var sources = _frame?.Elements.Where(e => !e.IsDummy).Select(e => e.Page).Distinct().ToArray() ?? [];
         foreach (var page in _images.Keys.Except(sources).ToArray()) { _images[page].Dispose(); _images.Remove(page); }
+        foreach (var page in _pageErrors.Keys.Except(sources).ToArray()) _pageErrors.Remove(page);
         InvalidateVisual();
         try
         {
             foreach (var page in sources)
             {
-                var lease = await _factory.GetAsync(page, GetRequest(page), request.Token);
+                BitmapLease lease;
+                try { lease = await _factory.GetAsync(page, GetRequest(page), request.Token); }
+                catch (EmptyArchivePageException) { if (revision == _revision) _pageErrors[page] = ""; continue; }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                { if (revision == _revision) _pageErrors[page] = ex.Message; continue; }
                 if (_disposed || revision != _revision) { lease.Dispose(); return; }
                 var pixels = lease.Image;
                 var handle = GCHandle.Alloc(pixels.Pixels, GCHandleType.Pinned);
@@ -78,8 +89,10 @@ public sealed class ReaderView : Control, IDisposable
                 catch { bitmap?.Dispose(); lease.Dispose(); throw; }
                 finally { handle.Free(); }
                 if (_images.Remove(page, out var old)) old.Dispose();
-                _images[page] = new(bitmap, lease); InvalidateVisual();
+                _pageErrors.Remove(page); _images[page] = new(bitmap, lease); InvalidateVisual();
             }
+            if (_disposed || revision != _revision || request.IsCancellationRequested) return;
+            InvalidateVisual();
             DisplayCompleted?.Invoke(this, EventArgs.Empty);
             if (_operation.Book is { } book && _frame is { } frame)
             {
@@ -124,6 +137,9 @@ public sealed class ReaderView : Control, IDisposable
         {
             var target = new Avalonia.Rect(left, center.Y - source.Height * scale / 2, source.Width * scale, source.Height * scale);
             if (source.IsDummy) context.FillRectangle(Brushes.White, target);
+            else if (source.Page.PageType.IsFolder())
+                ArchivePageRenderer.Draw(this, context, source.Page, target, _images.GetValueOrDefault(source.Page)?.Bitmap,
+                    _pageErrors.GetValueOrDefault(source.Page) ?? "正在加载…");
             else if (_images.TryGetValue(source.Page, out var image))
             {
                 var crop = source.ViewSizeCalculator.GetViewBox();
@@ -133,7 +149,7 @@ public sealed class ReaderView : Control, IDisposable
             else
             {
                 context.FillRectangle(new SolidColorBrush(Color.Parse("#202020")), target);
-                DrawText(context, source.Page.Content.Error ?? _loadError ?? "正在加载…", target.TopLeft + new Avalonia.Vector(12, 12));
+                DrawText(context, source.Page.Content.Error ?? _pageErrors.GetValueOrDefault(source.Page) ?? _loadError ?? "正在加载…", target.TopLeft + new Avalonia.Vector(12, 12));
             }
             left += target.Width + _frame.Span * _zoom;
         }
@@ -230,6 +246,12 @@ public sealed class ReaderView : Control, IDisposable
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e); Focus();
+        if (GetBookPageAt(e.GetPosition(this)) is { } page)
+        {
+            _bookCardPressed = true; e.Handled = true;
+            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed && e.ClickCount == 2) ChildBookRequested?.Invoke(this, page);
+            return;
+        }
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) { _pressed = e.GetPosition(this); _initialPan = _pan; _dragged = false; e.Pointer.Capture(this); }
     }
     /// <summary>拖动大图只修改表现变换。</summary>
@@ -245,17 +267,34 @@ public sealed class ReaderView : Control, IDisposable
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e); e.Pointer.Capture(null);
-        if (!_dragged)
+        if (!_dragged && !_bookCardPressed)
         {
             var gesture = e.InitialPressMouseButton switch { MouseButton.Left => "LeftClick", MouseButton.Right => "RightClick", MouseButton.Middle => "MiddleClick", _ => null };
             if (gesture is not null) GestureRequested?.Invoke(this, gesture);
         }
-        _pressed = null; _dragged = false;
+        _pressed = null; _dragged = false; _bookCardPressed = false;
+    }
+    /// <summary>按原封面按钮区域命中书籍页，单击不翻页，双击打开实际命中项。</summary>
+    private Page? GetBookPageAt(Point point)
+    {
+        if (_frame is null) return null;
+        var center = new Point(Bounds.Width / 2 + _pan.X, Bounds.Height / 2 + _pan.Y);
+        var angle = -_frame.Angle * Math.PI / 180; var relative = point - center;
+        var local = center + new Avalonia.Vector(relative.X * Math.Cos(angle) - relative.Y * Math.Sin(angle), relative.X * Math.Sin(angle) + relative.Y * Math.Cos(angle));
+        var sources = _frame.GetDirectedSources().ToArray(); var scale = _frame.Scale * _zoom;
+        double left = center.X - (sources.Sum(e => e.Width) * scale + _frame.TotalSpan * _zoom) / 2;
+        foreach (var source in sources)
+        {
+            var target = new Avalonia.Rect(left, center.Y - source.Height * scale / 2, source.Width * scale, source.Height * scale);
+            if (!source.IsDummy && source.Page.PageType.IsFolder() && ArchivePageRenderer.CoverArea(target).Contains(local)) return source.Page;
+            left += target.Width + _frame.Span * _zoom;
+        }
+        return null;
     }
     /// <summary>释放当前需求和所有显示租约，晚到结果按 revision 拒绝。</summary>
     public void Dispose()
     {
         if (_disposed) return; _disposed = true; ++_revision; _request?.Cancel(); _request = null;
-        foreach (var item in _images.Values) item.Dispose(); _images.Clear();
+        foreach (var item in _images.Values) item.Dispose(); _images.Clear(); _pageErrors.Clear();
     }
 }

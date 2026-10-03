@@ -20,6 +20,7 @@ public sealed class ThumbnailView : Control, IDisposable
         public void Dispose() { Bitmap.Dispose(); Lease.Dispose(); }
     }
     private readonly Dictionary<Page, Display> _images = [];
+    private readonly Dictionary<Page, string> _pageErrors = [];
     private BookOperation? _operation;
     private BitmapFactory? _factory;
     private CancellationTokenSource? _request, _details;
@@ -32,6 +33,7 @@ public sealed class ThumbnailView : Control, IDisposable
     private bool _disposed;
     public bool IsNavigator { get; set; }
     public int DisplayCount => _images.Count;
+    public string? GetPageError(Page page) => _pageErrors.GetValueOrDefault(page);
     public double HorizontalOffset => _offset;
     public string? DetailText { get; private set; }
     public event EventHandler<int>? PageRequested;
@@ -49,7 +51,7 @@ public sealed class ThumbnailView : Control, IDisposable
         if (_operation is not null) _operation.MarkersChanged -= Markers_Changed;
         // 控件重绑也必须结束旧请求和租约，不能让旧工厂晚到结果混入新操作实例。
         ++_revision; _request?.Cancel(); ClearDetail();
-        foreach (var image in _images.Values) image.Dispose(); _images.Clear();
+        foreach (var image in _images.Values) image.Dispose(); _images.Clear(); _pageErrors.Clear();
         _requestedPages = []; _targetSize = 0; _loadTask = Task.CompletedTask; _displayBook = null; _offset = 0;
         _operation = operation; _factory = factory; Focusable = true;
         if (!IsNavigator) operation.PageSelector.SelectionChanged += Selection_Changed;
@@ -94,6 +96,7 @@ public sealed class ThumbnailView : Control, IDisposable
         int revision = ++_revision; _request?.Cancel(); var request = new CancellationTokenSource(); _request = request;
         _requestedPages = pages;
         foreach (var page in _images.Keys.Where(p => target != _targetSize || !pages.Contains(p)).ToArray()) { _images[page].Dispose(); _images.Remove(page); }
+        foreach (var page in _pageErrors.Keys.Where(p => target != _targetSize || !pages.Contains(p)).ToArray()) _pageErrors.Remove(page);
         _targetSize = target;
         if (pages.Length == 0) { ClearDetail(); _request = null; request.Dispose(); _loadTask = Task.CompletedTask; return _loadTask; }
         _loadTask = LoadAsync(pages, target, request, revision); return _loadTask;
@@ -106,8 +109,12 @@ public sealed class ThumbnailView : Control, IDisposable
             if (!IsNavigator) await Task.Delay(200, request.Token);
             foreach (var page in pages)
             {
-                if (_images.ContainsKey(page)) continue;
-                var lease = await _factory!.GetAsync(page, new(target, target, true), request.Token, true);
+                if (_images.ContainsKey(page) || _pageErrors.ContainsKey(page)) continue;
+                BitmapLease lease;
+                try { lease = await _factory!.GetAsync(page, new(target, target, true), request.Token, true); }
+                catch (EmptyArchivePageException) { if (revision == _revision) _pageErrors[page] = ""; continue; }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                { if (revision == _revision) _pageErrors[page] = ex.Message; continue; }
                 if (_disposed || revision != _revision) { lease.Dispose(); return; }
                 var pixels = lease.Image; var pin = GCHandle.Alloc(pixels.Pixels, GCHandleType.Pinned);
                 Bitmap? bitmap = null;
@@ -121,6 +128,7 @@ public sealed class ThumbnailView : Control, IDisposable
                 if (_disposed || revision != _revision || request.IsCancellationRequested) { bitmap.Dispose(); lease.Dispose(); return; }
                 _images[page] = new(bitmap, lease); InvalidateVisual();
             }
+            if (!_disposed && revision == _revision) InvalidateVisual();
         }
         catch (OperationCanceledException) { }
         catch (Exception ex) { if (revision == _revision) _requestedPages = []; System.Diagnostics.Trace.WriteLine("缩略图：" + ex.Message); }
@@ -145,6 +153,8 @@ public sealed class ThumbnailView : Control, IDisposable
                 var size = image.Bitmap.Size; var scale = Math.Min(cell.Width / size.Width, cell.Height / size.Height);
                 context.DrawImage(image.Bitmap, new Avalonia.Rect(cell.Center.X - size.Width * scale / 2, cell.Center.Y - size.Height * scale / 2, size.Width * scale, size.Height * scale));
             }
+            else if (_pageErrors.TryGetValue(page, out var error))
+                context.DrawText(new FormattedText(page.PageType.IsFolder() ? "▱" : "!", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("sans-serif"), 24, Brushes.LightGray), cell.Center - new Avalonia.Vector(12, 12));
             if (_operation.Frame?.Elements.Any(e => !e.IsDummy && ReferenceEquals(e.Page, page)) == true)
                 context.DrawRectangle(null, new Pen(Brushes.LightGray, 1), cell);
             if (IsNavigator || page.Index == _operation.PageSelector.SelectedIndex) context.DrawRectangle(null, new Pen(Brushes.DodgerBlue, 2), cell);
@@ -251,6 +261,6 @@ public sealed class ThumbnailView : Control, IDisposable
         if (_disposed) return; _disposed = true; ++_revision; _request?.Cancel(); ClearDetail();
         if (_operation is not null) _operation.PageSelector.SelectionChanged -= Selection_Changed;
         if (_operation is not null) _operation.MarkersChanged -= Markers_Changed;
-        foreach (var image in _images.Values) image.Dispose(); _images.Clear();
+        foreach (var image in _images.Values) image.Dispose(); _images.Clear(); _pageErrors.Clear();
     }
 }

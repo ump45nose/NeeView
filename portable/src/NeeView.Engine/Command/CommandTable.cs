@@ -40,6 +40,9 @@ public sealed class CommandTable
         _actions["PrevBook"] = () => operation.MoveBookAsync(-1);
         _actions["NextBook"] = () => operation.MoveBookAsync(1);
         _actions["RandomBook"] = operation.RandomBookAsync;
+        _actions["MoveToParentBook"] = operation.MoveToParentBookAsync;
+        _actions["MoveToChildBook"] = operation.MoveToChildBookAsync;
+        _actions["ToggleIsRecursiveFolder"] = operation.ToggleRecursiveFolderAsync;
         _actions["ToggleBookOrder"] = operation.ToggleFolderOrderAsync;
         foreach (var pair in BookOrderCommands) _actions[pair.Key] = () => operation.ChangeFolderOrderAsync(pair.Value);
         _actions["PrevFolderPage"] = () => operation.MoveFolderPageAsync(-1);

@@ -32,7 +32,7 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     public Task<bool> SyncAsync(Book book, CancellationToken token = default, bool force = false)
     {
         var path = System.IO.Path.TrimEndingDirectorySeparator(book.Path);
-        var parent = System.IO.Path.GetDirectoryName(path) ?? path;
+        var parent = book.BookAddress.Place ?? path;
         return SetPlaceAsync(parent, book.Path, token, force);
     }
 
@@ -52,7 +52,7 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
         {
             if (!force && Place == place)
             {
-                if (selectedPath is not null) SelectedItem = Items.FirstOrDefault(e => e.Path == selectedPath);
+                if (selectedPath is not null) SelectedItem = FindSelection(selectedPath);
                 Error = null; IsLoading = false; Changed?.Invoke(this, EventArgs.Empty); return true;
             }
             IsLoading = true; Error = null; Changed?.Invoke(this, EventArgs.Empty);
@@ -63,7 +63,7 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
             var mode = GetNormalOrder(parameter.FolderOrder);
             var items = FolderCollection.Sort(entries, mode, Config.Current.Bookshelf.FolderSortOrder, parameter.Seed, pending.Token);
             _entries = entries; _parameter = parameter; Place = place; Items = items; FolderOrder = mode;
-            SelectedItem = Items.FirstOrDefault(e => e.Path == selectedPath); return true;
+            SelectedItem = selectedPath is null ? null : FindSelection(selectedPath); return true;
         }
         catch (OperationCanceledException) when (pending.IsCancellationRequested) { return false; }
         catch (Exception ex) { if (revision == _revision) Error = "目录暂不可访问：" + ex.Message; return false; }
@@ -76,6 +76,9 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
 
     /// <summary>原普通列表不提供路径/注册时间排序，保留原字段而使用文件名回退。</summary>
     private static FolderOrder GetNormalOrder(FolderOrder mode) => !Enum.IsDefined(mode) || mode.IsEntryCategory() || mode.IsPathCategory() ? FolderOrder.FileName : mode;
+    /// <summary>原归档递归模式同步到根书项，先精确定位，再匹配带目录边界的真实祖先。</summary>
+    private FolderItem? FindSelection(string path) => Items.FirstOrDefault(e => e.Path == path)
+        ?? Items.FirstOrDefault(e => path.StartsWith(e.Path.TrimEnd('/') + "/", StringComparison.Ordinal));
 
     /// <summary>在已有元数据上重排并按路径保持选择，不重复扫描或打开书籍。</summary>
     /// <param name="mode">普通书架排序。</param>
