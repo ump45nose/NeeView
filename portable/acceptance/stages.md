@@ -237,3 +237,12 @@ P2继续书架书签互联、历史、列表模板、浮动宿主及输入/动�
 - 已离线审查[两个书签列表](p2-bookshelf-bookmarks-bookshelf-bookmarks-layout.png)，未启动正式应用或访问用户数据；见[静默记录](p2-bookshelf-bookmarks-runtime.md)。原Windows、旧证据及用户.DS_Store保持。
 
 P2继续历史、模板、浮动宿主与动画；依设备及Windows动态对照另验。本增量自动本地提交后继续，不推送发布。
+
+## P2 第二十批：原历史登记与可靠清理
+
+- 原主Page阈值、已有书一次切换、删除后同页抑制/真实翻页重启、设置/页尾/退出请求和强制访问日期接入。IsSaveHistory关闭只删除文件，运行历史与LastBook独立。
+- 可靠来源检查和全批提交保护权限/超时/取消/离线卷/未映射路径；归档逻辑目录精确检查，晚到旧版本不删除新进度。启动/手动清理及ClearHistoryInPlace接通同一服务。
+- 新增13项，最终全量 **320通过、0失败、0跳过**；Engine、正式Library、ARM64.app及本地ad-hoc严格签名均通过，见[p2-history-policy-validation.json](p2-history-policy-validation.json)。默认输出串行。
+- 已离线查看[历史设置](p2-history-policy-history-settings-layout.png)，未启动正式应用或修改用户数据，见[静默记录](p2-history-policy-runtime.md)。原Windows、旧证据及用户.DS_Store保持。
+
+P2继续四模板、浮动宿主和动画；Windows/真机/NAS/完整性能分别待验。本增量自动本地提交后继续，不推送发布。

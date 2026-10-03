@@ -33,6 +33,8 @@ public interface IArchiveFactory
 {
     /// <summary>打开目录、ZIP、RAR 或 7z。调用方负责释放返回来源。</summary>
     Task<Archive> OpenAsync(string path, CancellationToken token);
+    /// <summary>可靠检查真实或归档内部定位；仅确定缺失返回false，权限/断线/不支持传播。</summary>
+    Task<bool> ExistsAsync(string path, CancellationToken token) => throw new NotSupportedException("来源存在检查尚未实现。");
     /// <summary>列出直接子目录，用于 P1 基础导航。</summary>
     Task<IReadOnlyList<FolderItem>> ListFoldersAsync(string path, CancellationToken token);
     /// <summary>列出普通书架的目录及已支持归档；只返回元数据，不打开每本书。</summary>

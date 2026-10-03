@@ -258,7 +258,7 @@ public sealed partial class SettingsWindow : Window
                 // 只写用户修改的差分，避免一次保存就展开全部235条默认命令。
                 foreach (var input in _inputs.Where(i => _resetInputDefaults || i.Value.Trim() != i.OriginalValue.Trim()))
                     _model.SaveData.SetShortcutDifference(input.Name, input.Value.Trim(), input.Definition.Shortcut);
-                ApplyFilm(); ApplyAutoHide(); ApplyView();
+                ApplyFilm(); ApplyAutoHide(); ApplyView(); _historySettings!.ApplyPolicy(Config.Current.History);
                 foreach (var parameter in _parameters.Values) parameter.Apply(_model.SaveData);
                 Config.Current.Bookshelf.FolderSortOrder = (FolderSortOrder)Math.Max(0, this.FindControl<ComboBox>("BookshelfGroup")!.SelectedIndex);
                 Config.Current.Book.IsPrioritizeBookMove = this.FindControl<CheckBox>("PrioritizeBookMove")!.IsChecked == true;

@@ -5,7 +5,7 @@ namespace NeeView;
 /// <summary>沿用 UserSetting/History JSON 和 BookMemento；原始节点保留未迁移字段。</summary>
 /// <param name="directory">独立Mac用户状态目录。</param>
 /// <param name="temporaryDirectory">启动层提供的应用临时根；不会排除整个系统临时目录。</param>
-public sealed class SaveData(string directory, string? temporaryDirectory = null)
+public sealed partial class SaveData(string directory, string? temporaryDirectory = null)
 {
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true, PropertyNameCaseInsensitive = true, AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip };
     private readonly SemaphoreSlim _gate = new(1);
@@ -13,9 +13,10 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
     private JsonObject _setting = new();
     private JsonObject _history = new();
     private JsonObject _bookmarks = new();
-    // 原 Remove/Clear 不会因阅读位置保存自动重新登记；显式重新打开才恢复登记。
+    // 原Remove/Clear抑制同主图保存；下一次真实主图变化或新访问按原阈值重启登记。
     private readonly HashSet<string> _suppressedHistoryPaths = new(StringComparer.Ordinal);
     private string? _activeHistoryPath;
+    private Book? _activeHistoryBook;
     public BookmarkCollection Bookmarks { get; private set; } = new(new() { Children = [] });
     public BookmarkNode BookmarkRoot => Bookmarks.Items;
     private BookmarkNodeMemento[] _removedBookmarks = [];
@@ -43,7 +44,7 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
         Bookmarks = new(_bookmarks["Nodes"]?.Deserialize<BookmarkNode>(Options) ?? new() { Children = [] });
         _removedBookmarks = [];
         _suppressedHistoryPaths.Clear();
-        _activeHistoryPath = null;
+        _activeHistoryPath = null; _activeHistoryBook = null;
         if (!BookmarkRoot.IsFolder) throw new JsonException("Bookmark.Nodes 必须是根文件夹。");
         var raw = _setting["Config"] as JsonObject;
         var config = new Config();
@@ -346,13 +347,13 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
     /// <summary>在历史编辑锁内提交真实新书，再解除登记抑制，避免取消或清空与新访问交错。</summary>
     /// <param name="commit">原打开流程的最后代次检查与书籍赋值；返回 false 表示未提交。</param>
     /// <returns>书籍及新访问是否同时提交；没有额外文件写入。</returns>
-    internal async Task<bool> BeginHistoryVisitAsync(string path, Func<bool> commit)
+    internal async Task<bool> BeginHistoryVisitAsync(Book book, Func<bool> commit)
     {
         await _gate.WaitAsync();
         try
         {
             if (!commit()) return false;
-            _suppressedHistoryPaths.Remove(path); _activeHistoryPath = path; return true;
+            _suppressedHistoryPaths.Remove(book.Path); _activeHistoryPath = book.Path; _activeHistoryBook = book; return true;
         }
         finally { _gate.Release(); }
     }
@@ -378,7 +379,7 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
     }
 
     /// <summary>串行修改历史与三文件事务；选中删除和清空使用同一失败回滚。</summary>
-    private async Task<int> EditHistoryAsync(HashSet<string>? paths, CancellationToken token)
+    private async Task<int> EditHistoryAsync(HashSet<string>? paths, CancellationToken token, IReadOnlyDictionary<string, string>? expected = null)
     {
         await _gate.WaitAsync(token);
         var previous = _history.DeepClone().AsObject();
@@ -387,13 +388,16 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
         {
             var items = _history["Items"] as JsonArray;
             var removed = items?.OfType<JsonObject>().Where(item => item["Path"] is JsonValue value &&
-                (paths is null || paths.Contains(value.GetValue<string>()))).ToArray() ?? [];
+                (paths is null || paths.Contains(value.GetValue<string>())) &&
+                (expected is null || expected.TryGetValue(value.GetValue<string>(), out var version) && item.ToJsonString() == version)).ToArray() ?? [];
             if (removed.Length == 0 && paths is not null) return 0;
             // 首次打开还未到防抖保存时也允许清空；不能让晚到的当前书保存重新登记。
             if (paths is null && _activeHistoryPath is not null) _suppressedHistoryPaths.Add(_activeHistoryPath);
             foreach (var item in removed)
             { _suppressedHistoryPaths.Add(item["Path"]!.GetValue<string>()); items!.Remove(item); }
-            await WritePairAsync(token); RefreshHistory(); return removed.Length;
+            await WritePairAsync(token);
+            if (_activeHistoryBook is { } current && (paths is null || removed.Any(e => e["Path"]!.GetValue<string>() == current.Path))) current.MementoControl.OnHistoryRemoved();
+            RefreshHistory(); return removed.Length;
         }
         catch
         {
@@ -416,8 +420,9 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
         await _gate.WaitAsync(token);
         var previousSetting = _setting.DeepClone().AsObject();
         var previousHistory = _history.DeepClone().AsObject();
-        var historyConfig = historyLimits is { } limits
-            ? new HistoryConfig { LimitSize = limits.Size, LimitSpan = limits.Span } : Config.Current.History;
+        var historyConfig = JsonSerializer.Deserialize<HistoryConfig>(JsonSerializer.Serialize(Config.Current.History, Options), Options)!;
+        if (historyLimits is { } limits) { historyConfig.LimitSize = limits.Size; historyConfig.LimitSpan = limits.Span; }
+        bool historyEntry = false;
         try
         {
             var config = Object(_setting, "Config");
@@ -439,16 +444,22 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
                 var items = _history["Items"] as JsonArray ?? new JsonArray();
                 _history["Items"] = items;
                 var old = items.OfType<JsonObject>().FirstOrDefault(e => e["Path"]?.GetValue<string>() == book.Path);
-                var item = old ?? new JsonObject();
+                var item = old?.DeepClone().AsObject() ?? new JsonObject();
                 var unknownProps = FilterProps(item["Props"]?.GetValue<string>(), false);
                 item["Path"] = book.Path; item["Page"] = memento.Page;
                 item["Props"] = string.Join(' ', new[] { memento.ToPropertiesString(), unknownProps }.Where(e => !string.IsNullOrEmpty(e)));
+                keepHistoryOrder &= !historyConfig.IsForceUpdateHistory;
                 if (!keepHistoryOrder || old is null) item["LastAccessTime"] = DateTime.Now;
                 item["MacPagePart"] = part;
                 item["MacIsSupportedWidePage"] = memento.IsSupportedWidePage;
                 // 原 KeepHistoryOrder：阅读位置仍更新，重放不改变访问排序或原数组位置。
-                if (!_suppressedHistoryPaths.Contains(book.Path) && (!keepHistoryOrder || old is null))
-                { if (old is not null) items.Remove(old); items.Insert(0, item); }
+                if (book.MementoControl.CanHistory(historyConfig) && (!_suppressedHistoryPaths.Contains(book.Path)
+                    || ReferenceEquals(book, _activeHistoryBook) && !book.MementoControl.IsHistoryRemoved))
+                {
+                    if (old is not null) { var oldIndex = items.IndexOf(old); items.Remove(old); items.Insert(keepHistoryOrder ? oldIndex : 0, item); }
+                    else items.Insert(0, item);
+                    historyEntry = true;
+                }
                 // LastBook 独立于可移除的历史记录，保留启动恢复所需的分割与宽图补值。
                 Object(config, "StartUp")["LastBookV2"] = new JsonObject { ["Path"] = book.Path, ["Page"] = memento.Page, ["Props"] = item["Props"]!.DeepClone(), ["MacPagePart"] = part, ["MacIsSupportedWidePage"] = memento.IsSupportedWidePage };
             }
@@ -463,6 +474,8 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
                 Config.Current.History.LimitSize = historyConfig.LimitSize;
                 Config.Current.History.LimitSpan = historyConfig.LimitSpan;
             }
+            if (clearLastBook) { _activeHistoryBook = null; _activeHistoryPath = null; }
+            if (historyEntry && book is not null) { book.MementoControl.CommitHistoryEntry(); _suppressedHistoryPaths.Remove(book.Path); }
             RefreshHistory();
         }
         // 文件事务失败时恢复同一权威内存状态；用户尚未保存的表单/Config 可继续重试。
@@ -515,7 +528,8 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
             var preparedHistory = _history.DeepClone().AsObject();
             if (_history["Items"] is JsonArray items)
                 preparedHistory["Items"] = CreateLimitedHistoryItems(items, historyConfig ?? Config.Current.History, sort: true);
-            await WriteTemporaryAsync(names[0], preparedHistory, token);
+            var saveHistory = (historyConfig ?? Config.Current.History).IsSaveHistory;
+            if (saveHistory) await WriteTemporaryAsync(names[0], preparedHistory, token);
             await WriteTemporaryAsync(names[1], _setting, token);
             // 在副本上准备书签文件，提交失败不能污染权威内存节点。
             var preparedBookmarks = _bookmarks.DeepClone().AsObject();
@@ -536,7 +550,8 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
             foreach (var name in names)
             {
                 var path = System.IO.Path.Combine(DirectoryPath, name);
-                File.Move(path + ".tmp", path, true);
+                if (name == "History.json" && !saveHistory) File.Delete(path);
+                else File.Move(path + ".tmp", path, true);
             }
             File.Delete(marker);
             _bookmarks = preparedBookmarks;

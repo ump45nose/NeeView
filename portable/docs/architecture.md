@@ -94,3 +94,5 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 第十八批见[p2-book-controls.md](p2-book-controls.md)。原锁定、五种页尾/下一书位置策略和可复用Unload归BookOperation；弹窗只回报选择，原循环页框/JSON保持。
 
 第十九批见[p2-bookshelf-bookmarks.md](p2-bookshelf-bookmarks.md)。原书架bookmark scheme、共享节点独立列表、每目录参数/元数据排序及StartUp列表恢复接通；无第二书签树/状态体系。
+
+第二十批接入原历史登记策略与可靠清理，继续使用唯一BookMementoControl/SaveData及四JSON事务；表现仅编辑草稿与转交命令，见[契约](p2-history-policy.md)。

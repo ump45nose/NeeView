@@ -1202,6 +1202,30 @@
       "target": "src/NeeView.MacOS/Views/MainWindow.BookshelfBookmarks.cs",
       "sha256": "5d094aa746f7ab1047c4a88cc73c4abf96f8c17bfa356ecc9caa74aa332d64e8",
       "status": "第十九批：原bookmark scheme/共享节点独立位置、每目录参数、元数据排序及启动列表快照；平台I/O异步化"
+    },
+    {
+      "source": "NeeView/BookHub/BookMementoControl.cs",
+      "target": "src/NeeView.Engine/BookHub/BookMementoControl.cs",
+      "sha256": "767441b5125d01b795bdaa14962afd3e5b39c01669ff2a1b1a349d9eba6ccfc2",
+      "status": "原主Page计数、登记阈值、删除/重新登记和计数绕过；JSON事务由SaveData执行，嵌套P5"
+    },
+    {
+      "source": "NeeView/BookHistory/BookHistoryCollection.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.History.cs",
+      "sha256": "addd035b3f7540da5b0851c2b79fbef2bbf880518c39bf553c75f654342fbece",
+      "status": "原整批无效检查后移除；增加晚到版本保护，不把权限/离线当缺失"
+    },
+    {
+      "source": "NeeView/Archiver/ArchiveEntryUtility.cs",
+      "target": "src/NeeView.Backends/Content/ArchiveFactory.History.cs",
+      "sha256": "01ae8c774e5c7512ca56b2d6075902fc57061aafe528360387bf01a1c973179b",
+      "status": "原来源存在检查的Mac替换，归档逻辑定位/挂载根/权限与未支持能力"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderList.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.HistoryPolicy.cs",
+      "sha256": "5854e9abf42991aa6117fb3f7c6516f6162f95dcd92f8f042960dc3b69452b90",
+      "status": "原ClearHistoryInPlace按当前集合真实目标精确删除，确认由宿主处理"
     }
   ],
   "rule_references": [

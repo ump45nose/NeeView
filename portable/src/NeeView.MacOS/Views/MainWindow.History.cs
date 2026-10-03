@@ -10,6 +10,34 @@ namespace NeeView.MacOS.Views;
 public sealed partial class MainWindow
 {
     private HistoryRow? _historyClickRow;
+    private CancellationTokenSource? _historyCleanupCancellation;
+    private Task<int>? _historyCleanupTask;
+    private bool _startupHistoryCleanupStarted;
+    /// <summary>原启动清理只运行一次；任务可观察、可取消，不抢系统焦点。</summary>
+    public async Task RunStartupHistoryCleanupAsync()
+    {
+        if (_startupHistoryCleanupStarted || _model is null || _preparing || _closedPrepared) return;
+        _startupHistoryCleanupStarted = true;
+        if (Config.Current.History.IsAutoCleanupEnabled) await CleanupHistoryAsync();
+    }
+    /// <summary>手动与自动共用来源检查；重复调用取消旧检查，关闭时等待取消完成。</summary>
+    public Task<int> CleanupHistoryAsync()
+    {
+        if (_model is null || _preparing || _closedPrepared) return Task.FromResult(0);
+        _historyCleanupCancellation?.Cancel(); var request = new CancellationTokenSource(); _historyCleanupCancellation = request;
+        return _historyCleanupTask = RunAsync();
+        async Task<int> RunAsync()
+        {
+            try
+            {
+                var count = await _model.Operation.RemoveUnlinkedHistoryAsync(request.Token);
+                if (!request.IsCancellationRequested) ShowError($"已移除 {count} 条无效历史记录。"); return count;
+            }
+            catch (OperationCanceledException) when (request.IsCancellationRequested) { return 0; }
+            catch (Exception ex) { if (!request.IsCancellationRequested) ShowError("历史清理失败，记录已保留：" + ex.Message); return 0; }
+            finally { if (ReferenceEquals(_historyCleanupCancellation, request)) _historyCleanupCancellation = null; request.Dispose(); }
+        }
+    }
     /// <summary>Enter确认历史查询，数字/Delete/Backspace仍属于文本作用域。</summary>
     private async void HistorySearch_KeyDown(object? sender, KeyEventArgs e)
     { if (e.Key == Key.Enter && e.KeyModifiers == KeyModifiers.None) { e.Handled = true; await SearchHistoryAsync(); } }
@@ -128,7 +156,7 @@ public sealed partial class MainWindow
         }
     }
 
-    /// <summary>转换原更多菜单；未迁入的显示样式与无效清理保留禁用入口。</summary>
+    /// <summary>转换原更多菜单；未迁显示样式保留禁用入口；无效清理使用同一可取消服务。</summary>
     private void History_More(object? sender, RoutedEventArgs e)
     {
         if (sender is not Button button || _model is null) return;
@@ -151,7 +179,8 @@ public sealed partial class MainWindow
         };
         menu.Items.Add(settings);
         menu.Items.Add(new Separator());
-        menu.Items.Add(new MenuItem { Header = "移除无效历史记录 · 尚未迁移", IsEnabled = false });
+        var cleanup = new MenuItem { Header = "移除无效历史记录", IsEnabled = !_preparing && !_closedPrepared };
+        cleanup.Click += async (_, _) => await CleanupHistoryAsync(); menu.Items.Add(cleanup);
         var clear = new MenuItem { Header = "清空全部历史记录…", IsEnabled = _model.SaveData.HistoryEntries.Count > 0 };
         clear.Click += async (_, _) =>
         {

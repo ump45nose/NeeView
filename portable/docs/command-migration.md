@@ -45,7 +45,7 @@
 | RenameBook | 重命名书籍 |  | 待 P2–P5 | NeeView/Command/Commands/RenameBookCommand.cs |
 | SelectArchiver | 选择归档程序 |  | 待 P2–P5 | NeeView/Command/Commands/SelectArchiverCommand.cs |
 | ClearHistory | 清理历史记录 |  | P2 原历史集合清空；具体范围见验收表 | NeeView/Command/Commands/ClearHistoryCommand.cs |
-| ClearHistoryInPlace | 删除当前位置的历史记录 |  | 待 P2–P5 | NeeView/Command/Commands/ClearHistoryInPlaceCommand.cs |
+| ClearHistoryInPlace | 删除当前位置的历史记录 |  | P2已接通，确认后按书架真实目标精确移除 | NeeView/Command/Commands/ClearHistoryInPlaceCommand.cs |
 | RemoveUnlinkedHistory | 删除无效的历史记录 |  | 待 P2–P5 | NeeView/Command/Commands/RemoveUnlinkedHistoryCommand.cs |
 | ToggleStretchMode | 切换拉伸 | LeftButton+WheelDown | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ToggleStretchModeCommand.cs |
 | ToggleStretchModeReverse | 切换拉伸 (反向) | LeftButton+WheelUp | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ToggleStretchModeReverseCommand.cs |

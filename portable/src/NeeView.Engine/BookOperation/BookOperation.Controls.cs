@@ -41,6 +41,7 @@ public sealed partial class BookOperation
         try
         {
             if (!IsCurrent()) return;
+            book.MementoControl.RequestSaveBookMemento(true); ScheduleSave();
             var action = Config.Current.Book.PageEndAction;
             var notify = action != PageEndAction.Dialog;
             if (action == PageEndAction.Dialog)

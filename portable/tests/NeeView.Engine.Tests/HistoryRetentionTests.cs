@@ -64,7 +64,7 @@ public sealed class HistoryRetentionTests
         if (expected > 0) Assert.Equal(99, history["Items"]![0]!["Future"]!.GetValue<int>());
         var settings = JsonNode.Parse(await ReadAsync(fixture, "UserSetting.json"))!["Config"]!["History"]!;
         Assert.Equal("2.00:00:00", settings["LimitSpan"]!.GetValue<string>()); Assert.Equal(17, settings["Future"]!.GetValue<int>());
-        Assert.True(settings["IsAutoCleanupEnabled"]!.GetValue<bool>()); // 未迁自动清理只保留，不执行来源探测。
+        Assert.True(settings["IsAutoCleanupEnabled"]!.GetValue<bool>()); // Engine加载保持只读；来源清理由窗口启动生命周期触发。
     }
 
     /// <summary>保存只限制副本；阅读导航/查找仍完整，其他事务同样遵循已提交上限。</summary>

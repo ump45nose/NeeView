@@ -74,7 +74,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                 : Config.Current.BookSettingPolicy.Mix(Config.Current.BookSettingDefault, Config.Current.BookSetting, restored.Memento?.ToBookSetting(), false);
             collection = new(source, archives, setting.IsRecursiveFolder);
             var pages = await BookSourceFactory.CreatePageCollectionAsync(collection, Config.Current.System.BookPageCollectMode, archives, opening.Token, saveData.FolderConfigs);
-            var book = new Book(source, pages, setting) { Entries = collection };
+            var book = new Book(source, pages, setting) { Entries = collection, IsNew = restored.Memento is null };
             book.SortSeed = restored.Memento?.SortSeed ?? 0; book.Sort(opening.Token);
             var explicitEntry = entryName ?? source.RequestedEntryName;
             var requested = explicitEntry ?? (ImageFormats.IsImage(path) ? System.IO.Path.GetFileName(path) : setting.Page);
@@ -97,7 +97,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                 await saveData.SaveAsync(Book, Position.Part, opening.Token, _keepHistoryOrder || keepHistoryOrder);
                 var old = Book;
                 // 与 Remove/Clear 串行提交：取消的打开不能解除抑制，新书提交后清空仍作用于新书。
-                if (!await saveData.BeginHistoryVisitAsync(book.Path, () =>
+                if (!await saveData.BeginHistoryVisitAsync(book, () =>
                 {
                     opening.Token.ThrowIfCancellationRequested();
                     if (_disposed || _closing || generation != _generation || IsBookLocked && Book is { } commitLocked && commitLocked.Path != book.Path || expectedPlaylist is not null && !ReferenceEquals(expectedPlaylist, _playlistHub?.Current)) return false;
@@ -344,7 +344,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         try
         {
             if (_disposed || _closing || Book is null || IsLoading) return;
-            var current = Book.CurrentPage; change(Book.Setting); Book.Sort(CancellationToken.None);
+            var current = Book.CurrentPage; change(Book.Setting); Book.MementoControl.RequestSaveBookMemento(true); Book.Sort(CancellationToken.None);
             Position = new(current?.Index ?? 0, Position.Part); RebuildFrame(1); RecordPageHistory(); ScheduleSave(); Notify();
         }
         finally { _gate.Release(); }
@@ -381,9 +381,13 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             var validStretchMode = Config.Current.View.ValidStretchMode;
             var commands = saveData.CaptureCommandSettings();
             var reading = Book?.Setting is { } setting ? (BookSettingConfig)setting.Clone() : null;
+            var pageCountEnabled = Book?.MementoControl.IsPageChangeCountEnabled;
             try
             {
-                apply(); await SaveAsync(historyLimits);
+                apply();
+                if (reading is not null && Book is { } edited && System.Text.Json.JsonSerializer.Serialize(reading) != System.Text.Json.JsonSerializer.Serialize(edited.Setting))
+                    edited.MementoControl.RequestSaveBookMemento(true);
+                await SaveAsync(historyLimits);
             }
             catch
             {
@@ -391,6 +395,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                 foreach (var branch in typeof(Config).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance).Where(p => p.PropertyType.IsClass && p.CanWrite))
                     CopySettingFields(branch.GetValue(snapshot)!, branch.GetValue(Config.Current)!);
                 saveData.RestoreCommandSettings(commands);
+                if (pageCountEnabled is { } enabled && Book is { } retained) retained.MementoControl.IsPageChangeCountEnabled = enabled;
                 Config.Current.View.RestoreStretchMode(snapshot.View.StretchMode, validStretchMode);
                 if (reading is not null && Book is { } book) { CopySettingFields(reading, book.Setting); book.Setting.Page = reading.Page; }
                 throw;
@@ -426,7 +431,10 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         if (!(Context.PageMode == PageMode.SinglePage && Context.IsSupportedDividePage && Maths.AspectRatioTools.IsLandscape(page.Content.PageDataSource.Size))) Position = new(page.Index, direction > 0 ? 0 : 1);
         Frame = new PageFrameFactory(Context, new BookContext(Book.Pages), new ContentSizeCalculator(Context)).CreatePageFrame(Position, direction);
         // 原 BookContext.SelectedRange.CollectPositions 按索引升序；主图片不随视觉左右或反向生成改变。
+        var oldPage = Book.CurrentPage;
         Book.CurrentPage = Frame?.Elements.Where(e => !e.IsDummy).Select(e => e.Page).MinBy(page => page.Index);
+        // 原SetStartPage发生在登记控制订阅前；首帧不算一次浏览操作。
+        if (oldPage is not null && !ReferenceEquals(oldPage, Book.CurrentPage)) Book.MementoControl.OnTopPageChanged();
         if (synchronizeSelection) PageSelector.Synchronize(Book, Math.Max(0, Frame?.FrameRange.Min.Index ?? 0));
     }
     /// <summary>只探测当前及生成双页所需邻页，损坏页保留占位。</summary>
@@ -483,6 +491,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             if (_playlistHub is not null) await _playlistHub.FlushAsync();
             if (_restoreBookshelf is not null) await _restoreBookshelf;
             SaveLastBookshelf();
+            if (Book is { } closingBook) closingBook.MementoControl.IsPageChangeCountEnabled = false;
             await SaveAsync();
             if (Book is not null) await Book.DisposeAsync();
             _bookshelf?.Dispose(); HistoryList.Dispose();

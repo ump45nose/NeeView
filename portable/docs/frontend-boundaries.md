@@ -59,3 +59,5 @@
 第十八批MainWindow.BookControls只呈现原页尾三按钮，BookOperation在回报后核对身份/代次/位置；关闭释放回调，设置页不承担页尾规则。
 
 第十九批MainWindow.BookshelfBookmarks只负责焦点/树选择/面板转交；虚拟位置和每目录排序在原BookshelfFolderList/BookmarkFolderList，元数据通过Engine后端契约。两个列表选择独立，主题不参与地址解析或保存。
+
+第二十批接入原历史登记策略与可靠清理，继续使用唯一BookMementoControl/SaveData及四JSON事务；表现仅编辑草稿与转交命令，见[契约](p2-history-policy.md)。

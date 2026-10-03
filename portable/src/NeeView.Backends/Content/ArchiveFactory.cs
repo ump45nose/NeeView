@@ -4,7 +4,7 @@ using NeeView;
 namespace NeeView.Backends;
 
 /// <summary>原 Archive 工厂的 Mac 实现，目录、ZIP、RAR 与 7z 共用原来源关系。</summary>
-public sealed class ArchiveFactory : IArchiveFactory
+public sealed partial class ArchiveFactory : IArchiveFactory
 {
     /// <summary>应用独占的解压临时根；启动装配将此目录交给历史保存排除，非系统临时根。</summary>
     public static string TemporaryDirectory => System.IO.Path.Combine(System.IO.Path.GetTempPath(), "NeeView.Mac");

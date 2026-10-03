@@ -4,6 +4,9 @@ namespace NeeView;
 /// <summary>原 Book 的 P1 适配：来源、页面、当前页和设置；媒体/标记在后续阶段迁入。</summary>
 public sealed class Book(Archive source, List<Page> pages, BookSettingConfig setting) : IAsyncDisposable
 {
+    public bool IsNew { get; init; } = true;
+    private BookMementoControl? _mementoControl;
+    public BookMementoControl MementoControl => _mementoControl ??= new(this);
     public Archive Source { get; } = source;
     public BookAddress BookAddress { get; } = BookAddress.Create(source);
     public ArchiveEntryCollection? Entries { get; init; }

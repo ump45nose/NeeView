@@ -101,6 +101,8 @@
       <!-- 原历史设置区域；候选与草稿由独立表现模型持有，限制算法在Engine。 -->
       <StackPanel Margin="24" Spacing="14">
         <TextBlock Text="历史记录" FontSize="20" />
+        <CheckBox x:Name="SaveHistory" Content="保存历史记录文件" IsChecked="{Binding IsSaveHistory, Mode=TwoWay}" />
+        <TextBlock Text="关闭后删除历史文件；本次运行仍可导航，最后打开书籍和书签独立保存。" TextWrapping="Wrap" />
         <TextBlock Text="保存限制" FontSize="16" />
         <TextBlock Text="设置保存在文件中的历史记录上限。应用程序运行期间的历史记录不受限制。" TextWrapping="Wrap" />
         <TextBlock Text="数量限制" />
@@ -113,8 +115,11 @@
         </ComboBox>
         <TextBlock Text="数量为 0 时不保存访问条目。书签、搜索历史与最后阅读位置独立保留；下次启动按限制载入。" TextWrapping="Wrap" />
         <TextBlock Text="登记与清理" FontSize="16" Margin="0,8,0,0" />
-        <TextBlock Text="按浏览页数 / 播放时间登记 · 尚未迁移" Opacity="0.5" />
-        <TextBlock Text="启动时自动移除无效历史 · 尚未迁移" Opacity="0.5" />
+        <TextBlock Text="新书主页面切换次数（0 表示立即登记；已登记书籍一次切换即可更新）" TextWrapping="Wrap" />
+        <NumericUpDown x:Name="HistoryEntryPageCount" Minimum="-2147483648" Maximum="2147483647" Increment="1" FormatString="0" Value="{Binding HistoryEntryPageCount, Mode=TwoWay}" />
+        <CheckBox x:Name="ForceUpdateHistory" Content="从历史打开也更新访问日期" IsChecked="{Binding IsForceUpdateHistory, Mode=TwoWay}" />
+        <CheckBox x:Name="AutoCleanupHistory" Content="启动时自动移除确定不存在的记录" IsChecked="{Binding IsAutoCleanupEnabled, Mode=TwoWay}" />
+        <TextBlock Text="权限不足、离线卷和检查失败时保留整批记录。播放时间登记随视频后端迁移。" TextWrapping="Wrap" />
         <TextBlock Text="最近打开书籍数量 · 尚未迁移" Opacity="0.5" />
         <TextBlock Text="保存页面浏览记录 · 尚未迁移" Opacity="0.5" />
       </StackPanel>

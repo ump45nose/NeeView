@@ -68,20 +68,21 @@ public sealed class HistoryListTests
         File.Copy(fixture.Zip, missing); await operation.MoveHistoryListAsync(-1); Assert.Equal(missing, operation.Book!.Path); Assert.Null(operation.Error);
     }
 
-    /// <summary>多选移除只改记录；当前项在翻页/退出保存中不复活，重新显式打开才登记。</summary>
+    /// <summary>多选移除只改记录；同页保存保持删除抑制，真实翻页后按原规则重新登记。</summary>
     [Fact]
-    public async Task RemovingCurrentHistorySurvivesSaveAndExplicitReopen()
+    public async Task RemovingCurrentHistorySurvivesSamePageSaveAndResumesOnPageChange()
     {
         using var fixture = new Fixture(); await SeedAsync(fixture, fixture.Images, fixture.Zip);
         var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
         await using var operation = fixture.Operation(state); await operation.OpenHistoryAsync(fixture.Images);
         await state.RegisterBookmarkAsync(operation.Book!, token: TestContext.Current.CancellationToken);
         Assert.Equal(1, await state.RemoveHistoryAsync([fixture.Images, fixture.Images, "/absent"], TestContext.Current.CancellationToken));
-        await operation.JumpAsync(3); await operation.SaveAsync(); Assert.Single(state.HistoryEntries); Assert.True(state.IsBookmark(fixture.Images));
+        await operation.SaveAsync(); Assert.Single(state.HistoryEntries); Assert.True(state.IsBookmark(fixture.Images));
         Assert.True(File.Exists(Path.Combine(fixture.Images, "004.png")));
         var saved = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "History.json"), TestContext.Current.CancellationToken))!;
         Assert.Equal("preserve", saved["UnknownRoot"]!.GetValue<string>()); Assert.Equal("search", saved["BookHistorySearchHistory"]![0]!.GetValue<string>());
         Assert.Equal(99, saved["Items"]![0]!["Future"]!.GetValue<int>());
+        await operation.JumpAsync(3); await operation.SaveAsync(); Assert.Equal(2, state.HistoryEntries.Count);
         await operation.OpenAsync(fixture.Images, TestContext.Current.CancellationToken); await operation.SaveAsync(); Assert.Equal(2, state.HistoryEntries.Count);
         await operation.DisposeAsync(); var fresh = new SaveData(fixture.State); await fresh.LoadAsync(TestContext.Current.CancellationToken); Assert.Equal(2, fresh.HistoryEntries.Count);
     }
@@ -139,7 +140,8 @@ public sealed class HistoryListTests
             Assert.Equal(PageMode.SinglePage, operation.Book.Setting.PageMode); Assert.Equal(PageReadOrder.LeftToRight, operation.Book.Setting.BookReadOrder);
             Assert.False(operation.Book.Setting.IsSupportedWidePage);
             await operation.SaveAsync(); await state.RemoveHistoryAsync([fixture.Images], TestContext.Current.CancellationToken);
-            await operation.JumpAsync(4); await operation.SaveAsync(); Assert.Empty(state.HistoryEntries);
+            await operation.JumpAsync(4); await operation.SaveAsync(); await state.RemoveHistoryAsync([fixture.Images], TestContext.Current.CancellationToken);
+            await operation.SaveAsync(); Assert.Empty(state.HistoryEntries);
             var fresh = new SaveData(fixture.State); await fresh.LoadAsync(TestContext.Current.CancellationToken);
             Assert.Equal("005.png", fresh.GetLastBook().Memento!.Page); Assert.False(fresh.GetLastBook().Memento!.IsSupportedWidePage);
             await using var restarted = fixture.Operation(fresh); await restarted.RestoreLastAsync(TestContext.Current.CancellationToken);
@@ -165,7 +167,7 @@ public sealed class HistoryListTests
             var more = window.FindControl<Button>("HistoryMoreButton")!; more.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             var menu = more.ContextMenu!; var items = menu.Items.OfType<MenuItem>().ToArray();
             // 能力入口可渐进增加；验证原占位和真实动作，而非把项目总数当作功能契约。
-            Assert.All(items.Take(4), item => Assert.False(item.IsEnabled)); Assert.False(items.Single(item => item.Header?.ToString()?.StartsWith("移除无效历史记录") == true).IsEnabled);
+            Assert.All(items.Take(4), item => Assert.False(item.IsEnabled)); Assert.True(items.Single(item => item.Header?.ToString()?.StartsWith("移除无效历史记录") == true).IsEnabled);
             Assert.Contains(items, item => Equals(item.Header, "历史记录设置…") && item.IsEnabled);
             items.Single(item => Equals(item.Header, "按日期分组")).RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)); Dispatcher.UIThread.RunJobs(); menu.Close();
             Assert.True(Config.Current.History.IsGroupBy); Assert.Equal(0, refreshes); Assert.True(model.History[0].HasGroupHeader);

@@ -1,9 +1,15 @@
 // Copyright (c) NeeLaboratory. 来自原 HistoryConfig 的列表分支，其他字段保留在 JSON。
 namespace NeeView;
 
-/// <summary>原历史面板、搜索及文件保留策略；显示模板和自动无效清理尚未迁入。</summary>
+/// <summary>原历史面板、搜索及文件保留策略；登记、清理与文件保留策略。</summary>
 public sealed class HistoryConfig
 {
+    public bool IsSaveHistory { get; set; } = true;
+    public bool IsForceUpdateHistory { get; set; }
+    public int HistoryEntryPageCount { get; set; }
+    public bool IsInnerArchiveHistoryEnabled { get; set; } = true;
+    public bool IsUncHistoryEnabled { get; set; } = true;
+    public bool IsAutoCleanupEnabled { get; set; }
     private int _limitSize = -1;
     private TimeSpan _limitSpan;
     /// <summary>原保存数量限制；-1无限，0不保存访问条目，运行中集合不受限。</summary>

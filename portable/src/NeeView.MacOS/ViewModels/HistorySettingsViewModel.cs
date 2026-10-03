@@ -5,6 +5,10 @@ namespace NeeView.MacOS.ViewModels;
 /// <summary>历史限制的独立编辑副本；不执行裁剪、访问来源或写入配置。</summary>
 public sealed class HistorySettingsViewModel
 {
+    public bool IsSaveHistory { get; set; }
+    public bool IsForceUpdateHistory { get; set; }
+    public bool IsAutoCleanupEnabled { get; set; }
+    public int HistoryEntryPageCount { get; set; }
     public IReadOnlyList<HistoryLimitChoice<int>> SizeChoices { get; }
     public IReadOnlyList<HistoryLimitChoice<TimeSpan>> SpanChoices { get; }
     public HistoryLimitChoice<int> SelectedSize { get; set; }
@@ -14,6 +18,8 @@ public sealed class HistorySettingsViewModel
     /// <param name="config">已提交的原历史配置；表单编辑不会修改此对象。</param>
     public HistorySettingsViewModel(HistoryConfig config)
     {
+        IsSaveHistory = config.IsSaveHistory; IsForceUpdateHistory = config.IsForceUpdateHistory;
+        IsAutoCleanupEnabled = config.IsAutoCleanupEnabled; HistoryEntryPageCount = config.HistoryEntryPageCount;
         var sizes = new[] { 0, 1, 10, 20, 50, 100, 200, 500, 1000, -1 }.ToList();
         if (!sizes.Contains(config.LimitSize)) sizes.Add(config.LimitSize);
         SizeChoices = sizes.Select(value => new HistoryLimitChoice<int>(value, value == -1 ? "无限制" : value.ToString())).ToArray();
@@ -23,6 +29,13 @@ public sealed class HistorySettingsViewModel
             : value.Ticks % TimeSpan.TicksPerDay == 0 ? $"{value.TotalDays:0} 天" : value.ToString())).ToArray();
         SelectedSize = SizeChoices.Single(choice => choice.Value == config.LimitSize);
         SelectedSpan = SpanChoices.Single(choice => choice.Value == config.LimitSpan);
+    }
+
+    /// <summary>仅在Engine设置事务内部应用草稿；失败由原Config快照恢复，不执行来源访问。</summary>
+    public void ApplyPolicy(HistoryConfig config)
+    {
+        config.IsSaveHistory = IsSaveHistory; config.IsForceUpdateHistory = IsForceUpdateHistory;
+        config.IsAutoCleanupEnabled = IsAutoCleanupEnabled; config.HistoryEntryPageCount = HistoryEntryPageCount;
     }
 
     /// <summary>将选择转成保存候选，实际归一、限制和事务由Engine执行。</summary>

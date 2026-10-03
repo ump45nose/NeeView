@@ -47,7 +47,7 @@ public sealed partial class MainWindow : Window
         "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
-        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkList", "FocusBookmarkSearchBox", "ClearHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
+        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkList", "FocusBookmarkSearchBox", "ClearHistory", "ClearHistoryInPlace", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
     };
     /// <summary>由启动层接入原生事件；只消费主查看器区域，其余控件使用框架输入。</summary>
     public void AttachPlatformInput(IPlatformInput input)
@@ -105,6 +105,7 @@ public sealed partial class MainWindow : Window
         history.AddHandler(PointerReleasedEvent, History_Released, RoutingStrategies.Bubble, handledEventsToo: true);
         this.FindControl<TextBox>("HistorySearchBox")!.AddHandler(KeyDownEvent, HistorySearch_KeyDown, RoutingStrategies.Tunnel);
         Closing += Window_Closing;
+        Opened += async (_, _) => await RunStartupHistoryCleanupAsync();
     }
     /// <summary>由唯一启动层传入已经装配的契约，不在控件中创建解码或存储实现。</summary>
     public void Bind(ReaderWorkspaceViewModel model, BitmapFactory images, IPlatformService platform)
@@ -388,6 +389,9 @@ public sealed partial class MainWindow : Window
                 case "LoadRecentBook":
                     var recent = _model.SaveData.HistoryEntries.FirstOrDefault(e => e.Path != _model.Operation.Book?.Path);
                     if (recent is not null) await OpenAsync(recent.Path); break;
+                case "ClearHistoryInPlace":
+                    if (await ConfirmAsync("清理当前位置历史", "移除当前书架列表真实目标的历史记录？不会删除文件或书签。", "移除") && !_preparing && !_closedPrepared)
+                        await _model.Operation.ClearHistoryInPlaceAsync(); break;
                 case "ClearHistory": if (!_model.Operation.IsLoading) await _model.SaveData.ClearHistoryAsync(); break;
                 case "FocusHistorySearchBox":
                     Config.Current.History.IsVisibleSearchBox = true; _model.RefreshHistory(); _model.ShowPanel("HistoryPanel");
@@ -790,6 +794,8 @@ public sealed partial class MainWindow : Window
         _pageEndDialog?.Close(PageEndAction.None);
         try
         {
+            _historyCleanupCancellation?.Cancel();
+            if (_historyCleanupTask is not null) await _historyCleanupTask;
             await this.FindControl<PlaylistView>("PlaylistPanelView")!.PrepareCloseAsync();
             await this.FindControl<BookmarkListView>("BookmarkPanelList")!.PrepareCloseAsync();
             if (_model is not null) await _model.HistorySearch.PrepareCloseAsync();
