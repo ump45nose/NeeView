@@ -255,3 +255,12 @@ P2继续四模板、浮动宿主和动画；Windows/真机/NAS/完整性能分�
 - 已离线检查Content、Banner和万条目网格，独立前缀不覆盖旧证据；未启动正式应用、未操作用户数据，见[静默记录](p2-list-templates-runtime.md)。原Windows及用户.DS_Store保持。
 
 P2继续浮动宿主、动画/手势反馈与资源性能收尾；Windows动态、真实设备/NAS和完整显示性能分别待验。本增量自动本地提交后继续，不推送发布。
+
+## P2 第二十二批：原侧栏浮动宿主
+
+- 原StandAlone/Open/OpenWindow/OpenDock/Close及Windows.Panels/WindowPlacement迁入。唯一面板内容浮动/停靠/关闭重开/跨窗拖回，位置和选择独立；非模态宿主与对话框区分。
+- 主关闭先保存位置、冻结浮窗；失败恢复同一宿主/资源，成功后释放但保留打开集合供重启。原JSON未知数据保持；真实捕获/Retina/多屏独立待验。
+- 新增7项，最终全量 **335通过、0失败、0跳过**；Engine、正式Library、ARM64.app和本地ad-hoc严格签名五步通过，见[p2-floating-validation.json](p2-floating-validation.json)。正式XAML生成字段命名冲突修正后完整重跑，默认输出串行。
+- 已离线查看导航器浮窗；未启动正式应用或操作用户数据，见[静默记录](p2-floating-runtime.md)。旧Windows、验收图及用户.DS_Store保持。
+
+P2继续动画/手势及资源性能收尾；Windows/真机/NAS与完整显示性能分别待验。本增量自动本地提交后继续，不推送发布。

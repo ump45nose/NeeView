@@ -126,7 +126,7 @@ public sealed class AutoHidePresenter : IDisposable
         if (focused is not null && TopLevel.GetTopLevel(focused) == _window) _logicalFocus = focused;
         var config = Config.Current.AutoHide;
         var popups = _window.OpenedPopups.Select(p => p.PlacementTarget).OfType<Control>().ToArray();
-        bool dialog = _window.OwnedWindows.Any(w => w.IsVisible);
+        bool dialog = WindowInteraction.HasDialog(_window);
         Control[] regions = [_menu, _left, _right, _status, _film];
         bool[] shown = new bool[5];
         for (int i = 0; i < shown.Length; i++)

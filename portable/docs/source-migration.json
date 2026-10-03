@@ -1238,6 +1238,30 @@
       "target": "src/NeeView.Engine/Config/PanelListItemProfile.cs",
       "sha256": "125f31855e97be45b802244dd166795e4f1924fbe0cd994c1e3b36ba49b98fb6",
       "status": "保留四默认Profile/形状/开关及差分字段，字体测量/裁剪归Mac表现"
+    },
+    {
+      "source": "NeeView/NeeView/Runtime/LayoutPanel/LayoutPanelWindowManager.cs",
+      "target": "src/NeeView.Engine/SidePanels/LayoutPanelManager.cs",
+      "sha256": "7e1d79e2b4b6bed26c00b36c6ff0d23e5d99ea1e07683da4e39e7e5a8da8b8f3",
+      "status": "原Windows.Panels打开集合、浮动/关闭/停靠和位置状态迁入；窗口控件与集合同步留在表现端"
+    },
+    {
+      "source": "NeeView/NeeView/Runtime/LayoutPanel/LayoutPanelWindow.cs",
+      "target": "src/NeeView.MacOS/Views/FloatingPanelWindow.axaml.cs",
+      "sha256": "bd620eb31bede7c007397ee5ce5b23adb1f1ffee8b17b7cbc44bc01ebaec478a",
+      "status": "单面板Owner浮窗、位置快照及右键停靠/关闭转换为Avalonia，复用唯一内容控件"
+    },
+    {
+      "source": "NeeView/NeeView/Windows/WindowPlacement.cs",
+      "target": "src/NeeView.Engine/SidePanels/WindowPlacement.cs",
+      "sha256": "f38cd6726efe267f7af1e07177e06c97b3a8299175179fe86d48bbb75d1b66b5",
+      "status": "原五段物理像素位置和字符串JSON；去除WPF状态映射，未知字符串保留"
+    },
+    {
+      "source": "NeeView/NeeView/Windows/WindowStateEx.cs",
+      "target": "src/NeeView.Engine/SidePanels/WindowPlacement.cs",
+      "sha256": "849f6fac27b8310886e1e91d39478971a44aa3a77a17ebccba793baed396b80b",
+      "status": "原枚举值保持；Windows FullDesktop保留数据，不作为Mac浮窗恢复状态"
     }
   ],
   "rule_references": [

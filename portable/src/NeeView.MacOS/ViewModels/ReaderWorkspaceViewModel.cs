@@ -84,7 +84,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public bool ShowNavigator => IsPanelVisible("NavigatePanel");
     public bool ShowPlaylist => IsPanelVisible("PlaylistPanel");
     /// <summary>跨栏后按实际组选择与栏显隐计算面板状态。</summary>
-    public bool IsPanelVisible(string name) => Layout.Find(name) is { } found && ReferenceEquals(Layout.Docks[found.Side].SelectedItem, found.Group) && (found.Side == "Left" ? LeftVisible : RightVisible);
+    public bool IsPanelVisible(string name) => Layout.Windows.Contains(name) || Layout.Find(name) is { } found && ReferenceEquals(Layout.Docks[found.Side].SelectedItem, found.Group) && (found.Side == "Left" ? LeftVisible : RightVisible);
     public HistorySearchViewModel HistorySearch { get; } = new(saveData, operation.HistoryList) { ReadMetadataAsync = operation.GetFileMetadataAsync };
     private bool _historySearchAttached;
     private IReadOnlyList<HistoryRow> _historyRows = [];
@@ -186,6 +186,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     /// <summary>焦点命令明确显示所需面板，不使用切换语义把已打开面板关闭。</summary>
     public void ShowPanel(string name)
     {
+        if (Layout.IsFloating(name)) { Layout.Open(name); return; }
         if (Layout.Find(name) is not { } found) return;
         if (found.Side == "Left") Config.Current.Panels.IsLeftVisible = true; else Config.Current.Panels.IsRightVisible = true;
         Layout.Docks[found.Side].SelectedItem = found.Group;
@@ -194,6 +195,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     /// <summary>切换已支持侧栏页面或显隐，业务阅读位置不变。</summary>
     public void SelectPanel(string name)
     {
+        if (Layout.IsFloating(name)) { if (Layout.Windows.Contains(name)) Layout.Close(name); else Layout.Open(name); return; }
         if (Layout.Find(name) is not { } found) return;
         var dock = Layout.Docks[found.Side];
         bool selected = ReferenceEquals(dock.SelectedItem, found.Group);

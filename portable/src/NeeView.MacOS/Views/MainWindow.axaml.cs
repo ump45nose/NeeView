@@ -57,7 +57,7 @@ public sealed partial class MainWindow : Window
     /// <summary>真实精确滚动连续平移，捏合围绕当前指针缩放，不使用增量大小猜设备。</summary>
     public bool HandlePlatformGesture(PlatformGesture gesture)
     {
-        if (_preparing || !IsActive || OwnedWindows.Any(w => w.IsVisible) || _model?.Operation.Book is null) return false;
+        if (_preparing || !IsActive || WindowInteraction.HasDialog(this) || _model?.Operation.Book is null) return false;
         if (gesture.SourceWindow != (TryGetPlatformHandle()?.Handle ?? 0)) return false;
         var point = Viewer.TranslatePoint(new Point(0, 0), this);
         if (point is null) return false;
@@ -144,6 +144,7 @@ public sealed partial class MainWindow : Window
         _leftWidth = model.LeftWidth; _rightWidth = model.RightWidth; UpdatePanelColumns(); model.Attach();
         FilmStrip.Attach(model.Operation, images); NavigatorView.Attach(model.Operation, images);
         _sidePanels = new(this, model);
+        _sidePanels.FloatingKeyDown += Key_Down;
         FilmStrip.PageRequested += async (_, index) => { try { await model.Operation.JumpAsync(index); } catch (Exception ex) { ShowError(ex.Message); } };
         FilmStrip.FrameMoveRequested += async (_, direction) => { try { await model.Operation.MoveAsync(direction); } catch (Exception ex) { ShowError(ex.Message); } };
         FilmStrip.GlobalWheelRequested += FilmStrip_GlobalWheel;
@@ -637,15 +638,17 @@ public sealed partial class MainWindow : Window
         // 原 PreviewKeyDown 先 LeaveVisibleLocked，避免委托注册顺序让新锁被同一按键清除。
         _autoHide?.HandleKey(e.Source as Control);
         if (e.Handled || _model is null) return;
+        var inputWindow = sender as Window ?? this;
+        var focusedElement = inputWindow.FocusManager?.GetFocusedElement();
         if (e.Key == Key.Escape && _sidePanels?.CancelDrag() == true) { e.Handled = true; return; }
         if (e.KeyModifiers == KeyModifiers.Meta && e.Key is Key.O or Key.W or Key.Q)
-        { e.Handled = true; await ExecuteAsync(e.Key == Key.O ? "LoadAs" : e.Key == Key.W ? "CloseWindow" : "CloseApplication"); return; }
-        if (FocusManager?.GetFocusedElement() is TextBox) return;
+        { e.Handled = true; if (e.Key == Key.W && inputWindow is FloatingPanelWindow) inputWindow.Close(); else await ExecuteAsync(e.Key == Key.O ? "LoadAs" : e.Key == Key.W ? "CloseWindow" : "CloseApplication"); return; }
+        if (focusedElement is TextBox) return;
         // 弹出菜单拥有方向键，不能让原阅读快捷键抢走菜单导航/选择。
-        if (this.FindControl<Menu>("MenuBar")!.IsOpen || FocusManager?.GetFocusedElement() is MenuItem) return;
-        if (FocusManager?.GetFocusedElement() is ComboBox && e.KeyModifiers == KeyModifiers.None && e.Key is Key.Up or Key.Down or Key.Left or Key.Right or Key.Enter or Key.Space) return;
+        if (this.FindControl<Menu>("MenuBar")!.IsOpen || focusedElement is MenuItem) return;
+        if (focusedElement is ComboBox && e.KeyModifiers == KeyModifiers.None && e.Key is Key.Up or Key.Down or Key.Left or Key.Right or Key.Enter or Key.Space) return;
         // 普通列表拥有方向/定位键；选条目不能触发全局 Up/Down 书籍导航。
-        if (FocusManager?.GetFocusedElement() is Control focused && (focused is ListBox or TreeView || focused.GetVisualAncestors().Any(x => x is ListBox or TreeView)))
+        if (focusedElement is Control focused && (focused is ListBox or TreeView || focused.GetVisualAncestors().Any(x => x is ListBox or TreeView)))
         {
             var bookmarkList = this.FindControl<BookmarkListView>("BookmarkPanelList")!;
             if (bookmarkList.IsKeyboardFocusWithin && e.KeyModifiers == KeyModifiers.None && e.Key is Key.Enter or Key.Back) return;
@@ -668,10 +671,10 @@ public sealed partial class MainWindow : Window
             }
             if (e.KeyModifiers == KeyModifiers.None && e.Key is Key.Up or Key.Down or Key.Left or Key.Right or Key.Home or Key.End or Key.PageUp or Key.PageDown) return;
         }
-        if (FocusManager?.GetFocusedElement() == FilmStrip && FilmStrip.HandleSelectionKey(e)) return;
-        if (FocusManager?.GetFocusedElement() == this.FindControl<Slider>("PageSliderView") && e.KeyModifiers == KeyModifiers.None && e.Key == Key.Enter)
+        if (focusedElement == FilmStrip && FilmStrip.HandleSelectionKey(e)) return;
+        if (focusedElement == this.FindControl<Slider>("PageSliderView") && e.KeyModifiers == KeyModifiers.None && e.Key == Key.Enter)
         { e.Handled = true; await CommitSliderAsync(); return; }
-        if (FocusManager?.GetFocusedElement() == this.FindControl<Slider>("PageSliderView") && e.KeyModifiers == KeyModifiers.None && e.Key is Key.Left or Key.Right or Key.Up or Key.Down) return;
+        if (focusedElement == this.FindControl<Slider>("PageSliderView") && e.KeyModifiers == KeyModifiers.None && e.Key is Key.Left or Key.Right or Key.Up or Key.Down) return;
         var matches = _model.Commands.Definitions.Where(d => _model.SaveData.GetShortcut(d.Name, d.Shortcut).Split(',').Any(s => MatchKey(s, e))).ToArray();
         if (matches.Length == 0) return; e.Handled = true;
         if (matches.Length > 1) { ShowError("快捷键冲突：" + string.Join("、", matches.Select(d => d.Text))); return; }
@@ -793,6 +796,7 @@ public sealed partial class MainWindow : Window
     {
         await Task.Yield();
         _preparing = true;
+        _sidePanels?.PrepareClose();
         _pageEndDialog?.Close(PageEndAction.None);
         try
         {
@@ -824,7 +828,7 @@ public sealed partial class MainWindow : Window
         }
         finally
         {
-            if (!_closedPrepared) { this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); this.FindControl<BookmarkListView>("BookmarkPanelList")!.CancelClose(); _model?.HistorySearch.CancelClose(); }
+            if (!_closedPrepared) { _sidePanels?.CancelClose(); this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); this.FindControl<BookmarkListView>("BookmarkPanelList")!.CancelClose(); _model?.HistorySearch.CancelClose(); }
             _preparing = false; _shutdown = null;
         }
     }

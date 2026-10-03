@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using NeeView.Windows;
 namespace NeeView.Runtime.LayoutPanel;
 
 public enum PanelOrientation { Horizontal, Vertical }
@@ -12,6 +13,7 @@ public sealed class LayoutPanel(string key)
 {
     public string Key { get; } = key;
     public double Weight { get; set; } = 1;
+    public WindowPlacement WindowPlacement { get; set; } = WindowPlacement.None;
 }
 
 /// <summary>原面板组：第一项为侧栏图标，组内共享排列方向。</summary>
@@ -34,6 +36,9 @@ public sealed class LayoutPanelManager
     public static readonly string[] RightDefaults = ["FileInformationPanel", "NavigatePanel", "ImageEffectPanel", "BookmarkPanel", "PlaylistPanel", "DestinationFolderPanel"];
     public Dictionary<string, LayoutPanel> Panels { get; } = LeftDefaults.Concat(RightDefaults).ToDictionary(k => k, k => new LayoutPanel(k));
     public Dictionary<string, LayoutDockPanelContent> Docks { get; } = new() { ["Left"] = new(), ["Right"] = new() };
+    /// <summary>当前打开的浮动面板键；位置独立保存，关闭后仍可重新浮动。</summary>
+    public IReadOnlyCollection<string> Windows => _windows;
+    private readonly HashSet<string> _windows = new(StringComparer.Ordinal);
     private readonly LayoutPanelManagerMemento _original;
     public event EventHandler? Changed;
 
@@ -56,16 +61,21 @@ public sealed class LayoutPanelManager
             // 完整旧布局可能把默认栏成员移到另一栏；在读取两边后统一补缺项。
             if (saved is null && _original.Docks is null)
                 foreach (var key in defaults.Where(seen.Add)) dock.Items.Add(new() { Panels[key] });
-            dock.SelectedItem = dock.Items.FirstOrDefault(g => g.Any(p => p.Key == saved?.SelectedItem)) ?? dock.Items.FirstOrDefault();
+            dock.SelectedItem = saved is not null && saved.SelectedItem is null ? null :
+                dock.Items.FirstOrDefault(g => g.Any(p => p.Key == saved?.SelectedItem)) ?? dock.Items.FirstOrDefault();
         }
         foreach (var key in Panels.Keys.Where(k => !seen.Contains(k)))
             Docks[LeftDefaults.Contains(key) ? "Left" : "Right"].Items.Add(new() { Panels[key] });
+        foreach (var (side, dock) in Docks)
+            if (_original.Docks?.GetValueOrDefault(side) is null) dock.SelectedItem ??= dock.Items.FirstOrDefault();
         foreach (var (key, panel) in Panels)
         {
             var length = _original.Panels?.GetValueOrDefault(key)?.GridLength;
             if (length?.EndsWith('*') == true && double.TryParse(length[..^1], NumberStyles.Float, CultureInfo.InvariantCulture, out var weight) && double.IsFinite(weight) && weight > 0) panel.Weight = weight;
+            panel.WindowPlacement = _original.Panels?.GetValueOrDefault(key)?.WindowPlacement ?? WindowPlacement.None;
         }
-        foreach (var dock in Docks.Values) dock.SelectedItem ??= dock.Items.FirstOrDefault();
+        foreach (var key in (_original.Windows?.Panels ?? []).Where(Panels.ContainsKey).Distinct().ToArray())
+        { StandAlone(key); CloseDock(key); _windows.Add(key); }
     }
 
     /// <summary>找到原面板所属栏与组，跨栏后仍使用同一面板对象。</summary>
@@ -77,12 +87,51 @@ public sealed class LayoutPanelManager
         return null;
     }
 
+    /// <summary>原 StandAlone：只拆出所选成员，保留所在栏和其余组选择。</summary>
+    public bool StandAlone(string key)
+    {
+        if (Find(key) is not { } found) return false;
+        if (found.Group.Count == 1) return true;
+        var dock = Docks[found.Side]; var index = dock.Items.IndexOf(found.Group);
+        found.Group.Remove(Panels[key]); dock.Items.Insert(index + 1, new() { Panels[key] }); return true;
+    }
+    /// <summary>原 Open 根据保存位置重新打开浮窗，否则选择停靠组。</summary>
+    public void Open(string key)
+    { if (!Panels.TryGetValue(key, out var panel)) return; if (IsFloating(key)) OpenWindow(key); else OpenDock(key); }
+    /// <summary>原 OpenWindow：拆成单成员、清除该停靠选择、登记浮动窗口。</summary>
+    public void OpenWindow(string key, WindowPlacement? placement = null)
+    {
+        if (!StandAlone(key)) return;
+        if (placement?.IsValid() == true) Panels[key].WindowPlacement = placement;
+        CloseDock(key); _windows.Add(key); Notify();
+    }
+    /// <summary>停靠关闭浮窗并选中原组；对应原 dock Snap 清除有效浮动位置。</summary>
+    public void OpenDock(string key)
+    {
+        if (Find(key) is not { } found) return;
+        _windows.Remove(key); Panels[key].WindowPlacement = WindowPlacement.None;
+        Docks[found.Side].SelectedItem = found.Group; Notify();
+    }
+    /// <summary>关闭隐藏当前宿主，保留位置；标题关闭先拆组，与原容器命令一致。</summary>
+    public void Close(string key, bool standAlone = false)
+    { if (!Panels.ContainsKey(key)) return; if (standAlone) StandAlone(key); _windows.Remove(key); CloseDock(key); Notify(); }
+    /// <summary>浮动位置和当前打开集合是两个独立的原状态。</summary>
+    public bool IsFloating(string key) => Panels.TryGetValue(key, out var panel) && (panel.WindowPlacement.IsValid() || _windows.Contains(key));
+    /// <summary>只有打开浮窗或停靠选中组算选中。</summary>
+    public bool IsPanelSelected(string key) => _windows.Contains(key) || Find(key) is { } found && ReferenceEquals(Docks[found.Side].SelectedItem, found.Group);
+    /// <summary>保存窗口快照只更新布局，不重建阅读或登记访问。</summary>
+    public void SetWindowPlacement(string key, WindowPlacement placement)
+    { if (Panels.TryGetValue(key, out var panel)) { panel.WindowPlacement = placement; CreateMemento(); } }
+    private void CloseDock(string key)
+    { foreach (var dock in Docks.Values) if (dock.SelectedItem?.Any(p => p.Key == key) == true) dock.SelectedItem = null; }
+
     /// <summary>原 MovePanel：leader 携带整组；非 leader 从组分离成独立图标。</summary>
     /// <param name="index">移除源项前的目标栏插入位置。</param>
     public bool MovePanel(string key, string side, int index)
     {
         if (Find(key) is not { } source || !Docks.TryGetValue(side, out var target)) return false;
         var sourceDock = Docks[source.Side]; var group = source.Group; var panel = Panels[key];
+        _windows.Remove(key); panel.WindowPlacement = WindowPlacement.None;
         if (ReferenceEquals(group[0], panel))
         {
             var old = sourceDock.Items.IndexOf(group);
@@ -99,6 +148,8 @@ public sealed class LayoutPanelManager
     {
         if (key == targetKey || Find(key) is not { } source || Find(targetKey) is not { } target) return false;
         var panel = Panels[key]; var anchor = Panels[targetKey]; var group = target.Group;
+        if (_windows.Contains(targetKey)) return false;
+        _windows.Remove(key); panel.WindowPlacement = WindowPlacement.None;
         group.Orientation = edge is PanelDock.Top or PanelDock.Bottom ? PanelOrientation.Vertical : PanelOrientation.Horizontal;
         bool sameGroup = ReferenceEquals(source.Group, group);
         source.Group.Remove(panel);
@@ -137,7 +188,10 @@ public sealed class LayoutPanelManager
         {
             if (!_original.Panels.TryGetValue(key, out var saved)) _original.Panels[key] = saved = new();
             saved.GridLength = panel.Weight.ToString("G17", CultureInfo.InvariantCulture) + "*";
+            saved.WindowPlacement = panel.WindowPlacement;
         }
+        _original.Windows ??= new();
+        _original.Windows.Panels = (_original.Windows.Panels ?? []).Where(k => !Panels.ContainsKey(k)).Concat(_windows).Distinct().ToList();
         return _original;
     }
 
@@ -153,11 +207,19 @@ public sealed class LayoutPanelManagerMemento
 {
     public Dictionary<string, LayoutPanelMemento>? Panels { get; set; }
     public Dictionary<string, LayoutDockPanelContentMemento>? Docks { get; set; }
+    public LayoutPanelWindowManagerMemento? Windows { get; set; }
     [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 public sealed class LayoutPanelMemento
 {
     public string GridLength { get; set; } = "1*";
+    public WindowPlacement WindowPlacement { get; set; } = WindowPlacement.None;
+    [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
+}
+/// <summary>原 Windows.Panels 格式；未识别字段和面板保留供后续迁移。</summary>
+public sealed class LayoutPanelWindowManagerMemento
+{
+    public List<string> Panels { get; set; } = [];
     [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 public sealed class LayoutDockPanelContentMemento

@@ -63,3 +63,5 @@
 第二十批接入原历史登记策略与可靠清理，继续使用唯一BookMementoControl/SaveData及四JSON事务；表现仅编辑草稿与转交命令，见[契约](p2-history-policy.md)。
 
 第二十一批列表结构在PanelListItemView.axaml，切换/虚拟化在PanelListPresentation/VirtualizingThumbnailPanel，显示租约在ListCoverImage；原Profile、封面选择及唯一缓存归Engine。列表主题不改变原条目身份/排序/打开或阅读访问，见[p2-list-templates.md](p2-list-templates.md)。
+
+第二十二批浮窗结构在FloatingPanelWindow.axaml，SidePanelPresenter负责唯一内容父级、同一输入路由及屏幕坐标；Engine保存原浮动/位置JSON，非模态宿主不锁住主查看器，见[p2-floating.md](p2-floating.md)。

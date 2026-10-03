@@ -46,3 +46,5 @@ P2第十三批原历史限制对照：BookHistoryCollection.CreateMemento/Restor
 P2第十五批对照：原BookSourceFactory/ArchiveEntryCollection的三模式、WherePageAll、shortcut及坏子书规则接入；BookAddress/RequestLoadParent以真实相对条目返回，MoveToChildBook用当前主页。原ArchivePageUtility指定目标/regex/首图/Take(depth)与包内整前缀范围保留，非图像页框480×640。卡片采用原ArchivePageControl上3/下1结构和等比封面，Windows动态像素对照待验。详见[p2-book-hierarchy.md](p2-book-hierarchy.md)。
 
 P2第二十一批对照：原HistoryListBox四模板、PanelListItemProfile/PanelThumbnailItemSize及FolderListConfig默认Content保持；History.LastAccessTime不替换为文件时间。原相对封面bookPath基准、单图RequestedEntryName及有限自然首图选择共用；真正网格虚拟化替换原WPF VirtualizingWrapPanel，Windows动态待验。
+
+P2第二十二批：原LayoutPanelManager/WindowManager/WindowPlacement关系迁入；关闭保留位置、停靠清除位置、浮动独立成员、打开集合与JSON恢复经过固定样本和正式Headless验证。Windows动态/真实多屏捕获仍待验，见[p2-floating.md](p2-floating.md)。

@@ -51,3 +51,5 @@ P2第十三批原设置左导航加入历史页，右侧保留保存限制说明
 第十五批中央查看器接入原Folder/Archive卡片区域：上部等比封面/叠页、下部文件信息及正常空封面；独立ArchivePageRenderer/主题资源，封面单击隔离及双击实际项。原上下/左右/底栏关系保持。目录页与横图ZIP封面离线图使用p2-book-hierarchy前缀；Windows像素和真机双击另验。
 
 P2第二十一批：历史/书架/书签原四模板入口启用，Content左封面右文字、Banner上横幅下标题、Thumbnail固定格网和Normal纯文字。结构、主题与封面所有权独立，完整Profile编辑/平台图标细节及Windows动态对照继续明确保留。
+
+第二十二批接入原单面板Owner浮窗、右键浮动/停靠/关闭、保留位置重开、拖回内容/图标栏与Windows.Panels恢复。唯一控件复用；真实捕获/多屏/Retina待验，见[p2-floating.md](p2-floating.md)。
