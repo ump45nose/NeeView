@@ -37,6 +37,10 @@ public interface IArchiveFactory
     Task<IReadOnlyList<FolderItem>> ListFoldersAsync(string path, CancellationToken token);
     /// <summary>列出普通书架的目录及已支持归档；只返回元数据，不打开每本书。</summary>
     Task<IReadOnlyList<FolderItem>> ListBooksAsync(string path, CancellationToken token);
+    /// <summary>查询单一真实来源的时间/大小；不存在返回空，权限/超时传播，归档内部不解压。</summary>
+    /// <param name="path">原书签真实来源路径。</param><param name="token">取消后台来源探测。</param>
+    /// <returns>文件或目录元数据；未实现此能力的来源明确失败。</returns>
+    Task<FolderItem?> GetFileMetadataAsync(string path, CancellationToken token) => throw new NotSupportedException("来源元数据查询尚未实现。");
 }
 
 /// <summary>目录导航只读条目，使用真实文件系统路径。</summary>

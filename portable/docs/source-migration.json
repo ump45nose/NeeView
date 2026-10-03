@@ -270,6 +270,12 @@
       "target": "src/NeeView.Engine/SidePanels/Bookshelf/FolderList/FolderOrder.cs",
       "sha256": "cc65a4030edaeb6f3cd0403577c968d691e74483f6b9ed66cf93443435dacddd",
       "status": "保留原枚举顺序与分类，移除文案注解；普通目录不开放路径/注册时间排序"
+    },
+    {
+      "source": "NeeView/BookHistory/HistoryStringCollection.cs",
+      "target": "src/NeeView.Engine/BookHistory/HistoryStringCollection.cs",
+      "sha256": "ebce41a51423db37ef5afb953189c23c889146e438d90c8ad1ec6c9110c95cc9",
+      "status": "原字符串历史去重/前置/限制/删除源码迁入"
     }
   ],
   "partial_adapters": [
@@ -764,6 +770,42 @@
       "target": "src/NeeView.MacOS/Views/BookmarkListView.axaml.cs",
       "sha256": "fca8d1f84099f586987498a47a38002675eb77c112a2beed683bfdfd42dc8334",
       "status": "原列表打开/单双击/Enter的Mac表现适配；不包含完整拖放和所有列表命令"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/SearchBookmarkFolderCollection.cs",
+      "target": "src/NeeView.Engine/Search/SearchBookmarkFolderCollection.cs",
+      "sha256": "da8d604ae5163ae9274f44d804fc5d3499cdc00c294d014b69803b48119006bb",
+      "status": "原递归/直接子项和同节点结果；后台快照/取消/懒元数据适配"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/BookSearchProfile.cs",
+      "target": "src/NeeView.Engine/Search/BookSearchProfile.cs",
+      "sha256": "663ad74ea670909d080ae4157c73e5a682d3a5c2e7998e0e1851578bb41183c8",
+      "status": "只迁入原书签实际注册的Book Profile，保留/bookmark和/history"
+    },
+    {
+      "source": "NeeView/SearchBox/SearchBoxModel.cs",
+      "target": "src/NeeView.MacOS/ViewModels/BookmarkListViewModel.cs",
+      "sha256": "109910eabd7cbf0e2d42621256587f0b9cb6aacad2b52e8f6a8d192f78ef8986",
+      "status": "原Trim/增量/确认/历史/环境重置控制流程；异步可等待和取消适配"
+    },
+    {
+      "source": "NeeView/Config/SystemConfig.cs",
+      "target": "src/NeeView.Engine/Config/Config.cs",
+      "sha256": "f108d9973d964784cc5fa46ef97e6ee62b322cf95b0ecc6682ea9621c69a3de6",
+      "status": "原IsIncrementalSearchEnabled及SearchHistorySize字段/默认/非负范围；其余JSON保留"
+    },
+    {
+      "source": "NeeView/Command/Commands/FocusBookmarkSearchBoxCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml.cs",
+      "sha256": "0a098153b8bac3c3f134fa820f2a35b6ff42f78c4b4e770f597e29be44842626",
+      "status": "显示原书签面板并聚焦搜索；原稳定命令名和系统焦点保持"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderItem.cs",
+      "target": "src/NeeView.Engine/Search/SearchBookmarkFolderCollection.cs",
+      "sha256": "7ec942452dd647877dad8c873ad99a107ce67cc5362ad275fe29c7c12ae7cb32",
+      "status": "原五属性GetValue：名称、文件时间/大小、是否书籍书签、真实访问历史"
     }
   ],
   "rule_references": [
@@ -899,7 +941,13 @@
       "source": "NeeView/SidePanels/Bookmark/BookmarkListView.xaml",
       "target": "src/NeeView.MacOS/Views/BookmarkListView.axaml",
       "sha256": "ac7629a44c480b1fb52db915037b0ed6005db1946d07d2aa2fbfb195c6954924",
-      "status": "原地址/返回/同步/排序/列表区域转换；原搜索和模板保留占位，树完整布局待迁"
+      "status": "原地址/返回/同步/排序/搜索/列表区域转换；模板和树完整布局待迁"
+    },
+    {
+      "source": "NeeView/SearchBox/SearchBox.xaml",
+      "target": "src/NeeView.MacOS/Views/BookmarkListView.axaml",
+      "sha256": "d93e2cfa905c52e76fecca341eb5217f3d457470a9a0d5c9650d4ac00e5bb66b",
+      "status": "原搜索输入/清空/历史/错误反馈区域转换；不复刻WPF模板"
     }
   ],
   "backend_reuse": [
@@ -914,6 +962,150 @@
       "source": "portable/src/NeeView.Platform.MacOS/MacPlatformService.cs",
       "target": "src/NeeView.Backends/MacPlatformService.cs",
       "status": "复用正式Foundation/AppKit系统调用"
+    }
+  ],
+  "upstream_sources": [
+    {
+      "repository": "https://github.com/neelabo/neelaboratory.io.search",
+      "gitlink": "NeeLaboratory.IO.Search",
+      "commit": "d8568a3a14688d77ab591f0dd2d296e545aa53e1",
+      "license": "MIT; Kanaxs New BSD",
+      "files": [
+        {
+          "source": "NeeLaboratory.IO.Search/FuzzyStringCache.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/FuzzyStringCache.cs",
+          "sha256": "186f2b336c41f0aeec3f30763ab64ee908f4c11f8338ce3b33a22035fb110ca8"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/ISearchItem.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/ISearchItem.cs",
+          "sha256": "7fe39f805e3cc537c80a24d6c80085bcf0abceccb249c1337a9f5f891f01d428"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/IStringCache.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/IStringCache.cs",
+          "sha256": "eca675675ed1961a69a65197255d1276ed6e4d7eaad18ea43f02ba407758ab44"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchConjunction.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchConjunction.cs",
+          "sha256": "68ec97eae77b579db94906b1e49839414e801b32f40f591aad98adcc45189648"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchContext.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchContext.cs",
+          "sha256": "a15f8c687fe9898bfbb5786f7367be2443ba0100d7a58bfb42df42f5b4f5ec06"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchDateTimeTools.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchDateTimeTools.cs",
+          "sha256": "398e702b1ddfa741fec07d11844f1ef5c055a09f02311683ad3fb4c203be88bd"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchFilter.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchFilter.cs",
+          "sha256": "9815c294754e88a7dc611b8f62c7d1709fad3ed2277ea3c8658fee588fe134ed",
+          "adapted_sha256": "bc779184e1d950518624936723cce27d30a7abd24eccda61d13e89f5b43b9ebc",
+          "status": "用户正则匹配每项250ms超时，解析语法不变"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchFilterProfile.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchFilterProfile.cs",
+          "sha256": "8662c0f9bb0d0ecd839005edd726d41ddf7fe84e8806b58d49d7f5336af11467"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchKey.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchKey.cs",
+          "sha256": "e312324921105404495374aac25b41b739b1da33cc1a9409aed32a1067865de0"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchKeyAliasCollection.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchKeyAliasCollection.cs",
+          "sha256": "538a6adad91d19396fa12d3acf0ab357e51eafdd56da14d8950b9998f1c5098c"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchKeyAnalyzer.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchKeyAnalyzer.cs",
+          "sha256": "3d7bd7216e11c06c43e8955b49b8fbeae1f7cee0e3a917f765b07d6f0de63c47"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchKeyOption.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchKeyOption.cs",
+          "sha256": "4abb8455290aa6581ce8ec0c8455bc0040776a7626ffd165b650308ee63e61c6"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchKeyOptionCollection.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchKeyOptionCollection.cs",
+          "sha256": "39925c273cfea86d729bcc5215dda99e65afaa5a344d4d1d78eb2f963de24976"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchKeywordException.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchKeywordException.cs",
+          "sha256": "9a18f65bbadd9db0f3a4925ea6556017cf0827297edbe48e06814964baaa76e4"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchProfile.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchProfile.cs",
+          "sha256": "4260d9308c8e7c10f9ce43b83d84d290907d67cffde5b1feadd9a5857815e415"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchPropertyProfile.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchPropertyProfile.cs",
+          "sha256": "498493a9f48a18ed0a6e4068a93f86dc43722d236c6442a044c2af5a6833530b"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchStringTools.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchStringTools.cs",
+          "sha256": "99bea98ad06e71c58b5df226b80f637760313620c88e7a5f64833d6fcba75de4"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchValue.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchValue.cs",
+          "sha256": "8ce5c08b9f494f1339008f263280a715388e83122c2bc1409f0ced819cac053a"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchValueCache.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchValueCache.cs",
+          "sha256": "179105a8587a65b83046126577a58a753f77344132a63457beafe0366b5d90d0"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/SearchValueCacheFactory.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/SearchValueCacheFactory.cs",
+          "sha256": "171dacb0e7e3cbaa6261eb86985560585b9ca586efed3efdf4feacd438bf10b1"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/Searcher.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/Searcher.cs",
+          "sha256": "5b62fe67efe96d1d1bb780ebca52685fbde92fde356a317b5724b51e350356a9"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/StringCache.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/StringCache.cs",
+          "sha256": "f7b2cd57edeb3e0f53d1c45396eea1dca066c4a0690ba8b8acf7653eeb67d44a"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/StringKey.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/StringKey.cs",
+          "sha256": "911274535f7b8856817cdfbee40960625c3b5dcbd607b9bb1feb9c440716cd10"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/WordStringCache.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/WordStringCache.cs",
+          "sha256": "c1b84d84eb391fc776d7ef77933605440a6efc9e4dc2f369ea2ada5fc8c43430"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search/Kanaxs/Kanaxs.cs",
+          "target": "src/NeeView.Engine/Search/Upstream/Kanaxs/Kanaxs.cs",
+          "sha256": "c7b88a6445d4667560f0ad732f1dc28c8d9e3e45135a0d62b254161f33b59953"
+        },
+        {
+          "source": "NeeLaboratory.IO.Search.Test/SearchEngineTest.cs",
+          "target": "tests/NeeView.Engine.Tests/UpstreamSearchTests.cs",
+          "sha256": "8a9e750f54bc0e6bd508a4388e8873e6645f01c66bbda6975249883f14bc5de2",
+          "adapted_sha256": "3cfbef1f23b602a0ae7baee4243b84fab996142cc41b3dc8e11442e62574c102",
+          "status": "移除未用诊断引用和xUnit v2命名空间，保留7项原测试算法"
+        }
+      ]
     }
   ]
 }

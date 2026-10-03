@@ -8,4 +8,5 @@ public sealed class HistoryConfig
     public bool IsGroupBy { get; set; }
     public bool IsVisibleItemsCount { get; set; } = true;
     public bool IsVisibleSearchBox { get; set; } = true;
+    public bool IsKeepSearchHistory { get; set; } = true;
 }

@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="NeeView.MacOS.Views.BookmarkListView" x:CompileBindings="False">
   <!-- 从原 BookmarkListView 的地址/返回/同步/排序/列表区域转换；树编辑由现有宿主保留。 -->
-  <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+  <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto">
     <Grid ColumnDefinitions="*,Auto" Margin="8,4">
       <TextBlock Text="{Binding Place}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Place}" VerticalAlignment="Center" />
       <Button x:Name="BookmarkMore" Grid.Column="1" Content="⋯" Click="More_Click" ToolTip.Tip="书签列表菜单" />
@@ -15,17 +15,25 @@
         <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>
       </ComboBox>
     </WrapPanel>
-    <TextBlock Grid.Row="2" Text="{Binding CapabilityMessage}" TextWrapping="Wrap" Margin="8,0" FontSize="10" />
-    <DockPanel Grid.Row="3">
+    <!-- 搜索只提交原表达式；主题和控件布局独立于 Engine 查询规则。 -->
+    <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" Margin="8,0,8,4" IsVisible="{Binding SearchVisible}">
+      <TextBox x:Name="BookmarkSearchBox" Text="{Binding Keyword, Mode=TwoWay}" PlaceholderText="搜索书签" LostFocus="Search_LostFocus"
+               ToolTip.Tip="原搜索语法：名称、/and /or /not、引号、/word、/re /ire、/bookmark /history、/since /until、/size" />
+      <Button x:Name="BookmarkSearchClear" Grid.Column="1" Content="×" Click="SearchClear_Click" ToolTip.Tip="清空搜索" />
+      <Button x:Name="BookmarkSearchHistory" Grid.Column="2" Content="▾" Click="SearchHistory_Click" ToolTip.Tip="搜索历史" />
+    </Grid>
+    <TextBlock Grid.Row="3" Text="{Binding CapabilityMessage}" TextWrapping="Wrap" Margin="8,0" FontSize="10" />
+    <DockPanel Grid.Row="4">
     <ContentControl x:Name="BookmarkTreeHost" DockPanel.Dock="Top" />
     <ListBox x:Name="BookmarkItems" Focusable="True" SelectionMode="Multiple" SelectionChanged="Item_Changed" DoubleTapped="Item_DoubleTapped">
-      <ListBox.ContextMenu><ContextMenu><MenuItem Header="打开 / 进入文件夹" Click="Open_Click" /></ContextMenu></ListBox.ContextMenu>
+      <ListBox.ContextMenu><ContextMenu><MenuItem Header="打开 / 进入文件夹" Click="Open_Click" /><MenuItem Header="定位所在书签文件夹" Click="RevealPlace_Click" /></ContextMenu></ListBox.ContextMenu>
       <ListBox.ItemTemplate><DataTemplate><StackPanel Margin="0,2" ToolTip.Tip="{Binding Path}">
         <StackPanel Orientation="Horizontal" Spacing="6"><TextBlock Text="■" IsVisible="{Binding IsFolder}" Foreground="{Binding Color, TargetNullValue='#8CA0AF'}" /><TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" /></StackPanel>
         <TextBlock Text="{Binding Page}" Opacity="0.6" FontSize="10" />
       </StackPanel></DataTemplate></ListBox.ItemTemplate>
     </ListBox>
     </DockPanel>
-    <TextBlock Grid.Row="4" Text="{Binding Count}" IsVisible="{Binding CountVisible}" FontSize="10" Margin="8,4" Opacity="0.7" />
+    <TextBlock Grid.Row="5" Text="{Binding SearchError}" TextWrapping="Wrap" FontSize="10" Margin="8,0" Foreground="#D9957C" />
+    <TextBlock Grid.Row="6" Text="{Binding Count}" IsVisible="{Binding CountVisible}" FontSize="10" Margin="8,4" Opacity="0.7" />
   </Grid>
 </UserControl>

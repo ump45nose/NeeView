@@ -7,4 +7,6 @@ public sealed class BookmarkConfig
     public FolderOrder BookmarkFolderOrder { get; set; }
     public bool IsFolderTreeVisible { get; set; }
     public bool IsVisibleItemsCount { get; set; } = true;
+    public bool IsVisibleSearchBox { get; set; } = true;
+    public bool IsSearchIncludeSubdirectories { get; set; } = true;
 }

@@ -6,6 +6,22 @@ namespace NeeView.Backends;
 /// <summary>原 Archive 工厂的 Mac 实现，目录、ZIP、RAR 与 7z 共用原来源关系。</summary>
 public sealed class ArchiveFactory : IArchiveFactory
 {
+    /// <summary>原书签 GetFileSystemInfo 替换点；仅后台探测指定路径，不枚举或解压。</summary>
+    /// <param name="path">文件系统原定位。</param><param name="token">有界 I/O 的取消令牌。</param>
+    /// <returns>真实时间及大小；缺失或非文件系统定位返回空。</returns>
+    public Task<FolderItem?> GetFileMetadataAsync(string path, CancellationToken token) => SourceIo.RunAsync<FolderItem?>(() =>
+    {
+        token.ThrowIfCancellationRequested();
+        // GetAttributes 区分缺失和权限失败；不能将断线/权限错误默默解释为零大小。
+        try
+        {
+            var attributes = File.GetAttributes(path);
+            FileSystemInfo info = (attributes & FileAttributes.Directory) != 0 ? new DirectoryInfo(path) : new FileInfo(path);
+            return new(info.Name, info.FullName, info is DirectoryInfo, info is FileInfo file ? file.Length : -1, info.LastWriteTime);
+        }
+        catch (FileNotFoundException) { return null; }
+        catch (DirectoryNotFoundException) { return null; }
+    }, token);
     /// <summary>沿用原 FolderItemFactory 的普通目录/归档过滤；枚举元数据不递归也不解码封面。</summary>
     public Task<IReadOnlyList<FolderItem>> ListBooksAsync(string path, CancellationToken token) => SourceIo.RunAsync<IReadOnlyList<FolderItem>>(() =>
     {

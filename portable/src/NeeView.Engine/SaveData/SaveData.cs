@@ -18,6 +18,8 @@ public sealed class SaveData(string directory)
     private BookmarkNodeMemento[] _removedBookmarks = [];
     public bool CanRestoreBookmarks => _removedBookmarks.Any(e => BookmarkRoot.Walk().Contains(e.Parent));
     public IReadOnlyList<HistoryEntry> HistoryEntries { get; private set; } = [];
+    public HistoryStringCollection BookmarkSearchHistory { get; } = new();
+    public event EventHandler? BookmarkSearchHistoryChanged;
     public event EventHandler? Changed;
     /// <summary>仅书签编辑提交或回滚后回报；阅读进度保存不触发书签列表重排。</summary>
     public event EventHandler? BookmarksChanged;
@@ -53,6 +55,7 @@ public sealed class SaveData(string directory)
             config.Bookshelf = ReadBranch<BookshelfConfig>(raw, "Bookshelf");
             config.History = ReadBranch<HistoryConfig>(raw, "History");
             config.Bookmark = ReadBranch<BookmarkConfig>(raw, "Bookmark");
+            config.System = ReadBranch<SystemConfig>(raw, "System");
             config.Playlist = ReadBranch<PlaylistConfig>(raw, "Playlist");
             config.Window = ReadBranch<WindowConfig>(raw, "Window");
             config.MenuBar = ReadBranch<MenuBarConfig>(raw, "MenuBar");
@@ -77,7 +80,29 @@ public sealed class SaveData(string directory)
         config.Playlist.DefaultFolder = System.IO.Path.Combine(DirectoryPath, "Playlists");
         Playlists = new(config.Playlist);
         Config.SetCurrent(config);
+        BookmarkSearchHistory.Replace(_history["BookmarkSearchHistory"]?.Deserialize<string[]>(Options));
     }
+
+    /// <summary>原书签搜索历史追加/删除；复用三文件事务，失败恢复同一集合供重试。</summary>
+    /// <param name="keyword">已规范化的有效关键字；空白不登记。</param>
+    /// <param name="remove">删除指定历史，而非追加至首位。</param><param name="token">窗口关闭或调用方取消。</param>
+    public async Task EditBookmarkSearchHistoryAsync(string keyword, bool remove = false, CancellationToken token = default)
+    {
+        if (string.IsNullOrWhiteSpace(keyword)) return;
+        await _gate.WaitAsync(token);
+        var previous = BookmarkSearchHistory.ToArray(); var raw = _history.DeepClone().AsObject();
+        try
+        {
+            if (remove) BookmarkSearchHistory.Remove(keyword); else BookmarkSearchHistory.Append(keyword);
+            WriteBookmarkSearchHistory(); await WritePairAsync(token);
+        }
+        catch { _history = raw; BookmarkSearchHistory.Replace(previous); throw; }
+        finally { _gate.Release(); BookmarkSearchHistoryChanged?.Invoke(this, EventArgs.Empty); }
+    }
+
+    /// <summary>沿原 History.IsKeepSearchHistory 控制已迁书签历史；其他模块未知字段保留。</summary>
+    private void WriteBookmarkSearchHistory() => _history["BookmarkSearchHistory"] = Config.Current.History.IsKeepSearchHistory && BookmarkSearchHistory.Count > 0
+        ? JsonSerializer.SerializeToNode(BookmarkSearchHistory, Options) : null;
 
     /// <summary>按原 Path/Page/Props 恢复；Page 是条目名，不是数字页码。</summary>
     public (BookMemento? Memento, int Part) Find(string path)
@@ -330,7 +355,7 @@ public sealed class SaveData(string directory)
         try
         {
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "History", "Bookmark", "Playlist", "AutoHide", "Window", "MenuBar" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "History", "Bookmark", "System", "Playlist", "AutoHide", "Window", "MenuBar" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 Merge(Object(config, branch), JsonSerializer.SerializeToNode(value, Options)!.AsObject());
@@ -360,6 +385,7 @@ public sealed class SaveData(string directory)
             // 保留原 Format；新文件使用原名称和版本结构，避免添加另一套存储格式。
             _setting["Format"] ??= JsonValue.Create("NeeView.UserSetting/46.3.0");
             _history["Format"] ??= JsonValue.Create("NeeView.History/46.3.0");
+            WriteBookmarkSearchHistory();
             await WritePairAsync(token);
             RefreshHistory();
         }

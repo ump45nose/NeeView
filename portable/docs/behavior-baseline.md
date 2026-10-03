@@ -36,3 +36,5 @@
 | 旧Profile/nvzip | SaveData | 待 P5，完整旧迁移规则待迁入 |
 
 [235条命令迁移表](command-migration.md) 与源码 manifest 一致，每条单独标记状态，不用命令数量计算功能覆盖率。[源码迁入表](source-migration.json) 区分完整算法与P1子集。
+
+P2第十一批原书签查询对照：固定依赖gitlink的原解析器/匹配测试迁入，保留Default/Date/Size/Book Profiles、名称匹配、递归范围、父级局部索引注册排序与有效语法确认即登记历史。日期/大小探测采用现有后台来源能力，原访问历史成员单独更新；未将简单Contains当作原搜索。见[p2-bookmark-search.md](p2-bookmark-search.md)和独立静默验收记录，Windows动态样本待验。

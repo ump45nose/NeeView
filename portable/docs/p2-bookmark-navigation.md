@@ -1,6 +1,6 @@
 # P2 第十批：原书签列表目录导航与排序
 
-2026-10-04。迁入原 BookmarkFolderList 的进入、返回、固定根及当前书定位流程，以及 BookmarkFolderCollection/FolderCollection 的无磁盘探测排序。本批是原书签列表子集，不代表完整搜索、书架互联或所有显示模板已迁移。
+2026-10-04。迁入原 BookmarkFolderList 的进入、返回、固定根及当前书定位流程，以及 BookmarkFolderCollection/FolderCollection 的无磁盘探测排序。本批是原书签列表子集；原结构化搜索由[第十一批](p2-bookmark-search.md)接入，书架互联和显示模板仍待迁。
 
 ## 职责、依赖与契约
 
@@ -41,6 +41,6 @@
 
 证据独立保存为 `p2-bookmark-navigation-*`；不覆盖历史阶段截图。构建、自动回归、Headless 图像与真机分别记录，见[验收记录](../acceptance/p2-bookmark-navigation-runtime.md)。本批默认静默，未启动正式应用、未发送真实键鼠，未修改用户 Application Support 数据。
 
-仍待迁：原结构化搜索/搜索历史/递归搜索、四显示模板及完整属性、完整树布局/路径选择、无效清理/链接修复/监视、StartUp.LastBookmarkFolder、按目录 FolderParameter 持久化、书架 bookmark scheme 与目录树互联、IsSyncBookshelfEnabled 的完整加载请求语义。FocusBookmarkList 原意是在书架显示书签位置，不冒充聚焦本面板；FocusBookmarkSearchBox 等命令继续禁用占位。完整旧 Profile/路径映射在 P5。
+原结构化搜索/搜索历史/递归范围已由第十一批迁入。仍待迁：四显示模板及完整属性、完整树布局/路径选择、无效清理/链接修复/监视、StartUp.LastBookmarkFolder、按目录 FolderParameter 持久化、书架 bookmark scheme 与目录树互联、IsSyncBookshelfEnabled 的完整加载请求语义。FocusBookmarkList 原意是在书架显示书签位置，不冒充聚焦本面板；FocusBookmarkSearchBox 已由第十一批接通。完整旧 Profile/路径映射在 P5。
 
 前台单/双击、弹出菜单、树拖动/焦点和真实触控板/IME等按[静默优先流程](validation-workflow.md)另行安排；Windows 动态对照、NAS、长期 native 内存、完整帧/P95和发布均未由本批自动测试证明。P2不封板。

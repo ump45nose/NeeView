@@ -42,7 +42,7 @@ public sealed partial class MainWindow : Window
         "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
-        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "RegisterBookmark", "FocusHistorySearchBox", "ClearHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
+        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkSearchBox", "ClearHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
     };
     /// <summary>由启动层接入原生事件；只消费主查看器区域，其余控件使用框架输入。</summary>
     public void AttachPlatformInput(IPlatformInput input)
@@ -104,6 +104,7 @@ public sealed partial class MainWindow : Window
         var bookmarks = this.FindControl<BookmarkListView>("BookmarkPanelList")!;
         bookmarks.OpenBookAsync = async node => { if (!_preparing && !_closedPrepared && node.Path is { } path) await OpenAsync(path); };
         bookmarks.CurrentBookPath = () => model.Operation.Book?.Path;
+        bookmarks.ReadMetadataAsync = model.Operation.GetFileMetadataAsync;
         bookmarks.SaveSettingsAsync = () => model.Operation.SaveAsync();
         bookmarks.Failed += (_, message) => ShowError(message);
         bookmarks.TreeVisibilityUpdated += (_, _) => model.RefreshBookmarkTree();
@@ -315,6 +316,8 @@ public sealed partial class MainWindow : Window
                 case "FocusHistorySearchBox":
                     Config.Current.History.IsVisibleSearchBox = true; _model.RefreshHistory(); _model.ShowPanel("HistoryPanel");
                     this.FindControl<TextBox>("HistorySearchBox")!.Focus(); break;
+                case "FocusBookmarkSearchBox":
+                    _model.ShowPanel("BookmarkPanel"); this.FindControl<BookmarkListView>("BookmarkPanelList")!.FocusSearch(); break;
                 case "OpenBookExplorer": if (_model.Operation.Book is { } source) await _platform!.RevealAsync(source.Path); break;
                 case "ToggleVisibleBookshelf": _model.SelectPanel("FolderPanel"); break;
                 case "ToggleVisiblePageList": _model.SelectPanel("PageListPanel"); break;

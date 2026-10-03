@@ -15,6 +15,7 @@ public sealed class Config
     public BookshelfConfig Bookshelf { get; set; } = new();
     public HistoryConfig History { get; set; } = new();
     public BookmarkConfig Bookmark { get; set; } = new();
+    public SystemConfig System { get; set; } = new();
     public PlaylistConfig Playlist { get; set; } = new();
     public AutoHideConfig AutoHide { get; set; } = new();
     public WindowConfig Window { get; set; } = new();
@@ -24,6 +25,15 @@ public sealed class Config
     public bool IsAddressBarEnabled { get => MenuBar.IsAddressBarEnabled; set => MenuBar.IsAddressBarEnabled = value; }
     /// <summary>启动时装配唯一配置，读取前不初始化具体窗口。</summary>
     public static void SetCurrent(Config config) => Current = config;
+}
+
+/// <summary>原 SystemConfig 搜索分支；其余系统设置仍在原 JSON 中保留。</summary>
+public sealed class SystemConfig
+{
+    public bool IsIncrementalSearchEnabled { get; set; } = true;
+    private int _searchHistorySize = 8;
+    /// <summary>沿用原非负上限，零表示不保留搜索历史。</summary>
+    public int SearchHistorySize { get => _searchHistorySize; set => _searchHistorySize = Math.Max(0, value); }
 }
 
 /// <summary>来自原 FilmStripConfig 的胶片条显示与尺寸默认值；未迁入字段由原 JSON 保留。</summary>

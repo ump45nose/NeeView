@@ -23,6 +23,15 @@ def check_boundaries(root):
                 raise RuntimeError("固定 Windows 源码变化：" + item["source"])
             if not (root / item["target"]).is_file():
                 raise RuntimeError("缺少迁移目标：" + item["target"])
+    # 原依赖库按基线 gitlink 锁定；源码内嵌进 Engine，保持三个生产项目。
+    for library in manifest.get("upstream_sources", []):
+        entry = subprocess.check_output(["git", "ls-tree", manifest["baseline"], library["gitlink"]], cwd=root.parent, text=True)
+        if entry.split()[2] != library["commit"]:
+            raise RuntimeError("原依赖库提交不一致：" + library["gitlink"])
+        for item in library["files"]:
+            expected = item.get("adapted_sha256", item["sha256"])
+            if hashlib.sha256((root / item["target"]).read_bytes()).hexdigest() != expected:
+                raise RuntimeError("迁入依赖源码变化未更新出处：" + item["target"])
     forbidden = ("using Avalonia", "using System.Windows", "using AppKit", "using Foundation", "using ImageMagick", "using SharpCompress")
     for path in (root / "src/NeeView.Engine").rglob("*.cs"):
         if "obj" in path.parts or "bin" in path.parts:
@@ -33,7 +42,8 @@ def check_boundaries(root):
         for path in (root / "src/NeeView.MacOS" / area).rglob("*.cs"):
             if any(value in path.read_text() for value in ("NeeView.Backends", "ImageMagick", "SharpCompress", "Directory.Enumerate")):
                 raise RuntimeError("视图直接依赖后端：" + str(path))
-    return {"production_projects": projects, "source_files": len(manifest["files"]), "partial_adapters": len(manifest["partial_adapters"])}
+    return {"production_projects": projects, "source_files": len(manifest["files"]), "partial_adapters": len(manifest["partial_adapters"]),
+            "upstream_source_files": sum(len(library["files"]) for library in manifest.get("upstream_sources", []))}
 
 
 def main():
@@ -42,7 +52,7 @@ def main():
     parser.add_argument("--dotnet", default="dotnet")
     parser.add_argument("--macos-source", action="store_true", help="仅验证正式入口编译，需 macOS workload；不是应用构建")
     parser.add_argument("--macos", action="store_true", help="执行正式应用构建，需匹配的完整 Xcode")
-    parser.add_argument("--phase", choices=("p1", "p2", "p2-docking", "p2-selection", "p2-bookshelf", "p2-bookmark", "p2-history", "p2-slider", "p2-playlist", "p2-autohide", "p2-bookmark-navigation"), default="p1", help="独立保存当前阶段的构建与测试证据")
+    parser.add_argument("--phase", choices=("p1", "p2", "p2-docking", "p2-selection", "p2-bookshelf", "p2-bookmark", "p2-history", "p2-slider", "p2-playlist", "p2-autohide", "p2-bookmark-navigation", "p2-bookmark-search"), default="p1", help="独立保存当前阶段的构建与测试证据")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     env = os.environ.copy(); env.pop("DOTNET_ROOT", None)

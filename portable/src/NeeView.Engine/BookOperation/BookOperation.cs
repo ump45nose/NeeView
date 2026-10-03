@@ -34,6 +34,9 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     public string? Error { get; private set; }
     public event EventHandler? Changed;
 
+    /// <summary>将书签元数据需求送入同一来源后端，表现端不接触具体文件系统实现。</summary>
+    public Task<FolderItem?> GetFileMetadataAsync(string path, CancellationToken token) => archives.GetFileMetadataAsync(path, token);
+
     /// <summary>打开图片所在目录或来源；失败保持旧书，晚到来源只释放。</summary>
     public async Task OpenAsync(string path, CancellationToken token = default)
     { await OpenCoreAsync(path, token); }

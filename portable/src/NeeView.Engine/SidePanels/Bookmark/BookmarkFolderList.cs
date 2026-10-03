@@ -2,12 +2,19 @@
 namespace NeeView;
 
 /// <summary>浏览原书签集合，不创建第二棵树；位置和选择仅属于当前窗口。</summary>
-public sealed class BookmarkFolderList
+public sealed class BookmarkFolderList : IDisposable
 {
     private readonly BookmarkCollection _collection;
     private BookmarkNode[] _ancestors = [];
     private readonly Dictionary<BookmarkNode, int> _seeds = [];
     private readonly Dictionary<BookmarkNode, BookmarkNode> _parents = [];
+    private CancellationTokenSource? _searchRequest;
+    private long _searchRevision;
+    private IReadOnlyList<BookmarkNode>? _matches;
+    private bool _disposed;
+    public string SearchKeyword { get; private set; } = "";
+    public bool IsSearching { get; private set; }
+    public bool HasHistoryPredicate => SearchBookmarkFolderCollection.Analyze(SearchKeyword).Any(key => key.Property.Name == "history");
     public BookmarkNode Place { get; private set; }
     public BookmarkNode? SelectedItem { get; private set; }
     public IReadOnlyList<BookmarkNode> Items { get; private set; } = [];
@@ -36,6 +43,7 @@ public sealed class BookmarkFolderList
     public bool SetPlace(BookmarkNode folder, BookmarkNode? selected = null)
     {
         if (!folder.IsFolder || !_collection.Items.Walk().Contains(folder)) return false;
+        CancelSearch(); SearchKeyword = ""; _matches = null;
         Place = folder; SelectedItem = selected; Refresh(); return true;
     }
 
@@ -71,12 +79,14 @@ public sealed class BookmarkFolderList
     /// <summary>集合提交或回滚后刷新；目录失效退到最近存活祖先，仍在树中的移动目录继续保留。</summary>
     public void Refresh()
     {
+        // 节点/顺序变化使后台快照过期；调用方按已提交搜索重新申请，不扫描磁盘。
+        CancelSearch();
         var live = _collection.Items.Walk().ToHashSet();
         // 从同一批节点生成派生父级索引；路径比较不在每次比较中重新遍历整棵树。
         _parents.Clear();
         foreach (var parent in live.Where(node => node.IsFolder))
             foreach (var child in parent.Children!) _parents[child] = parent;
-        if (!live.Contains(Place)) Place = _ancestors.LastOrDefault(live.Contains) ?? _collection.Items;
+        if (!live.Contains(Place)) { Place = _ancestors.LastOrDefault(live.Contains) ?? _collection.Items; SearchKeyword = ""; _matches = null; }
         var chain = new Stack<BookmarkNode>();
         for (BookmarkNode? parent = Place; parent is not null; parent = _parents.GetValueOrDefault(parent)) chain.Push(parent);
         _ancestors = chain.ToArray();
@@ -84,17 +94,59 @@ public sealed class BookmarkFolderList
         foreach (var dead in _seeds.Keys.Where(node => !live.Contains(node)).ToArray()) _seeds.Remove(dead);
         FolderOrder = SupportsOrder(Config.Current.Bookmark.BookmarkFolderOrder) ? Config.Current.Bookmark.BookmarkFolderOrder : FolderOrder.FileName;
         if (!_seeds.TryGetValue(Place, out var seed)) _seeds[Place] = seed = Random.Shared.Next(1, int.MaxValue);
-        Items = Sort(Place.Children ?? [], FolderOrder, Config.Current.Bookshelf.FolderSortOrder, seed);
+        Items = Sort(_matches is null ? Place.Children ?? [] : _matches.Where(live.Contains), FolderOrder, Config.Current.Bookshelf.FolderSortOrder, seed);
         if (SelectedItem is not null && !Items.Contains(SelectedItem)) SelectedItem = null;
     }
+
+    /// <summary>异步搜索当前原节点范围；成功才替换表达式和结果，错误/取消保留旧列表。</summary>
+    /// <param name="keyword">Trim 后的原表达式；空串回到当前目录普通子项。</param>
+    /// <param name="historyPaths">原访问历史路径的调用时快照。</param><param name="metadata">后端元数据替换点。</param>
+    /// <param name="token">输入变更或关闭取消。</param><returns>是否提交到仍然有效的位置。</returns>
+    public async Task<bool> SearchAsync(string keyword, IEnumerable<string> historyPaths,
+        Func<string, CancellationToken, Task<FolderItem?>>? metadata = null, CancellationToken token = default)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this); CancelSearch(); token.ThrowIfCancellationRequested();
+        keyword = keyword.Trim();
+        if (keyword.Length == 0) { SearchKeyword = ""; _matches = null; Refresh(); return true; }
+        var pending = CancellationTokenSource.CreateLinkedTokenSource(token); _searchRequest = pending;
+        var revision = _searchRevision; var place = Place; var paths = historyPaths.ToHashSet(StringComparer.Ordinal);
+        // 只在调用线程读取集合/名称；后台不可遍历正在编辑的 ObservableCollection。
+        var source = Config.Current.Bookmark.IsSearchIncludeSubdirectories ? Place.Walk().Skip(1) : Place.Children ?? [];
+        var snapshot = source.Where(node => node.IsFolder || !string.IsNullOrWhiteSpace(node.Path)).Select(node =>
+            new BookmarkSearchItem(node, node.DisplayName, node.Path, node.IsFolder, node.EntryTime, node.Path is { } path && paths.Contains(path))).ToArray();
+        IsSearching = true;
+        try
+        {
+            var found = await Task.Run(() => SearchBookmarkFolderCollection.SearchAsync(keyword, snapshot, metadata, pending.Token), pending.Token);
+            pending.Token.ThrowIfCancellationRequested();
+            if (_disposed || revision != _searchRevision || !ReferenceEquals(place, Place)) return false;
+            SearchKeyword = keyword; _matches = found; Refresh(); return true;
+        }
+        catch (OperationCanceledException) when (pending.IsCancellationRequested) { return false; }
+        finally
+        {
+            if (ReferenceEquals(_searchRequest, pending)) { _searchRequest = null; IsSearching = false; }
+            pending.Dispose();
+        }
+    }
+
+    /// <summary>替换/导航/关闭使晚到查询失效；不改已经提交的列表。</summary>
+    public void CancelSearch()
+    {
+        _searchRevision++; _searchRequest?.Cancel(); _searchRequest = null; IsSearching = false;
+    }
+
+    /// <summary>面板释放只取消查询，唯一书签集合仍由 SaveData 维护。</summary>
+    public void Dispose() { _disposed = true; CancelSearch(); }
 
     /// <summary>保留原注册顺序不受目录分组影响；其他模式先分组再比较，随机种子在当前位置稳定。</summary>
     private IReadOnlyList<BookmarkNode> Sort(IEnumerable<BookmarkNode> source, FolderOrder mode, FolderSortOrder grouping, int seed)
     {
         var nodes = source.ToArray();
         // 原 Directory/File 的 ConstOrder 同为 2；EntryTime 只按节点索引，降序反转整个普通项目序列。
-        if (mode == FolderOrder.EntryTime) return nodes;
-        if (mode == FolderOrder.EntryTimeDescending) return nodes.Reverse().ToArray();
+        // 原 GetIndex 是父节点中的索引；递归搜索跨父级的同索引按树枚举顺序稳定保留。
+        if (mode == FolderOrder.EntryTime) return nodes.OrderBy(node => _parents[node].Children!.IndexOf(node)).ToArray();
+        if (mode == FolderOrder.EntryTimeDescending) return nodes.OrderBy(node => _parents[node].Children!.IndexOf(node)).Reverse().ToArray();
         var order = nodes.OrderBy(_ => 0);
         order = grouping switch
         {
