@@ -15,6 +15,17 @@ public sealed partial class SettingsWindow : Window
     private bool _saving;
     private HistorySettingsViewModel? _historySettings;
     private bool _resetInputDefaults;
+    private readonly Dictionary<string, CommandParameterEdit> _parameters = [];
+    /// <summary>参数弹窗只修改父表单的共享草稿，取消整个设置时不写JSON。</summary>
+    private async void Parameter_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_model is null || sender is not Button { DataContext: ShortcutEdit input } || _saving) return;
+        var owner = DefaultInputScheme.GetParameterOwner(input.Name);
+        var draft = CommandParameterEdit.Create(_model.SaveData, input.Name, _parameters.GetValueOrDefault(owner));
+        if (draft is null) return;
+        var result = await new CommandParameterWindow(draft, input.Definition.Text).ShowDialog<CommandParameterEdit?>(this);
+        if (result is not null) _parameters[owner] = result;
+    }
     /// <summary>独立加载布局，不依赖具体存储或解码后端。</summary>
     public SettingsWindow() { AvaloniaXamlLoader.Load(this); _initialized = true; }
     /// <summary>传入业务表现模型，编辑副本直到用户保存。</summary>
@@ -22,7 +33,7 @@ public sealed partial class SettingsWindow : Window
     {
         _model = model;
         _inputs = model.Commands.Definitions.Select(d => new ShortcutEdit(d, model.SaveData.GetShortcut(d.Name, d.Shortcut), available?.Invoke(d.Name) ?? model.Commands.IsAvailable(d.Name))).ToArray();
-        this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm(); FillAutoHide();
+        this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm(); FillAutoHide(); FillView();
         this.FindControl<ComboBox>("InputScheme")!.SelectedIndex = (int)Config.Current.Command.PresetInputScheme;
         this.FindControl<ComboBox>("InputReadOrder")!.SelectedIndex = (int)Config.Current.Command.PresetPageReadOrder;
         this.FindControl<CheckBox>("ReversePageMove")!.IsChecked = Config.Current.Command.IsReversePageMove;
@@ -84,6 +95,9 @@ public sealed partial class SettingsWindow : Window
         this.FindControl<CheckBox>("Wide")!.IsChecked = setting.IsSupportedWidePage;
         this.FindControl<CheckBox>("First")!.IsChecked = setting.IsSupportedSingleFirstPage;
         this.FindControl<CheckBox>("Last")!.IsChecked = setting.IsSupportedSingleLastPage;
+        var baseScale = this.FindControl<NumericUpDown>("BaseScale")!;
+        var value = double.IsFinite(setting.BaseScale) && Math.Abs(setting.BaseScale) < (double)decimal.MaxValue ? (decimal)setting.BaseScale : 1;
+        baseScale.Minimum = Math.Min(.1m, value); baseScale.Maximum = Math.Max(2, value); baseScale.Value = value;
     }
     /// <summary>将当前表单写回选定原设置对象，不改写未迁移字段。</summary>
     private void Apply(BookSettingConfig setting)
@@ -94,6 +108,48 @@ public sealed partial class SettingsWindow : Window
         setting.IsSupportedWidePage = this.FindControl<CheckBox>("Wide")!.IsChecked == true;
         setting.IsSupportedSingleFirstPage = this.FindControl<CheckBox>("First")!.IsChecked == true;
         setting.IsSupportedSingleLastPage = this.FindControl<CheckBox>("Last")!.IsChecked == true;
+        setting.BaseScale = (double)(this.FindControl<NumericUpDown>("BaseScale")!.Value ?? 1);
+    }
+    /// <summary>原查看器配置独立于书籍表单作用域，只有保存后生效。</summary>
+    private void FillView()
+    {
+        var c = Config.Current.View;
+        foreach (var (name, value) in new[] { ("BaseScaleEnabled", c.IsBaseScaleEnabled), ("KeepScale", c.IsKeepScale), ("KeepAngle", c.IsKeepAngle), ("KeepFlip", c.IsKeepFlip),
+            ("KeepScaleBooks", c.IsKeepScaleBooks), ("KeepAngleBooks", c.IsKeepAngleBooks), ("KeepFlipBooks", c.IsKeepFlipBooks), ("KeepPageTransform", c.IsKeepPageTransform), ("ScaleStretchTracking", c.IsScaleStretchTracking) })
+            this.FindControl<CheckBox>(name)!.IsChecked = value;
+        foreach (var (name, value) in new[] { ("ScaleCenter", c.ScaleCenter), ("RotateCenter", c.RotateCenter), ("FlipCenter", c.FlipCenter) })
+        { var combo = this.FindControl<ComboBox>(name)!; combo.ItemsSource = new[] { "视口中心", "图像中心", "指针位置", "自动" }; combo.SelectedIndex = (int)value; }
+        var horizontal = this.FindControl<ComboBox>("ViewHorizontalOrigin")!;
+        horizontal.ItemsSource = new[] { "居中", "左", "右", "随翻页方向", "随阅读方向", "小图居中 / 大图靠左", "小图居中 / 大图靠右", "小图居中 / 随翻页方向", "小图居中 / 随阅读方向" }; horizontal.SelectedIndex = (int)c.ViewHorizontalOrigin;
+        var vertical = this.FindControl<ComboBox>("ViewVerticalOrigin")!;
+        vertical.ItemsSource = new[] { "居中", "上", "下", "随翻页方向", "小图居中 / 大图靠上", "小图居中 / 大图靠下", "小图居中 / 随翻页方向" }; vertical.SelectedIndex = (int)c.ViewVerticalOrigin;
+        this.FindControl<ComboBox>("MovementConstraint")!.SelectedIndex = (int)c.MovementConstraint;
+        FillNumber("AngleFrequency", c.AngleFrequency, 0, 180);
+        FillNumber("ViewOriginCenterRatio", c.ViewOriginCenterRatio, 1, 2);
+    }
+    /// <summary>正常编辑范围包含原值，保存其他设置不会截断已存在的合法数值。</summary>
+    private void FillNumber(string name, double original, decimal minimum, decimal maximum)
+    {
+        var number = this.FindControl<NumericUpDown>(name)!;
+        var value = double.IsFinite(original) && Math.Abs(original) < (double)decimal.MaxValue ? (decimal)original : minimum;
+        number.Minimum = Math.Min(minimum, value); number.Maximum = Math.Max(maximum, value); number.Value = value;
+    }
+    /// <summary>写原View字段，取消不进入；命令参数由共享参数草稿独立应用。</summary>
+    private void ApplyView()
+    {
+        var c = Config.Current.View;
+        bool Checked(string name) => this.FindControl<CheckBox>(name)!.IsChecked == true;
+        c.IsBaseScaleEnabled = Checked("BaseScaleEnabled"); c.IsKeepScale = Checked("KeepScale"); c.IsKeepAngle = Checked("KeepAngle"); c.IsKeepFlip = Checked("KeepFlip");
+        c.IsKeepScaleBooks = Checked("KeepScaleBooks"); c.IsKeepAngleBooks = Checked("KeepAngleBooks"); c.IsKeepFlipBooks = Checked("KeepFlipBooks");
+        c.IsKeepPageTransform = Checked("KeepPageTransform"); c.IsScaleStretchTracking = Checked("ScaleStretchTracking");
+        c.ScaleCenter = (DragControlCenter)Math.Max(0, this.FindControl<ComboBox>("ScaleCenter")!.SelectedIndex);
+        c.RotateCenter = (DragControlCenter)Math.Max(0, this.FindControl<ComboBox>("RotateCenter")!.SelectedIndex);
+        c.FlipCenter = (DragControlCenter)Math.Max(0, this.FindControl<ComboBox>("FlipCenter")!.SelectedIndex);
+        c.ViewHorizontalOrigin = (ViewHorizontalOrigin)Math.Max(0, this.FindControl<ComboBox>("ViewHorizontalOrigin")!.SelectedIndex);
+        c.ViewVerticalOrigin = (ViewVerticalOrigin)Math.Max(0, this.FindControl<ComboBox>("ViewVerticalOrigin")!.SelectedIndex);
+        c.MovementConstraint = (MovementConstraint)Math.Max(0, this.FindControl<ComboBox>("MovementConstraint")!.SelectedIndex);
+        c.AngleFrequency = (double)(this.FindControl<NumericUpDown>("AngleFrequency")!.Value ?? 0);
+        c.ViewOriginCenterRatio = (double)(this.FindControl<NumericUpDown>("ViewOriginCenterRatio")!.Value ?? 1);
     }
     /// <summary>读取原胶片条、滑条及共享步长参数到编辑控件，取消不修改配置。</summary>
     private void FillFilm()
@@ -192,7 +248,8 @@ public sealed partial class SettingsWindow : Window
                 // 只写用户修改的差分，避免一次保存就展开全部235条默认命令。
                 foreach (var input in _inputs.Where(i => _resetInputDefaults || i.Value.Trim() != i.OriginalValue.Trim()))
                     _model.SaveData.SetShortcutDifference(input.Name, input.Value.Trim(), input.Definition.Shortcut);
-                ApplyFilm(); ApplyAutoHide();
+                ApplyFilm(); ApplyAutoHide(); ApplyView();
+                foreach (var parameter in _parameters.Values) parameter.Apply(_model.SaveData);
                 Config.Current.Bookshelf.FolderSortOrder = (FolderSortOrder)Math.Max(0, this.FindControl<ComboBox>("BookshelfGroup")!.SelectedIndex);
                 Config.Current.Book.IsPrioritizeBookMove = this.FindControl<CheckBox>("PrioritizeBookMove")!.IsChecked == true;
             }, _historySettings!.GetLimits());

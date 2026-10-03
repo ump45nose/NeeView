@@ -8,6 +8,7 @@ public sealed class ShortcutEdit(CommandDefinition definition, string value, boo
     public CommandDefinition Definition { get; } = definition;
     public string Label => Definition.Text + (available ? "" : "（尚未迁移）");
     public string Name => Definition.Name;
+    public bool HasParameters => available && CommandParameterEdit.GetParameterType(Name) is not null;
     public string OriginalValue { get; } = value;
     private string _value = value;
     public string Value { get => _value; set => SetProperty(ref _value, value); }

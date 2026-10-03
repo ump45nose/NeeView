@@ -15,9 +15,24 @@
         <TextBlock Text="阅读方向" /><ComboBox x:Name="Order" SelectedIndex="0"><ComboBoxItem Content="从右向左" /><ComboBoxItem Content="从左向右" /></ComboBox>
         <CheckBox x:Name="Divide" Content="单页模式分割横向页面" /><CheckBox x:Name="Wide" Content="双页模式宽图独占一页" />
         <CheckBox x:Name="First" Content="首页单独显示" /><CheckBox x:Name="Last" Content="末页单独显示" />
+        <TextBlock Text="书籍基准缩放（独立于手工缩放）" /><NumericUpDown x:Name="BaseScale" Minimum="0.1" Maximum="2" Increment="0.05" FormatString="0.#####" />
         <TextBlock Text="书架（全局）" FontSize="16" Margin="0,8,0,0" />
         <TextBlock Text="文件夹与归档排序" /><ComboBox x:Name="BookshelfGroup"><ComboBoxItem Content="混排" /><ComboBoxItem Content="文件夹在前" /><ComboBoxItem Content="文件夹在后" /></ComboBox>
         <CheckBox x:Name="PrioritizeBookMove" Content="允许前后书命令取代正在加载的书籍" />
+        <TextBlock Text="查看器（全局）" FontSize="16" Margin="0,8,0,0" />
+        <CheckBox x:Name="BaseScaleEnabled" Content="启用书籍基准缩放" />
+        <TextBlock Text="缩放中心" /><ComboBox x:Name="ScaleCenter" />
+        <TextBlock Text="旋转中心" /><ComboBox x:Name="RotateCenter" />
+        <TextBlock Text="翻转中心" /><ComboBox x:Name="FlipCenter" />
+        <TextBlock Text="旋转吸附步长（度，0 为关闭）" /><NumericUpDown x:Name="AngleFrequency" Minimum="0" Maximum="180" Increment="1" FormatString="0.#####" />
+        <CheckBox x:Name="KeepScale" Content="翻页保持缩放" /><CheckBox x:Name="KeepScaleBooks" Content="切书也保持缩放（需启用翻页保持）" />
+        <CheckBox x:Name="KeepAngle" Content="翻页保持旋转" /><CheckBox x:Name="KeepAngleBooks" Content="切书也保持旋转（需启用翻页保持）" />
+        <CheckBox x:Name="KeepFlip" Content="翻页保持翻转" /><CheckBox x:Name="KeepFlipBooks" Content="切书也保持翻转（需启用翻页保持）" />
+        <CheckBox x:Name="KeepPageTransform" Content="分别记住当前书中每页的变换" /><CheckBox x:Name="ScaleStretchTracking" Content="缩放跟随窗口适配" />
+        <TextBlock Text="页面水平起点" /><ComboBox x:Name="ViewHorizontalOrigin" />
+        <TextBlock Text="页面垂直起点" /><ComboBox x:Name="ViewVerticalOrigin" />
+        <TextBlock Text="居中范围比例" /><NumericUpDown x:Name="ViewOriginCenterRatio" Minimum="1" Maximum="2" Increment="0.1" FormatString="0.#####" />
+        <TextBlock Text="移动限制" /><ComboBox x:Name="MovementConstraint"><ComboBoxItem Content="无限制" /><ComboBoxItem Content="限制在视口内" /><ComboBoxItem Content="尺寸溢出前锁定" /><ComboBoxItem Content="吸附边界" /></ComboBox>
       </StackPanel>
     </ScrollViewer>
     <Grid x:Name="InputSettings" Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto,*" Margin="16" IsVisible="False">
@@ -33,7 +48,7 @@
       </StackPanel>
       <TextBox Grid.Row="3" PlaceholderText="搜索命令" TextChanged="InputSearch_Changed" Margin="0,0,0,8" />
       <ListBox x:Name="InputList" Grid.Row="4">
-        <ListBox.ItemTemplate><DataTemplate><Grid ColumnDefinitions="*,230" Margin="0,4"><StackPanel><TextBlock Text="{Binding Label}" /><TextBlock Text="{Binding Name}" FontSize="10" Opacity="0.6" /></StackPanel><TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" ToolTip.Tip="逗号分隔多个输入；空值解绑。Control 保留原值，Mac Command 使用 Meta。" /></Grid></DataTemplate></ListBox.ItemTemplate>
+        <ListBox.ItemTemplate><DataTemplate><Grid ColumnDefinitions="*,210,Auto" Margin="0,4"><StackPanel><TextBlock Text="{Binding Label}" /><TextBlock Text="{Binding Name}" FontSize="10" Opacity="0.6" /></StackPanel><TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" ToolTip.Tip="逗号分隔多个输入；空值解绑。Control 保留原值，Mac Command 使用 Meta。" /><Button Grid.Column="2" Content="参数…" Margin="8,0,0,0" IsEnabled="{Binding HasParameters}" Click="Parameter_Click" /></Grid></DataTemplate></ListBox.ItemTemplate>
       </ListBox>
     </Grid>
     <ScrollViewer x:Name="FilmSettings" Grid.Column="1" IsVisible="False">

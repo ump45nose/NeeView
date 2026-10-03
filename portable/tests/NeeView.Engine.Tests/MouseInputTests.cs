@@ -118,7 +118,8 @@ public sealed class MouseInputTests
             window.MouseUp(point, MouseButton.Right); Assert.Equal(2, operation.Position.Index);
             state.SetShortcut("ViewScaleUp", ""); state.SetShortcut("NextOnePage", "RightButton+WheelUp"); width = window.Viewer.GetContentRect().Width;
             window.MouseDown(point, MouseButton.Right); window.MouseWheel(point, new(0, 1), RawInputModifiers.RightMouseButton); await WaitAsync(() => operation.Position.Index == 3);
-            window.MouseUp(point, MouseButton.Right); Assert.Equal(3, operation.Position.Index); Assert.Equal(width, window.Viewer.GetContentRect().Width);
+            window.MouseUp(point, MouseButton.Right); Assert.Equal(3, operation.Position.Index);
+            Assert.Equal(1, window.Viewer.TransformScale); // 原默认翻页不保持手工缩放，改绑也不能强制缩放。
         }
         finally { await window.PrepareShutdownAsync(); window.Close(); }
     }

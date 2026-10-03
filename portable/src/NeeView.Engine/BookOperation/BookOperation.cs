@@ -358,6 +358,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             _saving?.Cancel();
             await saveData.SynchronizeWritesAsync();
             var snapshot = System.Text.Json.JsonSerializer.Deserialize<Config>(System.Text.Json.JsonSerializer.Serialize(Config.Current))!;
+            var validStretchMode = Config.Current.View.ValidStretchMode;
             var commands = saveData.CaptureCommandSettings();
             var reading = Book?.Setting is { } setting ? (BookSettingConfig)setting.Clone() : null;
             try
@@ -370,6 +371,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                 foreach (var branch in typeof(Config).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance).Where(p => p.PropertyType.IsClass && p.CanWrite))
                     CopySettingFields(branch.GetValue(snapshot)!, branch.GetValue(Config.Current)!);
                 saveData.RestoreCommandSettings(commands);
+                Config.Current.View.RestoreStretchMode(snapshot.View.StretchMode, validStretchMode);
                 if (reading is not null && Book is { } book) { CopySettingFields(reading, book.Setting); book.Setting.Page = reading.Page; }
                 throw;
             }

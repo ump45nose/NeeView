@@ -431,6 +431,7 @@ public sealed class SaveData(string directory, string? temporaryDirectory = null
             // 退役的 Mac 别名统一归入原字段，避免下一次加载出现两套相反的权威值。
             Object(config, "Panels").Remove("IsLeftAutoHide"); Object(config, "Panels").Remove("IsRightAutoHide");
             config.Remove("IsAddressBarEnabled");
+            Object(config, "View").Remove("ViewOrigin");
             if (book is not null)
             {
                 var memento = book.CreateMemento();

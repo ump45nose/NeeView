@@ -39,6 +39,9 @@ public sealed partial class MainWindow : Window
     {
         "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen",
         "ViewScaleUp", "ViewScaleDown", "ViewScrollUp", "ViewScrollDown", "ViewScrollLeft", "ViewScrollRight", "OpenContextMenu", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
+        "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff",
+        "ToggleViewFlipVertical", "ViewFlipVerticalOn", "ViewFlipVerticalOff", "ViewReset", "ViewScaleStretch", "ViewPresetScroll", "ViewScrollNTypeUp", "ViewScrollNTypeDown",
+        "ToggleStretchMode", "ToggleStretchModeReverse", "SetStretchModeUniformToFill", "SetStretchModeUniformToSize", "SetStretchModeUniformToVertical", "SetStretchModeUniformToHorizontal", "ToggleStretchAllowScaleUp", "ToggleStretchAllowScaleDown",
         "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
@@ -208,6 +211,14 @@ public sealed partial class MainWindow : Window
         "ShowHiddenPanels" => _autoHide?.IsVisibleLocked,
         "SetStretchModeUniform" => Config.Current.View.StretchMode == PageStretchMode.Uniform,
         "SetStretchModeNone" => Config.Current.View.StretchMode == PageStretchMode.None,
+        "SetStretchModeUniformToFill" => Config.Current.View.StretchMode == PageStretchMode.UniformToFill,
+        "SetStretchModeUniformToSize" => Config.Current.View.StretchMode == PageStretchMode.UniformToSize,
+        "SetStretchModeUniformToVertical" => Config.Current.View.StretchMode == PageStretchMode.UniformToVertical,
+        "SetStretchModeUniformToHorizontal" => Config.Current.View.StretchMode == PageStretchMode.UniformToHorizontal,
+        "ToggleStretchAllowScaleUp" => Config.Current.View.AllowStretchScaleUp,
+        "ToggleStretchAllowScaleDown" => Config.Current.View.AllowStretchScaleDown,
+        "ToggleViewFlipHorizontal" => Viewer.IsFlipHorizontal,
+        "ToggleViewFlipVertical" => Viewer.IsFlipVertical,
         _ => null
     };
     /// <summary>表现变化只更新列宽；GridSplitter 的实际宽度由窗口保存，控件不设置固定 Width。</summary>
@@ -240,13 +251,13 @@ public sealed partial class MainWindow : Window
     /// <summary>打开请求统一进入 BookOperation，窗口不枚举内容。</summary>
     public async Task OpenAsync(string path)
     {
-        if (_model is null) return; Viewer.ResetTransform(); await _model.Operation.OpenAsync(path);
+        if (_model is null) return; await _model.Operation.OpenAsync(path);
     }
     /// <summary>启动和无窗口重开传入原完整快照，页面恢复不依赖已删除的历史项。</summary>
     public async Task RestoreLastAsync()
     {
         if (_model is null) return;
-        Viewer.ResetTransform(); await _model.Operation.RestoreLastAsync();
+        await _model.Operation.RestoreLastAsync();
     }
     /// <summary>菜单与历史面板共用原设置窗口；关闭后只刷新表现，不另建阅读入口。</summary>
     /// <param name="history">是否定位到历史记录设置页面。</param>
@@ -258,6 +269,7 @@ public sealed partial class MainWindow : Window
         await settings.ShowDialog(this);
         if (_preparing || _closedPrepared) return;
         _model.RefreshSelection(); _model.RefreshPanels(); await FilmStrip.RefreshAsync(); BuildMenus();
+        await Viewer.RefreshAsync();
     }
 
     /// <summary>执行宿主命令或转交原阅读命令；错误显示给用户。</summary>
@@ -297,8 +309,19 @@ public sealed partial class MainWindow : Window
                 case "ToggleHidePanel":
                     bool hide = !(Config.Current.Panels.IsHideLeftPanel || Config.Current.Panels.IsHideRightPanel);
                     Config.Current.Panels.IsHideLeftPanel = hide; Config.Current.Panels.IsHideRightPanel = hide; _model.RefreshPanels(); break;
-                case "ViewScaleUp": await Viewer.ZoomAsync(1.2); break;
-                case "ViewScaleDown": await Viewer.ZoomAsync(1 / 1.2); break;
+                case "ViewScaleUp": case "ViewScaleDown": case "ViewBaseScaleUp": case "ViewBaseScaleDown":
+                    await Viewer.ScaleAsync(name.EndsWith("Up") ? 1 : -1, _model.SaveData.GetCommandParameter<ViewScaleCommandParameter>(name), name.StartsWith("ViewBase")); break;
+                case "ViewRotateLeft": case "ViewRotateRight":
+                    await Viewer.RotateAsync(name.EndsWith("Right") ? 1 : -1, _model.SaveData.GetCommandParameter<ViewRotateCommandParameter>(name)); break;
+                case "ToggleViewFlipHorizontal": case "ToggleViewFlipVertical":
+                    bool horizontal = name.EndsWith("Horizontal");
+                    Viewer.Flip(horizontal, _model.SaveData.GetCommandParameter<ToggleCommandParameter>(name).GetState(horizontal ? Viewer.IsFlipHorizontal : Viewer.IsFlipVertical, fromMenu)); break;
+                case "ViewFlipHorizontalOn": case "ViewFlipHorizontalOff": case "ViewFlipVerticalOn": case "ViewFlipVerticalOff":
+                    Viewer.Flip(name.Contains("Horizontal"), name.EndsWith("On")); break;
+                case "ViewReset": Viewer.ResetTransform(); await Viewer.RefreshAsync(); break;
+                case "ViewScaleStretch": await Viewer.StretchAsync(); break;
+                case "ViewPresetScroll": Viewer.ScrollToPreset(_model.SaveData.GetCommandParameter<ViewPresetScrollCommandParameter>(name)); break;
+                case "ViewScrollNTypeUp": case "ViewScrollNTypeDown": Viewer.ScrollNType(name.EndsWith("Down") ? 1 : -1, _model.SaveData.GetCommandParameter<ViewScrollNTypeCommandParameter>(name)); break;
                 case "ViewScrollUp": case "ViewScrollDown": case "ViewScrollLeft": case "ViewScrollRight":
                     Viewer.ScrollView(name, _model.SaveData.GetCommandParameter<ViewScrollCommandParameter>(name)); break;
                 case "OpenContextMenu": OpenViewerContextMenu(); break;
@@ -313,8 +336,16 @@ public sealed partial class MainWindow : Window
                         if (number is not null) await JumpPageAsync(number.Value);
                     }
                     break;
-                case "SetStretchModeUniform": Config.Current.View.StretchMode = PageStretchMode.Uniform; Viewer.ResetTransform(); await Viewer.RefreshAsync(); break;
-                case "SetStretchModeNone": Config.Current.View.StretchMode = PageStretchMode.None; Viewer.ResetTransform(); await Viewer.RefreshAsync(); break;
+                case "ToggleStretchMode": case "ToggleStretchModeReverse":
+                    Config.Current.View.StretchMode = NeeView.PageFrames.ViewTransformMath.ToggleStretch(Config.Current.View.StretchMode, name.EndsWith("Reverse") ? -1 : 1,
+                        _model.SaveData.GetCommandParameter<ToggleStretchModeCommandParameter>(name)); await Viewer.RefreshAsync(); await Viewer.StretchAsync(); break;
+                case "SetStretchModeNone": case "SetStretchModeUniform": case "SetStretchModeUniformToFill": case "SetStretchModeUniformToSize": case "SetStretchModeUniformToVertical": case "SetStretchModeUniformToHorizontal":
+                    var mode = Enum.Parse<PageStretchMode>(name["SetStretchMode".Length..]);
+                    var toggle = name != "SetStretchModeNone" && _model.SaveData.GetCommandParameter<StretchModeCommandParameter>(name).IsToggle;
+                    Config.Current.View.StretchMode = toggle && Config.Current.View.StretchMode == mode ? PageStretchMode.None : mode;
+                    await Viewer.RefreshAsync(); await Viewer.StretchAsync(); break;
+                case "ToggleStretchAllowScaleUp": Config.Current.View.AllowStretchScaleUp = !Config.Current.View.AllowStretchScaleUp; await Viewer.RefreshAsync(); await Viewer.StretchAsync(); break;
+                case "ToggleStretchAllowScaleDown": Config.Current.View.AllowStretchScaleDown = !Config.Current.View.AllowStretchScaleDown; await Viewer.RefreshAsync(); await Viewer.StretchAsync(); break;
                 case "ToggleHideLeftPanel": Config.Current.Panels.IsHideLeftPanel = !Config.Current.Panels.IsHideLeftPanel; _model.RefreshPanels(); break;
                 case "ToggleHideRightPanel": Config.Current.Panels.IsHideRightPanel = !Config.Current.Panels.IsHideRightPanel; _model.RefreshPanels(); break;
                 case "OpenOptionsWindow":

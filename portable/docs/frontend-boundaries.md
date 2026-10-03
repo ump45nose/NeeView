@@ -53,3 +53,5 @@
 第十五批ArchivePageRenderer独立转换原封面/叠页/文件信息区，主题使用ArchivePage资源。ReaderView只命中封面并发出实际Page动作，Engine核对所属Book并加载；封面选择/目录递归/父级定位均在Engine，控件不访问文件。空封面/未知文件逐页处理，其他可见需求继续。详见[p2-book-hierarchy.md](p2-book-hierarchy.md)。
 
 第十六批MouseGestureSource只处理框架动作到原输入标识的转换，设置校验与执行共用；A/B/C和反转规则在Engine.DefaultInputScheme。SettingsWindow编辑副本经BookOperation.ApplyOptionsAsync提交，失败恢复原设置引用；外观与输入不重建阅读帧。布局/配色仍可单独调整，见[p2-mouse-input.md](p2-mouse-input.md)。
+
+第十七批ReaderTransformPresenter独立管理原变换图和唯一矩阵，ReaderView管理资源/输入；CommandParameterEdit管理克隆草稿，CommandParameterWindow只呈现字段。设置草稿最后进入原ApplyOptionsAsync，布局/主题不实现参数算法，详见[p2-view-transform.md](p2-view-transform.md)。

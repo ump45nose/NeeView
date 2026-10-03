@@ -49,4 +49,14 @@ public sealed class DragArea
         }
         return new(x - originalX, y - originalY);
     }
+    /// <summary>原预置滚动：小图在非snap时仅校正越界，大图或snap时强制对齐指定边。</summary>
+    public Vector SnapAlignment(LimitedHorizontalAlignment horizontal, LimitedVerticalAlignment vertical, bool snap)
+    {
+        var correction = SnapView(false);
+        var x = snap || ContentRect.Width > ViewRect.Width ? horizontal switch
+        { LimitedHorizontalAlignment.Left => ViewRect.Left + ContentRect.Width * .5, LimitedHorizontalAlignment.Right => ViewRect.Right - ContentRect.Width * .5, _ => ViewRect.Left + ViewRect.Width * .5 } : ContentRect.X + ContentRect.Width * .5 + correction.X;
+        var y = snap || ContentRect.Height > ViewRect.Height ? vertical switch
+        { LimitedVerticalAlignment.Top => ViewRect.Top + ContentRect.Height * .5, LimitedVerticalAlignment.Bottom => ViewRect.Bottom - ContentRect.Height * .5, _ => ViewRect.Top + ViewRect.Height * .5 } : ContentRect.Y + ContentRect.Height * .5 + correction.Y;
+        return new(x - ContentRect.X - ContentRect.Width * .5, y - ContentRect.Y - ContentRect.Height * .5);
+    }
 }

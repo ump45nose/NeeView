@@ -107,9 +107,41 @@ public sealed class BookshelfConfig
 /// <summary>原查看器基础缩放选项。</summary>
 public sealed class ViewConfig
 {
-    public PageStretchMode StretchMode { get; set; } = PageStretchMode.Uniform;
+    private PageStretchMode _stretchMode = PageStretchMode.Uniform;
+    public PageStretchMode StretchMode { get => _stretchMode; set { _stretchMode = value; if (value != PageStretchMode.None) ValidStretchMode = value; } }
+    [System.Text.Json.Serialization.JsonIgnore]
+    public PageStretchMode ValidStretchMode { get; private set; } = PageStretchMode.Uniform;
+    /// <summary>原表单回滚恢复有效适配模式，JSON忽略的运行状态不能由序列化快照推测。</summary>
+    internal void RestoreStretchMode(PageStretchMode mode, PageStretchMode valid) { _stretchMode = mode; ValidStretchMode = valid; }
     public bool AllowStretchScaleUp { get; set; } = true;
     public bool AllowStretchScaleDown { get; set; } = true;
+    public bool IsBaseScaleEnabled { get; set; } = true;
+    public DragControlCenter ScaleCenter { get; set; }
+    public DragControlCenter RotateCenter { get; set; }
+    public DragControlCenter FlipCenter { get; set; }
+    public bool IsKeepScale { get; set; }
+    public bool IsKeepAngle { get; set; }
+    public bool IsKeepFlip { get; set; }
+    public bool IsKeepScaleBooks { get; set; }
+    public bool IsKeepAngleBooks { get; set; }
+    public bool IsKeepFlipBooks { get; set; }
+    public bool IsKeepPageTransform { get; set; }
+    public bool IsScaleStretchTracking { get; set; }
+    public ViewHorizontalOrigin ViewHorizontalOrigin { get; set; } = ViewHorizontalOrigin.CenterOrDirectionDependent;
+    public ViewVerticalOrigin ViewVerticalOrigin { get; set; } = ViewVerticalOrigin.CenterOrDirectionDependent;
+    public double ViewOriginCenterRatio { get; set; } = 1;
+    private double _angleFrequency;
+    public double AngleFrequency { get => _angleFrequency; set => _angleFrequency = double.IsFinite(value) ? Math.Round(Math.Max(0, value), 5) : 0; }
+    public MovementConstraint MovementConstraint { get; set; } = MovementConstraint.LockUntilResized;
+    public double ScrollDuration { get; set; } = .2;
+    /// <summary>旧原字段只作读取转换，保存继续使用两个独立方向。</summary>
+    [System.Text.Json.Serialization.JsonPropertyName("ViewOrigin"), System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public int ViewOriginLegacy
+    {
+        get => 0;
+        set { ViewHorizontalOrigin = value == 0 ? ViewHorizontalOrigin.Center : ViewHorizontalOrigin.CenterOrDirectionDependent;
+            ViewVerticalOrigin = value == 0 ? ViewVerticalOrigin.Center : value == 2 ? ViewVerticalOrigin.CenterOrTop : ViewVerticalOrigin.CenterOrDirectionDependent; }
+    }
 }
 /// <summary>窗口级布局状态，独立于书籍和阅读规则。</summary>
 public sealed class PanelsConfig

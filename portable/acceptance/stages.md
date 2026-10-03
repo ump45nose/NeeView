@@ -210,3 +210,12 @@ P2仍继续完整输入、阅读控制、书架书签互联与列表完善；Win
 - 本批未启动正式应用、未注入真实键鼠或访问用户数据，见[静默记录](p2-mouse-input-runtime.md)。原Windows、旧验收图及用户.DS_Store保持。
 
 P2继续查看器变换、页尾/锁定/帧方向、书架书签互联、历史与浮动宿主；真机输入、Windows动态对照、NAS、长期内存与完整显示P95独立待验。自动本地提交后继续，不推送或发布。
+
+## P2 第十七批：原查看器变换与参数编辑
+
+- 迁入原变换图/共享数据、缩放/旋转/Stretch/滚动限制参数；统一绘制/包围盒/导航器/卡片逆矩阵。默认翻页重置、每页记忆、锁定与Books继承分别验证，BaseScale沿原Props独立。
+- 参数弹窗与父草稿分开，未知字段/$type/共享owner/原大数值保持；设置保存失败恢复运行ValidStretchMode。窗口跟随保留原相对适配比例，None的设备比例只做一次。
+- 新增20项，最终全量 **286通过、0失败、0跳过**。Engine、正式Library、正式.app构建与本地ad-hoc严格签名见[p2-view-transform-validation.json](p2-view-transform-validation.json)。串行默认输出；首次裁剪分析错误修复后全量重跑，未跳过正式构建。
+- 已离线检查[参数窗口](p2-view-transform-parameter-layout.png)和[旋转翻转卡片](p2-view-transform-transform-layout.png)。本批未启动正式应用或修改用户数据，见[静默记录](p2-view-transform-runtime.md)。原Windows、旧证据和用户.DS_Store保持。
+
+P2继续书籍锁定/页尾/帧方向/Unload、书架书签、历史策略/模板与浮动宿主；依设备验收与完整显示性能独立待验。本增量自动本地提交后继续，不推送发布。

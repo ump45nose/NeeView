@@ -282,6 +282,42 @@
       "target": "src/NeeView.Engine/Book/PageType.cs",
       "sha256": "064e1a524fbf5ac73fea75007fd4187f1c67d02f8cf7bdd860a1fc5e9d504a1d",
       "status": "P2原枚举数值与IsFolder迁入"
+    },
+    {
+      "source": "NeeView/PageFrames/PageFrameTransformMap.cs",
+      "target": "src/NeeView.Engine/PageFrames/PageFrameTransformMap.cs",
+      "sha256": "015a1156d05165410739b455e34e0edb0e6c927b8a8793f6b033c59b1fb70a6e",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/PageFrames/IShareTransformContext.cs",
+      "target": "src/NeeView.Engine/PageFrames/IShareTransformContext.cs",
+      "sha256": "22babed8381ee0ca055e93e21fb1df854fafef08186fac680a2c066ba1c66d9a",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/MouseInput/DragControlCenter.cs",
+      "target": "src/NeeView.Engine/MouseInput/DragControlCenter.cs",
+      "sha256": "df68cf5ce26f38e2cebdb4a9bf08029ffb30bdc5a0edae4131758c947c16c758",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/Config/MovementConstraint.cs",
+      "target": "src/NeeView.Engine/Config/MovementConstraint.cs",
+      "sha256": "0831a89880eee77372b1dcb8965353bff796c1d0f1906f0e247261ec6579369e",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/Config/ViewHorizontalOrigin.cs",
+      "target": "src/NeeView.Engine/Config/ViewHorizontalOrigin.cs",
+      "sha256": "9093f473b40a0764b5e87bbf43e86c19e80ab80c0294b09a1353ca4f63ed5cd6",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/Config/ViewVerticalOrigin.cs",
+      "target": "src/NeeView.Engine/Config/ViewVerticalOrigin.cs",
+      "sha256": "eea7706baddd112ef878ce37778f30ab46717fa008cccb5cd56bc55bbf50738e",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
     }
   ],
   "partial_adapters": [
@@ -1004,6 +1040,102 @@
       "target": "src/NeeView.MacOS/Views/ReaderView.cs",
       "sha256": "a91075c9d356ff8cf7bedc1ea9071d590c427daf9cefd774066874a3408c002e",
       "status": "Original four-way and boundary cross-axis scroll; full transforms pending"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/ViewScaleCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/ViewScaleCommandParameter.cs",
+      "sha256": "b4b0f47ffd64eb877168f384edf9d06eac3cbf316a777c2a65ac6999567470df",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/ViewRotateCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/ViewRotateCommandParameter.cs",
+      "sha256": "a07907a8c8603ec90db2b2ee47b6c4bfbb56a3fe38d8c844c042c37a2a7199cf",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/ViewPresetScrollCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/ViewPresetScrollCommandParameter.cs",
+      "sha256": "2a381a6fd7287bc73a1c73d497e71d9b1bbd8688a2cff90aa1057a810ccc6ce7",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/ViewScrollNTypeCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/ViewScrollNTypeCommandParameter.cs",
+      "sha256": "0229d221ad164d1bf2200afc87505ae3e129704802ce0d738028da1419e0bec6",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/ToggleStretchModeCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/StretchModeCommandParameter.cs",
+      "sha256": "614192e133bcabfba831be586558843c4f2152b0876c7bcb35bd9bf2675556f5",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/StretchModeCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/StretchModeCommandParameter.cs",
+      "sha256": "aab0b05f0f2856961e107c8dbe970cbdd3875ce6230d09a492b689f8d4af2166",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/PageFrames/PageFrameTransform.cs",
+      "target": "src/NeeView.Engine/PageFrames/PageFrameTransform.cs",
+      "sha256": "e313fc4fad7e387772069e3cbb9816d29393d517a9efa07146fcdad585a70b43",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/PageFrames/PageFrameTransformAccessor.cs",
+      "target": "src/NeeView.Engine/PageFrames/PageFrameTransform.cs",
+      "sha256": "b32830ae5e57f12d8d33f12554c4974c51c91e715b74df1ba55d4a26095efcdf",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/MainView/ViewTransformControl.cs",
+      "target": "src/NeeView.Engine/PageFrames/ViewTransformMath.cs",
+      "sha256": "a91075c9d356ff8cf7bedc1ea9071d590c427daf9cefd774066874a3408c002e",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/MouseInput/DragTransform.cs",
+      "target": "src/NeeView.Engine/PageFrames/ViewTransformMath.cs",
+      "sha256": "5841569dee57b5c083dd43513ac15d42632200dc2743418c36ab7bb9e743f38f",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/MainView/ViewPropertyControl.cs",
+      "target": "src/NeeView.Engine/PageFrames/ViewTransformMath.cs",
+      "sha256": "a039d9cfe4aa7940f73ef6e686b18d4cbda00af3dea12505fa737e0e538566e1",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/PageFramesMath/ScrollAreaLimit.cs",
+      "target": "src/NeeView.Engine/MouseInput/ScrollAreaLimit.cs",
+      "sha256": "f9842d77311ee7449243b39fb932227f610fe475ead313e04a5631c26e1a5299",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/PageFramesMath/ScrollLock.cs",
+      "target": "src/NeeView.Engine/MouseInput/ScrollLock.cs",
+      "sha256": "f8ceef2a4fab901584a2a211cae558d0006678d453192f698f6b1b01ff25615e",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/MouseInput/PageFrameContentDragTransformContext.cs",
+      "target": "src/NeeView.MacOS/Views/ReaderTransformPresenter.cs",
+      "sha256": "0a8a02682dce0a6fd6f8fd511d7f8641c60eb024850ae3212c9fa7f7ce1f8d69",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/PageFrames/BaseScaleTransform.cs",
+      "target": "src/NeeView.MacOS/Views/ReaderTransformPresenter.cs",
+      "sha256": "7acb2fcbfbd07572d5d98f5851a9028dc8e3484cab39ba09e8ae20c87b027d62",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
+    },
+    {
+      "source": "NeeView/PageFrames/PageFrameContent.cs",
+      "target": "src/NeeView.MacOS/Views/ReaderTransformPresenter.cs",
+      "sha256": "1b61defff86cfb1f5033522a7c59d18fe4c723275cc63fd0e3bfac5aa0f9bd94",
+      "status": "P2 batch 17: original numeric transform and parameter chain; platform display adapted separately"
     }
   ],
   "rule_references": [
@@ -1182,6 +1314,18 @@
       "target": "src/NeeView.MacOS/Views/ReaderView.cs",
       "sha256": "3e45129bc329ab277e53cad01461b3663c4dd02e3dd08239c0d7501a52c6e672",
       "status": "原封面单击隔离/双击实际书籍；框架Pointer及可等待加载适配"
+    },
+    {
+      "source": "NeeView/Setting/CommandParameterControl.xaml",
+      "target": "src/NeeView.MacOS/Views/CommandParameterWindow.cs",
+      "sha256": "944db7f4dfc31a9fbf1bff2dd8aa4c925bf828e59b438c23fee844ff72930be6",
+      "status": "第十七批：原共享拥有者/克隆草稿/属性编辑转换；保留父设置提交边界"
+    },
+    {
+      "source": "NeeView/Setting/CommandParameterViewModel.cs",
+      "target": "src/NeeView.MacOS/ViewModels/CommandParameterEdit.cs",
+      "sha256": "29d78b9e443cd8fa08b2f10d23d2236de0018bc7f642ba13a095f64c6502c5ef",
+      "status": "第十七批：原共享拥有者/克隆草稿/属性编辑转换；保留父设置提交边界"
     }
   ],
   "backend_reuse": [

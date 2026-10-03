@@ -47,16 +47,16 @@
 | ClearHistory | 清理历史记录 |  | P2 原历史集合清空；具体范围见验收表 | NeeView/Command/Commands/ClearHistoryCommand.cs |
 | ClearHistoryInPlace | 删除当前位置的历史记录 |  | 待 P2–P5 | NeeView/Command/Commands/ClearHistoryInPlaceCommand.cs |
 | RemoveUnlinkedHistory | 删除无效的历史记录 |  | 待 P2–P5 | NeeView/Command/Commands/RemoveUnlinkedHistoryCommand.cs |
-| ToggleStretchMode | 切换拉伸 | LeftButton+WheelDown | 待 P2–P5 | NeeView/Command/Commands/ToggleStretchModeCommand.cs |
-| ToggleStretchModeReverse | 切换拉伸 (反向) | LeftButton+WheelUp | 待 P2–P5 | NeeView/Command/Commands/ToggleStretchModeReverseCommand.cs |
-| SetStretchModeNone | 原始大小 |  | P1 宿主适配 | NeeView/Command/Commands/SetStretchModeNoneCommand.cs |
-| SetStretchModeUniform | 适应窗口 |  | P1 宿主适配 | NeeView/Command/Commands/SetStretchModeUniformCommand.cs |
-| SetStretchModeUniformToFill | 铺满整个窗口 |  | 待 P2–P5 | NeeView/Command/Commands/SetStretchModeUniformToFillCommand.cs |
-| SetStretchModeUniformToSize | 适应窗口区域 |  | 待 P2–P5 | NeeView/Command/Commands/SetStretchModeUniformToSizeCommand.cs |
-| SetStretchModeUniformToVertical | 适应窗口高度 |  | 待 P2–P5 | NeeView/Command/Commands/SetStretchModeUniformToVerticalCommand.cs |
-| SetStretchModeUniformToHorizontal | 适应窗口宽度 |  | 待 P2–P5 | NeeView/Command/Commands/SetStretchModeUniformToHorizontalCommand.cs |
-| ToggleStretchAllowScaleUp | 允许放大 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleStretchAllowScaleUpCommand.cs |
-| ToggleStretchAllowScaleDown | 允许缩小 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleStretchAllowScaleDownCommand.cs |
+| ToggleStretchMode | 切换拉伸 | LeftButton+WheelDown | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ToggleStretchModeCommand.cs |
+| ToggleStretchModeReverse | 切换拉伸 (反向) | LeftButton+WheelUp | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ToggleStretchModeReverseCommand.cs |
+| SetStretchModeNone | 原始大小 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/SetStretchModeNoneCommand.cs |
+| SetStretchModeUniform | 适应窗口 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/SetStretchModeUniformCommand.cs |
+| SetStretchModeUniformToFill | 铺满整个窗口 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/SetStretchModeUniformToFillCommand.cs |
+| SetStretchModeUniformToSize | 适应窗口区域 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/SetStretchModeUniformToSizeCommand.cs |
+| SetStretchModeUniformToVertical | 适应窗口高度 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/SetStretchModeUniformToVerticalCommand.cs |
+| SetStretchModeUniformToHorizontal | 适应窗口宽度 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/SetStretchModeUniformToHorizontalCommand.cs |
+| ToggleStretchAllowScaleUp | 允许放大 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ToggleStretchAllowScaleUpCommand.cs |
+| ToggleStretchAllowScaleDown | 允许缩小 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ToggleStretchAllowScaleDownCommand.cs |
 | ToggleNearestNeighbor | 启用/禁用逐点放大 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleNearestNeighborCommand.cs |
 | ToggleBackground | 切换背景 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleBackgroundCommand.cs |
 | SetBackgroundBlack | 黑色背景 |  | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundBlackCommand.cs |
@@ -101,31 +101,31 @@
 | ToggleWindowMaximize | 最大化窗口 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleWindowMaximizeCommand.cs |
 | ShowHiddenPanels | 临时显示面板 |  | P2 Mac 原窗口显示控制 | NeeView/Command/Commands/ShowHiddenPanelsCommand.cs |
 | ToggleSlideShow | 幻灯片播放/停止 | F5 | 待 P2–P5 | NeeView/Command/Commands/ToggleSlideShowCommand.cs |
-| ViewScrollNTypeUp | N 字形滚动↑ |  | 待 P2–P5 | NeeView/Command/Commands/ViewScrollNTypeUpCommand.cs |
-| ViewScrollNTypeDown | N 字形滚动↓ |  | 待 P2–P5 | NeeView/Command/Commands/ViewScrollNTypeDownCommand.cs |
+| ViewScrollNTypeUp | N 字形滚动↑ |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ViewScrollNTypeUpCommand.cs |
+| ViewScrollNTypeDown | N 字形滚动↓ |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ViewScrollNTypeDownCommand.cs |
 | ViewScrollUp | 滚动↑ |  | P2 第十六批宿主适配 | NeeView/Command/Commands/ViewScrollUpCommand.cs |
 | ViewScrollDown | 滚动↓ |  | P2 第十六批宿主适配 | NeeView/Command/Commands/ViewScrollDownCommand.cs |
 | ViewScrollLeft | 滚动← |  | P2 第十六批宿主适配 | NeeView/Command/Commands/ViewScrollLeftCommand.cs |
 | ViewScrollRight | 滚动→ |  | P2 第十六批宿主适配 | NeeView/Command/Commands/ViewScrollRightCommand.cs |
-| ViewPresetScroll | 预设滚动 |  | 待 P2–P5 | NeeView/Command/Commands/ViewPresetScrollCommand.cs |
-| ViewScaleUp | 放大 | RightButton+WheelUp | P1 宿主适配 | NeeView/Command/Commands/ViewScaleUpCommand.cs |
-| ViewScaleDown | 缩小 | RightButton+WheelDown | P1 宿主适配 | NeeView/Command/Commands/ViewScaleDownCommand.cs |
-| ViewScaleStretch | 拉伸 |  | 待 P2–P5 | NeeView/Command/Commands/ViewScaleStretchCommand.cs |
-| ViewBaseScaleUp | 放大基准比例 |  | 待 P2–P5 | NeeView/Command/Commands/ViewBaseScaleUpCommand.cs |
-| ViewBaseScaleDown | 缩小基准比例 |  | 待 P2–P5 | NeeView/Command/Commands/ViewBaseScaleDownCommand.cs |
-| ViewRotateLeft | 左旋 |  | 待 P2–P5 | NeeView/Command/Commands/ViewRotateLeftCommand.cs |
-| ViewRotateRight | 右旋 |  | 待 P2–P5 | NeeView/Command/Commands/ViewRotateRightCommand.cs |
+| ViewPresetScroll | 预设滚动 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ViewPresetScrollCommand.cs |
+| ViewScaleUp | 放大 | RightButton+WheelUp | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ViewScaleUpCommand.cs |
+| ViewScaleDown | 缩小 | RightButton+WheelDown | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ViewScaleDownCommand.cs |
+| ViewScaleStretch | 拉伸 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ViewScaleStretchCommand.cs |
+| ViewBaseScaleUp | 放大基准比例 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ViewBaseScaleUpCommand.cs |
+| ViewBaseScaleDown | 缩小基准比例 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ViewBaseScaleDownCommand.cs |
+| ViewRotateLeft | 左旋 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ViewRotateLeftCommand.cs |
+| ViewRotateRight | 右旋 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ViewRotateRightCommand.cs |
 | ToggleIsAutoRotateLeft | 启用/禁用自动左旋转 |  | P2 Engine 接入；Windows动态对照待验 | NeeView/Command/Commands/ToggleIsAutoRotateLeftCommand.cs |
 | ToggleIsAutoRotateRight | 启用/禁用自动右旋转 |  | P2 Engine 接入；Windows动态对照待验 | NeeView/Command/Commands/ToggleIsAutoRotateRightCommand.cs |
 | ToggleIsAutoRotateForcedLeft | 启用/禁用强制左旋转 |  | P2 Engine 接入；Windows动态对照待验 | NeeView/Command/Commands/ToggleIsAutoRotateForcedLeftCommand.cs |
 | ToggleIsAutoRotateForcedRight | 启用/禁用强制右旋转 |  | P2 Engine 接入；Windows动态对照待验 | NeeView/Command/Commands/ToggleIsAutoRotateForcedRightCommand.cs |
-| ToggleViewFlipHorizontal | 左右翻转 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleViewFlipHorizontalCommand.cs |
-| ViewFlipHorizontalOn | 允许左右翻转 |  | 待 P2–P5 | NeeView/Command/Commands/ViewFlipHorizontalOnCommand.cs |
-| ViewFlipHorizontalOff | 取消左右翻转 |  | 待 P2–P5 | NeeView/Command/Commands/ViewFlipHorizontalOffCommand.cs |
-| ToggleViewFlipVertical | 上下翻转 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleViewFlipVerticalCommand.cs |
-| ViewFlipVerticalOn | 允许上下翻转 |  | 待 P2–P5 | NeeView/Command/Commands/ViewFlipVerticalOnCommand.cs |
-| ViewFlipVerticalOff | 取消上下翻转 |  | 待 P2–P5 | NeeView/Command/Commands/ViewFlipVerticalOffCommand.cs |
-| ViewReset | 重置视图 |  | 待 P2–P5 | NeeView/Command/Commands/ViewResetCommand.cs |
+| ToggleViewFlipHorizontal | 左右翻转 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ToggleViewFlipHorizontalCommand.cs |
+| ViewFlipHorizontalOn | 允许左右翻转 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ViewFlipHorizontalOnCommand.cs |
+| ViewFlipHorizontalOff | 取消左右翻转 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ViewFlipHorizontalOffCommand.cs |
+| ToggleViewFlipVertical | 上下翻转 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ToggleViewFlipVerticalCommand.cs |
+| ViewFlipVerticalOn | 允许上下翻转 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ViewFlipVerticalOnCommand.cs |
+| ViewFlipVerticalOff | 取消上下翻转 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ViewFlipVerticalOffCommand.cs |
+| ViewReset | 重置视图 |  | P2 original transform/parameters; batch 17 | NeeView/Command/Commands/ViewResetCommand.cs |
 | PrevPage | 后退 | Right,RightClick | P1 Engine | NeeView/Command/Commands/PrevPageCommand.cs |
 | NextPage | 前进 | Left,LeftClick | P1 Engine | NeeView/Command/Commands/NextPageCommand.cs |
 | PrevOnePage | 后退一页 |  | P1 Engine | NeeView/Command/Commands/PrevOnePageCommand.cs |
