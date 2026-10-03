@@ -4,7 +4,7 @@
     <Border Grid.Column="0" Classes="panel">
       <Grid RowDefinitions="Auto,*">
         <TextBox PlaceholderText="搜索设置" Margin="8" IsEnabled="False" ToolTip.Tip="完整设置搜索在 P2–P5 迁移" />
-        <ListBox Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
+        <ListBox Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
       </Grid>
     </Border>
     <ScrollViewer x:Name="ReadingSettings" Grid.Column="1">
@@ -41,9 +41,30 @@
         <TextBlock Text="滑条厚度（DIP，15–50）" /><NumericUpDown x:Name="SliderThickness" Minimum="15" Maximum="50" Increment="1" FormatString="0.#####" />
         <TextBlock Text="滑条不透明度（0–1）" /><NumericUpDown x:Name="SliderOpacity" Minimum="0" Maximum="1" Increment="0.05" FormatString="0.#####" />
         <TextBlock Text="滑条滚轮动作" /><ComboBox x:Name="SliderWheel"><ComboBoxItem Content="移动正文页" /><ComboBoxItem Content="使用命令绑定" /></ComboBox>
-        <CheckBox Content="滑条自动隐藏（后续迁移）" IsEnabled="False" />
+        <CheckBox x:Name="SliderHide" Content="自动隐藏滑条（胶片条一起弹出）" /><CheckBox x:Name="SliderModeHide" Content="自动隐藏模式下隐藏滑条" /><CheckBox x:Name="FilmModeHide" Content="自动隐藏模式下隐藏胶片条" />
         <CheckBox x:Name="SliderMarks" Content="滑条显示播放列表标记" /><CheckBox x:Name="FilmMarks" Content="胶片条显示播放列表标记" />
         <TextBlock Text="指定页数步进（上一方向、下一方向共用）" /><NumericUpDown x:Name="MoveSize" Minimum="0" Maximum="1000" Increment="1" FormatString="0" />
+      </StackPanel>
+    </ScrollViewer>
+    <ScrollViewer x:Name="AutoHideSettings" Grid.Column="1" IsVisible="False">
+      <StackPanel Margin="24" Spacing="14">
+        <TextBlock Text="窗口 / 自动隐藏" FontSize="20" />
+        <TextBlock Text="启用自动隐藏模式" FontSize="16" />
+        <CheckBox x:Name="AutoNormal" Content="普通窗口" /><CheckBox x:Name="AutoMaximized" Content="最大化窗口" /><CheckBox x:Name="AutoFullScreen" Content="全屏窗口" />
+        <TextBlock Text="菜单 / 侧栏" FontSize="16" />
+        <CheckBox x:Name="AddressEnabled" Content="显示地址栏" /><CheckBox x:Name="SideBarEnabled" Content="显示侧栏图标" />
+        <CheckBox x:Name="MenuHide" Content="自动隐藏菜单和地址栏" /><CheckBox x:Name="MenuModeHide" Content="自动隐藏模式下隐藏菜单和地址栏" />
+        <CheckBox x:Name="LeftHide" Content="自动隐藏左侧栏" /><CheckBox x:Name="RightHide" Content="自动隐藏右侧栏" />
+        <CheckBox x:Name="LeftModeHide" Content="自动隐藏模式下隐藏左侧栏" /><CheckBox x:Name="RightModeHide" Content="自动隐藏模式下隐藏右侧栏" />
+        <TextBlock Text="延迟与边缘触发" FontSize="16" />
+        <TextBlock Text="隐藏延迟（秒）" /><NumericUpDown x:Name="HideDelay" Minimum="0" Maximum="60" Increment="0.1" FormatString="0.#####" />
+        <TextBlock Text="显示延迟（秒）" /><NumericUpDown x:Name="ShowDelay" Minimum="0" Maximum="60" Increment="0.1" FormatString="0.#####" />
+        <CheckBox x:Name="KeyDelay" Content="按键延长所属区域的隐藏延迟" />
+        <TextBlock Text="左右边缘宽度（DIP）" /><NumericUpDown x:Name="HorizontalMargin" Minimum="0" Maximum="500" FormatString="0.#####" />
+        <TextBlock Text="上下边缘宽度（DIP）" /><NumericUpDown x:Name="VerticalMargin" Minimum="0" Maximum="500" FormatString="0.#####" />
+        <TextBlock Text="焦点锁定" /><ComboBox x:Name="FocusLock"><ComboBoxItem Content="无" /><ComboBoxItem Content="逻辑焦点" /><ComboBoxItem Content="文本逻辑焦点" /><ComboBoxItem Content="实际焦点" /><ComboBoxItem Content="文本实际焦点" /></ComboBox>
+        <TextBlock Text="上边缘与侧栏冲突" /><ComboBox x:Name="TopConflict"><ComboBoxItem Content="允许同时弹出" /><ComboBoxItem Content="仅最边缘触发" /><ComboBoxItem Content="禁止同时弹出" /></ComboBox>
+        <TextBlock Text="下边缘与侧栏冲突" /><ComboBox x:Name="BottomConflict"><ComboBoxItem Content="允许同时弹出" /><ComboBoxItem Content="仅最边缘触发" /><ComboBoxItem Content="禁止同时弹出" /></ComboBox>
       </StackPanel>
     </ScrollViewer>
     <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="16" Spacing="8">

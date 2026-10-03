@@ -1,0 +1,56 @@
+{
+  "utc": "2026-10-03T15:00:55.375343+00:00",
+  "app_stopped_before_restore": true,
+  "saved_normal_mode": false,
+  "saved_last_page": "中文/004.png",
+  "restored_files": {
+    "UserSetting.json": {
+      "sha256": "e99d82cfe048e327d81e53a50435933b3f879e6ba376e9c7dcb97eeb679a219f",
+      "matches_before": true,
+      "byte_equal": true
+    },
+    "History.json": {
+      "sha256": "150504aa677e1b8fb450475cc8cae69a936697ee0dcfd384c5f4cc2dd1cf06cd",
+      "matches_before": true,
+      "byte_equal": true
+    },
+    "Bookmark.json": {
+      "sha256": "0e605947c1d28342dbfb49dbbdf4a12dce22015bd1ed974a69848dbaa381e915",
+      "matches_before": true,
+      "byte_equal": true
+    }
+  },
+  "source_hashes": {
+    "portable/artifacts/p1-smoke/漫画.cbz": {
+      "sha256": "1ca8739cba01324cf38a94bfb38b315fa4a4456d68a63a26f6709d5ff4494526",
+      "unchanged": true
+    },
+    "portable/artifacts/p1-smoke/图片/002.png": {
+      "sha256": "db5e22abe81c1c21a030df32c90f524529e16250f4afb7558c0ffd238bf3ecef",
+      "unchanged": true
+    },
+    "portable/artifacts/p1-smoke/图片/003.png": {
+      "sha256": "28c7b47bccae4e3afe80040e2b5761ec8357deb3bc5311106b86251b60a27c4e",
+      "unchanged": true
+    },
+    "portable/artifacts/p1-smoke/图片/001.png": {
+      "sha256": "d1f4999f50f0038b1744127bd76d0a8a39142d3cac74b51bf82b7b3fac6d110e",
+      "unchanged": true
+    },
+    "portable/artifacts/p1-smoke/图片/004.png": {
+      "sha256": "49bd0033d044d15c8b1614a597346609e12d1f0f3858c2fa07820d9a27a1534b",
+      "unchanged": true
+    },
+    "portable/artifacts/p1-smoke/图片/005.png": {
+      "sha256": "61a81db3477a296b9dd916d4d8a2c7a79799f50f1c2a9d5ac0e05116e8ca39cd",
+      "unchanged": true
+    },
+    "portable/artifacts/p1-smoke/图片/006.png": {
+      "sha256": "36f0c148eb1a4ae472a2e5b4ad3a7b8fe9276a559d5f6653988118eea42832eb",
+      "unchanged": true
+    }
+  },
+  "Playlists_exists_after": false,
+  "restored_last_page": "中文/003.png",
+  "temporary_keys_removed": true
+}

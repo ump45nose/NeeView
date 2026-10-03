@@ -65,15 +65,15 @@
 | SetBackgroundCheck | 白色方格背景 |  | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundCheckCommand.cs |
 | SetBackgroundCheckDark | 黑色方格背景 |  | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundCheckDarkCommand.cs |
 | SetBackgroundCustom | 自定义背景 |  | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundCustomCommand.cs |
-| ToggleTopmost | 启用/禁用总是置顶显示 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleTopmostCommand.cs |
+| ToggleTopmost | 启用/禁用总是置顶显示 |  | P2 Mac 原窗口显示控制 | NeeView/Command/Commands/ToggleTopmostCommand.cs |
 | ToggleVisibleAddressBar | 显示/隐藏地址栏 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleAddressBarCommand.cs |
-| ToggleHideMenu | 启用/禁用自动隐藏菜单 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleHideMenuCommand.cs |
-| ToggleVisibleSideBar | 显示/隐藏侧边栏 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleSideBarCommand.cs |
-| ToggleHidePanel | 启用/禁用自动隐藏面板 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleHidePanelCommand.cs |
-| ToggleHideLeftPanel | 切换自动隐藏左面板 |  | P1 宿主适配 | NeeView/Command/Commands/ToggleHideLeftPanelCommand.cs |
-| ToggleHideRightPanel | 切换自动隐藏右面板 |  | P1 宿主适配 | NeeView/Command/Commands/ToggleHideRightPanelCommand.cs |
+| ToggleHideMenu | 启用/禁用自动隐藏菜单 |  | P2 Mac 原窗口显示控制 | NeeView/Command/Commands/ToggleHideMenuCommand.cs |
+| ToggleVisibleSideBar | 显示/隐藏侧边栏 |  | P2 Mac 原窗口显示控制 | NeeView/Command/Commands/ToggleVisibleSideBarCommand.cs |
+| ToggleHidePanel | 启用/禁用自动隐藏面板 |  | P2 Mac 原窗口显示控制 | NeeView/Command/Commands/ToggleHidePanelCommand.cs |
+| ToggleHideLeftPanel | 切换自动隐藏左面板 |  | P2 Mac 原窗口显示控制 | NeeView/Command/Commands/ToggleHideLeftPanelCommand.cs |
+| ToggleHideRightPanel | 切换自动隐藏右面板 |  | P2 Mac 原窗口显示控制 | NeeView/Command/Commands/ToggleHideRightPanelCommand.cs |
 | ToggleVisiblePageSlider | 显示/隐藏滚动条 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleVisiblePageSliderCommand.cs |
-| ToggleHidePageSlider | 启用/禁用自动隐藏滚动条 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleHidePageSliderCommand.cs |
+| ToggleHidePageSlider | 启用/禁用自动隐藏滚动条 |  | P2 Mac 原窗口显示控制 | NeeView/Command/Commands/ToggleHidePageSliderCommand.cs |
 | ToggleVisibleBookshelf | 显示/隐藏书架 | B | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleBookshelfCommand.cs |
 | ToggleVisiblePageList | 显示/隐藏页面列表面板 | P | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisiblePageListCommand.cs |
 | ToggleVisibleBookmarkList | 显示/隐藏书签面板 | D | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleBookmarkListCommand.cs |
@@ -93,13 +93,13 @@
 | ToggleVisibleFilmStrip | 显示/隐藏幻灯条 |  | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleFilmStripCommand.cs |
 | ToggleHideFilmStrip | 启用/禁用自动隐藏幻灯条 |  | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleHideFilmStripCommand.cs |
 | ToggleMainViewFloating | 切换主视图窗口 | F12 | 待 P2–P5 | NeeView/Command/Commands/ToggleMainViewFloatingCommand.cs |
-| ToggleFullScreen | 切换全屏状态 | F11 | P1 宿主适配 | NeeView/Command/Commands/ToggleFullScreenCommand.cs |
-| SetFullScreen | 全屏 |  | 待 P2–P5 | NeeView/Command/Commands/SetFullScreenCommand.cs |
-| CancelFullScreen | 退出全屏 |  | 待 P2–P5 | NeeView/Command/Commands/CancelFullScreenCommand.cs |
+| ToggleFullScreen | 切换全屏状态 | F11 | P2 Mac 原窗口显示控制 | NeeView/Command/Commands/ToggleFullScreenCommand.cs |
+| SetFullScreen | 全屏 |  | P2 Mac 原窗口显示控制 | NeeView/Command/Commands/SetFullScreenCommand.cs |
+| CancelFullScreen | 退出全屏 |  | P2 Mac 原窗口显示控制 | NeeView/Command/Commands/CancelFullScreenCommand.cs |
 | ToggleFullDesktop | 切换全桌面 | Shift+F11 | 待 P2–P5 | NeeView/Command/Commands/ToggleFullDesktopCommand.cs |
 | ToggleWindowMinimize | 最小化窗口 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleWindowMinimizeCommand.cs |
 | ToggleWindowMaximize | 最大化窗口 |  | 待 P2–P5 | NeeView/Command/Commands/ToggleWindowMaximizeCommand.cs |
-| ShowHiddenPanels | 临时显示面板 |  | 待 P2–P5 | NeeView/Command/Commands/ShowHiddenPanelsCommand.cs |
+| ShowHiddenPanels | 临时显示面板 |  | P2 Mac 原窗口显示控制 | NeeView/Command/Commands/ShowHiddenPanelsCommand.cs |
 | ToggleSlideShow | 幻灯片播放/停止 | F5 | 待 P2–P5 | NeeView/Command/Commands/ToggleSlideShowCommand.cs |
 | ViewScrollNTypeUp | N 字形滚动↑ |  | 待 P2–P5 | NeeView/Command/Commands/ViewScrollNTypeUpCommand.cs |
 | ViewScrollNTypeDown | N 字形滚动↓ |  | 待 P2–P5 | NeeView/Command/Commands/ViewScrollNTypeDownCommand.cs |

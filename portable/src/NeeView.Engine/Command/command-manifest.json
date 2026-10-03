@@ -445,7 +445,7 @@
     "Text": "启用/禁用总是置顶显示",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleTopmostCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "总是置顶显示"
   },
   {
@@ -461,7 +461,7 @@
     "Text": "启用/禁用自动隐藏菜单",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleHideMenuCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "自动隐藏菜单"
   },
   {
@@ -469,7 +469,7 @@
     "Text": "显示/隐藏侧边栏",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleVisibleSideBarCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "侧边栏"
   },
   {
@@ -477,7 +477,7 @@
     "Text": "启用/禁用自动隐藏面板",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleHidePanelCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "自动隐藏面板"
   },
   {
@@ -485,7 +485,7 @@
     "Text": "切换自动隐藏左面板",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleHideLeftPanelCommand.cs",
-    "Stage": "P1 宿主适配",
+    "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "自动隐藏左面板"
   },
   {
@@ -493,7 +493,7 @@
     "Text": "切换自动隐藏右面板",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleHideRightPanelCommand.cs",
-    "Stage": "P1 宿主适配",
+    "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "自动隐藏右面板"
   },
   {
@@ -509,7 +509,7 @@
     "Text": "启用/禁用自动隐藏滚动条",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleHidePageSliderCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "自动隐藏滚动条"
   },
   {
@@ -669,7 +669,7 @@
     "Text": "切换全屏状态",
     "Shortcut": "F11",
     "Source": "NeeView/Command/Commands/ToggleFullScreenCommand.cs",
-    "Stage": "P1 宿主适配",
+    "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "全屏"
   },
   {
@@ -677,14 +677,14 @@
     "Text": "全屏",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetFullScreenCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md"
   },
   {
     "Name": "CancelFullScreen",
     "Text": "退出全屏",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/CancelFullScreenCommand.cs",
-    "Stage": "待 P2–P5"
+    "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md"
   },
   {
     "Name": "ToggleFullDesktop",
@@ -715,7 +715,7 @@
     "Text": "临时显示面板",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ShowHiddenPanelsCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "临时显示面板"
   },
   {

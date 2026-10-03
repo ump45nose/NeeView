@@ -18,6 +18,7 @@
 | 书签登记字段与按钮布局 | Views/BookmarkRegistrationWindow.axaml | 原 BookmarkPopupEdit；取消不提交，已确认目标需重新校验 |
 | 播放列表结构、行选择、焦点与输入 | Views/PlaylistView.axaml(.cs)、ViewModels/PlaylistViewModel.cs | 原 PlaylistHub 当前文件/条目及集合；不枚举目录或写文件 |
 | 滑条及胶片条页标记 | Views/PageMarkersView.cs、Views/ThumbnailView.cs | 原 BookPageMarker 页索引；标记变化只重绘，不申请正文资源 |
+| 五区自动隐藏、覆盖插槽、延迟/焦点/捕获 | Views/AutoHidePresenter.cs | 原Config资格/窗口状态；ChromeRefreshed不刷新正文或写JSON |
 | 设置页导航/内容结构 | Views/SettingsWindow.axaml | 原 BookSettingConfig 和恢复策略 |
 | 具体后端及实例装配 | MacApp.cs | 唯一可引用 Backends 的启动装配点 |
 
@@ -25,7 +26,7 @@
 
 主图是单绘制控件，不为每页创建图像控件；页面列表使用虚拟化 ListBox。主图及可见缩略图的显示 Bitmap 与像素租约归各查看器所有，先释放 Bitmap 再释放租约。切书/缩放/视口变化用 revision 拒绝旧请求；所有 UI 对象在 Dispatcher 线程修改。
 
-主布局参照原 MainWindow.xaml、SidePanels/SidePanelFrameView.xaml、菜单和 Dock 插槽。41 DIP 侧栏、36 DIP 按钮及转换资源保留。胶片条、历史、书签和导航器已接入首批业务。SidePanelPresenter 复用九个唯一内容控件，按 Engine 的组顺序/方向排布；拖放预览、指针捕获、分隔条与原图标资源归表现端。布局改变只触发 PanelsRefreshed，不请求主图。完整浮动窗口和自动隐藏细节仍待后续，详见 layout-migration.md。样式现代化应另做增量，先保留区域和操作流程。
+主布局参照原 MainWindow.xaml、SidePanels/SidePanelFrameView.xaml、菜单和 Dock 插槽。41 DIP 侧栏、36 DIP 按钮及转换资源保留。胶片条、历史、书签和导航器已接入首批业务。SidePanelPresenter 复用九个唯一内容控件，按 Engine 的组顺序/方向排布；拖放预览、指针捕获、分隔条与原图标资源归表现端。布局改变只触发 PanelsRefreshed，不请求主图。完整浮动窗口和高级窗口/输入细节仍待后续，详见 layout-migration.md。样式现代化应另做增量，先保留区域和操作流程。
 
 输入设置使用编辑副本，可搜索全部原命令；原复杂绑定保留，新增不可解析输入及冲突阻止保存。输入文本时不响应阅读/数字命令；Command+O/W/Q 仍是系统操作。旧 Control 只规范解析名称，不替换为 Command。PrevScrollPage/NextScrollPage 调用 Engine 的原 NScroll 计算，ReaderView 应用向量或进入原帧导航；参数从原 Commands 差分读取，完整滚动参数编辑及全景作用待后续。指定页对话框、共享步长和历史命令也进入同一正文入口；胶片条/滑条布局及主题不处理历史或阅读规则。正式 AppKit 桥接依据 HasPreciseScrollingDeltas，按窗口身份和查看器区域消费精确滚动/捏合；平移使用原 SnapView 防止图片移出视口，真实触控板待用户验收。
 
@@ -33,6 +34,8 @@
 
 第六批历史列表由 Engine.HistoryList/SaveData 管理过滤、导航和编辑，HistoryRow/MainWindow.History 管理分组显示、焦点、多选及菜单。历史主题/布局调整不触发阅读解码或修改访问顺序；四种显示模板与无效清理保留禁用入口。
 
-第七批滑条页号结构、输入反馈与主题分开；ReaderWorkspaceViewModel提供位置/显隐/尺寸/透明度，SettingsWindow只改表现字段时不调用ApplySettingAsync。原SliderConfig字段写回现有JSON，未知/未迁字段继续合并保留。Fluent轨道留白/滑块尺寸使用主题资源覆盖，15–50 DIP内不裁切，不维护第二套Slider模板；见[p2-slider-input.md](p2-slider-input.md)。第八批接入全局播放列表页标记，完整自动隐藏仍待窗口控制迁入。
+第七批滑条页号结构、输入反馈与主题分开；ReaderWorkspaceViewModel提供位置/显隐/尺寸/透明度，SettingsWindow只改表现字段时不调用ApplySettingAsync。原SliderConfig字段写回现有JSON，未知/未迁字段继续合并保留。Fluent轨道留白/滑块尺寸使用主题资源覆盖，15–50 DIP内不裁切，不维护第二套Slider模板；见[p2-slider-input.md](p2-slider-input.md)。第八批接入全局播放列表页标记，五区自动隐藏由第九批窗口控制迁入。
 
 第八批列表行引用与业务条目身份分开，集合刷新恢复选中容器焦点；普通方向键只选行，Enter/Delete在列表隧道消费。前后登记命令更新Hub当前项时回显新高亮，当前项仍在选中批次中则保留多选。关闭先禁止新动作并等待已授权编辑；尚在采集路径/文字的对话框返回后禁止续写。主题、标记绘制及面板排序不重建正文，详见[p2-playlist.md](p2-playlist.md)。
+
+第九批自动隐藏区使用最终shown状态，实际悬停/焦点/捕获由独立AutoHidePresenter采集，不与延迟后的显示状态混用。覆盖区域复用原控件与组引用，内容上下余量保留原资格语义，正文区域不受它改变。原系统手势桥接仍负责设备信息，主窗口用实际控件命中排除覆盖面板；见[p2-autohide.md](p2-autohide.md)。

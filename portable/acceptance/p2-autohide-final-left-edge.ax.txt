@@ -1,0 +1,58 @@
+Window: "漫画.cbz — NeeView", App: NeeView.
+0 standard window 漫画.cbz — NeeView, Secondary Actions: Raise
+	1 container WindowChrome, ID: AvaloniaWindowChrome
+	2 container
+		3 container PART_VisualLayerManager
+			4 container Root
+				5 container SidePanelFrame
+					6 container MainViewSocket
+					7 container LeftRailItems
+						8 button Avalonia.Controls.PathIcon, Help: 信息 / 页面列表（拖动可重排或组合）
+						9 button Avalonia.Controls.PathIcon, Help: 文件夹（拖动可重排或组合）
+						10 button Avalonia.Controls.PathIcon, Help: 历史（拖动可重排或组合）
+					11 container LeftDockHost
+						12 container
+							13 text 信息
+							14 scroll area
+								15 container
+									16 text 中文/003.png
+
+尺寸：1800 × 1000
+大小：11,296 字节
+
+来源：/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz
+
+						17 handle
+						18 container
+							19 text 页面列表
+							20 content list PageList
+								21 scroll area PART_ScrollViewer
+									22 container
+										23 container
+											24 row (selectable) 中文/001.png
+												25 text 中文/001.png
+											26 row (selectable) 中文/002.png
+												27 text 中文/002.png
+											28 row (selected) 中文/003.png
+												29 text 中文/003.png
+											30 row (selectable) 中文/004.png
+												31 text 中文/004.png
+											32 row (selectable) 中文/005.png
+												33 text 中文/005.png
+											34 row (selectable) 中文/006.png
+												35 text 中文/006.png
+					36 handle
+					37 container RightRailItems
+						38 button Avalonia.Controls.PathIcon, Help: 导航器（拖动可重排或组合）
+						39 button Avalonia.Controls.PathIcon, Help: 图像效果（P5）（拖动可重排或组合）
+						40 button Avalonia.Controls.PathIcon, Help: 书签（拖动可重排或组合）
+						41 button Avalonia.Controls.PathIcon, Help: 播放列表（拖动可重排或组合）
+						42 button Avalonia.Controls.PathIcon, Help: 目标文件夹（P4）（拖动可重排或组合）
+	43 close button
+	44 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	45 minimize button
+	46 text 漫画.cbz — NeeView
+47 menu bar
+	48 NeeView
+
+The focused UI element is 6 container MainViewSocket

@@ -1,0 +1,135 @@
+[
+  {
+    "name": "normal-hidden",
+    "time": "2026-10-03T14:48:11.534Z",
+    "ax": "p2-autohide-normal-hidden.ax.txt",
+    "screenshot": "p2-autohide-normal-hidden.png",
+    "build": "initial-no-side-margin"
+  },
+  {
+    "name": "show-all",
+    "time": "2026-10-03T14:48:30.667Z",
+    "ax": "p2-autohide-show-all.ax.txt",
+    "screenshot": "p2-autohide-show-all.png",
+    "build": "initial-no-side-margin"
+  },
+  {
+    "name": "show-toggle-observed",
+    "time": "2026-10-03T14:49:30.058Z",
+    "ax": "p2-autohide-show-toggle-observed.ax.txt",
+    "screenshot": "p2-autohide-show-toggle-observed.png",
+    "build": "initial-no-side-margin"
+  },
+  {
+    "name": "final-normal-hidden",
+    "time": "2026-10-03T14:53:48.376Z",
+    "ax": "p2-autohide-final-normal-hidden.ax.txt",
+    "screenshot": "p2-autohide-final-normal-hidden.png",
+    "build": "final-side-margin"
+  },
+  {
+    "name": "final-show-all",
+    "time": "2026-10-03T14:53:49.595Z",
+    "ax": "p2-autohide-final-show-all.ax.txt",
+    "screenshot": "p2-autohide-final-show-all.png",
+    "build": "final-side-margin"
+  },
+  {
+    "name": "final-text-focus-menu-held",
+    "time": "2026-10-03T14:53:53.648Z",
+    "ax": "p2-autohide-final-text-focus-menu-held.ax.txt",
+    "screenshot": "p2-autohide-final-text-focus-menu-held.png",
+    "build": "final-side-margin"
+  },
+  {
+    "name": "final-viewer-focus-released",
+    "time": "2026-10-03T14:53:58.748Z",
+    "ax": "p2-autohide-final-viewer-focus-released.ax.txt",
+    "screenshot": "p2-autohide-final-viewer-focus-released.png",
+    "build": "final-side-margin"
+  },
+  {
+    "name": "final-fullscreen-hidden",
+    "time": "2026-10-03T14:53:59.934Z",
+    "ax": "p2-autohide-final-fullscreen-hidden.ax.txt",
+    "screenshot": "p2-autohide-final-fullscreen-hidden.png",
+    "build": "final-side-margin"
+  },
+  {
+    "name": "final-fullscreen-shown",
+    "time": "2026-10-03T14:54:06.843Z",
+    "ax": "p2-autohide-final-fullscreen-shown.ax.txt",
+    "screenshot": "p2-autohide-final-fullscreen-shown.png",
+    "build": "final-side-margin"
+  },
+  {
+    "name": "final-fullscreen-cancelled",
+    "time": "2026-10-03T14:54:07.787Z",
+    "ax": "p2-autohide-final-fullscreen-cancelled.ax.txt",
+    "screenshot": "p2-autohide-final-fullscreen-cancelled.png",
+    "build": "final-side-margin"
+  },
+  {
+    "name": "final-left-edge",
+    "time": "2026-10-03T14:54:26.972Z",
+    "ax": "p2-autohide-final-left-edge.ax.txt",
+    "screenshot": "p2-autohide-final-left-edge.png",
+    "build": "final-side-margin"
+  },
+  {
+    "name": "final-restart-hidden",
+    "time": "2026-10-03T14:57:44.624Z",
+    "ax": "p2-autohide-final-restart-hidden.ax.txt",
+    "screenshot": "p2-autohide-final-restart-hidden.png",
+    "build": "final-side-margin"
+  },
+  {
+    "name": "final-settings-cancel-draft",
+    "time": "2026-10-03T14:58:35.238Z",
+    "ax": "p2-autohide-final-settings-cancel-draft.ax.txt",
+    "screenshot": "p2-autohide-final-settings-cancel-draft.png",
+    "build": "final-side-margin"
+  },
+  {
+    "name": "final-settings-cancelled",
+    "time": "2026-10-03T14:58:51.995Z",
+    "ax": "p2-autohide-final-settings-cancelled.ax.txt",
+    "screenshot": "p2-autohide-final-settings-cancelled.png",
+    "build": "final-side-margin"
+  },
+  {
+    "name": "final-settings-cancel-retained",
+    "time": "2026-10-03T14:59:13.167Z",
+    "ax": "p2-autohide-final-settings-cancel-retained.ax.txt",
+    "screenshot": "p2-autohide-final-settings-cancel-retained.png",
+    "build": "final-side-margin"
+  },
+  {
+    "name": "final-settings-saved-visible",
+    "time": "2026-10-03T14:59:38.946Z",
+    "ax": "p2-autohide-final-settings-saved-visible.ax.txt",
+    "screenshot": "p2-autohide-final-settings-saved-visible.png",
+    "build": "final-side-margin"
+  },
+  {
+    "name": "final-page-four",
+    "time": "2026-10-03T14:59:50.235Z",
+    "ax": "p2-autohide-final-page-four.ax.txt",
+    "screenshot": "p2-autohide-final-page-four.png",
+    "build": "final-side-margin"
+  },
+  {
+    "name": "final-restart-saved-visible-four",
+    "time": "2026-10-03T15:00:25.532Z",
+    "ax": "p2-autohide-final-restart-saved-visible-four.ax.txt",
+    "screenshot": "p2-autohide-final-restart-saved-visible-four.png",
+    "build": "final-side-margin"
+  },
+  {
+    "name": "final-user-restored",
+    "time": "2026-10-03T15:01:10.916Z",
+    "ax": "p2-autohide-final-user-restored.ax.txt",
+    "screenshot": "p2-autohide-final-user-restored.png",
+    "build": "final-side-margin"
+  }
+]

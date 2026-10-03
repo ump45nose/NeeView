@@ -650,6 +650,72 @@
       "target": "src/NeeView.Engine/BookOperation/BookOperation.cs",
       "sha256": "42289d6353cbefe4f39078663a06dbbfc92cb6568e2fa4a764c83e5d06d743a6",
       "status": "原SelectedRange.CollectPositions升序设置主页，修正反向双页视觉元素首项误用"
+    },
+    {
+      "source": "NeeView/Config/AutoHideConfig.cs",
+      "target": "src/NeeView.Engine/Config/AutoHideConfig.cs",
+      "sha256": "fbd3bcf9cfa9efe0d21c561e74886c4ea95b608019be5e95bd693f00d15c0b5e",
+      "status": "原默认/精度/枚举及旧字段兼容；控件与定时器分离"
+    },
+    {
+      "source": "NeeView/Config/WindowConfig.cs",
+      "target": "src/NeeView.Engine/Config/AutoHideConfig.cs",
+      "sha256": "f06d77ea8b227688ad2112cd5488f97606cd8f9c54fb2929eb250ee5517a483f",
+      "status": "原普通/最大化/全屏自动隐藏资格及Topmost；Windows专属字段只保留"
+    },
+    {
+      "source": "NeeView/Config/MenuBarConfig.cs",
+      "target": "src/NeeView.Engine/Config/AutoHideConfig.cs",
+      "sha256": "baae401118dbc78605f40578ab7c26a893004ba8dc807d39e4b01b97a893a4ce",
+      "status": "原菜单与地址显隐资格；高级菜单属性未迁"
+    },
+    {
+      "source": "NeeView/Config/PanelsConfig.cs",
+      "target": "src/NeeView.Engine/Config/Config.cs",
+      "sha256": "889a37660e715920acf7d49eecdf186a99d66fa1dd10d3eb9bb61c01a30f4fc1",
+      "status": "原左右自动隐藏和图标总开关；早期Mac别名收归原字段"
+    },
+    {
+      "source": "NeeView/MainWindow/MainWindowController.cs",
+      "target": "src/NeeView.MacOS/Views/AutoHidePresenter.cs",
+      "sha256": "15cf7f2737268ac2435974bbf58a9d5bbd92c9d33170a5cd4ef31366354285d4",
+      "status": "原窗口状态自动隐藏模式资格，Mac实际窗口属性替换"
+    },
+    {
+      "source": "NeeView/MainWindow/MainWindowModel.cs",
+      "target": "src/NeeView.MacOS/Views/AutoHidePresenter.cs",
+      "sha256": "a2b1cd6e9e196b2939eec1f56bbce0b9a71345d881398dadf1f271351f5c6f44",
+      "status": "原五区CanHide规则和ShowHiddenPanels连续切换/操作解除顺序"
+    },
+    {
+      "source": "NeeView/NeeView/Windows/Controls/AutoHideBehavior.cs",
+      "target": "src/NeeView.MacOS/Views/AutoHidePresenter.cs",
+      "sha256": "c378ba4543f57883937586f1c36b5d935d91163359069076e706142fbf4ea727",
+      "status": "原边缘/焦点/立即锁定/显示隐藏延迟/重复缩短/键盘延长，实际Avalonia焦点和popup替换"
+    },
+    {
+      "source": "NeeView/MainWindow/MenuAutoHideDescription.cs",
+      "target": "src/NeeView.MacOS/Views/AutoHidePresenter.cs",
+      "sha256": "87ef4b709f19654db050ed522049035637b9ff7336b0aa27252546dc83263ca7",
+      "status": "原上边缘Allow/AllowPixel/Deny冲突及1.5阈值"
+    },
+    {
+      "source": "NeeView/MainWindow/StatusAutoHideDescription.cs",
+      "target": "src/NeeView.MacOS/Views/AutoHidePresenter.cs",
+      "sha256": "5caa0a746e19e94a32aef90dcc6ae6985e5c78c75fb60251f0aea44c637c4ad9",
+      "status": "原下边缘冲突规则"
+    },
+    {
+      "source": "NeeView/MainWindow/BasicAutoHideDescription.cs",
+      "target": "src/NeeView.MacOS/Views/AutoHidePresenter.cs",
+      "sha256": "6ae579fef6c8cec5651f5e077492ad618324a2ea5faab586eec5da073351a078",
+      "status": "原弹出层/上下文/拖动归属锁；使用真实PlacementTarget和捕获"
+    },
+    {
+      "source": "NeeView/MainWindow/MainWindowViewModel.cs",
+      "target": "src/NeeView.MacOS/Views/AutoHidePresenter.cs",
+      "sha256": "0e4ca5d27a4a7e4ebc4f3bbd225e052d90f4b051c44b6a54c38b0510392bfeba",
+      "status": "原SidePanelMargin及ConflictTop/BottomMargin安全余量随覆盖资格计算，不改变正文区域"
     }
   ],
   "rule_references": [

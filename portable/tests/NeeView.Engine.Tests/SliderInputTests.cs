@@ -138,6 +138,8 @@ public sealed class SliderInputTests
         try
         {
             await window.OpenAsync(fixture.Images); Pump(window);
+            // 原字段现已生效；这项外观测试用原一次显示命令固定打开覆盖底栏。
+            await window.ExecuteAsync("ShowHiddenPanels"); Pump(window);
             var cancel = new SettingsWindow(model); cancel.Show(window);
             cancel.FindControl<ComboBox>("SliderIndexLayout")!.SelectedIndex = 1;
             cancel.FindControl<Button>("CancelSettings")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));

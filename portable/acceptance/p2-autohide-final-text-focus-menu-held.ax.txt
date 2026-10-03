@@ -1,0 +1,57 @@
+Window: "漫画.cbz — NeeView", App: NeeView.
+0 standard window 漫画.cbz — NeeView, Secondary Actions: Raise
+	1 container WindowChrome, ID: AvaloniaWindowChrome
+	2 container
+		3 container PART_VisualLayerManager
+			4 container Root
+				5 container
+					6 menu bar MenuBar
+						7 container
+							8 文件
+								9 container
+									10 unknown PART_Popup
+							11 显示
+								12 container
+									13 unknown PART_Popup
+							14 图像
+								15 container
+									16 unknown PART_Popup
+							17 跳转
+								18 container
+									19 unknown PART_Popup
+							20 页面
+								21 container
+									22 unknown PART_Popup
+							23 书籍
+								24 container
+									25 unknown PART_Popup
+							26 选项
+								27 container
+									28 unknown PART_Popup
+							29 帮助
+								30 container
+									31 unknown PART_Popup
+					32 text field (settable) Help: 打开图片、目录、ZIP / RAR / 7z, Value: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz, ID: AddressBar
+						33 container
+							34 container
+								35 scroll area PART_ScrollViewer
+									36 container
+				37 container SidePanelFrame
+					38 container LeftRailItems
+						39 button Avalonia.Controls.PathIcon, Help: 信息 / 页面列表（拖动可重排或组合）
+						40 button Avalonia.Controls.PathIcon, Help: 文件夹（拖动可重排或组合）
+						41 button Avalonia.Controls.PathIcon, Help: 历史（拖动可重排或组合）
+					42 container RightRailItems
+						43 button Avalonia.Controls.PathIcon, Help: 导航器（拖动可重排或组合）
+						44 button Avalonia.Controls.PathIcon, Help: 图像效果（P5）（拖动可重排或组合）
+						45 button Avalonia.Controls.PathIcon, Help: 书签（拖动可重排或组合）
+						46 button Avalonia.Controls.PathIcon, Help: 播放列表（拖动可重排或组合）
+						47 button Avalonia.Controls.PathIcon, Help: 目标文件夹（P4）（拖动可重排或组合）
+	48 close button
+	49 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	50 minimize button
+	51 text 漫画.cbz — NeeView
+52 menu bar
+	53 NeeView
+
+The focused UI element is 32 text field (settable) Help: 打开图片、目录、ZIP / RAR / 7z, Value: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/artifacts/p1-smoke/漫画.cbz, ID: AddressBar

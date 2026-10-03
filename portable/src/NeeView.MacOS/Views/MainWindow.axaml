@@ -3,21 +3,21 @@
         Width="1200" Height="800" MinWidth="720" MinHeight="480" Title="{Binding Title}" x:CompileBindings="False">
   <!-- 转换自 MainWindow.xaml/SidePanelFrameView.xaml。保持顶部、左右、中间、底部和覆盖层关系。 -->
   <Grid x:Name="Root" RowDefinitions="Auto,*,Auto">
-    <Border x:Name="DockMenuSocket" Grid.Row="0" Background="{DynamicResource MenuBar.Background}">
+    <Border x:Name="DockMenuSocket" ZIndex="10" Grid.Row="0" Background="{DynamicResource MenuBar.Background}" IsVisible="{Binding MenuVisible}">
       <StackPanel>
         <!-- 原默认八组菜单由 MenuTree 生成；未迁移命令保留禁用占位。 -->
         <Menu x:Name="MenuBar" />
-        <TextBox x:Name="AddressBar" Classes="address" Text="{Binding Address}" PlaceholderText="打开图片、目录、ZIP / RAR / 7z" KeyDown="Address_KeyDown" />
+        <TextBox x:Name="AddressBar" IsVisible="{Binding AddressBarVisible}" Classes="address" Text="{Binding Address}" PlaceholderText="打开图片、目录、ZIP / RAR / 7z" KeyDown="Address_KeyDown" />
       </StackPanel>
     </Border>
     <Grid x:Name="SidePanelFrame" Grid.Row="1" ColumnDefinitions="41,240,4,*,4,240,41">
-      <Border x:Name="LeftRail" Grid.Column="0" Classes="rail" PointerEntered="LeftRail_Entered" PointerExited="LeftRail_Exited"><StackPanel x:Name="LeftRailItems" /></Border>
-      <Border x:Name="LeftPanel" Grid.Column="1" Classes="panel" IsVisible="{Binding LeftVisible}" PointerEntered="LeftRail_Entered" PointerExited="LeftRail_Exited"><Grid x:Name="LeftDockHost" /></Border>
-      <GridSplitter Grid.Column="2" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" IsVisible="{Binding LeftVisible}" />
       <local:ReaderView x:Name="MainViewSocket" Grid.Column="3" />
+      <Border x:Name="LeftRail" Grid.Column="0" Classes="rail" IsVisible="{Binding SideBarVisible}"><StackPanel x:Name="LeftRailItems" /></Border>
+      <Border x:Name="LeftPanel" Grid.Column="1" Classes="panel" IsVisible="{Binding LeftVisible}"><Grid x:Name="LeftDockHost" /></Border>
+      <GridSplitter Grid.Column="2" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" IsVisible="{Binding LeftVisible}" />
       <GridSplitter Grid.Column="4" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" IsVisible="{Binding RightVisible}" />
-      <Border x:Name="RightPanel" Grid.Column="5" Classes="panel" IsVisible="{Binding RightVisible}" PointerEntered="RightRail_Entered" PointerExited="RightRail_Exited"><Grid x:Name="RightDockHost" /></Border>
-      <Border x:Name="RightRail" Grid.Column="6" Classes="rail" PointerEntered="RightRail_Entered" PointerExited="RightRail_Exited"><StackPanel x:Name="RightRailItems" /></Border>
+      <Border x:Name="RightPanel" Grid.Column="5" Classes="panel" IsVisible="{Binding RightVisible}"><Grid x:Name="RightDockHost" /></Border>
+      <Border x:Name="RightRail" Grid.Column="6" Classes="rail" IsVisible="{Binding SideBarVisible}"><StackPanel x:Name="RightRailItems" /></Border>
       <!-- 内部拖放预览由独立表现适配绘制，不改变业务或布局数据。 -->
       <Canvas x:Name="PanelDropPreview" Grid.ColumnSpan="7" IsHitTestVisible="False" />
     </Grid>
@@ -82,7 +82,7 @@
       <Border Tag="PlaylistPanel"><local:PlaylistView x:Name="PlaylistPanelView" /></Border>
       <Border Tag="DestinationFolderPanel"><TextBlock Text="目标文件夹分类将在 P4 迁入。" TextWrapping="Wrap" Margin="10" /></Border>
     </Grid>
-    <Border x:Name="DockStatusArea" Grid.Row="2" Background="{DynamicResource BottomBar.Background}" PointerEntered="FilmStrip_Entered" PointerExited="FilmStrip_Exited">
+    <Border x:Name="DockStatusArea" ZIndex="10" Grid.Row="2" Background="{DynamicResource BottomBar.Background}">
       <StackPanel>
         <!-- 保持原底部插槽，可见窗口缩略图由共享工厂加载。 -->
         <local:ThumbnailView x:Name="DockFilmStripSocket" Height="{Binding FilmStripHeight}" IsVisible="{Binding FilmStripVisible}" />
@@ -95,6 +95,8 @@
         <TextBlock x:Name="StatusField" Text="{Binding Status}" TextTrimming="CharacterEllipsis" FontSize="11" Margin="10,0,10,5" />
       </StackPanel>
     </Border>
+    <!-- 独立胶片条隐藏时迁到覆盖插槽，保留同一内容实例及选择。 -->
+    <Border x:Name="LayerFilmStripSocket" ZIndex="11" Grid.RowSpan="3" VerticalAlignment="Bottom" Background="{DynamicResource BottomBar.Background}" />
     <Border x:Name="MessageLayer" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,14" Padding="12,6" CornerRadius="3" Background="#D9222222" IsVisible="{Binding IsLoading}" IsHitTestVisible="False"><TextBlock Text="正在读取…" /></Border>
   </Grid>
 </Window>

@@ -42,7 +42,17 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public bool SliderMarksVisible => Config.Current.Slider.IsVisiblePlaylistMark;
     public bool IsPlaylistMarked => Operation.Book?.CurrentPage?.IsMarked == true;
     public object? SliderSource => Operation.Book;
-    public bool SliderVisible => Config.Current.Slider.IsEnabled && Pages.Count > 0;
+    public bool SliderVisible => Config.Current.Slider.IsEnabled && Pages.Count > 0 && _sliderShown;
+    public bool MenuVisible => _menuShown;
+    public bool AddressBarVisible => Config.Current.MenuBar.IsAddressBarEnabled;
+    public bool SideBarVisible => Config.Current.Panels.IsSideBarEnabled;
+    public bool AutoHideMode { get; private set; }
+    public bool CanHideMenu => Config.Current.MenuBar.IsHideMenu || (Config.Current.MenuBar.IsHideMenuInAutoHideMode && AutoHideMode);
+    public bool CanHideSlider => Config.Current.Slider.IsEnabled && (Config.Current.Slider.IsHidePageSlider || (Config.Current.Slider.IsHidePageSliderInAutoHideMode && AutoHideMode));
+    // 原 CanHideFilmStrip 顺序：滑条隐藏时整个底部组一起弹出，胶片条不再独立隐藏。
+    public bool CanHideFilmStrip => !CanHideSlider && Config.Current.FilmStrip.IsEnabled && (Config.Current.FilmStrip.IsHideFilmStrip || (Config.Current.FilmStrip.IsHideFilmStripInAutoHideMode && AutoHideMode));
+    private bool _menuShown = true, _sliderShown = true, _filmShown = true;
+    public event EventHandler? ChromeRefreshed;
     public bool SliderNumberVisible => Config.Current.Slider.SliderIndexLayout != SliderIndexLayout.None;
     public int SliderNumberColumn => Config.Current.Slider.SliderIndexLayout == SliderIndexLayout.Left ? 0 : 2;
     public double SliderThickness => Config.Current.Slider.Thickness;
@@ -58,11 +68,11 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public bool LastSingle => Operation.Book?.Setting.IsSupportedSingleLastPage ?? false;
     public double LeftWidth => Config.Current.Panels.LeftWidth;
     public double RightWidth => Config.Current.Panels.RightWidth;
-    public bool LeftVisible => (Config.Current.Panels.IsLeftVisible || IsPanelDragging) && Layout.Docks["Left"].Items.Count > 0 && (!LeftAutoHide || _leftHovered || IsPanelDragging);
-    public bool RightVisible => (Config.Current.Panels.IsRightVisible || IsPanelDragging) && Layout.Docks["Right"].Items.Count > 0 && (!RightAutoHide || _rightHovered || IsPanelDragging);
-    public bool LeftAutoHide => Config.Current.Panels.IsLeftAutoHide;
-    public bool RightAutoHide => Config.Current.Panels.IsRightAutoHide;
-    private bool _leftHovered, _rightHovered;
+    public bool LeftVisible => (Config.Current.Panels.IsLeftVisible || IsPanelDragging) && Layout.Docks["Left"].Items.Count > 0 && (!LeftAutoHide || _leftShown || IsPanelDragging);
+    public bool RightVisible => (Config.Current.Panels.IsRightVisible || IsPanelDragging) && Layout.Docks["Right"].Items.Count > 0 && (!RightAutoHide || _rightShown || IsPanelDragging);
+    public bool LeftAutoHide => Config.Current.Panels.IsHideLeftPanel || (Config.Current.Panels.IsHideLeftPanelInAutoHideMode && AutoHideMode);
+    public bool RightAutoHide => Config.Current.Panels.IsHideRightPanel || (Config.Current.Panels.IsHideRightPanelInAutoHideMode && AutoHideMode);
+    private bool _leftShown = true, _rightShown = true;
     public bool ShowPageList => IsPanelVisible("PageListPanel");
     public bool ShowFolderList => IsPanelVisible("FolderPanel");
     public bool ShowHistory => IsPanelVisible("HistoryPanel");
@@ -96,8 +106,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public bool IsSingleBookmarkSelection => BookmarkSelectionCount == 1;
     public bool CanChooseBookmarkFolder => BookmarkSelectionCount <= 1;
     public bool IsBookmark => Operation.Book is { } book && SaveData.IsBookmark(book.Path);
-    public bool FilmStripVisible => Config.Current.FilmStrip.IsEnabled && (!Config.Current.FilmStrip.IsHideFilmStrip || _filmHovered) && Pages.Count > 0;
-    private bool _filmHovered;
+    public bool FilmStripVisible => Config.Current.FilmStrip.IsEnabled && _filmShown && Pages.Count > 0;
     public event EventHandler? Refreshed;
     public event EventHandler? PanelsRefreshed;
 
@@ -192,10 +201,20 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
         foreach (var name in new[] { nameof(LeftVisible), nameof(RightVisible), nameof(LeftAutoHide), nameof(RightAutoHide), nameof(ShowPageList), nameof(ShowFolderList), nameof(ShowHistory), nameof(ShowBookmarks), nameof(ShowInformation), nameof(ShowNavigator), nameof(ShowPlaylist), nameof(FilmStripVisible) }) OnPropertyChanged(name);
         PanelsRefreshed?.Invoke(this, EventArgs.Empty);
     }
-    /// <summary>自动隐藏只改变窗口表现状态，不改变书籍和目录索引。</summary>
-    public void Hover(bool left, bool value) { if (left) _leftHovered = value; else _rightHovered = value; RefreshPanels(); }
+    /// <summary>旧 Mac 临时显示入口；最终状态由独立显示适配发布，不保存在配置中。</summary>
+    public void Hover(bool left, bool value) { if (left) _leftShown = value; else _rightShown = value; RefreshPanels(); }
     /// <summary>胶片条自动隐藏只改变表现，鼠标进入底栏后恢复。</summary>
-    public void HoverFilmStrip(bool value) { _filmHovered = value; OnPropertyChanged(nameof(FilmStripVisible)); }
+    public void HoverFilmStrip(bool value) { _filmShown = value; OnPropertyChanged(nameof(FilmStripVisible)); }
+    /// <summary>窗口状态只改变原自动隐藏资格，不重建正文或更改书籍设置。</summary>
+    public void SetAutoHideMode(bool value) => AutoHideMode = value;
+    /// <summary>显示端发布五个区域的最终状态；不重建侧栏控件，保留输入焦点和拖动捕获。</summary>
+    public void SetChromeVisibility(bool menu, bool left, bool right, bool slider, bool film)
+    {
+        if ((_menuShown, _leftShown, _rightShown, _sliderShown, _filmShown) == (menu, left, right, slider, film)) return;
+        (_menuShown, _leftShown, _rightShown, _sliderShown, _filmShown) = (menu, left, right, slider, film);
+        foreach (var name in new[] { nameof(MenuVisible), nameof(LeftVisible), nameof(RightVisible), nameof(SliderVisible), nameof(FilmStripVisible) }) OnPropertyChanged(name);
+        ChromeRefreshed?.Invoke(this, EventArgs.Empty);
+    }
 }
 /// <summary>原排序枚举的界面文案，展示顺序不改变 JSON 枚举值。</summary>
 public sealed record FolderOrderChoice(FolderOrder Mode, string Label);

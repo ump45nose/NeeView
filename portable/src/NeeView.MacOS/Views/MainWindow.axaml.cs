@@ -29,6 +29,8 @@ public sealed partial class MainWindow : Window
     private double _sliderWheel;
     private double _leftWidth, _rightWidth;
     private SidePanelPresenter? _sidePanels;
+    private AutoHidePresenter? _autoHide;
+    private WindowState _lastFullScreenState = WindowState.Normal;
     public ReaderView Viewer => this.FindControl<ReaderView>("MainViewSocket")!;
     private ThumbnailView FilmStrip => this.FindControl<ThumbnailView>("DockFilmStripSocket")!;
     private ThumbnailView NavigatorView => this.FindControl<ThumbnailView>("Navigator")!;
@@ -37,10 +39,10 @@ public sealed partial class MainWindow : Window
     {
         "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen",
         "ViewScaleUp", "ViewScaleDown", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
-        "LeftAutoHide", "RightAutoHide", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
+        "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
-        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "RegisterBookmark", "FocusHistorySearchBox", "ClearHistory"
+        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "RegisterBookmark", "FocusHistorySearchBox", "ClearHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
     };
     /// <summary>由启动层接入原生事件；只消费主查看器区域，其余控件使用框架输入。</summary>
     public void AttachPlatformInput(IPlatformInput input)
@@ -56,6 +58,10 @@ public sealed partial class MainWindow : Window
         if (point is null) return false;
         var local = new Point(gesture.X - point.Value.X, gesture.Y - point.Value.Y);
         if (!new Avalonia.Rect(Viewer.Bounds.Size).Contains(local)) return false;
+        // 自动隐藏栏覆盖同一查看器范围；按实际命中控件排除菜单/侧栏/底栏，不能只比较矩形。
+        if (this.InputHitTest(new Point(gesture.X, gesture.Y)) is not Visual hit ||
+            (!ReferenceEquals(hit, Viewer) && !hit.GetVisualAncestors().Contains(Viewer))) return false;
+        _autoHide?.LeaveVisibleLocked();
         if (gesture.IsMagnify) _ = ZoomFromGestureAsync(1 + gesture.Magnification, local);
         else Viewer.Pan(new(gesture.DeltaX, gesture.DeltaY));
         return true;
@@ -113,7 +119,9 @@ public sealed partial class MainWindow : Window
             await model.Operation.JumpAsync(index, expectedBook: source as Book);
             if (!_preparing && !_closedPrepared) model.RefreshSelection();
         };
-        BuildMenus();
+        _autoHide = new(this, model);
+        model.ChromeRefreshed += Model_ChromeRefreshed;
+        UpdatePanelColumns(); BuildMenus();
     }
     /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
     public bool IsCommandAvailable(string name) => HostCommands.Contains(name) || _model?.Commands.IsAvailable(name) == true;
@@ -125,8 +133,6 @@ public sealed partial class MainWindow : Window
         root.Children![0].Children!.Insert(1, new("打开目录…", MenuElementType.Command, "OpenFolder"));
         root.Children[0].Children!.Add(new("重新载入", MenuElementType.Command, "ReLoad"));
         root.Children[0].Children!.Add(new("关闭窗口", MenuElementType.Command, "CloseWindow"));
-        foreach (var (text, command) in new[] { ("左侧栏自动隐藏", "LeftAutoHide"), ("右侧栏自动隐藏", "RightAutoHide") })
-            root.Children[1].Children!.Add(new(text, MenuElementType.Command, command));
         foreach (var (text, command) in new[] { ("放大", "ViewScaleUp"), ("缩小", "ViewScaleDown") })
             root.Children[2].Children!.Add(new(text, MenuElementType.Command, command));
         // 原默认菜单未列出的定位命令追加到跳转组，原节点/占位和顺序完整保留。
@@ -158,8 +164,15 @@ public sealed partial class MainWindow : Window
         "ToggleVisibleNavigator" => _model?.ShowNavigator,
         "ToggleVisibleFilmStrip" => Config.Current.FilmStrip.IsEnabled,
         "ToggleHideFilmStrip" => Config.Current.FilmStrip.IsHideFilmStrip,
-        "LeftAutoHide" => Config.Current.Panels.IsLeftAutoHide,
-        "RightAutoHide" => Config.Current.Panels.IsRightAutoHide,
+        "ToggleHideMenu" => Config.Current.MenuBar.IsHideMenu,
+        "ToggleHidePanel" => Config.Current.Panels.IsHideLeftPanel || Config.Current.Panels.IsHideRightPanel,
+        "ToggleHideLeftPanel" => Config.Current.Panels.IsHideLeftPanel,
+        "ToggleHideRightPanel" => Config.Current.Panels.IsHideRightPanel,
+        "ToggleHidePageSlider" => Config.Current.Slider.IsHidePageSlider,
+        "ToggleVisibleSideBar" => Config.Current.Panels.IsSideBarEnabled,
+        "ToggleFullScreen" => WindowState == WindowState.FullScreen,
+        "ToggleTopmost" => Config.Current.Window.IsTopmost,
+        "ShowHiddenPanels" => _autoHide?.IsVisibleLocked,
         "SetStretchModeUniform" => Config.Current.View.StretchMode == PageStretchMode.Uniform,
         "SetStretchModeNone" => Config.Current.View.StretchMode == PageStretchMode.None,
         _ => null
@@ -167,22 +180,29 @@ public sealed partial class MainWindow : Window
     /// <summary>表现变化只更新列宽；GridSplitter 的实际宽度由窗口保存，控件不设置固定 Width。</summary>
     private void Model_PanelsRefreshed(object? sender, EventArgs e)
     {
-        UpdatePanelColumns();
+        _autoHide?.Refresh(); UpdatePanelColumns();
         _sidePanels?.Refresh();
         _ = NavigatorView.RefreshAsync();
         MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck);
     }
-    /// <summary>隐藏时收起面板列，重新显示恢复用户拖动后的宽度。</summary>
+    /// <summary>仅更新覆盖区域，不重建侧栏或重新申请正文图像。</summary>
+    private void Model_ChromeRefreshed(object? sender, EventArgs e) => UpdatePanelColumns();
+    /// <summary>原自动隐藏栏覆盖正文；普通停靠栏占据列，隐藏弹出不改变查看器尺寸。</summary>
     private void UpdatePanelColumns()
     {
         if (_model is null) return;
         var columns = this.FindControl<Grid>("SidePanelFrame")!.ColumnDefinitions;
         if (columns[1].ActualWidth > 0) _leftWidth = columns[1].ActualWidth;
         if (columns[5].ActualWidth > 0) _rightWidth = columns[5].ActualWidth;
-        columns[1].Width = new GridLength(_model.LeftVisible ? Math.Max(100, _leftWidth) : 0);
-        columns[5].Width = new GridLength(_model.RightVisible ? Math.Max(100, _rightWidth) : 0);
+        columns[0].Width = new GridLength(_model.SideBarVisible ? 41 : 0);
+        columns[6].Width = new GridLength(_model.SideBarVisible ? 41 : 0);
+        columns[1].Width = new GridLength(_model.LeftVisible || _model.LeftAutoHide ? Math.Max(100, _leftWidth) : 0);
+        columns[5].Width = new GridLength(_model.RightVisible || _model.RightAutoHide ? Math.Max(100, _rightWidth) : 0);
         columns[2].Width = new GridLength(_model.LeftVisible ? 4 : 0);
         columns[4].Width = new GridLength(_model.RightVisible ? 4 : 0);
+        int start = _model.LeftAutoHide ? 0 : 3;
+        int end = _model.RightAutoHide ? 7 : 4;
+        Grid.SetColumn(Viewer, start); Grid.SetColumnSpan(Viewer, end - start);
     }
     /// <summary>打开请求统一进入 BookOperation，窗口不枚举内容。</summary>
     public async Task OpenAsync(string path)
@@ -221,7 +241,17 @@ public sealed partial class MainWindow : Window
                     if (_model.Operation.Book is { } book) await _platform!.RevealAsync(book.CurrentPage?.ArchiveEntry.FilePath ?? book.Path); break;
                 case "CloseWindow": Close(); break;
                 case "CloseApplication": (Avalonia.Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.TryShutdown(); break;
-                case "ToggleFullScreen": WindowState = WindowState == WindowState.FullScreen ? WindowState.Normal : WindowState.FullScreen; break;
+                case "ToggleFullScreen": SetFullScreen(WindowState != WindowState.FullScreen); break;
+                case "SetFullScreen": SetFullScreen(true); break;
+                case "CancelFullScreen": SetFullScreen(false); break;
+                case "ToggleTopmost": Config.Current.Window.IsTopmost = !Config.Current.Window.IsTopmost; _autoHide?.Refresh(); break;
+                case "ShowHiddenPanels": _autoHide?.ShowHiddenPanels(); break;
+                case "ToggleHideMenu": Config.Current.MenuBar.IsHideMenu = !Config.Current.MenuBar.IsHideMenu; _model.RefreshPanels(); break;
+                case "ToggleHidePageSlider": Config.Current.Slider.IsHidePageSlider = !Config.Current.Slider.IsHidePageSlider; _model.RefreshPanels(); break;
+                case "ToggleVisibleSideBar": Config.Current.Panels.IsSideBarEnabled = !Config.Current.Panels.IsSideBarEnabled; _model.RefreshPanels(); break;
+                case "ToggleHidePanel":
+                    bool hide = !(Config.Current.Panels.IsHideLeftPanel || Config.Current.Panels.IsHideRightPanel);
+                    Config.Current.Panels.IsHideLeftPanel = hide; Config.Current.Panels.IsHideRightPanel = hide; _model.RefreshPanels(); break;
                 case "ViewScaleUp": await Viewer.ZoomAsync(1.2); break;
                 case "ViewScaleDown": await Viewer.ZoomAsync(1 / 1.2); break;
                 case "NextScrollPage": await Viewer.ScrollToNextFrameAsync(1, _model.SaveData.GetScrollParameter(name)); break;
@@ -237,10 +267,8 @@ public sealed partial class MainWindow : Window
                     break;
                 case "SetStretchModeUniform": Config.Current.View.StretchMode = PageStretchMode.Uniform; Viewer.ResetTransform(); await Viewer.RefreshAsync(); break;
                 case "SetStretchModeNone": Config.Current.View.StretchMode = PageStretchMode.None; Viewer.ResetTransform(); await Viewer.RefreshAsync(); break;
-                case "ToggleHideLeftPanel": Config.Current.Panels.IsLeftVisible = !Config.Current.Panels.IsLeftVisible; _model.RefreshPanels(); break;
-                case "ToggleHideRightPanel": Config.Current.Panels.IsRightVisible = !Config.Current.Panels.IsRightVisible; _model.RefreshPanels(); break;
-                case "LeftAutoHide": Config.Current.Panels.IsLeftAutoHide = !Config.Current.Panels.IsLeftAutoHide; _model.RefreshPanels(); break;
-                case "RightAutoHide": Config.Current.Panels.IsRightAutoHide = !Config.Current.Panels.IsRightAutoHide; _model.RefreshPanels(); break;
+                case "ToggleHideLeftPanel": Config.Current.Panels.IsHideLeftPanel = !Config.Current.Panels.IsHideLeftPanel; _model.RefreshPanels(); break;
+                case "ToggleHideRightPanel": Config.Current.Panels.IsHideRightPanel = !Config.Current.Panels.IsHideRightPanel; _model.RefreshPanels(); break;
                 case "OpenOptionsWindow":
                     await new SettingsWindow(_model, IsCommandAvailable).ShowDialog(this);
                     _model.RefreshSelection(); _model.RefreshPanels(); await FilmStrip.RefreshAsync(); BuildMenus(); break;
@@ -287,6 +315,7 @@ public sealed partial class MainWindow : Window
             }
         }
         catch (Exception ex) { ShowError(ex.Message); }
+        _autoHide?.Refresh(); UpdatePanelColumns();
         MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck);
         RefreshHistoryCommandStates();
     }
@@ -300,6 +329,7 @@ public sealed partial class MainWindow : Window
         MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck);
         // 书籍变化时立即发起同步；不能等图像解码后再覆盖用户已经进入的书架目录。
         // 后续手动导航会由 Bookshelf 的原请求代次取消此次同步，图像与目录互不等待。
+        _autoHide?.Refresh(); UpdatePanelColumns();
         var folders = RefreshBookshelfAsync();
         await Viewer.RefreshAsync();
         await FilmStrip.RefreshAsync(); await NavigatorView.RefreshAsync();
@@ -423,10 +453,6 @@ public sealed partial class MainWindow : Window
         cancel.Click += (_, _) => dialog.Close(false); accept.Click += (_, _) => dialog.Close(true);
         return dialog.ShowDialog<bool>(this);
     }
-    /// <summary>进入底栏展开已启用的自动隐藏胶片条。</summary>
-    private void FilmStrip_Entered(object? sender, PointerEventArgs e) => _model?.HoverFilmStrip(true);
-    /// <summary>离开底栏恢复胶片条隐藏状态。</summary>
-    private void FilmStrip_Exited(object? sender, PointerEventArgs e) => _model?.HoverFilmStrip(false);
     /// <summary>按原命令的一起始页码定位，超出范围由 Engine 校正。</summary>
     /// <param name="number">用户页码，1 为首页。</param>
     public Task JumpPageAsync(int number) => _model?.Operation.JumpAsync((int)Math.Clamp((long)number - 1, 0, int.MaxValue)) ?? Task.CompletedTask;
@@ -491,6 +517,8 @@ public sealed partial class MainWindow : Window
     /// <summary>系统 Command 键先处理；编辑控件隔离其余原快捷键。</summary>
     private async void Key_Down(object? sender, KeyEventArgs e)
     {
+        // 原 PreviewKeyDown 先 LeaveVisibleLocked，避免委托注册顺序让新锁被同一按键清除。
+        _autoHide?.HandleKey(e.Source as Control);
         if (e.Handled || _model is null) return;
         if (e.Key == Key.Escape && _sidePanels?.CancelDrag() == true) { e.Handled = true; return; }
         if (e.KeyModifiers == KeyModifiers.Meta && e.Key is Key.O or Key.W or Key.Q)
@@ -587,12 +615,13 @@ public sealed partial class MainWindow : Window
     }
     /// <summary>错误信息只改变表现，不覆盖当前阅读内容。</summary>
     private void ShowError(string message) { if (!_preparing && !_closedPrepared) this.FindControl<TextBlock>("StatusField")!.Text = message; }
-    private void LeftRail_Entered(object? sender, PointerEventArgs e) => _model?.Hover(true, true);
-    private void RightRail_Entered(object? sender, PointerEventArgs e) => _model?.Hover(false, true);
-    /// <summary>延迟收起允许指针从图标栏进入相邻面板。</summary>
-    private async void LeftRail_Exited(object? sender, PointerEventArgs e) { await Task.Delay(150); if (!this.FindControl<Border>("LeftPanel")!.IsPointerOver && !((Control)sender!).IsPointerOver) _model?.Hover(true, false); }
-    /// <summary>右侧栏与左侧栏采用相同自动隐藏规则。</summary>
-    private async void RightRail_Exited(object? sender, PointerEventArgs e) { await Task.Delay(150); if (!this.FindControl<Border>("RightPanel")!.IsPointerOver && !((Control)sender!).IsPointerOver) _model?.Hover(false, false); }
+    /// <summary>Mac 全屏进入前保留普通/最大化状态；取消恢复真实上一状态。</summary>
+    private void SetFullScreen(bool enabled)
+    {
+        if (enabled && WindowState != WindowState.FullScreen)
+        { _lastFullScreenState = WindowState == WindowState.Maximized ? WindowState.Maximized : WindowState.Normal; WindowState = WindowState.FullScreen; }
+        else if (!enabled && WindowState == WindowState.FullScreen) WindowState = _lastFullScreenState;
+    }
     /// <summary>正常关闭先释放需求并保存，失败保留窗口供重试。</summary>
     private async void Window_Closing(object? sender, WindowClosingEventArgs e)
     {
@@ -626,10 +655,10 @@ public sealed partial class MainWindow : Window
                 await _model.Operation.DisposeAsync();
                 _model.HistoryRefreshed -= History_Refreshed;
                 _model.Operation.MarkersChanged -= Model_MarkersChanged;
-                _model.Detach(); _model.Refreshed -= Model_Refreshed; _model.PanelsRefreshed -= Model_PanelsRefreshed;
+                _model.Detach(); _model.Refreshed -= Model_Refreshed; _model.PanelsRefreshed -= Model_PanelsRefreshed; _model.ChromeRefreshed -= Model_ChromeRefreshed;
             }
             this.FindControl<PlaylistView>("PlaylistPanelView")!.Dispose();
-            _sidePanels?.Dispose(); _platformInput?.Dispose(); FilmStrip.Dispose(); NavigatorView.Dispose(); Viewer.Dispose(); _images?.Dispose(); _closedPrepared = true;
+            _autoHide?.Dispose(); _sidePanels?.Dispose(); _platformInput?.Dispose(); FilmStrip.Dispose(); NavigatorView.Dispose(); Viewer.Dispose(); _images?.Dispose(); _closedPrepared = true;
         }
         finally { if (!_closedPrepared) this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); _preparing = false; _shutdown = null; }
     }

@@ -1,0 +1,23 @@
+Window: "漫画.cbz — NeeView", App: NeeView.
+0 standard window 漫画.cbz — NeeView, Secondary Actions: Raise
+	1 container WindowChrome, ID: AvaloniaWindowChrome
+	2 container
+		3 container PART_VisualLayerManager
+			4 container Root
+				5 container SidePanelFrame
+					6 container MainViewSocket
+					7 container LeftRailItems
+						8 button Avalonia.Controls.PathIcon, Help: 信息 / 页面列表（拖动可重排或组合）
+						9 button Avalonia.Controls.PathIcon, Help: 文件夹（拖动可重排或组合）
+						10 button Avalonia.Controls.PathIcon, Help: 历史（拖动可重排或组合）
+					11 container RightRailItems
+						12 button Avalonia.Controls.PathIcon, Help: 导航器（拖动可重排或组合）
+						13 button Avalonia.Controls.PathIcon, Help: 图像效果（P5）（拖动可重排或组合）
+						14 button Avalonia.Controls.PathIcon, Help: 书签（拖动可重排或组合）
+						15 button Avalonia.Controls.PathIcon, Help: 播放列表（拖动可重排或组合）
+						16 button Avalonia.Controls.PathIcon, Help: 目标文件夹（P4）（拖动可重排或组合）
+	17 text 漫画.cbz — NeeView
+18 menu bar
+	19 NeeView
+
+The focused UI element is 6 container MainViewSocket

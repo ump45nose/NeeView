@@ -19,7 +19,7 @@ public sealed partial class SettingsWindow : Window
     {
         _model = model;
         _inputs = model.Commands.Definitions.Select(d => new ShortcutEdit(d, model.SaveData.GetShortcut(d.Name, d.Shortcut), available?.Invoke(d.Name) ?? model.Commands.IsAvailable(d.Name))).ToArray();
-        this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm();
+        this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm(); FillAutoHide();
         this.FindControl<ComboBox>("BookshelfGroup")!.SelectedIndex = (int)Config.Current.Bookshelf.FolderSortOrder;
         this.FindControl<CheckBox>("PrioritizeBookMove")!.IsChecked = Config.Current.Book.IsPrioritizeBookMove;
     }
@@ -31,6 +31,7 @@ public sealed partial class SettingsWindow : Window
         var index = (sender as ListBox)?.SelectedIndex ?? 0;
         reading.IsVisible = index == 0; input.IsVisible = index == 1;
         this.FindControl<ScrollViewer>("FilmSettings")!.IsVisible = index == 2;
+        this.FindControl<ScrollViewer>("AutoHideSettings")!.IsVisible = index == 3;
     }
     /// <summary>按名称及命令标识过滤编辑副本，未展示的键位也保留。</summary>
     private void InputSearch_Changed(object? sender, TextChangedEventArgs e)
@@ -76,7 +77,7 @@ public sealed partial class SettingsWindow : Window
     private void FillFilm()
     {
         var film = Config.Current.FilmStrip; var slider = Config.Current.Slider;
-        foreach (var (name, value) in new[] { ("FilmEnabled", film.IsEnabled), ("FilmHide", film.IsHideFilmStrip), ("FilmNumber", film.IsVisibleNumber), ("FilmCenter", film.IsSelectedCenter), ("FilmDetail", film.IsDetailPopupEnabled), ("SliderLinked", slider.IsSliderLinkedFilmStrip), ("SliderSync", slider.IsSyncPageMode) })
+        foreach (var (name, value) in new[] { ("FilmEnabled", film.IsEnabled), ("FilmHide", film.IsHideFilmStrip), ("FilmNumber", film.IsVisibleNumber), ("FilmCenter", film.IsSelectedCenter), ("FilmDetail", film.IsDetailPopupEnabled), ("SliderLinked", slider.IsSliderLinkedFilmStrip), ("SliderSync", slider.IsSyncPageMode), ("SliderHide", slider.IsHidePageSlider), ("SliderModeHide", slider.IsHidePageSliderInAutoHideMode), ("FilmModeHide", film.IsHideFilmStripInAutoHideMode) })
             this.FindControl<CheckBox>(name)!.IsChecked = value;
         this.FindControl<NumericUpDown>("FilmWidth")!.Value = (decimal)Math.Min(film.ImageWidth, (double)decimal.MaxValue / 2);
         this.FindControl<ComboBox>("FilmWheel")!.SelectedIndex = (int)film.MouseWheelAction;
@@ -90,12 +91,15 @@ public sealed partial class SettingsWindow : Window
         this.FindControl<ComboBox>("SliderWheel")!.SelectedIndex = (int)slider.MouseWheelAction;
         this.FindControl<NumericUpDown>("MoveSize")!.Value = _model!.SaveData.GetMoveSizeParameter().Size;
     }
-    /// <summary>只写当前已迁入字段；播放列表标记、全局自动隐藏等原字段保持原值。</summary>
+    /// <summary>只写当前已迁入的原胶片条与滑条字段，取消时不进入此入口。</summary>
     private void ApplyFilm()
     {
         var film = Config.Current.FilmStrip; var slider = Config.Current.Slider;
         film.IsEnabled = this.FindControl<CheckBox>("FilmEnabled")!.IsChecked == true;
         film.IsHideFilmStrip = this.FindControl<CheckBox>("FilmHide")!.IsChecked == true;
+        film.IsHideFilmStripInAutoHideMode = this.FindControl<CheckBox>("FilmModeHide")!.IsChecked == true;
+        slider.IsHidePageSlider = this.FindControl<CheckBox>("SliderHide")!.IsChecked == true;
+        slider.IsHidePageSliderInAutoHideMode = this.FindControl<CheckBox>("SliderModeHide")!.IsChecked == true;
         film.IsVisibleNumber = this.FindControl<CheckBox>("FilmNumber")!.IsChecked == true;
         film.IsSelectedCenter = this.FindControl<CheckBox>("FilmCenter")!.IsChecked == true;
         film.IsDetailPopupEnabled = this.FindControl<CheckBox>("FilmDetail")!.IsChecked == true;
@@ -114,6 +118,38 @@ public sealed partial class SettingsWindow : Window
         var size = (int)(this.FindControl<NumericUpDown>("MoveSize")!.Value ?? 10);
         if (size != _model!.SaveData.GetMoveSizeParameter().Size) _model.SaveData.SetCommandParameter("PrevSizePage", new MoveSizePageCommandParameter { Size = size });
     }
+    /// <summary>原配置填入独立窗口表现表单，配置本身没有 UI 类型。</summary>
+    private void FillAutoHide()
+    {
+        var c = Config.Current; var a = c.AutoHide;
+        foreach (var (name, value) in new[] { ("AutoNormal", c.Window.IsAutoHideInNormal), ("AutoMaximized", c.Window.IsAutoHideInMaximized), ("AutoFullScreen", c.Window.IsAutoHideInFullScreen),
+            ("AddressEnabled", c.MenuBar.IsAddressBarEnabled), ("SideBarEnabled", c.Panels.IsSideBarEnabled), ("MenuHide", c.MenuBar.IsHideMenu), ("MenuModeHide", c.MenuBar.IsHideMenuInAutoHideMode),
+            ("LeftHide", c.Panels.IsHideLeftPanel), ("RightHide", c.Panels.IsHideRightPanel), ("LeftModeHide", c.Panels.IsHideLeftPanelInAutoHideMode), ("RightModeHide", c.Panels.IsHideRightPanelInAutoHideMode), ("KeyDelay", a.IsAutoHideKeyDownDelay) })
+            this.FindControl<CheckBox>(name)!.IsChecked = value;
+        foreach (var (name, value, maximum) in new[] { ("HideDelay", a.AutoHideDelayTime, 60.0), ("ShowDelay", a.AutoHideDelayVisibleTime, 60.0), ("HorizontalMargin", a.AutoHideHitTestHorizontalMargin, 500.0), ("VerticalMargin", a.AutoHideHitTestVerticalMargin, 500.0) })
+            this.FindControl<NumericUpDown>(name)!.Value = (decimal)Math.Clamp(value, 0, maximum);
+        this.FindControl<ComboBox>("FocusLock")!.SelectedIndex = (int)a.AutoHideFocusLockMode;
+        this.FindControl<ComboBox>("TopConflict")!.SelectedIndex = (int)a.AutoHideConflictTopMargin;
+        this.FindControl<ComboBox>("BottomConflict")!.SelectedIndex = (int)a.AutoHideConflictBottomMargin;
+    }
+    /// <summary>保存用户编辑的原字段；滑条/胶片条资格在各自页面编辑。</summary>
+    private void ApplyAutoHide()
+    {
+        var c = Config.Current; var a = c.AutoHide;
+        bool Checked(string name) => this.FindControl<CheckBox>(name)!.IsChecked == true;
+        c.Window.IsAutoHideInNormal = Checked("AutoNormal"); c.Window.IsAutoHideInMaximized = Checked("AutoMaximized"); c.Window.IsAutoHideInFullScreen = Checked("AutoFullScreen");
+        c.MenuBar.IsAddressBarEnabled = Checked("AddressEnabled"); c.Panels.IsSideBarEnabled = Checked("SideBarEnabled");
+        c.MenuBar.IsHideMenu = Checked("MenuHide"); c.MenuBar.IsHideMenuInAutoHideMode = Checked("MenuModeHide");
+        c.Panels.IsHideLeftPanel = Checked("LeftHide"); c.Panels.IsHideRightPanel = Checked("RightHide");
+        c.Panels.IsHideLeftPanelInAutoHideMode = Checked("LeftModeHide"); c.Panels.IsHideRightPanelInAutoHideMode = Checked("RightModeHide"); a.IsAutoHideKeyDownDelay = Checked("KeyDelay");
+        a.AutoHideDelayTime = (double)(this.FindControl<NumericUpDown>("HideDelay")!.Value ?? 1);
+        a.AutoHideDelayVisibleTime = (double)(this.FindControl<NumericUpDown>("ShowDelay")!.Value ?? 0);
+        a.AutoHideHitTestHorizontalMargin = (double)(this.FindControl<NumericUpDown>("HorizontalMargin")!.Value ?? 32);
+        a.AutoHideHitTestVerticalMargin = (double)(this.FindControl<NumericUpDown>("VerticalMargin")!.Value ?? 32);
+        a.AutoHideFocusLockMode = (AutoHideFocusLockMode)Math.Max(0, this.FindControl<ComboBox>("FocusLock")!.SelectedIndex);
+        a.AutoHideConflictTopMargin = (AutoHideConflictMode)Math.Max(0, this.FindControl<ComboBox>("TopConflict")!.SelectedIndex);
+        a.AutoHideConflictBottomMargin = (AutoHideConflictMode)Math.Max(0, this.FindControl<ComboBox>("BottomConflict")!.SelectedIndex);
+    }
     /// <summary>设置应用成功并保存 JSON 后关闭；失败留在表单中。</summary>
     private async void Save_Click(object? sender, RoutedEventArgs e)
     {
@@ -127,7 +163,7 @@ public sealed partial class SettingsWindow : Window
             else Apply(Config.Current.BookSetting);
             // 只写用户修改的差分，避免一次保存就展开全部 235 条默认命令。
             foreach (var input in _inputs.Where(i => i.Value.Trim() != i.OriginalValue.Trim())) _model.SaveData.SetShortcut(input.Name, input.Value.Trim());
-            ApplyFilm();
+            ApplyFilm(); ApplyAutoHide();
             Config.Current.Bookshelf.FolderSortOrder = (FolderSortOrder)Math.Max(0, this.FindControl<ComboBox>("BookshelfGroup")!.SelectedIndex);
             Config.Current.Book.IsPrioritizeBookMove = this.FindControl<CheckBox>("PrioritizeBookMove")!.IsChecked == true;
             // 分组设置只重排已有元数据，不能重扫来源或意外重新洗牌。

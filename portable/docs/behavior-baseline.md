@@ -20,10 +20,10 @@
 | RAR/7z | 原Archive/阅读链 | 原来源关系下替换 SharpCompress，普通及固实夹具接入；密码/分卷/嵌套待迁移 |
 | 连续、瀑布流 | 原阅读链 | 待 P3 |
 | 完整默认菜单 | Menu/MenuTree.cs:CreateDefault、MenuNode.cs、MenuElementType.cs | 原八组树逐项迁入；未迁移节点禁用占位，原语言资源解析文案 |
-| 胶片条/导航器 | Config/FilmStripConfig.cs、PageSelect/FilmStrip、SidePanels/Navigate | 原选择/方向/首尾居中及可见需求算法，200ms防抖、三滚轮/确认、元数据详情与配置接入；标记/全局自动隐藏待迁入 |
-| 滑条联动与设置 | PageSelect/PageSlider/PageSlider.cs、PageSliderView.xaml.cs、Config/SliderConfig.cs | 原共享选择、方向/静态双页/同步步长及拖动预览释放确认；原显隐/位置/厚度/透明度/滚轮字段接入，外观独立；完整自动隐藏/全局显隐待迁入 |
+| 胶片条/导航器 | Config/FilmStripConfig.cs、PageSelect/FilmStrip、SidePanels/Navigate | 原选择/方向/首尾居中及可见需求算法，200ms防抖、三滚轮/确认、元数据详情与配置接入；原全局播放列表标记与覆盖自动隐藏接入 |
+| 滑条联动与设置 | PageSelect/PageSlider/PageSlider.cs、PageSliderView.xaml.cs、Config/SliderConfig.cs | 原共享选择、方向/静态双页/同步步长及拖动预览释放确认；原显隐/位置/厚度/透明度/滚轮字段接入，外观独立；原五区自动隐藏/窗口显示命令接入 |
 | 底部直接页号 | PageSelect/PageSlider/SliderTextBox.cs、PageSliderViewModel.cs | 原一起始数值转换与raw索引；Enter保持编辑、普通失焦和Escape均提交；文本作用域、切书/关闭草稿、旧书请求核对；自动/正式运行见p2-slider-input.md |
-| 原页标记 | PlaylistItemCollection、Playlist/Pagemark.nvpls、TogglePlaylistItem/PrevPlaylistItem/NextPlaylistItem | 46.3属于全局播放列表，待整体迁入；不新增Book私有标记或冒充原命令 |
+| 原页标记 | PlaylistItemCollection、Playlist/Pagemark.nvpls、TogglePlaylistItem/PrevPlaylistItem/NextPlaylistItem | 46.3属于全局播放列表，格式/编辑/导航及标记绘制迁入；完整文件监视/修复待迁，不新增Book私有标记 |
 | 指定页/指定步长 | JumpPageCommand.cs、MoveSizePageCommandParameter.cs、PageFrameBox.cs:1057-1094 | 一起始对话框、两方向共享参数，原周期对齐及端点终止；无循环页 |
 | 页面/打开导航历史 | BookHub/PageHistory.cs、BookHubHistory.cs、HistoryLimitedCollection.cs | 原100项环形/游标/分支；页面以路径+条目，打开顺序独立；失败异步重放不提交游标 |
 | 普通书架与前后书 | Bookshelf/FolderList/FolderCollection、BookshelfFolderList、BookOperation.MoveBook | 原目录分组/13项排序/普通端点/随机循环；混合候选、失败重试和优先切书；每路径参数/持久随机种子待迁 |
@@ -31,6 +31,8 @@
 | 侧栏拖拽组合 | SidePanels/CustomLayoutPanelManager、SidePanelViewModel、SidePanelDropAcceptor、LayoutDockPanel | 原组模型、leader 整组移动/成员拆组、分半组合及 V2 JSON 适配；Headless/真机恢复通过；浮动/旧布局导入待迁移 |
 | 历史/书签 | Bookamrk/BookmarkCollection.cs、BookMemento、HistoryCollection | 原 JSON 树字段/顺序保留；访问排序、共享状态与原移动/递归合并/确认/颜色/删除恢复接入；完整导航/修复/原Popup宿主待迁，见p2-bookmark-operations.md |
 | 历史列表导航/管理 | HistoryList、HistoryListViewModel、HistoryListBox、BookHistoryCollection | 原过滤后前后规则、KeepHistoryOrder/SkipSamePlace、日期/四开关、单或双击、批次移除和全部清空；搜索语法/样式/无效清理待迁 |
+| 原五区自动隐藏与显示锁 | MainWindowModel/Controller/ViewModel、AutoHideBehavior、MainWindow.xaml.cs | 原资格、覆盖插槽、内容余量、滑条/胶片条联动、延迟/边缘/焦点/弹出层/捕获及显示锁；Mac焦点适配，见p2-autohide.md |
+| 全屏与置顶 | 原WindowConfig/窗口控制命令 | Mac实际WindowState/Topmost；全屏取消恢复上一普通/最大化状态，FullDesktop等占位 |
 | 旧Profile/nvzip | SaveData | 待 P5，完整旧迁移规则待迁入 |
 
 [235条命令迁移表](command-migration.md) 与源码 manifest 一致，每条单独标记状态，不用命令数量计算功能覆盖率。[源码迁入表](source-migration.json) 区分完整算法与P1子集。

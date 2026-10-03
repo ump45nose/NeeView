@@ -15,7 +15,12 @@ public sealed class Config
     public BookshelfConfig Bookshelf { get; set; } = new();
     public HistoryConfig History { get; set; } = new();
     public PlaylistConfig Playlist { get; set; } = new();
-    public bool IsAddressBarEnabled { get; set; } = true;
+    public AutoHideConfig AutoHide { get; set; } = new();
+    public WindowConfig Window { get; set; } = new();
+    public MenuBarConfig MenuBar { get; set; } = new();
+    /// <summary>早期 Mac 字段兼容入口；真实配置沿用原 MenuBar 分支。</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public bool IsAddressBarEnabled { get => MenuBar.IsAddressBarEnabled; set => MenuBar.IsAddressBarEnabled = value; }
     /// <summary>启动时装配唯一配置，读取前不初始化具体窗口。</summary>
     public static void SetCurrent(Config config) => Current = config;
 }
@@ -45,6 +50,8 @@ public enum SliderMouseWheelAction { MovePage, CommandDependent }
 public sealed class SliderConfig
 {
     public bool IsEnabled { get; set; } = true;
+    public bool IsHidePageSlider { get; set; }
+    public bool IsHidePageSliderInAutoHideMode { get; set; } = true;
     public SliderIndexLayout SliderIndexLayout { get; set; } = SliderIndexLayout.Right;
     private double _thickness = 25;
     /// <summary>原厚度范围 15–50 DIP；拒绝非有限配置，按原精度舍入。</summary>
@@ -95,6 +102,20 @@ public sealed class PanelsConfig
     public double RightWidth { get; set; } = 240;
     public bool IsLeftVisible { get; set; } = true;
     public bool IsRightVisible { get; set; } = true;
-    public bool IsLeftAutoHide { get; set; }
-    public bool IsRightAutoHide { get; set; }
+    public bool IsHideLeftPanel { get; set; }
+    public bool IsHideRightPanel { get; set; }
+    public bool IsHideLeftPanelInAutoHideMode { get; set; } = true;
+    public bool IsHideRightPanelInAutoHideMode { get; set; } = true;
+    public bool IsSideBarEnabled { get; set; } = true;
+    private double _conflictTopMargin = 32, _conflictBottomMargin = 20;
+    /// <summary>原覆盖菜单与侧栏的内容安全余量，非负并保留五位精度。</summary>
+    public double ConflictTopMargin { get => _conflictTopMargin; set => _conflictTopMargin = double.IsFinite(value) ? Math.Round(Math.Max(0, value), 5) : 32; }
+    /// <summary>原覆盖滑条与侧栏的内容安全余量，正文区域不受它影响。</summary>
+    public double ConflictBottomMargin { get => _conflictBottomMargin; set => _conflictBottomMargin = double.IsFinite(value) ? Math.Round(Math.Max(0, value), 5) : 20; }
+    /// <summary>兼容旧 Mac 调用；不再写入第二个自动隐藏字段。</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public bool IsLeftAutoHide { get => IsHideLeftPanel; set => IsHideLeftPanel = value; }
+    /// <summary>右侧兼容入口，同样委托原字段。</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public bool IsRightAutoHide { get => IsHideRightPanel; set => IsHideRightPanel = value; }
 }

@@ -4,14 +4,14 @@
 
 | 原区域 | Mac 入口 | 当前状态 |
 |---|---|---|
-| DockMenuSocket / 地址栏 | MainWindow.axaml 顶部 Menu/AddressBar | 完整原八组默认菜单、地址打开；未迁移能力禁用占位，动态菜单配置待后续 |
-| SidePanelFrameView 左右栏 | SidePanelFrame 七列、左右rail | 原左3/右6入口、41 DIP栏/36 DIP图标，分隔拖动、显隐、基础自动隐藏 |
+| DockMenuSocket / 地址栏 | MainWindow.axaml 顶部 Menu/AddressBar | 完整原八组默认菜单、地址打开及原覆盖隐藏；未迁移能力禁用占位，动态菜单配置待后续 |
+| SidePanelFrameView 左右栏 | SidePanelFrame 七列、左右rail | 原左3/右6入口、41 DIP栏/36 DIP图标，分隔拖动、显隐、原资格/延迟/焦点及覆盖自动隐藏 |
 | MainViewSocket | ReaderView | 原页框绘制、缩放/平移、当前帧和邻图预取 |
-| DockFilmStripSocket | 同名底部插槽 | 原位置可见胶片条、独立选择/确认、三滚轮、详情和首尾居中；播放列表标记/完整自动隐藏待迁入 |
-| DockPageSliderSocket | PageSliderView | 位置滑条与页码，导航防抖 |
+| DockFilmStripSocket | 同名底部插槽 | 原位置可见胶片条、独立选择/确认、三滚轮、详情和首尾居中；播放列表标记、独立或随滑条覆盖弹出 |
+| DockPageSliderSocket | PageSliderView | 原滑条/直接页码/标记/表现设置与覆盖隐藏，导航防抖 |
 | DockStatusArea / 覆盖层 | 状态文本/MessageLayer | 当前条目、模式、方向、错误/加载 |
-| 设置左导航/搜索、右内容 | SettingsWindow.axaml | 当前/默认阅读设置、可搜索235命令键位编辑；其他页占位 |
-| 停靠、拖动、自动隐藏详细规则 | LayoutPanelManager / SidePanelPresenter | 跨栏重排、分割组合/拆组、比例/选择恢复、拖动锁定已接入；浮动窗口及完整细节待后续 |
+| 设置左导航/搜索、右内容 | SettingsWindow.axaml | 当前/默认阅读、235命令键位、胶片条/滑条及窗口/自动隐藏；高级页面保留占位 |
+| 停靠、拖动、自动隐藏详细规则 | LayoutPanelManager / SidePanelPresenter | 跨栏重排、分割组合/拆组、比例/选择恢复、拖动锁定已接入；浮动窗口及高级窗口/输入细节待后续 |
 
 | 原面板 | 当前区域/入口 | 当前状态 |
 |---|---|---|
@@ -34,6 +34,8 @@ Headless 测试检查区域顺序、栏宽、图像绘制、调整列宽/显隐�
 - 组内分隔比例、组顺序、选择及窗口重开恢复；保存原 PanelLayoutV2/SelectedItem/GridLength。
 - 拖动期间两栏自动隐藏锁定；Escape、捕获丢失和无效落点取消，不改变布局。
 - 未迁入面板可组合、选择并显示明确占位。
-- 浮动窗口、旧 V0/V1 布局导入及完整自动隐藏细节未迁入；未知旧字段只保留，不宣称其行为已支持。
+- 浮动窗口、旧 V0/V1 布局导入及高级窗口/输入细节未迁入；未知旧字段只保留，不宣称其行为已支持。
 
 依据原 CustomLayoutPanelManager、SidePanelFrameView、SidePanelIcon、SidePanelViewModel、LayoutDockPanel 与 SidePanelDropAcceptor；不增加大型停靠框架。
+
+第九批原菜单与底部覆盖插槽、左右自动隐藏时正文跨列、内容上下余量、边缘延迟/焦点/拖动锁和一次显示已迁入，详见[p2-autohide.md](p2-autohide.md)。普通停靠布局保留；同资格下弹出/收起不改变正文尺寸。窗口状态或配置资格改变允许原布局重新分配。实际Mac和Headless证据分别记录，Windows动态对照待验。

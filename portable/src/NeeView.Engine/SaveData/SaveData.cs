@@ -51,6 +51,25 @@ public sealed class SaveData(string directory)
             config.Bookshelf = ReadBranch<BookshelfConfig>(raw, "Bookshelf");
             config.History = ReadBranch<HistoryConfig>(raw, "History");
             config.Playlist = ReadBranch<PlaylistConfig>(raw, "Playlist");
+            config.Window = ReadBranch<WindowConfig>(raw, "Window");
+            config.MenuBar = ReadBranch<MenuBarConfig>(raw, "MenuBar");
+            // 原旧拼写与初期 Mac 字段只作读取别名；原新字段明确存在时优先。
+            var auto = raw["AutoHide"]?.DeepClone().AsObject() ?? new JsonObject();
+            if (auto["AutoHideHitTestMargin"] is { } margin)
+            {
+                auto["AutoHideHitTestHorizontalMargin"] ??= margin.DeepClone();
+                auto["AutoHideHitTestVerticalMargin"] ??= margin.DeepClone();
+            }
+            foreach (var part in new[] { "Top", "Bottom" })
+                if (auto[$"AutoHideConflict{part}Margin"] is null && auto[$"AutoHideConfrict{part}Margin"] is { } legacy)
+                    auto[$"AutoHideConflict{part}Margin"] = legacy.DeepClone();
+            var autoOptions = new JsonSerializerOptions(Options);
+            autoOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+            config.AutoHide = auto.Deserialize<AutoHideConfig>(autoOptions) ?? new();
+            var panels = raw["Panels"] as JsonObject;
+            if (panels?["IsHideLeftPanel"] is null && panels?["IsLeftAutoHide"] is JsonValue left) config.Panels.IsHideLeftPanel = left.GetValue<bool>();
+            if (panels?["IsHideRightPanel"] is null && panels?["IsRightAutoHide"] is JsonValue right) config.Panels.IsHideRightPanel = right.GetValue<bool>();
+            if (raw["MenuBar"]?["IsAddressBarEnabled"] is null && raw["IsAddressBarEnabled"] is JsonValue address) config.MenuBar.IsAddressBarEnabled = address.GetValue<bool>();
         }
         config.Playlist.DefaultFolder = System.IO.Path.Combine(DirectoryPath, "Playlists");
         Playlists = new(config.Playlist);
@@ -308,11 +327,14 @@ public sealed class SaveData(string directory)
         try
         {
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "History", "Playlist" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "History", "Playlist", "AutoHide", "Window", "MenuBar" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 Merge(Object(config, branch), JsonSerializer.SerializeToNode(value, Options)!.AsObject());
             }
+            // 退役的 Mac 别名统一归入原字段，避免下一次加载出现两套相反的权威值。
+            Object(config, "Panels").Remove("IsLeftAutoHide"); Object(config, "Panels").Remove("IsRightAutoHide");
+            config.Remove("IsAddressBarEnabled");
             if (book is not null)
             {
                 var memento = book.CreateMemento();

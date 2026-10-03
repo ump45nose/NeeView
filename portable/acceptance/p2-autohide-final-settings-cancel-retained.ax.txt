@@ -1,0 +1,158 @@
+Window: "选项", App: NeeView.
+0 standard window 选项, Secondary Actions: Raise
+	1 container WindowChrome, ID: AvaloniaWindowChrome
+	2 container
+		3 container
+			4 container
+				5 text field (disabled) Help: 完整设置搜索在 P2–P5 迁移, Placeholder: 搜索设置
+					6 container
+						7 container
+							8 scroll area (disabled) PART_ScrollViewer
+								9 container
+									10 container
+										11 text Value: 搜索设置, ID: PART_Placeholder
+				12 content list
+					13 scroll area PART_ScrollViewer
+						14 container
+							15 container
+								16 row (selectable) 书籍 / 阅读
+									17 text 书籍 / 阅读
+								18 row (selectable) 命令 / 键鼠
+									19 text 命令 / 键鼠
+								20 row (selectable) 胶片条 / 滑条
+									21 text 胶片条 / 滑条
+								22 row (selected) 窗口 / 自动隐藏
+									23 text 窗口 / 自动隐藏
+								24 row (selectable, disabled) 图像效果（P5）
+									25 text 图像效果（P5）
+								26 row (selectable, disabled) 导入旧配置（P5）
+									27 text 导入旧配置（P5）
+			28 scroll area AutoHideSettings
+				29 container
+					30 container
+						31 text 窗口 / 自动隐藏
+						32 text 启用自动隐藏模式
+						33 checkbox 普通窗口, Value: on, ID: AutoNormal
+							34 container RootGrid
+								35 container
+									36 container
+						37 checkbox 最大化窗口, Value: off, ID: AutoMaximized
+							38 container RootGrid
+								39 container
+									40 container
+						41 checkbox 全屏窗口, Value: on, ID: AutoFullScreen
+							42 container RootGrid
+								43 container
+									44 container
+						45 text 菜单 / 侧栏
+						46 checkbox 显示地址栏, Value: on, ID: AddressEnabled
+							47 container RootGrid
+								48 container
+									49 container
+						50 checkbox 显示侧栏图标, Value: on, ID: SideBarEnabled
+							51 container RootGrid
+								52 container
+									53 container
+						54 checkbox 自动隐藏菜单和地址栏, Value: off, ID: MenuHide
+							55 container RootGrid
+								56 container
+									57 container
+						58 checkbox 自动隐藏模式下隐藏菜单和地址栏, Value: on, ID: MenuModeHide
+							59 container RootGrid
+								60 container
+									61 container
+						62 checkbox 自动隐藏左侧栏, Value: off, ID: LeftHide
+							63 container RootGrid
+								64 container
+									65 container
+						66 checkbox 自动隐藏右侧栏, Value: off, ID: RightHide
+							67 container RootGrid
+								68 container
+									69 container
+						70 checkbox 自动隐藏模式下隐藏左侧栏, Value: on, ID: LeftModeHide
+							71 container RootGrid
+								72 container
+									73 container
+						74 checkbox 自动隐藏模式下隐藏右侧栏, Value: on, ID: RightModeHide
+							75 container RootGrid
+								76 container
+									77 container
+						78 text 延迟与边缘触发
+						79 text 隐藏延迟（秒）
+						80 stepper (settable, float) Value: 0.4, ID: HideDelay
+							81 container
+								82 container PART_SpinnerPanel
+									83 button Avalonia.Controls.PathIcon, ID: PART_IncreaseButton
+									84 button Avalonia.Controls.PathIcon, ID: PART_DecreaseButton
+								85 text field (settable) Value: 0.4, ID: PART_TextBox
+									86 container
+										87 container
+											88 scroll area PART_ScrollViewer
+												89 container
+						90 text 显示延迟（秒）
+						91 stepper (settable, float) Value: 0, ID: ShowDelay
+							92 container
+								93 container PART_SpinnerPanel
+									94 button Avalonia.Controls.PathIcon, ID: PART_IncreaseButton
+									95 button (disabled) Avalonia.Controls.PathIcon, ID: PART_DecreaseButton
+								96 text field (settable) Value: 0, ID: PART_TextBox
+									97 container
+										98 container
+											99 scroll area PART_ScrollViewer
+												100 container
+						101 checkbox 按键延长所属区域的隐藏延迟, Value: on, ID: KeyDelay
+							102 container RootGrid
+								103 container
+									104 container
+						105 text 左右边缘宽度（DIP）
+						106 stepper (settable, float) Value: 32, ID: HorizontalMargin
+							107 container
+								108 container PART_SpinnerPanel
+									109 button Avalonia.Controls.PathIcon, ID: PART_IncreaseButton
+									110 button Avalonia.Controls.PathIcon, ID: PART_DecreaseButton
+								111 text field (settable) Value: 32, ID: PART_TextBox
+									112 container
+										113 container
+											114 scroll area PART_ScrollViewer
+												115 container
+						116 text 上下边缘宽度（DIP）
+						117 stepper (settable, float) Value: 32, ID: VerticalMargin
+							118 container
+								119 container PART_SpinnerPanel
+									120 button Avalonia.Controls.PathIcon, ID: PART_IncreaseButton
+									121 button Avalonia.Controls.PathIcon, ID: PART_DecreaseButton
+								122 text field (settable) Value: 32, ID: PART_TextBox
+									123 container
+										124 container
+											125 scroll area PART_ScrollViewer
+												126 container
+						127 text 焦点锁定
+						128 pop up button Value: 文本逻辑焦点, ID: FocusLock
+							129 container
+								130 text 文本逻辑焦点
+								131 unknown PART_Popup
+						132 text 上边缘与侧栏冲突
+						133 pop up button Value: 仅最边缘触发, ID: TopConflict
+							134 container
+								135 text 仅最边缘触发
+								136 unknown PART_Popup
+						137 text 下边缘与侧栏冲突
+						138 pop up button Value: 允许同时弹出, ID: BottomConflict
+							139 container
+								140 text 允许同时弹出
+								141 unknown PART_Popup
+					142 scroll bar (settable, float) Value: 0, ID: PART_VerticalScrollBar
+						143 container
+							144 button Line up, ID: PART_LineUpButton
+							145 button Page up, ID: PART_PageUpButton
+							146 button Page down, ID: PART_PageDownButton
+							147 handle Position
+							148 button Line down, ID: PART_LineDownButton
+			149 text Message
+			150 button 取消, ID: CancelSettings
+			151 button 保存, ID: SaveSettings
+	152 close button
+	153 zoom button
+	154 text 选项
+155 menu bar
+	156 NeeView
