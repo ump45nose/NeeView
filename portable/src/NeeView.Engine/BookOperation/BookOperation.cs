@@ -36,6 +36,9 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
 
     /// <summary>将书签元数据需求送入同一来源后端，表现端不接触具体文件系统实现。</summary>
     public Task<FolderItem?> GetFileMetadataAsync(string path, CancellationToken token) => archives.GetFileMetadataAsync(path, token);
+    /// <summary>列表按可见需求租用原书籍封面，复用原选择、来源和唯一图像工厂。</summary>
+    public Task<BitmapLease> GetCoverAsync(BitmapFactory images, string path, DecodeRequest request, CancellationToken token) =>
+        images.GetCoverAsync(path, archives, saveData.FolderConfigs, request, token);
 
     /// <summary>打开图片所在目录或来源；失败保持旧书，晚到来源只释放。</summary>
     public async Task OpenAsync(string path, CancellationToken token = default)
@@ -359,6 +362,8 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     }
     /// <summary>立即保存，用于切书和正常退出。</summary>
     public Task SaveAsync() => saveData.SaveAsync(Book, Position.Part, keepHistoryOrder: _keepHistoryOrder);
+    /// <summary>仅保存配置/集合现状，不以外观切换重新登记阅读访问；阅读防抖与退出仍保存Book。</summary>
+    public Task SaveConfigurationAsync() => saveData.SaveAsync(null, 0);
 
     /// <summary>保存设置表单的历史限制副本；不改阅读规则或重建帧，成功后才应用配置。</summary>
     /// <param name="historyLimits">原数量及期限；保留当前书与LastBook启动快照。</param>

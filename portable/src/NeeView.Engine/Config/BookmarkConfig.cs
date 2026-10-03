@@ -4,6 +4,7 @@ namespace NeeView;
 /// <summary>原书签列表默认排序和树/数量显示；其他字段继续由原 JSON 保留。</summary>
 public sealed class BookmarkConfig
 {
+    public PanelListItemStyle PanelListItemStyle { get; set; } = PanelListItemStyle.Content;
     public bool IsSyncBookshelfEnabled { get; set; } = true;
     public FolderOrder BookmarkFolderOrder { get; set; }
     public bool IsFolderTreeVisible { get; set; }

@@ -96,3 +96,5 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 第十九批见[p2-bookshelf-bookmarks.md](p2-bookshelf-bookmarks.md)。原书架bookmark scheme、共享节点独立列表、每目录参数/元数据排序及StartUp列表恢复接通；无第二书签树/状态体系。
 
 第二十批接入原历史登记策略与可靠清理，继续使用唯一BookMementoControl/SaveData及四JSON事务；表现仅编辑草稿与转交命令，见[契约](p2-history-policy.md)。
+
+第二十一批迁入原列表四模板/共享Profile、稳定路径可见封面及真正虚拟缩略网格；仍共用唯一来源/BitmapFactory和原三列表JSON，见[p2-list-templates.md](p2-list-templates.md)。

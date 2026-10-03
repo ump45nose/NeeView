@@ -1,0 +1,14 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="NeeView.MacOS.Views.PanelListItemView" x:CompileBindings="False">
+  <!-- 原Normal/Content/Banner/Thumbnail结构；像素、选择与业务不写入主题。 -->
+  <Grid x:Name="ItemRoot" RowDefinitions="Auto,*" Margin="2" ToolTip.Tip="{Binding Detail}">
+    <TextBlock Grid.Row="0" Text="{Binding GroupHeader}" IsVisible="{Binding HasGroupHeader}" Height="26" FontWeight="SemiBold" />
+    <Grid x:Name="ContentGrid" Grid.Row="1">
+      <ContentControl x:Name="CoverHost" Focusable="False" />
+      <StackPanel x:Name="TextHost" Spacing="2" VerticalAlignment="Center" Margin="5,0">
+        <TextBlock Text="{Binding Date}" IsVisible="{Binding DateVisible}" FontSize="10" Foreground="{DynamicResource Panel.Note}" />
+        <TextBlock Text="{Binding Name}" IsVisible="{Binding TextVisible}" TextWrapping="{Binding Wrapping}" TextTrimming="CharacterEllipsis" MaxHeight="{Binding TextHeight}" />
+      </StackPanel>
+    </Grid>
+  </Grid>
+</UserControl>

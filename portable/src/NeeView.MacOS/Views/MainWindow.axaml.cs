@@ -123,7 +123,7 @@ public sealed partial class MainWindow : Window
         };
         bookmarks.CurrentBookPath = () => model.Operation.Book?.Path;
         bookmarks.ReadMetadataAsync = model.Operation.GetFileMetadataAsync;
-        bookmarks.SaveSettingsAsync = () => model.Operation.SaveAsync();
+        bookmarks.SaveSettingsAsync = () => model.Operation.SaveConfigurationAsync();
         bookmarks.Failed += (_, message) => ShowError(message);
         bookmarks.TreeVisibilityUpdated += (_, _) => model.RefreshBookmarkTree();
         bookmarks.SelectionUpdated += (_, _) =>
@@ -134,6 +134,7 @@ public sealed partial class MainWindow : Window
             model.SelectedBookmark = bookmarks.SelectedNodes.FirstOrDefault(); model.BookmarkSelectionCount = bookmarks.SelectedNodes.Count;
         };
         bookmarks.Attach(model.SaveData);
+        AttachListTemplates();
         var playlist = this.FindControl<PlaylistView>("PlaylistPanelView")!;
         playlist.Failed += (_, message) => ShowError(message); playlist.Attach(model.Operation);
         model.Operation.MarkersChanged += Model_MarkersChanged;
@@ -306,6 +307,7 @@ public sealed partial class MainWindow : Window
                 case "SyncBookshelfFolder":
                     if (_model.Operation.Book is { } current) await _model.Operation.Bookshelf.SyncAsync(current, force: true); break;
                 case "RefreshBookshelfFolder":
+                    RefreshListCovers();
                     if (await _model.Operation.Bookshelf.RefreshAsync()) await _model.Operation.SaveAsync(); break;
                 case "OpenExplorer":
                     if (_model.Operation.Book is { } book) await _platform!.RevealAsync(book.CurrentPage?.ArchiveEntry.FilePath ?? book.Path); break;
@@ -794,6 +796,7 @@ public sealed partial class MainWindow : Window
         _pageEndDialog?.Close(PageEndAction.None);
         try
         {
+            await _listStyleTask;
             _historyCleanupCancellation?.Cancel();
             if (_historyCleanupTask is not null) await _historyCleanupTask;
             await this.FindControl<PlaylistView>("PlaylistPanelView")!.PrepareCloseAsync();

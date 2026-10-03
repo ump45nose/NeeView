@@ -21,29 +21,71 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
         public CancellationTokenSource Cancellation { get; set; } = null!;
         public bool Finished;
     }
-    private readonly record struct Key(Archive Archive, int Id, long Length, DateTime Version, int Width, int Height, bool Thumbnail);
+    private readonly record struct Key(object Source, int Id, long Length, DateTime Version, int Width, int Height, bool Thumbnail, string? CoverSelection = null, long CoverRevision = 0);
     private readonly object _sync = new();
     private readonly Dictionary<Key, Entry> _cache = [];
+    private readonly HashSet<Entry> _retired = [];
     private readonly Dictionary<Key, Pending> _pending = [];
     private readonly SemaphoreSlim _decodeSlots = new(2);
     private readonly SemaphoreSlim _backgroundSlot = new(1);
     private readonly CancellationTokenSource _lifetime = new();
     private bool _disposed;
     private long _clock;
+    private long _coverRevision;
     public long Budget { get; set; } = 512L * 1024 * 1024;
     public long ThumbnailBudget { get; set; } = 64L * 1024 * 1024;
-    public long ByteCount { get { lock (_sync) return _cache.Values.Sum(e => e.Image.ByteCount + e.DisplayBytes); } }
+    public long ByteCount { get { lock (_sync) return _cache.Values.Concat(_retired).Sum(e => e.Image.ByteCount + e.DisplayBytes); } }
 
     /// <summary>合并相同规格读取，取消当前需求不影响其他共享需求。</summary>
-    public async Task<BitmapLease> GetAsync(Page page, DecodeRequest request, CancellationToken token, bool background = false)
+    public Task<BitmapLease> GetAsync(Page page, DecodeRequest request, CancellationToken token, bool background = false)
     {
         var entry = page.ArchiveEntry;
-        token.ThrowIfCancellationRequested();
         var key = new Key(entry.Archive, entry.Id, entry.Length, entry.LastWriteTime, request.TargetWidth, request.TargetHeight, request.IsThumbnail);
+        return GetCoreAsync(key, request, token, background, cancellation =>
+        {
+            if (!page.IsImage && !page.PageType.IsFolder()) throw new NotSupportedException("这个文件类型的查看器尚未迁移。");
+            return page.PageType.IsFolder() ? ArchivePageUtility.GetSelectedPageAsync(page, cancellation) : Task.FromResult(ArchivePageCover.Borrow(entry));
+        });
+    }
+    /// <summary>列表封面使用稳定原路径/版本/选择规格，复用同一解码槽和缩略预算，不缓存来源对象。</summary>
+    /// <param name="path">原来源定位。</param><param name="archives">已有来源替换点。</param><param name="folders">原封面配置。</param>
+    /// <param name="request">设备像素缩略规格。</param><param name="token">当前可见消费者取消。</param>
+    public async Task<BitmapLease> GetCoverAsync(string path, IArchiveFactory archives, FolderConfigCollection folders, DecodeRequest request, CancellationToken token)
+    {
+        var revision = Interlocked.Read(ref _coverRevision);
+        var metadata = await archives.GetFileMetadataAsync(path, token);
+        if (metadata is null)
+        {
+            // 包内定位的真实版本属于根归档；这个短期来源只用于解析，不进入缓存键/长期字典。
+            await using var source = await archives.OpenAsync(path, token);
+            metadata = await archives.GetFileMetadataAsync(source.RootArchivePath, token);
+        }
+        var selection = $"{folders.GetThumbnailTarget(path)}\n{Config.Current.Book.BookThumbnailRegex}\n{Config.Current.Book.BookThumbnailDepth}";
+        var key = new Key(path, 0, metadata?.Length ?? -1, metadata?.LastWriteTime ?? default, request.TargetWidth, request.TargetHeight, true, selection, revision);
+        return await GetCoreAsync(key, request with { IsThumbnail = true }, token, true,
+            cancellation => ArchivePageUtility.GetSelectedPageAsync(path, archives, folders, cancellation));
+    }
+    /// <summary>显式刷新重探封面；仍显示的旧租约不提前释放，过期后台结果不进入新缓存。</summary>
+    public void InvalidateCovers()
+    {
+        lock (_sync)
+        {
+            ++_coverRevision;
+            foreach (var pair in _cache.Where(e => e.Key.Source is string).ToArray())
+            { _cache.Remove(pair.Key); pair.Value.Cached = false; if (pair.Value.References == 0 && pair.Value.WaitingConsumers == 0) pair.Value.Image.Dispose(); else _retired.Add(pair.Value); }
+            foreach (var pair in _pending.Where(e => e.Key.Source is string).ToArray())
+            { RemovePending(pair.Key, pair.Value); pair.Value.Cancellation.Cancel(); }
+        }
+    }
+    /// <summary>正文和路径封面合并同规格需求，共享取消/晚到/租约保护。</summary>
+    private async Task<BitmapLease> GetCoreAsync(Key key, DecodeRequest request, CancellationToken token, bool background, Func<CancellationToken, Task<ArchivePageCover>> resolve)
+    {
+        token.ThrowIfCancellationRequested();
         Pending work;
         lock (_sync)
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
+            if (key.Source is string && key.CoverRevision != _coverRevision) throw new OperationCanceledException("封面已刷新。");
             if (_cache.TryGetValue(key, out var cached)) return Rent(cached);
             if (!_pending.TryGetValue(key, out work!))
             {
@@ -51,7 +93,7 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
                 work = new Pending { Cancellation = CancellationTokenSource.CreateLinkedTokenSource(_lifetime.Token) }; _pending[key] = work;
                 // 任务返回的像素在等待者取得租约前也受保护，其他请求的 Trim 不能回收。
                 var pending = work;
-                work.Task = Task.Run(() => LoadAsync(key, page, request, background, pending));
+                work.Task = Task.Run(() => LoadAsync(key, request, background, pending, resolve));
                 _ = ObserveAsync(work.Task);
             }
             work.Consumers++;
@@ -78,7 +120,7 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
                 if (work.Result is { } result)
                 {
                     result.WaitingConsumers--;
-                    if (!result.Cached && result.References == 0 && result.WaitingConsumers == 0) result.Image.Dispose();
+                    if (!result.Cached && result.References == 0 && result.WaitingConsumers == 0) { _retired.Remove(result); result.Image.Dispose(); }
                 }
                 Trim();
             }
@@ -90,16 +132,15 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
         try { await task; } catch { /* 实际等待者收到错误；无人等待的任务仍需观察。 */ }
     }
     /// <summary>按需读取及解码；背景任务最多占一个解码槽。</summary>
-    private async Task<Entry> LoadAsync(Key key, Page page, DecodeRequest request, bool background, Pending pending)
+    private async Task<Entry> LoadAsync(Key key, DecodeRequest request, bool background, Pending pending, Func<CancellationToken, Task<ArchivePageCover>> resolve)
     {
         bool backgroundHeld = false, decodeHeld = false;
         try
         {
             if (background) { await _backgroundSlot.WaitAsync(pending.Cancellation.Token); backgroundHeld = true; }
             await _decodeSlots.WaitAsync(pending.Cancellation.Token); decodeHeld = true;
-            if (!page.IsImage && !page.PageType.IsFolder()) throw new NotSupportedException("这个文件类型的查看器尚未迁移。");
-            await using var cover = page.PageType.IsFolder() ? await ArchivePageUtility.GetSelectedPageAsync(page, pending.Cancellation.Token) : null;
-            var entry = cover is not null ? cover.Entry ?? throw new EmptyArchivePageException() : page.ArchiveEntry;
+            await using var cover = await resolve(pending.Cancellation.Token);
+            var entry = cover.Entry ?? throw new EmptyArchivePageException();
             await using var stream = await entry.Archive.OpenEntryAsync(entry, pending.Cancellation.Token);
             var image = await decoder.DecodeAsync(stream, request, pending.Cancellation.Token);
             var result = new Entry(image, request.IsThumbnail);
@@ -133,7 +174,7 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
             lock (_sync)
             {
                 entry.DisplayBytes -= bytes; entry.References--;
-                if (!entry.Cached && entry.References == 0 && entry.WaitingConsumers == 0) entry.Image.Dispose();
+                if (!entry.Cached && entry.References == 0 && entry.WaitingConsumers == 0) { _retired.Remove(entry); entry.Image.Dispose(); }
                 Trim();
             }
         });
@@ -141,8 +182,8 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
     /// <summary>只回收没有显示租约的旧像素，当前显示资源不会提前释放。</summary>
     private void Trim()
     {
-        var main = _cache.Values.Where(e => !e.IsThumbnail).Sum(e => e.Image.ByteCount + e.DisplayBytes);
-        var thumbnails = _cache.Values.Where(e => e.IsThumbnail).Sum(e => e.Image.ByteCount + e.DisplayBytes);
+        var main = _cache.Values.Concat(_retired).Where(e => !e.IsThumbnail).Sum(e => e.Image.ByteCount + e.DisplayBytes);
+        var thumbnails = _cache.Values.Concat(_retired).Where(e => e.IsThumbnail).Sum(e => e.Image.ByteCount + e.DisplayBytes);
         foreach (var pair in _cache.OrderBy(e => e.Value.Used).ToArray())
         {
             var entry = pair.Value;
@@ -157,7 +198,7 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
         lock (_sync)
         {
             if (_disposed) return; _disposed = true; _lifetime.Cancel();
-            foreach (var entry in _cache.Values) { entry.Cached = false; if (entry.References == 0 && entry.WaitingConsumers == 0) entry.Image.Dispose(); }
+            foreach (var entry in _cache.Values) { entry.Cached = false; if (entry.References == 0 && entry.WaitingConsumers == 0) entry.Image.Dispose(); else _retired.Add(entry); }
             _cache.Clear();
         }
     }

@@ -161,8 +161,8 @@ public sealed partial class MainWindow
     {
         if (sender is not Button button || _model is null) return;
         var menu = new ContextMenu();
-        foreach (var label in new[] { "普通列表", "详细内容", "横幅", "缩略图" })
-            menu.Items.Add(new MenuItem { Header = label + " · 尚未迁移", IsEnabled = false });
+        foreach (var item in PanelListPresentation.CreateStyleMenuItems(Config.Current.History.PanelListItemStyle, style => SetListStyleAsync(true, style))) menu.Items.Add(item);
+        var refresh = new MenuItem { Header = "刷新封面" }; refresh.Click += (_, _) => RefreshListCovers(); menu.Items.Add(refresh);
         menu.Items.Add(new Separator());
         AddToggle("按日期分组", Config.Current.History.IsGroupBy, value => Config.Current.History.IsGroupBy = value);
         AddToggle("仅显示当前书籍所在目录", Config.Current.History.IsCurrentFolder, value => Config.Current.History.IsCurrentFolder = value);

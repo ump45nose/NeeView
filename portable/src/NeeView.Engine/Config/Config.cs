@@ -105,6 +105,7 @@ public sealed class BookConfig
 /// <summary>原 BookshelfConfig 普通书架默认排序；各路径参数、巡回及搜索后续迁入。</summary>
 public sealed class BookshelfConfig
 {
+    public PanelListItemStyle PanelListItemStyle { get; set; } = PanelListItemStyle.Content;
     public FolderOrder DefaultFolderOrder { get; set; } = FolderOrder.FileName;
     public FolderOrder PlaylistFolderOrder { get; set; }
     public FolderSortOrder FolderSortOrder { get; set; } = FolderSortOrder.First;
@@ -151,6 +152,13 @@ public sealed class ViewConfig
 /// <summary>窗口级布局状态，独立于书籍和阅读规则。</summary>
 public sealed class PanelsConfig
 {
+    public PanelListItemProfile NormalItemProfile { get; set; } = PanelListItemProfile.Create(PanelListItemStyle.Normal);
+    public PanelListItemProfile ContentItemProfile { get; set; } = PanelListItemProfile.Create(PanelListItemStyle.Content);
+    public PanelListItemProfile BannerItemProfile { get; set; } = PanelListItemProfile.Create(PanelListItemStyle.Banner);
+    public PanelListItemProfile ThumbnailItemProfile { get; set; } = PanelListItemProfile.Create(PanelListItemStyle.Thumbnail);
+    /// <summary>模板读取唯一原Panels分支，未知枚举回退Content但保留配置原值。</summary>
+    public PanelListItemProfile GetProfile(PanelListItemStyle style) => style switch
+    { PanelListItemStyle.Normal => NormalItemProfile, PanelListItemStyle.Banner => BannerItemProfile, PanelListItemStyle.Thumbnail => ThumbnailItemProfile, _ => ContentItemProfile };
     public bool OpenWithDoubleClick { get; set; }
     public Runtime.LayoutPanel.LayoutPanelManagerMemento? Layout { get; set; }
     public double LeftWidth { get; set; } = 240;

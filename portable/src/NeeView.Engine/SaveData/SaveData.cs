@@ -55,7 +55,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             config.BookSettingPolicy = ReadBranch<BookSettingPolicyConfig>(raw, "BookSettingPolicy");
             config.Book = ReadBranch<BookConfig>(raw, "Book");
             config.View = ReadBranch<ViewConfig>(raw, "View");
-            config.Panels = ReadBranch<PanelsConfig>(raw, "Panels");
+            config.Panels = ReadPanelsBranch(raw);
             config.FilmStrip = ReadBranch<FilmStripConfig>(raw, "FilmStrip");
             config.Slider = ReadBranch<SliderConfig>(raw, "Slider");
             config.Bookshelf = ReadBranch<BookshelfConfig>(raw, "Bookshelf");
@@ -494,6 +494,13 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
     }
     /// <summary>反序列化已迁移分支，缺失字段保留原默认值。</summary>
     private static T ReadBranch<T>(JsonObject root, string name) where T : class, new() => root[name]?.Deserialize<T>(Options) ?? new();
+    /// <summary>原四种Profile各有构造默认值；差分字段在对应模板默认副本上合并，不退回空Profile默认。</summary>
+    private static PanelsConfig ReadPanelsBranch(JsonObject root)
+    {
+        var defaults = JsonSerializer.SerializeToNode(new PanelsConfig(), Options)!.AsObject();
+        if (root["Panels"] is JsonObject raw) Merge(defaults, raw);
+        return defaults.Deserialize<PanelsConfig>(Options)!;
+    }
     /// <summary>获取或创建对象分支；已有未知字段保持原节点。</summary>
     private static JsonObject Object(JsonObject root, string name)
     {

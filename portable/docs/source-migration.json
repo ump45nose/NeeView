@@ -1226,6 +1226,18 @@
       "target": "src/NeeView.Engine/BookOperation/BookOperation.HistoryPolicy.cs",
       "sha256": "5854e9abf42991aa6117fb3f7c6516f6162f95dcd92f8f042960dc3b69452b90",
       "status": "原ClearHistoryInPlace按当前集合真实目标精确删除，确认由宿主处理"
+    },
+    {
+      "source": "NeeView/SidePanels/PanelListItemStyle.cs",
+      "target": "src/NeeView.Engine/Config/PanelListItemProfile.cs",
+      "sha256": "8ef08dc01484ba749e4162e58a0a711ffb13197da984a75eccaa350081337ced",
+      "status": "保留四模板数值与原配置关系，WPF converter由Mac表现替换"
+    },
+    {
+      "source": "NeeView/SidePanels/PanelListItemProfile.cs",
+      "target": "src/NeeView.Engine/Config/PanelListItemProfile.cs",
+      "sha256": "125f31855e97be45b802244dd166795e4f1924fbe0cd994c1e3b36ba49b98fb6",
+      "status": "保留四默认Profile/形状/开关及差分字段，字体测量/裁剪归Mac表现"
     }
   ],
   "rule_references": [
@@ -1416,6 +1428,18 @@
       "target": "src/NeeView.MacOS/ViewModels/CommandParameterEdit.cs",
       "sha256": "29d78b9e443cd8fa08b2f10d23d2236de0018bc7f642ba13a095f64c6502c5ef",
       "status": "第十七批：原共享拥有者/克隆草稿/属性编辑转换；保留父设置提交边界"
+    },
+    {
+      "source": "NeeView/SidePanels/History/HistoryListBox.xaml",
+      "target": "src/NeeView.MacOS/Views/PanelListItemView.axaml",
+      "sha256": "97069f7c276e720c3cbfc37639c781e91627cf1a29f80e43f925ae38dc7400c1",
+      "status": "原Normal/Content/Banner/Thumbnail共用结构转换，历史日期仍用LastAccessTime"
+    },
+    {
+      "source": "NeeView/SidePanels/PanelThumbnailItemSize.cs",
+      "target": "src/NeeView.MacOS/Views/VirtualizingThumbnailPanel.cs",
+      "sha256": "4ef98911db969233bb00747ed6203b86835c926dfcc01362a18928ba60642a8a",
+      "status": "原固定缩略单元关系适配Avalonia VirtualizingPanel及物理滚动锚点"
     }
   ],
   "backend_reuse": [

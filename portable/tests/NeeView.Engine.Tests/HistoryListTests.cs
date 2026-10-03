@@ -150,7 +150,7 @@ public sealed class HistoryListTests
         finally { await window.PrepareShutdownAsync(); window.Close(); }
     }
 
-    /// <summary>正式视图多选删除/文本作用域、菜单占位/开关及导航刷新不触发正文。</summary>
+    /// <summary>正式视图多选删除/文本作用域、原模板/开关及导航刷新不触发正文。</summary>
     [AvaloniaFact]
     public async Task HistoryPanelUsesOriginalMenuAndSelectionScopes()
     {
@@ -166,8 +166,10 @@ public sealed class HistoryListTests
             var refreshes = 0; model.Refreshed += (_, _) => refreshes++;
             var more = window.FindControl<Button>("HistoryMoreButton")!; more.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             var menu = more.ContextMenu!; var items = menu.Items.OfType<MenuItem>().ToArray();
-            // 能力入口可渐进增加；验证原占位和真实动作，而非把项目总数当作功能契约。
-            Assert.All(items.Take(4), item => Assert.False(item.IsEnabled)); Assert.True(items.Single(item => item.Header?.ToString()?.StartsWith("移除无效历史记录") == true).IsEnabled);
+            // 四模板已迁入，验证真实枚举入口/当前勾选，而非继续要求旧占位禁用。
+            Assert.Equal(Enum.GetValues<PanelListItemStyle>(), items.Take(4).Select(item => Assert.IsType<PanelListItemStyle>(item.Tag)));
+            Assert.All(items.Take(4), item => Assert.True(item.IsEnabled)); Assert.Equal(PanelListItemStyle.Content, Assert.Single(items.Take(4), item => item.IsChecked).Tag);
+            Assert.True(items.Single(item => item.Header?.ToString()?.StartsWith("移除无效历史记录") == true).IsEnabled);
             Assert.Contains(items, item => Equals(item.Header, "历史记录设置…") && item.IsEnabled);
             items.Single(item => Equals(item.Header, "按日期分组")).RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)); Dispatcher.UIThread.RunJobs(); menu.Close();
             Assert.True(Config.Current.History.IsGroupBy); Assert.Equal(0, refreshes); Assert.True(model.History[0].HasGroupHeader);

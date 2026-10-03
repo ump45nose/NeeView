@@ -16,6 +16,8 @@ public sealed partial class BookmarkListView : UserControl, IDisposable
     private bool _closing;
     private readonly HashSet<Task> _actions = [];
     private BookmarkNode? _pressed;
+    private PanelListPresentation? _presentation;
+    private Action? _refreshCovers;
     private Point _pressedPoint;
     private ListBox List => this.FindControl<ListBox>("BookmarkItems")!;
     /// <summary>普通视图插槽：导航栏始终在上，可选编辑树由宿主提供，控件不依赖树业务模型。</summary>
@@ -34,6 +36,20 @@ public sealed partial class BookmarkListView : UserControl, IDisposable
     public event EventHandler? TreeVisibilityUpdated;
     public event EventHandler<string>? Failed;
 
+    /// <summary>宿主装配原封面替换点，独立书签列表仍拥有自己的模板与选择。</summary>
+    public void AttachCovers(Func<string, DecodeRequest, CancellationToken, Task<BitmapLease>> load, Action refresh)
+    { _presentation = new(List, load); _refreshCovers = refresh; _presentation.Apply(Config.Current.Bookmark.PanelListItemStyle); }
+    /// <summary>显式刷新重提可见封面，不改变原书签节点或搜索位置。</summary>
+    public void RefreshCoverPresentation() => _presentation?.RefreshCovers();
+    /// <summary>沿原Bookmark字段保存四模板；失败恢复旧模板，关闭等待既有动作。</summary>
+    public Task SetListStyleAsync(PanelListItemStyle style) => RunAsync(async () =>
+    {
+        var before = Config.Current.Bookmark.PanelListItemStyle;
+        try { Set(style); if (SaveSettingsAsync is { } save) await save(); }
+        catch { Set(before); throw; }
+        void Set(PanelListItemStyle value) { Config.Current.Bookmark.PanelListItemStyle = value; _presentation?.Apply(value); }
+    });
+
     /// <summary>装载正式 XAML；列表拥有自己的 Enter/返回/方向键，不修改全局阅读键位。</summary>
     public BookmarkListView()
     {
@@ -46,6 +62,7 @@ public sealed partial class BookmarkListView : UserControl, IDisposable
     /// <summary>接入已有 SaveData；再次装配先退订旧表现模型。</summary>
     public void Attach(SaveData state)
     {
+        _presentation ??= new(List, null); _presentation.Apply(Config.Current.Bookmark.PanelListItemStyle);
         if (_model is not null) { _model.Refreshed -= Refresh; _model.Failed -= Search_Failed; _model.Dispose(); }
         _model = new(state) { ReadMetadataAsync = ReadMetadataAsync }; DataContext = _model; _model.Refreshed += Refresh; _model.Failed += Search_Failed; Refresh(this, EventArgs.Empty);
     }
@@ -139,7 +156,7 @@ public sealed partial class BookmarkListView : UserControl, IDisposable
     /// <summary>同步当前书籍按原当前目录优先规则；未找到不离开当前位置。</summary>
     private void Sync_Click(object? sender, RoutedEventArgs e) { if (_model is not null && !_busy && !_closing) { _model.List.Sync(CurrentBookPath?.Invoke()); _model.Refresh(resetInput: true); FocusSelection(); } }
     private void Refresh_Click(object? sender, RoutedEventArgs e)
-    { if (_model is not null && !_busy && !_closing) { _model.List.InvalidateMetadata(); _model.Refresh(); } }
+    { if (_model is not null && !_busy && !_closing) { _refreshCovers?.Invoke(); _model.List.InvalidateMetadata(); _model.Refresh(); } }
     /// <summary>改动排序后等待既有保存；失败恢复原配置和值，允许原地重试。</summary>
     private async void Order_Changed(object? sender, SelectionChangedEventArgs e)
     {
@@ -162,11 +179,10 @@ public sealed partial class BookmarkListView : UserControl, IDisposable
         var recursive = SearchOption("搜索子文件夹", Config.Current.Bookmark.IsSearchIncludeSubdirectories, "recursive");
         var incremental = SearchOption("增量搜索", Config.Current.System.IsIncrementalSearchEnabled, "incremental");
         var keep = SearchOption("保存书签搜索历史", Config.Current.History.IsKeepSearchHistory, "keep");
-        var menu = new ContextMenu { ItemsSource = new Control[] { tree, count, new Separator(),
+        var menu = new ContextMenu { ItemsSource = PanelListPresentation.CreateStyleMenuItems(Config.Current.Bookmark.PanelListItemStyle, SetListStyleAsync).Cast<Control>().Concat(new Control[] { new Separator(), tree, count, new Separator(),
             search, recursive, incremental, keep,
-            new MenuItem { Header = "Normal / Banner / Thumbnail 模板（待迁移）", IsEnabled = false },
             SearchOption("打开书签时同步书架", Config.Current.Bookmark.IsSyncBookshelfEnabled, "sync"),
-            new MenuItem { Header = "路径修复 / 移除无效（待迁移）", IsEnabled = false } } };
+            new MenuItem { Header = "路径修复 / 移除无效（待迁移）", IsEnabled = false } }).ToArray() };
         menu.Open(this.FindControl<Button>("BookmarkMore")!);
     }
 

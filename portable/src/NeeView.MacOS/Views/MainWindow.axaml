@@ -25,7 +25,7 @@
     <Grid x:Name="PanelContentStore" IsVisible="False">
       <Border Tag="FolderPanel"><Grid RowDefinitions="Auto,Auto,Auto,*">
           <StackPanel Margin="8" Spacing="6">
-            <TextBlock Text="{Binding FolderPlace}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding FolderPlace}" />
+            <Grid ColumnDefinitions="*,Auto"><TextBlock Text="{Binding FolderPlace}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding FolderPlace}" /><Button x:Name="BookshelfMore" Grid.Column="1" Content="⋯" Click="Bookshelf_More" ToolTip.Tip="书架列表菜单" /></Grid>
             <WrapPanel>
               <Button Content="上一级" Tag="ParentFolder" Click="Command_Click" ToolTip.Tip="浏览书架父目录" />
               <Button Content="进入" Tag="EnterBookshelfFolder" Click="Command_Click" ToolTip.Tip="浏览选中目录，保留当前书籍" />
@@ -44,7 +44,7 @@
           </TreeView>
           <ListBox x:Name="FolderList" Focusable="True" ItemsSource="{Binding Folders}" SelectedItem="{Binding SelectedFolder, Mode=TwoWay}" DoubleTapped="Folder_DoubleTapped">
             <ListBox.ContextMenu><ContextMenu><MenuItem Header="打开 / 进入书签文件夹" Click="Bookshelf_Open" /><MenuItem Header="在独立书签面板中定位" Click="Bookshelf_RevealBookmark" /></ContextMenu></ListBox.ContextMenu>
-            <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Path}" /></DataTemplate></ListBox.ItemTemplate>
+
           </ListBox></DockPanel></Grid></Border>
       <Border Tag="PageListPanel">          <ListBox x:Name="PageList"  ItemsSource="{Binding Pages}" SelectedItem="{Binding SelectedPage}" SelectionChanged="Page_SelectionChanged">
             <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding EntryName}" TextTrimming="CharacterEllipsis" /></DataTemplate></ListBox.ItemTemplate>
@@ -63,7 +63,7 @@
             <TextBlock x:Name="HistorySearchError" Grid.Row="2" Text="{Binding HistorySearch.Error}" TextWrapping="Wrap" Margin="8,0" FontSize="10" Foreground="#D9957C" />
             <ListBox x:Name="HistoryList" Grid.Row="3" Focusable="True" ItemsSource="{Binding History}" SelectionMode="Multiple" SelectedItem="{Binding SelectedHistory, Mode=TwoWay}" DoubleTapped="History_DoubleTapped" KeyDown="History_KeyDown">
               <ListBox.ContextMenu><ContextMenu Opening="History_ContextOpening"><MenuItem Header="打开书籍" Click="History_Open" /><Separator /><MenuItem Header="移除所选历史记录" Click="History_Remove" /></ContextMenu></ListBox.ContextMenu>
-              <ListBox.ItemTemplate><DataTemplate><StackPanel ToolTip.Tip="{Binding Path}"><TextBlock Text="{Binding GroupHeader}" IsVisible="{Binding HasGroupHeader}" FontWeight="SemiBold" Margin="0,6,0,4" /><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" /><TextBlock Text="{Binding Page}" FontSize="10" Opacity="0.6" /></StackPanel></DataTemplate></ListBox.ItemTemplate>
+
             </ListBox>
             <TextBlock Grid.Row="4" Text="{Binding HistoryCount}" IsVisible="{Binding HistoryCountVisible}" Margin="8,4" FontSize="10" Opacity="0.7" />
           </Grid></Border>

@@ -4,6 +4,7 @@ namespace NeeView;
 /// <summary>原历史面板、搜索及文件保留策略；登记、清理与文件保留策略。</summary>
 public sealed class HistoryConfig
 {
+    public PanelListItemStyle PanelListItemStyle { get; set; } = PanelListItemStyle.Content;
     public bool IsSaveHistory { get; set; } = true;
     public bool IsForceUpdateHistory { get; set; }
     public int HistoryEntryPageCount { get; set; }

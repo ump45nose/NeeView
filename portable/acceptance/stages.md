@@ -246,3 +246,12 @@ P2继续历史、模板、浮动宿主与动画；依设备及Windows动态对�
 - 已离线查看[历史设置](p2-history-policy-history-settings-layout.png)，未启动正式应用或修改用户数据，见[静默记录](p2-history-policy-runtime.md)。原Windows、旧证据及用户.DS_Store保持。
 
 P2继续四模板、浮动宿主和动画；Windows/真机/NAS/完整性能分别待验。本增量自动本地提交后继续，不推送发布。
+
+## P2 第二十一批：原列表四模板与可见封面
+
+- 历史、书架、书签接入原Normal/Content/Banner/Thumbnail及共享Profile，独立JSON字段和原条目身份保持。共用唯一PanelListItemView，Thumbnail真实虚拟网格只实现可见邻行，Normal不读取封面。
+- 稳定路径封面复用原ArchivePageUtility和唯一BitmapFactory，原指定封面/单图/归档内部定位、版本失效、可见防抖、隐藏/回收/晚到释放及显示旧租约预算分别验证。显示设置保存不登记阅读访问，失败恢复旧模板/配置。
+- 新增8项，最终全量 **328通过、0失败、0跳过**；Engine、正式Library、ARM64.app与本地ad-hoc严格签名五步通过，见[p2-list-templates-validation.json](p2-list-templates-validation.json)。默认输出串行，旧菜单占位断言更新后全量重跑。
+- 已离线检查Content、Banner和万条目网格，独立前缀不覆盖旧证据；未启动正式应用、未操作用户数据，见[静默记录](p2-list-templates-runtime.md)。原Windows及用户.DS_Store保持。
+
+P2继续浮动宿主、动画/手势反馈与资源性能收尾；Windows动态、真实设备/NAS和完整显示性能分别待验。本增量自动本地提交后继续，不推送发布。

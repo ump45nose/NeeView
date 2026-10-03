@@ -61,3 +61,5 @@
 第十九批MainWindow.BookshelfBookmarks只负责焦点/树选择/面板转交；虚拟位置和每目录排序在原BookshelfFolderList/BookmarkFolderList，元数据通过Engine后端契约。两个列表选择独立，主题不参与地址解析或保存。
 
 第二十批接入原历史登记策略与可靠清理，继续使用唯一BookMementoControl/SaveData及四JSON事务；表现仅编辑草稿与转交命令，见[契约](p2-history-policy.md)。
+
+第二十一批列表结构在PanelListItemView.axaml，切换/虚拟化在PanelListPresentation/VirtualizingThumbnailPanel，显示租约在ListCoverImage；原Profile、封面选择及唯一缓存归Engine。列表主题不改变原条目身份/排序/打开或阅读访问，见[p2-list-templates.md](p2-list-templates.md)。
