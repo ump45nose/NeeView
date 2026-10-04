@@ -1,10 +1,10 @@
 # 完整命令迁移表
 
-固定基线235个原命令实例全部保留。P4第六批为 **162个执行入口接入、73个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
+固定基线235个原命令实例全部保留。P4第七批为 **164个执行入口接入、71个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
 
 原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。实际键位/手势按原A/B/C、阅读方向和用户差分计算。
 
-对照[当前运行导出](../acceptance/p4-realization-commands.json)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider与ToggleHidePageSlider语义独立，前者仍占位；ToggleVisibleAddressBar入口仍占位。参数拥有者映射不等于执行能力；P4分类/P5高级能力继续逐项迁移。
+对照[当前运行导出](../acceptance/p4-multi-paste-commands.json)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider与ToggleHidePageSlider语义独立，前者仍占位；ToggleVisibleAddressBar入口仍占位。参数拥有者映射不等于执行能力；P4分类/P5高级能力继续逐项迁移。
 
 | 原命令 | 文案 | 默认输入 | 默认方向手势 | 执行入口 | 迁移说明 | 原出处 |
 |---|---|---|---|---|---|---|
@@ -18,7 +18,7 @@
 | CutFile | 剪切文件 | Ctrl+X |  | 占位 | 用户选择暂保留禁用；移动使用分类/移至文件夹 | NeeView/Command/Commands/CutFileCommand.cs |
 | CopyFile | 复制文件 | Ctrl+C |  | 已接入 | P4 原页组/普通实体及归档四策略剪贴板复制；目录提取/链接待迁 | NeeView/Command/Commands/CopyFileCommand.cs |
 | CopyImage | 复制图像 | Ctrl+Shift+C |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/CopyImageCommand.cs |
-| Paste | 粘贴 | Ctrl+V |  | 已接入 | P4 单文件URL/原QueryPath加载；多文件/位图待迁 | NeeView/Command/Commands/PasteCommand.cs |
+| Paste | 粘贴 | Ctrl+V |  | 已接入 | P4 QueryPath优先/单来源及多项临时列表加载；位图等其他内容待迁 | NeeView/Command/Commands/PasteCommand.cs |
 | CopyToFolderAs | 复制到文件夹 |  |  | 已接入 | P4 原页组固定复制/归档LimitedRealization；整目录复制待后续 | NeeView/Command/Commands/CopyToFolderAsCommand.cs |
 | MoveToFolderAs | 移动到文件夹 |  |  | 已接入 | P4 普通目录分类/原多页策略 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
 | MoveToDestinationFolder1 | 移动到文件夹 1 | 1 |  | 已接入 | P4 普通目录分类/原多页策略 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
@@ -194,8 +194,8 @@
 | SetSortModeTimeStampDescending | 文件日期降序 |  |  | 已接入 | P2 Engine 接入；Windows动态对照待验 | NeeView/Command/Commands/SetSortModeTimeStampDescendingCommand.cs |
 | SetSortModeSize | 文件大小升序 |  |  | 已接入 | P1 Engine | NeeView/Command/Commands/SetSortModeSizeCommand.cs |
 | SetSortModeSizeDescending | 文件大小降序 |  |  | 已接入 | P2 Engine 接入；Windows动态对照待验 | NeeView/Command/Commands/SetSortModeSizeDescendingCommand.cs |
-| SetSortModeEntry | 文件登记时间升序 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SetSortModeEntryCommand.cs |
-| SetSortModeEntryDescending | 文件登记时间降序 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SetSortModeEntryDescendingCommand.cs |
+| SetSortModeEntry | 文件登记时间升序 |  |  | 已接入 | P4 原Playlist来源登记顺序排序；普通来源禁用 | NeeView/Command/Commands/SetSortModeEntryCommand.cs |
+| SetSortModeEntryDescending | 文件登记时间降序 |  |  | 已接入 | P4 原Playlist来源登记顺序排序；普通来源禁用 | NeeView/Command/Commands/SetSortModeEntryDescendingCommand.cs |
 | SetSortModeRandom | 随机 |  |  | 已接入 | P1 Engine | NeeView/Command/Commands/SetSortModeRandomCommand.cs |
 | SetDefaultPageSetting | 重置页面设置 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SetDefaultPageSettingCommand.cs |
 | ToggleBookmark | 添加/删除书签 | Ctrl+D |  | 已接入 | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleBookmarkCommand.cs |

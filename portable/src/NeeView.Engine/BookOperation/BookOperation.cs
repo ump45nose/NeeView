@@ -44,19 +44,28 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     public async Task OpenAsync(string path, CancellationToken token = default)
     { await OpenCoreAsync(path, token); }
 
+    /// <summary>原BookHubTools多路径加载；两项以上生成临时.nvpls，仍进入唯一打开链。</summary>
+    /// <param name="paths">接收顺序，目录/重复项不预处理。</param><param name="token">列表准备和加载取消。</param>
+    /// <returns>当前打开请求完成任务。</returns>
+    public async Task OpenFilesAsync(IEnumerable<string> paths, CancellationToken token = default)
+    {
+        var values = FileClipboardCodec.ValidatePaths(paths);
+        if (values.Length > 0) await OpenCoreAsync(values[0], token, openPaths: values);
+    }
+
     /// <summary>沿用原 FirstLoader 显式传入 LastBook 的恢复链；不依赖历史列表中的记录。</summary>
     /// <param name="token">取消启动或无窗口重开时的加载请求。</param>
     public async Task RestoreLastAsync(CancellationToken token = default)
     {
         var last = saveData.GetLastBook();
-        if (saveData.LastBookPath is { } path)
+        if (saveData.LastBookPath is { } path && !saveData.IsTemporaryPath(path))
             await OpenCoreAsync(path, token, startupMemento: last);
     }
 
     /// <summary>共享原加载链；历史重放可指定条目并保留访问顺序，返回是否实际提交新书。</summary>
     /// <param name="startupMemento">原 FirstLoader 的显式启动快照，优先于历史和字段恢复策略。</param>
     /// <param name="pageSearchKeyword">同书文件结果重载保留原临时搜索；普通切书仍使用默认空查询。</param>
-    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, Playlist? expectedPlaylist = null, int? terminalDirection = null, string? pageSearchKeyword = null)
+    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, Playlist? expectedPlaylist = null, int? terminalDirection = null, string? pageSearchKeyword = null, IReadOnlyList<string>? openPaths = null)
     {
         ObjectDisposedException.ThrowIf(_disposed || _closing, this);
         CancelCopyPreparation();
@@ -72,6 +81,13 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         bool indexCompleted = false;
         try
         {
+            // 与普通打开共用代次/取消；准备临时列表时发起的更新请求仍然优先。
+            if (openPaths is { Count: > 1 })
+            {
+                if (_temporaryPlaylists is null) throw new NotSupportedException("多文件加载需要原临时播放列表来源，尚未装配；本次未打开任何项目。");
+                path = await _temporaryPlaylists.CreateAsync(openPaths, opening.Token);
+                opening.Token.ThrowIfCancellationRequested();
+            }
             source = await archives.OpenAsync(path, opening.Token);
             // 原BookHub锁定允许同地址重载；由来源解析实际书籍地址，不能按图片路径猜测。
             if (IsBookLocked && Book is { } locked && locked.Path != source.Path) return false;
@@ -171,8 +187,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             if (_disposed || _closing || generation != _generation || !ReferenceEquals(book, Book)) return false;
             var positionPage = book.Pages.ElementAtOrDefault(Position.Index);
             var input = book.Pages.SourcePages.Concat(batch).ToArray();
-            var mode = book.Setting.SortMode.IsEntryCategory()
-                ? book.Setting.SortMode.IsDescending() ? PageSortMode.FileNameDescending : PageSortMode.FileName : book.Setting.SortMode;
+            var mode = BookSourceFactory.ValidatePageSortMode(book.Setting.SortMode, book.Source);
             // 原Random以原收集顺序分配随机键；不能以已排序批次再次分配，导致最终顺序随批量变化。
             var prefix = BookTableOfContents.GetPagesPrefix(input);
             foreach (var page in input) page.Prefix = prefix;
@@ -604,5 +619,7 @@ public static class ArchiveFormats
 {
     private static readonly HashSet<string> Extensions = new(StringComparer.OrdinalIgnoreCase) { ".zip", ".cbz", ".rar", ".cbr", ".7z" };
     /// <summary>按扩展名识别归档候选，损坏或加密归档仍由加载入口明确报错。</summary>
-    public static bool IsArchive(string path) => Extensions.Contains(System.IO.Path.GetExtension(path));
+    public static bool IsArchive(string path) => IsCompressedArchive(path) || PlaylistSourceTools.IsPlaylist(path);
+    /// <summary>压缩后端资格与.nvpls明确分离，不能把列表JSON交给SharpCompress。</summary>
+    public static bool IsCompressedArchive(string path) => Extensions.Contains(System.IO.Path.GetExtension(path));
 }

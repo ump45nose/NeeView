@@ -29,7 +29,7 @@ public sealed partial class ArchiveFactory
             { candidate = System.IO.Path.GetDirectoryName(candidate); continue; }
             if (candidate == path) return true;
             if ((attributes & FileAttributes.Directory) != 0) return false;
-            if (!ArchiveFormats.IsArchive(candidate)) return false;
+            if (!ArchiveFormats.IsCompressedArchive(candidate)) return false;
             using var archive = SharpCompress.Archives.ArchiveFactory.OpenArchive(candidate);
             var relative = System.IO.Path.GetRelativePath(candidate, path).Replace('\\', '/').TrimEnd('/');
             // 嵌套归档无法可靠判断其内部；明确传播能力错误，整批不误删。

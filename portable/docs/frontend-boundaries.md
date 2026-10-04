@@ -97,3 +97,5 @@ P4第四批：名称输入、扩展名/编号及失败重试对话框由MainWind
 P4第五批：主窗口只按原CopyFile/CopyBook/Paste命令转交并等待任务，菜单展开/重新激活仅重查剪贴板能力，不申请正文图片。CommandParameterEdit/Window编辑MultiPagePolicy独立草稿，SettingsWindow.Files只编辑TextCopyPolicy；原ApplyOptions保存与失败回滚保持。具体NSPasteboard实现仅在MacApp装配，Engine负责选页、来源复核及加载，控件不访问剪贴板或操作文件。Cut保留禁用，见[p4-clipboard.md](p4-clipboard.md)。
 
 P4第六批：文件设置XAML新增原ArchiveCopyPolicy四选项，SettingsWindow.Files只读写草稿并沿原配置事务提交。CopyFile/CopyToFolderAs来源能力及实体化仍由Engine/Backends处理；唯一启动装配持有进程级临时实体后端，视图不读取归档或管理磁盘文件。主窗口退出只请求取消尚未提交的准备，既有文件动作等待边界保持，见[p4-realization.md](p4-realization.md)。
+
+P4第七批：主窗口、Finder/启动参数与拖入只转交OpenFilesAsync，临时.nvpls创建/解析/过滤在Engine及Backends。Entry排序菜单按当前来源资格启用，原Page与阅读设置沿同一模型；界面不改变全局PlaylistHub，不保存临时列表或解释显示别名，见[p4-multi-paste.md](p4-multi-paste.md)。

@@ -140,7 +140,7 @@ public sealed partial class BookOperation
                 lock (_fileCopySync) _fileCopyPreparation = pending;
                 try
                 {
-                    foreach (var path in pages.Select(page => page.ArchiveEntry.FilePath ?? page.ArchiveEntry.Archive.RootArchivePath).Distinct(StringComparer.Ordinal))
+                    foreach (var path in pages.Select(page => page.ArchiveEntry.TargetArchiveEntry).Select(entry => entry.FilePath ?? entry.Archive.RootArchivePath).Distinct(StringComparer.Ordinal))
                     {
                         var info = await archives.GetFileMetadataAsync(path, pending.Token);
                         if (info is null) throw new FileNotFoundException("复制来源已不存在。", path);

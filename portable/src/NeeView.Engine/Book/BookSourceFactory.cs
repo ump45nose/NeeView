@@ -9,6 +9,10 @@ public enum ArchiveEntryCollectionMode { CurrentDirectory, IncludeSubDirectories
 /// <summary>按原模式过滤页面，保留有内容目录展平及空目录页面的判断。</summary>
 public static class BookSourceFactory
 {
+    /// <summary>原ValidatePageSortMode：列表允许Entry类别，普通书籍保持文件名回退。</summary>
+    /// <param name="mode">阅读配置中的原排序。</param><param name="source">真实书籍来源。</param><returns>原来源支持的有效排序。</returns>
+    public static PageSortMode ValidatePageSortMode(PageSortMode mode, Archive source) => !source.IsPlaylist && mode.IsEntryCategory()
+        ? mode.IsDescending() ? PageSortMode.FileNameDescending : PageSortMode.FileName : mode;
     /// <summary>直接目录分批构造原Page；递归展平和归档继续完整过滤，避免过早发布会消失的目录项。</summary>
     /// <param name="collection">唯一来源所有者。</param><param name="mode">原过滤模式。</param>
     /// <param name="archives">原来源工厂。</param><param name="token">逐条取消。</param>
@@ -77,7 +81,7 @@ public sealed class ArchiveEntryCollection(Archive root, IArchiveFactory archive
     public Archive Root => root;
     private readonly List<Archive> _owned = [root];
     public ArchiveEntryCollectionMode Mode { get; } = recursive ? ArchiveEntryCollectionMode.IncludeSubArchives
-        : root.IsDirectory ? ArchiveEntryCollectionMode.CurrentDirectory : Config.Current.System.ArchiveRecursiveMode;
+        : root.IsDirectory || root.IsPlaylist ? ArchiveEntryCollectionMode.CurrentDirectory : Config.Current.System.ArchiveRecursiveMode;
     /// <summary>收集元数据；普通目录按原递归进入子书，符号链接不继续展开以避免环。</summary>
     /// <param name="token">完整收集的取消令牌，取消后已拥有来源仍由本集合关闭。</param>
     /// <returns>完整条目快照；本方法不把部分索引发布给阅读端。</returns>
@@ -93,14 +97,14 @@ public sealed class ArchiveEntryCollection(Archive root, IArchiveFactory archive
     private async Task CollectAsync(Archive archive, string prefix, List<ArchiveEntryNode> result, CancellationToken token)
     {
         var entries = await archive.GetEntriesAsync(token);
-        if (!archive.IsDirectory && Mode == ArchiveEntryCollectionMode.CurrentDirectory)
+        if (!archive.IsDirectory && !archive.IsPlaylist && Mode == ArchiveEntryCollectionMode.CurrentDirectory)
             entries = GetCurrentDirectoryEntries(archive, entries);
         foreach (var entry in entries)
         {
             token.ThrowIfCancellationRequested();
             var name = prefix + entry.EntryName.TrimEnd('/'); result.Add(new(entry, name));
             // 真正的嵌套归档需要专门后端，P5接入；包内目录已经由当前归档一次返回。
-            if (Mode != ArchiveEntryCollectionMode.IncludeSubArchives || !archive.IsDirectory || !entry.IsBook() || entry.IsShortcut) continue;
+            if (Mode != ArchiveEntryCollectionMode.IncludeSubArchives || !(archive.IsDirectory || archive.IsPlaylist) || !entry.IsBook() || entry.IsShortcut) continue;
             try
             {
                 var child = await archives.OpenAsync(entry.SystemPath, token); _owned.Add(child);

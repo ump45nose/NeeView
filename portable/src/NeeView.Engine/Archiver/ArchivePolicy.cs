@@ -70,7 +70,7 @@ public static class ArchiveEntryUtility
         var files = new RealizedFilePathList();
         try
         {
-            foreach (var entry in entries.Distinct())
+            foreach (var entry in entries.Select(entry => entry.TargetArchiveEntry).Distinct())
             {
                 token.ThrowIfCancellationRequested();
                 if (!entry.CanRealize()) throw new NotSupportedException("此条目尚不支持实体化复制：" + entry.EntryName);

@@ -188,6 +188,7 @@ public sealed partial class MainWindow : Window
         "CopyBook" => _model?.Operation.CanCopyBook == true,
         "Paste" => _model?.Operation.CanPasteFiles == true,
         "CutFile" or "CutBook" => false,
+        "SetSortModeEntry" or "SetSortModeEntryDescending" => _model?.Operation.IsLoading == false && _model.Operation.Book?.Source.IsPlaylist == true,
         "UndoDestinationMove" => _model?.Operation is { IsDeletingFile: false, IsRenamingBook: false, IsUsingClipboard: false } && Config.Current.System.IsFileWriteAccessEnabled && _model.Operation.DestinationMoves?.CanUndo == true,
         "RedoDestinationMove" => _model?.Operation is { IsDeletingFile: false, IsRenamingBook: false, IsUsingClipboard: false } && Config.Current.System.IsFileWriteAccessEnabled && _model.Operation.DestinationMoves?.CanRedo == true,
         var command when command.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal) => IsDestinationCommandAvailable(command),
@@ -300,6 +301,9 @@ public sealed partial class MainWindow : Window
     {
         if (_model is null) return; await _model.Operation.OpenAsync(path);
     }
+    /// <summary>Finder/拖入多路径转交原加载链，视图不生成或解析临时列表。</summary>
+    /// <param name="paths">系统提供的本机地址顺序。</param><returns>业务加载完成任务。</returns>
+    public Task OpenFilesAsync(IEnumerable<string> paths) => _model is null || _preparing || _closedPrepared ? Task.CompletedTask : _model.Operation.OpenFilesAsync(paths);
     /// <summary>启动和无窗口重开传入原完整快照，页面恢复不依赖已删除的历史项。</summary>
     public async Task RestoreLastAsync()
     {
@@ -820,7 +824,12 @@ public sealed partial class MainWindow : Window
         if (!Viewer.TryWheelScroll(e)) await DispatchWheelAsync(Viewer, e);
     }
     /// <summary>Finder 拖入使用与菜单相同的打开链路。</summary>
-    private async void Drop(object? sender, DragEventArgs e) { if (e.DataTransfer.TryGetFiles()?.FirstOrDefault()?.TryGetLocalPath() is { } path) { e.Handled = true; await OpenAsync(path); } }
+    private async void Drop(object? sender, DragEventArgs e)
+    {
+        if (e.DataTransfer.TryGetFiles() is not { } files) return;
+        var paths = files.Select(file => file.TryGetLocalPath()).OfType<string>().ToArray();
+        if (paths.Length > 0) { e.Handled = true; try { await OpenFilesAsync(paths); } catch (Exception ex) { ShowError(ex.Message); } }
+    }
     /// <summary>显示完整基线命令及迁移状态，已登记数量不当作功能覆盖率。</summary>
     private Task ShowCommandStatusAsync()
     {

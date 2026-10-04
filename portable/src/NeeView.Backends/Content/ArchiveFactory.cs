@@ -63,7 +63,7 @@ public sealed partial class ArchiveFactory : IArchiveFactory
             while (!string.IsNullOrEmpty(parent))
             {
                 token.ThrowIfCancellationRequested();
-                if (File.Exists(parent) && ArchiveFormats.IsArchive(parent))
+                if (File.Exists(parent) && ArchiveFormats.IsCompressedArchive(parent))
                 {
                     var relative = System.IO.Path.GetRelativePath(parent, path);
                     var compressed = new CompressedArchive(parent);
@@ -94,8 +94,9 @@ public sealed partial class ArchiveFactory : IArchiveFactory
         if (!File.Exists(path)) throw new FileNotFoundException("来源不存在。", path);
         if (System.Text.RegularExpressions.Regex.IsMatch(path, @"(?:\.part\d+\.rar|\.r\d{2}|\.\d{3})$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
             throw new NotSupportedException("分卷归档尚未迁移，请使用完整的单文件归档。");
-        if (ArchiveFormats.IsArchive(path)) return new CompressedArchive(path);
-        throw new NotSupportedException("支持目录、图片、ZIP/CBZ、RAR/CBR 和 7z；其他来源尚未迁移。");
+        if (PlaylistSourceTools.IsPlaylist(path)) return new PlaylistArchive(path, this);
+        if (ArchiveFormats.IsCompressedArchive(path)) return new CompressedArchive(path);
+        throw new NotSupportedException("支持目录、图片、ZIP/CBZ、RAR/CBR、7z 和播放列表；其他来源尚未迁移。");
     }, token);
 }
 

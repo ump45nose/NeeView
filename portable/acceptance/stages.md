@@ -8,7 +8,7 @@
 | P1核心阅读 | 模块/Headless及核心真机流程通过，未封板 | 目录/ZIP、原页框/单双/宽图/分割、缩放平移、导航信息、JSON恢复；真机已验证打开/分页/退出恢复，完整交互与原版视觉对照待验 |
 | P2阅读导航 | 开发范围完成；整体验收未封板 | 25批原阅读/归档、历史/书签/搜索、胶片条/导航、父子书/每目录参数、原输入/手势/变换/动画、列表模板/封面、侧栏组合/自动隐藏/浮动及资源优化；开发收尾355项回归；设备输入修复375项、最新资源/排序节点376项回归与五步构建/签名通过。235原命令保留、138入口接入/97占位；目录/CBZ阅读及侧栏部分真机复演通过，完整Windows固定基线/无损Retina/长期RSS/屏幕性能仍待验；触控板用户要求跳过，多屏无环境，见p2-device-resources-runtime.md |
 | P3大量图片 | 开发范围完成；设备待项并入P4 | 七批连续/瀑布、逐页缩略、后台检查点、渐进目录索引、原帧全景、普通目录树/QuickAccess/监视及页面/书架搜索；444项回归与五步构建/签名通过，见[p3-completion-runtime.md](p3-completion-runtime.md)。剩余真机/Windows/无损Retina/长期性能按用户要求随P4集中验收 |
-| P4fork分类 | 前六批开发回归通过，未封板 | 原分类/多页/共享UndoRedo与恢复、当前普通图片删除、书籍重命名及联动、实体/归档四策略CopyFile/CopyBook/单来源Paste接入；最新633项回归及五步构建/签名通过，见[p4-realization-runtime.md](p4-realization-runtime.md)。Cut禁用；多文件/其他Paste、基础书籍菜单及其他删除范围继续迁移 |
+| P4fork分类 | 前七批开发回归通过，未封板 | 原分类/多页/共享UndoRedo与恢复、当前普通图片删除、书籍重命名及联动、实体/归档四策略复制与多来源临时列表Paste接入；最新656项回归及五步构建/签名通过，见[p4-multi-paste-runtime.md](p4-multi-paste-runtime.md)。Cut禁用；其他Paste、基础书籍菜单及其他删除范围继续迁移 |
 | P5兼容高级交付 | 待实施 | 完整原版本迁移/Profile导入、高级内容后端、签名公证与安装 |
 
 ## P0/P1 历史证据
@@ -370,3 +370,7 @@ P2继续动画/手势及资源性能收尾；Windows/真机/NAS与完整显示�
 原ArchivePolicy四值/默认提取、LimitedRealization、QueryPath分离及保序去重接入；临时实体请求所有，成功剪贴板进程持有，关窗/切书保留，下一成功复制或退出清理。固定复制整组准备受原忙碌锁保护，沿既有覆盖/完整性协议执行，不入历史。清理失败后端登记目录并暂停新提取，退出可重试。关闭同步使准备失效，修复晚到提交间隙；启动退出等待初始化，禁止晚到窗口。
 
 最终633/633及78项定向通过，Engine/正式Library/ARM64.app/严格ad-hoc签名通过；初次专项预期错误及全量关闭竞态失败保留，见[p4-realization-runtime.md](p4-realization-runtime.md)。235实例保留、162入口/73占位。常规静默，无真实NSPasteboard/Finder或Windows动态；多项Paste、目录/链接及基础书籍菜单/其他删除继续迁移，P4未完成。节点本地提交，不推送发布。
+
+## P4 第七批：多来源加载与原播放列表来源
+
+原BookHubTools/ContentDropReceiver多项临时.nvpls及PlaylistArchive/Entry接入唯一打开链；顺序/重复/混合、原收集/排序、真实类型/别名及来源复用保持，全局Hub不变。临时书运行历史保留、写出过滤、FirstLoader跳过，进程文件切书/关窗保留、正常退出清理。最终656/656与115项专项、正式Library/ARM64.app/严格ad-hoc签名通过，先前编译/夹具/预期失败留证；见[p4-multi-paste-runtime.md](p4-multi-paste-runtime.md)。235实例保留，164入口/71占位；其他Paste/书籍菜单/删除继续迁移，P4未完成，设备集中验收，自动本地提交不推送发布。

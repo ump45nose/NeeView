@@ -631,7 +631,7 @@
       "source": "NeeView/MainWindow/FirstLoader.cs",
       "target": "src/NeeView.MacOS/Views/MainWindow.axaml.cs",
       "sha256": "3a3f69ad7683b174038a2c241ebc5e2b8f13bf4e8c8276b663d138b2ed35090d",
-      "status": "第六批真机修复：启动/无窗口重开传完整LastBook到现有BookOperation；仅启动快照链，其他FirstLoader分支仍未完整迁入"
+      "status": "第六批真机修复：启动/无窗口重开传完整LastBook到现有BookOperation；仅启动快照链，其他FirstLoader分支仍未完整迁入；P4第七批共用临时根边界过滤LastBook，不更改运行时历史登记"
     },
     {
       "source": "NeeView/BookHub/BookHub.cs",
@@ -689,9 +689,9 @@
     },
     {
       "source": "NeeView/Playlist/PlaylistSourceTools.cs",
-      "target": "src/NeeView.Engine/Playlist/PlaylistHub.cs",
+      "target": "src/NeeView.Engine/Playlist/PlaylistSourceTools.cs",
       "sha256": "17c4c51f9a14db8d0b8ee7cae6d9614b7a526f581fd9271b6c8fb12fa46c7cb9",
-      "status": "v1/v2读写替换；Mac即时原子提交/回滚/提交前指纹，完整路径修复待迁"
+      "status": "P4第七批共用原v1/v2解析与临时列表格式；原Hub与来源同入口，保留重复及顺序；路径映射/完整修复待P5"
     },
     {
       "source": "NeeView/Playlist/PlaylistSourceValidator.cs",
@@ -1621,7 +1621,7 @@
       "source": "NeeView/System/ContentDropReceiver.cs",
       "target": "src/NeeView.Engine/BookOperation/BookOperation.Clipboard.cs",
       "sha256": "80d8e8d1f069cf8d6dfb2f6a6e49f6175d113c2daf1ed0bf99256afdf10dc11d",
-      "status": "原Paste=加载且QueryPath优先；单来源复用OpenCore，多文件不丢项明确拒绝，临时播放列表/其他数据待迁"
+      "status": "原QueryPath优先/单来源加载及P4第七批多项临时列表；位图/文本/网络地址等待迁"
     },
     {
       "source": "NeeView/External/ArchivePolicy.cs",
@@ -1640,6 +1640,42 @@
       "target": "src/NeeView.Backends/Content/ArchiveEntryRealizer.cs",
       "sha256": "57e2bad5fac525d8b578c308576feb7ef07179d729bc8a9a9608b5a1835c1f50",
       "status": "原GetFileProxyAsync保持叶文件名/独立临时实体生命周期适配；只提取已支持归档文件项，链接及归档目录待迁"
+    },
+    {
+      "source": "NeeView/Archiver/PlaylistArchive.cs",
+      "target": "src/NeeView.Backends/Content/PlaylistArchive.cs",
+      "sha256": "61376d1bb824c99466a80dc0b9b3ab06841ae7b6521c71e6b90cd2f4d9776afb",
+      "status": "P4第七批原索引解析/失败跳过/连续Id/读取委托；真实来源复用与受限读取，编辑/删除仍待迁"
+    },
+    {
+      "source": "NeeView/Archiver/PlaylistArchiveEntry.cs",
+      "target": "src/NeeView.Engine/Archiver/PlaylistArchiveEntry.cs",
+      "sha256": "8dcc159fccab50ab79ff4b15313ab71c525110c66f1cccc30865cbd65badf637",
+      "status": "原显示名/InnerEntry/SystemPath/实体化代理；实际类型与来源分离，别名不影响识别"
+    },
+    {
+      "source": "NeeView/BookHub/BookHubTools.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.cs",
+      "sha256": "7019da4b744baca84475c9112e488ca27883a373510959ea98390b7c93309982",
+      "status": "原多来源临时.nvpls加载，不预展开/不去重/不改全局Hub；同一代次及取消链"
+    },
+    {
+      "source": "NeeView/Playlist/PlaylistSourceTools.cs",
+      "target": "src/NeeView.Backends/Content/TemporaryPlaylistService.cs",
+      "sha256": "17c4c51f9a14db8d0b8ee7cae6d9614b7a526f581fd9271b6c8fb12fa46c7cb9",
+      "status": "原临时列表落盘替换：进程独立目录/32MiB预算/退出清理，切书与关窗保留"
+    },
+    {
+      "source": "NeeView/Command/Commands/SetSortModeEntryCommand.cs",
+      "target": "src/NeeView.Engine/Command/CommandTable.cs",
+      "sha256": "3649e50cee36eb4dfc0d5d5216c0dc8d5820823685e261c43b183b90eb6f3ab2",
+      "status": "原Entry排序命令仅对Playlist来源开放"
+    },
+    {
+      "source": "NeeView/Command/Commands/SetSortModeEntryDescendingCommand.cs",
+      "target": "src/NeeView.Engine/Command/CommandTable.cs",
+      "sha256": "55472c8bda2494d3bb29b5b611169447cb97c511f0bead6c41cec45cc60065dd",
+      "status": "原EntryDescending排序命令仅对Playlist来源开放"
     }
   ],
   "rule_references": [

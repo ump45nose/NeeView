@@ -72,11 +72,12 @@ public static class ArchivePageUtility
     /// <summary>保留原先找当前来源首图、再限深度寻找子书的顺序；损坏子书不阻止其他候选。</summary>
     private static async Task<ArchiveEntry?> SelectAsync(ArchiveEntry entry, IArchiveFactory archives, int depth, Regex? match, ArchivePageCover cover, CancellationToken token)
     {
+        entry = entry.TargetArchiveEntry;
         token.ThrowIfCancellationRequested();
         try
         {
             IReadOnlyList<ArchiveEntry> entries;
-            if (entry.IsDirectory && !entry.Archive.IsDirectory)
+            if (entry.IsDirectory && !entry.Archive.IsDirectory && entry.EntryName.Length > 0)
             {
                 var prefix = entry.EntryName.TrimEnd('/') + "/";
                 entries = (await entry.Archive.GetEntriesAsync(token)).Where(e => e.EntryName.StartsWith(prefix, StringComparison.Ordinal)).ToArray();

@@ -88,6 +88,8 @@ public sealed class CommandTable
         _actions["SetSortModeRandom"] = () => operation.ApplySettingAsync(e => e.SortMode = PageSortMode.Random);
         _actions["SetSortModeTimeStampDescending"] = () => operation.ApplySettingAsync(e => e.SortMode = PageSortMode.TimeStampDescending);
         _actions["SetSortModeSizeDescending"] = () => operation.ApplySettingAsync(e => e.SortMode = PageSortMode.SizeDescending);
+        _actions["SetSortModeEntry"] = () => operation.Book?.Source.IsPlaylist == true ? operation.ApplySettingAsync(e => e.SortMode = PageSortMode.Entry) : Task.CompletedTask;
+        _actions["SetSortModeEntryDescending"] = () => operation.Book?.Source.IsPlaylist == true ? operation.ApplySettingAsync(e => e.SortMode = PageSortMode.EntryDescending) : Task.CompletedTask;
         // AutoRotate 的原判断仍在 PageFrameFactory；命令只切换原枚举。
         foreach (var rotate in new[] { AutoRotateType.Left, AutoRotateType.Right, AutoRotateType.ForcedLeft, AutoRotateType.ForcedRight })
             _actions["ToggleIsAutoRotate" + rotate] = () => operation.ApplySettingAsync(e => e.AutoRotate = e.AutoRotate == rotate ? AutoRotateType.None : rotate);

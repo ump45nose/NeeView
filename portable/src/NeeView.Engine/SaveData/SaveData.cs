@@ -35,6 +35,10 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
     public PlaylistHub Playlists { get; private set; } = null!;
     public FolderConfigCollection FolderConfigs { get; } = new();
     public string? LastBookPath => _setting["Config"]?["StartUp"]?["LastBookV2"]?["Path"]?.GetValue<string>();
+    /// <summary>原FirstLoader不恢复应用临时来源；历史写出采用同一明确目录边界。</summary>
+    /// <param name="path">原书籍定位，不读取文件。</param><returns>仅应用临时根或其子路径为true。</returns>
+    public bool IsTemporaryPath(string path) => _temporaryDirectory is not null &&
+        (path == _temporaryDirectory || path.StartsWith(_temporaryDirectory + System.IO.Path.DirectorySeparatorChar, StringComparison.Ordinal));
 
     /// <summary>加载原命名文件并恢复 P1 已支持配置；损坏文件不覆盖。</summary>
     public async Task LoadAsync(CancellationToken token = default)
@@ -636,8 +640,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         if (sort)
         {
             // 原CreateMemento在数量限制前排除应用临时来源，保留同前缀的普通用户目录。
-            if (_temporaryDirectory is not null) source = source.Where(item => item["Path"]?.GetValue<string>() is not { } path ||
-                (path != _temporaryDirectory && !path.StartsWith(_temporaryDirectory + System.IO.Path.DirectorySeparatorChar, StringComparison.Ordinal)));
+            if (_temporaryDirectory is not null) source = source.Where(item => item["Path"]?.GetValue<string>() is not { } path || !IsTemporaryPath(path));
             source = source.OrderByDescending(item => item["LastAccessTime"]?.GetValue<DateTime>() ?? DateTime.MinValue);
         }
         return new JsonArray(BookHistoryCollection.Limit(source, config.LimitSize, config.LimitSpan,

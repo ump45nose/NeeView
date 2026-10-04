@@ -76,3 +76,5 @@ P4第四批：原RenameBookCommand/BookControl.RenameBook/FileIO.RenameAsync/Res
 P4第五批：原CopyFile按CollectPages/Once/All/AllLeftToRight选序与分割去重；CopyBook复制实体书籍目录/根归档，二者不写源文件或移动历史、不要求源修改开关。原TextCopyPolicy数值/默认None、QueryPath优先和Paste=加载保持，单来源进入唯一OpenCore。Mac标准fileURL与私有有限JSON替换原FileDrop；多项输入不静默删项。CutFile/CutBook按用户决定禁用，归档实体化/临时多文件播放列表/位图与FileContents另列待迁；静默测试不证明真实NSPasteboard/Finder互操作，见[p4-clipboard.md](p4-clipboard.md)。
 
 P4第六批：原ArchivePolicy.None/SendArchiveFile/SendArchivePath/SendExtractFile数值及默认、LimitedRealization和RealizeArchiveEntry保序/Distinct接入；None仍输出QueryPath，固定复制虚拟策略改为提取。原ClipboardUtility的OriginalPath实际再次调用同一提取策略，故保留输出实体路径，未按选项名称重解释。文件名仅取叶名称，逻辑Page/QueryPath保持原所属来源；成功剪贴板资源跨切书/关窗保留，真Finder另验，见[p4-realization.md](p4-realization.md)。
+
+P4第七批：原BookHubTools/ContentDropReceiver多项保存为临时.nvpls；原PlaylistArchive按接收顺序解析、失败跳过及连续Id，代理真实SystemPath/类型/实体化与显示名分开。WherePageAll保留按真实父路径过滤规则；仅Entry类别按登记序，临时书运行历史保留、写出过滤、FirstLoader跳过恢复，不改全局Hub。自动原源码对照见[p4-multi-paste.md](p4-multi-paste.md)，Windows动态仍待集中验收。

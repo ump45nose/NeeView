@@ -21,6 +21,7 @@ public sealed partial class MacApp : Avalonia.Application
     private FileOperationBackend? _fileOperations;
     private DestinationMoveService? _destinationMoves;
     private ArchiveEntryRealizer? _entryRealizer;
+    private TemporaryPlaylistService? _temporaryPlaylists;
     /// <summary>加载转换的原主题资源和原生应用菜单。</summary>
     public override void Initialize()
     {
@@ -48,8 +49,10 @@ public sealed partial class MacApp : Avalonia.Application
                     if (_window is not null) await _window.PrepareShutdownAsync();
                     // 初始化也属于进程生命周期；等待恢复操作结束，禁止退出后晚到创建后端/窗口。
                     if (_openingWindow is { } opening) await opening;
-                    if (_window is not null) await _window.PrepareShutdownAsync();
-                    if (_entryRealizer is not null) await _entryRealizer.DisposeAsync();
+                    if (_window is not null) { await _window.PrepareShutdownAsync(); _window.Close(); }
+                    // 已释放实例不留给退出失败后的窗口重开；清理失败实例仍保留供重试。
+                    if (_entryRealizer is not null) { await _entryRealizer.DisposeAsync(); _entryRealizer = null; }
+                    if (_temporaryPlaylists is not null) { await _temporaryPlaylists.DisposeAsync(); _temporaryPlaylists = null; }
                     desktop.Shutdown();
                 }
                 catch (Exception ex) { _shuttingDown = false; System.Diagnostics.Trace.WriteLine(ex); }
@@ -67,7 +70,7 @@ public sealed partial class MacApp : Avalonia.Application
                 if (_shuttingDown) return;
                 if (e is FileActivatedEventArgs files)
                 {
-                    foreach (var file in files.Files) if (file.TryGetLocalPath() is { } path && _window is not null) await _window.OpenAsync(path);
+                    if (_window is not null) await _window.OpenFilesAsync(files.Files.Select(file => file.TryGetLocalPath()).OfType<string>());
                 }
                 else if (e.Kind == ActivationKind.Reopen && _window is not null) _window.Activate();
             };
@@ -78,7 +81,7 @@ public sealed partial class MacApp : Avalonia.Application
     {
         await OpenWindowAsync(false);
         if (_window is null || _shuttingDown) return;
-        if (InitialPaths.FirstOrDefault() is { } path) await _window.OpenAsync(path);
+        if (InitialPaths.Length > 0) await _window.OpenFilesAsync(InitialPaths);
         else if (!_explicitOpen) await _window.RestoreLastAsync();
     }
     /// <summary>重用进行中的初始化，单窗口入口不增加第二个 Host。</summary>
@@ -107,6 +110,7 @@ public sealed partial class MacApp : Avalonia.Application
             var images = new BitmapFactory(decoder); operation.AttachFileOperations(_destinationMoves, _fileOperations, images);
             operation.AttachFileClipboard(new MacFileClipboard());
             _entryRealizer ??= new ArchiveEntryRealizer(); operation.AttachArchiveEntryRealizer(_entryRealizer);
+            _temporaryPlaylists ??= new TemporaryPlaylistService(); operation.AttachTemporaryPlaylists(_temporaryPlaylists);
             var model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state);
             _window = new MainWindow(); _window.Bind(model, images, new MacPlatformService());
             _window.AttachPlatformInput(new MacTrackpadInput());

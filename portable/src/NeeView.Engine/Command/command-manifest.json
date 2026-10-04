@@ -89,7 +89,7 @@
     "Text": "粘贴",
     "Shortcut": "Ctrl+V",
     "Source": "NeeView/Command/Commands/PasteCommand.cs",
-    "Stage": "P4 单文件URL/原QueryPath加载；多文件/位图待迁",
+    "Stage": "P4 QueryPath优先/单来源及多项临时列表加载；位图等其他内容待迁",
     "MenuText": "粘贴(V)",
     "MouseGesture": ""
   },
@@ -1561,7 +1561,7 @@
     "Text": "文件登记时间升序",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetSortModeEntryCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P4 原Playlist来源登记顺序排序；普通来源禁用",
     "MouseGesture": ""
   },
   {
@@ -1569,7 +1569,7 @@
     "Text": "文件登记时间降序",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetSortModeEntryDescendingCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P4 原Playlist来源登记顺序排序；普通来源禁用",
     "MouseGesture": ""
   },
   {

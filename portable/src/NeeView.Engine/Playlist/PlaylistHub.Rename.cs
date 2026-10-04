@@ -41,7 +41,7 @@ public sealed partial class PlaylistHub
                 {
                     await Task.Run(() =>
                     {
-                        var bytes = File.ReadAllBytes(path); var data = Deserialize(bytes); bool changed = false;
+                        var bytes = File.ReadAllBytes(path); var data = PlaylistSourceTools.Deserialize(bytes); bool changed = false;
                         foreach (var item in data.Items)
                         {
                             var next = BookMementoTools.RenamePath(item.Path, source, destination);

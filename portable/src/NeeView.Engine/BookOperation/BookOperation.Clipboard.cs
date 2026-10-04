@@ -5,6 +5,7 @@ public sealed partial class BookOperation
 {
     private IFileClipboard? _fileClipboard;
     private IArchiveEntryRealizer? _entryRealizer;
+    private ITemporaryPlaylistService? _temporaryPlaylists;
     private int _clipboardBusy;
     private CancellationTokenSource _clipboardClosing = new();
     private TaskCompletionSource? _clipboardCompletion;
@@ -21,6 +22,8 @@ public sealed partial class BookOperation
     /// <summary>启动层注入进程级实体化能力；关窗和切书不释放成功发布的剪贴板材料。</summary>
     /// <param name="realizer">与原归档读取关系相连的临时实体后端。</param>
     public void AttachArchiveEntryRealizer(IArchiveEntryRealizer realizer) => _entryRealizer = realizer;
+    /// <summary>注入原多来源临时列表能力；文件由进程服务持有，不改变全局PlaylistHub。</summary>
+    public void AttachTemporaryPlaylists(ITemporaryPlaylistService playlists) => _temporaryPlaylists = playlists;
     /// <summary>宿主关闭前取消当前准备；已提交的原生写入仍等待真实结果，不永久禁用后续复制。</summary>
     public void CancelClipboardPreparation()
     { lock (_clipboardSync) _clipboardPending?.Cancel(); }
@@ -81,7 +84,7 @@ public sealed partial class BookOperation
                 if (_disposed || _closing || IsLoading || generation != _generation || !ReferenceEquals(requestedBook, Book)) return;
                 FileClipboardCodec.ValidatePaths(query);
                 // 整组选区的普通实体/根归档先确认；虚拟路径不能交给文件系统存在性检查。
-                foreach (var path in book ? query : entries.Select(entry => entry.FilePath ?? entry.Archive.RootArchivePath).Distinct(StringComparer.Ordinal))
+                foreach (var path in book ? query : entries.Select(entry => entry.TargetArchiveEntry).Select(entry => entry.FilePath ?? entry.Archive.RootArchivePath).Distinct(StringComparer.Ordinal))
                 {
                     var info = await archives.GetFileMetadataAsync(path, pending.Token);
                     if (info is null) throw new FileNotFoundException("要复制的实体已不存在。", path);
@@ -112,7 +115,7 @@ public sealed partial class BookOperation
         catch (Exception ex) { if (!_closing && generation == _generation) Error = "文件复制到剪贴板失败：" + ex.Message; }
         finally { EndClipboard(pending, completion); }
     }
-    /// <summary>原Paste加载文件而非粘入目录；QueryPath优先，当前仅单个来源，多个不丢项。</summary>
+    /// <summary>原Paste加载文件；QueryPath优先，多项经原临时列表作为一本书打开。</summary>
     /// <param name="token">剪贴板读取和来源打开的取消令牌。</param><returns>原打开链路完成的任务。</returns>
     public async Task PasteFilesAsync(CancellationToken token = default)
     {
@@ -125,9 +128,8 @@ public sealed partial class BookOperation
             if (_disposed || _closing || generation != _generation) return;
             var paths = FileClipboardCodec.ValidatePaths(content.QueryPaths.Count > 0 ? content.QueryPaths : content.Files);
             if (paths.Length == 0) return;
-            if (paths.Length != 1) throw new NotSupportedException("多文件粘贴需要原临时播放列表来源，本批尚未迁入；本次未打开任何项目。");
             if (_disposed || _closing || generation != _generation) return;
-            await OpenCoreAsync(paths[0], pending.Token);
+            await OpenCoreAsync(paths[0], pending.Token, openPaths: paths);
         }
         catch (OperationCanceledException) { }
         catch (Exception ex) { if (!_closing && generation == _generation) Error = "剪贴板加载失败：" + ex.Message; }

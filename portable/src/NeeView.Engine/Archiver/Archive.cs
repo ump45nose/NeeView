@@ -9,6 +9,8 @@ public abstract class Archive(string path) : IAsyncDisposable
     /// <summary>来源解析的显式图片条目，普通历史恢复不能覆盖该定位。</summary>
     public string? RequestedEntryName { get; init; }
     public virtual bool IsDirectory => false;
+    /// <summary>原PlaylistArchive来源资格；登记顺序可用，目录递归采用普通书籍策略。</summary>
+    public virtual bool IsPlaylist => false;
     public bool IsDisposed { get; protected set; }
     /// <summary>建立条目索引，后台执行且支持取消。</summary>
     public abstract Task<IReadOnlyList<ArchiveEntry>> GetEntriesAsync(CancellationToken token);
@@ -27,12 +29,12 @@ public abstract class Archive(string path) : IAsyncDisposable
 }
 
 /// <summary>原 ArchiveEntry 的只读子集，ID 区分归档中同名条目。</summary>
-public sealed class ArchiveEntry(Archive archive)
+public class ArchiveEntry(Archive archive)
 {
     public Archive Archive { get; } = archive;
     public int Id { get; init; }
     public string RawEntryName { get; init; } = "";
-    public string EntryName => Archive.IsDirectory ? RawEntryName : RawEntryName.Replace('\\', '/');
+    public string EntryName => Archive.IsDirectory || Archive.IsPlaylist ? RawEntryName : RawEntryName.Replace('\\', '/');
     public string Extension => System.IO.Path.GetExtension(EntryName);
     public long Length { get; init; }
     public DateTime LastWriteTime { get; init; }
@@ -40,13 +42,15 @@ public sealed class ArchiveEntry(Archive archive)
     public bool IsShortcut { get; init; }
     public string? FilePath { get; init; }
     /// <summary>原 SystemPath：真实文件或归档加内部条目，绝不指向解压缓存。</summary>
-    public string SystemPath => FilePath ?? System.IO.Path.Combine(Archive.Path, EntryName.TrimStart('/'));
+    public virtual string SystemPath => FilePath ?? System.IO.Path.Combine(Archive.Path, EntryName.TrimStart('/'));
+    /// <summary>原PlaylistArchiveEntry代理的实际条目；显示名与实体类型/定位分别保存。</summary>
+    public virtual ArchiveEntry TargetArchiveEntry => this;
     /// <summary>原已支持的图片候选；损坏图片仍保留页面。</summary>
-    public bool IsImage() => !IsDirectory && ImageFormats.IsImage(EntryName);
+    public bool IsImage() => !ReferenceEquals(TargetArchiveEntry, this) ? TargetArchiveEntry.IsImage() : !IsDirectory && ImageFormats.IsImage(EntryName);
     /// <summary>原书籍候选：目录或已接入的压缩格式。</summary>
-    public bool IsBook() => IsDirectory || ArchiveFormats.IsArchive(EntryName);
+    public bool IsBook() => !ReferenceEquals(TargetArchiveEntry, this) ? TargetArchiveEntry.IsBook() : IsDirectory || ArchiveFormats.IsArchive(EntryName);
     /// <summary>当前可实体化的文件；归档内目录提取和链接复制继续保留明确能力限制。</summary>
     /// <returns>普通文件或已支持归档文件项为 true。</returns>
-    public bool CanRealize() => !IsDirectory && !IsShortcut && !Archive.IsDisposed;
+    public bool CanRealize() => !Archive.IsDisposed && (!ReferenceEquals(TargetArchiveEntry, this) ? TargetArchiveEntry.CanRealize() : !IsDirectory && !IsShortcut);
     public override string ToString() => EntryName;
 }

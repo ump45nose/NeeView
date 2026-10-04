@@ -41,7 +41,7 @@ public sealed partial class PlaylistHub(PlaylistConfig config)
             token.ThrowIfCancellationRequested();
             byte[]? bytes = File.Exists(path) ? File.ReadAllBytes(path) : null;
             if (bytes is null && path != Config.DefaultPlaylist && path != Config.PagemarkPlaylist) throw new FileNotFoundException("播放列表不存在。", path);
-            var source = bytes is null ? new PlaylistSource() : Deserialize(bytes);
+            var source = bytes is null ? new PlaylistSource() : PlaylistSourceTools.Deserialize(bytes);
             var playlist = new Playlist(path, source);
             foreach (var item in playlist.Items) item.Place = GetPlace(item.Path);
             var files = GetFiles(path); token.ThrowIfCancellationRequested();
@@ -66,26 +66,6 @@ public sealed partial class PlaylistHub(PlaylistConfig config)
         while (!string.IsNullOrEmpty(parent))
         { if (File.Exists(parent) || Directory.Exists(parent)) return parent; parent = System.IO.Path.GetDirectoryName(parent); }
         return "";
-    }
-    /// <summary>接受原两种格式；未知格式/新版本明确拒绝，不保存成当前版本破坏源。</summary>
-    private static PlaylistSource Deserialize(byte[] bytes)
-    {
-        using var document = JsonDocument.Parse(bytes, new() { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip });
-        var root = document.RootElement;
-        var format = root.GetProperty("Format").GetString();
-        if (format == "NeeViewPlaylist.1")
-        {
-            var source = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(bytes, Options)!;
-            var result = new PlaylistSource { Items = root.GetProperty("Items").EnumerateArray().Select(item => new PlaylistSourceItem { Path = item.GetString() ?? throw new JsonException("播放列表路径为空。") }).ToList() };
-            source.Remove("Format"); source.Remove("Items"); result.ExtensionData = source; return result;
-        }
-        const string prefix = "NeeView.Playlist/";
-        if (format == "NeeView.Playlist/45.0.3981") format = "NeeView.Playlist/2.0.0"; // 原 45 alpha.4 错版本修正规则。
-        if (format is null || !format.StartsWith(prefix, StringComparison.Ordinal) || !Version.TryParse(format[prefix.Length..], out var version) || version > new Version(2, 0, 1))
-            throw new NotSupportedException("不支持的播放列表格式：" + format);
-        var playlist = JsonSerializer.Deserialize<PlaylistSource>(bytes, Options) ?? throw new JsonException("播放列表为空。");
-        if (playlist.Items is null || playlist.Items.Any(item => item is null || string.IsNullOrEmpty(item.Path))) throw new JsonException("播放列表条目必须包含 Path。");
-        return playlist;
     }
     /// <summary>注册按原 IsFirstIn 决定首尾，重复条目返回原引用。</summary>
     public async Task<PlaylistItem?> AddAsync(string path, CancellationToken token = default)

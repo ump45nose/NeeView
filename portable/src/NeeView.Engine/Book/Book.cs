@@ -51,9 +51,7 @@ public sealed class Book(Archive source, List<Page> pages, BookSettingConfig set
     public void Sort(CancellationToken token)
     {
         // 原 BookSourceFactory.ValidatePageSortMode：普通来源不使用播放列表的注册顺序。
-        var mode = Setting.SortMode.IsEntryCategory()
-            ? (Setting.SortMode.IsDescending() ? PageSortMode.FileNameDescending : PageSortMode.FileName)
-            : Setting.SortMode;
+        var mode = BookSourceFactory.ValidatePageSortMode(Setting.SortMode, Source);
         UpdatePrefix();
         var result = BookPageSort.Sort(PageSearchProfile.Search(Pages.SearchKeyword, Pages.SourcePages, token), mode, SortSeed, token);
         ApplySort(result);
