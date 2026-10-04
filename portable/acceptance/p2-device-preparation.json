@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-04",
+  "phase": "p2-device-preparation",
+  "product_source_commit": "402cdfb02",
+  "fixture_preflight": {
+    "png_count": 24,
+    "verified": ["sha256", "png_chunk_crc", "png_dimensions", "inflated_row_lengths", "cbz_entries_match_png"],
+    "cbz_count": 2,
+    "existing_output_refused": true,
+    "dataset_scope": "synthetic correctness, device pixel mapping and memory workload; not photo or screen performance evidence"
+  },
+  "sampler_preflight": {
+    "subject": "temporary Python process created for this check",
+    "sample_rows": 5,
+    "metrics": ["rss_bytes", "cpu_percent", "open_file_descriptors"],
+    "existing_csv_refused": true,
+    "subject_stopped_after_check": true,
+    "limits": "No sustained NeeView browsing; no managed/native allocation breakdown or internal cache observation"
+  },
+  "windows_transport": {
+    "tcp_3389": "reachable",
+    "tcp_22": "timeout",
+    "ssh_install_log": "Add-WindowsCapability 0x80240438; sshd service not found",
+    "interactive_login": "not_attempted",
+    "reference_version": "not_read",
+    "reference_baseline_match": "not_verified"
+  },
+  "runtime_acceptance": {
+    "neeview_started_by_this_increment": false,
+    "system_input_sent": false,
+    "user_profile_accessed": false,
+    "trackpad": "not_executed",
+    "retina": "not_executed",
+    "windows_dynamic": "not_executed",
+    "long_term_memory": "not_executed",
+    "multi_display": "no_environment"
+  },
+  "product_build_and_tests": "not_repeated; no product source changes",
+  "push_or_release": "not_performed",
+  "p2_acceptance_sealed": false
+}
