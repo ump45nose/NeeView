@@ -8,6 +8,7 @@ namespace NeeView.Backends;
 public sealed class MacPlatformService : IPlatformService
 {
     private readonly SemaphoreSlim _icons = new(2);
+    private readonly SemaphoreSlim _trash = new(1);
     private readonly Dictionary<string, byte[]?> _iconCache = new(StringComparer.Ordinal);
     /// <summary>使用NSWorkspace真实图标，原生对象在主线程创建/释放，PNG字节跨平台边界传递。</summary>
     public async Task<byte[]?> ReadFileIconAsync(string path, CancellationToken token = default)
@@ -47,11 +48,25 @@ public sealed class MacPlatformService : IPlatformService
         return Task.CompletedTask;
     }
     /// <summary>系统废纸篓操作，失败传播 NSError，禁止永久删除回退。</summary>
-    public Task TrashAsync(string path, CancellationToken token = default) => Task.Run(() =>
+    public async Task TrashAsync(string path, CancellationToken token = default)
     {
-        token.ThrowIfCancellationRequested(); using var url = NSUrl.FromFilename(path);
-        if (!NSFileManager.DefaultManager.TrashItem(url, out var resulting, out var error))
-        { var message = error?.LocalizedDescription ?? "移至废纸篓失败。"; error?.Dispose(); throw new IOException(message); }
-        resulting?.Dispose(); error?.Dispose();
-    }, token);
+        await _trash.WaitAsync(token);
+        try
+        {
+            await Task.Run(() =>
+            {
+                token.ThrowIfCancellationRequested();
+                var file = new FileInfo(path);
+                if (!file.Exists || (file.Attributes & FileAttributes.Directory) != 0) throw new FileNotFoundException("源图片已不存在或不是普通文件。", path);
+                if (file.LinkTarget is not null || (file.Attributes & FileAttributes.ReparsePoint) != 0)
+                    throw new NotSupportedException("链接的删除尚未迁移。");
+                using var url = NSUrl.FromFilename(file.FullName);
+                bool success = NSFileManager.DefaultManager.TrashItem(url, out var resulting, out var error);
+                try { if (!success) throw new IOException(error?.LocalizedDescription ?? "移至废纸篓失败。"); }
+                finally { resulting?.Dispose(); error?.Dispose(); }
+                // 系统已经提交时不再抛晚取消，调用方必须更新原索引。
+            }, token);
+        }
+        finally { _trash.Release(); }
+    }
 }

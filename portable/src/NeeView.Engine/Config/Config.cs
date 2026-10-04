@@ -35,6 +35,8 @@ public sealed class Config
 public sealed class SystemConfig
 {
     public bool IsFileWriteAccessEnabled { get; set; }
+    /// <summary>原普通文件删除默认确认；Mac始终使用系统废纸篓，不降级永久删除。</summary>
+    public bool IsRemoveConfirmed { get; set; } = true;
     public DestinationFolderCollection DestinationFolderCollection { get; set; } = new();
     /// <summary>原拼写兼容仅用于读取；保存统一使用正确字段。</summary>
     [System.Text.Json.Serialization.JsonPropertyName("DestinationFodlerCollection"), System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]

@@ -8,6 +8,9 @@ public sealed partial class MainWindow
     private void AttachDestinationFolders()
     {
         if (_model is null) return;
+        if (_platform is not null && _images is not null) _model.Operation.AttachFileDeletion(_platform, _images);
+        _model.Operation.ConfirmDeleteAsync = async path => !_preparing && !_closedPrepared
+            && await ConfirmAsync("删除当前图片", "将以下图片移至系统废纸篓？\n" + path, "移至废纸篓") && !_preparing && !_closedPrepared;
         var panel = this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!;
         panel.Attach(_model.Operation); panel.Failed += (_, message) => ShowError(message);
         panel.ManageAsync = ManageDestinationFoldersAsync; panel.CreateAsync = CreateDestinationChildAsync;

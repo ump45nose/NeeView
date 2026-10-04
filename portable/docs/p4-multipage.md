@@ -2,6 +2,8 @@
 
 本批在第一批分类链路上迁入原 `Book.CurrentPages/CurrentPage` 关系和 `BookPageActionControl.CollectPages` 判断顺序，补齐普通目录的多页分类及固定 `CopyToFolderAs`。仍只有三个生产项目，使用同一 BookOperation、来源索引、文件后端和原 JSON。
 
+本文记录第二批交付边界；当前普通图片 DeleteFile/废纸篓已在第三批接入，最新范围见 [p4-delete.md](p4-delete.md)。
+
 ## 职责、依赖与公开契约
 
 `Book.CurrentPages` 保存原当前阅读范围的 Page，分页/全景按原选中范围索引升序；`CurrentPage` 继续是首项。BookOperation 负责选区捕获、来源能力、导航锁和真实结果协调。DestinationMoveService 负责批次忙碌锁和逐项移动历史；底层完整性/覆盖/恢复协议复用第一批后端，不另建事务系统。

@@ -877,7 +877,7 @@
       "source": "NeeView/Config/SystemConfig.cs",
       "target": "src/NeeView.Engine/Config/Config.cs",
       "sha256": "f108d9973d964784cc5fa46ef97e6ee62b322cf95b0ecc6682ea9621c69a3de6",
-      "status": "原IsIncrementalSearchEnabled及SearchHistorySize字段/默认/非负范围；其余JSON保留"
+      "status": "原搜索/写权限/IsRemoveConfirmed默认true字段迁入；Mac废纸篓不永久删除回退，NukeWarning等其余JSON保留"
     },
     {
       "source": "NeeView/Command/Commands/FocusBookmarkSearchBoxCommand.cs",
@@ -1471,7 +1471,7 @@
       "source": "NeeView/BookOperation/BookPageActionControl.cs",
       "target": "src/NeeView.Engine/BookOperation/BookOperation.FileActions.cs",
       "sha256": "bbe456cdbfeb66d467c2838ad11670d79b0cf58188bc7c31e5f2e687f6eb2d47",
-      "status": "P4原Once/All/AllLeftToRight普通目录分类、固定复制、真实成功项索引推进；归档实体化/剪贴板/删除待后续"
+      "status": "P4原当前页组分类/固定复制/真实成功项推进；当前主页删除委托BookOperation.DeleteFile沿原确认规则接入；归档实体化/剪贴板/列表多选删除待后续"
     },
     {
       "source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
@@ -1514,6 +1514,18 @@
       "target": "src/NeeView.MacOS/Views/MainWindow.DestinationFolders.cs",
       "sha256": "0021b73eb89dd16acfc0dac19a7c2059329d2bce988b825eaa134f3b8f693b13",
       "status": "原固定复制/Index菜单及多页参数；本批普通目录图片，归档实体化待后续"
+    },
+    {
+      "source": "NeeView/BookOperation/BookPageActionControl.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.DeleteFile.cs",
+      "sha256": "bbe456cdbfeb66d467c2838ad11670d79b0cf58188bc7c31e5f2e687f6eb2d47",
+      "status": "原DeleteFile单主页/写权限/默认确认/成功推进/失败保留；系统真实结果后提交替代原预移除后reload；普通目录图片子集，归档/链接/列表多选继续待迁"
+    },
+    {
+      "source": "NeeView/Command/Commands/DeleteFileCommand.cs",
+      "target": "src/NeeView.Engine/Command/CommandTable.cs",
+      "sha256": "f65f5ee6745594629973c5f3e928402b5e7c5de8cbf934984039720339300962",
+      "status": "保留原命令名/默认Delete键/无多页参数/当前主页执行；确认和系统替换经可等待原业务入口"
     }
   ],
   "rule_references": [

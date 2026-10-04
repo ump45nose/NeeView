@@ -68,3 +68,5 @@ P3第四至七批：原SourcePages/Searcher/BookPageSort正文关系、全源公
 P4第一批：原DestinationFolder/Collection、DestinationMoveService、DestinationFolderPanelViewModel及MoveToFolderAsCommand的两区、目录变化刷新、无限集合、数字Index/模式、Once主图、固定移动与成功后变栈迁入。原System.IsFileWriteAccessEnabled=false保留。Windows Shell替换为有界文件协议及可恢复覆盖/中断记录；真实落点更新原SourcePages及阅读位置，JSON仍唯一权威。All/AllLeftToRight、删除/剪贴板/书籍重命名明确待后续；未采集P4Windows动态，不声称全部分类一致性通过。P3剩余设备/Windows/长期性能与P4集中验收。
 
 P4第二批：Book.CurrentPages/CurrentPage及原CollectPages迁入，Once/All/AllLeftToRight判断顺序保留；普通目录多页移动逐项成功入栈，部分失败/晚取消仍协调已成功项。CopyToFolderAs固定复制、Index及多页参数接入，不随面板模式、不要求源写权限开关；归档实体化复制仍未迁入。静默夹具与Windows/真机集中验收分别记录，见[p4-multipage.md](p4-multipage.md)。
+
+P4第三批：原DeleteFile无MultiPagePolicy，仅CurrentPage；IsFileWriteAccessEnabled=false和IsRemoveConfirmed=true默认保持，取消不执行且删除不入分类历史。原预移除+失败reload改为系统真实成功后提交，普通目录当前图片走AppKit废纸篓，无永久回退。归档内不可逆删除/链接/列表所选页等原能力本批未迁，明确占位。空搜索保留全源锚点但不登记隐藏页历史；原空书历史不登记规则保持。自动测试与AppKit/Windows动态设备验收分别记录，见[p4-delete.md](p4-delete.md)。

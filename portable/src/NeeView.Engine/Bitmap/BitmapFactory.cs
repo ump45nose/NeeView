@@ -97,6 +97,19 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
             { RemovePending(pair.Key, pair.Value); pair.Value.Cancellation.Cancel(); }
         }
     }
+    /// <summary>真实删除后移除该原Page所有规格及晚到需求，正在显示的租约归还前继续计费。</summary>
+    /// <param name="page">来自原来源索引的页面，不根据路径猜测其他来源的身份。</param>
+    public void InvalidatePage(Page page)
+    {
+        var entry = page.ArchiveEntry;
+        lock (_sync)
+        {
+            foreach (var pair in _cache.Where(e => ReferenceEquals(e.Key.Source, entry.Archive) && e.Key.Id == entry.Id).ToArray())
+            { _cache.Remove(pair.Key); pair.Value.Cached = false; if (pair.Value.References == 0 && pair.Value.WaitingConsumers == 0) pair.Value.Image.Dispose(); else _retired.Add(pair.Value); }
+            foreach (var pair in _pending.Where(e => ReferenceEquals(e.Key.Source, entry.Archive) && e.Key.Id == entry.Id).ToArray())
+            { RemovePending(pair.Key, pair.Value); pair.Value.Cancellation.Cancel(); }
+        }
+    }
     /// <summary>正文和路径封面合并同规格需求，共享取消/晚到/租约保护。</summary>
     private async Task<BitmapLease> GetCoreAsync(Key key, DecodeRequest request, CancellationToken token, bool background, Func<CancellationToken, Task<ArchivePageCover>> resolve)
     {

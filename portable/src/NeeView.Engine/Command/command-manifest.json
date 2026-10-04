@@ -249,7 +249,7 @@
     "Text": "删除文件",
     "Shortcut": "Delete",
     "Source": "NeeView/Command/Commands/DeleteFileCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P4 普通目录当前图片/系统废纸篓；归档/列表多选待后续",
     "MenuText": "删除(D)",
     "MouseGesture": ""
   },

@@ -179,8 +179,9 @@ public sealed partial class MainWindow : Window
         var command when PagedTransformCommands.Contains(command) && _model?.Operation.IsFrameReading != true => false,
         "Unload" => _model?.Operation.CanUnload == true,
         "MoveToFolderAs" or "CopyToFolderAs" => IsDestinationCommandAvailable(name),
-        "UndoDestinationMove" => _model?.Operation.DestinationMoves?.CanUndo == true,
-        "RedoDestinationMove" => _model?.Operation.DestinationMoves?.CanRedo == true,
+        "DeleteFile" => _model?.Operation.CanDeleteFile == true,
+        "UndoDestinationMove" => _model?.Operation is { IsDeletingFile: false } && Config.Current.System.IsFileWriteAccessEnabled && _model.Operation.DestinationMoves?.CanUndo == true,
+        "RedoDestinationMove" => _model?.Operation is { IsDeletingFile: false } && Config.Current.System.IsFileWriteAccessEnabled && _model.Operation.DestinationMoves?.CanRedo == true,
         var command when command.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal) => IsDestinationCommandAvailable(command),
         "MoveToParentBook" => _model?.Operation.CanMoveToParentBook == true,
         "MoveToChildBook" => _model?.Operation.CanMoveToChildBook == true,
@@ -380,6 +381,7 @@ public sealed partial class MainWindow : Window
                     Viewer.ScrollView(name, _model.SaveData.GetCommandParameter<ViewScrollCommandParameter>(name)); break;
                 case "OpenContextMenu": OpenViewerContextMenu(); break;
                 case "MoveToFolderAs": case "CopyToFolderAs": await OpenDestinationMoveMenuAsync(name); break;
+                case "DeleteFile": await RunDestinationActionAsync(() => _model.Operation.DeleteFileAsync()); break;
                 case var command when command.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal):
                     await OpenDestinationMoveMenuAsync(command); break;
                 case "UndoDestinationMove": case "RedoDestinationMove":
@@ -614,8 +616,8 @@ public sealed partial class MainWindow : Window
     private Task<bool> ConfirmAsync(string title, string message, string acceptText = "移除")
     {
         var cancel = new Button { Content = "取消" }; var accept = new Button { Content = acceptText };
-        var dialog = new Window { Title = title, Width = 380, Height = 160, WindowStartupLocation = WindowStartupLocation.CenterOwner,
-            Content = new StackPanel { Margin = new Thickness(16), Spacing = 16, Children = { new TextBlock { Text = message, TextWrapping = Avalonia.Media.TextWrapping.Wrap }, new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 8, Children = { cancel, accept } } } } };
+        var dialog = new Window { Title = title, Width = 420, MinHeight = 160, SizeToContent = SizeToContent.Height, WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Content = new StackPanel { Margin = new Thickness(16), Spacing = 16, Children = { new ScrollViewer { MaxHeight = 280, Content = new TextBlock { Text = message, TextWrapping = Avalonia.Media.TextWrapping.Wrap } }, new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 8, Children = { cancel, accept } } } } };
         cancel.Click += (_, _) => dialog.Close(false); accept.Click += (_, _) => dialog.Close(true);
         return dialog.ShowDialog<bool>(this);
     }
@@ -871,6 +873,7 @@ public sealed partial class MainWindow : Window
                 await _model.Operation.DisposeAsync();
                 _model.Operation.Bookshelf.Changed -= FolderTree_PlaceChanged;
                 _model.Operation.PageEndDialogAsync = null;
+                _model.Operation.ConfirmDeleteAsync = null;
                 _model.HistoryRefreshed -= History_Refreshed;
                 _model.Operation.MarkersChanged -= Model_MarkersChanged;
                 if (_model.Operation.DestinationMoves is { } moves) { moves.StateChanged -= DestinationMove_Changed; moves.ConfirmOverwriteAsync = null; }

@@ -4,7 +4,7 @@
     <Border Grid.Column="0" Classes="panel">
       <Grid RowDefinitions="Auto,*">
         <TextBox PlaceholderText="搜索设置" Margin="8" IsEnabled="False" ToolTip.Tip="完整设置搜索在 P2–P5 迁移" />
-        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
+        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
       </Grid>
     </Border>
     <ScrollViewer x:Name="NavigationSettings" Grid.Column="1" IsVisible="False">
@@ -146,6 +146,15 @@
         <TextBlock Text="权限不足、离线卷和检查失败时保留整批记录。播放时间登记随视频后端迁移。" TextWrapping="Wrap" />
         <TextBlock Text="最近打开书籍数量 · 尚未迁移" Opacity="0.5" />
         <TextBlock Text="保存页面浏览记录 · 尚未迁移" Opacity="0.5" />
+      </StackPanel>
+    </ScrollViewer>
+    <ScrollViewer x:Name="FileSettings" Grid.Column="1" IsVisible="False">
+      <StackPanel Margin="16" Spacing="12">
+        <TextBlock Text="文件操作" FontSize="18" />
+        <CheckBox x:Name="FileWriteAccess" Content="允许修改文件" />
+        <CheckBox x:Name="RemoveConfirmed" Content="删除文件前确认" />
+        <TextBlock Text="删除当前普通目录图片时移至系统废纸篓。" TextWrapping="Wrap" />
+        <TextBlock Text="归档内删除、链接和页面列表多选删除 · 尚未迁移" TextWrapping="Wrap" Opacity="0.5" />
       </StackPanel>
     </ScrollViewer>
     <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="16" Spacing="8">

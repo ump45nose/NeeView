@@ -391,7 +391,8 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>原页面历史只登记当前真实显示帧中索引最小的页，空内容使用空记录。</summary>
     private void RecordPageHistory()
     {
-        var page = IsFrameReading ? Frame?.Elements.Where(e => !e.IsDummy).Select(e => e.Page).MinBy(p => p.Index) : Book?.CurrentPage;
+        var page = IsFrameReading ? Frame?.Elements.Where(e => !e.IsDummy).Select(e => e.Page).MinBy(p => p.Index)
+            : Book?.Pages.Count > 0 ? Book.CurrentPage : null;
         PageHistory.Add(page is null || Book is null ? PageHistoryUnit.Empty : new(Book.Path, page.EntryName));
     }
 
