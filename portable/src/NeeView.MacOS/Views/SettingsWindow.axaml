@@ -20,6 +20,7 @@
         <TextBlock Text="页尾切书位置" /><ComboBox x:Name="ResetNextBookPageMode"><ComboBoxItem Content="恢复阅读位置" /><ComboBoxItem Content="始终从首页开始" /><ComboBoxItem Content="连续阅读（向前首页 / 向后末页）" /></ComboBox>
         <CheckBox x:Name="NotifyPageLoop" Content="提示页面已循环" />
         <TextBlock Text="页框移动方向" /><ComboBox x:Name="PageOrientation"><ComboBoxItem Content="水平" /><ComboBoxItem Content="垂直" /></ComboBox>
+        <TextBlock Text="全景帧间隔 (DIP)" /><NumericUpDown x:Name="FrameSpace" Minimum="-32" Maximum="32" Increment="1" FormatString="0.#####" />
         <TextBlock Text="翻页过渡" /><ComboBox x:Name="PageMoveType"><ComboBoxItem Content="滚动" /><ComboBoxItem Content="淡入淡出" /></ComboBox>
         <TextBlock Text="翻页时长（秒，0 为立即）" /><NumericUpDown x:Name="PageMoveDuration" Minimum="0" Maximum="1" Increment="0.1" FormatString="0.#####" />
         <TextBlock Text="命令滚动时长（秒）" /><NumericUpDown x:Name="ScrollDuration" Minimum="0" Maximum="1" Increment="0.1" FormatString="0.#####" />

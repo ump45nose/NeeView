@@ -32,7 +32,7 @@ public sealed class CommandTable
         _actions["ToggleBookLock"] = () => { operation.SetBookLock(!operation.IsBookLocked); return Task.CompletedTask; };
         _actions["TogglePageOrientation"] = () => operation.SetOrientationAsync(Config.Current.Book.Orientation.GetToggle());
         _actions["ToggleIsPanorama"] = () => operation.SetBrowseModeAsync(operation.BrowseMode == BrowseLayoutMode.Paged
-            ? Config.Current.Book.MacPanoramaLayout == BrowseLayoutMode.Masonry ? BrowseLayoutMode.Masonry : BrowseLayoutMode.Continuous
+            ? Config.Current.Book.MacPanoramaLayout is BrowseLayoutMode.Masonry or BrowseLayoutMode.Continuous ? Config.Current.Book.MacPanoramaLayout : BrowseLayoutMode.Panorama
             : BrowseLayoutMode.Paged);
         _actions["SetPageOrientationHorizontal"] = () => operation.SetOrientationAsync(PageFrameOrientation.Horizontal);
         _actions["SetPageOrientationVertical"] = () => operation.SetOrientationAsync(PageFrameOrientation.Vertical);

@@ -148,7 +148,7 @@ public sealed class FolderArchive(string path) : Archive(path)
             await foreach (var batch in channel.Reader.ReadAllAsync(token).ConfigureAwait(false)) yield return batch;
             await producer.ConfigureAwait(false);
         }
-        finally { lifetime.Cancel(); }
+        finally { lifetime.Cancel(); await producer.ConfigureAwait(false); }
 
         // SourceIo持有槽直到真正退出；超时只结束消费者，不能提前释放仍阻塞的NAS枚举槽。
         async Task ProduceAsync()

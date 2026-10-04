@@ -4,8 +4,9 @@ public sealed partial class BookOperation
 {
     private readonly SemaphoreSlim _probeSlots = new(2);
     public BrowseLayoutMode BrowseMode => Config.Current.Book.IsPanorama
-        ? Config.Current.Book.MacPanoramaLayout == BrowseLayoutMode.Masonry ? BrowseLayoutMode.Masonry : BrowseLayoutMode.Continuous
+        ? Config.Current.Book.MacPanoramaLayout is BrowseLayoutMode.Masonry or BrowseLayoutMode.Continuous ? Config.Current.Book.MacPanoramaLayout : BrowseLayoutMode.Panorama
         : BrowseLayoutMode.Paged;
+    public bool IsFrameReading => BrowseMode is BrowseLayoutMode.Paged or BrowseLayoutMode.Panorama;
     public double BrowseScale => BrowseMode == BrowseLayoutMode.Continuous ? Config.Current.Book.MacContinuousScale : Config.Current.Book.MacGalleryColumnWidth;
 
     /// <summary>切换表现布局并原子保存原Config，不排序页面或重新加载书籍；失败恢复旧模式。</summary>
@@ -49,6 +50,19 @@ public sealed partial class BookOperation
         }
         finally { _gate.Release(); }
     }
+    /// <summary>原全景滚动选中帧回报；锁内保持精确分割位置，只有当前同书/代次才能提交。</summary>
+    public async Task ReportPanoramaPositionAsync(Book book, PagePosition position, int direction)
+    {
+        await _gate.WaitAsync();
+        try
+        {
+            if (_disposed || _closing || IsLoading || BrowseMode != BrowseLayoutMode.Panorama || !ReferenceEquals(Book, book) || Position == position) return;
+            if (!Context!.IsLoopPage && (position.Index < 0 || position.Index >= book.Pages.Count)) return;
+            Position = position; RebuildFrame(direction); RecordPageHistory(); ScheduleSave(); Notify();
+        }
+        finally { _gate.Release(); }
+    }
+
     /// <summary>只探测可见需求的原Page；有界后台读取，不创建新身份或全书预解码。</summary>
     /// <param name="book">发出需求的书籍，切书后拒绝旧需求。</param>
     /// <param name="page">原排序集合中的页面。</param>

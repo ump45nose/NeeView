@@ -89,13 +89,15 @@ public sealed class BookConfig
     /// <summary>原全景开关；Mac连续/瀑布模式共用同一书籍和位置。</summary>
     public bool IsPanorama { get; set; }
     /// <summary>Mac全景布局扩展，原JSON字段保留；关闭全景不丢失上次布局选择。</summary>
-    public BrowseLayoutMode MacPanoramaLayout { get; set; } = BrowseLayoutMode.Continuous;
+    public BrowseLayoutMode MacPanoramaLayout { get; set; } = BrowseLayoutMode.Panorama;
     private double _galleryColumnWidth = 320;
     /// <summary>瀑布流目标列宽DIP；缩放调整列数，非法配置回到默认值。</summary>
     public double MacGalleryColumnWidth { get => _galleryColumnWidth; set => _galleryColumnWidth = double.IsFinite(value) ? Math.Clamp(value, 96, 1600) : 320; }
     private double _continuousScale = 1;
     /// <summary>连续阅读相对视口的缩放；独立于原分页变换和瀑布列宽。</summary>
     public double MacContinuousScale { get => _continuousScale; set => _continuousScale = double.IsFinite(value) ? Math.Clamp(value, .1, 8) : 1; }
+    /// <summary>原全景帧间隔，可负值重叠；合法数值不按界面范围截断。</summary>
+    public double FrameSpace { get; set; } = -1;
     public PageEndAction PageEndAction { get; set; }
     public ResetNextBookPageMode ResetNextBookPageMode { get; set; } = ResetNextBookPageMode.Continue;
     public bool IsNotifyPageLoop { get; set; }

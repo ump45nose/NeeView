@@ -118,6 +118,7 @@ public sealed partial class SettingsWindow : Window
     private void FillView()
     {
         var c = Config.Current.View; var mouse=Config.Current.Mouse;
+        FillNumber("FrameSpace", Config.Current.Book.FrameSpace, -32, 32);
         this.FindControl<ComboBox>("PageMoveType")!.SelectedIndex=(int)c.PageMoveType;
         FillNumber("PageMoveDuration",c.PageMoveDuration,0,1); FillNumber("ScrollDuration",c.ScrollDuration,0,1);
         this.FindControl<CheckBox>("HoverScroll")!.IsChecked=mouse.IsHoverScroll;
@@ -159,6 +160,7 @@ public sealed partial class SettingsWindow : Window
         mouse.MouseWheelScrollSensitivity=(double)(this.FindControl<NumericUpDown>("WheelSensitivity")!.Value??1); mouse.MouseWheelScrollDuration=(double)(this.FindControl<NumericUpDown>("WheelDuration")!.Value??.2m);
         Config.Current.Book.PageEndAction = (PageEndAction)Math.Max(0, this.FindControl<ComboBox>("PageEndAction")!.SelectedIndex);
         Config.Current.Book.ResetNextBookPageMode = (ResetNextBookPageMode)Math.Max(0, this.FindControl<ComboBox>("ResetNextBookPageMode")!.SelectedIndex);
+        Config.Current.Book.FrameSpace = (double)(this.FindControl<NumericUpDown>("FrameSpace")!.Value ?? -1);
         Config.Current.Book.Orientation = (PageFrameOrientation)Math.Max(0, this.FindControl<ComboBox>("PageOrientation")!.SelectedIndex);
         Config.Current.Book.IsNotifyPageLoop = this.FindControl<CheckBox>("NotifyPageLoop")!.IsChecked == true;
         bool Checked(string name) => this.FindControl<CheckBox>(name)!.IsChecked == true;

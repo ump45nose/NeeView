@@ -13,7 +13,8 @@ public sealed class PageFrameContext(BookSettingConfig setting, Config config) :
     public bool IsSupportedSingleLastPage => setting.IsSupportedSingleLastPage && FramePageSize == 2;
     public bool IsLoopPage => config.Book.PageEndAction == PageEndAction.SeamlessLoop;
     public PageFrameOrientation FrameOrientation => config.Book.Orientation;
-    public double FrameMargin => 1; // 原静态分页帧间距；全景 FrameSpace 在 P3 接入。
+    public bool IsPanorama => config.Book.IsPanorama && config.Book.MacPanoramaLayout == BrowseLayoutMode.Panorama;
+    public double FrameMargin => IsPanorama && double.IsFinite(config.Book.FrameSpace) ? config.Book.FrameSpace : 1;
     public TimeSpan ScrollDuration => SafeDuration(config.View.ScrollDuration);
     public TimeSpan PageChangeDuration => SafeDuration(config.View.PageMoveDuration);
     public PageMoveType PageChangeType => PageChangeDuration == TimeSpan.Zero ? PageMoveType.Scroll : config.View.PageMoveType;
@@ -30,7 +31,8 @@ public sealed class PageFrameContext(BookSettingConfig setting, Config config) :
     public AutoRotateType AutoRotate => setting.AutoRotate;
     public AutoRotatePolicy AutoRotatePolicy => AutoRotatePolicy.FitToViewArea;
     public bool AllowFileContentAutoRotate => true;
-    public PageStretchMode StretchMode => config.View.StretchMode;
+    public PageStretchMode StretchMode => IsPanorama && config.View.StretchMode == PageStretchMode.Uniform
+        ? FrameOrientation == PageFrameOrientation.Horizontal ? PageStretchMode.UniformToVertical : PageStretchMode.UniformToHorizontal : config.View.StretchMode;
     public double ContentsSpace => Math.Max(0, config.Book.ContentsSpace);
     public bool AllowEnlarge => config.View.AllowStretchScaleUp;
     public bool AllowReduce => config.View.AllowStretchScaleDown;

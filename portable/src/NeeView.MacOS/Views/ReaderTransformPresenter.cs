@@ -88,14 +88,18 @@ internal sealed class ReaderTransformPresenter : IShareTransformContext, IDispos
     /// <summary>帧原点坐标，包含双页间隔，外部变换一次性作用于整帧。</summary>
     public IEnumerable<(PageFrameElement Source, Avalonia.Rect Target)> GetTargets()
     {
-        if (Frame is null) yield break;
-        var sources = Frame.GetDirectedSources().ToArray();
-        var width = sources.Sum(e => e.Width) * Frame.Scale + Frame.TotalSpan;
+        return Frame is null ? [] : GetTargets(Frame);
+    }
+    /// <summary>原帧的局部目标几何；全景邻帧也复用同一双页排列/裁剪入口。</summary>
+    public static IEnumerable<(PageFrameElement Source, Avalonia.Rect Target)> GetTargets(PageFrame frame)
+    {
+        var sources = frame.GetDirectedSources().ToArray();
+        var width = sources.Sum(e => e.Width) * frame.Scale + frame.TotalSpan;
         double left = -width / 2;
         foreach (var source in sources)
         {
-            var rect = new Avalonia.Rect(left, -source.Height * Frame.Scale / 2, source.Width * Frame.Scale, source.Height * Frame.Scale);
-            yield return (source, rect); left += rect.Width + Frame.Span;
+            var rect = new Avalonia.Rect(left, -source.Height * frame.Scale / 2, source.Width * frame.Scale, source.Height * frame.Scale);
+            yield return (source, rect); left += rect.Width + frame.Span;
         }
     }
     /// <summary>原顺序：BaseScale、自动旋转、翻转、手工缩放/旋转，再平移到视口。</summary>

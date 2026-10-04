@@ -1370,6 +1370,12 @@
       "target": "src/NeeView.MacOS/Views/FolderTreeView.axaml.cs",
       "sha256": "0861e46f2cfdb7f35de9ed64eadbee7bf86df478a77e29bb3a36a7b7191865fe",
       "status": "原普通行点击/Enter确认与焦点适配；隐藏取消需求，文件拖放/高级操作未迁"
+    },
+    {
+      "source": "NeeView/PageFrames/PageFrameBox.cs",
+      "target": "src/NeeView.Engine/PageFrames/PageFramePanorama.cs",
+      "sha256": "d3ecb95fc78100ae57db968c1ffc437f61afab8c148abdaafa42a954d9d54fa7",
+      "status": "原CreatePanoramaContentRect首尾膨胀及容器关系数值适配；原帧生成器复用，轻量邻帧窗口有界"
     }
   ],
   "rule_references": [

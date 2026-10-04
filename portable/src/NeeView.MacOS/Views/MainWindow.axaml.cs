@@ -175,7 +175,7 @@ public sealed partial class MainWindow : Window
     /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
     public bool IsCommandAvailable(string name) => name switch
     {
-        var command when PagedTransformCommands.Contains(command) && _model?.Operation.BrowseMode != BrowseLayoutMode.Paged => false,
+        var command when PagedTransformCommands.Contains(command) && _model?.Operation.IsFrameReading != true => false,
         "Unload" => _model?.Operation.CanUnload == true,
         "MoveToParentBook" => _model?.Operation.CanMoveToParentBook == true,
         "MoveToChildBook" => _model?.Operation.CanMoveToChildBook == true,
@@ -307,7 +307,7 @@ public sealed partial class MainWindow : Window
     public async Task ExecuteAsync(string name, bool fromMenu = false)
     {
         if (_model is null || _preparing || _closedPrepared) return;
-        if (PagedTransformCommands.Contains(name) && _model.Operation.BrowseMode != BrowseLayoutMode.Paged)
+        if (PagedTransformCommands.Contains(name) && !_model.Operation.IsFrameReading)
         { ShowError("当前展示方式暂不支持此变换，切回分页可使用。"); return; }
         try
         {

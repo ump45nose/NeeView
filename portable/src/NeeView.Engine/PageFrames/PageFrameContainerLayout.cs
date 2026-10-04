@@ -8,7 +8,7 @@ public static class PageFrameContainerLayout
     /// <param name="context">原帧方向、阅读顺序与间距。</param><param name="direction">前进1，后退-1。</param>
     public static Rect Layout(Rect reference, Size size, PageFrameContext context, int direction)
     {
-        if (context.PageChangeType == PageMoveType.Fade) return new(reference.X, reference.Y, size.Width, size.Height);
+        if (!context.IsPanorama && context.PageChangeType == PageMoveType.Fade) return new(reference.X, reference.Y, size.Width, size.Height);
         if (context.FrameOrientation == PageFrameOrientation.Horizontal)
         {
             bool previous = (context.ReadOrder == PageReadOrder.LeftToRight ? direction : -direction) < 0;

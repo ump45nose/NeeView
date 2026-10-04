@@ -1,7 +1,7 @@
 namespace NeeView;
 
 /// <summary>Mac全景展示方式；分页仍由原IsPanorama开关及PageFrame控制。</summary>
-public enum BrowseLayoutMode { Paged, Continuous, Masonry }
+public enum BrowseLayoutMode { Paged, Continuous, Masonry, Panorama }
 
 /// <summary>无界面依赖的图片位置；单位为DIP，索引对应原排序后的Page。</summary>
 public readonly record struct BrowseItemRect(double X, double Y, double Width, double Height)

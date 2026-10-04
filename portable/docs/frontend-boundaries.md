@@ -81,3 +81,5 @@ P3：ReaderBrowsePresenter是唯一ReaderView的连续/瀑布表现辅助；Engi
 P3第二批：FolderTreeView.axaml/.cs只绑定原DirectoryNode并转交确认/焦点；MainWindow.DirectoryTree管理书架内部Top/Left分隔和原配置提交，枚举在Engine节点及既有来源。页面四模板复用共享表现，ListCoverImage显式PageSource/LoadPageAsync直接租用当前来源。原Page身份、排序/导航和JSON仍在Engine；样式/布局调整不扫描来源或重建正文，见[p3-navigation.md](p3-navigation.md)。
 
 P3第三批：Engine.BrowseLayout保存不可变几何检查点，ReaderBrowsePresenter只安排后台计算并在UI线程发布快照及恢复Page锚点。快照与渲染分别持有几何和像素，旧计算不能修改正在绘制的段；视图仍不枚举/排序/写配置。外观和控件布局入口保持，详见[p3-performance.md](p3-performance.md)。
+
+P3第四/五批已接入[渐进目录索引](p3-index.md)和[原帧全景](p3-panorama.md)，早期批次的待迁说明按该契约更新；导航高级项继续迁移，静默验收不等同设备封板。

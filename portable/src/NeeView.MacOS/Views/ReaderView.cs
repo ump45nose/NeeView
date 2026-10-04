@@ -15,7 +15,7 @@ using CoreBitmapFactory = NeeView.BitmapFactory;
 namespace NeeView.MacOS.Views;
 
 /// <summary>原 MainView 的绘制适配；页框与分割规则由迁入的 Engine 计算。</summary>
-public sealed class ReaderView : Control, IDisposable
+public sealed partial class ReaderView : Control, IDisposable
 {
     private sealed class Display(Bitmap bitmap, BitmapLease lease, DecodeRequest request, long length, DateTime version) : IDisposable
     {
@@ -45,7 +45,7 @@ public sealed class ReaderView : Control, IDisposable
     private BookOperation? _operation;
     private CoreBitmapFactory? _factory;
     private ReaderBrowsePresenter? _browse;
-    private bool IsBrowsing => _operation is not null && _operation.BrowseMode != BrowseLayoutMode.Paged;
+    private bool IsBrowsing => _operation is not null && !_operation.IsFrameReading;
     internal BrowseLayout? BrowseLayout => _browse?.Layout;
     internal bool BrowseLayoutPending => _browse?.IsLayoutPending ?? false;
     internal long BrowseLayoutPublications => _browse?.LayoutPublications ?? 0;
@@ -132,7 +132,7 @@ public sealed class ReaderView : Control, IDisposable
         _motionTimer.Tick += (_, _) =>
         {
             if (!_motion.IsPageActive && !_awaitingTransition) ReleaseOutgoing();
-            if (!_motion.IsActive) _motionTimer.Stop();
+            if (!_motion.IsActive) { _motionTimer.Stop(); if (IsPanorama) _ = ReportPanoramaAnchorAsync(); }
             InvalidateVisual();
         };
         _sequence.GestureProgressed += (_, e) => { _sequenceHint = e.Sequence.IsEmpty ? "" : (MouseSequenceText?.Invoke(e.Sequence) is { } text ? text + "\n" : "") + e.Sequence.GetDisplayString(); InvalidateVisual(); };
@@ -160,7 +160,18 @@ public sealed class ReaderView : Control, IDisposable
         var revision = ++_revision; _request?.Cancel(); var request = new CancellationTokenSource(); _request = request;
         SynchronizeFrame(); _loadError = null;
         ClampPan();
-        var sources = _frame?.Elements.Where(e => !e.IsDummy).Select(e => e.Page).Distinct().ToArray() ?? [];
+        var sources = GetDemandSources();
+        if (IsPanorama && _operation.Book is { } sourceBook)
+        {
+            try
+            {
+                foreach (var page in sources) await _operation.EnsurePageInfoAsync(sourceBook, page, request.Token);
+                if (_disposed || revision != _revision || request.IsCancellationRequested)
+                { if (ReferenceEquals(_request, request)) _request = null; request.Dispose(); return; }
+                SynchronizeFrame(); sources = GetDemandSources();
+            }
+            catch (OperationCanceledException) { if (ReferenceEquals(_request, request)) _request = null; request.Dispose(); return; }
+        }
         foreach (var page in _images.Keys.Except(sources).ToArray()) { _images[page].Dispose(); _images.Remove(page); }
         foreach (var page in _pageErrors.Keys.Except(sources).ToArray()) _pageErrors.Remove(page);
         InvalidateVisual();
@@ -199,7 +210,7 @@ public sealed class ReaderView : Control, IDisposable
             }
             if (Config.Current.Mouse.IsHoverScroll && _pointer is { } hover) HoverScroll(hover, true);
             DisplayCompleted?.Invoke(this, EventArgs.Empty);
-            if (_operation.Book is { } book && _frame is { } frame)
+            if (!IsPanorama && _operation.Book is { } book && _frame is { } frame)
             {
                 var next = frame.FrameRange.Next().Index;
                 if (next < book.Pages.Count) await PrefetchAsync(book.Pages[next], request.Token);
@@ -220,7 +231,7 @@ public sealed class ReaderView : Control, IDisposable
         {
             _pan += _motion.CancelPan(); ReleaseOutgoing();
             if (ReferenceEquals(_displayBook, _operation.Book) && _frame is not null && nextFrame is not null
-                && _operation.Context?.PageChangeDuration > TimeSpan.Zero && _images.Count > 0)
+                && !IsPanorama && _operation.Context?.PageChangeDuration > TimeSpan.Zero && _images.Count > 0)
             {
                 var pages = _transform.GetTargets().Where(t => !t.Source.IsDummy).Select(t => t.Source.Page).Distinct().ToHashSet();
                 _outgoing = new(_transform.GetTargets().ToArray(), _transform.GetMatrix(), GetContentRect(),
@@ -235,7 +246,7 @@ public sealed class ReaderView : Control, IDisposable
         {
             CancelMouseSequence();
             _displayBook = _operation.Book; _displayRange = _frame?.FrameRange;
-            AlignPageOrigin(_operation.MoveDirection);
+            if (!RestorePanoramaReference()) AlignPageOrigin(_operation.MoveDirection);
             _scrollLock.SetLock(Config.Current.View.MovementConstraint.IsLockStart);
             if (_outgoing is { } previous && _operation.Context is { } context)
             {
@@ -251,7 +262,8 @@ public sealed class ReaderView : Control, IDisposable
     private DecodeRequest GetRequest(Page page)
     {
         var size = page.Content.PageDataSource.Size;
-        var scale = _transform.PixelScale * (TopLevel.GetTopLevel(this)?.RenderScaling ?? 1);
+        var frameScale = _panorama?.Frames.FirstOrDefault(f => f.Frame.Contains(page))?.Frame.Scale ?? _frame?.Scale ?? 1;
+        var scale = frameScale * _transform.BaseScale * _zoom * (TopLevel.GetTopLevel(this)?.RenderScaling ?? 1);
         return new(Math.Max(128, (int)Math.Ceiling(Math.Min(size.Width, size.Width * scale) / 128) * 128), Math.Max(128, (int)Math.Ceiling(Math.Min(size.Height, size.Height * scale) / 128) * 128));
     }
     /// <summary>邻页预取只有一个背景槽，取消或损坏不影响当前图。</summary>
@@ -269,9 +281,10 @@ public sealed class ReaderView : Control, IDisposable
         { DrawText(context, _operation?.Book is null ? "NeeView\n打开图片、目录或 ZIP / CBZ" : "这个来源没有可阅读的图片", new(30,30)); return; }
         using var clip=context.PushClip(new Avalonia.Rect(Bounds.Size));
         var motion=_motion.GetPageState();
+        if (IsPanorama) DrawPanorama(context);
         if (_outgoing is { } old)
             DrawFrame(context,old.Targets,old.Matrix * Matrix.CreateTranslation(motion.Outgoing),old.Images,old.Errors,_awaitingTransition ? 1 : motion.OutgoingOpacity);
-        if (!_awaitingTransition)
+        if (!IsPanorama && !_awaitingTransition)
             DrawFrame(context,_transform.GetTargets(),GetRenderedMatrix(),_images,_pageErrors,motion.IncomingOpacity);
         if (_sequenceHint.Length>0) { context.FillRectangle(new SolidColorBrush(Color.FromArgb(210,24,24,24)),new Avalonia.Rect(12,12,220,58)); DrawText(context,_sequenceHint,new(24,20)); }
         if (_loadError is not null) DrawText(context,_loadError,new(12,12));
@@ -310,7 +323,7 @@ public sealed class ReaderView : Control, IDisposable
     /// <summary>围绕指针位置缩放，像素需求随缩放更新。</summary>
     public async Task ZoomAsync(double factor, Point? pointer = null)
     {
-        if (IsBrowsing && _browse is not null) { await _browse.ZoomAsync(factor); await _browse.RefreshAsync(); return; }
+        if (IsBrowsing && _browse is not null) { await _browse.ZoomAsync(factor, pointer); await _browse.RefreshAsync(); return; }
         StopMotion(); SynchronizeFrame();
         var origin = pointer ?? new Point(Bounds.Width / 2, Bounds.Height / 2);
         var old = _zoom; _zoom *= factor; var ratio = _zoom / old;
@@ -386,7 +399,7 @@ public sealed class ReaderView : Control, IDisposable
     {
         if (IsBrowsing && _browse is not null) { _browse.Scroll(direction * Bounds.Height * parameter.Scroll); return; }
         if (_frame is null || Config.Current.Mouse.IsHoverScroll || _operation?.Context is not { } context) return;
-        var result = _scrollControl.ScrollToNext(context, GetContentRect(), new(0, 0, Bounds.Width, Bounds.Height), direction, parameter);
+        var result = _scrollControl.ScrollToNext(context, GetScrollContent(parameter.PagesAsOne), new(0, 0, Bounds.Width, Bounds.Height), direction, parameter);
         if (result is not null && !result.IsTerminated) { var from=_pan+_motion.GetPanOffset(); ApplyPan(new(result.Vector.X,result.Vector.Y)); AnimatePan(from,ScrollDuration); }
     }
     /// <summary>高精度滚动平移；分页导航由输入映射处理。</summary>
@@ -397,11 +410,12 @@ public sealed class ReaderView : Control, IDisposable
         var move = new NeeView.Vector(delta.X, delta.Y);
         if (Config.Current.View.MovementConstraint.IsLimited)
         {
-            var rect = GetContentRect(); var viewport = new NeeView.Rect(0, 0, Bounds.Width, Bounds.Height);
+            var rect = GetMotionBounds(); var viewport = new NeeView.Rect(0, 0, Bounds.Width, Bounds.Height);
             _scrollLock.Update(rect, viewport); move = _scrollLock.Limit(move);
             move = new ScrollAreaLimit(rect, viewport).GetLimitContentMove(move);
         }
         _pan += new Avalonia.Vector(move.X, move.Y); InvalidateVisual();
+        if (IsPanorama) Dispatcher.UIThread.Post(async () => { if (!IsMotionActive) await ReportPanoramaAnchorAsync(); });
     }
     /// <summary>按原四向滚动先移动指定轴，到边界后按阅读方向尝试跨轴。</summary>
     public void ScrollView(string command, ViewScrollCommandParameter parameter)
@@ -449,7 +463,7 @@ public sealed class ReaderView : Control, IDisposable
     {
         if (_frame is null || Bounds.Width <= 0 || Bounds.Height <= 0) return;
         if (Config.Current.View.MovementConstraint < MovementConstraint.Snap) return;
-        var delta = new DragArea(new(0, 0, Bounds.Width, Bounds.Height), GetContentRect()).SnapView(true);
+        var delta = new DragArea(new(0, 0, Bounds.Width, Bounds.Height), GetMotionBounds()).SnapView(true);
         _pan += new Avalonia.Vector(delta.X, delta.Y);
     }
     /// <summary>原 ScrollToNextFrame：先应用 NScroll 位移，终止后才进入原帧导航。</summary>
@@ -462,7 +476,7 @@ public sealed class ReaderView : Control, IDisposable
         {
             if (IsBrowsing && _browse is not null) { _browse.Scroll(direction * Bounds.Height * parameter.Scroll); return; }
             if (_disposed || _frame is null || _operation?.Context is not { } context || _operation.IsLoading || Bounds.Width <= 0 || Bounds.Height <= 0) return;
-            var result = Config.Current.Mouse.IsHoverScroll ? new PageFrames.ScrollResult(default, default) : _scrollControl.ScrollToNext(context, GetContentRect(), new(0, 0, Bounds.Width, Bounds.Height), direction, parameter);
+            var result = Config.Current.Mouse.IsHoverScroll ? new PageFrames.ScrollResult(default, default) : _scrollControl.ScrollToNext(context, GetScrollContent(parameter.PagesAsOne), new(0, 0, Bounds.Width, Bounds.Height), direction, parameter);
             if (result is null) return;
             if (!result.IsTerminated) { var from=_pan+_motion.GetPanOffset(); ApplyPan(new(result.Vector.X,result.Vector.Y)); AnimatePan(from,ScrollDuration); return; }
             // 导航仍走 BookOperation 的原帧范围；切书后不能应用旧命令的原点。
@@ -605,6 +619,18 @@ public sealed class ReaderView : Control, IDisposable
     private Page? GetBookPageAt(Point point)
     {
         if (_frame is null) return null;
+        if (IsPanorama)
+        {
+            RebuildPanorama();
+            foreach (var placement in _panorama?.Frames ?? [])
+            {
+                if (!PanoramaMatrix(placement).TryInvert(out var matrix)) continue;
+                var hit = matrix.Transform(point);
+                foreach (var (source, target) in ReaderTransformPresenter.GetTargets(placement.Frame))
+                    if (!source.IsDummy && source.Page.PageType.IsFolder() && ArchivePageRenderer.CoverArea(target).Contains(hit)) return source.Page;
+            }
+            return null;
+        }
         if (!GetRenderedMatrix().TryInvert(out var inverse)) return null;
         var local = inverse.Transform(point);
         foreach (var (source, target) in _transform.GetTargets())
@@ -618,7 +644,7 @@ public sealed class ReaderView : Control, IDisposable
     {
         if (_disposed) return; CancelMouseSequence(); StopMotion(); _disposed = true; ++_revision; _request?.Cancel(); _request = null;
         foreach (var item in _images.Values) item.Dispose(); _images.Clear(); _pageErrors.Clear();
-        _browse?.Dispose();
+        _browse?.Dispose(); _panorama = null; _panoramaRecenter = null;
         _transform.Dispose();
     }
 }

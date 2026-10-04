@@ -327,3 +327,7 @@ P2继续动画/手势及资源性能收尾；Windows/真机/NAS与完整显示�
 ## P3 第四批：渐进普通目录索引
 
 非递归普通目录首批可读、已知图片先产出、128项有界批次；原Page身份/排序/Part及末端保护，失败保留已提交页。完整418项回归、Library/正式ARM64.app/严格ad-hoc签名通过，见[p3-index-validation.json](p3-index-validation.json)与[契约](../docs/p3-index.md)。递归展平/归档仍完整索引，设备/Windows验收独立；本轮继续原全景与导航。
+
+## P3 第五批：原帧全景
+
+唯一ReaderView沿原页框生成/容器/NScroll迁入水平、垂直与双页全景，保留FrameSpace、PagesAsOne、变换及邻帧书籍命中；连续/瀑布精确缩放锚点。428项完整回归、Library及正式ARM64.app/严格ad-hoc签名结果见[p3-panorama-validation.json](p3-panorama-validation.json)，契约见[p3-panorama.md](../docs/p3-panorama.md)。默认静默，真实设备与Windows动态另验；继续导航收尾。

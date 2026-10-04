@@ -36,6 +36,7 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     private double _layoutComputeMs, _layoutPublishMs;
     private (double Width, BrowseLayoutMode Mode, double ColumnWidth, bool Rtl, double Scale)? _layoutShape;
     private double? _pendingNavigation;
+    private (Page Page, double X, double Y, Point Pointer)? _zoomAnchor;
     public long LayoutPublications { get; private set; }
     public bool IsLayoutPending => _layoutPending || _relayout.IsEnabled;
     private double _width, _columnWidth, _scale, _offset, _offsetX;
@@ -70,11 +71,11 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
         }
         var book = operation.Book;
         bool wasActive = Active;
-        Active = operation.BrowseMode != BrowseLayoutMode.Paged;
+        Active = operation.BrowseMode is BrowseLayoutMode.Continuous or BrowseLayoutMode.Masonry;
         if (!Active)
         {
             if (wasActive) { _resumeAnchor = CaptureAnchor(); _resumePosition = operation.Position.Index; }
-            ReleaseDemand(); return;
+            ReleaseDemand(); Layout = null; return;
         }
         bool newBook = !ReferenceEquals(book, _book);
         var anchor = newBook ? (Page: book?.CurrentPage, Fraction: 0d) : CaptureAnchor();
@@ -84,7 +85,7 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
             || _rightToLeft != (book?.Setting.BookReadOrder == PageReadOrder.RightToLeft);
         bool newOrder = _order != book?.PageOrderVersion;
         if (newBook || newOrder || _mode != operation.BrowseMode) { ReleaseDemand(); Layout = null; }
-        if (newBook) { _selection = null; _reported = null; _observedIndex = -1; }
+        if (newBook) { _zoomAnchor = null; _selection = null; _reported = null; _observedIndex = -1; }
         if (!wasActive)
         {
             anchor = !newBook && _resumePosition == operation.Position.Index && _resumeAnchor.Page is not null ? _resumeAnchor : (book?.CurrentPage, 0);
@@ -166,6 +167,16 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
                 _offsetX = Math.Clamp(centerX * Layout.Width - _width / 2, 0, Math.Max(0, Layout.Width - _width));
                 int index = FindPageIndex(latest.Page);
                 if (index >= 0) _offset = Layout.Items[index].Y + latest.Fraction * Layout.Items[index].Height;
+                if (_zoomAnchor is { } zoom)
+                {
+                    _zoomAnchor = null; int zoomIndex = FindPageIndex(zoom.Page);
+                    if (zoomIndex >= 0)
+                    {
+                        var rect = Layout.Items[zoomIndex];
+                        _offset = rect.Y + rect.Height * zoom.Y - zoom.Pointer.Y;
+                        _offsetX = Math.Clamp(rect.X + rect.Width * zoom.X - zoom.Pointer.X, 0, Math.Max(0, Layout.Width - _width));
+                    }
+                }
                 _offset = Math.Clamp(_offset, 0, MaximumOffset);
                 foreach (var pair in changes) if (_dirtySizes.TryGetValue(pair.Key, out var value) && value == pair.Value) _dirtySizes.Remove(pair.Key);
                 if (_pendingNavigation is { } target)
@@ -337,7 +348,17 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     /// <summary>缩放调整连续比例或瀑布列宽，不改变原分页变换图。</summary>
     /// <param name="factor">有限正缩放倍数，Engine负责限幅及保存。</param>
     /// <returns>Engine缩放提交完成，后续Refresh按内容锚点重排。</returns>
-    public Task ZoomAsync(double factor) => operation.ScaleBrowseColumnsAsync(factor);
+    public Task ZoomAsync(double factor, Point? pointer = null)
+    {
+        var center = pointer ?? new Point(owner.Bounds.Width / 2, owner.Bounds.Height / 2);
+        int index = Layout?.HitTest(center.X + _offsetX, center.Y + _offset) ?? -1;
+        if (index >= 0 && index < _pages.Length && Layout is not null)
+        {
+            var rect = Layout.Items[index];
+            _zoomAnchor = (_pages[index], (center.X + _offsetX - rect.X) / rect.Width, (center.Y + _offset - rect.Y) / rect.Height, center);
+        }
+        return operation.ScaleBrowseColumnsAsync(factor);
+    }
     /// <summary>把导航器相对纵向位置转换成滚动，实际Page锚点随后回报原BookOperation。</summary>
     /// <param name="point">Y为0至1的全书纵向比例，本增量忽略X。</param>
     public void Navigate(Point point)

@@ -12,7 +12,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public bool IsPanelDragging { get; private set; }
     public BookOperation Operation { get; } = operation;
     public CommandTable Commands { get; } = commands;
-    public IReadOnlyList<BrowseModeChoice> BrowseModes { get; } = [new(BrowseLayoutMode.Paged, "分页"), new(BrowseLayoutMode.Continuous, "连续阅读"), new(BrowseLayoutMode.Masonry, "瀑布流")];
+    public IReadOnlyList<BrowseModeChoice> BrowseModes { get; } = [new(BrowseLayoutMode.Paged, "分页"), new(BrowseLayoutMode.Panorama, "原版全景"), new(BrowseLayoutMode.Continuous, "连续阅读"), new(BrowseLayoutMode.Masonry, "瀑布流")];
     public BrowseModeChoice SelectedBrowseMode => BrowseModes.First(e => e.Mode == Operation.BrowseMode);
     public SaveData SaveData { get; } = saveData;
     public string Title => Operation.Book is { } book ? $"{System.IO.Path.GetFileName(book.Path)} — NeeView" : "NeeView";
@@ -68,7 +68,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public double FilmStripHeight => Config.Current.FilmStrip.ImageWidth + 16;
     public string PositionText => Pages.Count == 0 ? "0 / 0" : $"{PageIndex + 1} / {Pages.Count}";
     public bool IsLoading => Operation.IsLoading;
-    public string Status => Operation.Error ?? (Operation.Book is { } book ? $"{book.CurrentPage?.EntryName}  ·  {(book.Setting.PageMode == PageMode.WidePage ? "双页" : "单页")}  ·  {(book.Setting.BookReadOrder == PageReadOrder.RightToLeft ? "从右向左" : "从左向右")}" : "打开图片、目录或 ZIP / CBZ");
+    public string Status => Operation.Error ?? (Operation.Book is { } book ? $"{book.CurrentPage?.EntryName}{(book.IsIndexing ? " · 索引补齐中" : book.IndexError is not null ? " · 索引未完成" : "")}  ·  {(book.Setting.PageMode == PageMode.WidePage ? "双页" : "单页")}  ·  {(book.Setting.BookReadOrder == PageReadOrder.RightToLeft ? "从右向左" : "从左向右")}" : "打开图片、目录或 ZIP / CBZ");
     public string Information => Operation.Book?.CurrentPage is { } page ? $"{page.EntryName}\n\n尺寸：{page.Content.PageDataSource.Size.Width:0} × {page.Content.PageDataSource.Size.Height:0}\n大小：{page.ArchiveEntry.Length:N0} 字节\n\n来源：{Operation.Book.Path}\n{page.Content.Error}" : "没有打开书籍";
     public bool Divide => Operation.Book?.Setting.IsSupportedDividePage ?? false;
     public bool Wide => Operation.Book?.Setting.IsSupportedWidePage ?? true;
