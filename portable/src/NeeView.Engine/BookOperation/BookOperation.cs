@@ -60,6 +60,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     {
         ObjectDisposedException.ThrowIf(_disposed || _closing, this);
         CancelCopyPreparation();
+        CancelFileCopyPreparation();
         var generation = Interlocked.Increment(ref _generation);
         _opening?.Cancel();
         var opening = CancellationTokenSource.CreateLinkedTokenSource(token); _opening = opening;
@@ -551,13 +552,17 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>序列化保存和释放；保存失败恢复操作能力，下一次退出仍会重试。</summary>
     private async Task CloseCoreAsync()
     {
-        await Task.Yield();
+        // 关闭请求当场使准备失效；先 Yield 会给原生晚到结果留下继续提交的间隙。
         _closing = true; Interlocked.Increment(ref _generation);
+        CancelClipboardPreparation();
+        CancelFileCopyPreparation();
+        await Task.Yield();
         _opening?.Cancel(); _saving?.Cancel();
         // 未确认文本/重试可取消；已开始实体操作等待真实结果和路径联动，不释放仍使用的来源。
         _renameClosing.Cancel();
         _clipboardClosing.Cancel();
         CancelClipboardPreparation();
+        CancelFileCopyPreparation();
         if (_renameCompletion is { } rename) await rename.Task;
         if (_clipboardCompletion is { } clipboard) await clipboard.Task;
         await _gate.WaitAsync();

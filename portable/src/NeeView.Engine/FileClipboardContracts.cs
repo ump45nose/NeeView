@@ -1,6 +1,6 @@
 namespace NeeView;
 
-/// <summary>文件剪贴板快照：系统实体路径、原QueryPath逻辑路径及可选文本各自独立。</summary>
+/// <summary>文件剪贴板快照：系统文件地址（可为原虚拟策略）、原QueryPath及可选文本独立。</summary>
 public sealed record FileClipboardContent(IReadOnlyList<string> Files, IReadOnlyList<string> QueryPaths, string? Text = null);
 
 /// <summary>替代原ClipboardUtility的系统边界，不包含AppKit/控件或文件写入。</summary>

@@ -1603,7 +1603,7 @@
       "source": "NeeView/BookOperation/BookPageActionControl.cs",
       "target": "src/NeeView.Engine/BookOperation/BookOperation.Clipboard.cs",
       "sha256": "bbe456cdbfeb66d467c2838ad11670d79b0cf58188bc7c31e5f2e687f6eb2d47",
-      "status": "原CollectPages/CopyToClipboard业务关系；实体普通目录子集，归档实体化待迁，Copy不受源写权限约束"
+      "status": "原CollectPages/CopyToClipboard与归档四策略实体化接入，保留原QueryPath/文本实际行为；目录提取/链接待迁，Copy不受写权限约束"
     },
     {
       "source": "NeeView/BookOperation/BookControl.cs",
@@ -1615,13 +1615,31 @@
       "source": "NeeView/External/ClipboardUtility.cs",
       "target": "src/NeeView.Backends/MacFileClipboard.cs",
       "sha256": "55528a9a264389a7730f43ca7cff37b6851f44e302adf1b0417235c88337a654",
-      "status": "Windows FileDrop/QueryPath/可选文本替换为NSPasteboard fileURL/有限私有JSON/文本；用户决定Cut禁用，提交后等待真实结果"
+      "status": "原QueryPath/四种ArchivePolicy/FileDrop及实际TextCopyPolicy输出迁入；标准fileURL与有限私有JSON替换协议，None仍写QueryPath；位图等待迁"
     },
     {
       "source": "NeeView/System/ContentDropReceiver.cs",
       "target": "src/NeeView.Engine/BookOperation/BookOperation.Clipboard.cs",
       "sha256": "80d8e8d1f069cf8d6dfb2f6a6e49f6175d113c2daf1ed0bf99256afdf10dc11d",
       "status": "原Paste=加载且QueryPath优先；单来源复用OpenCore，多文件不丢项明确拒绝，临时播放列表/其他数据待迁"
+    },
+    {
+      "source": "NeeView/External/ArchivePolicy.cs",
+      "target": "src/NeeView.Engine/Archiver/ArchivePolicy.cs",
+      "sha256": "8cf1a77b493336941cf9c7ae968c5874b8cd2bf5b4d2fee78ba8e904990223ab",
+      "status": "原枚举数值/默认策略及LimitedRealization迁入；去除WPF转换器，原ArchiveEntryUtility保序策略并入此文件"
+    },
+    {
+      "source": "NeeView/Archiver/ArchiveEntryUtility.cs",
+      "target": "src/NeeView.Engine/Archiver/ArchivePolicy.cs",
+      "sha256": "01ae8c774e5c7512ca56b2d6075902fc57061aafe528360387bf01a1c973179b",
+      "status": "原RealizeArchiveEntry页组选序/路径去重迁入；资源以请求级租约替换TempFile/FileProxy，剪贴板成功后进程持有"
+    },
+    {
+      "source": "NeeView/Archiver/ArchiveEntry.cs",
+      "target": "src/NeeView.Backends/Content/ArchiveEntryRealizer.cs",
+      "sha256": "57e2bad5fac525d8b578c308576feb7ef07179d729bc8a9a9608b5a1835c1f50",
+      "status": "原GetFileProxyAsync保持叶文件名/独立临时实体生命周期适配；只提取已支持归档文件项，链接及归档目录待迁"
     }
   ],
   "rule_references": [

@@ -16,7 +16,7 @@ public sealed class MacFileClipboard : IFileClipboard
     public Task WriteAsync(FileClipboardContent content, CancellationToken token) => OnMainThreadAsync(() =>
     {
         var files = FileClipboardCodec.ValidatePaths(content.Files); var query = FileClipboardCodec.ValidatePaths(content.QueryPaths);
-        if (files.Length == 0) throw new NotSupportedException("本批只支持真实文件剪贴板。");
+        if (files.Length == 0 && query.Length == 0) throw new NotSupportedException("没有可复制的文件或原QueryPath。");
         var items = new List<NSPasteboardItem>();
         try
         {
@@ -26,6 +26,8 @@ public sealed class MacFileClipboard : IFileClipboard
                 using var url = NSUrl.FromFilename(path);
                 if (!item.SetStringForType(url.AbsoluteString!, FileUrlType)) throw new IOException("系统拒绝文件URL数据。");
             }
+            // ArchivePolicy.None 仍复制原QueryPath，原项目也允许没有FileDrop的剪贴板。
+            if (items.Count == 0) items.Add(new NSPasteboardItem());
             if (!items[0].SetStringForType(FileClipboardCodec.EncodeQueryPaths(query), FileClipboardCodec.QueryPathsType)) throw new IOException("系统拒绝原QueryPath数据。");
             if (content.Text is { } text && !items[0].SetStringForType(text, TextType)) throw new IOException("系统拒绝路径文本。");
             token.ThrowIfCancellationRequested();

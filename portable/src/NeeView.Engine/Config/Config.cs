@@ -39,6 +39,8 @@ public sealed class SystemConfig
     public bool IsRemoveConfirmed { get; set; } = true;
     /// <summary>原文件复制附带文本策略；默认不把文件对象复制伪装成纯文本。</summary>
     public TextCopyPolicy TextCopyPolicy { get; set; }
+    /// <summary>原默认提取文件，保留 None/归档文件/虚拟路径/提取文件的数值。</summary>
+    public ArchivePolicy ArchiveCopyPolicy { get; set; } = ArchivePolicy.SendExtractFile;
     public DestinationFolderCollection DestinationFolderCollection { get; set; } = new();
     /// <summary>原拼写兼容仅用于读取；保存统一使用正确字段。</summary>
     [System.Text.Json.Serialization.JsonPropertyName("DestinationFodlerCollection"), System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]

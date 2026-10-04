@@ -20,6 +20,7 @@ public sealed partial class MacApp : Avalonia.Application
     // 启动装配持有唯一具体后端，向各业务分别注入文件与重命名能力契约。
     private FileOperationBackend? _fileOperations;
     private DestinationMoveService? _destinationMoves;
+    private ArchiveEntryRealizer? _entryRealizer;
     /// <summary>加载转换的原主题资源和原生应用菜单。</summary>
     public override void Initialize()
     {
@@ -42,7 +43,15 @@ public sealed partial class MacApp : Avalonia.Application
             {
                 e.Cancel = true;
                 if (_shuttingDown) return; _shuttingDown = true;
-                try { if (_window is not null) await _window.PrepareShutdownAsync(); desktop.Shutdown(); }
+                try
+                {
+                    if (_window is not null) await _window.PrepareShutdownAsync();
+                    // 初始化也属于进程生命周期；等待恢复操作结束，禁止退出后晚到创建后端/窗口。
+                    if (_openingWindow is { } opening) await opening;
+                    if (_window is not null) await _window.PrepareShutdownAsync();
+                    if (_entryRealizer is not null) await _entryRealizer.DisposeAsync();
+                    desktop.Shutdown();
+                }
                 catch (Exception ex) { _shuttingDown = false; System.Diagnostics.Trace.WriteLine(ex); }
             };
             _ = StartAsync();
@@ -50,10 +59,12 @@ public sealed partial class MacApp : Avalonia.Application
         if (TryGetFeature(typeof(IActivatableLifetime)) is IActivatableLifetime activation)
             activation.Activated += async (_, e) =>
             {
+                if (_shuttingDown) return;
                 // Finder 明确打开优先于启动默认恢复，即使激活先于窗口初始化完成。
                 if (e is FileActivatedEventArgs) _explicitOpen = true;
                 // 关闭窗口后的 Dock/Finder 重开恢复旧书；明确打开文件仍由下面的新请求决定。
                 await OpenWindowAsync(e is not FileActivatedEventArgs);
+                if (_shuttingDown) return;
                 if (e is FileActivatedEventArgs files)
                 {
                     foreach (var file in files.Files) if (file.TryGetLocalPath() is { } path && _window is not null) await _window.OpenAsync(path);
@@ -66,13 +77,14 @@ public sealed partial class MacApp : Avalonia.Application
     private async Task StartAsync()
     {
         await OpenWindowAsync(false);
-        if (_window is null) return;
+        if (_window is null || _shuttingDown) return;
         if (InitialPaths.FirstOrDefault() is { } path) await _window.OpenAsync(path);
         else if (!_explicitOpen) await _window.RestoreLastAsync();
     }
     /// <summary>重用进行中的初始化，单窗口入口不增加第二个 Host。</summary>
     public Task OpenWindowAsync(bool restore = true)
     {
+        if (_shuttingDown) return Task.CompletedTask;
         if (_window is not null) { _window.Activate(); return Task.CompletedTask; }
         return _openingWindow ??= CreateWindowAsync(restore);
     }
@@ -85,13 +97,16 @@ public sealed partial class MacApp : Avalonia.Application
         {
             var directory = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile), "Library", "Application Support", "NeeView.Mac");
             var state = new SaveData(directory, Backends.ArchiveFactory.TemporaryDirectory); await state.LoadAsync();
-            var decoder = new MagickImageDecoder(); var operation = new BookOperation(new Backends.ArchiveFactory(), decoder, state);
+            if (_shuttingDown) return;
             IReadOnlyList<string> recovery = [];
             if (_fileOperations is null) { _fileOperations = new FileOperationBackend(Path.Combine(directory, "FileRecovery")); recovery = await _fileOperations.RecoverAsync(); }
             recovery = recovery.Concat(await state.RecoverBookRenameAsync(_fileOperations)).ToArray();
+            if (_shuttingDown) return;
+            var decoder = new MagickImageDecoder(); var operation = new BookOperation(new Backends.ArchiveFactory(), decoder, state);
             _destinationMoves ??= new(_fileOperations);
             var images = new BitmapFactory(decoder); operation.AttachFileOperations(_destinationMoves, _fileOperations, images);
             operation.AttachFileClipboard(new MacFileClipboard());
+            _entryRealizer ??= new ArchiveEntryRealizer(); operation.AttachArchiveEntryRealizer(_entryRealizer);
             var model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state);
             _window = new MainWindow(); _window.Bind(model, images, new MacPlatformService());
             _window.AttachPlatformInput(new MacTrackpadInput());
@@ -103,7 +118,8 @@ public sealed partial class MacApp : Avalonia.Application
         catch (Exception ex)
         {
             System.Diagnostics.Trace.WriteLine(ex);
-            new Window { Title = "NeeView 启动失败", Width = 600, Height = 240, Content = new TextBlock { Text = "无法加载状态，原文件保持不变。\n" + ex.Message, TextWrapping = Avalonia.Media.TextWrapping.Wrap, Margin = new Thickness(24) } }.Show();
+            if (!_shuttingDown)
+                new Window { Title = "NeeView 启动失败", Width = 600, Height = 240, Content = new TextBlock { Text = "无法加载状态，原文件保持不变。\n" + ex.Message, TextWrapping = Avalonia.Media.TextWrapping.Wrap, Margin = new Thickness(24) } }.Show();
         }
         finally { _openingWindow = null; }
     }

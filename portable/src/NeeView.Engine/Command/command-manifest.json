@@ -71,7 +71,7 @@
     "Text": "复制文件",
     "Shortcut": "Ctrl+C",
     "Source": "NeeView/Command/Commands/CopyFileCommand.cs",
-    "Stage": "P4 普通目录实体/原页组复制到系统剪贴板；归档实体化待迁",
+    "Stage": "P4 原页组/普通实体及归档四策略剪贴板复制；目录提取/链接待迁",
     "MenuText": "复制(C)",
     "MouseGesture": ""
   },
@@ -98,7 +98,7 @@
     "Text": "复制到文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/CopyToFolderAsCommand.cs",
-    "Stage": "P4 普通目录固定复制/多页；归档实体化待后续",
+    "Stage": "P4 原页组固定复制/归档LimitedRealization；整目录复制待后续",
     "MenuText": "复制到文件夹(Y)",
     "MouseGesture": ""
   },

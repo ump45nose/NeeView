@@ -45,5 +45,8 @@ public sealed class ArchiveEntry(Archive archive)
     public bool IsImage() => !IsDirectory && ImageFormats.IsImage(EntryName);
     /// <summary>原书籍候选：目录或已接入的压缩格式。</summary>
     public bool IsBook() => IsDirectory || ArchiveFormats.IsArchive(EntryName);
+    /// <summary>当前可实体化的文件；归档内目录提取和链接复制继续保留明确能力限制。</summary>
+    /// <returns>普通文件或已支持归档文件项为 true。</returns>
+    public bool CanRealize() => !IsDirectory && !IsShortcut && !Archive.IsDisposed;
     public override string ToString() => EntryName;
 }

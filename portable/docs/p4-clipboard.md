@@ -23,9 +23,9 @@
 
 ## 业务规则与兼容范围
 
-CopyFile 复用唯一 `CollectFileActionPages` 的 Once、All、AllLeftToRight、原阅读方向和分割页去重；瀑布须明确选中图片，不将滚动可见集合当作文件目标。本批允许普通目录真实项，缺失或链接不写入剪贴板；归档内部条目实体化仍待迁。CopyBook 使用整个实体目录或根归档，不读取 CopyFile 参数，单图定位打开仍复制所在书籍目录。
+CopyFile 复用唯一 `CollectFileActionPages` 的 Once、All、AllLeftToRight、原阅读方向和分割页去重；瀑布须明确选中图片，不将滚动可见集合当作文件目标。第五批允许普通目录真实项；归档文件实体化已由第六批接入，见[p4-realization.md](p4-realization.md)。缺失或链接不写入剪贴板。CopyBook 使用整个实体目录或根归档，不读取 CopyFile 参数，单图定位打开仍复制所在书籍目录。
 
-原 `TextCopyPolicy` 的 None=0、CopyFilePath=1、OriginalPath=2 保持，默认 None。本批均为真实实体路径，后两项文本相同；未来实体化时需区分原逻辑地址和实体输出。设置表单只编辑草稿，参数沿 `CopyFile.MultiPagePolicy` 保存在原 Commands 差分，最终进入唯一 ApplyOptions 保存/回滚；未知配置及弃用参数字段继续保留。
+原 `TextCopyPolicy` 的 None=0、CopyFilePath=1、OriginalPath=2 保持，默认 None。第五批均为真实实体路径，后两项文本相同；第六批核对原ClipboardUtility实际OriginalPath行为后仍保留实体输出，QueryPath与文件输出独立。设置表单只编辑草稿，参数沿 `CopyFile.MultiPagePolicy` 保存在原 Commands 差分，最终进入唯一 ApplyOptions 保存/回滚；未知配置及弃用参数字段继续保留。
 
 **Paste 是加载剪贴板内容。** QueryPath 优先于系统文件地址，单图片、目录或归档进入原 `OpenCoreAsync`，打开失败保留可用书籍。多个项目需要原临时播放列表来源，本批明确拒绝且不打开任何项；不静默选择第一或最后项。文本、位图、FileContents 和其他原接收类型继续待迁，不把路径文本冒充文件对象。
 
@@ -37,4 +37,4 @@ CopyFile 复用唯一 `CollectFileActionPages` 的 Once、All、AllLeftToRight�
 
 `FileClipboardTests` 使用自建 PNG/ZIP/Profile 与 fake IFileClipboard，覆盖两方向三策略、分割页/瀑布选择、根书籍、文本数值、缺失/链接、失败/取消/晚取消、切书、导航锁等待/关闭、关闭失败重试、单来源/QueryPath 优先、多项拒绝、过期读取、URI/JSON 限额、正式菜单/输入/参数/保存事务。真实系统剪贴板不读写；AppKit API 通过正式 macOS 构建核验，Finder 互操作及真实剪贴板仍随 P3/P4 集中设备验收。
 
-后续沿现有原归档与加载链迁入实体化复制、临时多文件播放列表和其他 Paste 类型；本批不证明 P4 全部完成或设备封板。触控板跳过、多屏无环境，签名公证/发布仍为 P5。
+第六批已沿原归档链迁入文件实体化复制；后续继续临时多文件播放列表和其他 Paste 类型；本批不证明 P4 全部完成或设备封板。触控板跳过、多屏无环境，签名公证/发布仍为 P5。

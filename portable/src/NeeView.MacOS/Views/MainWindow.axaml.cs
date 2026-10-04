@@ -854,6 +854,7 @@ public sealed partial class MainWindow : Window
         await Task.Yield();
         _preparing = true;
         _model?.Operation.CancelClipboardPreparation();
+        _model?.Operation.CancelFileCopyPreparation();
         _sidePanels?.PrepareClose();
         _pageEndDialog?.Close(PageEndAction.None);
         try

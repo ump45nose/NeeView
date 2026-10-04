@@ -25,11 +25,18 @@ public sealed class DestinationMoveService(IFileOperationBackend backend)
     /// <param name="requests">已经捕获和核对的真实图片目标，不能在翻页后重新采集。</param>
     /// <param name="token">取消阻止后续项；提交过的项仍返回给阅读控制协调。</param>
     /// <returns>按实际成功顺序排列的结果；失败或取消不会丢失先前已提交项。</returns>
-    public async Task<IReadOnlyList<FileTransferResult>> TransferManyAsync(IReadOnlyList<FileTransferRequest> requests, CancellationToken token = default)
+    public Task<IReadOnlyList<FileTransferResult>> TransferManyAsync(IReadOnlyList<FileTransferRequest> requests, CancellationToken token = default)
+        => TransferManyAsync(_ => Task.FromResult(requests), token);
+
+    /// <summary>归档实体化准备也独占原忙碌锁；准备失败不能执行部分路径或改变历史。</summary>
+    /// <param name="prepare">捕获整组并生成真实请求，执行期间不允许另一文件动作插入。</param>
+    /// <param name="token">准备及实体提交前取消。</param><returns>真实成功项的原有顺序。</returns>
+    public async Task<IReadOnlyList<FileTransferResult>> TransferManyAsync(Func<CancellationToken, Task<IReadOnlyList<FileTransferRequest>>> prepare, CancellationToken token = default)
     {
         var results = new List<FileTransferResult>();
         await RunAsync(async () =>
         {
+            var requests = await prepare(token);
             foreach (var request in requests)
             {
                 token.ThrowIfCancellationRequested();

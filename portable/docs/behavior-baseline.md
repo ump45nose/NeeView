@@ -74,3 +74,5 @@ P4第三批：原DeleteFile无MultiPagePolicy，仅CurrentPage；IsFileWriteAcce
 P4第四批：原RenameBookCommand/BookControl.RenameBook/FileIO.RenameAsync/RestoreBook的实体范围、写权限、编号名称、扩展名确认与失败重试迁入；单图打开仍改所在书籍目录。原BookMementoTools.RenameRecursive、QuickAccess/FolderConfig/Playlist明确路径联动保持未知字段与节点身份，不猜测替换未知字符串。Windows Shell改为同目录无覆盖后端，记录支持部分保存/启动恢复；原重新加载首半页和较新请求优先保留。45项专项覆盖真实临时文件、两处导航锁关闭取消、损坏记录与其他列表失败恢复；Mac/Windows动态另验，见[p4-rename.md](p4-rename.md)。
 
 P4第五批：原CopyFile按CollectPages/Once/All/AllLeftToRight选序与分割去重；CopyBook复制实体书籍目录/根归档，二者不写源文件或移动历史、不要求源修改开关。原TextCopyPolicy数值/默认None、QueryPath优先和Paste=加载保持，单来源进入唯一OpenCore。Mac标准fileURL与私有有限JSON替换原FileDrop；多项输入不静默删项。CutFile/CutBook按用户决定禁用，归档实体化/临时多文件播放列表/位图与FileContents另列待迁；静默测试不证明真实NSPasteboard/Finder互操作，见[p4-clipboard.md](p4-clipboard.md)。
+
+P4第六批：原ArchivePolicy.None/SendArchiveFile/SendArchivePath/SendExtractFile数值及默认、LimitedRealization和RealizeArchiveEntry保序/Distinct接入；None仍输出QueryPath，固定复制虚拟策略改为提取。原ClipboardUtility的OriginalPath实际再次调用同一提取策略，故保留输出实体路径，未按选项名称重解释。文件名仅取叶名称，逻辑Page/QueryPath保持原所属来源；成功剪贴板资源跨切书/关窗保留，真Finder另验，见[p4-realization.md](p4-realization.md)。

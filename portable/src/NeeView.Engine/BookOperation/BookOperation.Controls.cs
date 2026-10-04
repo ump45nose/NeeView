@@ -13,6 +13,7 @@ public sealed partial class BookOperation
     {
         if (_disposed || _closing || IsUsingClipboard || _renameCommitting) return;
         IsBookLocked = false; var generation = Interlocked.Increment(ref _generation); _opening?.Cancel(); _saving?.Cancel();
+        CancelFileCopyPreparation();
         await _gate.WaitAsync(token);
         try
         {

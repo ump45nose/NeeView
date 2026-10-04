@@ -8,10 +8,10 @@ P4沿原fork分类与原BookPageActionControl/BookControl迁入，不增加数�
 | 数字1–9/Index改绑/移动复制/固定MoveToFolderAs | 第一批Once接入 | 真实临时文件/默认绑定/文本隔离；Windows分类样本另验 |
 | 移动UndoRedo/容量/覆盖/恢复记录 | 第一批接入 | 真实同卷夹具/中断/外部变化/切书和退出；真跨卷/NAS/权限待集中验 |
 | 多页All/AllLeftToRight | 第二批普通目录接入 | 原当前页组/两方向/实际顺序/部分失败与晚取消；Windows动态另验 |
-| CopyToFolderAs固定复制 | 第二批普通目录接入 | 三策略/Index/不随面板模式/复制不入历史；归档实体化及书籍项待后续 |
+| CopyToFolderAs固定复制 | 第二批普通目录、第六批归档文件接入 | 三策略/Index/不随面板模式/LimitedRealization/复制不入历史；整目录与书籍菜单待后续 |
 | DeleteFile/系统废纸篓 | 第三批当前普通图片接入 | 原单主页/确认/失败保留/搜索/晚取消/关闭与缓存；AppKit真机另验，归档/链接/列表多选仍待迁 |
 | RenameBook及定位联动 | 第四批目录/根归档接入 | 原名称编号/扩展名/重试、阅读恢复及JSON/书签/QuickAccess/目录/列表明确路径；真实权限/NAS/Windows动态另验 |
-| CopyFile/CopyBook/Paste | 第五批实体及单来源接入 | 原三页组策略/文本/标准文件URL/QueryPath、切书关闭及静默表单；真实Finder互操作另验，归档实体化/多文件/位图待迁 |
+| CopyFile/CopyBook/Paste | 第五批实体及单来源、第六批归档四策略接入 | 原页组/文本/标准URL/QueryPath、进程级临时租约/切书关闭及静默表单；真实Finder互操作另验，多文件/位图/目录提取待迁 |
 | CutFile/CutBook | 用户决定继续禁用占位 | 移动继续使用既有分类/移至文件夹，不伪造Windows剪切标记 |
 | 其他基础书籍文件菜单 | 待后续批次 | 原范围/来源能力，不能由分类复制替代 |
 | 原Finder定位 | 已有桥接，设备待验 | 当前页面/当前书籍实际定位及失败 |
@@ -25,4 +25,4 @@ P4沿原fork分类与原BookPageActionControl/BookControl迁入，不增加数�
 - 真跨卷及已挂载NAS中断/权限/恢复材料。前台测试集中约定时段，不在开发途中抢焦点。
 - 触控板用户要求跳过；多屏无环境。签名公证/分发安装属于P5，不由ad-hoc构建继承。
 
-前五批开发增量不等同P4开发完成或P3/P4设备封板；契约见[p4-multipage.md](p4-multipage.md)、[p4-delete.md](p4-delete.md)、[p4-rename.md](p4-rename.md)与[p4-clipboard.md](p4-clipboard.md)，继续归档实体化剪贴板/固定复制、多文件播放列表/其他Paste内容、基础书籍文件菜单及其他删除类型。
+前六批开发增量不等同P4开发完成或P3/P4设备封板；契约见[p4-multipage.md](p4-multipage.md)、[p4-delete.md](p4-delete.md)、[p4-rename.md](p4-rename.md)与[p4-clipboard.md](p4-clipboard.md)，归档文件实体化剪贴板/固定复制已接入；继续多文件播放列表/其他Paste内容、基础书籍文件菜单及其他删除类型。

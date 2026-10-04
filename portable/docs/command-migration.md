@@ -1,10 +1,10 @@
 # 完整命令迁移表
 
-固定基线235个原命令实例全部保留。P4第五批为 **162个执行入口接入、73个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
+固定基线235个原命令实例全部保留。P4第六批为 **162个执行入口接入、73个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
 
 原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。实际键位/手势按原A/B/C、阅读方向和用户差分计算。
 
-对照[当前运行导出](../acceptance/p4-clipboard-commands.json)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider与ToggleHidePageSlider语义独立，前者仍占位；ToggleVisibleAddressBar入口仍占位。参数拥有者映射不等于执行能力；P4分类/P5高级能力继续逐项迁移。
+对照[当前运行导出](../acceptance/p4-realization-commands.json)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider与ToggleHidePageSlider语义独立，前者仍占位；ToggleVisibleAddressBar入口仍占位。参数拥有者映射不等于执行能力；P4分类/P5高级能力继续逐项迁移。
 
 | 原命令 | 文案 | 默认输入 | 默认方向手势 | 执行入口 | 迁移说明 | 原出处 |
 |---|---|---|---|---|---|---|
@@ -16,10 +16,10 @@
 | OpenExternalApp | 在外部应用中打开 (简单) |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenExternalAppCommand.cs |
 | OpenExternalAppAs | 在外部应用中打开 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenExternalAppAsCommand.cs |
 | CutFile | 剪切文件 | Ctrl+X |  | 占位 | 用户选择暂保留禁用；移动使用分类/移至文件夹 | NeeView/Command/Commands/CutFileCommand.cs |
-| CopyFile | 复制文件 | Ctrl+C |  | 已接入 | P4 普通目录实体/原页组复制到系统剪贴板；归档实体化待迁 | NeeView/Command/Commands/CopyFileCommand.cs |
+| CopyFile | 复制文件 | Ctrl+C |  | 已接入 | P4 原页组/普通实体及归档四策略剪贴板复制；目录提取/链接待迁 | NeeView/Command/Commands/CopyFileCommand.cs |
 | CopyImage | 复制图像 | Ctrl+Shift+C |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/CopyImageCommand.cs |
 | Paste | 粘贴 | Ctrl+V |  | 已接入 | P4 单文件URL/原QueryPath加载；多文件/位图待迁 | NeeView/Command/Commands/PasteCommand.cs |
-| CopyToFolderAs | 复制到文件夹 |  |  | 已接入 | P4 普通目录固定复制/多页；归档实体化待后续 | NeeView/Command/Commands/CopyToFolderAsCommand.cs |
+| CopyToFolderAs | 复制到文件夹 |  |  | 已接入 | P4 原页组固定复制/归档LimitedRealization；整目录复制待后续 | NeeView/Command/Commands/CopyToFolderAsCommand.cs |
 | MoveToFolderAs | 移动到文件夹 |  |  | 已接入 | P4 普通目录分类/原多页策略 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
 | MoveToDestinationFolder1 | 移动到文件夹 1 | 1 |  | 已接入 | P4 普通目录分类/原多页策略 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
 | MoveToDestinationFolder2 | 移动到文件夹 2 | 2 |  | 已接入 | P4 普通目录分类/原多页策略 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
