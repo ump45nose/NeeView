@@ -18,7 +18,7 @@
 | 两区分类和移动历史 | SidePanels/DestinationFolder、DestinationFolder/DestinationMoveService.cs | 完整目标登记；待P4，不能继承旧测试通过状态 |
 | 原窗口/九面板/设置 | MainWindow.xaml、SidePanelFrameView.xaml、Options | 布局壳及核心面板转换；见layout-migration.md，Windows截图待验证 |
 | RAR/7z | 原Archive/阅读链 | 原来源关系下替换 SharpCompress，普通及固实夹具接入；密码/分卷/嵌套待迁移 |
-| 连续、瀑布流 | 原阅读链 | 待 P3 |
+| 连续、瀑布流 | 原阅读链与Mac展示扩展 | P3第一批纵向逐图/最短列、可见需求及原Page锚点；原帧级全景待迁，见p3-browse.md |
 | 完整默认菜单 | Menu/MenuTree.cs:CreateDefault、MenuNode.cs、MenuElementType.cs | 原八组树逐项迁入；未迁移节点禁用占位，原语言资源解析文案 |
 | 胶片条/导航器 | Config/FilmStripConfig.cs、PageSelect/FilmStrip、SidePanels/Navigate | 原选择/方向/首尾居中及可见需求算法，200ms防抖、三滚轮/确认、元数据详情与配置接入；原全局播放列表标记与覆盖自动隐藏接入 |
 | 滑条联动与设置 | PageSelect/PageSlider/PageSlider.cs、PageSliderView.xaml.cs、Config/SliderConfig.cs | 原共享选择、方向/静态双页/同步步长及拖动预览释放确认；原显隐/位置/厚度/透明度/滚轮字段接入，外观独立；原五区自动隐藏/窗口显示命令接入 |

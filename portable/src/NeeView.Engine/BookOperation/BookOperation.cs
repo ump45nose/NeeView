@@ -77,7 +77,9 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             collection = new(source, archives, setting.IsRecursiveFolder);
             var pages = await BookSourceFactory.CreatePageCollectionAsync(collection, Config.Current.System.BookPageCollectMode, archives, opening.Token, saveData.FolderConfigs);
             var book = new Book(source, pages, setting) { Entries = collection, IsNew = restored is null };
-            book.SortSeed = restored?.SortSeed ?? 0; book.Sort(opening.Token);
+            book.SortSeed = restored?.SortSeed ?? 0;
+            // 索引完成后的自然排序可能包含万条目，未提交书籍在后台排序，UI继续可操作。
+            await Task.Run(() => book.Sort(opening.Token), opening.Token);
             var explicitEntry = entryName ?? source.RequestedEntryName;
             var requested = explicitEntry ?? (ImageFormats.IsImage(path) ? System.IO.Path.GetFileName(path) : setting.Page);
             int index = book.Pages.FindIndex(e => e.EntryName == requested);
@@ -336,7 +338,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>原页面历史只登记当前真实显示帧中索引最小的页，空内容使用空记录。</summary>
     private void RecordPageHistory()
     {
-        var page = Frame?.Elements.Where(e => !e.IsDummy).Select(e => e.Page).MinBy(p => p.Index);
+        var page = BrowseMode == BrowseLayoutMode.Paged ? Frame?.Elements.Where(e => !e.IsDummy).Select(e => e.Page).MinBy(p => p.Index) : Book?.CurrentPage;
         PageHistory.Add(page is null || Book is null ? PageHistoryUnit.Empty : new(Book.Path, page.EntryName));
     }
 
@@ -437,10 +439,11 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         Frame = new PageFrameFactory(Context, new BookContext(Book.Pages), new ContentSizeCalculator(Context)).CreatePageFrame(Position, direction);
         // 原 BookContext.SelectedRange.CollectPositions 按索引升序；主图片不随视觉左右或反向生成改变。
         var oldPage = Book.CurrentPage;
-        Book.CurrentPage = Frame?.Elements.Where(e => !e.IsDummy).Select(e => e.Page).MinBy(page => page.Index);
+        // 全景速览以实际滚动/点击的原Page为锚点；分页仍按原SelectedRange选主图片。
+        Book.CurrentPage = BrowseMode == BrowseLayoutMode.Paged ? Frame?.Elements.Where(e => !e.IsDummy).Select(e => e.Page).MinBy(page => page.Index) : page;
         // 原SetStartPage发生在登记控制订阅前；首帧不算一次浏览操作。
         if (oldPage is not null && !ReferenceEquals(oldPage, Book.CurrentPage)) Book.MementoControl.OnTopPageChanged();
-        if (synchronizeSelection) PageSelector.Synchronize(Book, Math.Max(0, Frame?.FrameRange.Min.Index ?? 0));
+        if (synchronizeSelection) PageSelector.Synchronize(Book, BrowseMode == BrowseLayoutMode.Paged ? Math.Max(0, Frame?.FrameRange.Min.Index ?? 0) : page.Index);
     }
     /// <summary>只探测当前及生成双页所需邻页，损坏页保留占位。</summary>
     private async Task ProbeAroundAsync(Book book, int index, CancellationToken token)

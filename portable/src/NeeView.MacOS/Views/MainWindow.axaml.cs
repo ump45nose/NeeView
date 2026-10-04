@@ -49,6 +49,14 @@ public sealed partial class MainWindow : Window
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
         "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkList", "FocusBookmarkSearchBox", "ClearHistory", "ClearHistoryInPlace", "RemoveUnlinkedHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
     };
+    // 浏览增量仅支持整体缩放/平移；分页特有旋转/翻转/适配明确禁用，不能用空执行冒充支持。
+    private static readonly HashSet<string> PagedTransformCommands = new(StringComparer.Ordinal)
+    {
+        "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ViewReset",
+        "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff", "ToggleViewFlipVertical", "ViewFlipVerticalOn", "ViewFlipVerticalOff",
+        "SetStretchModeUniform", "SetStretchModeNone", "ToggleStretchMode", "ToggleStretchModeReverse", "SetStretchModeUniformToFill",
+        "SetStretchModeUniformToSize", "SetStretchModeUniformToVertical", "SetStretchModeUniformToHorizontal", "ToggleStretchAllowScaleUp", "ToggleStretchAllowScaleDown", "ToggleHoverScroll"
+    };
     /// <summary>由启动层接入原生事件；只消费主查看器区域，其余控件使用框架输入。</summary>
     public void AttachPlatformInput(IPlatformInput input)
     {
@@ -166,6 +174,7 @@ public sealed partial class MainWindow : Window
     /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
     public bool IsCommandAvailable(string name) => name switch
     {
+        var command when PagedTransformCommands.Contains(command) && _model?.Operation.BrowseMode != BrowseLayoutMode.Paged => false,
         "Unload" => _model?.Operation.CanUnload == true,
         "MoveToParentBook" => _model?.Operation.CanMoveToParentBook == true,
         "MoveToChildBook" => _model?.Operation.CanMoveToChildBook == true,
@@ -195,6 +204,7 @@ public sealed partial class MainWindow : Window
     private bool? GetCommandCheck(string name) => name switch
     {
         "ToggleBookLock" => _model?.Operation.IsBookLocked,
+        "ToggleIsPanorama" => Config.Current.Book.IsPanorama,
         "SetPageOrientationHorizontal" => Config.Current.Book.Orientation == PageFrameOrientation.Horizontal,
         "SetPageOrientationVertical" => Config.Current.Book.Orientation == PageFrameOrientation.Vertical,
         var command when CommandTable.BookOrderCommands.TryGetValue(command, out var order) => _model?.Operation.Bookshelf.FolderOrder == order,
@@ -295,6 +305,8 @@ public sealed partial class MainWindow : Window
     public async Task ExecuteAsync(string name, bool fromMenu = false)
     {
         if (_model is null || _preparing || _closedPrepared) return;
+        if (PagedTransformCommands.Contains(name) && _model.Operation.BrowseMode != BrowseLayoutMode.Paged)
+        { ShowError("当前展示方式暂不支持此变换，切回分页可使用。"); return; }
         try
         {
             switch (name)
@@ -472,6 +484,13 @@ public sealed partial class MainWindow : Window
     private void Panel_Click(object? sender, RoutedEventArgs e) { if (sender is Control { Tag: string name }) _model?.SelectPanel(name); }
     /// <summary>地址栏回车打开，文本编辑不触发阅读键位。</summary>
     private async void Address_KeyDown(object? sender, KeyEventArgs e) { if (e.Key == Key.Enter && _model is not null) { e.Handled = true; await OpenAsync(_model.Address); } }
+    /// <summary>展示选择转交同一BookOperation；失败回显已提交配置，不维护第二个模式状态。</summary>
+    private async void BrowseMode_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_preparing || _model is null || sender is not ComboBox { SelectedItem: ViewModels.BrowseModeChoice choice } || choice.Mode == _model.Operation.BrowseMode) return;
+        try { await _model.Operation.SetBrowseModeAsync(choice.Mode); }
+        catch (Exception ex) { _model.Refresh(); ShowError(ex.Message); }
+    }
     /// <summary>用户选中列表条目后按原索引定位，绑定回报不重复导航。</summary>
     private async void Page_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {

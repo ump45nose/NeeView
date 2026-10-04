@@ -171,6 +171,8 @@ public sealed class HistoryRetentionTests
             draft = (HistorySettingsViewModel)settings.FindControl<ScrollViewer>("HistorySettings")!.DataContext!;
             settings.FindControl<ComboBox>("HistoryLimitSize")!.SelectedItem = draft.SizeChoices.Single(e => e.Value == 0);
             settings.FindControl<ComboBox>("HistoryLimitSpan")!.SelectedItem = draft.SpanChoices.Single(e => e.Value == TimeSpan.FromDays(7));
+            // 等待已进入的阅读保存事务清理临时文件，再注入故障；不能与真实异步写入竞争同名路径。
+            await state.SynchronizeWritesAsync();
             var blocked = Path.Combine(fixture.State, "UserSetting.json.tmp"); Directory.CreateDirectory(blocked);
             try
             {

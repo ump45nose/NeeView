@@ -1310,6 +1310,12 @@
       "target": "src/NeeView.Engine/PageFrames/PageFrameContainerLayout.cs",
       "sha256": "52a81bdcb9f2837cdd3d3ec4bdc8f44ac5b06f7f5a4358927b5c1f9a53b6a803",
       "status": "原Layout方向/间距/位置分支迁入； linked容器/250ms几何宿主由表现快照替换"
+    },
+    {
+      "source": "NeeView/Config/BookConfig.cs",
+      "target": "src/NeeView.Engine/Config/Config.cs",
+      "sha256": "38a2573ffa5388f3939ae39ac6f5fa1dce3b307fe27a1f4f5d2a31fbd13341f6",
+      "status": "P3原IsPanorama开关；MacPanoramaLayout/列宽/连续缩放为展示扩展，原帧级全景待迁"
     }
   ],
   "rule_references": [
@@ -1670,6 +1676,20 @@
           "status": "移除未用诊断引用和xUnit v2命名空间，保留7项原测试算法"
         }
       ]
+    }
+  ],
+  "mac_extensions": [
+    {
+      "target": "src/NeeView.Engine/PageFrames/BrowseLayout.cs",
+      "status": "P3纵向连续/最短列瀑布及可见查询；独立几何，非原PageFrameBox全景等价实现"
+    },
+    {
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Browse.cs",
+      "status": "原BookOperation/JSON内的模式、按需尺寸及锚点适配"
+    },
+    {
+      "target": "src/NeeView.MacOS/Views/ReaderBrowsePresenter.cs",
+      "status": "唯一ReaderView的可见需求、显示租约及浏览表现；复用原Page/缓存"
     }
   ]
 }

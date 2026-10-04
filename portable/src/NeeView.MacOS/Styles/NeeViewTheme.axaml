@@ -12,6 +12,11 @@
       <SolidColorBrush x:Key="ArchivePage.Background" Color="#EEE" />
       <SolidColorBrush x:Key="ArchivePage.Foreground" Color="#222" />
       <SolidColorBrush x:Key="ArchivePage.CoverBorder" Color="LightGray" />
+      <SolidColorBrush x:Key="Gallery.Background" Color="#121212" />
+      <SolidColorBrush x:Key="Gallery.Placeholder" Color="#262626" />
+      <SolidColorBrush x:Key="Gallery.Selection" Color="#5CACEB" />
+      <SolidColorBrush x:Key="Gallery.Scrollbar" Color="#888" />
+      <SolidColorBrush x:Key="Gallery.Text" Color="#DDD" />
     </ResourceDictionary>
   </Styles.Resources>
   <!-- 保留原区域颜色和 41/36 DIP 图标栏尺寸；视觉调整集中在本文件。 -->

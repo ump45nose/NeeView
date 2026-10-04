@@ -110,3 +110,5 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 第二十四批接入原Scroll/Fade方向/时长与Hover/连续滚轮，单个退出帧共用现有显示租约，插值仅归表现，见[p2-animation.md](p2-animation.md)。
 
 第二十五批完成预算内免排序和同规格显示缓冲复用、原无效历史清理入口、正反向单双页切换及共享循环参数，固定夹具测量与 P2 收尾证据见[p2-resources.md](p2-resources.md)。没有增加第二工厂、状态模型或长期 Preview 路线。
+
+P3第一批接入[连续/瀑布速览](p3-browse.md)：唯一ReaderView与原Book/Page/BitmapFactory/JSON共享，布局/可见资源由独立表现辅助管理。原分页不改为新内核；纵向逐图是Mac扩展，原水平/双页帧级全景、目录树及逐页缩略/大目录优化仍待迁。P3在开发，入口登记当前139/96，数量不代表完整覆盖。

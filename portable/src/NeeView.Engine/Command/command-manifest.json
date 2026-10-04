@@ -1407,7 +1407,7 @@
     "Text": "全景模式",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsPanoramaCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P3纵向浏览开关接入；原帧级全景完整规则待迁",
     "MouseGesture": ""
   },
   {

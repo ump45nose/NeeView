@@ -44,6 +44,12 @@ public sealed class ReaderView : Control, IDisposable
     private readonly Dictionary<Page, string> _pageErrors = [];
     private BookOperation? _operation;
     private CoreBitmapFactory? _factory;
+    private ReaderBrowsePresenter? _browse;
+    private bool IsBrowsing => _operation is not null && _operation.BrowseMode != BrowseLayoutMode.Paged;
+    internal BrowseLayout? BrowseLayout => _browse?.Layout;
+    internal double BrowseOffset => _browse?.Offset ?? 0;
+    internal Page? BrowseSelection => _browse?.SelectedPage;
+    internal int BrowsePendingCount => _browse?.PendingCount ?? 0;
     private CancellationTokenSource? _request;
     private int _revision;
     private PageFrames.PageFrame? _frame;
@@ -79,13 +85,14 @@ public sealed class ReaderView : Control, IDisposable
     public Func<string, bool>? TryGestureRequested { get; set; }
     public event EventHandler<Page>? ChildBookRequested;
     public event EventHandler? DisplayCompleted;
-    public int DisplayCount => _images.Count;
+    public int DisplayCount => IsBrowsing ? _browse?.DisplayCount ?? 0 : _images.Count;
     /// <summary>资源测量计数，仅观察成功创建的显示缓冲，不作为页面完成事件。</summary>
     internal int BitmapCreationCount { get; private set; }
     /// <summary>写出正式窗口的设备比例和实际绘制几何；不触发布局、刷新或读取内容。</summary>
     /// <param name="writer">宿主拥有的诊断JSON输出；显式写值兼容正式裁剪构建。</param>
     internal void WriteDiagnostics(System.Text.Json.Utf8JsonWriter writer)
     {
+        if (IsBrowsing && _browse is not null) { _browse.WriteDiagnostics(writer); return; }
         var top = TopLevel.GetTopLevel(this); var matrix = GetRenderedMatrix();
         var origin = top is null ? (Point?)null : this.TranslatePoint(default, top);
         writer.WriteStartObject(); writer.WriteNumber("Revision", _revision);
@@ -132,12 +139,21 @@ public sealed class ReaderView : Control, IDisposable
     public void Attach(BookOperation operation, CoreBitmapFactory factory)
     {
         _operation = operation; _factory = factory; Focusable = true;
-
+        _browse?.Dispose();
+        _browse = new(this, operation, factory, () => DisplayCompleted?.Invoke(this, EventArgs.Empty));
     }
     /// <summary>状态变化触发当前可见帧需求；版本隔离旧解码结果。</summary>
     public async Task RefreshAsync()
     {
         if (_disposed || _operation is null || _factory is null) return;
+        _browse?.Refresh();
+        if (IsBrowsing)
+        {
+            ++_revision; _request?.Cancel(); StopMotion();
+            foreach (var image in _images.Values) image.Dispose(); _images.Clear(); _pageErrors.Clear();
+            _operation.SetViewport(new CoreSize(Bounds.Width, Bounds.Height), TopLevel.GetTopLevel(this)?.RenderScaling ?? 1);
+            InvalidateVisual(); return;
+        }
         var revision = ++_revision; _request?.Cancel(); var request = new CancellationTokenSource(); _request = request;
         SynchronizeFrame(); _loadError = null;
         ClampPan();
@@ -244,6 +260,7 @@ public sealed class ReaderView : Control, IDisposable
     /// <summary>绘制原页框的方向、空白页、缩放与归一化裁剪区域。</summary>
     public override void Render(DrawingContext context)
     {
+        if (IsBrowsing && _browse is not null) { base.Render(context); _browse.Render(context); return; }
         base.Render(context); context.FillRectangle(Brushes.Black, new Avalonia.Rect(Bounds.Size));
         if (_frame is null)
         { DrawText(context, _operation?.Book is null ? "NeeView\n打开图片、目录或 ZIP / CBZ" : "这个来源没有可阅读的图片", new(30,30)); return; }
@@ -290,6 +307,7 @@ public sealed class ReaderView : Control, IDisposable
     /// <summary>围绕指针位置缩放，像素需求随缩放更新。</summary>
     public async Task ZoomAsync(double factor, Point? pointer = null)
     {
+        if (IsBrowsing && _browse is not null) { await _browse.ZoomAsync(factor); _browse.Refresh(); return; }
         StopMotion(); SynchronizeFrame();
         var origin = pointer ?? new Point(Bounds.Width / 2, Bounds.Height / 2);
         var old = _zoom; _zoom *= factor; var ratio = _zoom / old;
@@ -300,10 +318,11 @@ public sealed class ReaderView : Control, IDisposable
         await RefreshAsync();
     }
     /// <summary>重置手工缩放及平移，100% 由引擎 StretchMode.None 与设备比例决定。</summary>
-    public void ResetTransform() { StopMotion(); _transform.Reset(); AlignPageOrigin(_operation?.MoveDirection ?? 1); InvalidateVisual(); }
+    public void ResetTransform() { if (IsBrowsing) return; StopMotion(); _transform.Reset(); AlignPageOrigin(_operation?.MoveDirection ?? 1); InvalidateVisual(); }
     /// <summary>原缩放参数及中心补偿；BaseScale写回书籍，手工Scale只写变换图。</summary>
     public async Task ScaleAsync(int direction, ViewScaleCommandParameter parameter, bool baseScale = false)
     {
+        if (IsBrowsing && _operation is not null) { await ZoomAsync(ViewTransformMath.Scale(_operation.BrowseScale, direction, parameter) / _operation.BrowseScale); return; }
         SynchronizeFrame();
         if (_frame is null || _operation?.Book is not { } book) return;
         StopMotion();
@@ -322,6 +341,7 @@ public sealed class ReaderView : Control, IDisposable
     /// <summary>原角度步长/频率、中心补偿；可选Stretch不改变翻转及基准缩放。</summary>
     public async Task RotateAsync(int direction, ViewRotateCommandParameter parameter)
     {
+        if (IsBrowsing) return;
         SynchronizeFrame();
         if (_frame is null) return;
         StopMotion();
@@ -337,6 +357,7 @@ public sealed class ReaderView : Control, IDisposable
     /// <summary>原屏幕轴翻转：翻转角度及内容中心，使旋转后仍按水平/垂直轴工作。</summary>
     public void Flip(bool horizontal, bool state)
     {
+        if (IsBrowsing) return;
         if (_frame is null || (horizontal ? IsFlipHorizontal : IsFlipVertical) == state) return;
         StopMotion();
         var center = _transform.GetCenter(Config.Current.View.FlipCenter, _pointer);
@@ -347,10 +368,11 @@ public sealed class ReaderView : Control, IDisposable
     }
     /// <summary>原适配操作重新计算手工Scale，并回到配置页起点。</summary>
     public async Task StretchAsync()
-    { StopMotion(); _transform.Stretch(); AlignPageOrigin(_operation?.MoveDirection ?? 1); ClampPan(); await RefreshAsync(); }
+    { if (IsBrowsing && _operation is not null) { await ZoomAsync((_operation.BrowseMode == BrowseLayoutMode.Continuous ? 1 : 320) / _operation.BrowseScale); return; } StopMotion(); _transform.Stretch(); AlignPageOrigin(_operation?.MoveDirection ?? 1); ClampPan(); await RefreshAsync(); }
     /// <summary>原预置滚动，不经过翻页命令且可强制对齐小图。</summary>
     public void ScrollToPreset(ViewPresetScrollCommandParameter parameter)
     {
+        if (IsBrowsing && _browse is not null) { _browse.Navigate(new(0, parameter.Vertical == LimitedVerticalAlignment.Top ? 0 : parameter.Vertical == LimitedVerticalAlignment.Bottom ? 1 : .5)); return; }
         if (_frame is null || Config.Current.Mouse.IsHoverScroll) return;
         var from=_pan+_motion.GetPanOffset();
         var delta = new DragArea(new(0, 0, Bounds.Width, Bounds.Height), GetContentRect()).SnapAlignment(parameter.Horizontal, parameter.Vertical, parameter.IsSnap);
@@ -359,12 +381,13 @@ public sealed class ReaderView : Control, IDisposable
     /// <summary>原纯NType到终端不翻页；与滚动翻页共用同一限流算法。</summary>
     public void ScrollNType(int direction, ViewScrollNTypeCommandParameter parameter)
     {
+        if (IsBrowsing && _browse is not null) { _browse.Scroll(direction * Bounds.Height * parameter.Scroll); return; }
         if (_frame is null || Config.Current.Mouse.IsHoverScroll || _operation?.Context is not { } context) return;
         var result = _scrollControl.ScrollToNext(context, GetContentRect(), new(0, 0, Bounds.Width, Bounds.Height), direction, parameter);
         if (result is not null && !result.IsTerminated) { var from=_pan+_motion.GetPanOffset(); ApplyPan(new(result.Vector.X,result.Vector.Y)); AnimatePan(from,ScrollDuration); }
     }
     /// <summary>高精度滚动平移；分页导航由输入映射处理。</summary>
-    public void Pan(Avalonia.Vector delta) { StopMotion(); ApplyPan(delta); }
+    public void Pan(Avalonia.Vector delta) { if (IsBrowsing && _browse is not null) { _browse.Scroll(-delta.Y, -delta.X); return; } StopMotion(); ApplyPan(delta); }
     private void ApplyPan(Avalonia.Vector delta)
     {
         if (_frame is null) return;
@@ -380,6 +403,12 @@ public sealed class ReaderView : Control, IDisposable
     /// <summary>按原四向滚动先移动指定轴，到边界后按阅读方向尝试跨轴。</summary>
     public void ScrollView(string command, ViewScrollCommandParameter parameter)
     {
+        if (IsBrowsing && _browse is not null)
+        {
+            bool browseHorizontal = command is "ViewScrollLeft" or "ViewScrollRight";
+            double delta = (command is "ViewScrollLeft" or "ViewScrollUp" ? -1 : 1) * (browseHorizontal ? Bounds.Width : Bounds.Height) * parameter.Scroll;
+            _browse.Scroll(browseHorizontal ? 0 : delta, browseHorizontal ? delta : 0); return;
+        }
         if (_frame is null || Config.Current.Mouse.IsHoverScroll) return;
         var from=_pan+_motion.GetPanOffset();
         var dx = Bounds.Width * parameter.Scroll; var dy = Bounds.Height * parameter.Scroll;
@@ -403,6 +432,7 @@ public sealed class ReaderView : Control, IDisposable
     /// <summary>原连续轮滚仅无修饰/按钮优先，横轴方向及120单位沿原Windows delta。</summary>
     public bool TryWheelScroll(PointerWheelEventArgs e)
     {
+        if (IsBrowsing && _browse is not null && !MouseGestureSource.HeldButtons(e.GetCurrentPoint(this).Properties).Any()) return _browse.Wheel(e);
         var c=Config.Current.Mouse;
         if(!c.IsMouseWheelScrollEnabled || e.KeyModifiers!=KeyModifiers.None || MouseGestureSource.HeldButtons(e.GetCurrentPoint(this).Properties).Any()) return false;
         var from=_pan+_motion.GetPanOffset(); ApplyPan(new(-e.Delta.X*120*c.MouseWheelScrollSensitivity,e.Delta.Y*120*c.MouseWheelScrollSensitivity));
@@ -410,7 +440,7 @@ public sealed class ReaderView : Control, IDisposable
     }
     /// <summary>组合滚轮消费当前按下动作，释放时不追加普通点击。</summary>
     public void SuppressPendingClick(PointerPointProperties properties)
-    { CancelMouseSequence(); _suppressedButtons.UnionWith(MouseGestureSource.HeldButtons(properties)); _pendingClick = null; _pressed = null; }
+    { CancelMouseSequence(); _browse?.CaptureLost(); _suppressedButtons.UnionWith(MouseGestureSource.HeldButtons(properties)); _pendingClick = null; _pressed = null; }
     /// <summary>沿用原 DragArea.SnapView，精确滚动和拖动不允许把图片完全推出视口。</summary>
     private void ClampPan()
     {
@@ -427,6 +457,7 @@ public sealed class ReaderView : Control, IDisposable
         await _scrollGate.WaitAsync();
         try
         {
+            if (IsBrowsing && _browse is not null) { _browse.Scroll(direction * Bounds.Height * parameter.Scroll); return; }
             if (_disposed || _frame is null || _operation?.Context is not { } context || _operation.IsLoading || Bounds.Width <= 0 || Bounds.Height <= 0) return;
             var result = Config.Current.Mouse.IsHoverScroll ? new PageFrames.ScrollResult(default, default) : _scrollControl.ScrollToNext(context, GetContentRect(), new(0, 0, Bounds.Width, Bounds.Height), direction, parameter);
             if (result is null) return;
@@ -449,6 +480,7 @@ public sealed class ReaderView : Control, IDisposable
     /// <summary>导航器将图像内指定位置移到视口中心；页框及旋转仍由原引擎计算。</summary>
     public void Navigate(Point point)
     {
+        if (IsBrowsing && _browse is not null) { _browse.Navigate(point); return; }
         StopMotion();
         if (_frame is null || _operation?.Book?.CurrentPage is not { } page) return;
         foreach (var (source, target) in _transform.GetTargets())
@@ -477,6 +509,9 @@ public sealed class ReaderView : Control, IDisposable
         { CompleteMouseSequence(properties, true); e.Handled = true; return; }
         // 所有按钮都持有本次输入，避免移出控件后的释放丢失；捕获转移会取消待确认动作。
         if (button != MouseButton.None) e.Pointer.Capture(this);
+        if (IsBrowsing && _browse is not null && button == MouseButton.Left && e.KeyModifiers == KeyModifiers.None
+            && MouseGestureSource.HeldButtons(properties).SequenceEqual([MouseButton.Left]))
+        { _pendingClick = null; _browse.SetClickCount(e.ClickCount); _browse.Press(e); return; }
         var action = MouseGestureSource.ClickAction(button, e.ClickCount);
         var gesture = action is null ? null : MouseGestureSource.Create(action, e.KeyModifiers, properties, button);
         // 原扩展组合/双击优先在按下阶段匹配，不能随后再触发第一次普通释放。
@@ -521,6 +556,7 @@ public sealed class ReaderView : Control, IDisposable
             if (!_sequence.IsEmpty) { _pendingClick = null; e.Handled = true; }
             return;
         }
+        if (IsBrowsing && _browse is not null) { _browse.Move(e); return; }
         if (_pressed is not { } start)
         { if (Config.Current.Mouse.IsHoverScroll && !MouseGestureSource.HeldButtons(properties).Any() && CanStartMouseSequence?.Invoke()!=false) HoverScroll(_pointer!.Value); return; }
         var position = e.GetPosition(this); var delta = new Avalonia.Vector(position.X - start.X, position.Y - start.Y);
@@ -528,9 +564,15 @@ public sealed class ReaderView : Control, IDisposable
         if (_dragged) Pan(_initialPan + delta - _pan);
     }
     /// <summary>未拖动的左右点击送入原快捷键映射。</summary>
-    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    protected override async void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
+        if (IsBrowsing && _browse?.HasPressedPointer == true && e.InitialPressMouseButton == MouseButton.Left && !_suppressedButtons.Contains(MouseButton.Left))
+        {
+            try { await _browse.ReleaseAsync(e, page => ChildBookRequested?.Invoke(this, page)); }
+            catch (Exception ex) { System.Diagnostics.Trace.WriteLine("Browse selection: " + ex.GetType().Name); }
+            return;
+        }
         if (_sequenceActive && !_sequence.IsEmpty)
         { CompleteMouseSequence(e.GetCurrentPoint(this).Properties, false); e.Handled = true; }
         else CancelMouseSequence(false);
@@ -542,7 +584,7 @@ public sealed class ReaderView : Control, IDisposable
     }
     /// <summary>捕获丢失取消未确认点击/拖动，旧指针不作用于新控件。</summary>
     protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
-    { base.OnPointerCaptureLost(e); CancelMouseSequence(); _pressed = null; _dragged = false; _pendingClick = null; _bookCardPressed = false; _suppressedButtons.Clear(); }
+    { base.OnPointerCaptureLost(e); _browse?.CaptureLost(); CancelMouseSequence(); _pressed = null; _dragged = false; _pendingClick = null; _bookCardPressed = false; _suppressedButtons.Clear(); }
     /// <summary>释放或已有方向时左键终止；未知序列也不能退化为右击翻页。</summary>
     private void CompleteMouseSequence(PointerPointProperties properties, bool click)
     {
@@ -573,6 +615,7 @@ public sealed class ReaderView : Control, IDisposable
     {
         if (_disposed) return; CancelMouseSequence(); StopMotion(); _disposed = true; ++_revision; _request?.Cancel(); _request = null;
         foreach (var item in _images.Values) item.Dispose(); _images.Clear(); _pageErrors.Clear();
+        _browse?.Dispose();
         _transform.Dispose();
     }
 }

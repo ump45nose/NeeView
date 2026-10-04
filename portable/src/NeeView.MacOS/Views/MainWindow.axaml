@@ -7,7 +7,12 @@
       <StackPanel>
         <!-- 原默认八组菜单由 MenuTree 生成；未迁移命令保留禁用占位。 -->
         <Menu x:Name="MenuBar" />
-        <TextBox x:Name="AddressBar" IsVisible="{Binding AddressBarVisible}" Classes="address" Text="{Binding Address}" PlaceholderText="打开图片、目录、ZIP / RAR / 7z" KeyDown="Address_KeyDown" />
+        <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding AddressBarVisible}">
+          <TextBox x:Name="AddressBar" Classes="address" Text="{Binding Address}" PlaceholderText="打开图片、目录、ZIP / RAR / 7z" KeyDown="Address_KeyDown" />
+          <ComboBox x:Name="BrowseModeView" Grid.Column="1" MinWidth="106" MinHeight="28" Padding="8,2" ItemsSource="{Binding BrowseModes}" SelectedItem="{Binding SelectedBrowseMode, Mode=OneWay}" SelectionChanged="BrowseMode_SelectionChanged" ToolTip.Tip="展示方式；瀑布流可滚动速览、双击图片进入分页">
+            <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>
+          </ComboBox>
+        </Grid>
       </StackPanel>
     </Border>
     <Grid x:Name="SidePanelFrame" Grid.Row="1" ColumnDefinitions="41,240,4,*,4,240,41">

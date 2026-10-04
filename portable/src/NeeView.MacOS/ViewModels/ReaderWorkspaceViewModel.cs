@@ -12,6 +12,8 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public bool IsPanelDragging { get; private set; }
     public BookOperation Operation { get; } = operation;
     public CommandTable Commands { get; } = commands;
+    public IReadOnlyList<BrowseModeChoice> BrowseModes { get; } = [new(BrowseLayoutMode.Paged, "分页"), new(BrowseLayoutMode.Continuous, "连续阅读"), new(BrowseLayoutMode.Masonry, "瀑布流")];
+    public BrowseModeChoice SelectedBrowseMode => BrowseModes.First(e => e.Mode == Operation.BrowseMode);
     public SaveData SaveData { get; } = saveData;
     public string Title => Operation.Book is { } book ? $"{System.IO.Path.GetFileName(book.Path)} — NeeView" : "NeeView";
     private string _address = "";
@@ -247,6 +249,8 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
 }
 /// <summary>原排序枚举的界面文案，展示顺序不改变 JSON 枚举值。</summary>
 public sealed record FolderOrderChoice(FolderOrder Mode, string Label);
+/// <summary>Mac展示方式的文案；模式及原全景开关以Engine为唯一权威。</summary>
+public sealed record BrowseModeChoice(BrowseLayoutMode Mode, string Label);
 /// <summary>历史行的独立表现数据；分组标题不成为可导航或删除的伪历史条目。</summary>
 public sealed record HistoryRow(HistoryEntry Entry, string? GroupHeader)
 {
