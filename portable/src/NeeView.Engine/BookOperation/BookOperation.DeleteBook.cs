@@ -13,7 +13,7 @@ public sealed partial class BookOperation
     /// <summary>保留原实体书/写权限资格，拒绝应用临时书、卷根及包含Profile的目录。</summary>
     /// <returns>廉价定位资格；提交前仍须由后端复核实体与实际路径。</returns>
     private bool CanDeleteBookCore() => Config.Current.System.IsFileWriteAccessEnabled && _filePlatform is not null
-        && !IsRenamingBook && !IsUsingClipboard && !_disposed && !_closing && !IsLoading && _destinationMoves?.IsBusy != true
+        && !IsRenamingBook && !IsTransferringBook && !IsUsingClipboard && !_disposed && !_closing && !IsLoading && _destinationMoves?.IsBusy != true
         && Book is { IsIndexing: false } book && book.Path == book.Source.RootArchivePath && !saveData.IsTemporaryPath(book.Path)
         && System.IO.Path.GetDirectoryName(book.Path) is not null && book.Path != "/Volumes"
         && System.IO.Path.GetDirectoryName(book.Path) != "/Volumes"

@@ -13,8 +13,8 @@ public sealed partial class BookOperation
     public Func<BookRenamePlan, Task<bool>>? ConfirmBookRenameAsync { get; set; }
     /// <summary>沿原失败重试/取消提示；等待用户时释放导航锁，返回后核对最新打开请求。</summary>
     public Func<string, Task<bool>>? RetryBookRenameAsync { get; set; }
-    public bool CanRenameBook => !IsRenamingBook && CanRenameBookCore();
-    private bool CanRenameBookCore() => Config.Current.System.IsFileWriteAccessEnabled && _fileBackend is IBookRenameBackend
+    public bool CanRenameBook => !IsRenamingBook && !IsTransferringBook && CanRenameBookCore();
+    private bool CanRenameBookCore() => !IsTransferringBook && Config.Current.System.IsFileWriteAccessEnabled && _fileBackend is IBookRenameBackend
         && !_disposed && !_closing && !IsLoading && Book is { IsIndexing: false } book
         && book.Path == book.Source.RootArchivePath && System.IO.Path.GetDirectoryName(book.Path) is not null
         && saveData.DirectoryPath != book.Path && !saveData.DirectoryPath.StartsWith(book.Path + "/", StringComparison.Ordinal)

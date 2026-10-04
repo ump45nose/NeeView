@@ -48,7 +48,7 @@ public sealed partial class FileOperationBackend : IBookRenameBackend
         try { return await Task.Run(() => { token.ThrowIfCancellationRequested(); return work(); }, token); }
         finally { _slot.Release(); }
     }
-    public Task<bool?> WasRenamedAsync(BookRenamePlan plan, CancellationToken token) => RenameWorkAsync<bool?>(() =>
+    public Task<bool?> WasRenamedAsync(BookRenamePlan plan, CancellationToken token) => plan.IsMove ? VerifyMovedBookAsync(plan, token) : RenameWorkAsync<bool?>(() =>
     {
         if (!Path.IsPathFullyQualified(plan.Target.Path) || !Path.IsPathFullyQualified(plan.Destination)
             || Path.GetDirectoryName(plan.Target.Path) != Path.GetDirectoryName(plan.Destination)

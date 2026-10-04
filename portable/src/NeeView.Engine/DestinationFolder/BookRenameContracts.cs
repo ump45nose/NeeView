@@ -2,8 +2,9 @@ namespace NeeView;
 
 /// <summary>真实书籍项快照；不把归档内部目录或链接当作可写来源。</summary>
 public sealed record BookRenameTarget(string Path, bool IsDirectory, DateTime CreationTimeUtc, DateTime LastWriteTimeUtc, long Length);
-/// <summary>原名称冲突编号建议和扩展名确认；目标限定在同一父目录。</summary>
-public sealed record BookRenamePlan(BookRenameTarget Target, string Destination, bool ExtensionChanged, bool Conflict);
+/// <summary>原路径联动记录；改名限同父目录，整书移动扩展带完整指纹及原目标指纹。</summary>
+public sealed record BookRenamePlan(BookRenameTarget Target, string Destination, bool ExtensionChanged, bool Conflict,
+    bool IsMove = false, string? ContentHash = null, string? PreviousDestinationHash = null);
 /// <summary>重命名仅替换一个同目录项，独立于分类移动历史和跨卷协议。</summary>
 public interface IBookRenameBackend
 {

@@ -181,7 +181,7 @@ public sealed partial class MainWindow : Window
     {
         var command when PagedTransformCommands.Contains(command) && _model?.Operation.IsFrameReading != true => false,
         "Unload" => _model?.Operation.CanUnload == true,
-        "MoveToFolderAs" or "CopyToFolderAs" => IsDestinationCommandAvailable(name),
+        "MoveToFolderAs" or "CopyToFolderAs" or "MoveBookToFolderAs" or "CopyBookToFolderAs" => IsDestinationCommandAvailable(name),
         "DeleteFile" => _model?.Operation.CanDeleteFile == true,
         "DeleteBook" => _model?.Operation.CanDeleteBook == true,
         "RenameBook" => _model?.Operation.CanRenameBook == true,
@@ -190,8 +190,8 @@ public sealed partial class MainWindow : Window
         "Paste" => _model?.Operation.CanPasteFiles == true,
         "CutFile" or "CutBook" => false,
         "SetSortModeEntry" or "SetSortModeEntryDescending" => _model?.Operation.IsLoading == false && _model.Operation.Book?.Source.IsPlaylist == true,
-        "UndoDestinationMove" => _model?.Operation is { IsDeletingFile: false, IsRenamingBook: false, IsUsingClipboard: false } && Config.Current.System.IsFileWriteAccessEnabled && _model.Operation.DestinationMoves?.CanUndo == true,
-        "RedoDestinationMove" => _model?.Operation is { IsDeletingFile: false, IsRenamingBook: false, IsUsingClipboard: false } && Config.Current.System.IsFileWriteAccessEnabled && _model.Operation.DestinationMoves?.CanRedo == true,
+        "UndoDestinationMove" => _model?.Operation is { IsDeletingFile: false, IsRenamingBook: false, IsUsingClipboard: false, IsTransferringBook: false } && Config.Current.System.IsFileWriteAccessEnabled && _model.Operation.DestinationMoves?.CanUndo == true,
+        "RedoDestinationMove" => _model?.Operation is { IsDeletingFile: false, IsRenamingBook: false, IsUsingClipboard: false, IsTransferringBook: false } && Config.Current.System.IsFileWriteAccessEnabled && _model.Operation.DestinationMoves?.CanRedo == true,
         var command when command.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal) => IsDestinationCommandAvailable(command),
         "MoveToParentBook" => _model?.Operation.CanMoveToParentBook == true,
         "MoveToChildBook" => _model?.Operation.CanMoveToChildBook == true,
@@ -393,7 +393,7 @@ public sealed partial class MainWindow : Window
                 case "ViewScrollUp": case "ViewScrollDown": case "ViewScrollLeft": case "ViewScrollRight":
                     Viewer.ScrollView(name, _model.SaveData.GetCommandParameter<ViewScrollCommandParameter>(name)); break;
                 case "OpenContextMenu": OpenViewerContextMenu(); break;
-                case "MoveToFolderAs": case "CopyToFolderAs": await OpenDestinationMoveMenuAsync(name); break;
+                case "MoveToFolderAs": case "CopyToFolderAs": case "MoveBookToFolderAs": case "CopyBookToFolderAs": await OpenDestinationMoveMenuAsync(name); break;
                 case "DeleteFile": await RunDestinationActionAsync(() => _model.Operation.DeleteFileAsync()); break;
                 case "DeleteBook": await RunDestinationActionAsync(() => _model.Operation.DeleteBookAsync()); break;
                 case "RenameBook": await RunDestinationActionAsync(() => _model.Operation.RenameBookAsync()); break;
@@ -871,6 +871,7 @@ public sealed partial class MainWindow : Window
         try
         {
             foreach (var dialog in OwnedWindows.ToArray()) dialog.Close();
+            _model?.Operation.CancelBookTransferPreparation();
             await _destinationAction;
             await this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.PrepareCloseAsync();
             await _listStyleTask;

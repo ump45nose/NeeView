@@ -1,6 +1,6 @@
 # 完整命令迁移表
 
-固定基线235个原命令实例全部保留。P4第八批为 **165个执行入口接入、70个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
+固定基线235个原命令实例全部保留。P4第九批为 **167个执行入口接入、68个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
 
 原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。实际键位/手势按原A/B/C、阅读方向和用户差分计算。
 
@@ -41,8 +41,8 @@
 | OpenBookExternalAppAs | 用外部应用打开书籍 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenBookExternalAppAsCommand.cs |
 | CutBook | 剪切书籍 |  |  | 占位 | 用户选择暂保留禁用；移动使用既有文件操作 | NeeView/Command/Commands/CutBookCommand.cs |
 | CopyBook | 复制书籍 |  |  | 已接入 | P4 实体目录或根归档复制到系统剪贴板 | NeeView/Command/Commands/CopyBookCommand.cs |
-| CopyBookToFolderAs | 复制书籍到文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/CopyBookToFolderAsCommand.cs |
-| MoveBookToFolderAs | 移动书籍到文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/MoveBookToFolderAsCommand.cs |
+| CopyBookToFolderAs | 复制书籍到文件夹 |  |  | 已接入 | P4 根实体整书固定复制/目标Index；逻辑目录提取待迁 | NeeView/Command/Commands/CopyBookToFolderAsCommand.cs |
+| MoveBookToFolderAs | 移动书籍到文件夹 |  |  | 已接入 | P4 根实体整书固定移动/卸载/原JSON路径联动；不入分类历史 | NeeView/Command/Commands/MoveBookToFolderAsCommand.cs |
 | DeleteBook | 删除书籍 |  |  | 已接入 | P4 真实根目录/文件整书废纸篓与原下一书；逻辑/临时/链接拒绝 | NeeView/Command/Commands/DeleteBookCommand.cs |
 | RenameBook | 重命名书籍 |  |  | 已接入 | P4 目录/根归档改名及原明确路径联动；见p4-rename.md | NeeView/Command/Commands/RenameBookCommand.cs |
 | SelectArchiver | 选择归档程序 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SelectArchiverCommand.cs |

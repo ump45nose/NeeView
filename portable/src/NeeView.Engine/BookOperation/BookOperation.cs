@@ -70,6 +70,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         ObjectDisposedException.ThrowIf(_disposed || _closing, this);
         CancelCopyPreparation();
         CancelFileCopyPreparation();
+        CancelBookTransferPreparation();
         var generation = Interlocked.Increment(ref _generation);
         _opening?.Cancel();
         var opening = CancellationTokenSource.CreateLinkedTokenSource(token); _opening = opening;
@@ -569,9 +570,10 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     {
         // 关闭请求当场使准备失效；先 Yield 会给原生晚到结果留下继续提交的间隙。
         _closing = true; Interlocked.Increment(ref _generation);
-        _bookDeleteClosing.Cancel();
+        _bookDeleteClosing.Cancel(); _bookTransferClosing.Cancel();
         CancelClipboardPreparation();
         CancelFileCopyPreparation();
+        CancelBookTransferPreparation();
         await Task.Yield();
         _opening?.Cancel(); _saving?.Cancel();
         // 未确认文本/重试可取消；已开始实体操作等待真实结果和路径联动，不释放仍使用的来源。
@@ -579,9 +581,11 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         _clipboardClosing.Cancel();
         CancelClipboardPreparation();
         CancelFileCopyPreparation();
+        CancelBookTransferPreparation();
         if (_renameCompletion is { } rename) await rename.Task;
         if (_clipboardCompletion is { } clipboard) await clipboard.Task;
         if (_bookDeleteCompletion is { } deletion) await deletion.Task;
+        if (_bookTransferCompletion is { } transfer) await transfer.Task;
         await _gate.WaitAsync();
         try
         {
@@ -600,10 +604,11 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             _gate.Release();
             _renameClosing.Dispose();
             _clipboardClosing.Dispose();
-            _bookDeleteClosing.Dispose();
+            _bookDeleteClosing.Dispose(); _bookTransferClosing.Dispose();
             if (!_disposed) _renameClosing = new();
             if (!_disposed) _clipboardClosing = new();
             if (!_disposed) _bookDeleteClosing = new();
+            if (!_disposed) _bookTransferClosing = new();
             _closing = false;
             lock (_closeSync) _closeTask = null;
         }

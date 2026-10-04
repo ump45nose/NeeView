@@ -13,7 +13,7 @@ public sealed partial class BookOperation
     private CancellationTokenSource? _clipboardPending;
     private bool _clipboardIsCopy;
     public bool IsUsingClipboard => Volatile.Read(ref _clipboardBusy) != 0;
-    private bool CanUseClipboard => _fileClipboard is not null && !_disposed && !_closing && !IsUsingClipboard && !IsRenamingBook && !IsDeletingFile && _destinationMoves?.IsBusy != true;
+    private bool CanUseClipboard => _fileClipboard is not null && !_disposed && !_closing && !IsUsingClipboard && !IsRenamingBook && !IsTransferringBook && !IsDeletingFile && _destinationMoves?.IsBusy != true;
     public bool CanPasteFiles => CanUseClipboard && !IsLoading && _fileClipboard!.HasFileContent;
     public bool CanCopyBook => CanUseClipboard && !IsLoading && Book is { IsIndexing: false } book && book.Path == book.Source.RootArchivePath;
     /// <summary>启动层注入系统协议；视图只转交稳定命令。</summary>

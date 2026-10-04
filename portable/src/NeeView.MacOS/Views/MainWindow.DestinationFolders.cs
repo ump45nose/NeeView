@@ -29,6 +29,10 @@ public sealed partial class MainWindow
         };
         _model.Operation.RetryBookRenameAsync = async message => !_preparing && !_closedPrepared
             && await ConfirmAsync("书籍重命名失败", message, "重试") && !_preparing && !_closedPrepared;
+        _model.Operation.ConfirmBookOverwriteAsync = async plan => !_preparing && !_closedPrepared
+            && await ConfirmAsync("覆盖已有书籍", "目标已存在：\n" + plan.Destination
+                + (plan.Target.IsDirectory ? "\n将替换整个目标目录及其中全部内容，不合并目录。" : "\n将替换已有文件。")
+                + "\n提交前保留可恢复副本；成功后清理。整书传输不进入分类撤销历史。", "覆盖") && !_preparing && !_closedPrepared;
         var panel = this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!;
         panel.Attach(_model.Operation); panel.Failed += (_, message) => ShowError(message);
         panel.ManageAsync = ManageDestinationFoldersAsync; panel.CreateAsync = CreateDestinationChildAsync;
@@ -68,14 +72,16 @@ public sealed partial class MainWindow
         var menu = new ContextMenu();
         foreach (var folder in Config.Current.System.DestinationFolderCollection)
         {
-            var item = new MenuItem { Header = folder.Name, IsEnabled = _model.Operation.CanTransferFileActionPages(parameter.MultiPagePolicy, requireWriteAccess: command != "CopyToFolderAs") }; ToolTip.SetTip(item, folder.Path);
+            var item = new MenuItem { Header = folder.Name, IsEnabled = IsDestinationCommandAvailable(command) }; ToolTip.SetTip(item, folder.Path);
             item.Click += async (_, _) => await RunDestinationActionAsync(() => TransferAsync(folder));
             menu.Items.Add(item);
         }
         if (menu.Items.Count == 0) menu.Items.Add(new MenuItem { Header = "没有手动目标", IsEnabled = false });
         var manage = new MenuItem { Header = "管理目标文件夹…" }; manage.Click += async (_, _) => { try { await ManageDestinationFoldersAsync(); } catch (Exception ex) { ShowError(ex.Message); } }; menu.Items.Add(manage);
         Viewer.ContextMenu = menu; menu.Open(Viewer);
-        Task TransferAsync(DestinationFolder folder) => command == "CopyToFolderAs"
+        Task TransferAsync(DestinationFolder folder) => command is "CopyBookToFolderAs" or "MoveBookToFolderAs"
+            ? _model.Operation.TransferBookToFolderAsync(folder, move: command == "MoveBookToFolderAs")
+            : command == "CopyToFolderAs"
             ? _model.Operation.CopyToFolderAsync(folder, parameter.MultiPagePolicy)
             : _model.Operation.ClassifyAsync(folder, copy: command != "MoveToFolderAs" && Config.Current.Panels.IsDestinationFolderCopyMode, policy: parameter.MultiPagePolicy);
     }
@@ -84,7 +90,13 @@ public sealed partial class MainWindow
         if (_model is null) return false;
         var parameter = _model.Operation.GetDestinationParameter(command);
         var folders = Config.Current.System.DestinationFolderCollection;
-        return _model.Operation.CanTransferFileActionPages(parameter.MultiPagePolicy, requireWriteAccess: command != "CopyToFolderAs")
+        bool capable = command switch
+        {
+            "CopyBookToFolderAs" => _model.Operation.CanCopyBookToFolder,
+            "MoveBookToFolderAs" => _model.Operation.CanMoveBookToFolder,
+            _ => _model.Operation.CanTransferFileActionPages(parameter.MultiPagePolicy, requireWriteAccess: command != "CopyToFolderAs")
+        };
+        return capable
             && (parameter.Index == 0 || folders.IsValidIndex(parameter.Index - 1) && folders[parameter.Index - 1].IsValid());
     }
     /// <summary>所有宿主文件动作共用可等待任务；失败已回报，退出不会重复等待故障任务。</summary>

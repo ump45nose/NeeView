@@ -1706,6 +1706,48 @@
       "target": "src/NeeView.Engine/BookOperation/BookOperation.DeleteBook.cs",
       "sha256": "5854e9abf42991aa6117fb3f7c6516f6162f95dcd92f8f042960dc3b69452b90",
       "status": "原NextFolderListBookLoader预捕获邻项、删除后刷新/打开；新打开代次优先，开关关闭仍刷新"
+    },
+    {
+      "source": "NeeView/BookOperation/BookControl.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.BookTransfer.cs",
+      "sha256": "7b2f0d2b0b31b5a50b55dba8f48e11674ca9bcfaaad209946dba8c70c8fc6ad4",
+      "status": "原CopyBookToFolderAs/MoveBookToFolderAs根实体范围、写权限差异与固定语义；移动先释放来源且不自动打开目标或邻书，失败恢复原memento，不进分类栈"
+    },
+    {
+      "source": "NeeView/DestinationFolder/DestinationFolder.cs",
+      "target": "src/NeeView.Engine/DestinationFolder/BookTransferContracts.cs",
+      "sha256": "4cdafbd8ed9e9c131d5505ff2778cc03f6d086985e96b827d00cbdaeaa62ea50",
+      "status": "真实存在目标目录和实际落点的小型整书接口；目录与文件快照/完整性，不伪装为图片动作"
+    },
+    {
+      "source": "NeeView/System/FileIO.cs",
+      "target": "src/NeeView.Backends/FileSystem/FileOperationBackend.BookTransfer.cs",
+      "sha256": "2b438ab676de625e70bc64861e3a10aaf081c480c65650bf76b2794d82f6561e",
+      "status": "原SHCopy/SHMoveToFolder及真实成功结果替换；复用既有后台槽/日志/暂存/指纹协议，完整目录含空项，失败保守恢复；Mac明确目录覆盖替换不合并，链接不迁"
+    },
+    {
+      "source": "NeeView/DestinationFolder/CopyBookToFolderMenuFactory.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.DestinationFolders.cs",
+      "sha256": "07fdd5fd3724387afff6593dde37e5d604fffcba68e66aea05f8191031c5283a",
+      "status": "原手动目标集合顺序与1-based Index菜单；整书覆盖独立文案，表现只确认和转交"
+    },
+    {
+      "source": "NeeView/DestinationFolder/MoveBookToFolderMenuFactory.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.DestinationFolders.cs",
+      "sha256": "264cadb5fbce6f99cfcdb8a1abc53dd403e3846690aeca5124a7f9aa798957b4",
+      "status": "原整书固定移动菜单和Index参数，不跟随分类面板复制模式"
+    },
+    {
+      "source": "NeeView/Command/Commands/CopyBookToFolderAsCommand.cs",
+      "target": "src/NeeView.Engine/Command/CommandTable.cs",
+      "sha256": "a69ebce9849cbfd69b2716837f8184ea5729fb18860dbd12fecc344a3b21d64b",
+      "status": "原整书复制名称/参数入口接通，Index0宿主目标菜单；根实体支持，逻辑目录提取仍待迁"
+    },
+    {
+      "source": "NeeView/Command/Commands/MoveBookToFolderAsCommand.cs",
+      "target": "src/NeeView.Engine/Command/CommandTable.cs",
+      "sha256": "bbd61cee76705a271e3bfe33b24e277e0f6b7dfa68ff960e653dd9295e34c545",
+      "status": "原整书移动名称/写权限/固定参数入口，真实成功才更新原JSON与卸载，不入分类历史"
     }
   ],
   "rule_references": [

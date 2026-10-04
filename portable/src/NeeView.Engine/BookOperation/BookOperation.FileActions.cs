@@ -41,7 +41,7 @@ public sealed partial class BookOperation
     {
         if (!Enum.IsDefined(policy)) return false;
         if (!requireWriteAccess) return CanCopyToFolder(policy);
-        if (requireWriteAccess && !Config.Current.System.IsFileWriteAccessEnabled || IsUsingClipboard || IsRenamingBook || IsDeletingFile || _destinationMoves is null || _destinationMoves.IsBusy || _disposed || _closing || IsLoading || Book?.IsIndexing != false) return false;
+        if (requireWriteAccess && !Config.Current.System.IsFileWriteAccessEnabled || IsUsingClipboard || IsRenamingBook || IsTransferringBook || IsDeletingFile || _destinationMoves is null || _destinationMoves.IsBusy || _disposed || _closing || IsLoading || Book?.IsIndexing != false) return false;
         var pages = CollectFileActionPages(policy);
         return pages.Count > 0 && pages.All(page => page is { IsImage: true, ArchiveEntry.FilePath: not null } && page.ArchiveEntry.Archive.IsDirectory && !page.ArchiveEntry.IsShortcut);
     }
@@ -49,7 +49,7 @@ public sealed partial class BookOperation
     /// <param name="policy">原页组范围。</param><returns>整组具备文件复制能力时为 true。</returns>
     public bool CanCopyToFolder(MultiPagePolicy policy = MultiPagePolicy.Once)
     {
-        if (!Enum.IsDefined(policy) || IsUsingClipboard || IsRenamingBook || IsDeletingFile || _destinationMoves is null || _destinationMoves.IsBusy || _disposed || _closing || IsLoading || Book?.IsIndexing != false) return false;
+        if (!Enum.IsDefined(policy) || IsUsingClipboard || IsRenamingBook || IsTransferringBook || IsDeletingFile || _destinationMoves is null || _destinationMoves.IsBusy || _disposed || _closing || IsLoading || Book?.IsIndexing != false) return false;
         var pages = CollectFileActionPages(policy);
         return pages.Count > 0 && pages.All(CanRealizeFile);
     }

@@ -28,6 +28,8 @@ public sealed class CommandTable
         _actions["UndoDestinationMove"] = () => operation.ReplayDestinationMoveAsync(true);
         _actions["RedoDestinationMove"] = () => operation.ReplayDestinationMoveAsync(false);
         _actions["DeleteFile"] = () => operation.DeleteFileAsync();
+        _actions["CopyBookToFolderAs"] = () => operation.TransferBookCommandAsync("CopyBookToFolderAs");
+        _actions["MoveBookToFolderAs"] = () => operation.TransferBookCommandAsync("MoveBookToFolderAs");
         _actions["DeleteBook"] = () => operation.DeleteBookAsync();
         _actions["RenameBook"] = () => operation.RenameBookAsync();
         _actions["CopyFile"] = () => operation.CopyFilesAsync();
