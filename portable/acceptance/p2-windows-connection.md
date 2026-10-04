@@ -1,6 +1,6 @@
 # P2 Windows 动态验收：连接排查记录
 
-日期：2026-10-04。用户明确允许开始前台验收，并表示目标 Windows 已打开和聚焦 NeeView。本记录只覆盖 Mac 远程桌面客户端与传输入口；没有进入目标桌面，不能视为 NeeView 动态验收。
+日期：2026-10-04。本记录保留此前连接排查时的观察。**后续用户已手动连接，目标桌面及独立副本的动态行为已采集，见 [Windows 参考记录](p2-windows-reference.md)。** 下文“未进入桌面”和 0x104 属于历史状态，不是当前入口结论。
 
 ## 已观察结果
 
@@ -21,12 +21,14 @@
 
 本机 DiagnosticReports 的 2026-10-04 10:59:54 +0800 记录显示 EXC_CRASH / SIGABRT、swift_dynamicCastFailure、EditBookmarkViewController.controlTextDidChange(_:) 及 NSAccessibility 设置属性栈。该证据支持“客户端编辑 UI 的类型转换崩溃”，不支持把崩溃判为 RDP 连接错误的原因。未发送 Microsoft 故障报告，未读取客户端凭据数据库。
 
-## 当前边界与下一步
+## 排查时的边界与后续进展
 
 - 操作限于 Mac 的 Windows App 和系统权限界面的只读查看。没有启动 Mac NeeView，没有进入 Windows 桌面，没有发送远程应用输入，没有读取或修改 NeeView 的现有书籍/配置/历史/书签。
 - 共享目录配置没有保存成功；最终专用连接不共享 Mac 文件夹、不保存密码。密码尚未用于认证。
 - 等待用户通过普通操作手动打开专用连接，确认是否出现权限提示、凭据界面或同样错误。新的权限提示按实际内容处理，不通过修改 TCC、签名或安全配置绕过。
 - 若普通操作能够连接，再核对参考程序版本、实际 DPI/桌面、用户现有实例和数据隔离后执行[共用验收用例](../docs/p2-device-acceptance.md)。如仍不能连接，先解决客户端入口；动态用例保持未执行。
+
+上述后续连接现已成功；实际安装包为 `ddc857b511e9f04cbc356bdabb1f748963e4f9e1-dirty`，因此固定基线一致性仍未确认。已完成部分 Windows 参考采集，不等于 Mac 双端对照通过。末段 CUA 工具超时单独记录，不把它归因于此前 0x104。
 
 资料核查：[微软 Windows App 概述](https://learn.microsoft.com/en-us/windows-app/overview)、[微软 macOS 客户端说明](https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/remote-desktop-mac)、[Apple 本地网络权限说明](https://support.apple.com/guide/mac-help/control-access-local-network-mchla4f49138/mac)。这些页面不提供当前 0x104 的具体根因，也不证明列表缺少条目等于权限关闭。
 

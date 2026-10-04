@@ -1,0 +1,288 @@
+{
+  "date": "2026-10-04",
+  "scope": "Windows reference capture only; Mac replay pending",
+  "raw_evidence_directory": "/var/folders/py/gj39wxxn3fz1r3dgt15zrh3m0000gn/T/neeview-device-preflight-2dix0xte/evidence",
+  "raw_images_committed": false,
+  "public_release_review_required": true,
+  "format_note": "CUA returned JPEG bytes saved with .png names; format inspected from bytes, files retained unchanged. These captures are not lossless pixel-mapping evidence.",
+  "excluded_files": [
+    {
+      "file": "windows-package-inventory.png",
+      "reason": "private user thumbnails; not read or copied by evidence inventory"
+    }
+  ],
+  "files": [
+    {
+      "file": "windows-autohide-right-away.png",
+      "media_type": "image/jpeg",
+      "bytes": 225147,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "74444c8dea817be5d26a3d88fc89c8ebc28ff4da110ca91205f08ecd2b9678dc"
+    },
+    {
+      "file": "windows-autohide-right-reveal.png",
+      "media_type": "image/jpeg",
+      "bytes": 327075,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "6d410b3f9deb177f3758d553e038d78cc32f8d2ff595427c9b5854586603a26f"
+    },
+    {
+      "file": "windows-cbz-double-rtl-001.png",
+      "media_type": "image/jpeg",
+      "bytes": 327123,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "db3f412beed3752911ab8ee6065e083522da95992764e4bba59111d65fb749ee"
+    },
+    {
+      "file": "windows-cbz-one-step-002.png",
+      "media_type": "image/jpeg",
+      "bytes": 301521,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "17f5fef893984343841154a841e6e88a6a9506cedb36f82d926f5845a4a57b2f"
+    },
+    {
+      "file": "windows-cbz-open-001.png",
+      "media_type": "image/jpeg",
+      "bytes": 295128,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "92a96c80a5312097091681738b4c26f9d86d7f4e0f1ce68c484ea21877790c5d"
+    },
+    {
+      "file": "windows-cbz-wide-003.png",
+      "media_type": "image/jpeg",
+      "bytes": 308235,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "5981a8aa54e469824b109821f8a2d796fe3ab959a75c49d1066fdeac08efdfb4"
+    },
+    {
+      "file": "windows-directory-final-003L.png",
+      "media_type": "image/jpeg",
+      "bytes": 248071,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "23989c7c1ad11e9f05a44cd9987efe55f23f90fc8c97bd3154bb834b804c67c3"
+    },
+    {
+      "file": "windows-directory-restore-003R.png",
+      "media_type": "image/jpeg",
+      "bytes": 252041,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "ee5b270129f85786c0639c63caaa495576a7ae3a5902110c32e9ef6d06139122"
+    },
+    {
+      "file": "windows-dock-cross-side-horizontal.png",
+      "media_type": "image/jpeg",
+      "bytes": 376165,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "df2e1d8608bba79c717a529150e0dfe7f3edc120c04236111b8fd3226bd2cdd3"
+    },
+    {
+      "file": "windows-dock-cross-side-vertical.png",
+      "media_type": "image/jpeg",
+      "bytes": 328784,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "5d34bb1e394f5862461dcc0fbf63dbc90eca25d1577422c2e32aafc04185423c"
+    },
+    {
+      "file": "windows-dock-floating.png",
+      "media_type": "image/jpeg",
+      "bytes": 397095,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "19c67c171238335afba1dbc14ea877612c3d613268855f5a130fa9d58a1d2dd8"
+    },
+    {
+      "file": "windows-dock-member-float-split.png",
+      "media_type": "image/jpeg",
+      "bytes": 348975,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "a74010f9876c7d64caf62e6e2b8449e3bc7c681018eb9cc128aedb8a1b054731"
+    },
+    {
+      "file": "windows-dock-ratio.png",
+      "media_type": "image/jpeg",
+      "bytes": 319884,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "e6f707482d92fef5e740d8b320d69f4749513e790bc614f891076691d38f95d9"
+    },
+    {
+      "file": "windows-dock-redock.png",
+      "media_type": "image/jpeg",
+      "bytes": 408841,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "d24da638089dd6aead53bfba1ece56f59cb410660e85275118abf9c060e2168e"
+    },
+    {
+      "file": "windows-isolated-history.png",
+      "media_type": "image/jpeg",
+      "bytes": 244838,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "33610dccabbf148556f89b4d0a5305e4633151d5e7e2e89097c4bb062ca6739a"
+    },
+    {
+      "file": "windows-isolated-layout-json.png",
+      "media_type": "image/jpeg",
+      "bytes": 225680,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "b24644cb00d206e565609592ceb8661fb61fd4128f077494f62b2a484d8d2e6e"
+    },
+    {
+      "file": "windows-rdp-display-dpi.png",
+      "media_type": "image/jpeg",
+      "bytes": 144119,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "2704bddaba4b5c68363af7362a1bb2df9f484ebf7e554a0dc0ed706b0645ffc7"
+    },
+    {
+      "file": "windows-reading-cover-001.png",
+      "media_type": "image/jpeg",
+      "bytes": 382990,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "3af5114fd01caba59bc9358c0008796c1d62942ab033e4f440977ce94f84169a"
+    },
+    {
+      "file": "windows-reading-double-ltr-004.png",
+      "media_type": "image/jpeg",
+      "bytes": 402701,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "27f23c3c3068d96e1156dc93873175a1413aa8d34c6e837e0a4d9a6ce052823f"
+    },
+    {
+      "file": "windows-reading-double-one-step-002.png",
+      "media_type": "image/jpeg",
+      "bytes": 384661,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "626fc09bb615eea2c7cdc8d2f49023620f42172e699f7a69ace95715fa340cdb"
+    },
+    {
+      "file": "windows-reading-double-rtl-001.png",
+      "media_type": "image/jpeg",
+      "bytes": 398820,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "ebfe3e4b54562b4946d09720453686bbdfbabf9a14abe4f7f1869f84e74e31d0"
+    },
+    {
+      "file": "windows-reading-double-rtl-004.png",
+      "media_type": "image/jpeg",
+      "bytes": 400726,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "24a7d27be79239160e7e2e55d2e45e8167bfb947993fe015ca502c7f9f8f8f11"
+    },
+    {
+      "file": "windows-reading-double-wide-003.png",
+      "media_type": "image/jpeg",
+      "bytes": 382948,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "fdea0283bba878ce351b6aba3ce724553c2fa94aec931f1ffa3de16deaf92090"
+    },
+    {
+      "file": "windows-reading-last-pair-008.png",
+      "media_type": "image/jpeg",
+      "bytes": 395830,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "bd5b3744b794f49662e71648a067ae53da4bebac63514958e052d91dc1422fa0"
+    },
+    {
+      "file": "windows-reading-last-single-009.png",
+      "media_type": "image/jpeg",
+      "bytes": 388802,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "3b8d45af1243edc50ca6bf9f2933a5db2cb3883aba74e57bfb4cc62454b641d3"
+    },
+    {
+      "file": "windows-reading-single-001.png",
+      "media_type": "image/jpeg",
+      "bytes": 380527,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "ce2234a34630a7690943d10aa88ca42046e79c362e266cca0d727a82f1d99796"
+    },
+    {
+      "file": "windows-reading-split-ltr-003L.png",
+      "media_type": "image/jpeg",
+      "bytes": 381926,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "e61b8267aaff201ab6a082e59f3cb7acd11ba307cd7d42cad45aaee96739acfc"
+    },
+    {
+      "file": "windows-reading-split-ltr-003R.png",
+      "media_type": "image/jpeg",
+      "bytes": 379727,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "048f67dc8c109dd8bd377ed5bc0dd54f7b603f708c79ba3872a9971ce7c9b5ce"
+    },
+    {
+      "file": "windows-reading-split-rtl-003L.png",
+      "media_type": "image/jpeg",
+      "bytes": 381848,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "e9e455ae6aa5639b6d306cb09ba50a7501d8e2fe78d84eead7d261747438c86c"
+    },
+    {
+      "file": "windows-reading-split-rtl-003R.png",
+      "media_type": "image/jpeg",
+      "bytes": 379676,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "30beabb57a7e1843ffd5dcc3e22b7d6968aeb820415c4288151d82de02d5a2cd"
+    },
+    {
+      "file": "windows-restart-autohide-setting.png",
+      "media_type": "image/jpeg",
+      "bytes": 287138,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "4c948771af53a9cb94a0d6536550d1d11f3d5d69cfb680a7c77d164cb4c4cab7"
+    },
+    {
+      "file": "windows-restart-directory-003R.png",
+      "media_type": "image/jpeg",
+      "bytes": 289298,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "3b78024d25467c7821a652b430cdbbe8d278e518387701b7d8710ecbe1963e27"
+    },
+    {
+      "file": "windows-restart-panel-reveal.png",
+      "media_type": "image/jpeg",
+      "bytes": 384498,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "0f4e23d4364a303a0164d6439ecd7208abc40ce002838c2b9633c19f913a9613"
+    },
+    {
+      "file": "windows-test-closed-original-running.png",
+      "media_type": "image/jpeg",
+      "bytes": 139380,
+      "width": 2578,
+      "height": 1682,
+      "sha256": "f08123d166d34aaddd86a802fdb3a25889160ce2b852e3b8fb5dd0be3c69aee7"
+    }
+  ]
+}
