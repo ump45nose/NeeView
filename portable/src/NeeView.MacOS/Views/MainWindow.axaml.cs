@@ -47,7 +47,7 @@ public sealed partial class MainWindow : Window
         "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
-        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkList", "FocusBookmarkSearchBox", "ClearHistory", "ClearHistoryInPlace", "RemoveUnlinkedHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
+        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "ToggleVisibleFoldersTree", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkList", "FocusBookmarkSearchBox", "ClearHistory", "ClearHistoryInPlace", "RemoveUnlinkedHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
     };
     // 浏览增量仅支持整体缩放/平移；分页特有旋转/翻转/适配明确禁用，不能用空执行冒充支持。
     private static readonly HashSet<string> PagedTransformCommands = new(StringComparer.Ordinal)
@@ -146,6 +146,7 @@ public sealed partial class MainWindow : Window
         };
         bookmarks.Attach(model.SaveData);
         AttachListTemplates();
+        AttachDirectoryTree();
         var playlist = this.FindControl<PlaylistView>("PlaylistPanelView")!;
         playlist.Failed += (_, message) => ShowError(message); playlist.Attach(model.Operation);
         model.Operation.MarkersChanged += Model_MarkersChanged;
@@ -221,6 +222,7 @@ public sealed partial class MainWindow : Window
         "TogglePlaylistItem" => _model?.IsPlaylistMarked,
         "ToggleVisiblePlaylist" => _model?.ShowPlaylist,
         "ToggleVisibleBookshelf" => _model?.ShowFolderList,
+        "ToggleVisibleFoldersTree" => Config.Current.Bookshelf.IsFolderTreeVisible && _model?.ShowFolderList == true,
         "ToggleVisiblePageList" => _model?.ShowPageList,
         "ToggleVisibleHistoryList" => _model?.ShowHistory,
         "ToggleVisibleFileInfo" => _model?.ShowInformation,
@@ -322,10 +324,15 @@ public sealed partial class MainWindow : Window
                     await _model.Operation.Bookshelf.UpAsync(); break;
                 case "EnterBookshelfFolder": await _model.Operation.Bookshelf.EnterAsync(); break;
                 case "SyncBookshelfFolder":
-                    if (_model.Operation.Book is { } current) await _model.Operation.Bookshelf.SyncAsync(current, force: true); break;
+                    if (_model.Operation.Book is { } current) await _model.Operation.Bookshelf.SyncAsync(current, force: true);
+                    if (Config.Current.Bookshelf.IsSyncFolderTree && Config.Current.Bookshelf.IsFolderTreeVisible) await _model.Operation.Bookshelf.FolderTree.SyncDirectoryAsync(_model.Operation.Bookshelf.Place, true); break;
                 case "RefreshBookshelfFolder":
                     RefreshListCovers();
+                    if (Config.Current.Bookshelf.IsFolderTreeVisible) await _model.Operation.Bookshelf.FolderTree.RefreshDirectoryAsync();
                     if (await _model.Operation.Bookshelf.RefreshAsync()) await _model.Operation.SaveAsync(); break;
+                case "ToggleVisibleFoldersTree":
+                    bool treeVisible = !_model.ShowFolderList || !Config.Current.Bookshelf.IsFolderTreeVisible;
+                    _model.ShowPanel("FolderPanel"); await SetFolderTreeVisibleAsync(treeVisible); break;
                 case "OpenExplorer":
                     if (_model.Operation.Book is { } book) await _platform!.RevealAsync(book.CurrentPage?.ArchiveEntry.FilePath ?? book.Path); break;
                 case "CloseWindow": Close(); break;
@@ -490,12 +497,6 @@ public sealed partial class MainWindow : Window
         if (_preparing || _model is null || sender is not ComboBox { SelectedItem: ViewModels.BrowseModeChoice choice } || choice.Mode == _model.Operation.BrowseMode) return;
         try { await _model.Operation.SetBrowseModeAsync(choice.Mode); }
         catch (Exception ex) { _model.Refresh(); ShowError(ex.Message); }
-    }
-    /// <summary>用户选中列表条目后按原索引定位，绑定回报不重复导航。</summary>
-    private async void Page_SelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        if (_model?.SelectedPage is { } page && _model.Operation.Book?.CurrentPage != page)
-            try { await _model.Operation.JumpAsync(page.Index); } catch (Exception ex) { ShowError(ex.Message); }
     }
     /// <summary>目录双击统一打开，控件只持有只读条目。</summary>
     private async void Folder_DoubleTapped(object? sender, TappedEventArgs e)
@@ -675,6 +676,9 @@ public sealed partial class MainWindow : Window
         // 普通列表拥有方向/定位键；选条目不能触发全局 Up/Down 书籍导航。
         if (focusedElement is Control focused && (focused is ListBox or TreeView || focused.GetVisualAncestors().Any(x => x is ListBox or TreeView)))
         {
+            if (this.FindControl<FolderTreeView>("BookshelfDirectoryTree")!.IsKeyboardFocusWithin && e.KeyModifiers == KeyModifiers.None && e.Key == Key.Enter) return;
+            if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.Enter && this.FindControl<ListBox>("PageList")!.IsKeyboardFocusWithin)
+            { e.Handled = true; await CommitPageListAsync(); if (Config.Current.PageList.FocusMainView) Viewer.Focus(); return; }
             var bookmarkList = this.FindControl<BookmarkListView>("BookmarkPanelList")!;
             if (bookmarkList.IsKeyboardFocusWithin && e.KeyModifiers == KeyModifiers.None && e.Key is Key.Enter or Key.Back) return;
             if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.Delete && (bookmarkList.IsKeyboardFocusWithin || this.FindControl<TreeView>("BookmarkTree")!.IsKeyboardFocusWithin))
@@ -819,6 +823,7 @@ public sealed partial class MainWindow : Window
         try
         {
             await _listStyleTask;
+            await _folderTreeSettingsTask;
             _historyCleanupCancellation?.Cancel();
             if (_historyCleanupTask is not null) await _historyCleanupTask;
             await this.FindControl<PlaylistView>("PlaylistPanelView")!.PrepareCloseAsync();
@@ -835,6 +840,7 @@ public sealed partial class MainWindow : Window
                 _sidePanels?.SaveWeights();
                 // 先完成可靠保存，再退订与释放显示资源；失败不能留下已销毁的阅读窗口。
                 await _model.Operation.DisposeAsync();
+                _model.Operation.Bookshelf.Changed -= FolderTree_PlaceChanged;
                 _model.Operation.PageEndDialogAsync = null;
                 _model.HistoryRefreshed -= History_Refreshed;
                 _model.Operation.MarkersChanged -= Model_MarkersChanged;

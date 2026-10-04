@@ -13,6 +13,7 @@ public sealed class Config
     public FilmStripConfig FilmStrip { get; set; } = new();
     public SliderConfig Slider { get; set; } = new();
     public BookshelfConfig Bookshelf { get; set; } = new();
+    public PageListConfig PageList { get; set; } = new();
     public HistoryConfig History { get; set; } = new();
     public BookmarkConfig Bookmark { get; set; } = new();
     public SystemConfig System { get; set; } = new();
@@ -114,13 +115,28 @@ public sealed class BookConfig
     public double ContentsSpace { get; set; } = -1;
 }
 /// <summary>原 BookshelfConfig 普通书架默认排序；各路径参数、巡回及搜索后续迁入。</summary>
-public sealed class BookshelfConfig
+public sealed class BookshelfConfig : FolderListConfig
 {
-    public PanelListItemStyle PanelListItemStyle { get; set; } = PanelListItemStyle.Content;
+    public bool IsSyncFolderTree { get; set; }
+    public bool IsSyncFolderTreeAuto { get; set; }
     public FolderOrder DefaultFolderOrder { get; set; } = FolderOrder.FileName;
     public FolderOrder PlaylistFolderOrder { get; set; }
     public FolderSortOrder FolderSortOrder { get; set; } = FolderSortOrder.First;
 }
+/// <summary>原FolderListConfig共享树显隐/方向/尺寸及列表样式，JSON继续保存对应模块分支。</summary>
+public class FolderListConfig
+{
+    public PanelListItemStyle PanelListItemStyle { get; set; } = PanelListItemStyle.Content;
+    public FolderTreeLayout FolderTreeLayout { get; set; } = FolderTreeLayout.Left;
+    public bool IsFolderTreeVisible { get; set; }
+    private double _width = 128, _height = 72;
+    public double FolderTreeAreaWidth { get => _width; set => _width = double.IsFinite(value) ? Math.Clamp(value, 48, 2048) : 128; }
+    public double FolderTreeAreaHeight { get => _height; set => _height = double.IsFinite(value) ? Math.Clamp(value, 40, 2048) : 72; }
+}
+/// <summary>沿原Top/Left枚举数值，不为树布局增加Mac别名分支。</summary>
+public enum FolderTreeLayout { Top, Left }
+/// <summary>原页面列表配置子集；目录组目录树/搜索等未知字段继续保留。</summary>
+public sealed class PageListConfig : FolderListConfig { public bool FocusMainView { get; set; } }
 /// <summary>原查看器基础缩放选项。</summary>
 public sealed class ViewConfig
 {

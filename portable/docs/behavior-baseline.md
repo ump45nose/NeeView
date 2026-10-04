@@ -58,3 +58,5 @@ P2第二十二批：原LayoutPanelManager/WindowManager/WindowPlacement关系迁
 ## P2设备对照修复
 
 目录/CBZ单双页、左右方向、宽图/分割、首末单页与已采集Windows包动态样本一致。数字提示统一到输入层D0–D9；半页MacPagePart退出持久化，真机切书/重启恢复首半页。跨栏水平/垂直组合和比例与样本一致；Mac拆组/整组移动/组合重启已验但相应Windows样本不全。安装包dirty与固定源码对应仍未知，菜单/浮动/自动隐藏本轮Mac动态、真实手势、无损Retina及长期native未验，详见[运行记录](../acceptance/p2-device-input-runtime.md)。
+
+P3第二批：原FolderTreeNodeBase/Delay/DirectoryNode/Model的普通父子、展开占位、自然排序、确认及祖先链同步子集适配；同步I/O改为可取消后台提交。PageListBox.xaml.cs:374–394的普通按下定位/释放焦点及修饰键隔离保留，方向键只选择；四模板接入当前原Page，共用来源和缩略预算。QuickAccess/监视/页面组树/搜索/智能名称等未迁移项继续登记；详见[p3-navigation.md](p3-navigation.md)，未执行Windows动态对照。

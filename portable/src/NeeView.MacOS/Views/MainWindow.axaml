@@ -43,17 +43,21 @@
             <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>
           </ComboBox>
           <TextBlock Grid.Row="2" Text="{Binding FolderMessage}" TextWrapping="Wrap" Margin="8,0" />
-          <DockPanel Grid.Row="3">
+          <Grid x:Name="FolderBrowserBody" Grid.Row="3" ColumnDefinitions="0,0,*">
+          <local:FolderTreeView x:Name="BookshelfDirectoryTree" IsVisible="False" />
+          <GridSplitter x:Name="FolderTreeSplitter" Grid.Column="1" Width="4" ResizeDirection="Columns" DragCompleted="FolderTree_DragCompleted" IsVisible="False" />
+          <DockPanel x:Name="BookshelfItems" Grid.Column="2">
           <TreeView x:Name="BookshelfBookmarkTree" DockPanel.Dock="Top" MaxHeight="180" IsVisible="{Binding IsBookmarkPlace}" ItemsSource="{Binding Bookmarks}" SelectionChanged="BookshelfBookmarkTree_Changed">
             <TreeView.ItemTemplate><TreeDataTemplate ItemsSource="{Binding Children}"><TextBlock Text="{Binding DisplayName}" /></TreeDataTemplate></TreeView.ItemTemplate>
           </TreeView>
           <ListBox x:Name="FolderList" Focusable="True" ItemsSource="{Binding Folders}" SelectedItem="{Binding SelectedFolder, Mode=TwoWay}" DoubleTapped="Folder_DoubleTapped">
             <ListBox.ContextMenu><ContextMenu><MenuItem Header="打开 / 进入书签文件夹" Click="Bookshelf_Open" /><MenuItem Header="在独立书签面板中定位" Click="Bookshelf_RevealBookmark" /></ContextMenu></ListBox.ContextMenu>
 
-          </ListBox></DockPanel></Grid></Border>
-      <Border Tag="PageListPanel">          <ListBox x:Name="PageList"  ItemsSource="{Binding Pages}" SelectedItem="{Binding SelectedPage}" SelectionChanged="Page_SelectionChanged">
-            <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding EntryName}" TextTrimming="CharacterEllipsis" /></DataTemplate></ListBox.ItemTemplate>
-          </ListBox></Border>
+          </ListBox></DockPanel></Grid></Grid></Border>
+      <Border Tag="PageListPanel"><Grid RowDefinitions="Auto,*">
+          <Grid ColumnDefinitions="*,Auto" Margin="8,4"><TextBlock Text="页面列表" VerticalAlignment="Center" /><Button x:Name="PageListMore" Grid.Column="1" Content="⋯" Click="PageList_More" ToolTip.Tip="页面列表显示样式" /></Grid>
+          <ListBox x:Name="PageList" Grid.Row="1" ItemsSource="{Binding Pages}" SelectedItem="{Binding SelectedPage, Mode=TwoWay}" SelectionMode="Multiple" DoubleTapped="PageList_DoubleTapped" />
+        </Grid></Border>
       <Border Tag="HistoryPanel">          <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
             <Grid ColumnDefinitions="*,Auto" Margin="8,4">
               <TextBlock Text="{Binding HistoryPlace}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip.Tip="{Binding HistoryPlace}" />

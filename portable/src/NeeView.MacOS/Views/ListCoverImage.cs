@@ -14,7 +14,11 @@ public sealed class ListCoverImage : Control
 {
     public static readonly StyledProperty<string?> SourceProperty = AvaloniaProperty.Register<ListCoverImage, string?>(nameof(Source));
     public string? Source { get => GetValue(SourceProperty); set => SetValue(SourceProperty, value); }
+    public static readonly StyledProperty<Page?> PageSourceProperty = AvaloniaProperty.Register<ListCoverImage, Page?>(nameof(PageSource));
+    /// <summary>页面列表直接租用当前书的原Page，归档条目不重新按路径打开另一来源。</summary>
+    public Page? PageSource { get => GetValue(PageSourceProperty); set => SetValue(PageSourceProperty, value); }
     public Func<string, DecodeRequest, CancellationToken, Task<BitmapLease>>? LoadCoverAsync { get; init; }
+    public Func<Page, DecodeRequest, CancellationToken, Task<BitmapLease>>? LoadPageAsync { get; init; }
     public PanelListItemProfile Profile { get; init; } = PanelListItemProfile.Create(PanelListItemStyle.Content);
     public string Placeholder { get; set; } = "▱";
     public IBrush IconBrush { get; set; } = Brushes.LightGray;
@@ -24,6 +28,7 @@ public sealed class ListCoverImage : Control
     private int _revision;
     private bool _inViewport;
     private string? _loadedPath;
+    private Page? _loadedPage;
     private int _target;
     private readonly List<Visual> _ancestors = [];
     public bool HasImage => _bitmap is not null;
@@ -49,19 +54,20 @@ public sealed class ListCoverImage : Control
         var scale = TopLevel.GetTopLevel(this)?.RenderScaling ?? 1;
         int target = Math.Clamp((int)Math.Ceiling(Math.Max(Bounds.Width, Bounds.Height) * scale / 32) * 32, 32, 1024);
         var path = visible ? Source : null;
-        if (path == _loadedPath && target == _target) return;
-        ++_revision; _request?.Cancel(); _request = null; ClearImage(); Error = null; _loadedPath = path; _target = target;
-        if (path is null || LoadCoverAsync is null) { Loading = Task.CompletedTask; return; }
-        var request = new CancellationTokenSource(); _request = request; Loading = LoadAsync(path, target, _revision, request);
+        var page = visible ? PageSource : null;
+        if (path == _loadedPath && ReferenceEquals(page, _loadedPage) && target == _target) return;
+        ++_revision; _request?.Cancel(); _request = null; ClearImage(); Error = null; _loadedPath = path; _loadedPage = page; _target = target;
+        if (page is null ? path is null || LoadCoverAsync is null : LoadPageAsync is null) { Loading = Task.CompletedTask; return; }
+        var request = new CancellationTokenSource(); _request = request; Loading = LoadAsync(path, page, target, _revision, request);
     }
     /// <summary>滚动防抖后交给唯一工厂；创建显示缓冲后登记实际字节。</summary>
-    private async Task LoadAsync(string path, int target, int revision, CancellationTokenSource request)
+    private async Task LoadAsync(string? path, Page? page, int target, int revision, CancellationTokenSource request)
     {
         BitmapLease? lease = null; Bitmap? bitmap = null;
         try
         {
             await Task.Delay(150, request.Token);
-            lease = await LoadCoverAsync!(path, new(target, target, true), request.Token);
+            lease = page is null ? await LoadCoverAsync!(path!, new(target, target, true), request.Token) : await LoadPageAsync!(page, new(target, target, true), request.Token);
             if (revision != _revision || request.IsCancellationRequested) return;
             var pixels = lease.Image; var pin = GCHandle.Alloc(pixels.Pixels, GCHandleType.Pinned);
             try { bitmap = new(PixelFormat.Bgra8888, AlphaFormat.Premul, pin.AddrOfPinnedObject(), new((int)pixels.Size.Width, (int)pixels.Size.Height), new(96, 96), pixels.Stride); }
@@ -99,7 +105,7 @@ public sealed class ListCoverImage : Control
     private void ClearImage() { ToolTip.SetIsOpen(this, false); ToolTip.SetTip(this, null); _bitmap?.Dispose(); _bitmap = null; _lease?.Dispose(); _lease = null; InvalidateVisual(); }
     protected override void OnSizeChanged(SizeChangedEventArgs e) { base.OnSizeChanged(e); Refresh(); }
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
-    { base.OnPropertyChanged(change); if (change.Property == SourceProperty || change.Property == IsVisibleProperty) Refresh(); }
+    { base.OnPropertyChanged(change); if (change.Property == SourceProperty || change.Property == PageSourceProperty || change.Property == IsVisibleProperty) Refresh(); }
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
-    { base.OnDetachedFromVisualTree(e); foreach (var visual in _ancestors) visual.PropertyChanged -= AncestorChanged; _ancestors.Clear(); _inViewport = false; ++_revision; _request?.Cancel(); _loadedPath = null; ClearImage(); }
+    { base.OnDetachedFromVisualTree(e); foreach (var visual in _ancestors) visual.PropertyChanged -= AncestorChanged; _ancestors.Clear(); _inViewport = false; ++_revision; _request?.Cancel(); _loadedPath = null; _loadedPage = null; ClearImage(); }
 }

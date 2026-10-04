@@ -1,0 +1,142 @@
+{
+  "Utc": "2026-10-04T07:42:54.723931+00:00",
+  "Scope": "正式XAML/原Page/真实后端只读Headless采样，不代表正式Mac运行、Retina或P95性能",
+  "Measurements": [
+    {
+      "Sample": 1,
+      "Position": 0,
+      "Pages": 59,
+      "Index": 0,
+      "Shown": 4,
+      "RealizedCount": 5,
+      "ThumbnailBytes": 348160,
+      "DisplayBytes": 1389080,
+      "Leases": 5,
+      "DistinctRenderedSamples": 25,
+      "SettleMs": 222.5473
+    },
+    {
+      "Sample": 1,
+      "Position": 0.5,
+      "Pages": 59,
+      "Index": 29,
+      "Shown": 4,
+      "RealizedCount": 7,
+      "ThumbnailBytes": 522240,
+      "DisplayBytes": 1389080,
+      "Leases": 5,
+      "DistinctRenderedSamples": 16,
+      "SettleMs": 2560.6541
+    },
+    {
+      "Sample": 1,
+      "Position": 0.95,
+      "Pages": 59,
+      "Index": 55,
+      "Shown": 4,
+      "RealizedCount": 7,
+      "ThumbnailBytes": 696320,
+      "DisplayBytes": 1389080,
+      "Leases": 5,
+      "DistinctRenderedSamples": 25,
+      "SettleMs": 2737.8232
+    },
+    {
+      "Sample": 2,
+      "Position": 0,
+      "Pages": 81,
+      "Index": 0,
+      "Shown": 4,
+      "RealizedCount": 5,
+      "ThumbnailBytes": 1044480,
+      "DisplayBytes": 1389080,
+      "Leases": 5,
+      "DistinctRenderedSamples": 25,
+      "SettleMs": 221.8948
+    },
+    {
+      "Sample": 2,
+      "Position": 0.5,
+      "Pages": 81,
+      "Index": 40,
+      "Shown": 4,
+      "RealizedCount": 7,
+      "ThumbnailBytes": 1218560,
+      "DisplayBytes": 1389080,
+      "Leases": 5,
+      "DistinctRenderedSamples": 25,
+      "SettleMs": 6475.8371
+    },
+    {
+      "Sample": 2,
+      "Position": 0.95,
+      "Pages": 81,
+      "Index": 76,
+      "Shown": 4,
+      "RealizedCount": 7,
+      "ThumbnailBytes": 1392640,
+      "DisplayBytes": 1389080,
+      "Leases": 5,
+      "DistinctRenderedSamples": 25,
+      "SettleMs": 2579.8962
+    },
+    {
+      "Sample": 3,
+      "Position": 0,
+      "Pages": 78,
+      "Index": 0,
+      "Shown": 4,
+      "RealizedCount": 5,
+      "ThumbnailBytes": 1733344,
+      "DisplayBytes": 1361052,
+      "Leases": 5,
+      "DistinctRenderedSamples": 16,
+      "SettleMs": 221.7656
+    },
+    {
+      "Sample": 3,
+      "Position": 0.5,
+      "Pages": 78,
+      "Index": 38,
+      "Shown": 4,
+      "RealizedCount": 7,
+      "ThumbnailBytes": 1905392,
+      "DisplayBytes": 1361900,
+      "Leases": 5,
+      "DistinctRenderedSamples": 16,
+      "SettleMs": 6343.698
+    },
+    {
+      "Sample": 3,
+      "Position": 0.95,
+      "Pages": 78,
+      "Index": 73,
+      "Shown": 4,
+      "RealizedCount": 7,
+      "ThumbnailBytes": 2082352,
+      "DisplayBytes": 1364780,
+      "Leases": 5,
+      "DistinctRenderedSamples": 16,
+      "SettleMs": 6986.4179
+    }
+  ],
+  "ClosedLeases": 0,
+  "ClosedBytes": 0,
+  "Evidence": [
+    {
+      "File": "sample-1.png",
+      "Sha256": "291bb269384cbd4a73ecccd04899b816be863016e3f7bf1f5dbf9b09153d9655",
+      "Bytes": 666776
+    },
+    {
+      "File": "sample-2.png",
+      "Sha256": "0d1e1a8bb6abd17f976c03590270d91c4c2a2b71ad6c9bd342ed1c5accfa4dd7",
+      "Bytes": 670309
+    },
+    {
+      "File": "sample-3.png",
+      "Sha256": "a73f8ae4d0e338f550688cb7b806e05e0b8ff51d92f412c9b7712148c2e3a7ae",
+      "Bytes": 603384
+    }
+  ]
+}

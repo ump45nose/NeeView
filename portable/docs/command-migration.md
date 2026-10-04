@@ -1,10 +1,10 @@
 # 完整命令迁移表
 
-固定基线 235 个原命令实例。P2 收尾为138入口/97占位；P3第一批接入ToggleIsPanorama，当前为 **139 个执行入口接入、96 个能力占位**；这是入口登记，不是功能覆盖率。原帧级全景仍待迁，见[p3-browse.md](p3-browse.md)。Mac 额外打开目录/窗口入口不计入原 235 项。
+固定基线 235 个原命令实例。P2 收尾为138入口/97占位；P3第一/二批接入ToggleIsPanorama和普通ToggleVisibleFoldersTree，当前为 **140 个执行入口接入、95 个能力占位**；这是入口登记，不是功能覆盖率。原帧级全景仍待迁，见[p3-browse.md](p3-browse.md)。Mac 额外打开目录/窗口入口不计入原 235 项。
 
 原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。方向默认值来自固定 Windows 基线，实际键位/手势按原 A/B/C、阅读方向和用户差分计算。
 
-对照 [运行导出](../acceptance/p2-completion-commands.json)、[P2 收尾清单](p2-completion-checklist.md)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider 与 ToggleHidePageSlider 是不同语义，前者仍占位；地址栏设置已可保存，但 ToggleVisibleAddressBar 命令入口仍占位。TogglePageModeReverse 已接入原反向与共享 IsLoop，不将参数拥有者映射当作执行实现。
+对照 [当前运行导出](../acceptance/p3-navigation-commands.json)、[P2 收尾清单](p2-completion-checklist.md)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider 与 ToggleHidePageSlider 是不同语义，前者仍占位；地址栏设置已可保存，但 ToggleVisibleAddressBar 命令入口仍占位。TogglePageModeReverse 已接入原反向与共享 IsLoop，不将参数拥有者映射当作执行实现。
 
 | 原命令 | 文案 | 默认输入 | 默认方向手势 | 执行入口 | 迁移说明 | 原出处 |
 |---|---|---|---|---|---|---|
@@ -84,7 +84,7 @@
 | ToggleVisibleFileInfo | 显示/隐藏信息面板 | I |  | 已接入 | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleFileInfoCommand.cs |
 | ToggleVisibleNavigator | 显示/隐藏导航面板 | N |  | 已接入 | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleNavigatorCommand.cs |
 | ToggleVisibleEffectInfo | 显示/隐藏效果面板 | E |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleEffectInfoCommand.cs |
-| ToggleVisibleFoldersTree | 显示/隐藏目录树 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleFoldersTreeCommand.cs |
+| ToggleVisibleFoldersTree | 显示/隐藏目录树 |  |  | 已接入 | P3 普通目录树显隐；脚本参数/完整树仍待迁 | NeeView/Command/Commands/ToggleVisibleFoldersTreeCommand.cs |
 | ToggleVisibleContentsTree | 显示/隐藏内容面板 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleContentsTreeCommand.cs |
 | FocusFolderSearchBox | 聚焦到书架搜索框 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/FocusFolderSearchBoxCommand.cs |
 | FocusBookmarkSearchBox | 聚焦到书签搜索框 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/FocusBookmarkSearchBoxCommand.cs |

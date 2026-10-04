@@ -11,6 +11,9 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     private readonly FolderConfigCollection _folderConfigs = folderConfigs ?? new();
     private FolderParameter? _parameter;
     private BookmarkFolderList? _bookmarks;
+    private FolderTreeModel? _folderTree;
+    /// <summary>普通树与列表共用来源替换点，但各自保持选择和展开状态；创建不枚举。</summary>
+    public FolderTreeModel FolderTree => _folderTree ??= new(archives, this);
     public bool IsBookmarkPlace => Place?.StartsWith("bookmark:", StringComparison.Ordinal) == true;
     public BookmarkNode? BookmarkPlace => IsBookmarkPlace ? _bookmarks?.Place : null;
     /// <summary>两个列表共享节点及目录参数，位置与选择各自独立；只订阅真实书签事务。</summary>
@@ -175,7 +178,7 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     public Task<bool> RefreshAsync(CancellationToken token = default) => Place is { } place
         ? SetPlaceAsync(place, SelectedItem?.Path, token, true) : Task.FromResult(false);
     /// <summary>窗口关闭取消枚举；后端晚到结果不能更新已关闭的集合。</summary>
-    public void Dispose() { _disposed = true; Interlocked.Increment(ref _revision); _request?.Cancel(); _bookmarks?.Dispose(); if (state is not null) state.BookmarksChanged -= BookmarksChanged; }
+    public void Dispose() { _disposed = true; Interlocked.Increment(ref _revision); _request?.Cancel(); _folderTree?.Dispose(); _bookmarks?.Dispose(); if (state is not null) state.BookmarksChanged -= BookmarksChanged; }
     /// <summary>列表重建保持原节点选择，普通目标Path只用于加载/历史，不作为别名身份。</summary>
     private void PublishBookmarks()
     {

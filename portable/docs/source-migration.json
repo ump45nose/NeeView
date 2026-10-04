@@ -487,7 +487,7 @@
       "source": "NeeView/SidePanels/Bookshelf/BookshelfFolderList.cs",
       "target": "src/NeeView.Engine/SidePanels/Bookshelf/BookshelfFolderList.cs",
       "sha256": "dfde868f981158732fb33200c1ef83cda63a17714a67bb54771e02fac75c3a12",
-      "status": "原Sync普通来源父目录及独立位置/选择适配，后台枚举按代次拒绝晚到；目录树/书架历史待迁"
+      "status": "原普通来源父目录/独立位置选择，后台代次；P3持有唯一普通目录树，书架历史/完整树仍待迁"
     },
     {
       "source": "NeeView/Book/BookPageCollection.cs",
@@ -499,7 +499,7 @@
       "source": "NeeView/Config/BookshelfConfig.cs",
       "target": "src/NeeView.Engine/Config/Config.cs",
       "sha256": "31ef017b9adced3508ccff93901b6246dd733338f1ed01d95295fe738a9c20dd",
-      "status": "原普通书架DefaultFolderOrder与FolderSortOrder字段；JSON未知字段保留"
+      "status": "原书架排序/分组及P3树手动/自动同步字段；其余未知字段保留"
     },
     {
       "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderItemFactory.cs",
@@ -1316,6 +1316,60 @@
       "target": "src/NeeView.Engine/Config/Config.cs",
       "sha256": "38a2573ffa5388f3939ae39ac6f5fa1dce3b307fe27a1f4f5d2a31fbd13341f6",
       "status": "P3原IsPanorama开关；MacPanoramaLayout/列宽/连续缩放为展示扩展，原帧级全景待迁"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolterTree/FolderTreeNodeBase.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookshelf/FolterTree/FolderTreeNodeBase.cs",
+      "sha256": "b68f9fdf8da510d1e8be4a2535d01e4d5f5e2aa3ecc382d54df013fdb91c3e24",
+      "status": "P3第二批：原父子/展开/选择与根归属子集，移除WPF图标/文件操作；释放回报修复失效选择"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolterTree/FolderTreeNodeDelayBase.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookshelf/FolterTree/FolderTreeNodeDelayBase.cs",
+      "sha256": "a1dd143c3c5401f78fa70c37c24fb7552afe6cc3905d4c6335b5099504714ef9",
+      "status": "P3第二批：原展开占位/延迟子集，改为取消/代次/成功提交；刷新保留引用，隐藏/折叠拒绝晚到"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolterTree/DirectoryNode.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookshelf/FolterTree/DirectoryNode.cs",
+      "sha256": "a4721a979e59aca4a98f31063b5b81446c6a6451b9f56a991554d37ced36be51",
+      "status": "P3第二批：原父链/直接子目录/自然排序子集；既有来源后台枚举，不同步探测所有后代"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolterTree/FolderTreeModel.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookshelf/FolterTree/FolderTreeModel.cs",
+      "sha256": "41c1a52f84e6f8c24c1704c6b9a3b02565fbeefb3a27157a1e140cbe4184dc79",
+      "status": "P3第二批：原普通目录选择/Decide/祖先链同步子集；树焦点保留选择；Mac真实根替换，QuickAccess/监视/驱动器未迁"
+    },
+    {
+      "source": "NeeView/Config/FolderListConfig.cs",
+      "target": "src/NeeView.Engine/Config/Config.cs",
+      "sha256": "bd44775a5a94f7e83e2163e62f97a76981151f0df75215bdea30dd803625674e",
+      "status": "P3第二批：原共享列表样式、树显隐/Top或Left/默认尺寸；Mac有限尺寸归一，原JSON分支保持"
+    },
+    {
+      "source": "NeeView/Config/PageListConfig.cs",
+      "target": "src/NeeView.Engine/Config/Config.cs",
+      "sha256": "ee09501c4206d143905d9bf95e71616da7d9e5db67288283c382e8a688efdc5f",
+      "status": "P3第二批：原PageList四模板/FocusMainView默认；页面组树/搜索/智能名称等未迁字段继续保留"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolterTree/FolderTreeLayout.cs",
+      "target": "src/NeeView.Engine/Config/Config.cs",
+      "sha256": "e8ca798af375945d9156c9cbdbe2c0993e0a402318e1564de8a149045b85ba79",
+      "status": "原Top=0/Left=1枚举，WPF转换器由Mac布局替换"
+    },
+    {
+      "source": "NeeView/SidePanels/PageList/PageListBox.xaml.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.PageList.cs",
+      "sha256": "f8ed3754f8bcebf370082e991a5a01c21aa35d000a0397b0a3e07bc55f113b41",
+      "status": "原方向键仅选行、无修饰按下定位/释放焦点、Enter及目录页双击；原Page/当前Book核对；高级组/拖放仍待迁"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolterTree/FolderTreeView.xaml.cs",
+      "target": "src/NeeView.MacOS/Views/FolderTreeView.axaml.cs",
+      "sha256": "0861e46f2cfdb7f35de9ed64eadbee7bf86df478a77e29bb3a36a7b7191865fe",
+      "status": "原普通行点击/Enter确认与焦点适配；隐藏取消需求，文件拖放/高级操作未迁"
     }
   ],
   "rule_references": [
@@ -1518,6 +1572,18 @@
       "target": "src/NeeView.MacOS/Views/VirtualizingThumbnailPanel.cs",
       "sha256": "4ef98911db969233bb00747ed6203b86835c926dfcc01362a18928ba60642a8a",
       "status": "原固定缩略单元关系适配Avalonia VirtualizingPanel及物理滚动锚点"
+    },
+    {
+      "source": "NeeView/SidePanels/PageList/PageListBox.xaml",
+      "target": "src/NeeView.MacOS/Views/PanelListItemView.axaml",
+      "sha256": "33669e0c1c2f005f72d9a626906d85b3b5ed5bd9bb36fd2f6749d15b053d4b8b",
+      "status": "P3：原四模板结构转为既有共享表现，当前Page缩略直接复用来源；高级组/名称布局未完整转换"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolterTree/FolderTreeView.xaml",
+      "target": "src/NeeView.MacOS/Views/FolderTreeView.axaml",
+      "sha256": "b29de79289b62e5606416e3919be3794b4e20e8feb69fe759594815731ea30a1",
+      "status": "普通延迟目录树绑定/选择/展开；图标/QuickAccess/完整上下文未迁"
     }
   ],
   "backend_reuse": [

@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="NeeView.MacOS.Views.FolderTreeView" x:CompileBindings="False">
+  <!-- 原目录树节点/展开由Engine维护；样式和输入不承担枚举。 -->
+  <Grid RowDefinitions="*,Auto">
+    <TreeView x:Name="DirectoryTree" ItemsSource="{Binding Roots}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
+      <TreeView.Styles>
+        <Style Selector="TreeViewItem"><Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" /><Setter Property="IsEnabled" Value="{Binding !IsPlaceholder}" /></Style>
+      </TreeView.Styles>
+      <TreeView.ItemTemplate><TreeDataTemplate ItemsSource="{Binding Children}"><TextBlock Text="{Binding DisplayText}" ToolTip.Tip="{Binding Error}" TextTrimming="CharacterEllipsis" /></TreeDataTemplate></TreeView.ItemTemplate>
+    </TreeView>
+    <TextBlock Grid.Row="1" Text="{Binding Error}" TextWrapping="Wrap" FontSize="10" Foreground="#D9957C" />
+  </Grid>
+</UserControl>

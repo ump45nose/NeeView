@@ -657,7 +657,7 @@
     "Text": "显示/隐藏目录树",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleVisibleFoldersTreeCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P3 普通目录树宿主显隐；脚本参数/完整树仍待迁",
     "MenuText": "目录树",
     "MouseGesture": ""
   },

@@ -15,12 +15,12 @@
 
 | 原面板 | 当前区域/入口 | 当前状态 |
 |---|---|---|
-| FolderPanel | 左栏 | 原普通书架目录/归档混合列表、排序、独立浏览/同步/刷新及Enter/双击打开；每目录参数/种子、四模板/可见封面与书架书签位置已接入；完整目录树/P3延迟加载待迁 |
+| FolderPanel | 左栏 | 原普通书架目录/归档混合列表、排序、独立浏览/同步/刷新及Enter/双击打开；每目录参数/种子、四模板/可见封面与书架书签位置已接入；P3普通目录树延迟展开/Top或Left/同步及分隔保存已接；QuickAccess/监视/完整树待迁 |
 | HistoryPanel | 左rail历史 | 原访问倒序/日期分组/当前目录过滤、单或双击/Enter打开、前后列表、多选移除及更多菜单；结构化搜索、原保存/登记策略、四模板/可见封面与可靠无效清理已接入 |
 | BookmarkPanel | 右rail书签 | 原节点/编辑/移动/递归合并/删除恢复、登记、独立列表导航/搜索/排序、四模板及书架联动已接入；高级树布局/修复仍占位 |
 | PlaylistPanel | 默认右rail播放列表 | 原组合框/更多/过滤/条目区与编辑导航接入；高级模板/文件管理保留占位，见p2-playlist.md |
 | DestinationFolderPanel | 默认右rail目标文件夹 | 待P4，可选择占位；两区配置/九数字命令已登记 |
-| PageListPanel | 左栏 | 虚拟化名称列表和定位；逐页缩略完善在P3，胶片条/导航器缩略已接入 |
+| PageListPanel | 左栏 | 原四模板/可见逐页缩略及万页虚拟化；方向键仅选行，点击/Enter定位；组树/搜索等待迁 |
 | FileInformationPanel | 右栏 | 条目、尺寸、字节、来源和解码错误 |
 | NavigatePanel | 右rail导航器 | 当前页缩略图与点击定位，图像外留白不触发 |
 | ImageEffectPanel | 默认右rail效果 | 待P5，可选择占位 |
@@ -53,3 +53,5 @@ P2第十二批在原历史面板标题下转换搜索/清空/原历史菜单及�
 P2第二十一批：历史/书架/书签原四模板入口启用，Content左封面右文字、Banner上横幅下标题、Thumbnail固定格网和Normal纯文字。结构、主题与封面所有权独立，完整Profile编辑/平台图标细节及Windows动态对照继续明确保留。
 
 第二十二批接入原单面板Owner浮窗、右键浮动/停靠/关闭、保留位置重开、拖回内容/图标栏与Windows.Panels恢复。唯一控件复用；真实捕获/多屏/Retina待验，见[p2-floating.md](p2-floating.md)。
+
+P3第二批在原FolderPanel内部转换普通目录树Top/Left分隔布局，既有书架书签树及左右停靠关系保持。PageListPanel增加原四模板更多入口，使用原Page及共享64 MiB缩略预算。主题和资源所有权独立，详见[p3-navigation.md](p3-navigation.md)。
