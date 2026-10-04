@@ -47,6 +47,8 @@ public sealed class ReaderView : Control, IDisposable
     private ReaderBrowsePresenter? _browse;
     private bool IsBrowsing => _operation is not null && _operation.BrowseMode != BrowseLayoutMode.Paged;
     internal BrowseLayout? BrowseLayout => _browse?.Layout;
+    internal bool BrowseLayoutPending => _browse?.IsLayoutPending ?? false;
+    internal long BrowseLayoutPublications => _browse?.LayoutPublications ?? 0;
     internal double BrowseOffset => _browse?.Offset ?? 0;
     internal Page? BrowseSelection => _browse?.SelectedPage;
     internal int BrowsePendingCount => _browse?.PendingCount ?? 0;
@@ -146,7 +148,8 @@ public sealed class ReaderView : Control, IDisposable
     public async Task RefreshAsync()
     {
         if (_disposed || _operation is null || _factory is null) return;
-        _browse?.Refresh();
+        if (_browse is not null) await _browse.RefreshAsync();
+        if (_disposed) return;
         if (IsBrowsing)
         {
             ++_revision; _request?.Cancel(); StopMotion();
@@ -307,7 +310,7 @@ public sealed class ReaderView : Control, IDisposable
     /// <summary>围绕指针位置缩放，像素需求随缩放更新。</summary>
     public async Task ZoomAsync(double factor, Point? pointer = null)
     {
-        if (IsBrowsing && _browse is not null) { await _browse.ZoomAsync(factor); _browse.Refresh(); return; }
+        if (IsBrowsing && _browse is not null) { await _browse.ZoomAsync(factor); await _browse.RefreshAsync(); return; }
         StopMotion(); SynchronizeFrame();
         var origin = pointer ?? new Point(Bounds.Width / 2, Bounds.Height / 2);
         var old = _zoom; _zoom *= factor; var ratio = _zoom / old;

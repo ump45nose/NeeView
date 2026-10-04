@@ -79,3 +79,5 @@ P2 资源收尾：ReaderView 只在同一真实图片/解码规格/来源版本�
 P3：ReaderBrowsePresenter是唯一ReaderView的连续/瀑布表现辅助；Engine.BrowseLayout只处理几何和可见索引，BookOperation提交模式/缩放/位置，主题使用Gallery.*。主窗口区域保持，顶部展示选择仅转交Engine；不在视图排序、扫描目录或保存配置。原分页变换仍独立，参见[p3-browse.md](p3-browse.md)。
 
 P3第二批：FolderTreeView.axaml/.cs只绑定原DirectoryNode并转交确认/焦点；MainWindow.DirectoryTree管理书架内部Top/Left分隔和原配置提交，枚举在Engine节点及既有来源。页面四模板复用共享表现，ListCoverImage显式PageSource/LoadPageAsync直接租用当前来源。原Page身份、排序/导航和JSON仍在Engine；样式/布局调整不扫描来源或重建正文，见[p3-navigation.md](p3-navigation.md)。
+
+P3第三批：Engine.BrowseLayout保存不可变几何检查点，ReaderBrowsePresenter只安排后台计算并在UI线程发布快照及恢复Page锚点。快照与渲染分别持有几何和像素，旧计算不能修改正在绘制的段；视图仍不枚举/排序/写配置。外观和控件布局入口保持，详见[p3-performance.md](p3-performance.md)。

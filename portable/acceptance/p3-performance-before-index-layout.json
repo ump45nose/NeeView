@@ -1,0 +1,89 @@
+{
+  "Scope": "10000\u771F\u5B9E\u672C\u5730\u7A7A\u6587\u4EF6\u5143\u6570\u636E/\u539FPage\u521B\u5EFA/\u539F\u6392\u5E8F/\u7EAF\u51E0\u4F55\uFF1B\u65E0\u89E3\u7801/\u5C4F\u5E55P95/NAS\u5916\u63A8",
+  "Pages": 10000,
+  "EnumerateMs": 63.1038,
+  "CreatePagesMs": 8.7095,
+  "SortMs": 353.3201,
+  "FullLayoutSamples": [
+    {
+      "Milliseconds": 0.5056,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.4946,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.545,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.6182,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.5376,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.5116,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.5077,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.5066,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.5076,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.5021,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.903,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.5362,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 1.651,
+      "AllocatedBytes": 455656
+    },
+    {
+      "Milliseconds": 0.5536,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.5175,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.5504,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.567,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.4974,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.624,
+      "AllocatedBytes": 452464
+    },
+    {
+      "Milliseconds": 0.6456,
+      "AllocatedBytes": 452464
+    }
+  ]
+}

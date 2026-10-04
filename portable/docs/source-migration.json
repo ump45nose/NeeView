@@ -961,13 +961,13 @@
       "source": "NeeView/Book/BookSourceFactory.cs",
       "target": "src/NeeView.Engine/Book/BookSourceFactory.cs",
       "sha256": "e3ccfba2076ec30d2389759cc8fe90340a3586970af706c7adf0dd3b66dd15e2",
-      "status": "原三种收集模式和WherePageAll判断迁入；当前支持目录/归档内目录，嵌套压缩P5"
+      "status": "原三种收集模式和WherePageAll判断保留；P3过滤/Page创建后台执行并逐项取消，当前支持目录/归档内目录，嵌套压缩P5"
     },
     {
       "source": "NeeView/Archiver/ArchiveEntryCollection.cs",
       "target": "src/NeeView.Engine/Book/BookSourceFactory.cs",
       "sha256": "6b3906245a09390e5ad1ffeb893e5f7e7676e81937a649fab0aeb7536957ee76",
-      "status": "原递归来源所属关系/shortcut/失败子书/展平；来源按集合反向关闭"
+      "status": "原递归来源所属关系/shortcut/失败子书/展平；P3元数据循环后台执行，来源按集合反向关闭"
     },
     {
       "source": "NeeView/Archiver/ArchiveEntryCollectionMode.cs",
@@ -1747,7 +1747,7 @@
   "mac_extensions": [
     {
       "target": "src/NeeView.Engine/PageFrames/BrowseLayout.cs",
-      "status": "P3纵向连续/最短列瀑布及可见查询；独立几何，非原PageFrameBox全景等价实现"
+      "status": "P3纵向连续/最短列瀑布及可见查询；256项不可变检查点重排，独立几何，非原PageFrameBox全景等价实现"
     },
     {
       "target": "src/NeeView.Engine/BookOperation/BookOperation.Browse.cs",
@@ -1755,7 +1755,7 @@
     },
     {
       "target": "src/NeeView.MacOS/Views/ReaderBrowsePresenter.cs",
-      "status": "唯一ReaderView的可见需求、显示租约及浏览表现；复用原Page/缓存"
+      "status": "唯一ReaderView的可见需求、显示租约及浏览表现；P3单槽后台布局/代次发布/原Page锚点，复用原Page/缓存"
     }
   ]
 }

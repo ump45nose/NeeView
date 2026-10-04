@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -25,7 +26,19 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     private Book? _book;
     private Page[] _pages = [];
     private long _order = -1;
-    private double _width, _viewportHeight, _columnWidth, _scale, _offset, _offsetX;
+    private readonly SemaphoreSlim _layoutSlot = new(1);
+    private readonly Dictionary<int, NeeView.Size> _dirtySizes = [];
+    private CancellationTokenSource? _layoutCancellation;
+    private Task _layoutWork = Task.CompletedTask;
+    private long _layoutGeneration;
+    private bool _layoutPending;
+    private string? _layoutError;
+    private double _layoutComputeMs, _layoutPublishMs;
+    private (double Width, BrowseLayoutMode Mode, double ColumnWidth, bool Rtl, double Scale)? _layoutShape;
+    private double? _pendingNavigation;
+    public long LayoutPublications { get; private set; }
+    public bool IsLayoutPending => _layoutPending || _relayout.IsEnabled;
+    private double _width, _columnWidth, _scale, _offset, _offsetX;
     private BrowseLayoutMode _mode;
     private bool _rightToLeft, _disposed, _initialized;
     private Page? _reported, _selection;
@@ -41,17 +54,18 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     public int DisplayCount => _images.Count;
     public double Offset => _offset;
     public Page? SelectedPage => _selection;
-    public int PendingCount => _pending.Count;
+    public int PendingCount => _pending.Count + (IsLayoutPending ? 1 : 0);
     public bool HasPressedPointer => _pressed is not null;
 
     /// <summary>保持原Page锚点，尺寸补齐/排序/窗口变化后补偿滚动；普通回报不重算全书。</summary>
-    public void Refresh()
+    /// <returns>当前后台布局及UI需求刷新完成；被新请求取代时直接退出。</returns>
+    public async Task RefreshAsync()
     {
         if (_disposed) return;
         if (!_initialized)
         {
             _initialized = true;
-            _relayout.Tick += (_, _) => { _relayout.Stop(); Rebuild(CaptureAnchor()); UpdateDemand(); };
+            _relayout.Tick += async (_, _) => { _relayout.Stop(); await ScheduleLayoutAsync(CaptureAnchor(), full: false); };
             _position.Tick += async (_, _) => { _position.Stop(); await ReportPositionAsync(); };
         }
         var book = operation.Book;
@@ -65,10 +79,11 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
         bool newBook = !ReferenceEquals(book, _book);
         var anchor = newBook ? (Page: book?.CurrentPage, Fraction: 0d) : CaptureAnchor();
         bool rebuild = newBook || _order != book?.PageOrderVersion || _mode != operation.BrowseMode
-            || _width != owner.Bounds.Width || _viewportHeight != owner.Bounds.Height || _columnWidth != Config.Current.Book.MacGalleryColumnWidth
+            || _width != owner.Bounds.Width || _columnWidth != Config.Current.Book.MacGalleryColumnWidth
             || _scale != Config.Current.Book.MacContinuousScale
             || _rightToLeft != (book?.Setting.BookReadOrder == PageReadOrder.RightToLeft);
-        if (newBook || _mode != operation.BrowseMode) ReleaseDemand();
+        bool newOrder = _order != book?.PageOrderVersion;
+        if (newBook || newOrder || _mode != operation.BrowseMode) { ReleaseDemand(); Layout = null; }
         if (newBook) { _selection = null; _reported = null; _observedIndex = -1; }
         if (!wasActive)
         {
@@ -80,8 +95,12 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
         {
             if (newBook || _order != book?.PageOrderVersion) _pages = book?.Pages.ToArray() ?? [];
             _order = book?.PageOrderVersion ?? -1; _mode = operation.BrowseMode;
-            Rebuild(anchor);
+            _layoutWork = ScheduleLayoutAsync(anchor, full: true);
         }
+        var generation = _layoutGeneration;
+        await _layoutWork;
+        if (_disposed || !Active || generation != _layoutGeneration || !ReferenceEquals(book, _book)) return;
+        _offset = Math.Clamp(_offset, 0, MaximumOffset);
         if (_observedIndex != operation.Position.Index && book is not null && !ReferenceEquals(book.CurrentPage, _reported))
             BringIntoView(operation.Position.Index);
         _observedIndex = operation.Position.Index;
@@ -95,19 +114,88 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
         int index = Layout.Query(_offset, _offset + Math.Max(1, owner.Bounds.Height)).FirstOrDefault(-1);
         return index < 0 || index >= _pages.Length ? (null, 0) : (_pages[index], (_offset - Layout.Items[index].Y) / Layout.Items[index].Height);
     }
-    /// <summary>布局只读取尺寸；未知页面用原占位尺寸，补齐后以同一Page恢复相对位置。</summary>
-    private void Rebuild((Page? Page, double Fraction) anchor)
+    /// <summary>后台单槽构造不可变快照；结构变化全算，尺寸补齐从检查点重算。</summary>
+    /// <param name="anchor">旧几何失效时保存的原Page及页内相对位置。</param>
+    /// <param name="full">书籍/顺序/几何设置变化必须全算，尺寸补齐复用旧检查点。</param>
+    /// <returns>计算及UI发布完成；过期结果不发布，计算异常保留可用旧布局。</returns>
+    private Task ScheduleLayoutAsync((Page? Page, double Fraction) anchor, bool full)
     {
-        _width = owner.Bounds.Width; _viewportHeight = owner.Bounds.Height; _columnWidth = Config.Current.Book.MacGalleryColumnWidth;
+        if (_disposed || !Active) return Task.CompletedTask;
+        _layoutCancellation?.Cancel();
+        var cancellation = new CancellationTokenSource(); _layoutCancellation = cancellation;
+        var generation = ++_layoutGeneration; _layoutPending = true;
+        _width = owner.Bounds.Width; _columnWidth = Config.Current.Book.MacGalleryColumnWidth;
         _scale = Config.Current.Book.MacContinuousScale;
         _rightToLeft = _book?.Setting.BookReadOrder == PageReadOrder.RightToLeft;
-        double centerX = (_offsetX + _width / 2) / Math.Max(1, Layout?.Width ?? _width);
-        Layout = new(_pages.Select(p => p.Content.PageDataSource.Size).ToArray(), Math.Max(32, _width - 12), _mode, _columnWidth, _rightToLeft, _scale);
-        _offsetX = Math.Clamp(centerX * Layout.Width - _width / 2, 0, Math.Max(0, Layout.Width - _width));
-        int index = anchor.Page is null ? -1 : Array.IndexOf(_pages, anchor.Page);
-        if (index >= 0) _offset = Layout.Items[index].Y + anchor.Fraction * Layout.Items[index].Height;
-        _offset = Math.Clamp(_offset, 0, MaximumOffset); owner.InvalidateVisual();
+        var pages = _pages; var book = _book; var order = _order;
+        double width = Math.Max(32, _width - 12), columnWidth = _columnWidth, scale = _scale;
+        var mode = _mode; bool rtl = _rightToLeft;
+        var shape = (width, mode, columnWidth, rtl, scale);
+        // 尺寸补齐可能赶上窗口/列宽全算；不能用旧几何检查点替换新几何请求。
+        var basis = full || _layoutShape != shape ? null : Layout;
+        var changes = new Dictionary<int, NeeView.Size>(_dirtySizes);
+        _layoutWork = CalculateAsync(); return _layoutWork;
+
+        async Task CalculateAsync()
+        {
+            bool entered = false; var token = cancellation.Token;
+            try
+            {
+                await _layoutSlot.WaitAsync(token); entered = true;
+                var result = await Task.Run(() =>
+                {
+                    var clock = Stopwatch.StartNew();
+                    BrowseLayout next;
+                    if (basis is not null) next = basis.WithSizes(changes, token);
+                    else
+                    {
+                        // PageDataSource为不可变记录；后台读取引用，不访问控件或扫描来源。
+                        var sizes = new NeeView.Size[pages.Length];
+                        for (int i = 0; i < sizes.Length; i++) { if ((i & 255) == 0) token.ThrowIfCancellationRequested(); sizes[i] = pages[i].Content.PageDataSource.Size; }
+                        next = new(sizes, width, mode, columnWidth, rtl, scale, token);
+                    }
+                    return (Layout: next, Milliseconds: clock.Elapsed.TotalMilliseconds);
+                }, token);
+                if (_disposed || !Active || token.IsCancellationRequested || generation != _layoutGeneration
+                    || !ReferenceEquals(book, operation.Book) || order != book?.PageOrderVersion) return;
+                // 用户可以在计算期间继续滚动；发布时捕获最新旧布局锚点，避免退回请求时的位置。
+                var latest = Layout is null ? anchor : CaptureAnchor();
+                double centerX = (_offsetX + _width / 2) / Math.Max(1, Layout?.Width ?? _width);
+                var publish = Stopwatch.StartNew();
+                Layout = result.Layout; _layoutShape = shape; _layoutComputeMs = result.Milliseconds; _layoutError = null;
+                _offsetX = Math.Clamp(centerX * Layout.Width - _width / 2, 0, Math.Max(0, Layout.Width - _width));
+                int index = FindPageIndex(latest.Page);
+                if (index >= 0) _offset = Layout.Items[index].Y + latest.Fraction * Layout.Items[index].Height;
+                _offset = Math.Clamp(_offset, 0, MaximumOffset);
+                foreach (var pair in changes) if (_dirtySizes.TryGetValue(pair.Key, out var value) && value == pair.Value) _dirtySizes.Remove(pair.Key);
+                if (_pendingNavigation is { } target)
+                {
+                    _pendingNavigation = null;
+                    // 初次布局尚未发布时导航器也可使用；避免Refresh随后把位置拉回原页。
+                    _observedIndex = operation.Position.Index;
+                    Scroll(target * MaximumOffset - _offset);
+                }
+                LayoutPublications++; UpdateDemand(); owner.InvalidateVisual(); _layoutPublishMs = publish.Elapsed.TotalMilliseconds;
+            }
+            catch (OperationCanceledException) when (token.IsCancellationRequested) { }
+            catch (Exception ex)
+            {
+                if (!_disposed && generation == _layoutGeneration) { _layoutError = "布局计算失败"; owner.InvalidateVisual(); }
+                System.Diagnostics.Trace.WriteLine("Browse layout: " + ex.GetType().Name);
+            }
+            finally
+            {
+                if (entered) _layoutSlot.Release();
+                if (ReferenceEquals(_layoutCancellation, cancellation)) { _layoutCancellation = null; _layoutPending = false; }
+                cancellation.Dispose();
+            }
+        }
     }
+    /// <summary>已提交的原Page.Index提供常数时间身份校验，旧顺序对象不能误命中新书。</summary>
+    /// <param name="page">原内容锚点。</param>
+    /// <returns>当前快照索引；身份失效返回-1。</returns>
+    private int FindPageIndex(Page? page) => page is not null && page.Index >= 0 && page.Index < _pages.Length
+        && ReferenceEquals(_pages[page.Index], page) ? page.Index : -1;
     private double MaximumOffset => Math.Max(0, (Layout?.Height ?? 0) - owner.Bounds.Height);
     /// <summary>原导航改变页面时，只有该项离开视口才滚动，不重置已可见项的偏移。</summary>
     /// <param name="index">当前排序后的原页面索引。</param>
@@ -134,11 +222,21 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
         foreach (int index in indices)
         {
             var page = _pages[index]; var specification = GetRequest(index);
+            TrackSize(index, page);
             if (_images.TryGetValue(page, out var image) && image.Width == specification.TargetWidth && image.Height == specification.TargetHeight) continue;
             if (_pending.ContainsKey(page) || _errors.ContainsKey(page)) continue;
             var rect = Layout.Items[index]; var demand = new Demand(new(), rect.Bottom <= _offset || rect.Y >= _offset + owner.Bounds.Height); _pending.Add(page, demand);
             _ = LoadAsync(_book, page, demand);
         }
+    }
+    /// <summary>补齐可能来自取消后探测或其他缩略消费者；与发布快照比较而非只看HasSize。</summary>
+    /// <param name="index">已核对的当前页面快照索引。</param>
+    /// <param name="page">可见原页面，尺寸变化进入80ms合并窗口。</param>
+    private void TrackSize(int index, Page page)
+    {
+        if (Layout is null || Layout.GetPageSize(index) == page.Content.PageDataSource.Size) return;
+        _dirtySizes[index] = page.Content.PageDataSource.Size;
+        if (!_relayout.IsEnabled) _relayout.Start();
     }
     /// <summary>按实际设备比例和显示尺寸计算解码规格，瀑布使用缩略预算。</summary>
     /// <param name="index">当前布局中的页面索引。</param>
@@ -160,12 +258,11 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
         var token = demand.Cancellation.Token;
         try
         {
-            bool hadSize = page.Content.HasSize;
             await operation.EnsurePageInfoAsync(book, page, token);
             token.ThrowIfCancellationRequested();
             if (_disposed || !Active || !ReferenceEquals(_book, book)) return;
-            if (!hadSize && !_relayout.IsEnabled) _relayout.Start();
             int index = page.Index; if (index < 0 || index >= _pages.Length || !ReferenceEquals(_pages[index], page)) return;
+            TrackSize(index, page);
             var request = GetRequest(index);
             var lease = await factory.GetAsync(page, request, token, demand.Background);
             if (_disposed || !Active || token.IsCancellationRequested || !ReferenceEquals(_book, book)) { lease.Dispose(); return; }
@@ -197,7 +294,7 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     public void Render(DrawingContext context)
     {
         context.FillRectangle(Brush("Gallery.Background", Brushes.Black), new Avalonia.Rect(owner.Bounds.Size));
-        if (Layout is null || _pages.Length == 0) { Text(context, "这个来源没有可浏览的页面", new(24, 24)); return; }
+        if (Layout is null || _pages.Length == 0) { Text(context, _layoutError ?? (IsLayoutPending ? "正在计算布局…" : "这个来源没有可浏览的页面"), new(24, 24)); return; }
         using var clip = context.PushClip(new Avalonia.Rect(owner.Bounds.Size));
         foreach (int index in Layout.Query(_offset, _offset + owner.Bounds.Height))
         {
@@ -243,7 +340,13 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     public Task ZoomAsync(double factor) => operation.ScaleBrowseColumnsAsync(factor);
     /// <summary>把导航器相对纵向位置转换成滚动，实际Page锚点随后回报原BookOperation。</summary>
     /// <param name="point">Y为0至1的全书纵向比例，本增量忽略X。</param>
-    public void Navigate(Point point) => Scroll(Math.Clamp(point.Y, 0, 1) * MaximumOffset - _offset);
+    public void Navigate(Point point)
+    {
+        if (_disposed || !Active || !double.IsFinite(point.Y)) return;
+        var target = Math.Clamp(point.Y, 0, 1);
+        if (IsLayoutPending || Layout is null) _pendingNavigation = target;
+        if (Layout is not null) Scroll(target * MaximumOffset - _offset);
+    }
     /// <summary>普通滚轮直接浏览；带修饰键时交还宿主原命令路由。</summary>
     /// <param name="e">框架滚轮事件。</param>
     /// <returns>本次事件是否已被浏览滚动消费。</returns>
@@ -310,6 +413,9 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
         writer.WriteNumber("PageCount", _pages.Length); writer.WriteNumber("Columns", Layout?.ColumnCount ?? 0);
         writer.WriteNumber("Offset", _offset); writer.WriteNumber("ContentHeight", Layout?.Height ?? 0);
         writer.WriteNumber("DisplayCount", _images.Count); writer.WriteNumber("PendingCount", _pending.Count);
+        writer.WriteBoolean("LayoutPending", IsLayoutPending); writer.WriteNumber("LayoutPublications", LayoutPublications);
+        writer.WriteNumber("LayoutComputeMs", _layoutComputeMs); writer.WriteNumber("LayoutPublishMs", _layoutPublishMs);
+        writer.WriteNumber("RecomputedItems", Layout?.RecomputedItemCount ?? 0); writer.WriteNumber("ReusedBlocks", Layout?.ReusedBlockCount ?? 0);
         writer.WriteNumber("ErrorCount", _errors.Count); writer.WriteNumber("PageIndex", operation.Position.Index); writer.WriteEndObject();
     }
     /// <summary>停止位置/重排计时、取消等待并释放显示；晚到任务自行归还原生租约。</summary>
@@ -317,6 +423,7 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     {
         CaptureLost();
         _relayout.Stop(); _position.Stop();
+        ++_layoutGeneration; _layoutCancellation?.Cancel(); _layoutPending = false; _layoutWork = Task.CompletedTask; _dirtySizes.Clear(); _pendingNavigation = null;
         foreach (var pending in _pending.Values) pending.Cancellation.Cancel(); _pending.Clear();
         foreach (var image in _images.Values) image.Dispose(); _images.Clear(); _errors.Clear();
     }

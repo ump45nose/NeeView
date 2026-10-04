@@ -10,22 +10,36 @@ public enum ArchiveEntryCollectionMode { CurrentDirectory, IncludeSubDirectories
 public static class BookSourceFactory
 {
     /// <summary>收集已支持来源，并按原Image/ImageAndBook/All生成Page；不包含界面类型。</summary>
+    /// <param name="collection">拥有根/子来源的原集合，失败后由调用方释放。</param>
+    /// <param name="mode">原页面收集模式，数值和过滤顺序保持。</param>
+    /// <param name="archives">供后续目录/归档封面使用的既有来源工厂。</param>
+    /// <param name="token">枚举、过滤和逐页构造的取消令牌。</param>
+    /// <param name="folders">原每目录配置，构造期间不修改。</param>
+    /// <returns>未排序、未提交的原Page集合；不发布部分书籍。</returns>
     public static async Task<List<Page>> CreatePageCollectionAsync(ArchiveEntryCollection collection, BookPageCollectMode mode, IArchiveFactory archives, CancellationToken token, FolderConfigCollection? folders = null)
     {
-        var entries = await collection.GetEntriesAsync(token);
-        IEnumerable<ArchiveEntryNode> source = entries;
-        if (mode == BookPageCollectMode.All || mode == BookPageCollectMode.ImageAndBook && collection.Mode != ArchiveEntryCollectionMode.CurrentDirectory)
+        var entries = await collection.GetEntriesAsync(token).ConfigureAwait(false);
+        // 过滤/构造万项Page是CPU工作，不能在来源返回后重新占住UI线程。
+        return await Task.Run(() =>
         {
-            var parents = entries.Select(e => System.IO.Path.GetDirectoryName(e.ArchiveEntry.SystemPath.TrimEnd('/'))).ToHashSet(StringComparer.Ordinal);
-            source = source.Where(e => e.ArchiveEntry.IsShortcut || !parents.Contains(e.ArchiveEntry.SystemPath.TrimEnd('/')));
-        }
-        source = mode switch
-        {
-            BookPageCollectMode.Image => source.Where(e => e.ArchiveEntry.IsImage()),
-            BookPageCollectMode.ImageAndBook => source.Where(e => e.ArchiveEntry.IsImage() || e.ArchiveEntry.IsBook()),
-            _ => source
-        };
-        return source.Select(e => new Page(e.ArchiveEntry, e.EntryName, archives, folders)).ToList();
+            token.ThrowIfCancellationRequested();
+            HashSet<string>? parents = null;
+            if (mode == BookPageCollectMode.All || mode == BookPageCollectMode.ImageAndBook && collection.Mode != ArchiveEntryCollectionMode.CurrentDirectory)
+            {
+                parents = new(StringComparer.Ordinal);
+                foreach (var entry in entries) { token.ThrowIfCancellationRequested(); parents.Add(System.IO.Path.GetDirectoryName(entry.ArchiveEntry.SystemPath.TrimEnd('/'))!); }
+            }
+            var pages = new List<Page>(entries.Count);
+            foreach (var entry in entries)
+            {
+                token.ThrowIfCancellationRequested(); var value = entry.ArchiveEntry;
+                if (parents is not null && !value.IsShortcut && parents.Contains(value.SystemPath.TrimEnd('/'))) continue;
+                if (mode == BookPageCollectMode.Image && !value.IsImage()
+                    || mode == BookPageCollectMode.ImageAndBook && !value.IsImage() && !value.IsBook()) continue;
+                pages.Add(new(value, entry.EntryName, archives, folders));
+            }
+            return pages;
+        }, token).ConfigureAwait(false);
     }
 }
 
@@ -39,9 +53,15 @@ public sealed class ArchiveEntryCollection(Archive root, IArchiveFactory archive
     public ArchiveEntryCollectionMode Mode { get; } = recursive ? ArchiveEntryCollectionMode.IncludeSubArchives
         : root.IsDirectory ? ArchiveEntryCollectionMode.CurrentDirectory : Config.Current.System.ArchiveRecursiveMode;
     /// <summary>收集元数据；普通目录按原递归进入子书，符号链接不继续展开以避免环。</summary>
+    /// <param name="token">完整收集的取消令牌，取消后已拥有来源仍由本集合关闭。</param>
+    /// <returns>完整条目快照；本方法不把部分索引发布给阅读端。</returns>
     public async Task<IReadOnlyList<ArchiveEntryNode>> GetEntriesAsync(CancellationToken token)
     {
-        var result = new List<ArchiveEntryNode>(); await CollectAsync(root, "", result, token); return result;
+        // 同步完成的归档也可能包含万项；整个元数据收集循环放在后台，所有权仍归本集合。
+        return await Task.Run(async () =>
+        {
+            var result = new List<ArchiveEntryNode>(); await CollectAsync(root, "", result, token); return result;
+        }, token).ConfigureAwait(false);
     }
     /// <summary>每个条目先登记，再按原IncludeSubArchives展开；失败子书保留为可识别页面。</summary>
     private async Task CollectAsync(Archive archive, string prefix, List<ArchiveEntryNode> result, CancellationToken token)
