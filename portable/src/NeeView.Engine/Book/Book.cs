@@ -12,6 +12,8 @@ public sealed class Book(Archive source, List<Page> pages, BookSettingConfig set
     public ArchiveEntryCollection? Entries { get; init; }
     public string Path => Source.Path;
     public BookPageCollection Pages { get; } = new(pages);
+    /// <summary>页面顺序提交代次；展示端按此刷新列表，普通翻页不重建条目集合。</summary>
+    public long PageOrderVersion { get; private set; }
     public BookSettingConfig Setting { get; } = setting;
     public PageSortMode EffectiveSortMode { get; private set; }
     public int SortSeed { get; internal set; }
@@ -47,6 +49,7 @@ public sealed class Book(Archive source, List<Page> pages, BookSettingConfig set
         var result = BookPageSort.Sort(Pages, mode, SortSeed, token);
         EffectiveSortMode = result.SortMode; Pages.SortMode = result.SortMode; SortSeed = result.SortSeed; Pages.Clear(); Pages.AddRange(result.Pages);
         for (int i = 0; i < Pages.Count; i++) Pages[i].Index = i;
+        PageOrderVersion++;
     }
     /// <summary>书籍拥有来源，关闭后释放归档句柄。</summary>
     public ValueTask DisposeAsync() => Entries?.DisposeAsync() ?? Source.DisposeAsync();

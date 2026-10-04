@@ -24,6 +24,8 @@
 
 视图和表现模型不枚举目录、不解压、不调用 Magick/SharpCompress、不创建平台实现。目录/归档候选由 BookOperation.Bookshelf 和 IArchiveFactory.ListBooksAsync 契约获取；像素由 BitmapFactory 租用。侧栏 Hover/选择和临时页选择只通知表现属性，不发布阅读刷新。列表先更新来源再恢复当前Page/FolderItem，避免TwoWay回报抹掉选中项。书架浏览位置/选中项独立于正文，只有打开成功才提交切书结果；默认排序控件不承担业务排序。Engine 不反向调用控件，也不保留 Avalonia Bitmap。
 
+页面列表按 `Book` 引用和 `PageOrderVersion` 缓存展示数组。原集合排序提交后产生新的表现列表引用，仍持有相同 `Page`；普通导航复用数组。`Pages` getter与Refresh均及时读取已提交书籍，避免打开后的显隐绑定读取旧数组。排序算法及主页面定位仍在Engine，表现数组不能单独排序或成为另一套状态。实际ListBox回归及真机升降序见[设备资源记录](../acceptance/p2-device-resources-runtime.md)。
+
 主图是单绘制控件，不为每页创建图像控件；页面列表使用虚拟化 ListBox。主图及可见缩略图的显示 Bitmap 与像素租约归各查看器所有，先释放 Bitmap 再释放租约。切书/缩放/视口变化用 revision 拒绝旧请求；所有 UI 对象在 Dispatcher 线程修改。
 
 主布局参照原 MainWindow.xaml、SidePanels/SidePanelFrameView.xaml、菜单和 Dock 插槽。41 DIP 侧栏、36 DIP 按钮及转换资源保留。SidePanelPresenter 复用九个唯一内容控件，按 Engine 的组顺序/方向排布；拖放预览、指针捕获、分隔条、单面板浮窗与原图标资源归表现端。布局改变只触发 PanelsRefreshed，不请求主图。侧栏浮动/关闭/重开/停靠已接入，高级窗口/输入细节仍待后续，详见 layout-migration.md。样式现代化应另做增量，保留区域和操作流程。
@@ -31,6 +33,8 @@
 输入设置使用编辑副本，可搜索全部原命令；新增不可解析输入及冲突阻止保存。输入文本时不响应阅读/数字命令；Command+O/W/Q 仍是系统操作。旧 Control 只规范解析名称，不替换为 Command。PrevScrollPage/NextScrollPage 调用 Engine 的原 NScroll 计算，ReaderView 应用向量或进入原帧导航；完整分页滚动参数、鼠标组合/方向手势及正反单双页共享循环参数从原 Commands 差分读取。全景作用在 P3。指定页对话框、共享步长和历史命令也进入同一正文入口；胶片条/滑条布局及主题不处理历史或阅读规则。正式 AppKit 桥接依据 HasPreciseScrollingDeltas，按窗口身份和查看器区域消费精确滚动/捏合；平移使用原 SnapView 防止图片移出视口，真实触控板待用户验收。
 
 测试直接装载这些正式 XAML、主题和控件源码。Headless 截图用于检查布局与真实图像绘制，不能证明 Mac 手势、Retina、Finder 或 Windows 动态一致性。
+
+只读运行诊断由启动层显式启用，ReaderView仅输出现有几何/数值，不读文件、重排页面或触发绘制。默认无日志I/O；诊断开销和进程RSS由独立设备记录说明。触控板本轮用户要求跳过，未验，不从Headless手势测试继承为真机通过。
 
 历史列表由 Engine.HistoryList/SaveData 管理过滤、导航和编辑，HistoryRow/MainWindow.History 管理分组显示、焦点、多选及菜单。四种显示模板和可靠无效清理已接通；主题/布局调整不触发阅读解码或修改访问顺序。原 RemoveUnlinkedHistory 转交既有异步清理，不在菜单中实现存在检测。
 

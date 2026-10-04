@@ -1,6 +1,6 @@
 {
   "date": "2026-10-04",
-  "phase": "p2-device-preparation-and-dynamic-replay",
+  "phase": "p2-device-preparation-dynamic-replay-and-resources",
   "product_source_commit": "402cdfb02",
   "fixture_preflight": {
     "png_count": 24,
@@ -47,10 +47,10 @@
     "windows_test_profile_read_and_written": true,
     "mac_profile_replaced": true,
     "input_focus_limit": "one startup focus race; cannot prove which instance received mistimed text; no intentional test-book open in original instance",
-    "trackpad": "not_executed",
-    "retina": "100_percent_vs_fit_JPEG_size_precheck_only; actual_RenderScaling_and_lossless_mapping_pending",
-    "windows_dynamic": "reference_captured; mac_directory_cbz_and_partial_docking_replay_completed; fixed_baseline_match_unverified",
-    "long_term_memory": "not_executed",
+    "trackpad": "skipped_at_user_request_2026-10-04; not_verified",
+    "retina": "runtime_RenderScaling_2_and_100_percent_geometry_verified_on_375_test_diagnostic_build; lossless_device_pixel_sampling_pending",
+    "windows_dynamic": "directory_cbz_partial_docking_and_filename_sort_replay_completed; fixed_baseline_match_unverified",
+    "long_term_memory": "30min_intermittent_real_browsing_observed; cache_budget_handles_and_close_release_passed; final_RSS_growth_unresolved_not_sealed",
     "multi_display": "no_environment",
     "mac_profile_restored_and_sha256_verified": true,
     "mac_process_normally_closed": true
@@ -71,10 +71,10 @@
       "cross_side_vertical_and_horizontal_groups",
       "member_float_and_redock",
       "ratio_change",
-      "right_autohide_and_reopen"
+      "right_autohide_and_reopen",
+      "filename_sort_descending_preserves_003R_changes_index_3_to_7"
     ],
     "not_captured": [
-      "sorting",
       "full_history_and_bookmark_navigation",
       "grouped_layout_restart",
       "all_focus_and_popup_hiding_conditions",
@@ -91,10 +91,10 @@
     },
     "display_limits": "RDP APIs may be DPI virtualized; no physical display or frame performance evidence",
     "split_persistence_difference": "Confirmed on Mac: MacPagePart restored second half unlike original entry-only memento. Extension retired; switch/restart first-half replay passed.",
-    "keyboard_mode_restore": "ScanCode selection sent; current mode unverified after screenshot failure and CUA timeout",
+    "keyboard_mode_restore": "ScanCode selection sent; modifier transport not fully verified",
     "ui_tool_state": "two consecutive timeouts; explicit reset and targeted Windows App binding recovered AX and screenshot; RDP desktop still available"
   },
-  "product_build_and_tests": "final_375_passed_zero_failed_skipped; Engine_library_formal_arm64_app_and_local_strict_signing_passed",
+  "product_build_and_tests": "final_376_passed_zero_failed_skipped; Engine_library_formal_arm64_app_and_local_strict_signing_passed",
   "push_or_release": "not_performed",
   "p2_acceptance_sealed": false,
   "mac_replay_evidence": {
@@ -113,12 +113,38 @@
       "ratio_and_grouped_restart"
     ],
     "pending": [
-      "real_trackpad",
-      "lossless_retina_and_runtime_scaling",
-      "long_term_browsing",
-      "mac_popup_floating_autohide_replay",
-      "full_history_bookmark_sorting_comparison"
+      "lossless_retina_device_pixel_sampling",
+      "long_term_RSS_stability",
+      "mac_popup_floating_hover_and_focus_autohide_replay",
+      "full_history_bookmark_comparison",
+      "fixed_windows_reference_baseline_match"
     ],
-    "profile_files_restored_and_verified": 4
+    "profile_files_restored_and_verified": 4,
+    "skipped": [
+      "real_trackpad_at_user_request"
+    ]
+  },
+  "latest_resource_increment": {
+    "source_base_commit": "4f1ad0ee3137e2b10cff1a7a04ab3d4f0499e0d5",
+    "record": "p2-device-resources-runtime.md",
+    "manifest": "p2-device-resources-evidence.json",
+    "validation": "p2-device-resources-validation.json",
+    "memory_retina_runtime_build": "375-test diagnostic build before page-list fix and opt-in logging guard",
+    "sorting_hide_command_runtime_build": "final 376-test formal app",
+    "sampling_seconds": 1800.063,
+    "sample_rows": 356,
+    "verified_full_cycles": 88,
+    "verified_navigation_steps": 968,
+    "verified_cycle_span_seconds": 546.239,
+    "workload": "intermittent real 12-page synthetic 4K directory/CBZ browsing; not continuous 30min navigation",
+    "rss_start_bytes": 508329984,
+    "rss_end_peak_bytes": 1181089792,
+    "rss_stability": "pending",
+    "retina": "runtime mapping subset passed; lossless sampling pending",
+    "hide_commands": "ToggleHidePanel and ShowHiddenPanels subset passed; hover/focus/popups pending",
+    "profiles_restored_and_full_manifest_verified": true,
+    "windows_test_closed_original_retained": true,
+    "diagnostics_default": "disabled; NEEVIEW_DIAGNOSTICS=1 opt-in",
+    "p2_acceptance_sealed": false
   }
 }

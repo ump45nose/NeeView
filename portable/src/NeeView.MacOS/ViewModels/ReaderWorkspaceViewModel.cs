@@ -16,7 +16,10 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public string Title => Operation.Book is { } book ? $"{System.IO.Path.GetFileName(book.Path)} — NeeView" : "NeeView";
     private string _address = "";
     public string Address { get => _address; set => SetProperty(ref _address, value); }
-    public IReadOnlyList<Page> Pages => Operation.Book is { } book ? book.Pages : [];
+    private Book? _pagesBook;
+    private long _pageOrderVersion = -1;
+    private IReadOnlyList<Page> _pages = [];
+    public IReadOnlyList<Page> Pages { get { RefreshPages(); return _pages; } }
     private Page? _selectedPage;
     public Page? SelectedPage { get => _selectedPage; set => SetProperty(ref _selectedPage, value); }
     public IReadOnlyList<FolderItem> Folders => Operation.Bookshelf.Items;
@@ -161,8 +164,21 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public void Refresh()
     {
         Address = Operation.Book?.Path ?? Address;
+        RefreshPages();
         // 先替换列表来源，再恢复选择；反向顺序会被 ListBox 的 TwoWay 清空回报覆盖。
         OnPropertyChanged(""); SelectedPage = Operation.Book?.CurrentPage; RefreshHistory(); Refreshed?.Invoke(this, EventArgs.Empty);
+    }
+    /// <summary>保留原实时 getter 语义；后台回报尚在 UI 队列时，显隐绑定也能读取已提交书籍。</summary>
+    private void RefreshPages()
+    {
+        // 原集合原地排序，不具备集合通知；仅在换书或排序提交时发布新列表引用。
+        // 页面仍使用同一原对象，避免每次翻页复制全书或建立第二套页面身份。
+        var book = Operation.Book;
+        if (!ReferenceEquals(book, _pagesBook) || (book?.PageOrderVersion ?? -1) != _pageOrderVersion)
+        {
+            _pagesBook = book; _pageOrderVersion = book?.PageOrderVersion ?? -1;
+            _pages = book?.Pages.ToArray() ?? [];
+        }
     }
     /// <summary>复用未变化的历史展示行，保留选择；必要查询由独立模型交给后台，不刷新正文。</summary>
     public void RefreshHistory()

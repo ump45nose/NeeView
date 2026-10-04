@@ -16,6 +16,7 @@ public sealed class ResourceTests
         var first = cache.GetAsync(page, new(8, 8), cancelled.Token);
         var second = cache.GetAsync(page, new(8, 8), TestContext.Current.CancellationToken);
         await decoder.Started.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+        Assert.Equal(1, cache.GetDiagnostics().PendingRequests);
         cancelled.Cancel(); await Assert.ThrowsAnyAsync<OperationCanceledException>(() => first);
         decoder.Release.TrySetResult();
         using (var lease = await second)
@@ -24,8 +25,13 @@ public sealed class ResourceTests
             using var shared = await cache.GetAsync(page, new(8, 8), TestContext.Current.CancellationToken);
             Assert.Same(lease.Image, shared.Image); Assert.Equal(1, decoder.Calls); Assert.Equal(512, cache.ByteCount);
             Assert.Equal(256, lease.Image.Pixels.Length);
+            var diagnostics = cache.GetDiagnostics();
+            Assert.Equal(256, diagnostics.PixelBytes); Assert.Equal(256, diagnostics.DisplayBytes);
+            Assert.Equal(2, diagnostics.Leases); Assert.Equal(cache.ByteCount, diagnostics.MainBytes + diagnostics.ThumbnailBytes);
+            Assert.Equal(0, diagnostics.PendingRequests);
         }
         Assert.Equal(0, cache.ByteCount); Assert.Empty(decoder.LastImage!.Pixels);
+        Assert.Equal(0, cache.GetDiagnostics().Leases); Assert.Equal(0, cache.GetDiagnostics().DisplayBytes);
     }
     /// <summary>工厂关闭后不可中断的原生结果只能清理，不能返回新显示租约。</summary>
     [Fact]

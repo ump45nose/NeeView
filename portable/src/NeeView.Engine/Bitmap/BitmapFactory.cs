@@ -36,6 +36,26 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
     public long ThumbnailBudget { get; set; } = 64L * 1024 * 1024;
     public long ByteCount { get { lock (_sync) return _cache.Values.Concat(_retired).Sum(e => e.Image.ByteCount + e.DisplayBytes); } }
 
+    /// <summary>在同一缓存锁下汇总实际像素、显示租约及需求；只读观测不触发回收或解码。</summary>
+    /// <returns>不包含内容路径或缓存键的资源快照；显示中的退役条目仍计费。</returns>
+    public BitmapCacheDiagnostics GetDiagnostics()
+    {
+        lock (_sync)
+        {
+            long pixels = 0, display = 0, main = 0, thumbnails = 0;
+            int leases = 0, waiting = 0;
+            foreach (var entry in _cache.Values.Concat(_retired))
+            {
+                pixels += entry.Image.ByteCount; display += entry.DisplayBytes;
+                if (entry.IsThumbnail) thumbnails += entry.Image.ByteCount + entry.DisplayBytes;
+                else main += entry.Image.ByteCount + entry.DisplayBytes;
+                leases += entry.References; waiting += entry.WaitingConsumers;
+            }
+            return new(_cache.Count, _retired.Count, _pending.Count, pixels, display, main, thumbnails,
+                leases, waiting, 2 - _decodeSlots.CurrentCount, 1 - _backgroundSlot.CurrentCount, Budget, ThumbnailBudget, _disposed);
+        }
+    }
+
     /// <summary>合并相同规格读取，取消当前需求不影响其他共享需求。</summary>
     public Task<BitmapLease> GetAsync(Page page, DecodeRequest request, CancellationToken token, bool background = false)
     {
@@ -205,6 +225,11 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
         }
     }
 }
+
+/// <summary>缓存的无内容标识诊断数据；RSS/原生工作内存由进程采样单独记录。</summary>
+public sealed record BitmapCacheDiagnostics(int CachedEntries, int RetiredEntries, int PendingRequests,
+    long PixelBytes, long DisplayBytes, long MainBytes, long ThumbnailBytes, int Leases, int WaitingConsumers,
+    int DecodeSlotsInUse, int BackgroundSlotsInUse, long Budget, long ThumbnailBudget, bool IsDisposed);
 
 /// <summary>共享像素租约，Avalonia Bitmap 必须先释放再归还租约。</summary>
 public sealed class BitmapLease(DecodedImageLease image, Action<long> addDisplay, Action<long> release) : IDisposable

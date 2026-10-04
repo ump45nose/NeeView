@@ -82,6 +82,37 @@ public sealed class ReaderView : Control, IDisposable
     public int DisplayCount => _images.Count;
     /// <summary>资源测量计数，仅观察成功创建的显示缓冲，不作为页面完成事件。</summary>
     internal int BitmapCreationCount { get; private set; }
+    /// <summary>写出正式窗口的设备比例和实际绘制几何；不触发布局、刷新或读取内容。</summary>
+    /// <param name="writer">宿主拥有的诊断JSON输出；显式写值兼容正式裁剪构建。</param>
+    internal void WriteDiagnostics(System.Text.Json.Utf8JsonWriter writer)
+    {
+        var top = TopLevel.GetTopLevel(this); var matrix = GetRenderedMatrix();
+        var origin = top is null ? (Point?)null : this.TranslatePoint(default, top);
+        writer.WriteStartObject(); writer.WriteNumber("Revision", _revision);
+        Metric("RenderScaling", top?.RenderScaling); Metric("PixelScale", _transform.PixelScale);
+        Metric("ViewportWidth", Bounds.Width); Metric("ViewportHeight", Bounds.Height);
+        Metric("OriginX", origin?.X); Metric("OriginY", origin?.Y);
+        Metric("TransformScale", TransformScale); Metric("TransformAngle", TransformAngle);
+        writer.WriteBoolean("IsFlipHorizontal", IsFlipHorizontal); writer.WriteBoolean("IsFlipVertical", IsFlipVertical);
+        writer.WriteBoolean("IsMotionActive", IsMotionActive);
+        Metric("PageIndex", _operation?.Position.Index); Metric("Part", _operation?.Position.Part);
+        Metric("PageCount", _operation?.Book?.Pages.Count);
+        writer.WriteNumber("DisplayCount", DisplayCount); writer.WriteNumber("TransitionDisplayCount", TransitionDisplayCount);
+        writer.WriteNumber("BitmapCreationCount", BitmapCreationCount); writer.WriteStartArray("Targets");
+        foreach (var target in _transform.GetTargets().Where(t => !t.Source.IsDummy))
+        {
+            var rect = target.Target.TransformToAABB(matrix); var display = _images.GetValueOrDefault(target.Source.Page);
+            writer.WriteStartObject(); Metric("X", rect.X); Metric("Y", rect.Y); Metric("Width", rect.Width); Metric("Height", rect.Height);
+            Metric("SourceWidth", target.Source.Page.Content.PageDataSource.Size.Width);
+            Metric("SourceHeight", target.Source.Page.Content.PageDataSource.Size.Height);
+            Metric("BitmapWidth", display?.Bitmap.PixelSize.Width); Metric("BitmapHeight", display?.Bitmap.PixelSize.Height);
+            writer.WriteEndObject();
+        }
+        writer.WriteEndArray(); writer.WriteEndObject();
+        // 未完成布局的非有限值只记为null，日志不能打断真实阅读。
+        void Metric(string name, double? value)
+        { if (value is { } number && double.IsFinite(number)) writer.WriteNumber(name, number); else writer.WriteNull(name); }
+    }
     /// <summary>当前页的资源结果；空封面是正常状态，错误不会遮蔽同帧其他页。</summary>
     public string? GetPageError(Page page) => _pageErrors.GetValueOrDefault(page);
 

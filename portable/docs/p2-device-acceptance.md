@@ -1,6 +1,6 @@
 # P2 真机与 Windows 动态验收
 
-本轮范围为真实触控板、Retina、Windows 原版动态对照和长期进程资源。多屏缺少环境，单独保留待验。遵循[静默验证约定](validation-workflow.md)：后台准备不启动正式应用，真实输入和远程桌面操作集中安排，不将工具连接成功计为功能通过。
+本轮范围为Retina、Windows 原版动态对照和长期进程资源。**真实触控板按用户2026-10-04要求跳过，未验**，原用例保留供日后验收；多屏缺少环境，单独保留待验。遵循[静默验证约定](validation-workflow.md)：后台准备不启动正式应用，真实输入和远程桌面操作集中安排，不将工具连接成功计为功能通过。
 
 ## 共用数据与后台工具
 
@@ -35,12 +35,14 @@ OpenSSH 可选组件安装若失败，保留错误和系统版本再选择恢复
 | Retina 100% | 记录屏幕模式及实际 RenderScaling；在 100% 显示 800×600 棋盘格，保存原生分辨率截图并测量图像边界/格子；与适合窗口区分 | 图像占 800×600 设备像素；不能仅以看起来清楚判定；缩放、旋转和视口裁剪条件明确 |
 | 长期资源 | 真实进程每 5 秒采样，持续 30–60 分钟重复浏览 4K 目录/CBZ、切书、浮动/停靠和关闭/重开；记录各操作区间及两段同负载复测 | 预热后相同负载的 RSS/句柄/临时文件不持续线性增长；缓存预算和租约回收分别核对；原生趋势异常再用 Instruments 等定位 |
 
-触控板由用户实际操作，远程桌面鼠标事件不能替代。多屏本轮标记未验。NAS、复杂图像/归档和 Finder 等已有待验项继续独立保留；本表的通过不自动覆盖它们。
+触控板需要用户实际操作，远程桌面鼠标事件不能替代；本轮用户要求跳过，未验。多屏本轮标记无环境、未验。NAS、复杂图像/归档和 Finder 等已有待验项继续独立保留；本表的通过不自动覆盖它们。
 
 ## 留证与当前状态
 
 每项记录应用提交/版本、数据 SHA256、设置、步骤、桌面/DPI、预期/实际、截图或 CSV 路径、通过/失败/未执行及限制。长期样本的空闲、浏览和关闭区间分开，不能把空闲采样当作持续浏览。真实帧完成时间与系统采样分开，不从 ps CPU 或 Headless 帧时间推导屏幕 P95。
 
-准备及当前状态见 [p2-device-preparation.json](../acceptance/p2-device-preparation.json)。用户已连接 RDP，已在 Windows 独立程序副本及临时 Profile 采集目录/CBZ 阅读、侧栏组合/浮动/停靠、自动隐藏和明确打开目录后的恢复，见 [Windows 参考记录](../acceptance/p2-windows-reference.md)及[截图哈希清单](../acceptance/p2-windows-evidence.json)。安装包 Revision 带 dirty，未证明匹配固定基线；Mac 已完成目录/CBZ 阅读及跨栏组合/拆组/整组移动/比例和重启恢复复演，修复数字菜单提示及半页持久化差异，见[运行记录](../acceptance/p2-device-input-runtime.md)及[36张截图清单](../acceptance/p2-macos-device-evidence.json)。Retina 100%/适合窗口仅完成 JPEG 尺寸预检，实际 RenderScaling/无损映射待验；真实触控板及长期浏览未执行。Mac 默认 Profile 已还原，四个文件 SHA256 与原快照及备份一致；P2 未封板。
+准备及当前状态见 [p2-device-preparation.json](../acceptance/p2-device-preparation.json)。用户已连接 RDP，已在 Windows 独立程序副本及临时 Profile 采集目录/CBZ 阅读、侧栏组合/浮动/停靠、自动隐藏和明确打开目录后的恢复，见 [Windows 参考记录](../acceptance/p2-windows-reference.md)及[截图哈希清单](../acceptance/p2-windows-evidence.json)。安装包 Revision 带 dirty，未证明匹配固定基线；Mac 已完成目录/CBZ 阅读及跨栏组合/拆组/整组移动/比例和重启恢复复演，修复数字菜单提示及半页持久化差异，见[运行记录](../acceptance/p2-device-input-runtime.md)及[36张截图清单](../acceptance/p2-macos-device-evidence.json)。
 
-此前 Windows App 0x104 排查作为历史记录保留在 [连接记录](../acceptance/p2-windows-connection.md)，不能继续将其当作当前连接状态。采集末段 CUA 连续超时，显式重置并定向绑定应用后 AX/截图恢复，远程桌面仍可读取；没有 RDP 断开的证据。客户端扫描码恢复动作已发送，当前模式仍待观察确认；后续同夹具 Mac 复演已完成上述子集，本轮未在 Windows 再次打开测试副本。
+最新[设备资源节点](../acceptance/p2-device-resources-runtime.md)补充名称排序对照并修复页面列表刷新，最终376项回归及正式构建/本地签名通过。最终构建的隐藏/一次显示命令真机子集通过，完整hover/焦点/弹出层及Mac浮动仍待验。375项诊断构建直接观测RenderScaling=2及100%目标400×300 DIP对应800×600源图，运行时映射子集通过；无损像素采样仍未取得。30分钟间歇浏览356样本、88完整循环/968次导航，缓存预算/句柄/关闭释放子集通过；RSS末段仍增长，自然GC补采回落，长期稳定性待复测。触控板跳过，多屏无环境。Mac两个测试进程正常退出，原Profile四文件与完整快照/备份匹配；Windows测试副本关闭、原实例保留。详见[新证据清单](../acceptance/p2-device-resources-evidence.json)，P2未封板。
+
+此前 Windows App 0x104 排查作为历史记录保留在 [连接记录](../acceptance/p2-windows-connection.md)，不能继续将其当作当前连接状态。早先采集末段 CUA 连续超时，显式重置并定向绑定应用后 AX/截图恢复，远程桌面仍可读取；没有 RDP 断开的证据。本节点又完成隔离副本排序参考并关闭，Get-Process确认仅原实例保留。客户端ScanCode恢复选择已发送，组合键传输仍未充分验证，不把客户端选择动作等同于键盘语义通过。

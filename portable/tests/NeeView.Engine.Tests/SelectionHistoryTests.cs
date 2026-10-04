@@ -274,6 +274,34 @@ public sealed class SelectionHistoryTests
         finally { await window.PrepareShutdownAsync(); window.Close(); }
     }
 
+    /// <summary>排序更新真实列表顺序并保留页面身份；普通翻页复用列表，切书刷新来源。</summary>
+    [AvaloniaFact]
+    public async Task SortedPageListPublishesOrderWithoutCopyingOnNavigation()
+    {
+        using var fixture = new Fixture(); var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
+        var operation = fixture.Operation(state); var images = new BitmapFactory(new MagickImageDecoder());
+        var model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state);
+        var window = new MainWindow(); window.Bind(model, images, new NoSystemPlatform()); window.Show();
+        try
+        {
+            await window.OpenAsync(fixture.Images); await operation.JumpAsync(2); Dispatcher.UIThread.RunJobs(); window.UpdateLayout();
+            var current = operation.Book!.CurrentPage; var before = model.Pages;
+            var list = window.FindControl<ListBox>("PageList")!;
+            await window.ExecuteAsync("SetSortModeFileNameDescending"); Dispatcher.UIThread.RunJobs(); window.UpdateLayout();
+            Assert.NotSame(before, model.Pages);
+            Assert.Equal(before.Reverse(), list.Items.Cast<Page>());
+            Assert.Same(current, list.SelectedItem); Assert.Same(current, operation.Book.CurrentPage);
+            var sorted = model.Pages;
+            await operation.JumpAsync(0); Dispatcher.UIThread.RunJobs(); window.UpdateLayout();
+            Assert.Same(sorted, model.Pages); Assert.Same(sorted[0], list.SelectedItem);
+            await window.ExecuteAsync("SetSortModeFileName"); Dispatcher.UIThread.RunJobs(); window.UpdateLayout();
+            Assert.Equal(before, list.Items.Cast<Page>()); Assert.Same(sorted[0], list.SelectedItem);
+            await window.OpenAsync(fixture.Zip); Dispatcher.UIThread.RunJobs(); window.UpdateLayout();
+            Assert.Equal(operation.Book!.Pages, list.Items.Cast<Page>()); Assert.Same(operation.Book.CurrentPage, list.SelectedItem);
+        }
+        finally { await window.PrepareShutdownAsync(); window.Close(); }
+    }
+
     /// <summary>等异步正式输入到达目标状态；超时明确失败，不把固定延迟当作成功。</summary>
     private static async Task WaitForAsync(Func<bool> completed)
     {

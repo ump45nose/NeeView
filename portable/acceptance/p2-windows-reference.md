@@ -76,3 +76,5 @@
 ## 后续 Mac 复演
 
 上述状态为 Windows 采集节点当时结果。Mac 后续已完成阅读及部分侧栏复演，确认并修复半页持久化差异；结果和剩余项见[p2-device-input-runtime.md](p2-device-input-runtime.md)。允许留证的34张Windows原图已按原SHA256归档至Mac证据清单所列持久目录；含私人缩略图的inventory未复制。参考包固定基线未获证明，历史采集边界保持。
+
+后续[设备资源节点](p2-device-resources-runtime.md)使用同一安装包的隔离副本补采名称降序：003(R)保持，主位置3/9→7/9；Mac页面列表刷新差异已修复，最终构建升降序复验通过。三张新Windows JPEG及关闭记录列于[新清单](p2-device-resources-evidence.json)，不修改原34张历史清单。测试PID19704正常关闭，Get-Process确认仅原PID28680；查询终端退出。ScanCode恢复选择已发送，组合键传输仍未充分验证。触控板按用户要求跳过、未验，多屏无环境，固定源码版本及其余动态限制继续保留。

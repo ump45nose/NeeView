@@ -39,7 +39,9 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 
 来源属于 Book，流属于请求；解码像素由 BitmapFactory 缓存，显示 Bitmap 与租约由 ReaderView 所有。显示 Bitmap 先释放，再归还像素租约。视图按 revision 拒绝晚到结果；取消等待不取消其他消费者共享的解码；没有消费者时取消排队需求，原生晚到结果只清理。
 
-像素和实际显示缓冲统一计入 512 MiB 目标预算。等待者和显示租约保护资源；无引用资源按 LRU 回收，预算内不排序完整缓存。ReaderView 对同一图片/解码规格/来源版本复用显示缓冲；目录/归档封面和新来源仍走原请求。动画最多保留一个退出帧，复用租约、不复制像素，仍计预算。预算不等于进程 RSS 上限，临时/native 工作单独限额。解码并发 2，背景槽 1，待处理需求上限512；缩略图独立 64 MiB 预算，共用原工厂和解码槽。短期固定 JPEG/目录/ZIP 软件完整帧测量见[p2-resources.md](p2-resources.md)，不外推真机帧率或长期 native 稳定性。
+主图像素和实际显示缓冲计入 512 MiB 目标预算；缩略图像素和显示缓冲另计独立 64 MiB 预算，合计不是512 MiB。等待者和显示租约保护资源；无引用资源按 LRU 回收，预算内不排序完整缓存。ReaderView 对同一图片/解码规格/来源版本复用显示缓冲；目录/归档封面和新来源仍走原请求。动画最多保留一个退出帧，复用租约、不复制像素，仍计预算。预算不等于进程 RSS 上限，临时/native 工作单独限额。解码并发 2，背景槽 1，待处理需求上限512；缩略图共用原工厂和解码槽。短期固定 JPEG/目录/ZIP 软件完整帧测量见[p2-resources.md](p2-resources.md)，不外推真机帧率或长期 native 稳定性。
+
+正式窗口的只读 RuntimeDiagnostics 仅在 `NEEVIEW_DIAGNOSTICS=1` 时启用，记录同一 ReaderView 的实际 RenderScaling/绘制几何和同一 BitmapFactory 的锁内资源计数；不新增宿主、读取入口或内容身份。默认不执行日志I/O；启用时每5秒及显示完成写有限JSONL，路径不入日志，5 MiB/文件、最多4份，窗口关闭停计时、退订并释放。30分钟间歇式真实浏览已观察预算回收、稳定句柄及关闭后工厂归零；RSS末段仍增长，长期稳定性待复测，见[设备资源记录](../acceptance/p2-device-resources-runtime.md)。自然GC回落不能替代稳定性验收。
 
 文件系统后台槽 2，队列和执行等待各 15 秒超时；不能中断的系统调用仍占槽到真正结束。ZIP/RAR/7z 解压在后台持有来源互斥。非固实大条目用 DeleteOnClose 随机临时文件；固实及 7z 使用独立顺序读取实例和每来源 2 GiB LRU 磁盘缓存，关闭清理。7z 索引顺序不同于 Reader 顺序，按名称及同名序号定位。尚无跨来源总预算和崩溃遗留缓存回收；重复同名 7z 的物理顺序映射尚待专门夹具。目录和压缩包不长期持有所有图片流。
 
@@ -54,6 +56,8 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 ## 界面与迁移目标
 
 原 MainWindow/SidePanelFrame 的区域关系是布局基准，原 Colors/IconGeometries 是资源基准。顶部菜单/地址、左右图标栏/面板、中央查看器、底部滑条/状态和胶片条插槽已转换。九个原面板完整登记；未迁移命令保留禁用菜单，分类/效果等面板保留阶段说明。用户已认可总体布局；原 LayoutPanel 关系下的跨栏重排、分割组合、成员拆组、比例/选择恢复、拖动自动隐藏锁定及单面板浮动/停靠/关闭/重开已接入。Engine 只保存布局数据，SidePanelPresenter 负责 Avalonia 控件、浮窗及拖放预览，主题可独立更改。旧 V0/V1 布局导入、高级窗口/输入细节及 Windows 动态对照仍待迁移/验证。
+
+原 Book.Pages 仍原地排序并保持 Page 身份；排序提交递增 PageOrderVersion，表现模型按书籍引用/顺序版本发布新列表数组，使Avalonia收到排序变化。普通翻页不复制全书，getter及时读取已提交书籍，不把表现数组变成第二业务集合。名称升降序、主图/页号与选中项的真机对照见[设备资源记录](../acceptance/p2-device-resources-runtime.md)。触控板本轮按用户要求跳过，未验；多屏无环境。
 
 滚动翻页从原 PageFrameBox/NScroll/ScrollResult 迁入五种模式、分段、终端吸附和换行停顿，普通滚轮命令到边界后才进入原帧导航。精确滚动仍走表现平移，由原 DragArea.SnapView 约束；书籍阅读方向与帧移动方向分别保留。完整分页滚动参数、鼠标组合和方向手势已接入；全景 PagesAsOne 在 P3。详见 [P2 第二批契约](p2-docking-scroll.md)、[参数与变换](p2-view-transform.md)、[方向手势](p2-direction-gestures.md)。
 

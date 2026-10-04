@@ -1,0 +1,703 @@
+{
+  "date": "2026-10-04",
+  "source_base_commit": "4f1ad0ee3137e2b10cff1a7a04ab3d4f0499e0d5",
+  "record": "p2-device-resources-runtime.md",
+  "local_resource_root": "/Users/yuwk/.codex/artifacts/neeview/p2-device-20261004/resources",
+  "raw_evidence_policy": "local files; SHA256 manifest committed; JPEG screenshots are not lossless device pixel evidence",
+  "source_files": [
+    {
+      "path": "portable/src/NeeView.Engine/Bitmap/BitmapFactory.cs",
+      "sha256": "0421bb54d4dd89a4e2f75c3cac34439d8e1b2674848427604a5705112b748f01"
+    },
+    {
+      "path": "portable/src/NeeView.Engine/Book/Book.cs",
+      "sha256": "7b2fe0d54a98281211a6eadc4b997dbb44c95e5e1c8cafdfd59f74de4b2568bf"
+    },
+    {
+      "path": "portable/src/NeeView.MacOS/RuntimeDiagnostics.cs",
+      "sha256": "4004de19991deb90a2791e0a8898acb2bc35f26e5cb5f156b00d6c14096b4f1e"
+    },
+    {
+      "path": "portable/src/NeeView.MacOS/MacApp.cs",
+      "sha256": "85bf64f3ebad55c49716e9b54371df8c1bb558f6db6a6e82235249e06fe9107b"
+    },
+    {
+      "path": "portable/src/NeeView.MacOS/ViewModels/ReaderWorkspaceViewModel.cs",
+      "sha256": "eae919dbcc7445d2f4ae6d38393de7c8a470397a84bd1753c6c696bee84cc894"
+    },
+    {
+      "path": "portable/src/NeeView.MacOS/Views/ReaderView.cs",
+      "sha256": "f993e2953ac8babeb158a9c22128444568b11001f0e05983be92f79f2683d76f"
+    },
+    {
+      "path": "portable/tests/NeeView.Engine.Tests/ResourceTests.cs",
+      "sha256": "b5050bd3ab05fd095fdbe52f96d8eb3dcd6581ebe621cfa570bd8e91f7468b16"
+    },
+    {
+      "path": "portable/tests/NeeView.Engine.Tests/SelectionHistoryTests.cs",
+      "sha256": "c24d611cdd880c304ce35015fe065b728e211fdc51e58901b7db0b69e0ff4734"
+    },
+    {
+      "path": "portable/scripts/validate.py",
+      "sha256": "3b3245924dbb726807b72c0f62190ea7af74225ef4a10e86980152c0a18f7caa"
+    }
+  ],
+  "final_build": {
+    "validation": "p2-device-resources-validation.json",
+    "validation_sha256": "ce1d5bb601b851f05377d1c10f2eab525f30274c155652ca1179926a9ea05b5a",
+    "tests_passed": 376,
+    "steps_exit_codes": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "formal_executable": "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app/Contents/MacOS/NeeView.MacOS",
+    "formal_executable_sha256": "750acf509ed6db7d94c51144a3a1fbdef20532e8885fa8e40ddf5ae4751ff09b",
+    "dynamic_scope": [
+      "filename_descending_and_ascending_preserve_page_identity_and_split_half",
+      "ToggleHidePanel_and_ShowHiddenPanels_command_subset"
+    ],
+    "retina_memory_rerun": false
+  },
+  "memory": {
+    "pid": 55174,
+    "runtime_build_note": "375-test diagnostic build before page-list fix and opt-in logging guard",
+    "sampling_start_utc": "2026-10-04T05:06:10.295480+00:00",
+    "sampling_end_utc": "2026-10-04T05:36:10.321232+00:00",
+    "elapsed_seconds": 1800.063,
+    "samples": 356,
+    "rss_start": 508329984,
+    "rss_end": 1181089792,
+    "rss_peak": 1181089792,
+    "fd_values": [
+      233,
+      234
+    ],
+    "windows": [
+      {
+        "seconds": [
+          0,
+          300
+        ],
+        "count": 60,
+        "rss_min": 508248064,
+        "rss_median": 604135424.0,
+        "rss_max": 609189888,
+        "fd_values": [
+          233,
+          234
+        ]
+      },
+      {
+        "seconds": [
+          300,
+          600
+        ],
+        "count": 59,
+        "rss_min": 608780288,
+        "rss_median": 616792064,
+        "rss_max": 797442048,
+        "fd_values": [
+          233,
+          234
+        ]
+      },
+      {
+        "seconds": [
+          600,
+          900
+        ],
+        "count": 59,
+        "rss_min": 796934144,
+        "rss_median": 862683136,
+        "rss_max": 921927680,
+        "fd_values": [
+          233,
+          234
+        ]
+      },
+      {
+        "seconds": [
+          900,
+          1200
+        ],
+        "count": 59,
+        "rss_min": 808517632,
+        "rss_median": 974995456,
+        "rss_max": 1037533184,
+        "fd_values": [
+          233,
+          234
+        ]
+      },
+      {
+        "seconds": [
+          1200,
+          1500
+        ],
+        "count": 59,
+        "rss_min": 840613888,
+        "rss_median": 921714688,
+        "rss_max": 1065336832,
+        "fd_values": [
+          233,
+          234
+        ]
+      },
+      {
+        "seconds": [
+          1500,
+          1801
+        ],
+        "count": 60,
+        "rss_min": 1066418176,
+        "rss_median": 1116020736.0,
+        "rss_max": 1181089792,
+        "fd_values": [
+          233,
+          234
+        ]
+      }
+    ],
+    "verified_full_cycles": 88,
+    "verified_navigation_steps": 968,
+    "verified_cycles_by_book": {
+      "directory": 43,
+      "cbz": 45
+    },
+    "verified_cycle_span_seconds": 546.2389999999999,
+    "interval_note": "Intermittent real directory/CBZ browsing with Windows/Retina/code-review idle intervals; initial Home attempts excluded from verified cycles. This is not 30 minutes of uninterrupted navigation.",
+    "cache_before_close": {
+      "CachedEntries": 272,
+      "RetiredEntries": 0,
+      "PendingRequests": 0,
+      "PixelBytes": 597196800,
+      "DisplayBytes": 4204800,
+      "MainBytes": 534528000,
+      "ThumbnailBytes": 66873600,
+      "Leases": 2,
+      "WaitingConsumers": 0,
+      "DecodeSlotsInUse": 0,
+      "BackgroundSlotsInUse": 0,
+      "Budget": 536870912,
+      "ThumbnailBudget": 67108864,
+      "IsDisposed": false
+    },
+    "dotnet_counter_followup": {
+      "dotnet.gc.collections ({collection} / 1 sec)[gc.heap.generation=gen1]": {
+        "first": 0.0,
+        "last": 0.0,
+        "min": 0.0,
+        "max": 1.0,
+        "rate_sum": 1.0
+      },
+      "dotnet.gc.collections ({collection} / 1 sec)[gc.heap.generation=gen2]": {
+        "first": 0.0,
+        "last": 0.0,
+        "min": 0.0,
+        "max": 1.0,
+        "rate_sum": 1.0
+      },
+      "dotnet.gc.last_collection.heap.size (By)[gc.heap.generation=gen2]": {
+        "first": 118003664.0,
+        "last": 123084272.0,
+        "min": 118003664.0,
+        "max": 123084272.0,
+        "rate_sum": null
+      },
+      "dotnet.gc.last_collection.heap.size (By)[gc.heap.generation=loh]": {
+        "first": 963157376.0,
+        "last": 821227728.0,
+        "min": 821227728.0,
+        "max": 963157376.0,
+        "rate_sum": null
+      },
+      "dotnet.process.memory.working_set (By)": {
+        "first": 1186332672.0,
+        "last": 1105149952.0,
+        "min": 1101807616.0,
+        "max": 1190789120.0,
+        "rate_sum": null
+      },
+      "dotnet.gc.last_collection.heap.size (By)[gc.heap.generation=gen0]": {
+        "first": 24.0,
+        "last": 24.0,
+        "min": 24.0,
+        "max": 8552.0,
+        "rate_sum": null
+      },
+      "dotnet.gc.last_collection.memory.committed_size (By)": {
+        "first": 1093730304.0,
+        "last": 958070784.0,
+        "min": 954695680.0,
+        "max": 1095303168.0,
+        "rate_sum": null
+      },
+      "dotnet.gc.last_collection.heap.size (By)[gc.heap.generation=poh]": {
+        "first": 57216.0,
+        "last": 57216.0,
+        "min": 57216.0,
+        "max": 57216.0,
+        "rate_sum": null
+      },
+      "dotnet.gc.collections ({collection} / 1 sec)[gc.heap.generation=gen0]": {
+        "first": 0.0,
+        "last": 0.0,
+        "min": 0.0,
+        "max": 1.0,
+        "rate_sum": 12.0
+      },
+      "dotnet.gc.last_collection.heap.size (By)[gc.heap.generation=gen1]": {
+        "first": 6192792.0,
+        "last": 6151704.0,
+        "min": 471320.0,
+        "max": 6192792.0,
+        "rate_sum": null
+      }
+    },
+    "temporary_cache_at_end": {
+      "files": 0,
+      "bytes": 0,
+      "observed_after_process_exit": true
+    }
+  },
+  "memory_acceptance": {
+    "cache_budgets": "passed_subset",
+    "handles": "bounded_for_observed_workload",
+    "window_close_release": "passed_subset",
+    "closed_cache": {
+      "CachedEntries": 0,
+      "RetiredEntries": 0,
+      "PendingRequests": 0,
+      "PixelBytes": 0,
+      "DisplayBytes": 0,
+      "MainBytes": 0,
+      "ThumbnailBytes": 0,
+      "Leases": 0,
+      "WaitingConsumers": 0,
+      "DecodeSlotsInUse": 0,
+      "BackgroundSlotsInUse": 0,
+      "Budget": 536870912,
+      "ThumbnailBudget": 67108864,
+      "IsDisposed": true
+    },
+    "RSS_stability": "pending; last_window_growth_unresolved; not_passed",
+    "forced_GC": false
+  },
+  "retina": {
+    "runtime_build": "375-test diagnostic build before final sorting and opt-in logging changes",
+    "observations_100_percent": 13,
+    "example": {
+      "Utc": "2026-10-04T05:05:57.485804Z",
+      "Pid": 55174,
+      "Reason": "display_completed",
+      "Reader": {
+        "Revision": 11,
+        "RenderScaling": 2,
+        "PixelScale": 0.5,
+        "ViewportWidth": 630,
+        "ViewportHeight": 694.5,
+        "OriginX": 285,
+        "OriginY": 60,
+        "TransformScale": 1,
+        "TransformAngle": 0,
+        "IsFlipHorizontal": false,
+        "IsFlipVertical": false,
+        "IsMotionActive": false,
+        "PageIndex": 2,
+        "Part": 0,
+        "PageCount": 3,
+        "DisplayCount": 1,
+        "TransitionDisplayCount": 0,
+        "BitmapCreationCount": 1,
+        "Targets": [
+          {
+            "X": 115,
+            "Y": 197.25,
+            "Width": 400,
+            "Height": 300,
+            "SourceWidth": 800,
+            "SourceHeight": 600,
+            "BitmapWidth": 800,
+            "BitmapHeight": 600
+          }
+        ]
+      },
+      "Cache": {
+        "CachedEntries": 2,
+        "RetiredEntries": 0,
+        "PendingRequests": 0,
+        "PixelBytes": 2611200,
+        "DisplayBytes": 2611200,
+        "MainBytes": 3840000,
+        "ThumbnailBytes": 1382400,
+        "Leases": 2,
+        "WaitingConsumers": 0,
+        "DecodeSlotsInUse": 0,
+        "BackgroundSlotsInUse": 0,
+        "Budget": 536870912,
+        "ThumbnailBudget": 67108864,
+        "IsDisposed": false
+      }
+    },
+    "runtime_geometry_mapping": "passed_subset",
+    "lossless_device_pixel_sampling": "pending; no_lossless_capture_obtained",
+    "display": {
+      "hardware": "M1 Pro built-in Color LCD",
+      "current_backing_pixels": [
+        2992,
+        1934
+      ],
+      "ui_points": [
+        1496,
+        967
+      ],
+      "refresh_hz": 120,
+      "panel_native_pixels": [
+        3456,
+        2234
+      ]
+    }
+  },
+  "windows": {
+    "utc": "2026-10-04T05:35:33.484Z",
+    "closed_test_pid": 19704,
+    "normal_window_close_observed": true,
+    "get_process_neeview_ids": [
+      28680
+    ],
+    "original_pid_retained": true,
+    "query_terminal_closed": true,
+    "keyboard_mode": "ScanCode selection sent; modifier transport remains uncertain",
+    "private_desktop_capture_saved": false
+  },
+  "profile_restoration": {
+    "utc": "2026-10-04T05:49:13.148233+00:00",
+    "application_stopped": true,
+    "restored": true,
+    "full_manifest_matches_snapshot": true,
+    "full_manifest_matches_backup": true,
+    "files": {
+      "Bookmark.json": {
+        "type": "file",
+        "sha256": "0e605947c1d28342dbfb49dbbdf4a12dce22015bd1ed974a69848dbaa381e915",
+        "bytes": 263
+      },
+      "Foldres.json": {
+        "type": "file",
+        "sha256": "e3c080cc2021c5cd33307f56a4ae750b35a91d5630bd2dce9888254d70905c48",
+        "bytes": 57
+      },
+      "History.json": {
+        "type": "file",
+        "sha256": "54d12d77074ce39a43be98eeb8a42f99277ecbb8bb71a9a83b45e174c576571b",
+        "bytes": 2536
+      },
+      "UserSetting.json": {
+        "type": "file",
+        "sha256": "e1013e7f021baca4a467491a09bf47f6e6ee6860a0fb703e11adbd6f6cbf881c",
+        "bytes": 9715
+      }
+    },
+    "test_profile_preserved": "/var/folders/py/gj39wxxn3fz1r3dgt15zrh3m0000gn/T/neeview-device-preflight-2dix0xte/mac-profile-test"
+  },
+  "trackpad": "skipped_at_user_request; not_verified",
+  "multi_display": "no_environment; not_verified",
+  "p2_acceptance_sealed": false,
+  "files": [
+    {
+      "path": "browsing-actions.jsonl",
+      "bytes": 94378,
+      "sha256": "ca9e041553d41e69901033f129561e4a4b62240597683ea6d002043b7b3f27f5"
+    },
+    {
+      "path": "dotnet-counters-after30min.csv",
+      "bytes": 191363,
+      "sha256": "a8b460b2be6a5e626df001766b6410b367f5bc19293d0447a29081898a8dac1c"
+    },
+    {
+      "path": "fixtures/01-reading/001.png",
+      "bytes": 5791,
+      "sha256": "3c4549087ce7387dbb8ad89a2804a21b6318adaaab5ca95a75227897ed4f2c9d"
+    },
+    {
+      "path": "fixtures/01-reading/002.png",
+      "bytes": 5707,
+      "sha256": "fb6383edc84d4e892939c3d663d8a058065c322a3b6106c6524b62e9053b435e"
+    },
+    {
+      "path": "fixtures/01-reading/003.png",
+      "bytes": 15389,
+      "sha256": "7dce26f79bec8e5dba6094b0332e1b479807b34b4484cb64f741635ee93cf61b"
+    },
+    {
+      "path": "fixtures/01-reading/004.png",
+      "bytes": 5551,
+      "sha256": "a95b571d8be59bda3b6fca28a172d887a3f0681a857e17cc4b29cde417dca97a"
+    },
+    {
+      "path": "fixtures/01-reading/005.png",
+      "bytes": 26274,
+      "sha256": "21e20ae64d93874280da36f75a65920b2e9496b9ac71eb19349c034233ea7a8b"
+    },
+    {
+      "path": "fixtures/01-reading/006.png",
+      "bytes": 11663,
+      "sha256": "dc7c87420a4eaa5d0c98ae6c4b64a318c40719687a0567a0ee50142a54db672f"
+    },
+    {
+      "path": "fixtures/01-reading/007.png",
+      "bytes": 5759,
+      "sha256": "ea800a91f4455a1b37e24c14442c36b5bb1f887c307725c5c4816545d6da1d34"
+    },
+    {
+      "path": "fixtures/01-reading/008.png",
+      "bytes": 12464,
+      "sha256": "c26819e3db42a91c8e26dcd73b09c399e6c9f588c11a02a1626796381057f831"
+    },
+    {
+      "path": "fixtures/01-reading/009.png",
+      "bytes": 5649,
+      "sha256": "610d9177dd67bd31b61e478beef6534230e68f7120b7fe6161dd35cf349f0a42"
+    },
+    {
+      "path": "fixtures/01-reading.cbz",
+      "bytes": 6998,
+      "sha256": "5b42e66534235bca326153832a85a9d461745f030bbcfa4d54d7ebd9a3f1bbb4"
+    },
+    {
+      "path": "fixtures/02-retina/checker-1px-800x600.png",
+      "bytes": 3773,
+      "sha256": "1699b16e5485709d0f7de164a44517241cd3ac5e6f198434e300e68af136810d"
+    },
+    {
+      "path": "fixtures/02-retina/checker-2px-800x600.png",
+      "bytes": 4524,
+      "sha256": "ccc8375a1602146850002b964122670b5c9b98de2ba2f85151fbb831b720e783"
+    },
+    {
+      "path": "fixtures/02-retina/checker-8px-800x600.png",
+      "bytes": 5832,
+      "sha256": "2762266eda07d15ebbae4d48d778d1b3f745f6b27a97419eb3c8c00aced8f179"
+    },
+    {
+      "path": "fixtures/03-memory/001.png",
+      "bytes": 56111,
+      "sha256": "3ad0839d37c7784a4a61d96bc2d5f79d0434f671617049c8b79ab17f12794ed8"
+    },
+    {
+      "path": "fixtures/03-memory/002.png",
+      "bytes": 55940,
+      "sha256": "065c5d4596c0dfeff70e71d1a1bb65851ba2c81e990bdabfd3d2285298e15345"
+    },
+    {
+      "path": "fixtures/03-memory/003.png",
+      "bytes": 55957,
+      "sha256": "2fd0b9a59b9d2eebf083c8e37c13d61280e2a580f30a20c6b11baed04aff4d45"
+    },
+    {
+      "path": "fixtures/03-memory/004.png",
+      "bytes": 57874,
+      "sha256": "193ebec808e17982ab85f9f3d4f5b24617a6780f4af7333150c6a815c910feb7"
+    },
+    {
+      "path": "fixtures/03-memory/005.png",
+      "bytes": 55938,
+      "sha256": "e44552ebe0aa6f2d6f8a7a7ae5dbcb3f42f2a8201ddac2d00da682a611a6d38d"
+    },
+    {
+      "path": "fixtures/03-memory/006.png",
+      "bytes": 56951,
+      "sha256": "5bef800cb28301d5dab400beb957a347ae031b0b4159d4a1e433188ce722e721"
+    },
+    {
+      "path": "fixtures/03-memory/007.png",
+      "bytes": 56059,
+      "sha256": "6fbe025243ae37f0bdc1dafcc64231187b96d98fb60d6cc052f92f809c6dcc37"
+    },
+    {
+      "path": "fixtures/03-memory/008.png",
+      "bytes": 57977,
+      "sha256": "6c57e1128f1a91eb3031449d83281e9a108ebe54bf5697f41f61d151328d75c1"
+    },
+    {
+      "path": "fixtures/03-memory/009.png",
+      "bytes": 56963,
+      "sha256": "9074ccd2e19e933d29ce13e7deac129fb60c2a593716072c7a67b7780f297a86"
+    },
+    {
+      "path": "fixtures/03-memory/010.png",
+      "bytes": 56280,
+      "sha256": "a380136df619d85e9cdf85856228819c97cc1ef361fbf9506bd7635c36610f86"
+    },
+    {
+      "path": "fixtures/03-memory/011.png",
+      "bytes": 53171,
+      "sha256": "33998db08c5d24f5043ef0664af77cc114407739327ec3e25ac1ca9b6caf3d00"
+    },
+    {
+      "path": "fixtures/03-memory/012.png",
+      "bytes": 53417,
+      "sha256": "5c67097689e4737fa68eb5db379616bf4b5ef918eb3c916f048c7885faab619f"
+    },
+    {
+      "path": "fixtures/03-memory.cbz",
+      "bytes": 19111,
+      "sha256": "7c054378bd365cbe15f1e6fe0cba235ee74659975d82f9b87589625c71889d6b"
+    },
+    {
+      "path": "fixtures/manifest.json",
+      "bytes": 5346,
+      "sha256": "3b5ad6dceedbf4a9a95226de08cc540b12cb7ae89b2ace1fe722f4c862a687fc"
+    },
+    {
+      "path": "mac-autohide-hidden.ax.txt",
+      "bytes": 2744,
+      "sha256": "02d81d2c5943454bd6dc59e67ff38944ced9e9d3d3084afd754fbf494cd3c192"
+    },
+    {
+      "path": "mac-autohide-hidden.jpg",
+      "bytes": 176709,
+      "sha256": "4b5e6a5f197a5afd19b709c8703e34aea78557bafd59fd7d00d22bdecba93f94",
+      "format": "JPEG",
+      "width": 2400,
+      "height": 1664
+    },
+    {
+      "path": "mac-autohide-restored.ax.txt",
+      "bytes": 142,
+      "sha256": "3008298aa79919b628e2379daeb22337eb6c66e3845bef2d8fb6c11770c2d32c"
+    },
+    {
+      "path": "mac-autohide-restored.jpg",
+      "bytes": 253092,
+      "sha256": "27c14cb9fb7c8928bf04eb037eb17b7de6da1a498aef334d26e918a3e1755d99",
+      "format": "JPEG",
+      "width": 2400,
+      "height": 1664
+    },
+    {
+      "path": "mac-autohide-show-once.ax.txt",
+      "bytes": 4009,
+      "sha256": "bee3ebfe9009a6e590ad660c63c61689e1838684a1146f723bf2869c7422eef9"
+    },
+    {
+      "path": "mac-autohide-show-once.jpg",
+      "bytes": 252964,
+      "sha256": "a02325fdc9a5c87e0d9302aca514c59c997302e2776aff6132c03c7bb4bd4169",
+      "format": "JPEG",
+      "width": 2400,
+      "height": 1664
+    },
+    {
+      "path": "mac-profile-restoration.json",
+      "bytes": 951,
+      "sha256": "2bc5a3ca317b48f319c403c81b65e69f11e58463340595b531cb87c6843c2c9b"
+    },
+    {
+      "path": "mac-sort-ascending-fixed.ax.txt",
+      "bytes": 4009,
+      "sha256": "bee3ebfe9009a6e590ad660c63c61689e1838684a1146f723bf2869c7422eef9"
+    },
+    {
+      "path": "mac-sort-ascending-fixed.jpg",
+      "bytes": 253077,
+      "sha256": "bef2d8b245972fdfd2ba98adf7af78a7f50cd9f48d580430e2b9937806fc3ea8",
+      "format": "JPEG",
+      "width": 2400,
+      "height": 1664
+    },
+    {
+      "path": "mac-sort-descending-fixed.ax.txt",
+      "bytes": 4009,
+      "sha256": "614bd0691bb6c49f3d7db7d6c3962a56f9340d2123fe88f807f345936f7ca70c"
+    },
+    {
+      "path": "mac-sort-descending-fixed.jpg",
+      "bytes": 254431,
+      "sha256": "681716fcf15231cbc155f0b14277183fa86a776aa54ddbd9f8079d5622d44509",
+      "format": "JPEG",
+      "width": 2400,
+      "height": 1664
+    },
+    {
+      "path": "mac-sort-descending.jpg",
+      "bytes": 254157,
+      "sha256": "2f86b250aeb792cb195ce85cf0bdbbd0a96cd649a0b396098970020cc3827268",
+      "format": "JPEG",
+      "width": 2400,
+      "height": 1664
+    },
+    {
+      "path": "macos-memory-30min.csv",
+      "bytes": 23898,
+      "sha256": "e5511717d4c3430da3041d4d7a7d321bf7ad8d2525d831619506e6770070c1a1"
+    },
+    {
+      "path": "resources-summary.json",
+      "bytes": 17847,
+      "sha256": "83b5fb21de637bdddc194ef0d3a6b7c84b51b057a0f6c8731b82b7c90a0cc61d"
+    },
+    {
+      "path": "run.json",
+      "bytes": 223,
+      "sha256": "01dff136855f0619b7c901b23a448e2cf72e3c6211f5c8620a22b655b32e845e"
+    },
+    {
+      "path": "runtime-55174.jsonl",
+      "bytes": 1430044,
+      "sha256": "f9747ecfb7ea3a37b2164fb7c4128029e49bbcf1a1d13a475f5e94958ce0e566"
+    },
+    {
+      "path": "validation-initial-failure.json",
+      "bytes": 2745,
+      "sha256": "d94baa3adfb11851278c0ea33a0f2663317e6df6cddf8aa68112a4d44e566f69"
+    },
+    {
+      "path": "vmmap-after-window-close.txt",
+      "bytes": 8054,
+      "sha256": "8111c0e8899738aeab344a7727cc398eef5b1f4b1ad40a4a46f29fa91ce570da"
+    },
+    {
+      "path": "vmmap-before-close.txt",
+      "bytes": 8193,
+      "sha256": "af7950c95008afec03587c103e987cfddb8cb843429a9277373b5794b9a994be"
+    },
+    {
+      "path": "window-closed-diagnostics.json",
+      "bytes": 938,
+      "sha256": "20665d2a24b976bba9ce8a3b95a2d63410a0a4778530b99b466a54208a064aa7"
+    },
+    {
+      "path": "windows-cleanup.json",
+      "bytes": 345,
+      "sha256": "d2b5cd1e463b242b7a239a546f50be1eea0e049a75e7cb0189bf8cc40f173d18"
+    },
+    {
+      "path": "windows-page-menu.jpg",
+      "bytes": 332066,
+      "sha256": "7bb2fedc4c9ed48d4a927530b92e43ff59e6cc5cc0cb1e717b92682ff80d53d1",
+      "format": "JPEG",
+      "width": 2578,
+      "height": 1682
+    },
+    {
+      "path": "windows-reference-start.jpg",
+      "bytes": 285998,
+      "sha256": "22a0d6187b9c5ec30c092d5b39bcb143a7398917a6a4b3986002b7c65147412d",
+      "format": "JPEG",
+      "width": 2578,
+      "height": 1682
+    },
+    {
+      "path": "windows-sort-descending.jpg",
+      "bytes": 296621,
+      "sha256": "6a8708b28fc4dcaa4b885067b6e98cc67ef43c9e7d076455bcf144dc2e464a67",
+      "format": "JPEG",
+      "width": 2578,
+      "height": 1682
+    }
+  ]
+}

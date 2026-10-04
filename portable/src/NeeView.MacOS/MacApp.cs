@@ -88,7 +88,7 @@ public sealed partial class MacApp : Avalonia.Application
             _window.AttachPlatformInput(new MacTrackpadInput());
             _window.Closed += (_, _) => _window = null;
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) desktop.MainWindow = _window;
-            _window.Show(); if (restore) await _window.RestoreLastAsync();
+            _window.Show(); RuntimeDiagnostics.Attach(_window, images); if (restore) await _window.RestoreLastAsync();
         }
         catch (Exception ex)
         {
