@@ -42,3 +42,5 @@ OpenSSH 可选组件安装若失败，保留错误和系统版本再选择恢复
 每项记录应用提交/版本、数据 SHA256、设置、步骤、桌面/DPI、预期/实际、截图或 CSV 路径、通过/失败/未执行及限制。长期样本的空闲、浏览和关闭区间分开，不能把空闲采样当作持续浏览。真实帧完成时间与系统采样分开，不从 ps CPU 或 Headless 帧时间推导屏幕 P95。
 
 准备记录见 [p2-device-preparation.json](../acceptance/p2-device-preparation.json)。目前只完成工具与数据验证、入口探测；参考程序尚未读取，远程登录、Mac 正式运行和上述动态用例尚未执行。P2 整体验收仍未封板。
+
+用户已授权前台操作后的连接排查见 [p2-windows-connection.md](../acceptance/p2-windows-connection.md)：RDP 协商能够响应，但 Windows App 仍报 0x104，尚未进入凭据或桌面；客户端问题与 NeeView 动态验收分开记录。
