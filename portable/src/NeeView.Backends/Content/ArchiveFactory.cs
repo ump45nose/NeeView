@@ -132,6 +132,59 @@ public static class SourceIo
 public sealed class FolderArchive(string path) : Archive(path)
 {
     public override bool IsDirectory => true;
+    /// <summary>有界后台枚举，最多预排两批；已知图片先产出，同一文件在后续枚举中跳过。</summary>
+    /// <param name="token">读取、排队、隐藏/切书/关闭时的取消。</param>
+    /// <returns>首批不等待全目录扫描；每批最多128项，所有ID在本次枚举内唯一。</returns>
+    public override async IAsyncEnumerable<IReadOnlyList<ArchiveEntry>> EnumerateEntryBatchesAsync(
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
+    {
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
+        using var lifetime = CancellationTokenSource.CreateLinkedTokenSource(token);
+        var producerToken = lifetime.Token;
+        var channel = System.Threading.Channels.Channel.CreateBounded<IReadOnlyList<ArchiveEntry>>(2);
+        var producer = ProduceAsync();
+        try
+        {
+            await foreach (var batch in channel.Reader.ReadAllAsync(token).ConfigureAwait(false)) yield return batch;
+            await producer.ConfigureAwait(false);
+        }
+        finally { lifetime.Cancel(); }
+
+        // SourceIo持有槽直到真正退出；超时只结束消费者，不能提前释放仍阻塞的NAS枚举槽。
+        async Task ProduceAsync()
+        {
+            try
+            {
+                await SourceIo.RunAsync(() =>
+                {
+                    var batch = new List<ArchiveEntry>(128); int id = 0;
+                    if (RequestedEntryName is { } requested)
+                    {
+                        var file = new FileInfo(System.IO.Path.Combine(Path, requested));
+                        if (file.Exists) { Add(file); Flush(); }
+                    }
+                    foreach (var info in new DirectoryInfo(Path).EnumerateFileSystemInfos())
+                    {
+                        producerToken.ThrowIfCancellationRequested();
+                        if (info.Name.StartsWith('.') || info.Name == RequestedEntryName) continue;
+                        Add(info); if (batch.Count == 128) Flush();
+                    }
+                    Flush(); return true;
+
+                    void Add(FileSystemInfo info) => batch.Add(new(this) { Id = id++, RawEntryName = info.Name,
+                        FilePath = info.FullName, IsDirectory = info is DirectoryInfo, IsShortcut = info.LinkTarget is not null,
+                        Length = info is FileInfo value ? value.Length : -1, LastWriteTime = info.LastWriteTime });
+                    void Flush()
+                    {
+                        if (batch.Count == 0) return;
+                        channel.Writer.WriteAsync(batch.ToArray(), producerToken).AsTask().GetAwaiter().GetResult(); batch.Clear();
+                    }
+                }, producerToken).ConfigureAwait(false);
+                channel.Writer.TryComplete();
+            }
+            catch (Exception ex) { channel.Writer.TryComplete(ex); }
+        }
+    }
     /// <summary>按原 DirectoryInfo 枚举，过滤隐藏文件；不持有全目录文件句柄。</summary>
     public override Task<IReadOnlyList<ArchiveEntry>> GetEntriesAsync(CancellationToken token) => SourceIo.RunAsync<IReadOnlyList<ArchiveEntry>>(() =>
     {

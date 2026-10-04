@@ -379,7 +379,7 @@
       "source": "NeeView/BookOperation/BookOperation.cs",
       "target": "src/NeeView.Engine/BookOperation/BookOperation.cs",
       "sha256": "f419c0c0d409727c7902d8b253fbdb9e69ffc405b79ab052d18d6a8b9f279f23",
-      "status": "P1编排适配；来源/保存/代次协调；不是完整原BookOperation"
+      "status": "P1编排适配；来源/保存/代次协调；不是完整原BookOperation；P3直接目录分批索引沿原Page/导航锁提交，代次隔离及末端保护，递归展平/归档保持完整过滤"
     },
     {
       "source": "NeeView/PageFrames/PageFrameContext.cs",
@@ -505,7 +505,7 @@
       "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderItemFactory.cs",
       "target": "src/NeeView.Backends/Content/ArchiveFactory.cs",
       "sha256": "0fd03cb96f291ac5c95c56ad9d0996213be1b4039f646f10a29de5ae8a56d5fa",
-      "status": "原普通目录/支持归档候选及元数据适配，快捷方式/媒体/播放列表/分卷过滤未迁"
+      "status": "原普通目录/支持归档候选及元数据适配，快捷方式/媒体/播放列表/分卷过滤未迁；P3直接目录分批索引沿原Page/导航锁提交，代次隔离及末端保护，递归展平/归档保持完整过滤"
     },
     {
       "source": "NeeView/Bookamrk/BookmarkCollection.cs",
@@ -625,7 +625,7 @@
       "source": "NeeView/BookHub/BookHub.cs",
       "target": "src/NeeView.Engine/BookOperation/BookOperation.cs",
       "sha256": "4d33119203989d72ff6cebf6b8a29caa10c054db0f8d704ebd2cb605918760b6",
-      "status": "第六批真机修复：显式BookMemento优先于历史与普通恢复策略；保留页位置/设置/排序种子，不等同完整BookHub迁入"
+      "status": "第六批真机修复：显式BookMemento优先于历史与普通恢复策略；保留页位置/设置/排序种子，不等同完整BookHub迁入；P3直接目录分批索引沿原Page/导航锁提交，代次隔离及末端保护，递归展平/归档保持完整过滤"
     },
     {
       "source": "NeeView/PageSelect/PageSlider/SliderTextBox.cs",
@@ -739,7 +739,7 @@
       "source": "NeeView/PageFrames/BookContext.cs",
       "target": "src/NeeView.Engine/BookOperation/BookOperation.cs",
       "sha256": "42289d6353cbefe4f39078663a06dbbfc92cb6568e2fa4a764c83e5d06d743a6",
-      "status": "原SelectedRange.CollectPositions升序设置主页，修正反向双页视觉元素首项误用"
+      "status": "原SelectedRange.CollectPositions升序设置主页，修正反向双页视觉元素首项误用；P3直接目录分批索引沿原Page/导航锁提交，代次隔离及末端保护，递归展平/归档保持完整过滤"
     },
     {
       "source": "NeeView/Config/AutoHideConfig.cs",
@@ -961,25 +961,25 @@
       "source": "NeeView/Book/BookSourceFactory.cs",
       "target": "src/NeeView.Engine/Book/BookSourceFactory.cs",
       "sha256": "e3ccfba2076ec30d2389759cc8fe90340a3586970af706c7adf0dd3b66dd15e2",
-      "status": "原三种收集模式和WherePageAll判断保留；P3过滤/Page创建后台执行并逐项取消，当前支持目录/归档内目录，嵌套压缩P5"
+      "status": "原三种收集模式和WherePageAll判断保留；P3过滤/Page创建后台执行并逐项取消，当前支持目录/归档内目录，嵌套压缩P5；P3直接目录分批索引沿原Page/导航锁提交，代次隔离及末端保护，递归展平/归档保持完整过滤"
     },
     {
       "source": "NeeView/Archiver/ArchiveEntryCollection.cs",
       "target": "src/NeeView.Engine/Book/BookSourceFactory.cs",
       "sha256": "6b3906245a09390e5ad1ffeb893e5f7e7676e81937a649fab0aeb7536957ee76",
-      "status": "原递归来源所属关系/shortcut/失败子书/展平；P3元数据循环后台执行，来源按集合反向关闭"
+      "status": "原递归来源所属关系/shortcut/失败子书/展平；P3元数据循环后台执行，来源按集合反向关闭；P3直接目录分批索引沿原Page/导航锁提交，代次隔离及末端保护，递归展平/归档保持完整过滤"
     },
     {
       "source": "NeeView/Archiver/ArchiveEntryCollectionMode.cs",
       "target": "src/NeeView.Engine/Book/BookSourceFactory.cs",
       "sha256": "8a225c96f522ba60c073c0fa6182700ee4e8b966d2f51825b797d5dd9aae3e8e",
-      "status": "保留原三模式枚举数值"
+      "status": "保留原三模式枚举数值；P3直接目录分批索引沿原Page/导航锁提交，代次隔离及末端保护，递归展平/归档保持完整过滤"
     },
     {
       "source": "NeeView/Book/BookPageCollectMode.cs",
       "target": "src/NeeView.Engine/Book/BookSourceFactory.cs",
       "sha256": "9bdabe083acb88cec673b0c2d39c0ee5ab2fc09ba95cbfc46f7414e0a847c086",
-      "status": "保留原Image/ImageAndBook/All枚举数值"
+      "status": "保留原Image/ImageAndBook/All枚举数值；P3直接目录分批索引沿原Page/导航锁提交，代次隔离及末端保护，递归展平/归档保持完整过滤"
     },
     {
       "source": "NeeView/BookHub/BookAddress.cs",

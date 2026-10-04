@@ -9,6 +9,31 @@ public enum ArchiveEntryCollectionMode { CurrentDirectory, IncludeSubDirectories
 /// <summary>按原模式过滤页面，保留有内容目录展平及空目录页面的判断。</summary>
 public static class BookSourceFactory
 {
+    /// <summary>直接目录分批构造原Page；递归展平和归档继续完整过滤，避免过早发布会消失的目录项。</summary>
+    /// <param name="collection">唯一来源所有者。</param><param name="mode">原过滤模式。</param>
+    /// <param name="archives">原来源工厂。</param><param name="token">逐条取消。</param>
+    /// <param name="folders">每目录配置。</param><returns>同一来源中只构造一次的原Page批次。</returns>
+    public static async IAsyncEnumerable<List<Page>> CreatePageBatchesAsync(ArchiveEntryCollection collection, BookPageCollectMode mode,
+        IArchiveFactory archives, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token, FolderConfigCollection? folders = null)
+    {
+        if (!collection.Root.IsDirectory || collection.Mode != ArchiveEntryCollectionMode.CurrentDirectory)
+        { yield return await CreatePageCollectionAsync(collection, mode, archives, token, folders).ConfigureAwait(false); yield break; }
+        await foreach (var batch in collection.Root.EnumerateEntryBatchesAsync(token).ConfigureAwait(false))
+        {
+            var pages = await Task.Run(() =>
+            {
+                var result = new List<Page>();
+                foreach (var entry in batch)
+                {
+                    token.ThrowIfCancellationRequested();
+                    if (mode == BookPageCollectMode.Image && !entry.IsImage() || mode == BookPageCollectMode.ImageAndBook && !entry.IsImage() && !entry.IsBook()) continue;
+                    result.Add(new(entry, entry.EntryName, archives, folders));
+                }
+                return result;
+            }, token).ConfigureAwait(false);
+            if (pages.Count > 0) yield return pages;
+        }
+    }
     /// <summary>收集已支持来源，并按原Image/ImageAndBook/All生成Page；不包含界面类型。</summary>
     /// <param name="collection">拥有根/子来源的原集合，失败后由调用方释放。</param>
     /// <param name="mode">原页面收集模式，数值和过滤顺序保持。</param>
@@ -49,6 +74,7 @@ public sealed record ArchiveEntryNode(ArchiveEntry ArchiveEntry, string EntryNam
 /// <summary>原根来源及递归来源的唯一所有者；关闭/失败时释放全部来源。</summary>
 public sealed class ArchiveEntryCollection(Archive root, IArchiveFactory archives, bool recursive) : IAsyncDisposable
 {
+    public Archive Root => root;
     private readonly List<Archive> _owned = [root];
     public ArchiveEntryCollectionMode Mode { get; } = recursive ? ArchiveEntryCollectionMode.IncludeSubArchives
         : root.IsDirectory ? ArchiveEntryCollectionMode.CurrentDirectory : Config.Current.System.ArchiveRecursiveMode;

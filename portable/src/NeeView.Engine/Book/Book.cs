@@ -14,6 +14,9 @@ public sealed class Book(Archive source, List<Page> pages, BookSettingConfig set
     public BookPageCollection Pages { get; } = new(pages);
     /// <summary>页面顺序提交代次；展示端按此刷新列表，普通翻页不重建条目集合。</summary>
     public long PageOrderVersion { get; private set; }
+    /// <summary>来源索引仍在补齐时，末端不是实际页尾；失败保留已提交页面并记录错误。</summary>
+    public bool IsIndexing { get; internal set; }
+    public string? IndexError { get; internal set; }
     public BookSettingConfig Setting { get; } = setting;
     public PageSortMode EffectiveSortMode { get; private set; }
     public int SortSeed { get; internal set; }
@@ -47,6 +50,11 @@ public sealed class Book(Archive source, List<Page> pages, BookSettingConfig set
             ? (Setting.SortMode.IsDescending() ? PageSortMode.FileNameDescending : PageSortMode.FileName)
             : Setting.SortMode;
         var result = BookPageSort.Sort(Pages, mode, SortSeed, token);
+        ApplySort(result);
+    }
+    /// <summary>锁内提交后台生成的原排序结果；保持Page引用及同一页面集合。</summary>
+    internal void ApplySort(BookPageSortResult result)
+    {
         EffectiveSortMode = result.SortMode; Pages.SortMode = result.SortMode; SortSeed = result.SortSeed; Pages.Clear(); Pages.AddRange(result.Pages);
         for (int i = 0; i < Pages.Count; i++) Pages[i].Index = i;
         PageOrderVersion++;

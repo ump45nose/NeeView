@@ -65,6 +65,8 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         Archive? source = null;
         ArchiveEntryCollection? collection = null;
         bool committed = false;
+        Book? candidate = null;
+        bool indexCompleted = false;
         try
         {
             source = await archives.OpenAsync(path, opening.Token);
@@ -75,13 +77,22 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             var setting = startupMemento?.Path == source.Path ? startupMemento.ToBookSetting()
                 : Config.Current.BookSettingPolicy.Mix(Config.Current.BookSettingDefault, Config.Current.BookSetting, restored?.ToBookSetting(), false);
             collection = new(source, archives, setting.IsRecursiveFolder);
-            var pages = await BookSourceFactory.CreatePageCollectionAsync(collection, Config.Current.System.BookPageCollectMode, archives, opening.Token, saveData.FolderConfigs);
-            var book = new Book(source, pages, setting) { Entries = collection, IsNew = restored is null };
+            await using var batches = BookSourceFactory.CreatePageBatchesAsync(collection, Config.Current.System.BookPageCollectMode, archives, opening.Token, saveData.FolderConfigs).GetAsyncEnumerator(opening.Token);
+            var explicitEntry = entryName ?? source.RequestedEntryName;
+            var requested = explicitEntry ?? (ImageFormats.IsImage(path) ? System.IO.Path.GetFileName(path) : setting.Page);
+            var pages = new List<Page>();
+            // 反向页尾和末页重置需要真实末端；显式图片/历史目标到达前保留旧书，不误开首图。
+            var requireComplete = terminalDirection < 0 || explicitEntry is null && !string.IsNullOrEmpty(requested)
+                && Config.Current.BookSettingPolicy.Page == BookSettingPageSelectMode.RestoreOrDefaultReset;
+            while (await batches.MoveNextAsync())
+            {
+                pages.AddRange(batches.Current);
+                if (!requireComplete && (string.IsNullOrEmpty(requested) ? pages.Count > 0 : pages.Any(p => p.EntryName == requested))) break;
+            }
+            var book = candidate = new Book(source, pages, setting) { Entries = collection, IsNew = restored is null, IsIndexing = true };
             book.SortSeed = restored?.SortSeed ?? 0;
             // 索引完成后的自然排序可能包含万条目，未提交书籍在后台排序，UI继续可操作。
             await Task.Run(() => book.Sort(opening.Token), opening.Token);
-            var explicitEntry = entryName ?? source.RequestedEntryName;
-            var requested = explicitEntry ?? (ImageFormats.IsImage(path) ? System.IO.Path.GetFileName(path) : setting.Page);
             int index = book.Pages.FindIndex(e => e.EntryName == requested);
             // 原父书定位允许当前子书位于一个展示的归档项内；优先精确名称，再定位该真实祖先书项。
             if (index < 0 && explicitEntry is not null) index = book.Pages.FindIndex(e => e.PageType.IsFolder() && explicitEntry.StartsWith(e.EntryName.TrimEnd('/') + "/", StringComparison.Ordinal));
@@ -114,15 +125,28 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                 if (old is not null) await old.DisposeAsync();
                 if (!replayBookHistory) BookHistory.Add(book.Path);
                 if (!replayPageHistory) RecordPageHistory();
-                committed = true;
-                ScheduleSave();
+                committed = true; IsLoading = false;
+                ScheduleSave(); Notify();
             }
             finally { _gate.Release(); }
+            // 首批已经可阅读，后续批次仍由本打开调用观察，切书/卸载沿原generation取消。
+            while (await batches.MoveNextAsync())
+                if (!await AppendIndexBatchAsync(book, batches.Current, generation, opening.Token)) return committed;
+            indexCompleted = true;
         }
         catch (OperationCanceledException) when (opening.IsCancellationRequested) { }
-        catch (Exception ex) { if (generation == _generation) Error = ex.Message; }
+        catch (Exception ex)
+        {
+            if (committed && candidate is not null) candidate.IndexError = ex.Message;
+            if (generation == _generation) Error = committed ? "目录索引未完成：" + ex.Message : ex.Message;
+        }
         finally
         {
+            if (candidate is not null)
+            {
+                candidate.IsIndexing = false;
+                if (committed && !indexCompleted && candidate.IndexError is null) candidate.IndexError = "目录索引已取消，请重新载入以补齐。";
+            }
             if (collection is not null) await collection.DisposeAsync();
             else if (source is not null) await source.DisposeAsync();
             if (generation == _generation) { IsLoading = false; Notify(); }
@@ -130,6 +154,28 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             opening.Dispose();
         }
         return committed;
+    }
+
+    /// <summary>在原导航锁内捕获/提交分批排序；后台只计算快照，排序或切书不替换当前Page身份。</summary>
+    private async Task<bool> AppendIndexBatchAsync(Book book, List<Page> batch, long generation, CancellationToken token)
+    {
+        await _gate.WaitAsync(token);
+        try
+        {
+            if (_disposed || _closing || generation != _generation || !ReferenceEquals(book, Book)) return false;
+            var positionPage = book.Pages.ElementAtOrDefault(Position.Index);
+            var input = book.Pages.Concat(batch).ToArray();
+            var mode = book.Setting.SortMode.IsEntryCategory()
+                ? book.Setting.SortMode.IsDescending() ? PageSortMode.FileNameDescending : PageSortMode.FileName : book.Setting.SortMode;
+            // 原Random以原收集顺序分配随机键；不能以已排序批次再次分配，导致最终顺序随批量变化。
+            var result = await Task.Run(() => BookPageSort.Sort(input.OrderBy(p => p.EntryIndex), mode, book.SortSeed, token), token);
+            token.ThrowIfCancellationRequested();
+            if (_disposed || _closing || generation != _generation || !ReferenceEquals(book, Book)) return false;
+            book.ApplySort(result);
+            Position = new(positionPage?.Index ?? 0, Position.Part); RebuildFrame(MoveDirection);
+            ScheduleSave(); Notify(); return true;
+        }
+        finally { _gate.Release(); }
     }
 
     /// <summary>保留 PageFrameBox 的帧步进与单页步进算法，I/O 前后检查书籍代次。</summary>
@@ -148,7 +194,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                 : range.Next(direction);
             if (Context!.IsLoopPage) position = new BookContext(Book.Pages).NormalizePosition(position);
             else if (position.Index < 0 || position.Index >= Book.Pages.Count)
-            { terminatedBook = Book; terminatedGeneration = generation; terminatedPosition = Position; }
+            { if (Book.IsIndexing) return; terminatedBook = Book; terminatedGeneration = generation; terminatedPosition = Position; }
             // 解锁后执行页尾动作，不能在导航锁里等待对话框或下一书。
             if (terminatedBook is null)
             {
@@ -250,6 +296,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             else if (!accessor.ContainsIndex(index))
             {
                 int corrected = Math.Clamp(index, 0, Book.Pages.Count - 1);
+                if (Book.IsIndexing && requested >= Book.Pages.Count) return;
                 // 原 CorrectPosition：未到终点时允许定位首尾；已显示该端点时终止，不重建分割页。
                 if ((backwards ? Frame.FrameRange.Max.Index : Frame.FrameRange.Min.Index) == corrected)
                 { terminatedBook = Book; terminatedGeneration = generation; terminatedPosition = Position; }

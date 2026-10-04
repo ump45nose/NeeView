@@ -12,6 +12,14 @@ public abstract class Archive(string path) : IAsyncDisposable
     public bool IsDisposed { get; protected set; }
     /// <summary>建立条目索引，后台执行且支持取消。</summary>
     public abstract Task<IReadOnlyList<ArchiveEntry>> GetEntriesAsync(CancellationToken token);
+    /// <summary>按来源能力分批枚举；归档默认仍使用完整索引，普通目录后端可在枚举结束前产出。</summary>
+    /// <param name="token">取消枚举及等待，来源所有权仍属于书籍。</param>
+    /// <returns>稳定ID的条目批次，不包含图像数据。</returns>
+    public virtual async IAsyncEnumerable<IReadOnlyList<ArchiveEntry>> EnumerateEntryBatchesAsync(
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
+    {
+        yield return await Task.Run(() => GetEntriesAsync(token), token).ConfigureAwait(false);
+    }
     /// <summary>打开指定条目，返回流所有权转交调用方。</summary>
     public abstract Task<Stream> OpenEntryAsync(ArchiveEntry entry, CancellationToken token);
     /// <summary>释放来源及应用生成的临时文件。</summary>
