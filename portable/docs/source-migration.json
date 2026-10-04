@@ -360,6 +360,18 @@
       "target": "src/NeeView.Engine/Command/TogglePageModeCommandParameter.cs",
       "sha256": "df17b850874c90483afb7dd25fc86f38963b34f6335e5d2b5a590efe83046d74",
       "status": "保留原 IsLoop 默认 true；移除 WPF 属性编辑注解/通知，正反命令共用原 JSON 参数，独立 Mac 草稿编辑"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/CopyFileCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/CopyFileCommandParameter.cs",
+      "sha256": "4b2544c4d7fbd068d664bbcbc5b8728610140efb45417eade107cf2938dd229b",
+      "status": "原MultiPagePolicy默认Once；移除WPF/通知注解，旧弃用字段由原JSON保留"
+    },
+    {
+      "source": "NeeView/External/TextCopyPolicy.cs",
+      "target": "src/NeeView.Engine/Command/CopyFileCommandParameter.cs",
+      "sha256": "fc72d0e4bbeabccc27d641f43381b47c6faddb3d7da6a7acade58b93e3f4090a",
+      "status": "原None/CopyFilePath/OriginalPath数值与默认None保持"
     }
   ],
   "partial_adapters": [
@@ -877,7 +889,7 @@
       "source": "NeeView/Config/SystemConfig.cs",
       "target": "src/NeeView.Engine/Config/Config.cs",
       "sha256": "f108d9973d964784cc5fa46ef97e6ee62b322cf95b0ecc6682ea9621c69a3de6",
-      "status": "原搜索/写权限/IsRemoveConfirmed默认true字段迁入；Mac废纸篓不永久删除回退，NukeWarning等其余JSON保留"
+      "status": "原搜索/写权限/IsRemoveConfirmed默认true与TextCopyPolicy数值默认None迁入；未迁字段继续由原JSON合并保留"
     },
     {
       "source": "NeeView/Command/Commands/FocusBookmarkSearchBoxCommand.cs",
@@ -1471,7 +1483,7 @@
       "source": "NeeView/BookOperation/BookPageActionControl.cs",
       "target": "src/NeeView.Engine/BookOperation/BookOperation.FileActions.cs",
       "sha256": "bbe456cdbfeb66d467c2838ad11670d79b0cf58188bc7c31e5f2e687f6eb2d47",
-      "status": "P4原当前页组分类/固定复制/真实成功项推进；当前主页删除委托BookOperation.DeleteFile沿原确认规则接入；归档实体化/剪贴板/列表多选删除待后续"
+      "status": "P4原当前页组分类/固定复制/真实成功项推进；删除和实体剪贴板分别沿同一原控制迁入，归档实体化/列表多选删除待迁"
     },
     {
       "source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
@@ -1586,6 +1598,30 @@
       "target": "src/NeeView.MacOS/Views/MainWindow.DestinationFolders.cs",
       "sha256": "e9d995eda18c24e687bfafbd233efbde912158dd794ee5f98d7b013c394f67be",
       "status": "原书籍命名输入及扩展名主体选择、确认/取消/重试表现适配；主窗口复用可等待宿主文件动作，布局不承担I/O"
+    },
+    {
+      "source": "NeeView/BookOperation/BookPageActionControl.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Clipboard.cs",
+      "sha256": "bbe456cdbfeb66d467c2838ad11670d79b0cf58188bc7c31e5f2e687f6eb2d47",
+      "status": "原CollectPages/CopyToClipboard业务关系；实体普通目录子集，归档实体化待迁，Copy不受源写权限约束"
+    },
+    {
+      "source": "NeeView/BookOperation/BookControl.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Clipboard.cs",
+      "sha256": "7b2f0d2b0b31b5a50b55dba8f48e11674ca9bcfaaad209946dba8c70c8fc6ad4",
+      "status": "原CopyBook实体路径复制；加载/关闭/任务忙碌适配，根归档/普通目录，不把CopyFile参数用于整书"
+    },
+    {
+      "source": "NeeView/External/ClipboardUtility.cs",
+      "target": "src/NeeView.Backends/MacFileClipboard.cs",
+      "sha256": "55528a9a264389a7730f43ca7cff37b6851f44e302adf1b0417235c88337a654",
+      "status": "Windows FileDrop/QueryPath/可选文本替换为NSPasteboard fileURL/有限私有JSON/文本；用户决定Cut禁用，提交后等待真实结果"
+    },
+    {
+      "source": "NeeView/System/ContentDropReceiver.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Clipboard.cs",
+      "sha256": "80d8e8d1f069cf8d6dfb2f6a6e49f6175d113c2daf1ed0bf99256afdf10dc11d",
+      "status": "原Paste=加载且QueryPath优先；单来源复用OpenCore，多文件不丢项明确拒绝，临时播放列表/其他数据待迁"
     }
   ],
   "rule_references": [

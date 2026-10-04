@@ -34,7 +34,7 @@ public sealed partial class BookOperation
     /// <summary>原移动要求整组均为普通目录真实图片；固定复制不受源写权限开关限制。</summary>
     public bool CanTransferFileActionPages(MultiPagePolicy policy, bool requireWriteAccess = true)
     {
-        if (requireWriteAccess && !Config.Current.System.IsFileWriteAccessEnabled || IsRenamingBook || IsDeletingFile || _destinationMoves is null || _destinationMoves.IsBusy || _disposed || _closing || IsLoading || Book?.IsIndexing != false) return false;
+        if (requireWriteAccess && !Config.Current.System.IsFileWriteAccessEnabled || IsUsingClipboard || IsRenamingBook || IsDeletingFile || _destinationMoves is null || _destinationMoves.IsBusy || _disposed || _closing || IsLoading || Book?.IsIndexing != false) return false;
         var pages = CollectFileActionPages(policy);
         return pages.Count > 0 && pages.All(page => page is { IsImage: true, ArchiveEntry.FilePath: not null } && page.ArchiveEntry.Archive.IsDirectory && !page.ArchiveEntry.IsShortcut);
     }
@@ -129,12 +129,12 @@ public sealed partial class BookOperation
     /// <summary>共享历史允许跨书撤销；仍浏览恢复目录才重载定位，否则仅回报真实路径。</summary>
     public async Task ReplayDestinationMoveAsync(bool undo, CancellationToken token = default)
     {
-        if (_destinationMoves is null || _destinationMoves.IsBusy || IsDeletingFile || !Config.Current.System.IsFileWriteAccessEnabled) return;
+        if (_destinationMoves is null || _destinationMoves.IsBusy || IsUsingClipboard || IsDeletingFile || !Config.Current.System.IsFileWriteAccessEnabled) return;
         FileTransferResult? result; Book? book; long generation; string? entry = null; bool reload = false;
         await _gate.WaitAsync(token);
         try
         {
-            if (_disposed || _closing || IsLoading || IsRenamingBook) return;
+            if (_disposed || _closing || IsLoading || IsUsingClipboard || IsRenamingBook) return;
             _saving?.Cancel();
             book = Book; generation = _generation;
             result = await _destinationMoves.ReplayAsync(undo, token); Error = _destinationMoves.Error;

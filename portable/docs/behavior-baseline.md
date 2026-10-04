@@ -72,3 +72,5 @@ P4第二批：Book.CurrentPages/CurrentPage及原CollectPages迁入，Once/All/A
 P4第三批：原DeleteFile无MultiPagePolicy，仅CurrentPage；IsFileWriteAccessEnabled=false和IsRemoveConfirmed=true默认保持，取消不执行且删除不入分类历史。原预移除+失败reload改为系统真实成功后提交，普通目录当前图片走AppKit废纸篓，无永久回退。归档内不可逆删除/链接/列表所选页等原能力本批未迁，明确占位。空搜索保留全源锚点但不登记隐藏页历史；原空书历史不登记规则保持。自动测试与AppKit/Windows动态设备验收分别记录，见[p4-delete.md](p4-delete.md)。
 
 P4第四批：原RenameBookCommand/BookControl.RenameBook/FileIO.RenameAsync/RestoreBook的实体范围、写权限、编号名称、扩展名确认与失败重试迁入；单图打开仍改所在书籍目录。原BookMementoTools.RenameRecursive、QuickAccess/FolderConfig/Playlist明确路径联动保持未知字段与节点身份，不猜测替换未知字符串。Windows Shell改为同目录无覆盖后端，记录支持部分保存/启动恢复；原重新加载首半页和较新请求优先保留。45项专项覆盖真实临时文件、两处导航锁关闭取消、损坏记录与其他列表失败恢复；Mac/Windows动态另验，见[p4-rename.md](p4-rename.md)。
+
+P4第五批：原CopyFile按CollectPages/Once/All/AllLeftToRight选序与分割去重；CopyBook复制实体书籍目录/根归档，二者不写源文件或移动历史、不要求源修改开关。原TextCopyPolicy数值/默认None、QueryPath优先和Paste=加载保持，单来源进入唯一OpenCore。Mac标准fileURL与私有有限JSON替换原FileDrop；多项输入不静默删项。CutFile/CutBook按用户决定禁用，归档实体化/临时多文件播放列表/位图与FileContents另列待迁；静默测试不证明真实NSPasteboard/Finder互操作，见[p4-clipboard.md](p4-clipboard.md)。

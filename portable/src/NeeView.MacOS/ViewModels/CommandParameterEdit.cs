@@ -16,6 +16,7 @@ public sealed class CommandParameterEdit(string owner, object value)
     {
         "ViewScaleUp" or "ViewBaseScaleUp" => typeof(ViewScaleCommandParameter),
         "CopyToFolderAs" => typeof(CopyToFolderAsCommandParameter),
+        "CopyFile" => typeof(CopyFileCommandParameter),
         var name when name == "MoveToFolderAs" || name.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal) => typeof(MoveToFolderAsCommandParameter),
         "ViewRotateLeft" => typeof(ViewRotateCommandParameter),
         "ViewScrollUp" => typeof(ViewScrollCommandParameter),
@@ -45,7 +46,7 @@ public sealed class CommandParameterEdit(string owner, object value)
     /// <summary>原字段在Mac编辑页的文案，业务计算继续读取原属性名。</summary>
     public static string Label(string property) => property switch
     {
-        "Scale" => "缩放步幅（0–1）", "IsSnapDefaultScale" => "跨越默认比例时吸附到 100%", "Angle" => "旋转角度（度）", "IsStretch" => "旋转后适配窗口",
+        "MultiPagePolicy" => "当前页组范围", "Scale" => "缩放步幅（0–1）", "IsSnapDefaultScale" => "跨越默认比例时吸附到 100%", "Angle" => "旋转角度（度）", "IsStretch" => "旋转后适配窗口",
         "Scroll" => "滚动步幅（视口比例）", "AllowCrossScroll" => "到边界后滚动另一轴", "Horizontal" => "水平对齐", "Vertical" => "垂直对齐", "IsSnap" => "强制对齐小于视口的图像",
         "ScrollType" => "滚动路径", "LineBreakStopTime" => "换行停顿（秒）", "EndMargin" => "终端容差（DIP）", "LineBreakStopMode" => "停顿位置", "PagesAsOne" => "全景页面作为整体（P3）",
         "IsReverse" => "允许随滑条方向反转", "IsLoop" => "循环切换", "IsToggle" => "再次选择此模式时切回原始大小", "Size" => "步进页数", "ToggleMode" => "快捷键开关动作", "IsIncludeTerminal" => "包含书籍首尾",
@@ -54,6 +55,7 @@ public sealed class CommandParameterEdit(string owner, object value)
     /// <summary>枚举沿用原数值，界面只转换名称。</summary>
     public static string EnumLabel(object value) => value switch
     {
+        MultiPagePolicy.Once => "当前主页面", MultiPagePolicy.All => "当前页组（阅读顺序）", MultiPagePolicy.AllLeftToRight => "当前页组（从左到右）",
         LimitedHorizontalAlignment.Left => "左", LimitedHorizontalAlignment.Center => "居中", LimitedHorizontalAlignment.Right => "右",
         LimitedVerticalAlignment.Top => "上", LimitedVerticalAlignment.Center => "居中", LimitedVerticalAlignment.Bottom => "下",
         NScrollType.NType => "N 型", NScrollType.ZType => "Z 型", NScrollType.Diagonal => "斜向", NScrollType.Horizontal => "水平", NScrollType.Vertical => "垂直",

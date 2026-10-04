@@ -90,6 +90,9 @@ public sealed partial class MainWindow : Window
     {
         AvaloniaXamlLoader.Load(this);
         AddHandler(KeyDownEvent, Key_Down, RoutingStrategies.Tunnel);
+        // Finder复制不触发阅读回报，菜单展开/窗口重新激活时只重查命令能力。
+        this.FindControl<Menu>("MenuBar")!.AddHandler(MenuItem.SubmenuOpenedEvent, (_, _) => RefreshHistoryCommandStates());
+        Activated += (_, _) => RefreshHistoryCommandStates();
         AddHandler(DragDrop.DropEvent, Drop);
         DragDrop.SetAllowDrop(this, true);
         Viewer.TryGestureRequested = TryHandleGesture;
@@ -181,8 +184,12 @@ public sealed partial class MainWindow : Window
         "MoveToFolderAs" or "CopyToFolderAs" => IsDestinationCommandAvailable(name),
         "DeleteFile" => _model?.Operation.CanDeleteFile == true,
         "RenameBook" => _model?.Operation.CanRenameBook == true,
-        "UndoDestinationMove" => _model?.Operation is { IsDeletingFile: false, IsRenamingBook: false } && Config.Current.System.IsFileWriteAccessEnabled && _model.Operation.DestinationMoves?.CanUndo == true,
-        "RedoDestinationMove" => _model?.Operation is { IsDeletingFile: false, IsRenamingBook: false } && Config.Current.System.IsFileWriteAccessEnabled && _model.Operation.DestinationMoves?.CanRedo == true,
+        "CopyFile" => _model?.Operation is { } copy && copy.CanCopyFiles(copy.GetCopyFileParameter().MultiPagePolicy),
+        "CopyBook" => _model?.Operation.CanCopyBook == true,
+        "Paste" => _model?.Operation.CanPasteFiles == true,
+        "CutFile" or "CutBook" => false,
+        "UndoDestinationMove" => _model?.Operation is { IsDeletingFile: false, IsRenamingBook: false, IsUsingClipboard: false } && Config.Current.System.IsFileWriteAccessEnabled && _model.Operation.DestinationMoves?.CanUndo == true,
+        "RedoDestinationMove" => _model?.Operation is { IsDeletingFile: false, IsRenamingBook: false, IsUsingClipboard: false } && Config.Current.System.IsFileWriteAccessEnabled && _model.Operation.DestinationMoves?.CanRedo == true,
         var command when command.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal) => IsDestinationCommandAvailable(command),
         "MoveToParentBook" => _model?.Operation.CanMoveToParentBook == true,
         "MoveToChildBook" => _model?.Operation.CanMoveToChildBook == true,
@@ -384,6 +391,8 @@ public sealed partial class MainWindow : Window
                 case "MoveToFolderAs": case "CopyToFolderAs": await OpenDestinationMoveMenuAsync(name); break;
                 case "DeleteFile": await RunDestinationActionAsync(() => _model.Operation.DeleteFileAsync()); break;
                 case "RenameBook": await RunDestinationActionAsync(() => _model.Operation.RenameBookAsync()); break;
+                case "CopyFile": case "CopyBook": case "Paste":
+                    await RunDestinationActionAsync(() => _model.Commands.ExecuteAsync(name)); break;
                 case var command when command.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal):
                     await OpenDestinationMoveMenuAsync(command); break;
                 case "UndoDestinationMove": case "RedoDestinationMove":
@@ -844,6 +853,7 @@ public sealed partial class MainWindow : Window
     {
         await Task.Yield();
         _preparing = true;
+        _model?.Operation.CancelClipboardPreparation();
         _sidePanels?.PrepareClose();
         _pageEndDialog?.Close(PageEndAction.None);
         try

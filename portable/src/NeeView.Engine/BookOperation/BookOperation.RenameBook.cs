@@ -18,7 +18,7 @@ public sealed partial class BookOperation
         && !_disposed && !_closing && !IsLoading && Book is { IsIndexing: false } book
         && book.Path == book.Source.RootArchivePath && System.IO.Path.GetDirectoryName(book.Path) is not null
         && saveData.DirectoryPath != book.Path && !saveData.DirectoryPath.StartsWith(book.Path + "/", StringComparison.Ordinal)
-        && !IsDeletingFile && _destinationMoves?.IsBusy != true;
+        && !IsDeletingFile && !IsUsingClipboard && _destinationMoves?.IsBusy != true;
 
     /// <summary>原当前书籍目录或归档改名；单图打开仍改所在书籍目录，不改当前图片文件名。</summary>
     /// <param name="token">实体提交前可取消；提交后恢复新路径并落盘，不进入分类撤销栈。</param>

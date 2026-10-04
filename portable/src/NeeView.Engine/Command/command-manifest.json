@@ -62,7 +62,7 @@
     "Text": "剪切文件",
     "Shortcut": "Ctrl+X",
     "Source": "NeeView/Command/Commands/CutFileCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "用户选择暂保留禁用；移动使用分类/移至文件夹",
     "MenuText": "剪切(T)",
     "MouseGesture": ""
   },
@@ -71,7 +71,7 @@
     "Text": "复制文件",
     "Shortcut": "Ctrl+C",
     "Source": "NeeView/Command/Commands/CopyFileCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P4 普通目录实体/原页组复制到系统剪贴板；归档实体化待迁",
     "MenuText": "复制(C)",
     "MouseGesture": ""
   },
@@ -89,7 +89,7 @@
     "Text": "粘贴",
     "Shortcut": "Ctrl+V",
     "Source": "NeeView/Command/Commands/PasteCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P4 单文件URL/原QueryPath加载；多文件/位图待迁",
     "MenuText": "粘贴(V)",
     "MouseGesture": ""
   },
@@ -275,7 +275,7 @@
     "Text": "剪切书籍",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/CutBookCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "用户选择暂保留禁用；移动使用既有文件操作",
     "MenuText": "剪切书籍(T)",
     "MouseGesture": ""
   },
@@ -284,7 +284,7 @@
     "Text": "复制书籍",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/CopyBookCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P4 实体目录或根归档复制到系统剪贴板",
     "MenuText": "复制书籍(C)",
     "MouseGesture": ""
   },

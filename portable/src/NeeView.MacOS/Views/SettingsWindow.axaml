@@ -155,6 +155,12 @@
         <CheckBox x:Name="RemoveConfirmed" Content="删除文件前确认" />
         <TextBlock Text="删除当前普通目录图片时移至系统废纸篓。" TextWrapping="Wrap" />
         <TextBlock Text="归档内删除、链接和页面列表多选删除 · 尚未迁移" TextWrapping="Wrap" Opacity="0.5" />
+        <TextBlock Text="复制文件时附加路径文本" />
+        <ComboBox x:Name="TextCopyPolicy">
+          <ComboBoxItem Content="不附加文本" /><ComboBoxItem Content="复制出的文件路径" /><ComboBoxItem Content="原始来源路径" />
+        </ComboBox>
+        <TextBlock Text="复制文件不需要开启修改权限；页组范围可在输入设置的 CopyFile 参数中调整。" TextWrapping="Wrap" />
+        <TextBlock Text="剪切暂保留禁用入口。移动可使用分类或移至文件夹；归档内文件复制、多文件及图片粘贴尚未迁移。" TextWrapping="Wrap" Opacity="0.5" />
       </StackPanel>
     </ScrollViewer>
     <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="16" Spacing="8">

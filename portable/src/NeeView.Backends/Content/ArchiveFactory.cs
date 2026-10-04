@@ -19,7 +19,7 @@ public sealed partial class ArchiveFactory : IArchiveFactory
         {
             var attributes = File.GetAttributes(path);
             FileSystemInfo info = (attributes & FileAttributes.Directory) != 0 ? new DirectoryInfo(path) : new FileInfo(path);
-            return new(info.Name, info.FullName, info is DirectoryInfo, info is FileInfo file ? file.Length : -1, info.LastWriteTime);
+            return new(info.Name, info.FullName, info is DirectoryInfo, info is FileInfo file ? file.Length : -1, info.LastWriteTime) { IsSymbolicLink = (attributes & FileAttributes.ReparsePoint) != 0 || info.LinkTarget is not null };
         }
         catch (FileNotFoundException) { return null; }
         catch (DirectoryNotFoundException) { return null; }

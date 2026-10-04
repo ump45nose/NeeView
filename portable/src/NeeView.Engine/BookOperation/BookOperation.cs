@@ -59,6 +59,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, Playlist? expectedPlaylist = null, int? terminalDirection = null, string? pageSearchKeyword = null)
     {
         ObjectDisposedException.ThrowIf(_disposed || _closing, this);
+        CancelCopyPreparation();
         var generation = Interlocked.Increment(ref _generation);
         _opening?.Cancel();
         var opening = CancellationTokenSource.CreateLinkedTokenSource(token); _opening = opening;
@@ -555,7 +556,10 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         _opening?.Cancel(); _saving?.Cancel();
         // 未确认文本/重试可取消；已开始实体操作等待真实结果和路径联动，不释放仍使用的来源。
         _renameClosing.Cancel();
+        _clipboardClosing.Cancel();
+        CancelClipboardPreparation();
         if (_renameCompletion is { } rename) await rename.Task;
+        if (_clipboardCompletion is { } clipboard) await clipboard.Task;
         await _gate.WaitAsync();
         try
         {
@@ -573,7 +577,9 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         {
             _gate.Release();
             _renameClosing.Dispose();
+            _clipboardClosing.Dispose();
             if (!_disposed) _renameClosing = new();
+            if (!_disposed) _clipboardClosing = new();
             _closing = false;
             lock (_closeSync) _closeTask = null;
         }

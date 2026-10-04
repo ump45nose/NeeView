@@ -128,7 +128,9 @@ public sealed class BrowseTests
             await WaitAsync(() => window.Viewer.DisplayCount > 0);
             Assert.InRange(window.Viewer.DisplayCount, 1, 2);
             await operation.SetBrowseModeAsync(BrowseLayoutMode.Masonry); await window.Viewer.RefreshAsync();
-            await window.OpenAsync(fixture.Zip); await WaitAsync(() => window.Viewer.DisplayCount > 0 && window.Viewer.BrowsePendingCount == 0);
+            await window.OpenAsync(fixture.Zip); await window.Viewer.RefreshAsync();
+            // Open提交Book后，表现回报仍可排队；不能用上一书已有图像/零待办当作新布局完成。
+            await WaitAsync(() => window.Viewer.BrowseLayout?.Items.Count == operation.Book!.Pages.Count && window.Viewer.DisplayCount > 0 && window.Viewer.BrowsePendingCount == 0);
             Assert.Equal(5, window.Viewer.BrowseLayout!.Items.Count);
         }
         finally { await window.PrepareShutdownAsync(); window.Close(); }

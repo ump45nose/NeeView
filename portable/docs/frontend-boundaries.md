@@ -93,3 +93,5 @@ P4第二批菜单与参数表单继续使用原Index/MultiPagePolicy；固定复
 P4第三批：删除确认只通过可等待回调返回用户选择，捕获/复核目标、系统成功后的索引/搜索/缓存失效在Engine；SettingsWindow.Files只编辑原System字段草稿，提交沿唯一配置事务。确认路径区域可滚动，主题/结构可以独立调整，不改变单主页范围或废纸篓语义，见[p4-delete.md](p4-delete.md)。
 
 P4第四批：名称输入、扩展名/编号及失败重试对话框由MainWindow.DestinationFolders装配，主题/按钮/路径区域可独立调整。Engine捕获并复核原Book/代次、关闭来源、实体授权与原JSON/列表路径联动，Backends执行同目录无覆盖改名；视图不判断文件身份或替换路径。退出取消未授权准备和输入，等待已经授权实体，见[p4-rename.md](p4-rename.md)。
+
+P4第五批：主窗口只按原CopyFile/CopyBook/Paste命令转交并等待任务，菜单展开/重新激活仅重查剪贴板能力，不申请正文图片。CommandParameterEdit/Window编辑MultiPagePolicy独立草稿，SettingsWindow.Files只编辑TextCopyPolicy；原ApplyOptions保存与失败回滚保持。具体NSPasteboard实现仅在MacApp装配，Engine负责选页、来源复核及加载，控件不访问剪贴板或操作文件。Cut保留禁用，见[p4-clipboard.md](p4-clipboard.md)。

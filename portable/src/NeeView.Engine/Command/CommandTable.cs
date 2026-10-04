@@ -29,6 +29,9 @@ public sealed class CommandTable
         _actions["RedoDestinationMove"] = () => operation.ReplayDestinationMoveAsync(false);
         _actions["DeleteFile"] = () => operation.DeleteFileAsync();
         _actions["RenameBook"] = () => operation.RenameBookAsync();
+        _actions["CopyFile"] = () => operation.CopyFilesAsync();
+        _actions["CopyBook"] = () => operation.CopyFilesAsync(book: true);
+        _actions["Paste"] = () => operation.PasteFilesAsync();
         // 来源：NextPage/PrevPage/NextOnePage/PrevOnePageCommand.Execute，保留帧与单页之别。
         _actions["NextPage"] = () => operation.MoveAsync(1);
         _actions["PrevPage"] = () => operation.MoveAsync(-1);

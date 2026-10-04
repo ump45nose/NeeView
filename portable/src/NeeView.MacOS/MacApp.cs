@@ -91,6 +91,7 @@ public sealed partial class MacApp : Avalonia.Application
             recovery = recovery.Concat(await state.RecoverBookRenameAsync(_fileOperations)).ToArray();
             _destinationMoves ??= new(_fileOperations);
             var images = new BitmapFactory(decoder); operation.AttachFileOperations(_destinationMoves, _fileOperations, images);
+            operation.AttachFileClipboard(new MacFileClipboard());
             var model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state);
             _window = new MainWindow(); _window.Bind(model, images, new MacPlatformService());
             _window.AttachPlatformInput(new MacTrackpadInput());

@@ -4,14 +4,14 @@ public sealed partial class BookOperation
 {
     private int _pageTerminating;
     public bool IsBookLocked { get; private set; }
-    public bool CanUnload => !_disposed && !_closing && !_renameCommitting && (Book is not null || IsLoading);
+    public bool CanUnload => !_disposed && !_closing && !IsUsingClipboard && !_renameCommitting && (Book is not null || IsLoading);
     /// <summary>宿主仅提供原三种选择，业务在返回后再次核对书籍/位置/代次。</summary>
     public Func<int, CancellationToken, Task<PageEndAction>>? PageEndDialogAsync { get; set; }
     public void SetBookLock(bool value) { if (_disposed || _closing) return; IsBookLocked = value; Notify(); }
     /// <summary>关闭当前来源并解锁，服务继续可用；保存失败保留书籍供重试。</summary>
     public async Task UnloadAsync(CancellationToken token = default)
     {
-        if (_disposed || _closing || _renameCommitting) return;
+        if (_disposed || _closing || IsUsingClipboard || _renameCommitting) return;
         IsBookLocked = false; var generation = Interlocked.Increment(ref _generation); _opening?.Cancel(); _saving?.Cancel();
         await _gate.WaitAsync(token);
         try
