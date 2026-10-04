@@ -99,3 +99,5 @@ P4第五批：主窗口只按原CopyFile/CopyBook/Paste命令转交并等待任�
 P4第六批：文件设置XAML新增原ArchiveCopyPolicy四选项，SettingsWindow.Files只读写草稿并沿原配置事务提交。CopyFile/CopyToFolderAs来源能力及实体化仍由Engine/Backends处理；唯一启动装配持有进程级临时实体后端，视图不读取归档或管理磁盘文件。主窗口退出只请求取消尚未提交的准备，既有文件动作等待边界保持，见[p4-realization.md](p4-realization.md)。
 
 P4第七批：主窗口、Finder/启动参数与拖入只转交OpenFilesAsync，临时.nvpls创建/解析/过滤在Engine及Backends。Entry排序菜单按当前来源资格启用，原Page与阅读设置沿同一模型；界面不改变全局PlaylistHub，不保存临时列表或解释显示别名，见[p4-multi-paste.md](p4-multi-paste.md)。
+
+P4第八批：DeleteBook通过既有可等待文件任务转交；ConfirmDeleteBookAsync仅呈现整书范围并回报选择，设置页只编辑原Bookshelf.IsOpenNextBookWhenRemove。真实范围/双次元数据复核、来源释放/失败恢复、邻项及原JSON清启动目标归Engine，AppKit废纸篓归后端；布局和主题可独立调整，见[p4-delete-book.md](p4-delete-book.md)。

@@ -48,6 +48,9 @@ public sealed class MacPlatformService : IPlatformService
         return Task.CompletedTask;
     }
     /// <summary>系统废纸篓操作，失败传播 NSError，禁止永久删除回退。</summary>
+    /// <param name="path">真实文件或目录；目标/父路径链接拒绝，系统var别名除外。</param>
+    /// <param name="token">排队与进入系统调用前取消；提交后等待真实结果。</param>
+    /// <returns>单槽系统操作完成任务，调用方依据实际成功协调索引/阅读状态。</returns>
     public async Task TrashAsync(string path, CancellationToken token = default)
     {
         await _trash.WaitAsync(token);
@@ -56,16 +59,22 @@ public sealed class MacPlatformService : IPlatformService
             await Task.Run(() =>
             {
                 token.ThrowIfCancellationRequested();
-                var file = new FileInfo(path);
-                if (!file.Exists || (file.Attributes & FileAttributes.Directory) != 0) throw new FileNotFoundException("源图片已不存在或不是普通文件。", path);
-                if (file.LinkTarget is not null || (file.Attributes & FileAttributes.ReparsePoint) != 0)
+                path = Path.GetFullPath(path);
+                var attributes = File.GetAttributes(path);
+                FileSystemInfo entry = (attributes & FileAttributes.Directory) != 0 ? new DirectoryInfo(path) : new FileInfo(path);
+                if (entry.LinkTarget is not null || (attributes & FileAttributes.ReparsePoint) != 0)
                     throw new NotSupportedException("链接的删除尚未迁移。");
-                using var url = NSUrl.FromFilename(file.FullName);
+                for (var parent = new DirectoryInfo(Path.GetDirectoryName(path)!); parent is not null; parent = parent.Parent)
+                    if (parent.LinkTarget is not null && !(parent.FullName == "/var" && parent.ResolveLinkTarget(true)?.FullName == "/private/var"))
+                        throw new NotSupportedException("删除路径包含链接目录，尚未迁移。");
+                token.ThrowIfCancellationRequested();
+                using var url = NSUrl.FromFilename(entry.FullName);
                 bool success = NSFileManager.DefaultManager.TrashItem(url, out var resulting, out var error);
                 try { if (!success) throw new IOException(error?.LocalizedDescription ?? "移至废纸篓失败。"); }
                 finally { resulting?.Dispose(); error?.Dispose(); }
                 // 系统已经提交时不再抛晚取消，调用方必须更新原索引。
-            }, token);
+            // 取消由委托中的两次检查裁决；进入TrashItem后等待真实结果，不取消其完成任务。
+            }, CancellationToken.None);
         }
         finally { _trash.Release(); }
     }

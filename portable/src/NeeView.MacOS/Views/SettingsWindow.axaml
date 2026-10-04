@@ -153,7 +153,8 @@
         <TextBlock Text="文件操作" FontSize="18" />
         <CheckBox x:Name="FileWriteAccess" Content="允许修改文件" />
         <CheckBox x:Name="RemoveConfirmed" Content="删除文件前确认" />
-        <TextBlock Text="删除当前普通目录图片时移至系统废纸篓。" TextWrapping="Wrap" />
+        <CheckBox x:Name="OpenNextBookWhenRemove" Content="删除当前书籍后打开书架相邻项" />
+        <TextBlock Text="删除文件处理当前图片；删除书籍处理整本目录或根文件。均使用系统废纸篓。" TextWrapping="Wrap" />
         <TextBlock Text="归档内删除、链接和页面列表多选删除 · 尚未迁移" TextWrapping="Wrap" Opacity="0.5" />
         <TextBlock Text="复制文件时附加路径文本" />
         <ComboBox x:Name="TextCopyPolicy">
@@ -165,7 +166,7 @@
         </ComboBox>
         <TextBlock Text="虚拟路径用于 NeeView 定位；复制到文件夹时自动解压为真实文件。" TextWrapping="Wrap" />
         <TextBlock Text="复制文件不需要开启修改权限；页组范围可在输入设置的 CopyFile 参数中调整。" TextWrapping="Wrap" />
-        <TextBlock Text="剪切暂保留禁用入口。移动可使用分类或移至文件夹；链接、归档内目录复制、多文件及图片粘贴尚未迁移。" TextWrapping="Wrap" Opacity="0.5" />
+        <TextBlock Text="剪切暂保留禁用入口。移动可使用分类或移至文件夹；链接、归档内目录复制及图片粘贴尚未迁移。" TextWrapping="Wrap" Opacity="0.5" />
       </StackPanel>
     </ScrollViewer>
     <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="16" Spacing="8">

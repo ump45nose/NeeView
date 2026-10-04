@@ -1,0 +1,135 @@
+{
+  "utc": "2026-10-04T17:21:21.055081+00:00",
+  "steps": [
+    {
+      "name": "Engine 构建",
+      "exit_code": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:00.77\n"
+    },
+    {
+      "name": "原算法与正式视图测试",
+      "exit_code": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Engine.Tests -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/bin/Debug/net10.0/NeeView.Engine.Tests.dll\n/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/bin/Debug/net10.0/NeeView.Engine.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行\n总共 1 个测试文件与指定模式相匹配。\n警告: 正在覆盖结果文件: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/TestResults/engine.trx\n结果文件: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/TestResults/engine.trx\n\n已通过! - 失败:     0，通过:   684，已跳过:     0，总计:   684，持续时间: 2 m 44 s - NeeView.Engine.Tests.dll (net10.0)\n"
+    },
+    {
+      "name": "正式入口源码编译（Library检查）",
+      "exit_code": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Backends -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Backends/bin/Debug/net10.0-macos/NeeView.Backends.dll\n  NeeView.MacOS -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:07.61\n"
+    },
+    {
+      "name": "正式 Mac 应用构建",
+      "exit_code": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Backends -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Backends/bin/Debug/net10.0-macos/NeeView.Backends.dll\n  检测到的签名标识:\n  \n    Code Signing Key: \"\" (-)\n    Provisioning Profile: \"\" () - no entitlements\n    Bundle Id: com.ump45nose.NeeView\n    App Id: com.ump45nose.NeeView\n  检测到的签名标识:\n  \n    Code Signing Key: \"\" (-)\n    Provisioning Profile: \"\" () - no entitlements\n    Bundle Id: com.ump45nose.NeeView\n    App Id: com.ump45nose.NeeView\n  NeeView.MacOS -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/osx-arm64/NeeView.MacOS.dll\n  优化程序集以调整大小可能会更改应用的行为。请务必在发布后进行测试。请参阅: https://aka.ms/dotnet-illink\n  正在优化程序集以调整大小。此过程可能需要一段时间。\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:10.64\n"
+    },
+    {
+      "name": "正式 .app 本地签名校验",
+      "exit_code": 0,
+      "output": "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app: valid on disk\n/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app: satisfies its Designated Requirement\n"
+    }
+  ],
+  "scope": "p4-delete-book 原算法、资源、来源/导航及正式XAML Headless；不代表真机/Windows对照",
+  "formal_app": "构建及本地签名校验通过；运行见独立真机记录，Developer ID/公证/安装未执行",
+  "boundaries": {
+    "production_projects": [
+      "NeeView.Backends",
+      "NeeView.Engine",
+      "NeeView.MacOS"
+    ],
+    "source_files": 62,
+    "partial_adapters": 222,
+    "upstream_source_files": 26
+  },
+  "tests": {
+    "total": "684",
+    "executed": "684",
+    "passed": "684",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "app_bundle": "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app",
+  "prior_attempts": [
+    {
+      "kind": "compile",
+      "result": "failed",
+      "reason": "三项新测试API写法错误：BookmarkCollection.Register、SettingsWindow构造参数、ShowFilesPage；已改为实际SaveData登记及导航控件入口"
+    },
+    {
+      "kind": "targeted",
+      "result": "failed",
+      "total": 116,
+      "passed": 114,
+      "failed": 2,
+      "reason": "关闭下一书开关时漏刷新书架；正式确认窗断言未等待异步元数据。已独立捕获place并保持刷新，确认出现等待最多5秒"
+    },
+    {
+      "kind": "targeted",
+      "result": "passed",
+      "total": 116,
+      "passed": 116,
+      "failed": 0
+    },
+    {
+      "kind": "full",
+      "result": "passed",
+      "total": 681,
+      "passed": 681,
+      "failed": 0,
+      "reason": "之后复核发现实体路径别名可能绕过Profile/临时保护，新增系统realpath检查及3项回归，再重新全量验证"
+    }
+  ],
+  "targeted_tests": {
+    "total": 120,
+    "passed": 120,
+    "failed": 0,
+    "skipped": 0
+  },
+  "read_only_reviews": {
+    "lifecycle": "未发现确定缺陷；CanDeleteBook已检查删除忙碌",
+    "scope": "确认前后实体/根范围及关闭等待检查通过；系统同步Task.Run令牌仅管启动，本批改用None并在提交前显式检查",
+    "physical_paths": "未发现Profile/临时别名绕过或native泄漏；无跨进程inode原子身份保证"
+  },
+  "final_comment_only_build": {
+    "exit_code": 0,
+    "warnings": 0,
+    "errors": 0,
+    "scope": "补齐方法/参数/返回值业务注释后的最终正式.app串行构建；行为未变不重复测试",
+    "signature": {
+      "exit_code": 0,
+      "output": "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app: valid on disk\n/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app: satisfies its Designated Requirement\n"
+    }
+  },
+  "visual_evidence": {
+    "file": "p4-delete-book-book-confirm.png",
+    "sha256": "0b19bcc3a42a487f1525b34f614aa090dbe5247a1963c80964045fbb90fd96cf",
+    "scope": "离线合成Headless客户区，范围/路径/按钮可见；非系统废纸篓/前台证明"
+  },
+  "resource_samples": {
+    "thumbnails": {
+      "samples": 3,
+      "pages": 218,
+      "positions": 9,
+      "closed_leases": 0,
+      "closed_bytes": 0,
+      "scope": "用户指定目录只读抽样Headless，不证明真机/P95/长期内存"
+    },
+    "browse": {
+      "samples": 3,
+      "pages": 218,
+      "positions": 12,
+      "closed_leases": 0,
+      "closed_bytes": 0,
+      "scope": "用户指定目录只读抽样Headless，不证明真机/P95/长期内存"
+    }
+  }
+}

@@ -130,6 +130,7 @@ public sealed class BookConfig
 /// <summary>原 BookshelfConfig 普通书架默认排序；各路径参数、巡回及搜索后续迁入。</summary>
 public sealed class BookshelfConfig : FolderListConfig
 {
+    public bool IsOpenNextBookWhenRemove { get; set; } = true;
     public bool IsSearchIncludeSubdirectories { get; set; } = true;
     public bool IsSyncFolderTree { get; set; }
     public bool IsSyncFolderTreeAuto { get; set; }

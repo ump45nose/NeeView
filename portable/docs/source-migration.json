@@ -493,7 +493,7 @@
       "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderList.cs",
       "target": "src/NeeView.Engine/SidePanels/Bookshelf/BookshelfFolderList.cs",
       "sha256": "5854e9abf42991aa6117fb3f7c6516f6162f95dcd92f8f042960dc3b69452b90",
-      "status": "原GetFolderItem及普通前后移动；随机才循环，加载成功后提交选择；巡回/搜索/每路径参数待迁"
+      "status": "原GetFolderItem及普通前后移动；随机才循环，加载成功后提交选择；巡回/搜索/每路径参数待迁；P4第八批GetNextItem/GetNeighbor下一优先、末项退前与选中回退"
     },
     {
       "source": "NeeView/SidePanels/Bookshelf/BookshelfFolderList.cs",
@@ -511,7 +511,7 @@
       "source": "NeeView/Config/BookshelfConfig.cs",
       "target": "src/NeeView.Engine/Config/Config.cs",
       "sha256": "31ef017b9adced3508ccff93901b6246dd733338f1ed01d95295fe738a9c20dd",
-      "status": "原书架排序/分组、树手动/自动同步和P3递归搜索字段；其余未知配置保留"
+      "status": "原书架排序/分组、树手动/自动同步和P3递归搜索字段；其余未知配置保留；P4第八批原IsOpenNextBookWhenRemove默认true及JSON/设置恢复"
     },
     {
       "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderItemFactory.cs",
@@ -1676,6 +1676,36 @@
       "target": "src/NeeView.Engine/Command/CommandTable.cs",
       "sha256": "55472c8bda2494d3bb29b5b611169447cb97c511f0bead6c41cec45cc60065dd",
       "status": "原EntryDescending排序命令仅对Playlist来源开放"
+    },
+    {
+      "source": "NeeView/Command/Commands/DeleteBookCommand.cs",
+      "target": "src/NeeView.Engine/Command/CommandTable.cs",
+      "sha256": "bc8f9f61845f556ef33e0784c33785b0e14434e3c98758def49a879ac46a4f1b",
+      "status": "原DeleteBook名称、写权限及CanExecute；整书真实根实体/确认/下一书接入，归档内部与临时书拒绝"
+    },
+    {
+      "source": "NeeView/BookOperation/BookControl.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.DeleteBook.cs",
+      "sha256": "7b2f0d2b0b31b5a50b55dba8f48e11674ca9bcfaaad209946dba8c70c8fc6ad4",
+      "status": "原CanDeleteBook/DeleteBook、Close/RestoreBook及NextFolderListBookLoader流程；系统成功才导航，失败按原memento恢复，历史/书签保留"
+    },
+    {
+      "source": "NeeView/System/ConfirmFileIO.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.DeleteBook.cs",
+      "sha256": "1b9af14db79dc4b943e0af463900e6474b069f9502151cddd95e3ed9cd5b455c",
+      "status": "原删除确认与布尔授权结果，异步独立整书确认；修复原调用方忽略false仍继续导航"
+    },
+    {
+      "source": "NeeView/System/FileIO.cs",
+      "target": "src/NeeView.Backends/MacPlatformService.cs",
+      "sha256": "2b438ab676de625e70bc64861e3a10aaf081c480c65650bf76b2794d82f6561e",
+      "status": "原DeleteCore系统删除替换为NSFileManager.TrashItem文件/目录，拒绝目标/父路径链接，无永久删除回退，提交后不抛晚取消"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderList.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.DeleteBook.cs",
+      "sha256": "5854e9abf42991aa6117fb3f7c6516f6162f95dcd92f8f042960dc3b69452b90",
+      "status": "原NextFolderListBookLoader预捕获邻项、删除后刷新/打开；新打开代次优先，开关关闭仍刷新"
     }
   ],
   "rule_references": [
@@ -2074,6 +2104,10 @@
     {
       "target": "src/NeeView.MacOS/Views/ReaderBrowsePresenter.cs",
       "status": "唯一ReaderView的可见需求、显示租约及浏览表现；P3单槽后台布局/代次发布/原Page锚点，复用原Page/缓存"
+    },
+    {
+      "target": "src/NeeView.Backends/Content/ArchiveFactory.Paths.cs",
+      "status": "P4实体删除的系统realpath替换点：只在动作准备复核中解析实际大小写/系统链接及缺失末段，无新依赖/身份/持久状态；原调用关系之外的保护改造"
     }
   ]
 }

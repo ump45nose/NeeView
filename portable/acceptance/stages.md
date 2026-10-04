@@ -374,3 +374,11 @@ P2继续动画/手势及资源性能收尾；Windows/真机/NAS与完整显示�
 ## P4 第七批：多来源加载与原播放列表来源
 
 原BookHubTools/ContentDropReceiver多项临时.nvpls及PlaylistArchive/Entry接入唯一打开链；顺序/重复/混合、原收集/排序、真实类型/别名及来源复用保持，全局Hub不变。临时书运行历史保留、写出过滤、FirstLoader跳过，进程文件切书/关窗保留、正常退出清理。最终656/656与115项专项、正式Library/ARM64.app/严格ad-hoc签名通过，先前编译/夹具/预期失败留证；见[p4-multi-paste-runtime.md](p4-multi-paste-runtime.md)。235实例保留，164入口/71占位；其他Paste/书籍菜单/删除继续迁移，P4未完成，设备集中验收，自动本地提交不推送发布。
+
+## P4 第八批：原整书删除与书架邻项
+
+原DeleteBook真实根目录/文件、独立整书确认、GetNextItem下一优先/末项退前/选择回退及默认IsOpenNextBookWhenRemove接入；成功才清LastBook、刷新并导航，历史/书签保留，不入分类移动历史。明确修复原忽略确认false仍可能下一书；失败从原memento恢复页面/搜索/锁定，准备关闭可取消、系统授权后关闭等待，新打开请求优先，JSON失败可重试。
+
+系统realpath在实体准备/复核中保护Profile/临时根/卷根，大小写及系统var别名不能靠文字前缀绕过；目录内部链接只随目录移动，外部目标保留。最终全量684/684、专项120/120及Engine/正式Library/ARM64.app/严格本地ad-hoc签名通过，初次编译/两项专项失败及681项中间结果分别留证，见[静默验收](p4-delete-book-runtime.md)。235实例保留，165入口/70占位，数量不代表覆盖率。
+
+正式Headless整书确认与原字段保存通过，合成客户区截图离线检查；未启动/激活应用、未操作真实剪贴板/废纸篓/Windows。整书移动复制、目录/链接及其他删除/Paste继续迁移，P4未完成，设备/Windows/无损Retina/跨卷NAS/长期性能仍集中验收。本节点自动本地提交，不推送、公证或发布，用户.DS_Store保留。

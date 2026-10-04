@@ -59,6 +59,10 @@ public interface IArchiveFactory
     /// <param name="path">原书签真实来源路径。</param><param name="token">取消后台来源探测。</param>
     /// <returns>文件或目录元数据；未实现此能力的来源明确失败。</returns>
     Task<FolderItem?> GetFileMetadataAsync(string path, CancellationToken token) => throw new NotSupportedException("来源元数据查询尚未实现。");
+    /// <summary>仅实体文件操作使用的实际路径检查；解析系统链接及真实大小写，不改变内容定位。</summary>
+    /// <param name="path">目标或受保护目录；未创建目录解析到最近存在的祖先并保留末段。</param>
+    /// <param name="token">有界后台检查的取消。</param><returns>文件系统确认的绝对路径；不能可靠解析时失败。</returns>
+    Task<string> GetPhysicalPathAsync(string path, CancellationToken token) => throw new NotSupportedException("实体路径检查尚未实现。");
 }
 
 /// <summary>目录导航只读条目，使用真实文件系统路径。</summary>

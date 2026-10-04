@@ -10,6 +10,7 @@ P4沿原fork分类与原BookPageActionControl/BookControl迁入，不增加数�
 | 多页All/AllLeftToRight | 第二批普通目录接入 | 原当前页组/两方向/实际顺序/部分失败与晚取消；Windows动态另验 |
 | CopyToFolderAs固定复制 | 第二批普通目录、第六批归档文件接入 | 三策略/Index/不随面板模式/LimitedRealization/复制不入历史；整目录与书籍菜单待后续 |
 | DeleteFile/系统废纸篓 | 第三批当前普通图片接入 | 原单主页/确认/失败保留/搜索/晚取消/关闭与缓存；AppKit真机另验，归档/链接/列表多选仍待迁 |
+| DeleteBook/整书废纸篓及原邻项 | 第八批根目录/文件接入 | 整书独立确认/失败恢复/历史书签/下一前项/关闭/晚取消/JSON重试；AppKit与Windows动态待集中验 |
 | RenameBook及定位联动 | 第四批目录/根归档接入 | 原名称编号/扩展名/重试、阅读恢复及JSON/书签/QuickAccess/目录/列表明确路径；真实权限/NAS/Windows动态另验 |
 | CopyFile/CopyBook/Paste | 第五批实体及单来源、第六批归档四策略、第七批多来源接入 | 原页组/文本/标准URL/QueryPath、进程级临时租约/切书关闭及静默表单；真实Finder互操作另验，多文件保留重复/混合与原排序、运行历史/启动过滤；位图/目录提取待迁 |
 | CutFile/CutBook | 用户决定继续禁用占位 | 移动继续使用既有分类/移至文件夹，不伪造Windows剪切标记 |
@@ -25,6 +26,8 @@ P4沿原fork分类与原BookPageActionControl/BookControl迁入，不增加数�
 - 真跨卷及已挂载NAS中断/权限/恢复材料。前台测试集中约定时段，不在开发途中抢焦点。
 - 触控板用户要求跳过；多屏无环境。签名公证/分发安装属于P5，不由ad-hoc构建继承。
 
-前七批开发增量不等同P4开发完成或P3/P4设备封板；契约见[p4-multipage.md](p4-multipage.md)、[p4-delete.md](p4-delete.md)、[p4-rename.md](p4-rename.md)与[p4-clipboard.md](p4-clipboard.md)，归档文件实体化剪贴板/固定复制已接入；多来源播放列表已接入；继续其他Paste内容、基础书籍文件菜单及其他删除类型。
+前八批开发增量不等同P4开发完成或P3/P4设备封板；契约见[p4-multipage.md](p4-multipage.md)、[p4-delete.md](p4-delete.md)、[p4-rename.md](p4-rename.md)与[p4-clipboard.md](p4-clipboard.md)，归档文件实体化剪贴板/固定复制已接入；多来源播放列表已接入；继续其他Paste内容、基础书籍移动/复制菜单及其他删除类型。
 
 第七批契约见[p4-multi-paste.md](p4-multi-paste.md)，静默与集中设备验收仍分别记录。
+
+第八批契约见[p4-delete-book.md](p4-delete-book.md)，其他书籍移动/复制菜单、其他删除范围及Paste内容继续迁移；P4开发和设备封板仍未完成。

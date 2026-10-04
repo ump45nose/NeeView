@@ -435,7 +435,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     }
     /// <summary>立即保存，用于切书和正常退出。</summary>
     public async Task SaveAsync()
-    { await saveData.SaveAsync(Book, keepHistoryOrder: _keepHistoryOrder); await saveData.FlushBookRenameAsync(); }
+    { await SaveCurrentReadingAsync(); }
     /// <summary>仅保存配置/集合现状，不以外观切换重新登记阅读访问；阅读防抖与退出仍保存Book。</summary>
     public Task SaveConfigurationAsync() => saveData.SaveAsync(null);
 
@@ -443,7 +443,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <param name="historyLimits">原数量及期限；保留当前书与LastBook启动快照。</param>
     /// <returns>唯一SaveData事务的完成或失败。</returns>
     public Task SaveAsync((int Size, TimeSpan Span) historyLimits) =>
-        saveData.SaveAsync(Book, keepHistoryOrder: _keepHistoryOrder, historyLimits: historyLimits);
+        SaveCurrentReadingAsync(limits: historyLimits);
 
     /// <summary>设置表单在原导航锁内应用/保存；失败恢复已知字段及命令，保持原对象引用。</summary>
     /// <param name="apply">同步应用经过验证的表单草稿，不能嵌套调用导航入口。</param>
@@ -548,7 +548,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>观察后台保存错误，不产生未观察任务异常。</summary>
     private async Task SaveLaterAsync(CancellationTokenSource pending)
     {
-        try { await Task.Delay(1000, pending.Token); await saveData.SaveAsync(Book, pending.Token, _keepHistoryOrder); await saveData.FlushBookRenameAsync(); }
+        try { await Task.Delay(1000, pending.Token); await SaveCurrentReadingAsync(pending.Token); }
         catch (OperationCanceledException) { }
         catch (Exception ex) { Error = "保存失败：" + ex.Message; Notify(); }
         finally { if (ReferenceEquals(_saving, pending)) _saving = null; pending.Dispose(); }
@@ -569,6 +569,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     {
         // 关闭请求当场使准备失效；先 Yield 会给原生晚到结果留下继续提交的间隙。
         _closing = true; Interlocked.Increment(ref _generation);
+        _bookDeleteClosing.Cancel();
         CancelClipboardPreparation();
         CancelFileCopyPreparation();
         await Task.Yield();
@@ -580,6 +581,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         CancelFileCopyPreparation();
         if (_renameCompletion is { } rename) await rename.Task;
         if (_clipboardCompletion is { } clipboard) await clipboard.Task;
+        if (_bookDeleteCompletion is { } deletion) await deletion.Task;
         await _gate.WaitAsync();
         try
         {
@@ -598,8 +600,10 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             _gate.Release();
             _renameClosing.Dispose();
             _clipboardClosing.Dispose();
+            _bookDeleteClosing.Dispose();
             if (!_disposed) _renameClosing = new();
             if (!_disposed) _clipboardClosing = new();
+            if (!_disposed) _bookDeleteClosing = new();
             _closing = false;
             lock (_closeSync) _closeTask = null;
         }

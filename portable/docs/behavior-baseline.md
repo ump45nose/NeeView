@@ -78,3 +78,5 @@ P4第五批：原CopyFile按CollectPages/Once/All/AllLeftToRight选序与分割�
 P4第六批：原ArchivePolicy.None/SendArchiveFile/SendArchivePath/SendExtractFile数值及默认、LimitedRealization和RealizeArchiveEntry保序/Distinct接入；None仍输出QueryPath，固定复制虚拟策略改为提取。原ClipboardUtility的OriginalPath实际再次调用同一提取策略，故保留输出实体路径，未按选项名称重解释。文件名仅取叶名称，逻辑Page/QueryPath保持原所属来源；成功剪贴板资源跨切书/关窗保留，真Finder另验，见[p4-realization.md](p4-realization.md)。
 
 P4第七批：原BookHubTools/ContentDropReceiver多项保存为临时.nvpls；原PlaylistArchive按接收顺序解析、失败跳过及连续Id，代理真实SystemPath/类型/实体化与显示名分开。WherePageAll保留按真实父路径过滤规则；仅Entry类别按登记序，临时书运行历史保留、写出过滤、FirstLoader跳过恢复，不改全局Hub。自动原源码对照见[p4-multi-paste.md](p4-multi-paste.md)，Windows动态仍待集中验收。
+
+P4第八批：原DeleteBook处理根目录/根文件，用户.nvpls仅移走列表；GetNextItem下一优先/末项退前/选中回退、IsOpenNextBookWhenRemove默认true保持。原BookControl忽略ConfirmFileIO.DeleteAsync的false返回，本批明确修正为真实成功才导航，取消保持旧书、系统失败恢复memento/搜索/锁定；历史和书签不删除。AppKit废纸篓替换Windows系统实现，临时/Profile/卷根/逻辑条目/链接范围有明确限制，设备与Windows动态仍待验，见[p4-delete-book.md](p4-delete-book.md)。

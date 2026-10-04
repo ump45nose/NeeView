@@ -183,6 +183,7 @@ public sealed partial class MainWindow : Window
         "Unload" => _model?.Operation.CanUnload == true,
         "MoveToFolderAs" or "CopyToFolderAs" => IsDestinationCommandAvailable(name),
         "DeleteFile" => _model?.Operation.CanDeleteFile == true,
+        "DeleteBook" => _model?.Operation.CanDeleteBook == true,
         "RenameBook" => _model?.Operation.CanRenameBook == true,
         "CopyFile" => _model?.Operation is { } copy && copy.CanCopyFiles(copy.GetCopyFileParameter().MultiPagePolicy),
         "CopyBook" => _model?.Operation.CanCopyBook == true,
@@ -394,6 +395,7 @@ public sealed partial class MainWindow : Window
                 case "OpenContextMenu": OpenViewerContextMenu(); break;
                 case "MoveToFolderAs": case "CopyToFolderAs": await OpenDestinationMoveMenuAsync(name); break;
                 case "DeleteFile": await RunDestinationActionAsync(() => _model.Operation.DeleteFileAsync()); break;
+                case "DeleteBook": await RunDestinationActionAsync(() => _model.Operation.DeleteBookAsync()); break;
                 case "RenameBook": await RunDestinationActionAsync(() => _model.Operation.RenameBookAsync()); break;
                 case "CopyFile": case "CopyBook": case "Paste":
                     await RunDestinationActionAsync(() => _model.Commands.ExecuteAsync(name)); break;

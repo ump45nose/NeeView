@@ -195,6 +195,17 @@ public sealed partial class BookshelfFolderList(IArchiveFactory archives, Folder
         return next >= 0 && next < Items.Count ? Items[next] : null;
     }
 
+    /// <summary>原GetNextItem/GetNeighbor：删除前捕获下一项，末项退前；不在列表可回退当前选择。</summary>
+    /// <param name="path">要移走的书籍实体地址。</param><param name="selectedItemFallback">找不到该书时是否采用当前选择。</param>
+    /// <returns>原当前列表中的邻项，单项或未加载时为空。</returns>
+    public FolderItem? GetNextItem(string path, bool selectedItemFallback)
+    {
+        if (_disposed || IsLoading) return null;
+        int index = Items.ToList().FindIndex(item => item.Path == path);
+        if (index < 0) return selectedItemFallback ? SelectedItem : null;
+        return index + 1 < Items.Count ? Items[index + 1] : index > 0 ? Items[index - 1] : null;
+    }
+
     /// <summary>书架上一级只改变列表，保留原选中目录为定位目标。</summary>
     public Task<bool> UpAsync(CancellationToken token = default)
     {

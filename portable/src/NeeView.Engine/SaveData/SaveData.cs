@@ -32,6 +32,8 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
     /// <summary>仅书签编辑提交或回滚后回报；阅读进度保存不触发书签列表重排。</summary>
     public event EventHandler? BookmarksChanged;
     public string DirectoryPath { get; } = directory;
+    /// <summary>文件动作检查的应用临时根；仍由唯一启动装配提供，不另存状态。</summary>
+    internal string? TemporaryDirectoryPath => _temporaryDirectory;
     public PlaylistHub Playlists { get; private set; } = null!;
     public FolderConfigCollection FolderConfigs { get; } = new();
     public string? LastBookPath => _setting["Config"]?["StartUp"]?["LastBookV2"]?["Path"]?.GetValue<string>();

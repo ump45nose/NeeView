@@ -309,7 +309,7 @@
     "Text": "删除书籍",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/DeleteBookCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P4 真实根目录/文件整书废纸篓与原下一书；逻辑/临时/链接拒绝",
     "MenuText": "删除书籍(D)",
     "MouseGesture": ""
   },
