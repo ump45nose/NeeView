@@ -315,7 +315,7 @@ public sealed class SidePanelPresenter : IDisposable
     private static string Title(string key) => key switch
     {
         "FolderPanel" => "文件夹", "PageListPanel" => "页面列表", "HistoryPanel" => "历史", "FileInformationPanel" => "信息", "NavigatePanel" => "导航器",
-        "BookmarkPanel" => "书签", "ImageEffectPanel" => "图像效果（P5）", "PlaylistPanel" => "播放列表", "DestinationFolderPanel" => "目标文件夹（P4）", _ => key
+        "BookmarkPanel" => "书签", "ImageEffectPanel" => "图像效果（P5）", "PlaylistPanel" => "播放列表", "DestinationFolderPanel" => "目标文件夹", _ => key
     };
     /// <summary>使用原图标资源，主题替换不影响停靠操作。</summary>
     private PathIcon Icon(string key)

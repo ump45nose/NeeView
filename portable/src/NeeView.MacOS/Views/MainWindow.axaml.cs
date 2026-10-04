@@ -39,7 +39,7 @@ public sealed partial class MainWindow : Window
     private SliderTextBox PageNumber => this.FindControl<SliderTextBox>("PageNumberView")!;
     private static readonly HashSet<string> HostCommands = new(StringComparer.Ordinal)
     {
-        "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen",
+        "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen", "MoveToFolderAs",
         "ViewScaleUp", "ViewScaleDown", "ViewScrollUp", "ViewScrollDown", "ViewScrollLeft", "ViewScrollRight", "OpenContextMenu", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
         "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ToggleBookLock", "Unload", "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff",
         "ToggleViewFlipVertical", "ViewFlipVerticalOn", "ViewFlipVerticalOff", "ViewReset", "ViewScaleStretch", "ViewPresetScroll", "ViewScrollNTypeUp", "ViewScrollNTypeDown",
@@ -147,6 +147,7 @@ public sealed partial class MainWindow : Window
         bookmarks.Attach(model.SaveData);
         AttachListTemplates();
         AttachDirectoryTree();
+        AttachDestinationFolders();
         var playlist = this.FindControl<PlaylistView>("PlaylistPanelView")!;
         playlist.Failed += (_, message) => ShowError(message); playlist.Attach(model.Operation);
         model.Operation.MarkersChanged += Model_MarkersChanged;
@@ -177,6 +178,11 @@ public sealed partial class MainWindow : Window
     {
         var command when PagedTransformCommands.Contains(command) && _model?.Operation.IsFrameReading != true => false,
         "Unload" => _model?.Operation.CanUnload == true,
+        "MoveToFolderAs" => _model?.Operation.CanFileAction == true,
+        "UndoDestinationMove" => _model?.Operation.DestinationMoves?.CanUndo == true,
+        "RedoDestinationMove" => _model?.Operation.DestinationMoves?.CanRedo == true,
+        var command when command.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal) => _model?.Operation.CanFileAction == true
+            && _model.Operation.GetDestinationParameter(command) is { MultiPagePolicy: MultiPagePolicy.Once } parameter && (parameter.Index == 0 || Config.Current.System.DestinationFolderCollection.IsValidIndex(parameter.Index - 1)),
         "MoveToParentBook" => _model?.Operation.CanMoveToParentBook == true,
         "MoveToChildBook" => _model?.Operation.CanMoveToChildBook == true,
         "ToggleIsRecursiveFolder" => _model?.Operation.Book is not null && !_model.Operation.IsLoading,
@@ -374,6 +380,11 @@ public sealed partial class MainWindow : Window
                 case "ViewScrollUp": case "ViewScrollDown": case "ViewScrollLeft": case "ViewScrollRight":
                     Viewer.ScrollView(name, _model.SaveData.GetCommandParameter<ViewScrollCommandParameter>(name)); break;
                 case "OpenContextMenu": OpenViewerContextMenu(); break;
+                case "MoveToFolderAs": await OpenDestinationMoveMenuAsync(); break;
+                case var command when command.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal):
+                    await OpenDestinationMoveMenuAsync(command); break;
+                case "UndoDestinationMove": case "RedoDestinationMove":
+                    await RunDestinationActionAsync(() => _model.Operation.ReplayDestinationMoveAsync(name == "UndoDestinationMove")); break;
                 case "NextScrollPage": await Viewer.ScrollToNextFrameAsync(1, _model.SaveData.GetScrollParameter(name)); break;
                 case "PrevScrollPage": await Viewer.ScrollToNextFrameAsync(-1, _model.SaveData.GetScrollParameter(name)); break;
                 case "NextSizePage": await _model.Operation.MoveSizeAsync(_model.SaveData.GetMoveSizeParameter().Size); break;
@@ -834,6 +845,9 @@ public sealed partial class MainWindow : Window
         _pageEndDialog?.Close(PageEndAction.None);
         try
         {
+            foreach (var dialog in OwnedWindows.ToArray()) dialog.Close();
+            await _destinationAction;
+            await this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.PrepareCloseAsync();
             await _listStyleTask;
             await _folderTreeSettingsTask;
             await _quickAccessEditTask;
@@ -860,16 +874,18 @@ public sealed partial class MainWindow : Window
                 _model.Operation.PageEndDialogAsync = null;
                 _model.HistoryRefreshed -= History_Refreshed;
                 _model.Operation.MarkersChanged -= Model_MarkersChanged;
+                if (_model.Operation.DestinationMoves is { } moves) { moves.StateChanged -= DestinationMove_Changed; moves.ConfirmOverwriteAsync = null; }
                 _model.Detach(); _model.Refreshed -= Model_Refreshed; _model.PanelsRefreshed -= Model_PanelsRefreshed; _model.ChromeRefreshed -= Model_ChromeRefreshed;
                 _model.Refreshed -= PageNavigation_Refreshed;
             }
             this.FindControl<PlaylistView>("PlaylistPanelView")!.Dispose();
+            this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.Dispose();
             this.FindControl<BookmarkListView>("BookmarkPanelList")!.Dispose();
             _autoHide?.Dispose(); _sidePanels?.Dispose(); _platformInput?.Dispose(); FilmStrip.Dispose(); NavigatorView.Dispose(); Viewer.Dispose(); _images?.Dispose(); _closedPrepared = true;
         }
         finally
         {
-            if (!_closedPrepared) { _sidePanels?.CancelClose(); this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); this.FindControl<BookmarkListView>("BookmarkPanelList")!.CancelClose(); _model?.HistorySearch.CancelClose(); _model?.PageSearch.CancelClose(); _model?.FolderSearch.CancelClose(); }
+            if (!_closedPrepared) { _sidePanels?.CancelClose(); this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.CancelClose(); this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); this.FindControl<BookmarkListView>("BookmarkPanelList")!.CancelClose(); _model?.HistorySearch.CancelClose(); _model?.PageSearch.CancelClose(); _model?.FolderSearch.CancelClose(); }
             _preparing = false; _shutdown = null;
         }
     }

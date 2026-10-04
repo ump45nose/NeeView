@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="NeeView.MacOS.Views.DestinationFolderPanelView" x:CompileBindings="False">
+  <Grid RowDefinitions="Auto,*,Auto" Margin="6">
+    <StackPanel Spacing="4" Margin="0,0,0,6">
+      <CheckBox Content="允许文件操作" IsChecked="{Binding WriteAccess, Mode=OneWay}" Click="WriteAccess_Click" />
+      <WrapPanel><CheckBox x:Name="CopyMode" Margin="0,0,8,0" Content="复制模式" IsChecked="{Binding CopyMode, Mode=OneWay}" Click="Mode_Click" /><CheckBox Content="自动刷新" IsChecked="{Binding AutoRefresh, Mode=OneWay}" Click="AutoRefresh_Click" /></WrapPanel>
+      <TextBlock Text="{Binding Target}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Target}" />
+    </StackPanel>
+    <Grid x:Name="Sections" Grid.Row="1" RowDefinitions="*,5,*">
+      <Grid RowDefinitions="Auto,*"><TextBlock Text="手动目标文件夹" Margin="2,2,0,5" />
+        <ListBox x:Name="ManagedFolders" Grid.Row="1" ItemsSource="{Binding ManagedFolders}">
+          <ListBox.ItemTemplate><DataTemplate><Button Content="{Binding Label}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" IsEnabled="{Binding $parent[UserControl].DataContext.CanClassify}" ToolTip.Tip="{Binding Path}" Click="Classify_Click" /></DataTemplate></ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
+      <GridSplitter x:Name="SectionSplitter" Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+      <Grid Grid.Row="2" RowDefinitions="Auto,Auto,*"><TextBlock Text="当前目录的直接子文件夹" Margin="2,5,0,3" />
+        <TextBlock Grid.Row="1" Text="{Binding CurrentDirectory}" FontSize="10" Opacity="0.65" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding CurrentDirectory}" Margin="2,0,0,5" />
+        <ListBox x:Name="CurrentFolderChildren" Grid.Row="2" ItemsSource="{Binding CurrentFolderChildren}">
+          <ListBox.ItemTemplate><DataTemplate><Button Content="{Binding Name}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" IsEnabled="{Binding $parent[UserControl].DataContext.CanClassify}" ToolTip.Tip="{Binding Path}" Click="Classify_Click" /></DataTemplate></ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
+    </Grid>
+    <StackPanel Grid.Row="2" Spacing="4" Margin="0,6,0,0">
+      <WrapPanel><Button Content="刷新" Click="Refresh_Click" /><Button Content="新建子目录…" Click="Create_Click" /><Button Content="管理…" Click="Manage_Click" /></WrapPanel>
+      <WrapPanel><Button Content="撤销移动" IsEnabled="{Binding CanUndo}" Tag="undo" Click="Replay_Click" /><Button Content="重做移动" IsEnabled="{Binding CanRedo}" Tag="redo" Click="Replay_Click" /></WrapPanel>
+      <TextBlock Text="{Binding Status}" TextWrapping="Wrap" FontSize="11" />
+    </StackPanel>
+  </Grid>
+</UserControl>

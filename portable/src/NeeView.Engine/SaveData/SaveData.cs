@@ -216,6 +216,15 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         // 早期Mac各方向独立写出的参数仅作读取兼容；原共享节点明确存在时优先。
         return (_setting["Commands"]?[owner]?["Parameter"] ?? _setting["Commands"]?[name]?["Parameter"])?.Deserialize<T>(options) ?? new();
     }
+    /// <summary>九数字实例默认索引来自原构造器；差分未写Index时仍保留该默认值。</summary>
+    public MoveToFolderAsCommandParameter GetDestinationParameter(string name)
+    {
+        int index = name.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal) && int.TryParse(name["MoveToDestinationFolder".Length..], out var number) ? number : 0;
+        var defaults = JsonSerializer.SerializeToNode(new MoveToFolderAsCommandParameter { Index = index }, Options)!.AsObject();
+        if (_setting["Commands"]?[name]?["Parameter"] is JsonObject raw) Merge(defaults, raw);
+        var options = new JsonSerializerOptions(Options); options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        return defaults.Deserialize<MoveToFolderAsCommandParameter>(options)!;
+    }
 
     /// <summary>更新已支持参数并保留原节点的未知字段；原差分快捷键不会被覆盖。</summary>
     public void SetCommandParameter<T>(string name, T value) => Merge(Object(Object(Object(_setting, "Commands"), DefaultInputScheme.GetParameterOwner(name)), "Parameter"), JsonSerializer.SerializeToNode(value, Options)!.AsObject());
@@ -463,6 +472,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             Object(config, "History")["LimitSpan"] = JsonSerializer.SerializeToNode(historyConfig.LimitSpan, Options);
             // 退役的 Mac 别名统一归入原字段，避免下一次加载出现两套相反的权威值。
             Object(config, "Panels").Remove("IsLeftAutoHide"); Object(config, "Panels").Remove("IsRightAutoHide");
+            Object(config, "System").Remove("DestinationFodlerCollection");
             config.Remove("IsAddressBarEnabled");
             Object(config, "View").Remove("ViewOrigin");
             if (book is not null)

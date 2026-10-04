@@ -24,6 +24,9 @@ public sealed class CommandTable
     {
         using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("NeeView.Command.command-manifest.json")!;
         Definitions = JsonSerializer.Deserialize<List<CommandDefinition>>(stream)!;
+        for (int i = 1; i <= 9; i++) { var name = "MoveToDestinationFolder" + i; _actions[name] = () => operation.ClassifyCommandAsync(name); }
+        _actions["UndoDestinationMove"] = () => operation.ReplayDestinationMoveAsync(true);
+        _actions["RedoDestinationMove"] = () => operation.ReplayDestinationMoveAsync(false);
         // 来源：NextPage/PrevPage/NextOnePage/PrevOnePageCommand.Execute，保留帧与单页之别。
         _actions["NextPage"] = () => operation.MoveAsync(1);
         _actions["PrevPage"] = () => operation.MoveAsync(-1);

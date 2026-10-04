@@ -17,6 +17,8 @@ public sealed partial class MacApp : Avalonia.Application
     private bool _shuttingDown;
     private Task? _openingWindow;
     private bool _explicitOpen;
+    private IFileOperationBackend? _fileOperations;
+    private DestinationMoveService? _destinationMoves;
     /// <summary>加载转换的原主题资源和原生应用菜单。</summary>
     public override void Initialize()
     {
@@ -83,12 +85,17 @@ public sealed partial class MacApp : Avalonia.Application
             var directory = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile), "Library", "Application Support", "NeeView.Mac");
             var state = new SaveData(directory, Backends.ArchiveFactory.TemporaryDirectory); await state.LoadAsync();
             var decoder = new MagickImageDecoder(); var operation = new BookOperation(new Backends.ArchiveFactory(), decoder, state);
-            var images = new BitmapFactory(decoder); var model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state);
+            IReadOnlyList<string> recovery = [];
+            if (_fileOperations is null) { _fileOperations = new FileOperationBackend(Path.Combine(directory, "FileRecovery")); recovery = await _fileOperations.RecoverAsync(); }
+            _destinationMoves ??= new(_fileOperations);
+            var images = new BitmapFactory(decoder); operation.AttachFileOperations(_destinationMoves, _fileOperations, images);
+            var model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state);
             _window = new MainWindow(); _window.Bind(model, images, new MacPlatformService());
             _window.AttachPlatformInput(new MacTrackpadInput());
             _window.Closed += (_, _) => _window = null;
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) desktop.MainWindow = _window;
             _window.Show(); RuntimeDiagnostics.Attach(_window, images); if (restore) await _window.RestoreLastAsync();
+            _window.ReportFileRecovery(recovery);
         }
         catch (Exception ex)
         {

@@ -55,7 +55,8 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
 
     /// <summary>共享原加载链；历史重放可指定条目并保留访问顺序，返回是否实际提交新书。</summary>
     /// <param name="startupMemento">原 FirstLoader 的显式启动快照，优先于历史和字段恢复策略。</param>
-    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, Playlist? expectedPlaylist = null, int? terminalDirection = null)
+    /// <param name="pageSearchKeyword">同书文件结果重载保留原临时搜索；普通切书仍使用默认空查询。</param>
+    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, Playlist? expectedPlaylist = null, int? terminalDirection = null, string? pageSearchKeyword = null)
     {
         ObjectDisposedException.ThrowIf(_disposed || _closing, this);
         var generation = Interlocked.Increment(ref _generation);
@@ -91,6 +92,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             }
             var book = candidate = new Book(source, pages, setting) { Entries = collection, IsNew = restored is null, IsIndexing = true };
             book.SortSeed = restored?.SortSeed ?? 0;
+            if (pageSearchKeyword is not null) book.Pages.SearchKeyword = pageSearchKeyword;
             // 索引完成后的自然排序可能包含万条目，未提交书籍在后台排序，UI继续可操作。
             await Task.Run(() => book.Sort(opening.Token), opening.Token);
             int index = book.Pages.FindIndex(e => e.EntryName == requested);
@@ -99,7 +101,9 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             // 原递归切换由书籍项进入其第一项，反向切换则由上面的真实祖先定位收敛。
             if (index < 0 && explicitEntry is not null && startupMemento is not null)
                 index = book.Pages.FindIndex(e => e.EntryName.StartsWith(explicitEntry.TrimEnd('/') + "/", StringComparison.Ordinal));
-            if (explicitEntry is not null && index < 0) throw new FileNotFoundException((entryName is not null ? "历史页面已不存在：" : "指定页面已不存在：") + explicitEntry);
+            var sourceAnchor = book.Pages.SourcePages.FirstOrDefault(p => p.EntryName == requested);
+            if (explicitEntry is not null && index < 0 && !(pageSearchKeyword is not null && sourceAnchor is not null)) throw new FileNotFoundException((entryName is not null ? "历史页面已不存在：" : "指定页面已不存在：") + explicitEntry);
+            if (book.Pages.Count == 0 && pageSearchKeyword is not null) book.CurrentPage = sourceAnchor ?? book.Pages.SourcePages.FirstOrDefault();
             index = Math.Max(0, index);
             if (terminalDirection is not null) index = terminalDirection < 0 ? Math.Max(0, book.Pages.Count - 1) : 0;
             else if (explicitEntry is null && !keepHistoryOrder && !ImageFormats.IsImage(path) && Config.Current.BookSettingPolicy.Page == BookSettingPageSelectMode.RestoreOrDefaultReset && index >= book.Pages.Count - (setting.PageMode == PageMode.WidePage && !setting.IsSupportedSingleLastPage ? 2 : 1)) index = 0;
@@ -116,7 +120,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                 {
                     opening.Token.ThrowIfCancellationRequested();
                     if (_disposed || _closing || generation != _generation || IsBookLocked && Book is { } commitLocked && commitLocked.Path != book.Path || expectedPlaylist is not null && !ReferenceEquals(expectedPlaylist, _playlistHub?.Current)) return false;
-                    Book = book; source = null; collection = null; _keepHistoryOrder = keepHistoryOrder;
+                    Book = book; _fileSelection = null; source = null; collection = null; _keepHistoryOrder = keepHistoryOrder;
                     Config.Current.BookSetting = setting; Context = new(setting, Config.Current);
                     // 原 BookMemento 没有 Part；普通打开/启动从首半页开始，反向页尾进入末半页。
                     Position = new(index, terminalDirection < 0 ? 1 : 0);
@@ -556,7 +560,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             if (Book is { } closingBook) closingBook.MementoControl.IsPageChangeCountEnabled = false;
             await SaveAsync();
             if (Book is not null) await Book.DisposeAsync();
-            _bookshelf?.Dispose(); HistoryList.Dispose();
+            _bookshelf?.Dispose(); _destinationFolders?.Dispose(); HistoryList.Dispose();
             if (_playlistHub is not null) _playlistHub.Changed -= Playlist_Changed;
             Book = null; Frame = null; _disposed = true;
         }

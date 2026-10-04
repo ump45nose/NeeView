@@ -144,8 +144,9 @@ public sealed class ReadingTests
         Assert.Equal(235, table.Definitions.Count);
         Assert.Equal("Left,LeftClick", table.Definitions.Single(e => e.Name == "NextPage").Shortcut);
         for (int i = 1; i <= 9; i++) Assert.Contains(table.Definitions, e => e.Name == "MoveToDestinationFolder" + i);
-        Assert.False(table.IsAvailable("UndoDestinationMove"));
-        await Assert.ThrowsAsync<NotSupportedException>(() => table.ExecuteAsync("UndoDestinationMove"));
+        Assert.True(table.IsAvailable("UndoDestinationMove"));
+        Assert.False(table.IsAvailable("DeleteFile"));
+        await Assert.ThrowsAsync<NotSupportedException>(() => table.ExecuteAsync("DeleteFile"));
     }
     /// <summary>直接构造尺寸样本，测试只依赖引擎和原页框生成器。</summary>
     private static List<Page> Pages(params (int Width, int Height)[] sizes)

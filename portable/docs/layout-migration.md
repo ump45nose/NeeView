@@ -1,6 +1,6 @@
 # 原布局与面板迁移表
 
-原布局出处为 `NeeView/MainWindow/MainWindow.xaml`、`NeeView/SidePanels/SidePanelFrameView.xaml`，主题出处为 `NeeView/Styles/Colors.xaml`、`IconGeometries.xaml`。窗口壳是区域转换，尚未宣称所有原交互已经还原。P2已有部分Windows安装包动态参考，P3新交互尚未采集动态材料。面板默认分组直接取自 `CustomLayoutPanelManager.cs:37-53`；原默认右栏选目标文件夹，该模块待P4，P1暂显示信息面板并保留原位置的禁用入口。
+原布局出处为 `NeeView/MainWindow/MainWindow.xaml`、`NeeView/SidePanels/SidePanelFrameView.xaml`，主题出处为 `NeeView/Styles/Colors.xaml`、`IconGeometries.xaml`。窗口壳是区域转换，尚未宣称所有原交互已经还原。P2已有部分Windows安装包动态参考，P3新交互尚未采集动态材料。面板默认分组直接取自 `CustomLayoutPanelManager.cs:37-53`；原默认右栏选目标文件夹，P4第一批已迁入该模块；保留已有用户侧栏选择，新配置仍沿此前信息面板默认值。
 
 | 原区域 | Mac 入口 | 当前状态 |
 |---|---|---|
@@ -19,7 +19,7 @@
 | HistoryPanel | 左rail历史 | 原访问倒序/日期分组/当前目录过滤、单或双击/Enter打开、前后列表、多选移除及更多菜单；结构化搜索、原保存/登记策略、四模板/可见封面与可靠无效清理已接入 |
 | BookmarkPanel | 右rail书签 | 原节点/编辑/移动/递归合并/删除恢复、登记、独立列表导航/搜索/排序、四模板及书架联动已接入；高级树布局/修复仍占位 |
 | PlaylistPanel | 默认右rail播放列表 | 原组合框/更多/过滤/条目区与编辑导航接入；高级模板/文件管理保留占位，见p2-playlist.md |
-| DestinationFolderPanel | 默认右rail目标文件夹 | 待P4，可选择占位；两区配置/九数字命令已登记 |
+| DestinationFolderPanel | 默认右rail目标文件夹 | P4第一批两区/独立滚动/分隔比例、管理、创建/刷新及移动复制接入；同一组合/自动隐藏/浮动宿主 |
 | PageListPanel | 左栏 | 原四模板/可见逐页缩略及万页虚拟化；方向键仅选行，点击/Enter定位；原目录组树/Top或Left、智能名称/书名/分组、原搜索/历史/计数由第七批接入 |
 | FileInformationPanel | 右栏 | 条目、尺寸、字节、来源和解码错误 |
 | NavigatePanel | 右rail导航器 | 当前页缩略图与点击定位，图像外留白不触发 |

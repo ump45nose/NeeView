@@ -411,6 +411,7 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
         var book = _book; var selected = _pages[index]; var doubleClick = _doubleClick;
         _selection = selected; _reported = selected;
         await operation.JumpAsync(index, expectedBook: book); owner.InvalidateVisual();
+        await operation.SelectFileActionPageAsync(book, selected);
         if (_disposed || !ReferenceEquals(operation.Book, book) || !ReferenceEquals(_selection, selected)) return;
         if (e.InitialPressMouseButton == MouseButton.Left && doubleClick)
         {

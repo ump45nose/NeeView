@@ -1442,6 +1442,66 @@
       "target": "src/NeeView.MacOS/Views/SettingsWindow.Navigation.cs",
       "sha256": "ee09501c4206d143905d9bf95e71616da7d9e5db67288283c382e8a688efdc5f",
       "status": "原页面导航/树/名称设置表单草稿；事务成功才应用，取消不修改"
+    },
+    {
+      "source": "NeeView/DestinationFolder/DestinationFolder.cs",
+      "target": "src/NeeView.Engine/DestinationFolder/DestinationFolder.cs",
+      "sha256": "4cdafbd8ed9e9c131d5505ff2778cc03f6d086985e96b827d00cbdaeaa62ea50",
+      "status": "保留原Name/Path/Trim/Clone；Shell实现分离至文件后端"
+    },
+    {
+      "source": "NeeView/DestinationFolder/DestinationFolderCollection.cs",
+      "target": "src/NeeView.Engine/DestinationFolder/DestinationFolder.cs",
+      "sha256": "99a0d20aabed7ebf1ea8528b3769344266ad86fe2fe56942ca1eb5ba9a040a16",
+      "status": "原无限集合/CreateNew/Index保留，与DestinationFolder合并文件"
+    },
+    {
+      "source": "NeeView/DestinationFolder/DestinationMoveService.cs",
+      "target": "src/NeeView.Engine/DestinationFolder/DestinationMoveService.cs",
+      "sha256": "9611074a06796ba6a1bec2460afa22b2bcdab94b824af530738b333c9fa6b418",
+      "status": "原非排队忙碌锁/双栈/容量/成功后提交；注入进程实例与带指纹的真实文件结果"
+    },
+    {
+      "source": "NeeView/SidePanels/DestinationFolder/DestinationFolderPanelViewModel.cs",
+      "target": "src/NeeView.Engine/DestinationFolder/DestinationFolderPanel.cs",
+      "sha256": "bb6f1638c23c06ed946200506d3bd015b40f9841708231fa6503ba02820f355c",
+      "status": "原手动与直接子目录/目录变化刷新/取消晚到迁入；表现和对话框独立"
+    },
+    {
+      "source": "NeeView/BookOperation/BookPageActionControl.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.FileActions.cs",
+      "sha256": "bbe456cdbfeb66d467c2838ad11670d79b0cf58188bc7c31e5f2e687f6eb2d47",
+      "status": "P4迁入Once单主图普通目录分类和索引推进；All/剪贴板/删除待后续"
+    },
+    {
+      "source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "target": "src/NeeView.Engine/Command/CommandTable.cs",
+      "sha256": "3f3077806e0930439a6aab4d30fb499369bb3fe43cae71b79bdaee6fc1430fca",
+      "status": "原九数字默认输入/可配置Index/面板模式与固定移动区别；Index=0宿主菜单"
+    },
+    {
+      "source": "NeeView/Command/Commands/UndoDestinationMoveCommand.cs",
+      "target": "src/NeeView.Engine/DestinationFolder/DestinationMoveService.cs",
+      "sha256": "e35686e2ddc37a627284220f947cbd95b28fee872335f6be39395069a6951cf6",
+      "status": "原Undo入口及成功后变栈，平台结果/恢复材料适配"
+    },
+    {
+      "source": "NeeView/Command/Commands/RedoDestinationMoveCommand.cs",
+      "target": "src/NeeView.Engine/DestinationFolder/DestinationMoveService.cs",
+      "sha256": "24e4c886ee2635d67e5cbb5c71cb74e6ac971b8c6ec7aed5e4a0572c0556be23",
+      "status": "原Redo入口及失败/取消不变栈"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/MoveToFolderAsCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/MoveToFolderAsCommandParameter.cs",
+      "sha256": "99eaadef5f5642af91be6b7dbbbef4e4718d312c07de2408cfa18c6ca2cb143c",
+      "status": "原Index非负/Once默认；All字段保留但当前执行明确提示"
+    },
+    {
+      "source": "NeeView/External/MultiPagePolicy.cs",
+      "target": "src/NeeView.Engine/Command/MoveToFolderAsCommandParameter.cs",
+      "sha256": "4119442a45cbb5268a3a55246bfcad2a906e7403e67890700193cda40767224b",
+      "status": "保留原Once/All/AllLeftToRight枚举和值序"
     }
   ],
   "rule_references": [
@@ -1656,6 +1716,18 @@
       "target": "src/NeeView.MacOS/Views/FolderTreeView.axaml",
       "sha256": "b29de79289b62e5606416e3919be3794b4e20e8feb69fe759594815731ea30a1",
       "status": "原延迟树绑定/展开/选择布局；P3 QuickAccess上下文、根及按需系统图标适配，真实文件操作P4"
+    },
+    {
+      "source": "NeeView/SidePanels/DestinationFolder/DestinationFolderPanelView.xaml",
+      "target": "src/NeeView.MacOS/Views/DestinationFolderPanelView.axaml",
+      "sha256": "f88c20eaea05fb01f8f076350f309a8366637be730705000ef0ca69c4ffdebb5",
+      "status": "两区独立列表/分隔/模式/管理转换，沿原唯一停靠组合宿主"
+    },
+    {
+      "source": "NeeView/DestinationFolder/DestinationFolderDialogViewModel.cs",
+      "target": "src/NeeView.MacOS/Views/DestinationFolderDialog.cs",
+      "sha256": "9b08834e199adcc7f6d93e9df76bba5b9c79d0161a6701a5221a826ff93fa3c6",
+      "status": "原克隆编辑/增删顺序语义，转换Avalonia异步目录选取"
     }
   ],
   "backend_reuse": [

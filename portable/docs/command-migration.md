@@ -1,10 +1,10 @@
 # 完整命令迁移表
 
-固定基线235个原命令实例全部保留。P3开发收尾为 **144个执行入口接入、91个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
+固定基线235个原命令实例全部保留。P4第一批为 **156个执行入口接入、79个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
 
 原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。实际键位/手势按原A/B/C、阅读方向和用户差分计算。
 
-对照[当前运行导出](../acceptance/p3-completion-commands.json)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider与ToggleHidePageSlider语义独立，前者仍占位；ToggleVisibleAddressBar入口仍占位。参数拥有者映射不等于执行能力；P4分类/P5高级能力继续逐项迁移。
+对照[当前运行导出](../acceptance/p4-destination-commands.json)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider与ToggleHidePageSlider语义独立，前者仍占位；ToggleVisibleAddressBar入口仍占位。参数拥有者映射不等于执行能力；P4分类/P5高级能力继续逐项迁移。
 
 | 原命令 | 文案 | 默认输入 | 默认方向手势 | 执行入口 | 迁移说明 | 原出处 |
 |---|---|---|---|---|---|---|
@@ -20,18 +20,18 @@
 | CopyImage | 复制图像 | Ctrl+Shift+C |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/CopyImageCommand.cs |
 | Paste | 粘贴 | Ctrl+V |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/PasteCommand.cs |
 | CopyToFolderAs | 复制到文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/CopyToFolderAsCommand.cs |
-| MoveToFolderAs | 移动到文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
-| MoveToDestinationFolder1 | 移动到文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
-| MoveToDestinationFolder2 | 移动到文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
-| MoveToDestinationFolder3 | 移动到文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
-| MoveToDestinationFolder4 | 移动到文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
-| MoveToDestinationFolder5 | 移动到文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
-| MoveToDestinationFolder6 | 移动到文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
-| MoveToDestinationFolder7 | 移动到文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
-| MoveToDestinationFolder8 | 移动到文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
-| MoveToDestinationFolder9 | 移动到文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
-| UndoDestinationMove | 撤销目标文件夹移动 | Ctrl+Z |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/UndoDestinationMoveCommand.cs |
-| RedoDestinationMove | 重做目标文件夹移动 | Ctrl+Y |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/RedoDestinationMoveCommand.cs |
+| MoveToFolderAs | 移动到文件夹 |  |  | 已接入 | P4 分类首批 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
+| MoveToDestinationFolder1 | 移动到文件夹 1 | 1 |  | 已接入 | P4 分类首批 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
+| MoveToDestinationFolder2 | 移动到文件夹 2 | 2 |  | 已接入 | P4 分类首批 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
+| MoveToDestinationFolder3 | 移动到文件夹 3 | 3 |  | 已接入 | P4 分类首批 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
+| MoveToDestinationFolder4 | 移动到文件夹 4 | 4 |  | 已接入 | P4 分类首批 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
+| MoveToDestinationFolder5 | 移动到文件夹 5 | 5 |  | 已接入 | P4 分类首批 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
+| MoveToDestinationFolder6 | 移动到文件夹 6 | 6 |  | 已接入 | P4 分类首批 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
+| MoveToDestinationFolder7 | 移动到文件夹 7 | 7 |  | 已接入 | P4 分类首批 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
+| MoveToDestinationFolder8 | 移动到文件夹 8 | 8 |  | 已接入 | P4 分类首批 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
+| MoveToDestinationFolder9 | 移动到文件夹 9 | 9 |  | 已接入 | P4 分类首批 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
+| UndoDestinationMove | 撤销目标文件夹移动 | Ctrl+Z |  | 已接入 | P4 分类首批 | NeeView/Command/Commands/UndoDestinationMoveCommand.cs |
+| RedoDestinationMove | 重做目标文件夹移动 | Ctrl+Y |  | 已接入 | P4 分类首批 | NeeView/Command/Commands/RedoDestinationMoveCommand.cs |
 | ExportImageAs | 另存为 | Ctrl+S |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ExportImageAsCommand.cs |
 | ExportImage | 保存为文件 | Shift+Ctrl+S |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ExportImageCommand.cs |
 | ExportBookAs | 导出书籍 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ExportBookAsCommand.cs |
@@ -243,3 +243,5 @@
 | FocusNextApp | 切换到下一个 NeeView | Ctrl+Tab |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/FocusNextAppCommand.cs |
 | StretchWindow | 调整窗口大小 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/StretchWindowCommand.cs |
 | OpenConsole | 打开脚本控制台 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenConsoleCommand.cs |
+
+P4第一批原九数字、MoveToFolderAs及Undo/Redo接入，数字默认输入1–9并保留可配置Index。仅Once普通目录主图；多页参数保留且明确提示未迁入，CopyFile/CutFile/DeleteFile/RenameBook仍占位。菜单能力受原写权限/当前来源/有效目标/忙碌约束；详见[p4-destination-folders.md](p4-destination-folders.md)。

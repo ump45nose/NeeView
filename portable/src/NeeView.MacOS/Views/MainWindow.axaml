@@ -124,7 +124,7 @@
           </Grid></Border>
       <Border Tag="ImageEffectPanel"><TextBlock Text="图像效果将在 P5 迁入。" TextWrapping="Wrap" Margin="10" /></Border>
       <Border Tag="PlaylistPanel"><local:PlaylistView x:Name="PlaylistPanelView" /></Border>
-      <Border Tag="DestinationFolderPanel"><TextBlock Text="目标文件夹分类将在 P4 迁入。" TextWrapping="Wrap" Margin="10" /></Border>
+      <Border Tag="DestinationFolderPanel"><local:DestinationFolderPanelView x:Name="DestinationPanelView" /></Border>
     </Grid>
     <Border x:Name="DockStatusArea" ZIndex="10" Grid.Row="2" Background="{DynamicResource BottomBar.Background}">
       <StackPanel>

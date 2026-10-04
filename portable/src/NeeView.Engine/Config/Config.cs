@@ -34,6 +34,11 @@ public sealed class Config
 /// <summary>原 SystemConfig 搜索分支；其余系统设置仍在原 JSON 中保留。</summary>
 public sealed class SystemConfig
 {
+    public bool IsFileWriteAccessEnabled { get; set; }
+    public DestinationFolderCollection DestinationFolderCollection { get; set; } = new();
+    /// <summary>原拼写兼容仅用于读取；保存统一使用正确字段。</summary>
+    [System.Text.Json.Serialization.JsonPropertyName("DestinationFodlerCollection"), System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public DestinationFolderCollection? DestinationFodlerCollection_Typo { get => null; set { if (value is not null && DestinationFolderCollection.Count == 0) DestinationFolderCollection = value; } }
     public BookPageCollectMode BookPageCollectMode { get; set; } = BookPageCollectMode.ImageAndBook;
     public ArchiveEntryCollectionMode ArchiveRecursiveMode { get; set; } = ArchiveEntryCollectionMode.IncludeSubArchives;
     public bool IsIncrementalSearchEnabled { get; set; } = true;
@@ -192,6 +197,13 @@ public sealed class ViewConfig
 /// <summary>窗口级布局状态，独立于书籍和阅读规则。</summary>
 public sealed class PanelsConfig
 {
+    public bool IsDestinationFolderCopyMode { get; set; }
+    public bool IsDestinationFolderAutoRefreshEnabled { get; set; } = true;
+    public bool IsDestinationFolderPanelInitialized { get; set; }
+    private int _destinationMoveHistoryCapacity = 300;
+    public int DestinationMoveHistoryCapacity { get => _destinationMoveHistoryCapacity; set => _destinationMoveHistoryCapacity = Math.Clamp(value, 0, 1000); }
+    private double _destinationFolderSectionRatio = .5;
+    public double DestinationFolderSectionRatio { get => _destinationFolderSectionRatio; set => _destinationFolderSectionRatio = double.IsFinite(value) ? Math.Clamp(value, .1, .9) : .5; }
     public PanelListItemProfile NormalItemProfile { get; set; } = PanelListItemProfile.Create(PanelListItemStyle.Normal);
     public PanelListItemProfile ContentItemProfile { get; set; } = PanelListItemProfile.Create(PanelListItemStyle.Content);
     public PanelListItemProfile BannerItemProfile { get; set; } = PanelListItemProfile.Create(PanelListItemStyle.Banner);

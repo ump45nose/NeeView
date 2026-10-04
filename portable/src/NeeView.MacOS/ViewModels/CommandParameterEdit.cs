@@ -15,6 +15,7 @@ public sealed class CommandParameterEdit(string owner, object value)
     public static Type? GetParameterType(string command) => DefaultInputScheme.GetParameterOwner(command) switch
     {
         "ViewScaleUp" or "ViewBaseScaleUp" => typeof(ViewScaleCommandParameter),
+        var name when name == "MoveToFolderAs" || name.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal) => typeof(MoveToFolderAsCommandParameter),
         "ViewRotateLeft" => typeof(ViewRotateCommandParameter),
         "ViewScrollUp" => typeof(ViewScrollCommandParameter),
         "ViewPresetScroll" => typeof(ViewPresetScrollCommandParameter),
@@ -34,7 +35,7 @@ public sealed class CommandParameterEdit(string owner, object value)
     public static CommandParameterEdit? Create(SaveData state, string command, CommandParameterEdit? existing = null)
     {
         var type = GetParameterType(command); if (type is null) return null;
-        var value = existing?.Value ?? typeof(SaveData).GetMethod(nameof(SaveData.GetCommandParameter))!.MakeGenericMethod(type).Invoke(state, [command])!;
+        var value = existing?.Value ?? (type == typeof(MoveToFolderAsCommandParameter) ? state.GetDestinationParameter(command) : typeof(SaveData).GetMethod(nameof(SaveData.GetCommandParameter))!.MakeGenericMethod(type).Invoke(state, [command])!);
         return new(DefaultInputScheme.GetParameterOwner(command), JsonSerializer.Deserialize(JsonSerializer.Serialize(value, type), type)!);
     }
     /// <summary>保存到原共享参数拥有者；原未知字段由SaveData合并保留。</summary>
