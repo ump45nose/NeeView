@@ -13,6 +13,7 @@ public abstract class FolderTreeNodeBase : ObservableObject, IDisposable
     public bool IsDisposed => _disposed || Parent?.IsDisposed == true;
     public virtual bool IsPlaceholder => false;
     public abstract string Name { get; }
+    public virtual string Path => "";
     public virtual string DisplayName => Name;
     public virtual string DisplayText => DisplayName;
     public bool IsSelected { get => _selected; set => SetProperty(ref _selected, value); }

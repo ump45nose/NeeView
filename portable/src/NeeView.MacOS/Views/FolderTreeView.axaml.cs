@@ -17,6 +17,7 @@ public sealed partial class FolderTreeView : UserControl
     public FolderTreeView()
     {
         AvaloniaXamlLoader.Load(this);
+        AttachActions();
         AddHandler(PointerReleasedEvent, Released, RoutingStrategies.Bubble);
         AddHandler(KeyDownEvent, Directory_KeyDown, RoutingStrategies.Tunnel);
         GotFocus += (_, _) => { if (_model is not null) _model.HasKeyboardFocus = true; };
@@ -34,12 +35,13 @@ public sealed partial class FolderTreeView : UserControl
     {
         if (_model is null || e.InitialPressMouseButton != MouseButton.Left || e.KeyModifiers != KeyModifiers.None || e.Source is not Visual visual) return;
         var chain = visual.GetVisualAncestors().Prepend(visual).ToArray();
-        if (chain.Any(v => v is ToggleButton or ScrollBar) || chain.OfType<TreeViewItem>().FirstOrDefault()?.DataContext is not DirectoryNode node) return;
-        _model.SelectedItem = node; e.Handled = true; await _model.DecideAsync();
+        if (chain.Any(v => v is ToggleButton or ScrollBar) || chain.OfType<TreeViewItem>().FirstOrDefault()?.DataContext is not FolderTreeNodeBase node) return;
+        if (e.Handled) return;
+        _model.SelectedItem = node; e.Handled = true; try { await _model.DecideAsync(); } catch (Exception ex) { ErrorRequested?.Invoke(ex.Message); }
     }
     /// <summary>Enter确认目录，方向键留给原生TreeView，不触发查看器翻页。</summary>
     private async void Directory_KeyDown(object? sender, KeyEventArgs e)
-    { if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.Enter && _model is not null) { e.Handled = true; await _model.DecideAsync(); } }
+    { if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.Enter && _model is not null) { e.Handled = true; try { await _model.DecideAsync(); } catch (Exception ex) { ErrorRequested?.Invoke(ex.Message); } } }
     /// <summary>隐藏/脱离宿主取消等待但保留树元数据，浮动重挂载可继续浏览。</summary>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     { base.OnPropertyChanged(change); if (change.Property == IsVisibleProperty) UpdatePresentation(); }

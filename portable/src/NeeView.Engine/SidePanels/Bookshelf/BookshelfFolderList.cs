@@ -12,8 +12,12 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     private FolderParameter? _parameter;
     private BookmarkFolderList? _bookmarks;
     private FolderTreeModel? _folderTree;
+    private bool _quickSubscribed;
+    private QuickAccessTreeNode? _quickPlace;
     /// <summary>普通树与列表共用来源替换点，但各自保持选择和展开状态；创建不枚举。</summary>
-    public FolderTreeModel FolderTree => _folderTree ??= new(archives, this);
+    public FolderTreeModel FolderTree => _folderTree ??= new(archives, this, state: state);
+    public bool IsQuickAccessPlace => Place?.StartsWith("quickaccess:", StringComparison.Ordinal) == true;
+    public Func<string, Task>? OpenTargetAsync { get; set; }
     public bool IsBookmarkPlace => Place?.StartsWith("bookmark:", StringComparison.Ordinal) == true;
     public BookmarkNode? BookmarkPlace => IsBookmarkPlace ? _bookmarks?.Place : null;
     /// <summary>两个列表共享节点及目录参数，位置与选择各自独立；只订阅真实书签事务。</summary>
@@ -34,6 +38,17 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     public bool IsLoading { get; private set; }
     public string? Error { get; private set; }
     public event EventHandler? Changed;
+
+    /// <summary>快速访问目录进入原书架，文件进入唯一BookOperation；来源判断不进入视图。</summary>
+    public async Task<bool> NavigateTargetAsync(string path, CancellationToken token = default)
+    {
+        if (path.StartsWith("quickaccess:", StringComparison.Ordinal) || path.StartsWith("bookmark:", StringComparison.Ordinal)) return await SetPlaceAsync(path, token: token);
+        var item = await archives.GetFileMetadataAsync(path, token);
+        if (item?.IsDirectory == true) return await SetPlaceAsync(path, token: token);
+        if (item is null) throw new IOException("快速访问目标已不存在。");
+        if (OpenTargetAsync is null) throw new NotSupportedException("当前宿主没有书籍打开入口。");
+        await OpenTargetAsync(path); return true;
+    }
 
     /// <summary>选择必须属于当前集合，原系统项尚未进入普通书架集合。</summary>
     public void Select(FolderItem? item)
@@ -70,7 +85,8 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     {
         ObjectDisposedException.ThrowIf(_disposed, this); token.ThrowIfCancellationRequested();
         bool bookmark = place.StartsWith("bookmark:", StringComparison.Ordinal);
-        if (!bookmark) place = System.IO.Path.GetFullPath(place);
+        bool quick = place.StartsWith("quickaccess:", StringComparison.Ordinal);
+        if (!bookmark && !quick) place = System.IO.Path.GetFullPath(place);
         var revision = Interlocked.Increment(ref _revision);
         _request?.Cancel(); var pending = CancellationTokenSource.CreateLinkedTokenSource(token); _request = pending;
         var oldPlace = _bookmarks?.Place ?? (bookmark ? state?.BookmarkRoot : null); var oldSelection = _bookmarks?.SelectedItem; bool committed = false;
@@ -82,6 +98,15 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
                 committed = true; Error = null; IsLoading = false; Changed?.Invoke(this, EventArgs.Empty); return true;
             }
             IsLoading = true; Error = null; Changed?.Invoke(this, EventArgs.Empty);
+            if (quick)
+            {
+                var collection = GetQuickAccess();
+                var folder = collection.FindNode(place) ?? throw new IOException("快速访问位置已不存在。");
+                if (folder.Children is null) throw new IOException("请选择快速访问文件夹。");
+                _quickPlace = folder;
+                Place = place; Items = folder.Children.Select(node => new FolderItem(node.DisplayName, node.IsFolder ? collection.GetPath(node) : node.Path ?? "", node.IsFolder) { QuickAccess = node }).ToArray();
+                SelectedItem = Items.FirstOrDefault(item => item.Path == selectedPath); IsLoading = false; Error = null; committed = true; Changed?.Invoke(this, EventArgs.Empty); return true;
+            }
             if (bookmark)
             {
                 BookmarkList.Refresh();
@@ -125,6 +150,7 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     public void ChangeOrder(FolderOrder mode, bool reshuffle = true)
     {
         if (_disposed || IsLoading) return;
+        if (IsQuickAccessPlace) return;
         if (IsBookmarkPlace) { BookmarkList.ChangeOrder(mode); PublishBookmarks(); return; }
         if (_disposed || IsLoading || _parameter is null) return;
         mode = GetNormalOrder(mode);
@@ -135,6 +161,7 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     public void ReloadParameter()
     {
         if (_disposed || IsLoading || Place is null) return;
+        if (IsQuickAccessPlace) return;
         if (IsBookmarkPlace) { BookmarkList.Refresh(); PublishBookmarks(); return; }
         _parameter = new(Place, _folderConfigs); FolderOrder = GetNormalOrder(_parameter.FolderOrder); Reorder();
     }
@@ -142,6 +169,7 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     public void Reorder()
     {
         if (_disposed || IsLoading) return;
+        if (IsQuickAccessPlace) return;
         if (IsBookmarkPlace) { BookmarkList.Refresh(); PublishBookmarks(); return; }
         var path = SelectedItem?.Path;
         Items = FolderCollection.Sort(_entries, FolderOrder, Config.Current.Bookshelf.FolderSortOrder, _parameter?.Seed ?? 0, CancellationToken.None);
@@ -163,6 +191,8 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     public Task<bool> UpAsync(CancellationToken token = default)
     {
         token.ThrowIfCancellationRequested();
+        if (IsQuickAccessPlace && state?.QuickAccess.FindNode(Place!) is { } current)
+        { var quickParent = state.QuickAccess.ParentOf(current); return quickParent is null ? Task.FromResult(false) : SetPlaceAsync(state.QuickAccess.GetPath(quickParent), Place, token); }
         if (IsBookmarkPlace)
         {
             if (!BookmarkList.MoveToParent()) return Task.FromResult(false);
@@ -178,7 +208,23 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     public Task<bool> RefreshAsync(CancellationToken token = default) => Place is { } place
         ? SetPlaceAsync(place, SelectedItem?.Path, token, true) : Task.FromResult(false);
     /// <summary>窗口关闭取消枚举；后端晚到结果不能更新已关闭的集合。</summary>
-    public void Dispose() { _disposed = true; Interlocked.Increment(ref _revision); _request?.Cancel(); _folderTree?.Dispose(); _bookmarks?.Dispose(); if (state is not null) state.BookmarksChanged -= BookmarksChanged; }
+    public void Dispose() { _disposed = true; Interlocked.Increment(ref _revision); _request?.Cancel(); _folderTree?.Dispose(); _bookmarks?.Dispose(); if (state is not null) { state.BookmarksChanged -= BookmarksChanged; state.QuickAccessChanged -= QuickAccessChanged; } }
+    private QuickAccessCollection GetQuickAccess()
+    {
+        if (state is null) throw new NotSupportedException("快速访问未接入。");
+        if (!_quickSubscribed) { state.QuickAccessChanged += QuickAccessChanged; _quickSubscribed = true; }
+        return state.QuickAccess;
+    }
+    /// <summary>快速访问事务完成才更新同一书架；重命名按原节点恢复位置，不扫描目录。</summary>
+    private void QuickAccessChanged(object? sender, EventArgs e)
+    {
+        if (_disposed || !IsQuickAccessPlace || state is null) return;
+        var collection = state.QuickAccess; var selected = SelectedItem?.QuickAccess;
+        var folder = _quickPlace is not null && collection.Root.Walk().Contains(_quickPlace) ? _quickPlace : collection.Root;
+        _quickPlace = folder; Place = collection.GetPath(folder);
+        Items = (folder.Children ?? []).Select(node => new FolderItem(node.DisplayName, node.IsFolder ? collection.GetPath(node) : node.Path ?? "", node.IsFolder) { QuickAccess = node }).ToArray();
+        SelectedItem = Items.FirstOrDefault(item => ReferenceEquals(item.QuickAccess, selected)); Changed?.Invoke(this, EventArgs.Empty);
+    }
     /// <summary>列表重建保持原节点选择，普通目标Path只用于加载/历史，不作为别名身份。</summary>
     private void PublishBookmarks()
     {

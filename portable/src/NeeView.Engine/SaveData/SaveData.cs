@@ -41,6 +41,8 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         _setting = await ReadAsync("UserSetting.json", token);
         _history = await ReadAsync("History.json", token);
         _bookmarks = await ReadAsync("Bookmark.json", token);
+        _quickAccess = await ReadAsync(QuickAccessCollection.FileName, token);
+        QuickAccess.Restore(_quickAccess);
         Bookmarks = new(_bookmarks["Nodes"]?.Deserialize<BookmarkNode>(Options) ?? new() { Children = [] });
         _removedBookmarks = [];
         _suppressedHistoryPaths.Clear();
@@ -551,7 +553,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
     private async Task WritePairAsync(CancellationToken token, HistoryConfig? historyConfig = null)
     {
         Directory.CreateDirectory(DirectoryPath);
-        string[] names = ["History.json", "UserSetting.json", "Bookmark.json", FolderConfigCollection.FileName];
+        string[] names = ["History.json", "UserSetting.json", "Bookmark.json", FolderConfigCollection.FileName, QuickAccessCollection.FileName];
         var marker = System.IO.Path.Combine(DirectoryPath, ".save-pending.json");
         try
         {
@@ -569,6 +571,8 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             preparedBookmarks["Nodes"] = JsonSerializer.SerializeToNode(BookmarkRoot, Options);
             await WriteTemporaryAsync(names[2], preparedBookmarks, token);
             await WriteTemporaryAsync(names[3], FolderConfigs.CreateMemento(), token);
+            var preparedQuickAccess = QuickAccess.CreateMemento(_quickAccess);
+            await WriteTemporaryAsync(names[4], preparedQuickAccess, token);
             var previous = new JsonObject();
             foreach (var name in names)
             {
@@ -587,6 +591,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             }
             File.Delete(marker);
             _bookmarks = preparedBookmarks;
+            _quickAccess = preparedQuickAccess;
         }
         catch { RecoverInterruptedSave(); throw; }
         finally
@@ -623,7 +628,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         var marker = System.IO.Path.Combine(DirectoryPath, ".save-pending.json");
         if (!File.Exists(marker)) return;
         var previous = JsonNode.Parse(File.ReadAllText(marker))!.AsObject();
-        foreach (var name in new[] { "History.json", "UserSetting.json", "Bookmark.json", FolderConfigCollection.FileName }.Where(previous.ContainsKey))
+        foreach (var name in new[] { "History.json", "UserSetting.json", "Bookmark.json", FolderConfigCollection.FileName, QuickAccessCollection.FileName }.Where(previous.ContainsKey))
         {
             var path = System.IO.Path.Combine(DirectoryPath, name);
             if (previous[name]!.GetValue<bool>()) File.Copy(path + ".save-backup", path, true);

@@ -11,8 +11,8 @@ public sealed class DirectoryNode : FolderTreeNodeDelayBase
     /// <param name="archives">有界后台目录枚举的既有来源契约。</param>
     public DirectoryNode(string name, FolderTreeNodeBase? parent, IArchiveFactory archives) { Name = name; Parent = parent; _archives = archives; }
     public override string Name { get; }
-    public string Path => Parent is DirectoryNode directory ? System.IO.Path.Combine(directory.Path, Name) : Name;
-    public override string DisplayName => Parent is null && Name == "/" ? "Mac" : Name;
+    public override string Path => Parent is DirectoryNode directory ? System.IO.Path.Combine(directory.Path, Name) : Name;
+    public override string DisplayName => Parent is null && Name == "/" ? "Mac" : Parent is null && Name == "/Volumes" ? "挂载卷" : Name;
     /// <summary>只调用有界后台直接子目录枚举；不探测每个子目录是否又有子目录。</summary>
     /// <param name="token">折叠、刷新、切换同步或关闭取消。</param>
     /// <returns>自然名称顺序的延迟节点，不递归创建后代。</returns>

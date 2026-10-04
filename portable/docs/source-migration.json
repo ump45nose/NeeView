@@ -1376,6 +1376,12 @@
       "target": "src/NeeView.Engine/PageFrames/PageFramePanorama.cs",
       "sha256": "d3ecb95fc78100ae57db968c1ffc437f61afab8c148abdaafa42a954d9d54fa7",
       "status": "原CreatePanoramaContentRect首尾膨胀及容器关系数值适配；原帧生成器复用，轻量邻帧窗口有界"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/QuickAccessCollection.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookshelf/QuickAccessCollection.cs",
+      "sha256": "6f0bd6fd80a2b3a1c93c752a335f7cc202ab8b2d5a24ae24ec4614792fb5afe9",
+      "status": "P3 QuickAccess Name/Path/Children, ordering, logical folders and original JSON; WPF removed"
     }
   ],
   "rule_references": [

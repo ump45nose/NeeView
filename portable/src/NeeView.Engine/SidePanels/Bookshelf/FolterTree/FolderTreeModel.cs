@@ -4,17 +4,20 @@ using System.ComponentModel;
 namespace NeeView;
 
 /// <summary>普通目录树独立于书架列表；展开不改变书籍或列表，确认才浏览对应目录。</summary>
-public sealed class FolderTreeModel : ObservableObject, IDisposable
+public sealed partial class FolderTreeModel : ObservableObject, IDisposable
 {
     private readonly BookshelfFolderList _bookshelf;
     private CancellationTokenSource? _sync;
     private long _revision;
     private bool _disposed;
-    private DirectoryNode? _selected;
+    private FolderTreeNodeBase? _selected;
+    private readonly SaveData? _state;
     private string? _error;
     private bool _presented = true;
     public DirectoryNode Root { get; }
-    public IReadOnlyList<DirectoryNode> Roots { get; }
+    public IReadOnlyList<FolderTreeNodeBase> Roots { get; private set; }
+    public QuickAccessDirectoryNode? QuickAccessRoot { get; private set; }
+    public DirectoryNode? VolumesRoot { get; }
     public bool HasKeyboardFocus { get; set; }
     /// <summary>宿主仅回报实际显隐；隐藏取消请求，恢复时按原自动同步开关补齐位置。</summary>
     public bool IsPresented
@@ -25,15 +28,16 @@ public sealed class FolderTreeModel : ObservableObject, IDisposable
             if (_presented == value) return; _presented = value;
             if (!value) { HasKeyboardFocus = false; CancelPending(); }
             else PlaceChanged(this, EventArgs.Empty);
+            RefreshWatchers();
         }
     }
     public Task Synchronizing { get; private set; } = Task.CompletedTask;
-    public DirectoryNode? SelectedItem
+    public FolderTreeNodeBase? SelectedItem
     {
         get => _selected;
         set
         {
-            if (value is not null && !value.ContainsRoot(Root)) return;
+            if (value is not null && !Roots.Any(value.ContainsRoot)) return;
             if (ReferenceEquals(value, _selected)) return;
             if (_selected is not null) { _selected.PropertyChanged -= SelectedNodeChanged; _selected.IsSelected = false; }
             SetProperty(ref _selected, value);
@@ -44,8 +48,8 @@ public sealed class FolderTreeModel : ObservableObject, IDisposable
     private void SelectedNodeChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName != nameof(DirectoryNode.IsDisposed) || _selected is not { IsDisposed: true } node) return;
-        var parent = node.Parent as DirectoryNode;
-        while (parent?.IsDisposed == true) parent = parent.Parent as DirectoryNode;
+        var parent = node.Parent;
+        while (parent?.IsDisposed == true) parent = parent.Parent;
         SelectedItem = _disposed ? null : parent;
     }
     public string? Error { get => _error; private set => SetProperty(ref _error, value); }
@@ -53,12 +57,32 @@ public sealed class FolderTreeModel : ObservableObject, IDisposable
     /// <param name="archives">普通目录的既有后台来源契约。</param>
     /// <param name="bookshelf">确认目录时更新的唯一书架，正文独立。</param>
     /// <param name="root">实际文件系统根；默认Mac的/，测试可指定独立根。</param>
-    public FolderTreeModel(IArchiveFactory archives, BookshelfFolderList bookshelf, string root = "/")
-    { _bookshelf = bookshelf; Root = new(System.IO.Path.GetFullPath(root), null, archives); Roots = [Root]; bookshelf.Changed += PlaceChanged; }
+    public FolderTreeModel(IArchiveFactory archives, BookshelfFolderList bookshelf, string root = "/", SaveData? state = null)
+    {
+        _bookshelf = bookshelf; _state = state; _archives = archives; Root = new(System.IO.Path.GetFullPath(root), null, archives);
+        if (Root.Path == "/") VolumesRoot = new("/Volumes", null, archives);
+        Roots = VolumesRoot is null ? [Root] : [Root, VolumesRoot]; bookshelf.Changed += PlaceChanged;
+        if (state is not null) { state.QuickAccessChanged += RefreshQuickAccess; RefreshQuickAccess(this, EventArgs.Empty); }
+        RefreshWatchers();
+    }
+    /// <summary>适配树刷新保留同一权威节点的展开和选择，失败回滚仍可重试。</summary>
+    private void RefreshQuickAccess(object? sender, EventArgs e)
+    {
+        if (_disposed || _state is null) return;
+        var selected = (SelectedItem as QuickAccessDirectoryNode)?.Value;
+        var expanded = new HashSet<QuickAccessTreeNode>();
+        void Capture(FolderTreeNodeBase node) { if (node is QuickAccessDirectoryNode q && q.IsExpanded) expanded.Add(q.Value); foreach (var child in node.ChildrenRaw ?? []) Capture(child); }
+        if (QuickAccessRoot is not null) Capture(QuickAccessRoot);
+        if (selected is not null) SelectedItem = null;
+        QuickAccessRoot?.Dispose(); QuickAccessRoot = new(_state.QuickAccess, _state.QuickAccess.Root) { IsExpanded = true };
+        Roots = VolumesRoot is null ? [QuickAccessRoot, Root] : [QuickAccessRoot, Root, VolumesRoot]; OnPropertyChanged(nameof(Roots));
+        void Restore(FolderTreeNodeBase node) { if (node is QuickAccessDirectoryNode q) { if (expanded.Contains(q.Value)) q.IsExpanded = true; if (ReferenceEquals(q.Value, selected)) SelectedItem = q; } foreach (var child in node.ChildrenRaw ?? []) Restore(child); }
+        Restore(QuickAccessRoot);
+    }
     /// <summary>原Decide只请求书架位置，不打开目录为新书；选择来自本树才能执行。</summary>
     /// <returns>书架目录浏览是否提交成功。</returns>
     public async Task<bool> DecideAsync()
-    { if (_disposed || SelectedItem is not { IsDisposed: false } node) return false; return await _bookshelf.SetPlaceAsync(node.Path); }
+    { if (_disposed || SelectedItem is not { IsDisposed: false } node) return false; return node is QuickAccessDirectoryNode ? await _bookshelf.NavigateTargetAsync(node.Path) : await _bookshelf.SetPlaceAsync(node.Path); }
     /// <summary>沿目标父链展开，其他分支保持延迟；自动同步在树有焦点时不抢选择。</summary>
     /// <param name="path">普通书架真实目录路径；归档或书签地址不参与此树。</param>
     /// <param name="force">显式同步可更新选择，自动同步尊重树焦点。</param>
@@ -71,9 +95,10 @@ public sealed class FolderTreeModel : ObservableObject, IDisposable
         try
         {
             path = System.IO.Path.GetFullPath(path);
-            var relative = System.IO.Path.GetRelativePath(Root.Path, path);
+            var start = VolumesRoot is not null && (path == "/Volumes" || path.StartsWith("/Volumes/", StringComparison.Ordinal)) ? VolumesRoot : Root;
+            var relative = System.IO.Path.GetRelativePath(start.Path, path);
             if (relative == ".." || relative.StartsWith("../", StringComparison.Ordinal)) return null;
-            var node = Root;
+            var node = start;
             foreach (var name in relative == "." ? [] : relative.Split(System.IO.Path.DirectorySeparatorChar))
             {
                 if (!await node.CreateChildrenAsync(token: pending.Token))
@@ -101,14 +126,15 @@ public sealed class FolderTreeModel : ObservableObject, IDisposable
     /// <summary>显式刷新当前节点保留已展开后代及选择；失败保留旧可用子项。</summary>
     /// <param name="token">调用方关闭或取消。</param>
     /// <returns>刷新成功提交；失败/过期为false。</returns>
-    public Task<bool> RefreshDirectoryAsync(CancellationToken token = default) => (SelectedItem ?? Root).CreateChildrenAsync(true, token);
+    public Task<bool> RefreshDirectoryAsync(CancellationToken token = default) => (SelectedItem as DirectoryNode ?? Root).CreateChildrenAsync(true, token);
     /// <summary>隐藏时取消正在进行的路径同步和已加载分支需求，保留元数据供下次显示。</summary>
     public void CancelPending()
     {
         ++_revision; _sync?.Cancel();
         Cancel(Root);
+        if (VolumesRoot is not null) Cancel(VolumesRoot);
         static void Cancel(DirectoryNode node) { node.CancelLoading(); foreach (var child in node.ChildrenRaw?.OfType<DirectoryNode>() ?? []) Cancel(child); }
     }
     /// <summary>BookOperation关闭时解除书架订阅并拒绝所有晚到结果。</summary>
-    public void Dispose() { if (_disposed) return; _disposed = true; SelectedItem = null; CancelPending(); _bookshelf.Changed -= PlaceChanged; Root.Dispose(); }
+    public void Dispose() { if (_disposed) return; _disposed = true; SelectedItem = null; CancelPending(); StopWatchers(); _bookshelf.Changed -= PlaceChanged; Root.Dispose(); VolumesRoot?.Dispose(); QuickAccessRoot?.Dispose(); if (_state is not null) _state.QuickAccessChanged -= RefreshQuickAccess; }
 }

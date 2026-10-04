@@ -16,7 +16,7 @@ public sealed partial class MainWindow
     private async Task OpenBookshelfItemAsync(FolderItem item)
     {
         if (_model is null || _preparing || _closedPrepared) return;
-        if (item.Bookmark?.IsFolder == true) await _model.Operation.Bookshelf.SetPlaceAsync(item.Path);
+        if (item.QuickAccess?.IsFolder == true || item.Bookmark?.IsFolder == true) await _model.Operation.Bookshelf.SetPlaceAsync(item.Path);
         else { if (item.Bookmark is not null) _bookmarkOpenTarget = item.Path; await OpenAsync(item.Path); }
     }
     private async void Bookshelf_Open(object? sender, RoutedEventArgs e)

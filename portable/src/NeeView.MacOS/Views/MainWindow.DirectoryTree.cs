@@ -15,7 +15,11 @@ public sealed partial class MainWindow
     private void AttachDirectoryTree()
     {
         if (_model is null) return;
+        _model.Operation.Bookshelf.FolderTree.Post = action => Dispatcher.UIThread.Post(action);
         this.FindControl<FolderTreeView>("BookshelfDirectoryTree")!.Attach(_model.Operation.Bookshelf.FolderTree);
+        var view = this.FindControl<FolderTreeView>("BookshelfDirectoryTree")!;
+        view.ActionRequested = QuickAccessActionAsync; view.MoveRequested = MoveQuickAccessAsync; view.ErrorRequested = ShowError;
+        if (_platform is not null) view.SetValue(SystemFileIcon.LoaderProperty, _platform.ReadFileIconAsync);
         _model.Operation.Bookshelf.Changed += FolderTree_PlaceChanged;
         RefreshFolderTreeLayout();
     }
@@ -93,6 +97,9 @@ public sealed partial class MainWindow
     private void AddFolderTreeMenu(ContextMenu menu)
     {
         var c = Config.Current.Bookshelf;
+        var add = new MenuItem { Header = "添加当前位置到快速访问", IsEnabled = _model?.Operation.Bookshelf.Place is not null };
+        add.Click += async (_, _) => await QuickAccessActionAsync("add", null, null); menu.Items.Add(add);
+        var home = new MenuItem { Header = "浏览快速访问" }; home.Click += async (_, _) => { if (_model is not null) await _model.Operation.Bookshelf.SetPlaceAsync("quickaccess:"); }; menu.Items.Add(home);
         var visible = new MenuItem { Header = "目录树", ToggleType = MenuItemToggleType.CheckBox, IsChecked = c.IsFolderTreeVisible };
         visible.Click += async (_, _) => await SetFolderTreeVisibleAsync(!c.IsFolderTreeVisible); menu.Items.Add(new Separator()); menu.Items.Add(visible);
         foreach (var layout in Enum.GetValues<FolderTreeLayout>())

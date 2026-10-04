@@ -824,6 +824,7 @@ public sealed partial class MainWindow : Window
         {
             await _listStyleTask;
             await _folderTreeSettingsTask;
+            await _quickAccessEditTask;
             _historyCleanupCancellation?.Cancel();
             if (_historyCleanupTask is not null) await _historyCleanupTask;
             await this.FindControl<PlaylistView>("PlaylistPanelView")!.PrepareCloseAsync();

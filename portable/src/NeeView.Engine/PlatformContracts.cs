@@ -31,6 +31,8 @@ public interface IPlatformInput : IDisposable
 /// <summary>内容来源替换点；沿用 Archive/ArchiveEntry 模型。</summary>
 public interface IArchiveFactory
 {
+    /// <summary>监视单一已加载目录的直接目录变更；空表示此来源不支持，所有者隐藏/关闭释放。</summary>
+    IDisposable? WatchDirectory(string path, Action changed) => null;
     /// <summary>打开目录、ZIP、RAR 或 7z。调用方负责释放返回来源。</summary>
     Task<Archive> OpenAsync(string path, CancellationToken token);
     /// <summary>可靠检查真实或归档内部定位；仅确定缺失返回false，权限/断线/不支持传播。</summary>
@@ -50,6 +52,7 @@ public sealed record FolderItem(string Name, string Path, bool IsDirectory = tru
 {
     /// <summary>书签位置的原节点；普通文件系统条目为空，不复制书签树或建立新身份。</summary>
     public BookmarkNode? Bookmark { get; init; }
+    public QuickAccessTreeNode? QuickAccess { get; init; }
     public string DisplayName => (IsDirectory ? "▸ " : "") + Name;
 }
 
@@ -80,6 +83,8 @@ public sealed class DecodedImageLease(Size size, byte[] pixels) : IDisposable
 /// <summary>macOS 文件能力，系统失败必须传播给调用方。</summary>
 public interface IPlatformService
 {
+    /// <summary>按需取得系统文件图标PNG，未支持返回空；不返回AppKit/Avalonia对象。</summary>
+    Task<byte[]?> ReadFileIconAsync(string path, CancellationToken token = default) => Task.FromResult<byte[]?>(null);
     /// <summary>在 Finder 中定位真实文件。</summary>
     Task RevealAsync(string path, CancellationToken token = default);
     /// <summary>移入系统废纸篓，不以永久删除回退。</summary>

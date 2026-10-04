@@ -331,3 +331,7 @@ P2继续动画/手势及资源性能收尾；Windows/真机/NAS与完整显示�
 ## P3 第五批：原帧全景
 
 唯一ReaderView沿原页框生成/容器/NScroll迁入水平、垂直与双页全景，保留FrameSpace、PagesAsOne、变换及邻帧书籍命中；连续/瀑布精确缩放锚点。428项完整回归、Library及正式ARM64.app/严格ad-hoc签名结果见[p3-panorama-validation.json](p3-panorama-validation.json)，契约见[p3-panorama.md](../docs/p3-panorama.md)。默认静默，真实设备与Windows动态另验；继续导航收尾。
+
+## P3 第六批：快速访问与目录监视
+
+原快速访问节点/树重排/逻辑书架及 QuicAccess.json 接入唯一五文件保存事务，失败原地回滚；Mac/挂载卷根、按需系统图标及有界一级目录监视。完整435项回归、正式Library/ARM64.app/严格ad-hoc签名通过，见[p3-navigation-completion-validation.json](p3-navigation-completion-validation.json)；契约见[p3-quickaccess.md](../docs/p3-quickaccess.md)。正式TreeView静默拖动通过，系统图标仅编译验证；真实设备及Windows动态仍独立待验，继续页面目录/搜索收尾。
