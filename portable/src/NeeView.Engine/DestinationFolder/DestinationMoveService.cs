@@ -18,21 +18,38 @@ public sealed class DestinationMoveService(IFileOperationBackend backend)
     public Func<string, Task<bool>>? ConfirmOverwriteAsync { get; set; }
 
     /// <summary>处理一个原主图片；复制不进入历史，失败/取消不改变栈。</summary>
-    public Task<FileTransferResult?> TransferAsync(string source, string destination, bool move, CancellationToken token = default) => RunAsync(async () =>
+    public async Task<FileTransferResult?> TransferAsync(string source, string destination, bool move, CancellationToken token = default)
+        => (await TransferManyAsync([new(source, destination, move)], token)).FirstOrDefault();
+
+    /// <summary>同一原多页动作独占忙碌锁；按选定顺序逐项执行，仅真实成功项入历史并回报。</summary>
+    /// <param name="requests">已经捕获和核对的真实图片目标，不能在翻页后重新采集。</param>
+    /// <param name="token">取消阻止后续项；提交过的项仍返回给阅读控制协调。</param>
+    /// <returns>按实际成功顺序排列的结果；失败或取消不会丢失先前已提交项。</returns>
+    public async Task<IReadOnlyList<FileTransferResult>> TransferManyAsync(IReadOnlyList<FileTransferRequest> requests, CancellationToken token = default)
     {
-        bool overwrite = await backend.FileExistsAsync(destination, token);
-        if (overwrite && (ConfirmOverwriteAsync is null || !await ConfirmOverwriteAsync(destination))) return null;
-        token.ThrowIfCancellationRequested();
-        var result = await backend.TransferAsync(new(source, destination, move, overwrite), token);
-        if (move)
+        var results = new List<FileTransferResult>();
+        await RunAsync(async () =>
         {
-            List<FileTransferResult> retired;
-            lock (_syncRoot) { retired = _redoHistory.ToList(); _redoHistory.Clear(); _undoHistory.Add(result); retired.AddRange(Trim()); }
-            foreach (var old in retired) await ReleaseSafelyAsync(old);
-        }
-        else await ReleaseSafelyAsync(result);
-        return result;
-    });
+            foreach (var request in requests)
+            {
+                token.ThrowIfCancellationRequested();
+                bool overwrite = await backend.FileExistsAsync(request.Destination, token);
+                if (overwrite && (ConfirmOverwriteAsync is null || !await ConfirmOverwriteAsync(request.Destination))) break;
+                token.ThrowIfCancellationRequested();
+                var result = await backend.TransferAsync(request with { Overwrite = overwrite }, token);
+                results.Add(result);
+                if (request.Move)
+                {
+                    List<FileTransferResult> retired;
+                    lock (_syncRoot) { retired = _redoHistory.ToList(); _redoHistory.Clear(); _undoHistory.Add(result); retired.AddRange(Trim()); }
+                    foreach (var old in retired) await ReleaseSafelyAsync(old);
+                }
+                else await ReleaseSafelyAsync(result);
+            }
+            return results.LastOrDefault();
+        });
+        return results;
+    }
 
     /// <summary>反向重放栈顶，实际成功后才弹栈；覆盖副本一并恢复。</summary>
     public Task<FileTransferResult?> ReplayAsync(bool undo, CancellationToken token = default) => RunAsync(async () =>

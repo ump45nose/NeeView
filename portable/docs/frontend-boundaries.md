@@ -87,3 +87,5 @@ P3第四/五批已接入[渐进目录索引](p3-index.md)和[原帧全景](p3-pa
 P3收尾：页面目录组树、名称/分组/书名及搜索区域在MainWindow.axaml/MainWindow.PageNavigation，设置表单在SettingsWindow.Navigation；纯布局/主题可独立调整。NavigationSearchViewModel只有输入/历史/取消表现，PageSearchProfile/BookOperation负责正文过滤，SearchBookshelfCollection/BookshelfFolderList负责书架枚举/匹配/监视。目录树只按SourceVersion后台建立，节点仍引用原Page，表现不另存来源数组或按文件名重扫。系统图标通过Engine小型PNG契约进入独立SystemFileIcon控件，不向视图暴露AppKit对象。关闭等待已经确认的保存并取消晚到结果，见[p3-page-search.md](p3-page-search.md)和[p3-quickaccess.md](p3-quickaccess.md)。
 
 P4第一批：DestinationFolderPanelView.axaml只定义两区、分隔和控件；DestinationFolderPanelViewModel通知独立于原数据/业务。管理窗口使用克隆草稿，保存进入Engine配置事务；数字/固定移动/撤销菜单通过MainWindow.DestinationFolders可等待宿主入口。操作对象在业务调用时捕获，文本数字作用域不触发分类；窗口关闭等待宿主和面板任务。枚举/文件协议/容量/成功后索引推进仍归Engine及后端，主题可独立调整。
+
+P4第二批菜单与参数表单继续使用原Index/MultiPagePolicy；固定复制和数字模式只由宿主转交不同Engine入口。原CurrentPages/去重/阅读方向/实际成功项处理属于Engine，视图不推断左右图或扩大瀑布选区。详见[p4-multipage.md](p4-multipage.md)。

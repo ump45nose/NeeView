@@ -20,7 +20,12 @@ public sealed class Book(Archive source, List<Page> pages, BookSettingConfig set
     public BookSettingConfig Setting { get; } = setting;
     public PageSortMode EffectiveSortMode { get; private set; }
     public int SortSeed { get; internal set; }
-    public Page? CurrentPage { get; internal set; }
+    private IReadOnlyList<Page> _currentPages = Array.Empty<Page>();
+    /// <summary>原当前页集合按选中范围索引顺序保存；双页文件操作不以视觉左右推断阅读顺序。</summary>
+    public IReadOnlyList<Page> CurrentPages => _currentPages;
+    public Page? CurrentPage { get => _currentPages.FirstOrDefault(); internal set => SetCurrentPages(value is null ? [] : [value]); }
+    /// <summary>提交原阅读控制已确定的页集合，页面身份继续来自唯一来源索引。</summary>
+    internal void SetCurrentPages(IEnumerable<Page> pages) => _currentPages = pages.ToArray();
     private BookPageMarker? _marker;
     public BookPageMarker Marker => _marker ??= new(this);
 

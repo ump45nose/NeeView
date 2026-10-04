@@ -66,3 +66,5 @@ P3第三批：原BookSourceFactory三种收集模式、WherePageAll目录展平�
 P3第四至七批：原SourcePages/Searcher/BookPageSort正文关系、全源公共前缀与BookTableOfContents目录代表页迁入；临时FileName构树不受正文反序/搜索影响。普通书架沿原FileItem五属性及递归搜索，四类原搜索历史共用总保存开关；未知字段保留。普通直接目录128项渐进扩展保持原Page/Part和真实页尾保护；QuickAccess共享原节点/JSON且拖放不移动文件。全景使用原PageFrameFactory/容器/FrameSpace/PagesAsOne/NScroll，不把Mac瀑布当作原帧规则。原出处/自动对照与本批Windows动态状态分别登记，见[p3-page-search.md](p3-page-search.md)、[P3收尾](p3-completion-checklist.md)。
 
 P4第一批：原DestinationFolder/Collection、DestinationMoveService、DestinationFolderPanelViewModel及MoveToFolderAsCommand的两区、目录变化刷新、无限集合、数字Index/模式、Once主图、固定移动与成功后变栈迁入。原System.IsFileWriteAccessEnabled=false保留。Windows Shell替换为有界文件协议及可恢复覆盖/中断记录；真实落点更新原SourcePages及阅读位置，JSON仍唯一权威。All/AllLeftToRight、删除/剪贴板/书籍重命名明确待后续；未采集P4Windows动态，不声称全部分类一致性通过。P3剩余设备/Windows/长期性能与P4集中验收。
+
+P4第二批：Book.CurrentPages/CurrentPage及原CollectPages迁入，Once/All/AllLeftToRight判断顺序保留；普通目录多页移动逐项成功入栈，部分失败/晚取消仍协调已成功项。CopyToFolderAs固定复制、Index及多页参数接入，不随面板模式、不要求源写权限开关；归档实体化复制仍未迁入。静默夹具与Windows/真机集中验收分别记录，见[p4-multipage.md](p4-multipage.md)。

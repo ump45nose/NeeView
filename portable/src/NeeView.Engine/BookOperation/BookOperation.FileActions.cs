@@ -13,8 +13,31 @@ public sealed partial class BookOperation
     public string? CurrentPictureDirectory => Book?.CurrentPage is { IsImage: true, ArchiveEntry.FilePath: { } path } page && page.ArchiveEntry.Archive.IsDirectory
         ? System.IO.Path.GetDirectoryName(path) : null;
     public Page? FileActionPage => (BrowseMode == BrowseLayoutMode.Masonry ? _fileSelection : Book?.CurrentPage) is { } selected && Book?.Pages.Contains(selected) == true ? selected : null;
-    public bool CanFileAction => Config.Current.System.IsFileWriteAccessEnabled && _destinationMoves is not null && !_destinationMoves.IsBusy && !_disposed && !_closing && !IsLoading && Book?.IsIndexing == false
-        && FileActionPage is { IsImage: true, ArchiveEntry.FilePath: not null } page && page.ArchiveEntry.Archive.IsDirectory && !page.ArchiveEntry.IsShortcut;
+    public bool CanFileAction => CanTransferFileActionPages(MultiPagePolicy.Once, requireWriteAccess: true);
+
+    /// <summary>读取原当前页集合；分页按阅读范围，瀑布仅使用显式选中图片，不扩大到可见区。</summary>
+    /// <param name="policy">Once/All/AllLeftToRight沿原CollectPages判断顺序。</param>
+    /// <returns>来自当前可读集合的原Page，重复分割页仅返回一次。</returns>
+    public IReadOnlyList<Page> CollectFileActionPages(MultiPagePolicy policy)
+    {
+        IEnumerable<Page> pages = IsFrameReading ? Book?.CurrentPages ?? [] : FileActionPage is { } selected ? [selected] : [];
+        pages = pages.Where(page => Book?.Pages.Contains(page) == true).Distinct();
+        pages = policy switch
+        {
+            MultiPagePolicy.Once => pages.Take(1),
+            MultiPagePolicy.All => pages,
+            MultiPagePolicy.AllLeftToRight => Book?.Setting.BookReadOrder == PageReadOrder.RightToLeft ? pages.Reverse() : pages,
+            _ => throw new ArgumentOutOfRangeException(nameof(policy))
+        };
+        return pages.ToArray();
+    }
+    /// <summary>原移动要求整组均为普通目录真实图片；固定复制不受源写权限开关限制。</summary>
+    public bool CanTransferFileActionPages(MultiPagePolicy policy, bool requireWriteAccess = true)
+    {
+        if (requireWriteAccess && !Config.Current.System.IsFileWriteAccessEnabled || _destinationMoves is null || _destinationMoves.IsBusy || _disposed || _closing || IsLoading || Book?.IsIndexing != false) return false;
+        var pages = CollectFileActionPages(policy);
+        return pages.Count > 0 && pages.All(page => page is { IsImage: true, ArchiveEntry.FilePath: not null } && page.ArchiveEntry.Archive.IsDirectory && !page.ArchiveEntry.IsShortcut);
+    }
 
     /// <summary>唯一装配边界；图像失效仍使用原工厂，移动历史在窗口重开时继续共享。</summary>
     public void AttachFileOperations(DestinationMoveService moves, IFileOperationBackend backend, BitmapFactory images)
@@ -28,62 +51,80 @@ public sealed partial class BookOperation
         finally { _gate.Release(); }
     }
     /// <summary>九数字命令按原1-based索引，复制模式只作用于数字/面板命令。</summary>
-    public Task ClassifyAsync(int index, bool followPanelMode = true)
+    public Task ClassifyAsync(int index, bool followPanelMode = true, MultiPagePolicy policy = MultiPagePolicy.Once)
     {
         var folders = Config.Current.System.DestinationFolderCollection;
-        return index >= 1 && folders.IsValidIndex(index - 1) ? ClassifyAsync(folders[index - 1], followPanelMode && Config.Current.Panels.IsDestinationFolderCopyMode) : Task.CompletedTask;
+        return index >= 1 && folders.IsValidIndex(index - 1) ? ClassifyAsync(folders[index - 1], followPanelMode && Config.Current.Panels.IsDestinationFolderCopyMode, policy: policy) : Task.CompletedTask;
     }
     public MoveToFolderAsCommandParameter GetDestinationParameter(string name) => saveData.GetDestinationParameter(name);
-    /// <summary>原数字命令可配置目标索引，不能将命令后缀误当作永久绑定。</summary>
+    /// <summary>原数字命令可配置目标索引和多页策略，不能将命令后缀误当作永久绑定。</summary>
     public Task ClassifyCommandAsync(string name)
     {
         var parameter = GetDestinationParameter(name);
-        if (parameter.MultiPagePolicy != MultiPagePolicy.Once) throw new NotSupportedException("本批分类仅支持原单图策略；多页策略保留待后续迁入。");
-        return ClassifyAsync(parameter.Index);
+        return ClassifyAsync(parameter.Index, policy: parameter.MultiPagePolicy);
     }
-    /// <summary>当前主图片按真实结果更新原集合；取消/失败不翻页，复制不改变阅读位置。</summary>
-    public async Task ClassifyAsync(DestinationFolder folder, bool copy, CancellationToken token = default)
+    /// <summary>当前阅读范围按真实成功项更新；取消/失败不推进未成功项，复制不改变位置。</summary>
+    public Task ClassifyAsync(DestinationFolder folder, bool copy, CancellationToken token = default, MultiPagePolicy policy = MultiPagePolicy.Once)
+        => TransferFileActionPagesAsync(folder, copy, policy, requireWriteAccess: true, token);
+    /// <summary>原CopyToFolderAs固定复制，不跟随面板模式，也不将复制纳入移动历史。</summary>
+    public Task CopyToFolderAsync(DestinationFolder folder, MultiPagePolicy policy = MultiPagePolicy.Once, CancellationToken token = default)
+        => TransferFileActionPagesAsync(folder, copy: true, policy, requireWriteAccess: false, token);
+
+    private async Task TransferFileActionPagesAsync(DestinationFolder folder, bool copy, MultiPagePolicy policy, bool requireWriteAccess, CancellationToken token)
     {
-        var requestedBook = Book; var requestedPage = FileActionPage;
+        var requestedBook = Book; var requestedPages = CollectFileActionPages(policy);
         await _gate.WaitAsync(token);
         try
         {
-            if (!CanFileAction || !ReferenceEquals(requestedBook, Book) || !ReferenceEquals(requestedPage, FileActionPage) || !folder.IsValid()) return;
-            _saving?.Cancel();
-            var book = Book!; var page = requestedPage!; var readingAnchor = book.CurrentPage;
-            var result = await _destinationMoves!.TransferAsync(page.ArchiveEntry.FilePath!, System.IO.Path.Combine(folder.Path, System.IO.Path.GetFileName(page.ArchiveEntry.FilePath!)), !copy, token);
-            Error = _destinationMoves.Error;
-            if (result is null) { Notify(); return; }
-            // 不重建另一阅读内核；移动成功从原来源集合移除，同Page引用与排序规则继续使用。
-            var relative = System.IO.Path.GetRelativePath(book.Path, result.Destination);
-            bool withinSource = relative != ".." && !relative.StartsWith("../", StringComparison.Ordinal) && !System.IO.Path.IsPathRooted(relative)
-                && (book.Setting.IsRecursiveFolder || !relative.Contains('/'));
-            if (!copy || withinSource)
+            if (!CanTransferFileActionPages(policy, requireWriteAccess) || !ReferenceEquals(requestedBook, Book) || !requestedPages.SequenceEqual(CollectFileActionPages(policy)) || !folder.IsValid()) return;
+            var pages = requestedPages.GroupBy(page => System.IO.Path.GetFullPath(page.ArchiveEntry.FilePath!), StringComparer.Ordinal).Select(group => group.First()).ToArray();
+            // 开始前核对整组；混合不可操作页或已不存在的源不能静默降级为部分选区。
+            foreach (var page in pages)
             {
-                int previous = page.Index;
-                var next = book.Pages.Skip(previous + 1).FirstOrDefault() ?? book.Pages.Take(previous).LastOrDefault();
-                var source = book.Pages.SourcePages.Where(p => (copy || !ReferenceEquals(p, page)) && p.ArchiveEntry.FilePath != result.Destination).ToList();
-                // 递归书内分类仍属于同一来源；替换实际落点Page使旧目标像素/定位失效，其他Page保持引用。
-                if (withinSource)
-                {
-                    var moved = new Page(new ArchiveEntry(book.Source) { Id = book.Pages.SourcePages.Max(p => p.EntryIndex) + 1, RawEntryName = relative,
-                        FilePath = result.Destination, Length = page.ArchiveEntry.Length, LastWriteTime = page.ArchiveEntry.LastWriteTime });
-                    moved.Content.PageDataSource = page.Content.PageDataSource; moved.Content.HasSize = page.Content.HasSize; source.Add(moved);
-                }
-                book.Pages.SetSourcePages(source);
-                book.Sort(CancellationToken.None); if (!copy) _fileSelection = null;
-                // 空搜索结果保留原查询和可恢复来源锚点，但不能继续操作不可见图片。
-                if (book.Pages.Count == 0) book.CurrentPage = book.Pages.SourcePages.FirstOrDefault(p => p.EntryIndex > page.EntryIndex) ?? book.Pages.SourcePages.LastOrDefault();
-                var anchor = copy ? readingAnchor : next;
-                Position = new(anchor is not null && book.Pages.Contains(anchor) ? anchor.Index : 0, copy ? Position.Part : 0);
-                await ProbeAroundAsync(book, Position.Index, CancellationToken.None); RebuildFrame(1); RecordPageHistory();
+                if (!await _fileBackend!.FileExistsAsync(page.ArchiveEntry.FilePath!, token)) { Error = "源图片已不存在：" + page.EntryName; Notify(); return; }
             }
+            _saving?.Cancel();
+            var book = Book!; var readingAnchor = book.CurrentPage;
+            var results = await _destinationMoves!.TransferManyAsync(pages.Select(page => new FileTransferRequest(page.ArchiveEntry.FilePath!,
+                System.IO.Path.Combine(folder.Path, System.IO.Path.GetFileName(page.ArchiveEntry.FilePath!)), !copy)).ToArray(), token);
+            Error = _destinationMoves.Error;
+            if (results.Count == 0) { Notify(); return; }
+            bool changed = false;
+            foreach (var result in results)
+            {
+                var page = pages.First(page => System.IO.Path.GetFullPath(page.ArchiveEntry.FilePath!) == result.Source);
+                changed |= ApplyTransferredPage(book, page, result, copy, readingAnchor);
+            }
+            // 一次批次只补尺寸/重建正文一次；晚取消仍提交真实成功项并保持失败项。
+            if (changed) { await ProbeAroundAsync(book, Position.Index, CancellationToken.None); RebuildFrame(1); RecordPageHistory(); }
             _fileImages?.InvalidateCovers();
             try { await saveData.SaveAsync(book, keepHistoryOrder: _keepHistoryOrder); }
             catch (Exception ex) { Error = "文件操作已成功，阅读状态保存失败，请重试保存：" + ex.Message; ScheduleSave(); }
             Notify();
         }
         finally { _gate.Release(); }
+    }
+    /// <summary>单项结果沿原来源集合协调；批次目标已捕获，推进页面不重采集后续操作对象。</summary>
+    private bool ApplyTransferredPage(Book book, Page page, FileTransferResult result, bool copy, Page? readingAnchor)
+    {
+        var relative = System.IO.Path.GetRelativePath(book.Path, result.Destination);
+        bool withinSource = relative != ".." && !relative.StartsWith("../", StringComparison.Ordinal) && !System.IO.Path.IsPathRooted(relative)
+            && (book.Setting.IsRecursiveFolder || !relative.Contains('/'));
+        if (copy && !withinSource) return false;
+        int previous = page.Index;
+        var next = book.Pages.Skip(previous + 1).FirstOrDefault() ?? book.Pages.Take(previous).LastOrDefault();
+        var source = book.Pages.SourcePages.Where(p => (copy || !ReferenceEquals(p, page)) && p.ArchiveEntry.FilePath != result.Destination).ToList();
+        if (withinSource)
+        {
+            var moved = new Page(new ArchiveEntry(book.Source) { Id = book.Pages.SourcePages.Max(p => p.EntryIndex) + 1, RawEntryName = relative,
+                FilePath = result.Destination, Length = page.ArchiveEntry.Length, LastWriteTime = page.ArchiveEntry.LastWriteTime });
+            moved.Content.PageDataSource = page.Content.PageDataSource; moved.Content.HasSize = page.Content.HasSize; source.Add(moved);
+        }
+        book.Pages.SetSourcePages(source); book.Sort(CancellationToken.None); if (!copy) _fileSelection = null;
+        if (book.Pages.Count == 0) book.CurrentPage = book.Pages.SourcePages.FirstOrDefault(p => p.EntryIndex > page.EntryIndex) ?? book.Pages.SourcePages.LastOrDefault();
+        var anchor = copy ? readingAnchor : next;
+        Position = new(anchor is not null && book.Pages.Contains(anchor) ? anchor.Index : 0, copy ? Position.Part : 0);
+        return true;
     }
     /// <summary>共享历史允许跨书撤销；仍浏览恢复目录才重载定位，否则仅回报真实路径。</summary>
     public async Task ReplayDestinationMoveAsync(bool undo, CancellationToken token = default)

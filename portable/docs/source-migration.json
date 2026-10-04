@@ -367,7 +367,7 @@
       "source": "NeeView/Book/Book.cs",
       "target": "src/NeeView.Engine/Book/Book.cs",
       "sha256": "46d62b0029539aa5730b330dbda08dfa3686cfd1e5b0f2e7a1d85a9137513663",
-      "status": "原CreateMemento、排序/位置与原Page关系；P2标记/父子书、P3来源过滤/Smart前缀接入，媒体与高级控制未完整迁入"
+      "status": "原CreateMemento、排序/位置与原Page关系；P2标记/父子书、P3来源过滤/Smart前缀接入，媒体与高级控制未完整迁入；P4保留CurrentPages/CurrentPage关系与当前阅读范围顺序"
     },
     {
       "source": "NeeView/Page/Page.cs",
@@ -1471,7 +1471,7 @@
       "source": "NeeView/BookOperation/BookPageActionControl.cs",
       "target": "src/NeeView.Engine/BookOperation/BookOperation.FileActions.cs",
       "sha256": "bbe456cdbfeb66d467c2838ad11670d79b0cf58188bc7c31e5f2e687f6eb2d47",
-      "status": "P4迁入Once单主图普通目录分类和索引推进；All/剪贴板/删除待后续"
+      "status": "P4原Once/All/AllLeftToRight普通目录分类、固定复制、真实成功项索引推进；归档实体化/剪贴板/删除待后续"
     },
     {
       "source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
@@ -1495,13 +1495,25 @@
       "source": "NeeView/Command/CommandParameters/MoveToFolderAsCommandParameter.cs",
       "target": "src/NeeView.Engine/Command/MoveToFolderAsCommandParameter.cs",
       "sha256": "99eaadef5f5642af91be6b7dbbbef4e4718d312c07de2408cfa18c6ca2cb143c",
-      "status": "原Index非负/Once默认；All字段保留但当前执行明确提示"
+      "status": "原Index非负/Once默认及All/AllLeftToRight当前页组策略；数字参数保留原默认索引"
     },
     {
       "source": "NeeView/External/MultiPagePolicy.cs",
       "target": "src/NeeView.Engine/Command/MoveToFolderAsCommandParameter.cs",
       "sha256": "4119442a45cbb5268a3a55246bfcad2a906e7403e67890700193cda40767224b",
       "status": "保留原Once/All/AllLeftToRight枚举和值序"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/CopyToFolderAsCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/CopyToFolderAsCommandParameter.cs",
+      "sha256": "ff5a80336794ec71aec2d5655c4353d18d1263f1cc31e22e7d7b934753b97276",
+      "status": "原Index/Once默认/多页策略，参数编辑沿原JSON字段"
+    },
+    {
+      "source": "NeeView/Command/Commands/CopyToFolderAsCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.DestinationFolders.cs",
+      "sha256": "0021b73eb89dd16acfc0dac19a7c2059329d2bce988b825eaa134f3b8f693b13",
+      "status": "原固定复制/Index菜单及多页参数；本批普通目录图片，归档实体化待后续"
     }
   ],
   "rule_references": [

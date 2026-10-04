@@ -98,7 +98,7 @@
     "Text": "复制到文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/CopyToFolderAsCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P4 普通目录固定复制/多页；归档实体化待后续",
     "MenuText": "复制到文件夹(Y)",
     "MouseGesture": ""
   },
@@ -107,7 +107,7 @@
     "Text": "移动到文件夹",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "P4 分类首批",
+    "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹(E)",
     "MouseGesture": ""
   },
@@ -116,7 +116,7 @@
     "Text": "移动到文件夹 1",
     "Shortcut": "1",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "P4 分类首批",
+    "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 1",
     "MouseGesture": ""
   },
@@ -125,7 +125,7 @@
     "Text": "移动到文件夹 2",
     "Shortcut": "2",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "P4 分类首批",
+    "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 2",
     "MouseGesture": ""
   },
@@ -134,7 +134,7 @@
     "Text": "移动到文件夹 3",
     "Shortcut": "3",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "P4 分类首批",
+    "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 3",
     "MouseGesture": ""
   },
@@ -143,7 +143,7 @@
     "Text": "移动到文件夹 4",
     "Shortcut": "4",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "P4 分类首批",
+    "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 4",
     "MouseGesture": ""
   },
@@ -152,7 +152,7 @@
     "Text": "移动到文件夹 5",
     "Shortcut": "5",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "P4 分类首批",
+    "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 5",
     "MouseGesture": ""
   },
@@ -161,7 +161,7 @@
     "Text": "移动到文件夹 6",
     "Shortcut": "6",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "P4 分类首批",
+    "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 6",
     "MouseGesture": ""
   },
@@ -170,7 +170,7 @@
     "Text": "移动到文件夹 7",
     "Shortcut": "7",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "P4 分类首批",
+    "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 7",
     "MouseGesture": ""
   },
@@ -179,7 +179,7 @@
     "Text": "移动到文件夹 8",
     "Shortcut": "8",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "P4 分类首批",
+    "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 8",
     "MouseGesture": ""
   },
@@ -188,7 +188,7 @@
     "Text": "移动到文件夹 9",
     "Shortcut": "9",
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
-    "Stage": "P4 分类首批",
+    "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 9",
     "MouseGesture": ""
   },

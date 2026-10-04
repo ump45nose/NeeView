@@ -33,23 +33,38 @@ public sealed partial class MainWindow
         var name = await AskNameAsync("新建直接子目录", "新建文件夹");
         if (name is not null && !_preparing && !_closedPrepared) await _model.Operation.CreateDestinationChildAsync(name, directory);
     }
-    /// <summary>原MoveToFolderAs无索引时打开完整目标菜单，始终移动，不跟随复制模式。</summary>
+    /// <summary>固定移动/固定复制与数字命令共用目标菜单，参数由原JSON读取，语义独立。</summary>
     private async Task OpenDestinationMoveMenuAsync(string command = "MoveToFolderAs")
     {
         if (_model is null) return;
         var parameter = _model.Operation.GetDestinationParameter(command);
-        if (parameter.MultiPagePolicy != MultiPagePolicy.Once) throw new NotSupportedException("本批仅迁入单图分类策略，多页策略保留待后续迁入。");
-        if (parameter.Index > 0) { await RunDestinationActionAsync(() => _model.Operation.ClassifyAsync(parameter.Index, followPanelMode: command != "MoveToFolderAs")); return; }
+        if (parameter.Index > 0)
+        {
+            var folders = Config.Current.System.DestinationFolderCollection;
+            if (folders.IsValidIndex(parameter.Index - 1)) await RunDestinationActionAsync(() => TransferAsync(folders[parameter.Index - 1]));
+            return;
+        }
         var menu = new ContextMenu();
         foreach (var folder in Config.Current.System.DestinationFolderCollection)
         {
-            var item = new MenuItem { Header = folder.Name, IsEnabled = _model.Operation.CanFileAction }; ToolTip.SetTip(item, folder.Path);
-            item.Click += async (_, _) => await RunDestinationActionAsync(() => _model.Operation.ClassifyAsync(folder, copy: command != "MoveToFolderAs" && Config.Current.Panels.IsDestinationFolderCopyMode));
+            var item = new MenuItem { Header = folder.Name, IsEnabled = _model.Operation.CanTransferFileActionPages(parameter.MultiPagePolicy, requireWriteAccess: command != "CopyToFolderAs") }; ToolTip.SetTip(item, folder.Path);
+            item.Click += async (_, _) => await RunDestinationActionAsync(() => TransferAsync(folder));
             menu.Items.Add(item);
         }
         if (menu.Items.Count == 0) menu.Items.Add(new MenuItem { Header = "没有手动目标", IsEnabled = false });
         var manage = new MenuItem { Header = "管理目标文件夹…" }; manage.Click += async (_, _) => { try { await ManageDestinationFoldersAsync(); } catch (Exception ex) { ShowError(ex.Message); } }; menu.Items.Add(manage);
         Viewer.ContextMenu = menu; menu.Open(Viewer);
+        Task TransferAsync(DestinationFolder folder) => command == "CopyToFolderAs"
+            ? _model.Operation.CopyToFolderAsync(folder, parameter.MultiPagePolicy)
+            : _model.Operation.ClassifyAsync(folder, copy: command != "MoveToFolderAs" && Config.Current.Panels.IsDestinationFolderCopyMode, policy: parameter.MultiPagePolicy);
+    }
+    private bool IsDestinationCommandAvailable(string command)
+    {
+        if (_model is null) return false;
+        var parameter = _model.Operation.GetDestinationParameter(command);
+        var folders = Config.Current.System.DestinationFolderCollection;
+        return _model.Operation.CanTransferFileActionPages(parameter.MultiPagePolicy, requireWriteAccess: command != "CopyToFolderAs")
+            && (parameter.Index == 0 || folders.IsValidIndex(parameter.Index - 1) && folders[parameter.Index - 1].IsValid());
     }
     /// <summary>所有宿主文件动作共用可等待任务；失败已回报，退出不会重复等待故障任务。</summary>
     private Task RunDestinationActionAsync(Func<Task> action)

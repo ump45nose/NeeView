@@ -15,6 +15,7 @@ public sealed class CommandParameterEdit(string owner, object value)
     public static Type? GetParameterType(string command) => DefaultInputScheme.GetParameterOwner(command) switch
     {
         "ViewScaleUp" or "ViewBaseScaleUp" => typeof(ViewScaleCommandParameter),
+        "CopyToFolderAs" => typeof(CopyToFolderAsCommandParameter),
         var name when name == "MoveToFolderAs" || name.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal) => typeof(MoveToFolderAsCommandParameter),
         "ViewRotateLeft" => typeof(ViewRotateCommandParameter),
         "ViewScrollUp" => typeof(ViewScrollCommandParameter),
