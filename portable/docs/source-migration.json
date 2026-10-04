@@ -367,19 +367,19 @@
       "source": "NeeView/Book/Book.cs",
       "target": "src/NeeView.Engine/Book/Book.cs",
       "sha256": "46d62b0029539aa5730b330dbda08dfa3686cfd1e5b0f2e7a1d85a9137513663",
-      "status": "P1子集适配；原CreateMemento、排序与当前Page关系；媒体/标记待迁入"
+      "status": "原CreateMemento、排序/位置与原Page关系；P2标记/父子书、P3来源过滤/Smart前缀接入，媒体与高级控制未完整迁入"
     },
     {
       "source": "NeeView/Page/Page.cs",
       "target": "src/NeeView.Engine/Book/Page.cs",
       "sha256": "b089520ac7ed118a7c11cf6f9d2e373d12333769450a3b4752676937e31940e2",
-      "status": "P1子集适配；原条目与尺寸关系，其他内容业务待迁入"
+      "status": "原条目/尺寸/类型关系，P3原ISearchItem日期/大小/playlist及Smart名称适配；metadata/rating明确能力提示，其他高级媒体待P5"
     },
     {
       "source": "NeeView/BookOperation/BookOperation.cs",
       "target": "src/NeeView.Engine/BookOperation/BookOperation.cs",
       "sha256": "f419c0c0d409727c7902d8b253fbdb9e69ffc405b79ab052d18d6a8b9f279f23",
-      "status": "P1编排适配；来源/保存/代次协调；不是完整原BookOperation；P3直接目录分批索引沿原Page/导航锁提交，代次隔离及末端保护，递归展平/归档保持完整过滤"
+      "status": "原关系编排适配；唯一来源/保存/代次/导航锁，P3直接目录批次及末端保护、页面过滤提交与空结果位置保留；非完整原BookOperation"
     },
     {
       "source": "NeeView/PageFrames/PageFrameContext.cs",
@@ -493,13 +493,13 @@
       "source": "NeeView/Book/BookPageCollection.cs",
       "target": "src/NeeView.Engine/Book/BookPageCollection.cs",
       "sha256": "210071dd2f9cc86208196bcf3618f53a26035f6325e9438332f4ad4b66c57207",
-      "status": "原GetNextFolderIndex/GetPrevFolderIndex，仅文件名正反排序生效；增加越界保护，不含全原集合"
+      "status": "原目录组前后、SourcePages到Searcher/原排序的可读集合关系；渐进来源版本、单次枚举、正文Index重编号；不是完整原集合"
     },
     {
       "source": "NeeView/Config/BookshelfConfig.cs",
       "target": "src/NeeView.Engine/Config/Config.cs",
       "sha256": "31ef017b9adced3508ccff93901b6246dd733338f1ed01d95295fe738a9c20dd",
-      "status": "原书架排序/分组及P3树手动/自动同步字段；其余未知字段保留"
+      "status": "原书架排序/分组、树手动/自动同步和P3递归搜索字段；其余未知配置保留"
     },
     {
       "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderItemFactory.cs",
@@ -577,7 +577,7 @@
       "source": "NeeView/BookHistory/BookHistoryCollection.cs",
       "target": "src/NeeView.Engine/SaveData/SaveData.cs",
       "sha256": "addd035b3f7540da5b0851c2b79fbef2bbf880518c39bf553c75f654342fbece",
-      "status": "原Remove/Clear、两组表达式历史及CreateMemento/fromLoad限制适配三JSON事务；运行集合无限，写出副本先排除应用临时根，失败回滚"
+      "status": "原Remove/Clear、四类表达式历史和统一IsKeepSearchHistory、CreateMemento/fromLoad限制适配；唯一五JSON事务/原地回滚，写出副本限制，运行集合无限"
     },
     {
       "source": "NeeView/SidePanels/History/HistoryListViewModel.cs",
@@ -697,13 +697,13 @@
       "source": "NeeView/Book/BookPageMarker.cs",
       "target": "src/NeeView.Engine/Book/BookPageMarker.cs",
       "sha256": "3b7bfd5dc2958f45b305d6fdde5ab2a97168add611760088f2d776666348649d",
-      "status": "原SetMarkers及书内首尾/循环算法；来源删除回报待P4"
+      "status": "原标记/首尾/循环，P3导航仅取可读页索引，避免被过滤来源页旧Index跳转；删除回报P4"
     },
     {
       "source": "NeeView/BookOperation/BookPlaylist.cs",
       "target": "src/NeeView.Engine/BookOperation/BookPlaylist.cs",
       "sha256": "3ea50c3df8eeaff9638654838930efc1746c0996f37c5519295cdebc8a16ed95",
-      "status": "原书籍/全局列表路径关系、CanRegister/Find/Collect；媒体/临时来源待迁"
+      "status": "原书籍/全局路径、CanRegister/Find/Collect；P3从SourcePages映射标记，媒体/临时来源待迁"
     },
     {
       "source": "NeeView/BookOperation/BookPlaylistControl.cs",
@@ -1339,19 +1339,19 @@
       "source": "NeeView/SidePanels/Bookshelf/FolterTree/FolderTreeModel.cs",
       "target": "src/NeeView.Engine/SidePanels/Bookshelf/FolterTree/FolderTreeModel.cs",
       "sha256": "41c1a52f84e6f8c24c1704c6b9a3b02565fbeefb3a27157a1e140cbe4184dc79",
-      "status": "P3第二批：原普通目录选择/Decide/祖先链同步子集；树焦点保留选择；Mac真实根替换，QuickAccess/监视/驱动器未迁"
+      "status": "原选择/Decide/祖先同步关系，P3 QuickAccess独立根、Mac/挂载卷根、最多32项展开一级监视；文件操作P4"
     },
     {
       "source": "NeeView/Config/FolderListConfig.cs",
       "target": "src/NeeView.Engine/Config/Config.cs",
       "sha256": "bd44775a5a94f7e83e2163e62f97a76981151f0df75215bdea30dd803625674e",
-      "status": "P3第二批：原共享列表样式、树显隐/Top或Left/默认尺寸；Mac有限尺寸归一，原JSON分支保持"
+      "status": "原列表样式、树显隐/Top或Left/默认尺寸、搜索框/计数；Mac有限尺寸归一，原JSON分支保持"
     },
     {
       "source": "NeeView/Config/PageListConfig.cs",
       "target": "src/NeeView.Engine/Config/Config.cs",
       "sha256": "ee09501c4206d143905d9bf95e71616da7d9e5db67288283c382e8a688efdc5f",
-      "status": "P3第二批：原PageList四模板/FocusMainView默认；页面组树/搜索/智能名称等未迁字段继续保留"
+      "status": "原PageList四模板、FocusMainView、Smart名称/书名/分组、目录树/搜索框/计数和原默认值；未知字段保留"
     },
     {
       "source": "NeeView/SidePanels/Bookshelf/FolterTree/FolderTreeLayout.cs",
@@ -1369,7 +1369,7 @@
       "source": "NeeView/SidePanels/Bookshelf/FolterTree/FolderTreeView.xaml.cs",
       "target": "src/NeeView.MacOS/Views/FolderTreeView.axaml.cs",
       "sha256": "0861e46f2cfdb7f35de9ed64eadbee7bf86df478a77e29bb3a36a7b7191865fe",
-      "status": "原普通行点击/Enter确认与焦点适配；隐藏取消需求，文件拖放/高级操作未迁"
+      "status": "原行点击/Enter确认、焦点、QuickAccess引用拖放/重排；隐藏释放树需求；真实文件操作P4"
     },
     {
       "source": "NeeView/PageFrames/PageFrameBox.cs",
@@ -1382,6 +1382,66 @@
       "target": "src/NeeView.Engine/SidePanels/Bookshelf/QuickAccessCollection.cs",
       "sha256": "6f0bd6fd80a2b3a1c93c752a335f7cc202ab8b2d5a24ae24ec4614792fb5afe9",
       "status": "P3 QuickAccess Name/Path/Children, ordering, logical folders and original JSON; WPF removed"
+    },
+    {
+      "source": "NeeView/Book/BookTableOfContents.cs",
+      "target": "src/NeeView.Engine/Book/BookTableOfContents.cs",
+      "sha256": "e08670a68483c5f816fb493064d29848ad15008971c4ed94943f90c7f282e760",
+      "status": "原SourcePages临时FileName排序、目录分组首项代表页；取消后台几何适配"
+    },
+    {
+      "source": "NeeView/Book/ContentsPageNode.cs",
+      "target": "src/NeeView.Engine/Book/BookTableOfContents.cs",
+      "sha256": "dc8f796cee1b312094e0db9316b0acab12197743a0498c16a3af78efbb862e49",
+      "status": "原逐目录段Add及首次分支代表页；移除WPF转换器和控件类型"
+    },
+    {
+      "source": "NeeView/SidePanels/PageList/PageNameFormat.cs",
+      "target": "src/NeeView.Engine/Book/BookTableOfContents.cs",
+      "sha256": "ba8a0492ecc1d73a801091b755ff802ca1b5ce90e699a2d26533a04960af42c5",
+      "status": "原Smart/NameOnly/Raw/PageNumber枚举数值保留"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/PageSearchProfile.cs",
+      "target": "src/NeeView.Engine/Search/PageSearchProfile.cs",
+      "sha256": "83b8092cdf114ca7b39fbc125f98a7fd7b17c56d45c630b99d9720b8c4adeba7",
+      "status": "原日期/大小/playlist、meta/rating Profile和别名登记；未迁metadata/rating明确能力错误"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/FileItem.cs",
+      "target": "src/NeeView.Engine/Search/SearchBookshelfCollection.cs",
+      "sha256": "c0e5cc3d79c630966af6342c97e684a42d20764a284be6d4bafceff606efefff",
+      "status": "原Name/FileTime/FileSize/bookmark/history搜索值；真实来源元数据、唯一原历史/书签成员"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderSearchCollection.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookshelf/BookshelfFolderList.Search.cs",
+      "sha256": "78f8c04675084017d6fee3b893e1077f0410721d29501e20a2e6641d9a75b367",
+      "status": "原普通递归搜索范围、排序与监视关系；有界后台来源、单活动根/250ms合并/隐藏释放/旧ID隔离；在途用户导航期间监视只登记补刷新，失败保持原查询"
+    },
+    {
+      "source": "NeeView/Book/Book.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.PageSearch.cs",
+      "sha256": "46d62b0029539aa5730b330dbda08dfa3686cfd1e5b0f2e7a1d85a9137513663",
+      "status": "原源页Searcher过滤/BookPageSort/位置恢复流程；异步导航锁、代次、成功提交和空结果保留"
+    },
+    {
+      "source": "NeeView/SearchBox/SearchBoxModel.cs",
+      "target": "src/NeeView.MacOS/ViewModels/NavigationSearchViewModel.cs",
+      "sha256": "109910eabd7cbf0e2d42621256587f0b9cb6aacad2b52e8f6a8d192f78ef8986",
+      "status": "原Trim/Analyze、500ms增量/确认历史/环境重置；页面与书架独立输入表现、可等待关闭及取消适配"
+    },
+    {
+      "source": "NeeView/SidePanels/PageList/PageListViewModel.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.PageNavigation.cs",
+      "sha256": "f6332c4c698d9e1a8d80b8cb46cbb8bfe28c78c3d454042963ae5ea172cdc721",
+      "status": "原目录树、名称/分组/书名和搜索宿主关系；独立Mac异步焦点/布局/设置适配"
+    },
+    {
+      "source": "NeeView/Config/PageListConfig.cs",
+      "target": "src/NeeView.MacOS/Views/SettingsWindow.Navigation.cs",
+      "sha256": "ee09501c4206d143905d9bf95e71616da7d9e5db67288283c382e8a688efdc5f",
+      "status": "原页面导航/树/名称设置表单草稿；事务成功才应用，取消不修改"
     }
   ],
   "rule_references": [
@@ -1595,7 +1655,7 @@
       "source": "NeeView/SidePanels/Bookshelf/FolterTree/FolderTreeView.xaml",
       "target": "src/NeeView.MacOS/Views/FolderTreeView.axaml",
       "sha256": "b29de79289b62e5606416e3919be3794b4e20e8feb69fe759594815731ea30a1",
-      "status": "普通延迟目录树绑定/选择/展开；图标/QuickAccess/完整上下文未迁"
+      "status": "原延迟树绑定/展开/选择布局；P3 QuickAccess上下文、根及按需系统图标适配，真实文件操作P4"
     }
   ],
   "backend_reuse": [

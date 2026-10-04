@@ -118,7 +118,7 @@ public sealed class BookmarkSearchTests
         finally { Directory.Delete(Path.Combine(fixture.State, "History.json.tmp")); }
         Assert.Equal(new[] { "第三", "旧" }, state.BookmarkSearchHistory); await state.EditBookmarkSearchHistoryAsync("第三", remove: true, token: TestContext.Current.CancellationToken); Assert.Equal(new[] { "旧" }, state.BookmarkSearchHistory);
         Config.Current.History.IsKeepSearchHistory = false; await state.SaveAsync(null, TestContext.Current.CancellationToken); var json = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "History.json"), TestContext.Current.CancellationToken))!;
-        Assert.Null(json["BookmarkSearchHistory"]); Assert.Equal("保留", json["BookshelfSearchHistory"]![0]!.GetValue<string>()); Assert.Equal(7, json["Future"]!.GetValue<int>());
+        Assert.Null(json["BookmarkSearchHistory"]); Assert.Null(json["BookshelfSearchHistory"]); Assert.Equal(7, json["Future"]!.GetValue<int>());
         Config.Current.System.SearchHistorySize = 0; await state.EditBookmarkSearchHistoryAsync("不保留", token: TestContext.Current.CancellationToken); Assert.Empty(state.BookmarkSearchHistory);
     }
 

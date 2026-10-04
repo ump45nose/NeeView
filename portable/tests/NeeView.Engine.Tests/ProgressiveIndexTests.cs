@@ -5,6 +5,16 @@ namespace NeeView.Engine.Tests;
 public sealed class ProgressiveIndexTests
 {
     [Fact]
+    public async Task SearchDuringIndexingNeverDropsEarlierFilteredSourcePages()
+    {
+        using var fixture = new Fixture(); var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
+        var source = new BatchArchive(fixture.Images); await using var op = new BookOperation(new BatchFactory(source), new Decoder(), state);
+        var opening = op.OpenAsync(source.Path, TestContext.Current.CancellationToken); await source.Waiting.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+        await op.SearchPagesAsync("003 /or 001", op.Book, TestContext.Current.CancellationToken); Assert.Single(op.Book!.Pages);
+        source.Continue.TrySetResult(); await opening; Assert.Equal(4, op.Book.Pages.SourcePages.Count); Assert.Equal(new[] { "001.png", "003.png" }, op.Book.Pages.Select(p => p.EntryName));
+        await op.SearchPagesAsync("", op.Book, TestContext.Current.CancellationToken); Assert.Equal(4, op.Book.Pages.Count);
+    }
+    [Fact]
     public async Task FirstBatchIsReadableBeforeEnumerationEndsAndSortingKeepsPage()
     {
         using var fixture = new Fixture(); var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);

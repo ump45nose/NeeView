@@ -13,10 +13,11 @@ public sealed partial class MainWindow
     private void AttachPageListTemplates()
     {
         var list = this.FindControl<ListBox>("PageList")!;
-        _pagePresentation = new(list, null, (page, request, token) => _images!.GetAsync(page, request, token, true));
+        _pagePresentation = new(list, null, (page, request, token) => _images!.GetAsync(page, request, token, true), GetPageGroupHeader);
         _pagePresentation.Apply(Config.Current.PageList.PanelListItemStyle);
         list.AddHandler(PointerPressedEvent, PageList_Pressed, RoutingStrategies.Tunnel, true);
         list.AddHandler(PointerReleasedEvent, PageList_Released, RoutingStrategies.Bubble, true);
+        AttachPageNavigation();
     }
     /// <summary>持久化原PageList样式，模板改变不跳页或创建新书籍。</summary>
     /// <param name="style">原Normal/Content/Banner/Thumbnail枚举。</param>
@@ -64,7 +65,9 @@ public sealed partial class MainWindow
     private void PageList_More(object? sender, RoutedEventArgs e)
     {
         if (sender is not Button button) return;
-        var menu = new ContextMenu { ItemsSource = PanelListPresentation.CreateStyleMenuItems(Config.Current.PageList.PanelListItemStyle, SetPageListStyleAsync) };
+        var menu = new ContextMenu();
+        foreach (var item in PanelListPresentation.CreateStyleMenuItems(Config.Current.PageList.PanelListItemStyle, SetPageListStyleAsync)) menu.Items.Add(item);
+        AddPageNavigationMenu(menu);
         button.ContextMenu = menu; menu.Open(button);
     }
 }

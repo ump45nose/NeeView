@@ -164,15 +164,17 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         {
             if (_disposed || _closing || generation != _generation || !ReferenceEquals(book, Book)) return false;
             var positionPage = book.Pages.ElementAtOrDefault(Position.Index);
-            var input = book.Pages.Concat(batch).ToArray();
+            var input = book.Pages.SourcePages.Concat(batch).ToArray();
             var mode = book.Setting.SortMode.IsEntryCategory()
                 ? book.Setting.SortMode.IsDescending() ? PageSortMode.FileNameDescending : PageSortMode.FileName : book.Setting.SortMode;
             // 原Random以原收集顺序分配随机键；不能以已排序批次再次分配，导致最终顺序随批量变化。
-            var result = await Task.Run(() => BookPageSort.Sort(input.OrderBy(p => p.EntryIndex), mode, book.SortSeed, token), token);
+            var prefix = BookTableOfContents.GetPagesPrefix(input);
+            foreach (var page in input) page.Prefix = prefix;
+            var result = await Task.Run(() => BookPageSort.Sort(PageSearchProfile.Search(book.Pages.SearchKeyword, input.OrderBy(p => p.EntryIndex), token), mode, book.SortSeed, token), token);
             token.ThrowIfCancellationRequested();
             if (_disposed || _closing || generation != _generation || !ReferenceEquals(book, Book)) return false;
-            book.ApplySort(result);
-            Position = new(positionPage?.Index ?? 0, Position.Part); RebuildFrame(MoveDirection);
+            book.Pages.SetSourcePages(input); book.ApplySort(result);
+            Position = new(positionPage is not null && book.Pages.Contains(positionPage) ? positionPage.Index : 0, Position.Part); RebuildFrame(MoveDirection);
             ScheduleSave(); Notify(); return true;
         }
         finally { _gate.Release(); }
@@ -495,7 +497,12 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>只探测当前及生成双页所需邻页，损坏页保留占位。</summary>
     private async Task ProbeAroundAsync(Book book, int index, CancellationToken token)
     {
-        foreach (var page in book.Pages.Skip(Math.Max(0, index - 1)).Take(4))
+        await ProbePagesAsync(book.Pages.Skip(Math.Max(0, index - 1)).Take(4), token);
+    }
+    /// <summary>探测候选快照，提交前可取消，不留下半提交帧。</summary>
+    private async Task ProbePagesAsync(IEnumerable<Page> pages, CancellationToken token)
+    {
+        foreach (var page in pages)
         {
             if (page.Content.HasSize) continue;
             try

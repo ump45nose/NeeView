@@ -1,5 +1,7 @@
 # P3 第四批：渐进普通目录索引
 
+当前状态：P3开发范围已完成，见[P3收尾清单](p3-completion-checklist.md)；本文件记录该批契约和当时测量，后续接入点以下述链接为准，静默验证不等同真机/Windows封板。
+
 沿原 Archive/BookSourceFactory/Book/Page/BookOperation 增加批次入口。普通非递归目录在枚举完成前发布首批，已知图片先单项产出；后续最多128项/批、最多两批排队。目录枚举仍由有界 SourceIo 后台执行，未新增读取服务、身份或状态库。
 
 ## 契约、排序与位置
@@ -18,4 +20,4 @@ Archive.EnumerateEntryBatchesAsync 默认返回完整归档索引；FolderArchiv
 
 ProgressiveIndexTests覆盖确定性阻塞的后续批次、首批可导航、原末端保护、插入前页后的身份、排序改变、显式晚到目标、后续失败、新打开取消，以及真实305文件目录的首图/128项批量/唯一ID。完整418项回归、正式Library/ARM64.app构建及严格ad-hoc签名通过，原始输出见p3-index-validation.json；既有三目录实图和缩略用例继续静默执行。未启动前台应用。
 
-这里证明流式提交及生命周期，不代表NAS首图P95、屏幕帧率、长期RSS、Retina或Windows动态对照。原帧级全景及导航高级项继续本轮开发。
+这里证明流式提交及生命周期，不代表NAS首图P95、屏幕帧率、长期RSS、Retina或Windows动态对照。原帧全景及普通导航收尾随后已交付，见p3-panorama.md、p3-quickaccess.md、p3-page-search.md。

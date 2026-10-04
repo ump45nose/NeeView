@@ -54,6 +54,7 @@ public sealed class QuickAccessCollection
     /// <summary>原delta=0移入文件夹，负/正值插入前/后；禁止移入自身后代。</summary>
     public void Move(QuickAccessTreeNode node, QuickAccessTreeNode target, int delta)
     {
+        if (ReferenceEquals(node, target)) return;
         var source = ParentOf(node) ?? throw new InvalidOperationException("根节点不能移动。");
         var parent = delta == 0 ? target : ParentOf(target);
         if (parent?.Children is null || !Root.Walk().Contains(parent) || node.Walk().Contains(parent)) throw new InvalidOperationException("不能移动到此位置。");

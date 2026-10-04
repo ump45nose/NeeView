@@ -30,11 +30,11 @@
 
 主布局参照原 MainWindow.xaml、SidePanels/SidePanelFrameView.xaml、菜单和 Dock 插槽。41 DIP 侧栏、36 DIP 按钮及转换资源保留。SidePanelPresenter 复用九个唯一内容控件，按 Engine 的组顺序/方向排布；拖放预览、指针捕获、分隔条、单面板浮窗与原图标资源归表现端。布局改变只触发 PanelsRefreshed，不请求主图。侧栏浮动/关闭/重开/停靠已接入，高级窗口/输入细节仍待后续，详见 layout-migration.md。样式现代化应另做增量，保留区域和操作流程。
 
-输入设置使用编辑副本，可搜索全部原命令；新增不可解析输入及冲突阻止保存。输入文本时不响应阅读/数字命令；Command+O/W/Q 仍是系统操作。旧 Control 只规范解析名称，不替换为 Command。PrevScrollPage/NextScrollPage 调用 Engine 的原 NScroll 计算，ReaderView 应用向量或进入原帧导航；完整分页滚动参数、鼠标组合/方向手势及正反单双页共享循环参数从原 Commands 差分读取。全景作用在 P3。指定页对话框、共享步长和历史命令也进入同一正文入口；胶片条/滑条布局及主题不处理历史或阅读规则。正式 AppKit 桥接依据 HasPreciseScrollingDeltas，按窗口身份和查看器区域消费精确滚动/捏合；平移使用原 SnapView 防止图片移出视口，真实触控板待用户验收。
+输入设置使用编辑副本，可搜索全部原命令；新增不可解析输入及冲突阻止保存。输入文本时不响应阅读/数字命令；Command+O/W/Q 仍是系统操作。旧 Control 只规范解析名称，不替换为 Command。PrevScrollPage/NextScrollPage 调用 Engine 的原 NScroll 计算，ReaderView 应用向量或进入原帧导航；完整分页滚动参数、鼠标组合/方向手势及正反单双页共享循环参数从原 Commands 差分读取。原帧全景及PagesAsOne/NScroll已由P3接入；连续/瀑布是同一查看器的Mac展示扩展。指定页对话框、共享步长和历史命令也进入同一正文入口；胶片条/滑条布局及主题不处理历史或阅读规则。正式 AppKit 桥接依据 HasPreciseScrollingDeltas，按窗口身份和查看器区域消费精确滚动/捏合；平移使用原 SnapView 防止图片移出视口，真实触控板待用户验收。
 
 测试直接装载这些正式 XAML、主题和控件源码。Headless 截图用于检查布局与真实图像绘制，不能证明 Mac 手势、Retina、Finder 或 Windows 动态一致性。
 
-只读运行诊断由启动层显式启用，ReaderView仅输出现有几何/数值，不读文件、重排页面或触发绘制。默认无日志I/O；诊断开销和进程RSS由独立设备记录说明。触控板本轮用户要求跳过，未验，不从Headless手势测试继承为真机通过。
+只读运行诊断由启动层显式启用，ReaderView仅输出现有几何/数值，不读文件、重排页面或触发绘制。默认无日志I/O；诊断开销和进程RSS由独立设备记录说明。触控板按用户要求跳过，未验，不从Headless手势测试继承为真机通过。
 
 历史列表由 Engine.HistoryList/SaveData 管理过滤、导航和编辑，HistoryRow/MainWindow.History 管理分组显示、焦点、多选及菜单。四种显示模板和可靠无效清理已接通；主题/布局调整不触发阅读解码或修改访问顺序。原 RemoveUnlinkedHistory 转交既有异步清理，不在菜单中实现存在检测。
 
@@ -83,3 +83,5 @@ P3第二批：FolderTreeView.axaml/.cs只绑定原DirectoryNode并转交确认/�
 P3第三批：Engine.BrowseLayout保存不可变几何检查点，ReaderBrowsePresenter只安排后台计算并在UI线程发布快照及恢复Page锚点。快照与渲染分别持有几何和像素，旧计算不能修改正在绘制的段；视图仍不枚举/排序/写配置。外观和控件布局入口保持，详见[p3-performance.md](p3-performance.md)。
 
 P3第四/五批已接入[渐进目录索引](p3-index.md)和[原帧全景](p3-panorama.md)，早期批次的待迁说明按该契约更新；导航高级项继续迁移，静默验收不等同设备封板。
+
+P3收尾：页面目录组树、名称/分组/书名及搜索区域在MainWindow.axaml/MainWindow.PageNavigation，设置表单在SettingsWindow.Navigation；纯布局/主题可独立调整。NavigationSearchViewModel只有输入/历史/取消表现，PageSearchProfile/BookOperation负责正文过滤，SearchBookshelfCollection/BookshelfFolderList负责书架枚举/匹配/监视。目录树只按SourceVersion后台建立，节点仍引用原Page，表现不另存来源数组或按文件名重扫。系统图标通过Engine小型PNG契约进入独立SystemFileIcon控件，不向视图暴露AppKit对象。关闭等待已经确认的保存并取消晚到结果，见[p3-page-search.md](p3-page-search.md)和[p3-quickaccess.md](p3-quickaccess.md)。

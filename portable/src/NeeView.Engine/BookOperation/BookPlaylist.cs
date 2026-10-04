@@ -11,6 +11,6 @@ public sealed class BookPlaylist(Book book, Playlist playlist)
     public IEnumerable<Page> Collect()
     {
         var paths = playlist.Items.Select(item => item.Path).ToHashSet(StringComparer.Ordinal);
-        return book.Pages.Where(page => paths.Contains(page.EntryFullName));
+        return book.Pages.SourcePages.Where(page => paths.Contains(page.EntryFullName));
     }
 }

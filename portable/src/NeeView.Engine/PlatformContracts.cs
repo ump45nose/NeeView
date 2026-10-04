@@ -33,6 +33,20 @@ public interface IArchiveFactory
 {
     /// <summary>监视单一已加载目录的直接目录变更；空表示此来源不支持，所有者隐藏/关闭释放。</summary>
     IDisposable? WatchDirectory(string path, Action changed) => null;
+    /// <summary>搜索结果监视，含文件及目录元数据；仅活动书架拥有一个监视。</summary>
+    IDisposable? WatchBookSearch(string path, bool recursive, Action changed) => null;
+    /// <summary>普通书架搜索快照，递归不进入归档或符号链接目录；来源可替换真实后台枚举。</summary>
+    async Task<IReadOnlyList<FolderItem>> ListSearchBooksAsync(string path, bool recursive, CancellationToken token)
+    {
+        var result = new List<FolderItem>(); var pending = new Stack<string>(); var seen = new HashSet<string>(StringComparer.Ordinal); pending.Push(path);
+        while (pending.TryPop(out var current))
+        {
+            token.ThrowIfCancellationRequested(); if (!seen.Add(current)) continue;
+            var entries = await ListBooksAsync(current, token); result.AddRange(entries);
+            if (recursive) foreach (var item in entries.Where(item => item.IsDirectory && !item.IsSymbolicLink)) pending.Push(item.Path);
+        }
+        return result;
+    }
     /// <summary>打开目录、ZIP、RAR 或 7z。调用方负责释放返回来源。</summary>
     Task<Archive> OpenAsync(string path, CancellationToken token);
     /// <summary>可靠检查真实或归档内部定位；仅确定缺失返回false，权限/断线/不支持传播。</summary>
@@ -53,6 +67,7 @@ public sealed record FolderItem(string Name, string Path, bool IsDirectory = tru
     /// <summary>书签位置的原节点；普通文件系统条目为空，不复制书签树或建立新身份。</summary>
     public BookmarkNode? Bookmark { get; init; }
     public QuickAccessTreeNode? QuickAccess { get; init; }
+    public bool IsSymbolicLink { get; init; }
     public string DisplayName => (IsDirectory ? "▸ " : "") + Name;
 }
 

@@ -43,7 +43,7 @@ public sealed partial class ArchiveFactory : IArchiveFactory
         {
             token.ThrowIfCancellationRequested();
             if (info.Name.StartsWith('.')) continue;
-            if (info is DirectoryInfo) items.Add(new(info.Name, info.FullName, true, -1, info.LastWriteTime));
+            if (info is DirectoryInfo) items.Add(new(info.Name, info.FullName, true, -1, info.LastWriteTime) { IsSymbolicLink = info.LinkTarget is not null });
             else if (info is FileInfo file && ArchiveFormats.IsArchive(info.Name))
                 items.Add(new(info.Name, info.FullName, false, file.Length, file.LastWriteTime));
         }

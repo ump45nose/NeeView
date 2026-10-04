@@ -4,9 +4,25 @@
     <Border Grid.Column="0" Classes="panel">
       <Grid RowDefinitions="Auto,*">
         <TextBox PlaceholderText="搜索设置" Margin="8" IsEnabled="False" ToolTip.Tip="完整设置搜索在 P2–P5 迁移" />
-        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
+        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
       </Grid>
     </Border>
+    <ScrollViewer x:Name="NavigationSettings" Grid.Column="1" IsVisible="False">
+      <StackPanel Margin="24" Spacing="12">
+        <TextBlock Text="页面列表 / 书架" FontSize="20" />
+        <TextBlock Text="页面名称" /><ComboBox x:Name="PageNameFormat"><ComboBoxItem Content="智能名称" /><ComboBoxItem Content="仅文件名" /><ComboBoxItem Content="完整条目名" /><ComboBoxItem Content="页码" /></ComboBox>
+        <TextBlock Text="页面列表样式" /><ComboBox x:Name="PageListStyle"><ComboBoxItem Content="普通列表" /><ComboBoxItem Content="详细内容" /><ComboBoxItem Content="横幅" /><ComboBoxItem Content="缩略图" /></ComboBox>
+        <CheckBox x:Name="PageShowBookTitle" Content="显示书名" /><CheckBox x:Name="PageGroupBy" Content="按目录分组" /><CheckBox x:Name="PageShowSearch" Content="显示页面搜索框" /><CheckBox x:Name="PageShowCount" Content="显示项目数" /><CheckBox x:Name="PageFocusMain" Content="确认页面后焦点回正文" />
+        <CheckBox x:Name="PageTreeVisible" Content="显示页面目录组树" /><ComboBox x:Name="PageTreeLayout"><ComboBoxItem Content="上方" /><ComboBoxItem Content="左侧" /></ComboBox>
+        <TextBlock Text="页面树宽 / 高 (DIP)" /><NumericUpDown x:Name="PageTreeWidth" Minimum="48" Maximum="2048" /><NumericUpDown x:Name="PageTreeHeight" Minimum="40" Maximum="2048" />
+        <TextBlock Text="普通书架" FontSize="16" Margin="0,8,0,0" />
+        <CheckBox x:Name="FolderShowSearch" Content="显示书架搜索框" /><CheckBox x:Name="FolderSearchRecursive" Content="搜索包含子目录" />
+        <CheckBox x:Name="FolderTreeVisible" Content="显示普通目录树" /><ComboBox x:Name="FolderTreeLayout"><ComboBoxItem Content="上方" /><ComboBoxItem Content="左侧" /></ComboBox>
+        <TextBlock Text="书架树宽 / 高 (DIP)" /><NumericUpDown x:Name="FolderTreeWidth" Minimum="48" Maximum="2048" /><NumericUpDown x:Name="FolderTreeHeight" Minimum="40" Maximum="2048" />
+        <CheckBox x:Name="FolderTreeSync" Content="同步按钮同时同步目录树" /><CheckBox x:Name="FolderTreeAutoSync" Content="自动同步目录树" />
+        <TextBlock Text="搜索（全局）" FontSize="16" Margin="0,8,0,0" /><CheckBox x:Name="IncrementalSearch" Content="逐次搜索（500ms合并输入）" /><CheckBox x:Name="KeepSearchHistory" Content="保存搜索表达式历史" />
+      </StackPanel>
+    </ScrollViewer>
     <ScrollViewer x:Name="ReadingSettings" Grid.Column="1">
       <StackPanel Margin="24" Spacing="14">
         <TextBlock Text="书籍 / 阅读" FontSize="20" />

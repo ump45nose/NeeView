@@ -1,5 +1,7 @@
 # P3 第五批：原帧级全景与精确缩放锚点
 
+当前状态：P3开发范围已完成，见[P3收尾清单](p3-completion-checklist.md)；本文件记录该批契约和当时测量，后续接入点以下述链接为准，静默验证不等同真机/Windows封板。
+
 原 PageFrameFactory、PageFrameContainerLayout、PageFrameBox.CreatePanoramaContentRect 和 NScroll 是规则出处。全景扩展唯一 ReaderView，复用原帧生成、变换、BitmapFactory、显示租约和 JSON；连续/瀑布仍是 Mac 展示扩展。
 
 ## 契约与生命周期
@@ -16,4 +18,4 @@ PageFramePanorama 只构建当前帧及两侧最多各32帧，不持有像素；
 
 专项覆盖水平/垂直、左右方向、原双页/分割/首末/dummy、万页有界帧、原查看器同租约/变换/模式切换，以及页尾 None/Loop。Loop 测试先走完原边界吸附，不要求首次滚动立即循环。合成色块截图可入Git；用户指定三个子目录继续只读静默实图/缩略采样，私人图留忽略 artifacts。
 
-完整回归、正式Library/ARM64.app及严格ad-hoc签名见 p3-panorama-validation.json。Headless不证明屏幕帧率、原生焦点、Retina、多屏、触控板或Windows动态。导航高级项继续P3后续批次；高级效果及媒体保持P5清单。
+完整回归、正式Library/ARM64.app及严格ad-hoc签名见 p3-panorama-validation.json。Headless不证明屏幕帧率、原生焦点、Retina、多屏、触控板或Windows动态。QuickAccess/监视和页面目录/搜索随后由第六/七批交付；高级效果及媒体保持P5清单。

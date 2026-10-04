@@ -334,4 +334,13 @@ P2继续动画/手势及资源性能收尾；Windows/真机/NAS与完整显示�
 
 ## P3 第六批：快速访问与目录监视
 
-原快速访问节点/树重排/逻辑书架及 QuicAccess.json 接入唯一五文件保存事务，失败原地回滚；Mac/挂载卷根、按需系统图标及有界一级目录监视。完整435项回归、正式Library/ARM64.app/严格ad-hoc签名通过，见[p3-navigation-completion-validation.json](p3-navigation-completion-validation.json)；契约见[p3-quickaccess.md](../docs/p3-quickaccess.md)。正式TreeView静默拖动通过，系统图标仅编译验证；真实设备及Windows动态仍独立待验，继续页面目录/搜索收尾。
+原快速访问节点/树重排/逻辑书架及 QuicAccess.json 接入唯一五文件保存事务，失败原地回滚；Mac/挂载卷根、按需系统图标及有界一级目录监视。完整434项回归、正式Library/ARM64.app/严格ad-hoc签名通过，见[p3-navigation-completion-validation.json](p3-navigation-completion-validation.json)；契约见[p3-quickaccess.md](../docs/p3-quickaccess.md)。正式TreeView静默拖动通过，系统图标仅编译验证；真实设备及Windows动态仍独立待验，继续页面目录/搜索收尾。
+
+## P3 第七批：原页面导航、搜索及开发收尾
+
+- 原SourcePages/Searcher/BookPageSort与可读集合接入，保留Page身份、空结果阅读条目、搜索中渐进追加及可读标记索引。原目录代表页、Smart名称/书名/分组、Top/Left树和导航设置进入正式窗口。
+- 普通书架递归/原属性搜索及单活动根监视、500ms输入表现、四类原搜索历史/总开关和五JSON事务接通；设置取消不应用，保存失败原地回滚，未知字段保持。
+- 最终完整 **444/444通过，0失败/跳过**，Engine/正式Library/ARM64.app/严格本地ad-hoc签名五步通过，见[p3-completion-validation.json](p3-completion-validation.json)。失效虚拟位置保留查询与监视不打断在途导航补充回归通过，命令阶段文案和真实导出同步。
+- 同一三个子目录218页、瀑布12位置/缩略9位置只读Headless采样通过，关闭工厂归零；万条目元数据/虚拟化/检查点及原全景回归保持。已离线检查正式合成页面搜索布局，不启动/激活应用、不给真实键鼠，见[静默记录](p3-completion-runtime.md)。
+- **P3开发范围完成，整体验收待项独立。** 原235实例全部保留，144入口接入/91占位；Windows本批动态、真实焦点/弹出层/系统图标、无损Retina、屏幕P95和长期原生内存待集中验收。触控板按用户要求跳过，多屏无环境，P4/P5边界见[收尾清单](../docs/p3-completion-checklist.md)。
+- 当前架构/前端/模块/源码/命令/布局/行为表已同步；本节点自动本地提交，未推送、未执行远端CI、公证或发布。用户.DS_Store保留不提交，私人截图与重复回归材料留忽略artifacts。

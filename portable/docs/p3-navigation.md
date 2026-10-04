@@ -1,6 +1,8 @@
 # P3 第二批：普通目录树与逐页缩略图
 
-原 FolderTree/FolderListConfig/PageListConfig 和 PageListBox 是行为与结构出处。本批在既有三个生产项目内迁入普通目录树子集，页面模板复用既有列表表现，不增加读取服务、来源身份、状态库或第二阅读内核。P3 未封板。
+当前状态：P3开发范围已完成，见[P3收尾清单](p3-completion-checklist.md)；本文件记录该批契约和当时测量，后续接入点以下述链接为准，静默验证不等同真机/Windows封板。
+
+原 FolderTree/FolderListConfig/PageListConfig 和 PageListBox 是行为与结构出处。本批在既有三个生产项目内迁入普通目录树子集，页面模板复用既有列表表现，不增加读取服务、来源身份、状态库或第二阅读内核。P3整体验收待项独立记录。
 
 ## 职责与依赖
 
@@ -39,6 +41,6 @@ PageThumbnailResourceTests 沿用户约定从 `/Volumes/Picture/YY/秀人/5001-6
 
 ## 未迁范围与扩展点
 
-本批不标“完整目录树已迁”。原 QuickAccess、系统图标、驱动器/文件系统监视、树文件拖放/上下文高级操作、页面目录组树/搜索/智能名称格式与完整 Profile 编辑仍待逐项迁移；未知字段保留不表示执行支持。ToggleVisibleFoldersTree 只接入当前宿主普通显隐，完整脚本 On/Off/ByMenu 参数仍待输入/脚本迁移。
+本批是普通树子集；QuickAccess、按需图标、Mac/挂载卷根和有界监视随后由[p3-quickaccess.md](p3-quickaccess.md)接入，页面目录/搜索/智能名称由[p3-page-search.md](p3-page-search.md)接入。真实文件操作属于P4，完整Profile/脚本参数属于P5；未知字段保留不表示执行支持。ToggleVisibleFoldersTree 只接入当前宿主普通显隐，完整脚本 On/Off/ByMenu 参数仍待输入/脚本迁移。
 
-目录索引仍完整建立后打开，本批只使普通目录树展开延迟、页面控件/解码可见化。P3第三批已完成万项元数据测量及布局检查点/后台重排，见[p3-performance.md](p3-performance.md)；渐进目录索引及原帧级全景仍为P3后续目标。Headless 不证明正式 Mac 焦点/Retina/真实拖动/屏幕帧耗时或长期原生内存，真机和用户验收分别记录。
+本批完成普通树延迟展开和页面控件/解码可见化；普通非递归目录随后接入[p3-index.md](p3-index.md)渐进索引，递归及归档仍完整索引。P3第三批已完成万项元数据测量及布局检查点/后台重排，见[p3-performance.md](p3-performance.md)；渐进目录索引及原帧级全景已由第四/五批交付。Headless 不证明正式 Mac 焦点/Retina/真实拖动/屏幕帧耗时或长期原生内存，真机和用户验收分别记录。

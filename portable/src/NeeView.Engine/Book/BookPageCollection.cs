@@ -2,8 +2,17 @@
 namespace NeeView;
 
 /// <summary>沿用原页面集合的目录分组导航，其他索引和排序仍由原 BookPageSort 维护。</summary>
-public sealed class BookPageCollection(IEnumerable<Page> pages) : List<Page>(pages)
+public sealed class BookPageCollection : List<Page>
 {
+    private List<Page> _sourcePages;
+    /// <summary>来源只枚举一次，支持一次性后台批次，正文仍持有同一Page引用。</summary>
+    public BookPageCollection(IEnumerable<Page> pages) { _sourcePages = pages.ToList(); AddRange(_sourcePages); }
+    /// <summary>原来源页集合，搜索不能删除来源页；渐进追加和目录组树以此为准。</summary>
+    public IReadOnlyList<Page> SourcePages => _sourcePages;
+    public string SearchKeyword { get; internal set; } = "";
+    public long SourceVersion { get; private set; }
+    /// <summary>锁内提交来源快照，正文过滤/排序集合单独提交。</summary>
+    internal void SetSourcePages(IEnumerable<Page> source) { _sourcePages = source.ToList(); SourceVersion++; }
     public PageSortMode SortMode { get; internal set; }
     /// <summary>文件名排序从下一页扫描，遇到目录变化返回第一项；末尾不循环。</summary>
     /// <param name="start">当前显示范围的最小归一索引。</param>

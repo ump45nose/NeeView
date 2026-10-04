@@ -21,7 +21,7 @@ public sealed class BookPageMarker(Book book)
     public Page? GetNearMarkedPage(int index, int direction, bool isLoop, bool isIncludeTerminal)
     {
         if (book.Pages.Count < 2) return null;
-        var list = Markers.OrderBy(page => page.Index).ToList();
+        var list = Markers.Where(book.Pages.Contains).OrderBy(page => page.Index).ToList();
         if (isIncludeTerminal)
         {
             if (list.FirstOrDefault() != book.Pages.First()) list.Insert(0, book.Pages.First());

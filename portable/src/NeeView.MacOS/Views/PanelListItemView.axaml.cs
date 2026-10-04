@@ -13,13 +13,14 @@ public sealed partial class PanelListItemView : UserControl
     public PanelListItemStyle DisplayStyle { get; }
     public ListCoverImage Cover { get; }
     private readonly PanelListItemProfile _profile;
+    private readonly Func<Page, string?>? _pageHeader;
     private BookmarkNode? _observed;
     /// <summary>XAML工具构造默认Content；产品列表由宿主传入真实封面契约。</summary>
     public PanelListItemView() : this(PanelListItemStyle.Content, PanelListItemProfile.Create(PanelListItemStyle.Content), null) { }
     public PanelListItemView(PanelListItemStyle style, PanelListItemProfile profile, Func<string, DecodeRequest, CancellationToken, Task<BitmapLease>>? load,
-        Func<Page, DecodeRequest, CancellationToken, Task<BitmapLease>>? loadPage = null)
+        Func<Page, DecodeRequest, CancellationToken, Task<BitmapLease>>? loadPage = null, Func<Page, string?>? pageHeader = null)
     {
-        DisplayStyle = style; _profile = profile; AvaloniaXamlLoader.Load(this);
+        DisplayStyle = style; _profile = profile; _pageHeader = pageHeader; AvaloniaXamlLoader.Load(this);
         Cover = new() { Profile = profile, LoadCoverAsync = load, LoadPageAsync = loadPage };
         this.FindControl<ContentControl>("CoverHost")!.Content = Cover;
         var content = this.FindControl<Grid>("ContentGrid")!; var text = this.FindControl<StackPanel>("TextHost")!;
@@ -52,7 +53,7 @@ public sealed partial class PanelListItemView : UserControl
             case HistoryRow row: name = row.Name; path = row.Path; page = row.Page ?? ""; date = row.Entry.LastAccessTime; header = row.GroupHeader; break;
             case FolderItem item: name = item.Name; path = item.Path; date = item.LastWriteTime; folder = item.Bookmark?.IsFolder == true; directory = item.IsDirectory; color = item.Bookmark?.Color; break;
             case BookmarkNode node: name = node.DisplayName; path = node.Path ?? ""; page = node.Page ?? ""; folder = directory = node.IsFolder; color = node.Color; date = node.EntryTime; break;
-            case Page item: name = item.EntryName; path = item.ArchiveEntry.SystemPath; date = item.ArchiveEntry.LastWriteTime; directory = item.PageType.IsFolder(); break;
+            case Page item: name = item.GetDisplayName(Config.Current.PageList.Format); header = _pageHeader?.Invoke(item); path = item.ArchiveEntry.SystemPath; date = item.ArchiveEntry.LastWriteTime; directory = item.PageType.IsFolder(); break;
         }
         var model = new ListItemText(name, path, page, header, date, _profile, DisplayStyle, directory);
         this.FindControl<Grid>("ItemRoot")!.DataContext = model;

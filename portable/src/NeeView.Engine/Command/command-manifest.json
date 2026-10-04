@@ -657,7 +657,7 @@
     "Text": "显示/隐藏目录树",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleVisibleFoldersTreeCommand.cs",
-    "Stage": "P3 普通目录树宿主显隐；脚本参数/完整树仍待迁",
+    "Stage": "P3普通/QuickAccess目录树宿主显隐；完整脚本参数待P5",
     "MenuText": "目录树",
     "MouseGesture": ""
   },
@@ -666,7 +666,7 @@
     "Text": "显示/隐藏内容面板",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleVisibleContentsTreeCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P3全源目录组树宿主显隐；完整脚本参数待P5",
     "MenuText": "目录",
     "MouseGesture": ""
   },
@@ -675,7 +675,7 @@
     "Text": "聚焦到书架搜索框",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/FocusFolderSearchBoxCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P3普通书架搜索框显示与焦点；虚拟位置能力边界见契约",
     "MenuText": "书架搜索框",
     "MouseGesture": ""
   },
@@ -693,7 +693,7 @@
     "Text": "聚焦到页面列表搜索框",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/FocusPageListSearchBoxCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P3原页面搜索框显示与焦点，输入和正文作用域隔离",
     "MenuText": "页面列表搜索框",
     "MouseGesture": ""
   },
@@ -720,7 +720,7 @@
     "Text": "聚焦到主视图",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/FocusMainViewCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P3原主查看器焦点宿主接入",
     "MenuText": "主视图",
     "MouseGesture": ""
   },
@@ -1062,7 +1062,7 @@
     "Text": "滚动 + 上一页",
     "Shortcut": "WheelUp",
     "Source": "NeeView/Command/Commands/PrevScrollPageCommand.cs",
-    "Stage": "P2滚动与边界翻页已接入；全景/完整参数编辑待后续",
+    "Stage": "P2/P3原分页及全景NScroll、边界翻页与参数接入；真机动态待验",
     "MouseGesture": ""
   },
   {
@@ -1070,7 +1070,7 @@
     "Text": "滚动 + 下一页",
     "Shortcut": "WheelDown",
     "Source": "NeeView/Command/Commands/NextScrollPageCommand.cs",
-    "Stage": "P2滚动与边界翻页已接入；全景/完整参数编辑待后续",
+    "Stage": "P2/P3原分页及全景NScroll、边界翻页与参数接入；真机动态待验",
     "MouseGesture": ""
   },
   {
@@ -1407,7 +1407,7 @@
     "Text": "全景模式",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsPanoramaCommand.cs",
-    "Stage": "P3纵向浏览开关接入；原帧级全景完整规则待迁",
+    "Stage": "P3原帧级全景、PagesAsOne/NScroll与Mac连续/瀑布接入；设备/Windows动态独立验收",
     "MouseGesture": ""
   },
   {

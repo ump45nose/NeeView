@@ -2,7 +2,7 @@
 namespace NeeView;
 
 /// <summary>独立书架位置、列表及选择；浏览目录不改变当前书籍，所有枚举由后端完成。</summary>
-public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCollection? folderConfigs = null, SaveData? state = null) : IDisposable
+public sealed partial class BookshelfFolderList(IArchiveFactory archives, FolderConfigCollection? folderConfigs = null, SaveData? state = null) : IDisposable
 {
     private CancellationTokenSource? _request;
     private long _revision;
@@ -80,19 +80,21 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     /// <param name="selectedPath">希望定位的真实书籍路径。</param>
     /// <param name="token">调用方取消。</param>
     /// <param name="force">同目录是否重新枚举。</param>
+    /// <param name="searchKeyword">候选搜索表达式；省略时同目录沿用已提交条件。</param>
     /// <returns>此次请求是否成功提交。</returns>
-    public async Task<bool> SetPlaceAsync(string place, string? selectedPath = null, CancellationToken token = default, bool force = false)
+    public async Task<bool> SetPlaceAsync(string place, string? selectedPath = null, CancellationToken token = default, bool force = false, string? searchKeyword = null)
     {
         ObjectDisposedException.ThrowIf(_disposed, this); token.ThrowIfCancellationRequested();
         bool bookmark = place.StartsWith("bookmark:", StringComparison.Ordinal);
         bool quick = place.StartsWith("quickaccess:", StringComparison.Ordinal);
         if (!bookmark && !quick) place = System.IO.Path.GetFullPath(place);
+        var query = searchKeyword ?? (Place == place ? SearchKeyword : "");
         var revision = Interlocked.Increment(ref _revision);
         _request?.Cancel(); var pending = CancellationTokenSource.CreateLinkedTokenSource(token); _request = pending;
         var oldPlace = _bookmarks?.Place ?? (bookmark ? state?.BookmarkRoot : null); var oldSelection = _bookmarks?.SelectedItem; bool committed = false;
         try
         {
-            if (!force && Place == place)
+            if (!force && Place == place && SearchKeyword == query)
             {
                 if (selectedPath is not null && SelectedItem?.Path != selectedPath) Select(FindSelection(selectedPath));
                 committed = true; Error = null; IsLoading = false; Changed?.Invoke(this, EventArgs.Empty); return true;
@@ -103,7 +105,7 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
                 var collection = GetQuickAccess();
                 var folder = collection.FindNode(place) ?? throw new IOException("快速访问位置已不存在。");
                 if (folder.Children is null) throw new IOException("请选择快速访问文件夹。");
-                _quickPlace = folder;
+                SearchKeyword = ""; StopSearchWatch(); _quickPlace = folder;
                 Place = place; Items = folder.Children.Select(node => new FolderItem(node.DisplayName, node.IsFolder ? collection.GetPath(node) : node.Path ?? "", node.IsFolder) { QuickAccess = node }).ToArray();
                 SelectedItem = Items.FirstOrDefault(item => item.Path == selectedPath); IsLoading = false; Error = null; committed = true; Changed?.Invoke(this, EventArgs.Empty); return true;
             }
@@ -117,15 +119,21 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
                 BookmarkList.SetPlace(folder, selected);
                 await BookmarkList.LoadMetadataAsync(pending.Token); pending.Token.ThrowIfCancellationRequested();
                 if (_disposed || revision != _revision) return false;
-                PublishBookmarks(); committed = true; return true;
+                SearchKeyword = ""; StopSearchWatch(); PublishBookmarks(); committed = true; return true;
             }
-            var entries = await archives.ListBooksAsync(place, pending.Token);
+            var entries = query.Length == 0 ? await archives.ListBooksAsync(place, pending.Token) : await archives.ListSearchBooksAsync(place, Config.Current.Bookshelf.IsSearchIncludeSubdirectories, pending.Token);
+            if (query.Length > 0)
+            {
+                var history = state?.HistoryEntries.Select(item => item.Path).ToHashSet(StringComparer.Ordinal) ?? [];
+                var snapshot = entries.Select(item => new BookshelfSearchItem(item, state?.IsBookmark(item.Path) == true, history.Contains(item.Path))).ToArray();
+                entries = await Task.Run(() => SearchBookshelfCollection.Search(query, snapshot, pending.Token), pending.Token);
+            }
             pending.Token.ThrowIfCancellationRequested();
             if (_disposed || revision != _revision) return false;
             var parameter = new FolderParameter(place, _folderConfigs);
             var mode = GetNormalOrder(parameter.FolderOrder);
             var items = FolderCollection.Sort(entries, mode, Config.Current.Bookshelf.FolderSortOrder, parameter.Seed, pending.Token);
-            _entries = entries; _parameter = parameter; Place = place; Items = items; FolderOrder = mode;
+            _entries = entries; _parameter = parameter; Place = place; Items = items; FolderOrder = mode; SearchKeyword = query;
             SelectedItem = selectedPath is null ? null : FindSelection(selectedPath); return true;
         }
         catch (OperationCanceledException) when (pending.IsCancellationRequested) { return false; }
@@ -133,7 +141,7 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
         finally
         {
             if (bookmark && !committed && revision == _revision && oldPlace is not null) _bookmarks?.SetPlace(oldPlace, oldSelection);
-            if (revision == _revision) { IsLoading = false; Changed?.Invoke(this, EventArgs.Empty); }
+            if (revision == _revision) { IsLoading = false; RefreshSearchWatch(); Changed?.Invoke(this, EventArgs.Empty); }
             if (ReferenceEquals(_request, pending)) _request = null; pending.Dispose();
         }
     }
@@ -208,7 +216,7 @@ public sealed class BookshelfFolderList(IArchiveFactory archives, FolderConfigCo
     public Task<bool> RefreshAsync(CancellationToken token = default) => Place is { } place
         ? SetPlaceAsync(place, SelectedItem?.Path, token, true) : Task.FromResult(false);
     /// <summary>窗口关闭取消枚举；后端晚到结果不能更新已关闭的集合。</summary>
-    public void Dispose() { _disposed = true; Interlocked.Increment(ref _revision); _request?.Cancel(); _folderTree?.Dispose(); _bookmarks?.Dispose(); if (state is not null) { state.BookmarksChanged -= BookmarksChanged; state.QuickAccessChanged -= QuickAccessChanged; } }
+    public void Dispose() { _disposed = true; Interlocked.Increment(ref _revision); _request?.Cancel(); StopSearchWatch(); _folderTree?.Dispose(); _bookmarks?.Dispose(); if (state is not null) { state.BookmarksChanged -= BookmarksChanged; state.QuickAccessChanged -= QuickAccessChanged; } }
     private QuickAccessCollection GetQuickAccess()
     {
         if (state is null) throw new NotSupportedException("快速访问未接入。");

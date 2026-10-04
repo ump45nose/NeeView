@@ -47,7 +47,7 @@ public sealed partial class MainWindow : Window
         "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
-        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "ToggleVisibleFoldersTree", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkList", "FocusBookmarkSearchBox", "ClearHistory", "ClearHistoryInPlace", "RemoveUnlinkedHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
+        "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "ToggleVisibleFoldersTree", "ToggleVisibleContentsTree", "FocusMainView", "FocusFolderSearchBox", "FocusPageListSearchBox", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkList", "FocusBookmarkSearchBox", "ClearHistory", "ClearHistoryInPlace", "RemoveUnlinkedHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
     };
     // 浏览增量仅支持整体缩放/平移；分页特有旋转/翻转/适配明确禁用，不能用空执行冒充支持。
     private static readonly HashSet<string> PagedTransformCommands = new(StringComparer.Ordinal)
@@ -223,6 +223,7 @@ public sealed partial class MainWindow : Window
         "ToggleVisiblePlaylist" => _model?.ShowPlaylist,
         "ToggleVisibleBookshelf" => _model?.ShowFolderList,
         "ToggleVisibleFoldersTree" => Config.Current.Bookshelf.IsFolderTreeVisible && _model?.ShowFolderList == true,
+        "ToggleVisibleContentsTree" => Config.Current.PageList.IsFolderTreeVisible && _model?.ShowPageList == true,
         "ToggleVisiblePageList" => _model?.ShowPageList,
         "ToggleVisibleHistoryList" => _model?.ShowHistory,
         "ToggleVisibleFileInfo" => _model?.ShowInformation,
@@ -255,6 +256,7 @@ public sealed partial class MainWindow : Window
     /// <summary>表现变化只更新列宽；GridSplitter 的实际宽度由窗口保存，控件不设置固定 Width。</summary>
     private void Model_PanelsRefreshed(object? sender, EventArgs e)
     {
+        if (_model is not null) _model.Operation.Bookshelf.IsPresented = _model.ShowFolderList;
         _autoHide?.Refresh(); UpdatePanelColumns();
         _sidePanels?.Refresh();
         _ = NavigatorView.RefreshAsync();
@@ -296,10 +298,14 @@ public sealed partial class MainWindow : Window
     {
         if (_model is null || _preparing || _closedPrepared) return;
         var settings = new SettingsWindow(_model, IsCommandImplemented);
+        var pageFormat = Config.Current.PageList.Format; var recursiveSearch = Config.Current.Bookshelf.IsSearchIncludeSubdirectories;
         if (history) settings.SelectHistoryPage();
         await settings.ShowDialog(this);
         if (_preparing || _closedPrepared) return;
         _model.RefreshSelection(); _model.RefreshPanels(); await FilmStrip.RefreshAsync(); BuildMenus();
+        _model.RefreshNavigationPanel(); RefreshPageTreeLayout(); RefreshFolderTreeLayout(); _pagePresentation?.RefreshCovers();
+        if (pageFormat != Config.Current.PageList.Format && _model.Operation.Book is { } book && book.Pages.SearchKeyword.Length > 0) await _model.Operation.SearchPagesAsync(book.Pages.SearchKeyword, book);
+        if (recursiveSearch != Config.Current.Bookshelf.IsSearchIncludeSubdirectories && _model.Operation.Bookshelf.SearchKeyword.Length > 0) await _model.Operation.Bookshelf.RefreshAsync();
         await Viewer.RefreshAsync();
     }
 
@@ -424,6 +430,12 @@ public sealed partial class MainWindow : Window
                 case "FocusHistorySearchBox":
                     Config.Current.History.IsVisibleSearchBox = true; _model.RefreshHistory(); _model.ShowPanel("HistoryPanel");
                     UpdateLayout(); var historySearch = this.FindControl<TextBox>("HistorySearchBox")!; historySearch.Focus(); historySearch.SelectAll(); break;
+                case "FocusMainView": Viewer.Focus(); break;
+                case "ToggleVisibleContentsTree": await ChangePageNavigationAsync(c => c.IsFolderTreeVisible = !c.IsFolderTreeVisible); break;
+                case "FocusPageListSearchBox":
+                    Config.Current.PageList.IsVisibleSearchBox = true; _model.RefreshNavigationPanel(); _model.ShowPanel("PageListPanel"); UpdateLayout(); var pageSearch = this.FindControl<TextBox>("PageListSearchBox")!; pageSearch.Focus(); pageSearch.SelectAll(); break;
+                case "FocusFolderSearchBox":
+                    Config.Current.Bookshelf.IsVisibleSearchBox = true; _model.RefreshNavigationPanel(); _model.ShowPanel("FolderPanel"); UpdateLayout(); var folderSearch = this.FindControl<TextBox>("FolderSearchBox")!; folderSearch.Focus(); folderSearch.SelectAll(); break;
                 case "FocusBookmarkSearchBox":
                     _model.ShowPanel("BookmarkPanel"); this.FindControl<BookmarkListView>("BookmarkPanelList")!.FocusSearch(); break;
                 case "FocusBookmarkList": await FocusBookshelfBookmarksAsync(fromMenu); break;
@@ -825,11 +837,14 @@ public sealed partial class MainWindow : Window
             await _listStyleTask;
             await _folderTreeSettingsTask;
             await _quickAccessEditTask;
+            await _pageNavigationSettings;
+            _contentsRequest?.Cancel();
             _historyCleanupCancellation?.Cancel();
             if (_historyCleanupTask is not null) await _historyCleanupTask;
             await this.FindControl<PlaylistView>("PlaylistPanelView")!.PrepareCloseAsync();
             await this.FindControl<BookmarkListView>("BookmarkPanelList")!.PrepareCloseAsync();
             if (_model is not null) await _model.HistorySearch.PrepareCloseAsync();
+            if (_model is not null) { await _model.PageSearch.PrepareCloseAsync(); await _model.FolderSearch.PrepareCloseAsync(); }
             _folders?.Cancel(); _sliderDragging = false; PageNumber.CancelEdit();
             CancelBookmarkDrag();
             if (_model is not null)
@@ -846,6 +861,7 @@ public sealed partial class MainWindow : Window
                 _model.HistoryRefreshed -= History_Refreshed;
                 _model.Operation.MarkersChanged -= Model_MarkersChanged;
                 _model.Detach(); _model.Refreshed -= Model_Refreshed; _model.PanelsRefreshed -= Model_PanelsRefreshed; _model.ChromeRefreshed -= Model_ChromeRefreshed;
+                _model.Refreshed -= PageNavigation_Refreshed;
             }
             this.FindControl<PlaylistView>("PlaylistPanelView")!.Dispose();
             this.FindControl<BookmarkListView>("BookmarkPanelList")!.Dispose();
@@ -853,7 +869,7 @@ public sealed partial class MainWindow : Window
         }
         finally
         {
-            if (!_closedPrepared) { _sidePanels?.CancelClose(); this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); this.FindControl<BookmarkListView>("BookmarkPanelList")!.CancelClose(); _model?.HistorySearch.CancelClose(); }
+            if (!_closedPrepared) { _sidePanels?.CancelClose(); this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); this.FindControl<BookmarkListView>("BookmarkPanelList")!.CancelClose(); _model?.HistorySearch.CancelClose(); _model?.PageSearch.CancelClose(); _model?.FolderSearch.CancelClose(); }
             _preparing = false; _shutdown = null;
         }
     }

@@ -99,7 +99,7 @@ public sealed class HistorySearchTests
         list.Dispose(); finish.SetResult(null); Assert.False(await closing);
     }
 
-    /// <summary>原历史字段、模块隔离、容量及失败回滚；保存开关不丢未迁字段。</summary>
+    /// <summary>原历史字段、模块隔离、容量及失败回滚；保存开关统一控制已迁四类历史，未知字段仍保留。</summary>
     [Fact]
     public async Task OriginalExpressionHistoryPersistsIndependentlyAndRollsBack()
     {
@@ -116,7 +116,7 @@ public sealed class HistorySearchTests
         var reload = new SaveData(fixture.State); await reload.LoadAsync(TestContext.Current.CancellationToken); Assert.Equal(original, reload.BookHistorySearchHistory);
         Config.Current.History.IsKeepSearchHistory = false; await state.SaveAsync(null, TestContext.Current.CancellationToken);
         var raw = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "History.json"), TestContext.Current.CancellationToken))!;
-        Assert.Null(raw["BookHistorySearchHistory"]); Assert.Null(raw["BookmarkSearchHistory"]); Assert.Equal("书架未知", raw["BookshelfSearchHistory"]![0]!.GetValue<string>()); Assert.Equal(9, raw["Future"]!.GetValue<int>());
+        Assert.Null(raw["BookHistorySearchHistory"]); Assert.Null(raw["BookmarkSearchHistory"]); Assert.Null(raw["BookshelfSearchHistory"]); Assert.Equal(9, raw["Future"]!.GetValue<int>());
         Config.Current.System.SearchHistorySize = 0; await state.EditBookHistorySearchHistoryAsync("零容量", token: TestContext.Current.CancellationToken); Assert.Empty(original);
     }
 

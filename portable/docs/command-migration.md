@@ -1,10 +1,10 @@
 # 完整命令迁移表
 
-固定基线 235 个原命令实例。P2 收尾为138入口/97占位；P3第一/二批接入ToggleIsPanorama和普通ToggleVisibleFoldersTree，当前为 **140 个执行入口接入、95 个能力占位**；这是入口登记，不是功能覆盖率。原帧级全景仍待迁，见[p3-browse.md](p3-browse.md)。Mac 额外打开目录/窗口入口不计入原 235 项。
+固定基线235个原命令实例全部保留。P3开发收尾为 **144个执行入口接入、91个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
 
-原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。方向默认值来自固定 Windows 基线，实际键位/手势按原 A/B/C、阅读方向和用户差分计算。
+原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。实际键位/手势按原A/B/C、阅读方向和用户差分计算。
 
-对照 [当前运行导出](../acceptance/p3-navigation-commands.json)、[P2 收尾清单](p2-completion-checklist.md)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider 与 ToggleHidePageSlider 是不同语义，前者仍占位；地址栏设置已可保存，但 ToggleVisibleAddressBar 命令入口仍占位。TogglePageModeReverse 已接入原反向与共享 IsLoop，不将参数拥有者映射当作执行实现。
+对照[当前运行导出](../acceptance/p3-completion-commands.json)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider与ToggleHidePageSlider语义独立，前者仍占位；ToggleVisibleAddressBar入口仍占位。参数拥有者映射不等于执行能力；P4分类/P5高级能力继续逐项迁移。
 
 | 原命令 | 文案 | 默认输入 | 默认方向手势 | 执行入口 | 迁移说明 | 原出处 |
 |---|---|---|---|---|---|---|
@@ -84,14 +84,14 @@
 | ToggleVisibleFileInfo | 显示/隐藏信息面板 | I |  | 已接入 | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleFileInfoCommand.cs |
 | ToggleVisibleNavigator | 显示/隐藏导航面板 | N |  | 已接入 | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleNavigatorCommand.cs |
 | ToggleVisibleEffectInfo | 显示/隐藏效果面板 | E |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleEffectInfoCommand.cs |
-| ToggleVisibleFoldersTree | 显示/隐藏目录树 |  |  | 已接入 | P3 普通目录树显隐；脚本参数/完整树仍待迁 | NeeView/Command/Commands/ToggleVisibleFoldersTreeCommand.cs |
-| ToggleVisibleContentsTree | 显示/隐藏内容面板 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleContentsTreeCommand.cs |
-| FocusFolderSearchBox | 聚焦到书架搜索框 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/FocusFolderSearchBoxCommand.cs |
+| ToggleVisibleFoldersTree | 显示/隐藏目录树 |  |  | 已接入 | P3普通/QuickAccess目录树宿主显隐；完整脚本参数待P5 | NeeView/Command/Commands/ToggleVisibleFoldersTreeCommand.cs |
+| ToggleVisibleContentsTree | 显示/隐藏内容面板 |  |  | 已接入 | P3全源目录组树宿主显隐；完整脚本参数待P5 | NeeView/Command/Commands/ToggleVisibleContentsTreeCommand.cs |
+| FocusFolderSearchBox | 聚焦到书架搜索框 |  |  | 已接入 | P3普通书架搜索框显示与焦点；虚拟位置能力边界见契约 | NeeView/Command/Commands/FocusFolderSearchBoxCommand.cs |
 | FocusBookmarkSearchBox | 聚焦到书签搜索框 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/FocusBookmarkSearchBoxCommand.cs |
-| FocusPageListSearchBox | 聚焦到页面列表搜索框 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/FocusPageListSearchBoxCommand.cs |
+| FocusPageListSearchBox | 聚焦到页面列表搜索框 |  |  | 已接入 | P3原页面搜索框显示与焦点，输入和正文作用域隔离 | NeeView/Command/Commands/FocusPageListSearchBoxCommand.cs |
 | FocusHistorySearchBox | 聚焦到历史记录搜索框 |  |  | 已接入 | P2 原历史面板焦点 | NeeView/Command/Commands/FocusHistorySearchBoxCommand.cs |
 | FocusBookmarkList | 显示书签 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/FocusBookmarkListCommand.cs |
-| FocusMainView | 聚焦到主视图 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/FocusMainViewCommand.cs |
+| FocusMainView | 聚焦到主视图 |  |  | 已接入 | P3原主查看器焦点宿主接入 | NeeView/Command/Commands/FocusMainViewCommand.cs |
 | ToggleVisibleFilmStrip | 显示/隐藏幻灯条 |  |  | 已接入 | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleFilmStripCommand.cs |
 | ToggleHideFilmStrip | 启用/禁用自动隐藏幻灯条 |  |  | 已接入 | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleHideFilmStripCommand.cs |
 | ToggleMainViewFloating | 切换主视图窗口 | F12 |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleMainViewFloatingCommand.cs |
@@ -132,8 +132,8 @@
 | NextPage | 前进 | Left,LeftClick | L | 已接入 | P1 Engine | NeeView/Command/Commands/NextPageCommand.cs |
 | PrevOnePage | 后退一页 |  | LR | 已接入 | P1 Engine | NeeView/Command/Commands/PrevOnePageCommand.cs |
 | NextOnePage | 前进一页 |  | RL | 已接入 | P1 Engine | NeeView/Command/Commands/NextOnePageCommand.cs |
-| PrevScrollPage | 滚动 + 上一页 | WheelUp |  | 已接入 | P2滚动与边界翻页已接入；全景/完整参数编辑待后续 | NeeView/Command/Commands/PrevScrollPageCommand.cs |
-| NextScrollPage | 滚动 + 下一页 | WheelDown |  | 已接入 | P2滚动与边界翻页已接入；全景/完整参数编辑待后续 | NeeView/Command/Commands/NextScrollPageCommand.cs |
+| PrevScrollPage | 滚动 + 上一页 | WheelUp |  | 已接入 | P2/P3原分页及全景NScroll、边界翻页与参数接入；真机动态待验 | NeeView/Command/Commands/PrevScrollPageCommand.cs |
+| NextScrollPage | 滚动 + 下一页 | WheelDown |  | 已接入 | P2/P3原分页及全景NScroll、边界翻页与参数接入；真机动态待验 | NeeView/Command/Commands/NextScrollPageCommand.cs |
 | JumpPage | 转到指定页面 |  |  | 已接入 | P2 原定位/共享步长宿主接入；具体范围见验收表 | NeeView/Command/Commands/JumpPageCommand.cs |
 | JumpRandomPage | 转到随机页面 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/JumpRandomPageCommand.cs |
 | PrevSizePage | 后退指定页数 |  |  | 已接入 | P2 原定位/共享步长宿主接入；具体范围见验收表 | NeeView/Command/Commands/PrevSizePageCommand.cs |
@@ -175,7 +175,7 @@
 | TogglePageModeReverse | 切换页面模式 (反向) |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/TogglePageModeReverseCommand.cs |
 | SetPageModeOne | 单页显示 | Ctrl+1 | RU | 已接入 | P1 Engine | NeeView/Command/Commands/SetPageModeOneCommand.cs |
 | SetPageModeTwo | 双页显示 | Ctrl+2 | RD | 已接入 | P1 Engine | NeeView/Command/Commands/SetPageModeTwoCommand.cs |
-| ToggleIsPanorama | 全景模式 |  |  | 部分接入 | P3纵向浏览开关；原帧级全景待迁 | NeeView/Command/Commands/ToggleIsPanoramaCommand.cs |
+| ToggleIsPanorama | 全景模式 |  |  | 已接入 | P3原帧级全景、PagesAsOne/NScroll与Mac连续/瀑布接入；设备/Windows动态独立验收 | NeeView/Command/Commands/ToggleIsPanoramaCommand.cs |
 | TogglePageOrientation | 切换页面方向 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/TogglePageOrientationCommand.cs |
 | SetPageOrientationHorizontal | 水平页面布局 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/SetPageOrientationHorizontalCommand.cs |
 | SetPageOrientationVertical | 垂直页面布局 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/SetPageOrientationVerticalCommand.cs |

@@ -13,12 +13,12 @@
 | 当前图打开、排序后保持条目 | Book/Book.cs、BookHub/BookHub.cs | 原 Page 对象和 EntryName，不使用另一套身份数据库 |
 | History/Props | Book/BookMemento.cs、Book.CreateMemento、SaveData/SaveDataProfile.cs | 保留 Path/Page/Props 和未知字段；Mac只补false-wide值；收回早期半页持久化，普通重开恢复阅读方向首半页 |
 | 差分快捷键 | Command/CommandElement.cs、CommandTable.cs | Commands[name].ShortCutKey，null恢复默认、空串禁用；Control保持 |
-| 滚动翻页 | BookPageMoveControl、PageFrameBox.ScrollToNextFrame、PageFrames/NScroll.cs、DragArea.SnapView | 原五模式、分段/终端吸附、计时与停顿顺序迁入；分页及完整分页参数编辑接通，全景在P3，真鼠标待验 |
+| 滚动翻页 | BookPageMoveControl、PageFrameBox.ScrollToNextFrame、PageFrames/NScroll.cs、DragArea.SnapView | 原五模式、分段/终端吸附、计时与停顿顺序迁入；分页参数编辑及P3原全景/PagesAsOne已接通，真实设备验收单独记录 |
 | 九数字分类、固定移动 | MoveToDestinationFolderCommand、MoveToFolderAsCommand | 元数据保留，业务待P4 |
 | 两区分类和移动历史 | SidePanels/DestinationFolder、DestinationFolder/DestinationMoveService.cs | 完整目标登记；待P4，不能继承旧测试通过状态 |
 | 原窗口/九面板/设置 | MainWindow.xaml、SidePanelFrameView.xaml、Options | 布局壳及核心面板转换；见layout-migration.md，Windows截图待验证 |
 | RAR/7z | 原Archive/阅读链 | 原来源关系下替换 SharpCompress，普通及固实夹具接入；密码/分卷/嵌套待迁移 |
-| 连续、瀑布流 | 原阅读链与Mac展示扩展 | P3第一批纵向逐图/最短列、可见需求及原Page锚点；原帧级全景待迁，见p3-browse.md |
+| 连续、瀑布流 | 原阅读链与Mac展示扩展 | P3纵向逐图/最短列、可见需求及原Page锚点；原帧级全景/变换/NScroll接入，见p3-browse.md及p3-panorama.md |
 | 完整默认菜单 | Menu/MenuTree.cs:CreateDefault、MenuNode.cs、MenuElementType.cs | 原八组树逐项迁入；未迁移节点禁用占位，原语言资源解析文案 |
 | 胶片条/导航器 | Config/FilmStripConfig.cs、PageSelect/FilmStrip、SidePanels/Navigate | 原选择/方向/首尾居中及可见需求算法，200ms防抖、三滚轮/确认、元数据详情与配置接入；原全局播放列表标记与覆盖自动隐藏接入 |
 | 滑条联动与设置 | PageSelect/PageSlider/PageSlider.cs、PageSliderView.xaml.cs、Config/SliderConfig.cs | 原共享选择、方向/静态双页/同步步长及拖动预览释放确认；原显隐/位置/厚度/透明度/滚轮字段接入，外观独立；原五区自动隐藏/窗口显示命令接入 |
@@ -59,6 +59,8 @@ P2第二十二批：原LayoutPanelManager/WindowManager/WindowPlacement关系迁
 
 目录/CBZ单双页、左右方向、宽图/分割、首末单页与已采集Windows包动态样本一致。数字提示统一到输入层D0–D9；半页MacPagePart退出持久化，真机切书/重启恢复首半页。跨栏水平/垂直组合和比例与样本一致；Mac拆组/整组移动/组合重启已验但相应Windows样本不全。安装包dirty与固定源码对应仍未知，菜单/浮动/自动隐藏本轮Mac动态、真实手势、无损Retina及长期native未验，详见[运行记录](../acceptance/p2-device-input-runtime.md)。
 
-P3第二批：原FolderTreeNodeBase/Delay/DirectoryNode/Model的普通父子、展开占位、自然排序、确认及祖先链同步子集适配；同步I/O改为可取消后台提交。PageListBox.xaml.cs:374–394的普通按下定位/释放焦点及修饰键隔离保留，方向键只选择；四模板接入当前原Page，共用来源和缩略预算。QuickAccess/监视/页面组树/搜索/智能名称等未迁移项继续登记；详见[p3-navigation.md](p3-navigation.md)，未执行Windows动态对照。
+P3第二批：原FolderTreeNodeBase/Delay/DirectoryNode/Model的普通父子、展开占位、自然排序、确认及祖先链同步子集适配；同步I/O改为可取消后台提交。PageListBox.xaml.cs:374–394的普通按下定位/释放焦点及修饰键隔离保留，方向键只选择；四模板接入当前原Page，共用来源和缩略预算。QuickAccess/监视及页面组树/搜索/智能名称由第六/七批接入；详见[p3-navigation.md](p3-navigation.md)，未执行Windows动态对照。
 
 P3第三批：原BookSourceFactory三种收集模式、WherePageAll目录展平、shortcut及失败子书保留规则不变；只把元数据/Page创建循环后台化并补取消。Mac浏览几何检查点更新对照完整计算及实际矩形相交，原Page锚点/页内比例、顺序变更及来源所有权回归；不是原帧级全景或Windows动态对照的通过证明，见[p3-performance.md](p3-performance.md)。
+
+P3第四至七批：原SourcePages/Searcher/BookPageSort正文关系、全源公共前缀与BookTableOfContents目录代表页迁入；临时FileName构树不受正文反序/搜索影响。普通书架沿原FileItem五属性及递归搜索，四类原搜索历史共用总保存开关；未知字段保留。普通直接目录128项渐进扩展保持原Page/Part和真实页尾保护；QuickAccess共享原节点/JSON且拖放不移动文件。全景使用原PageFrameFactory/容器/FrameSpace/PagesAsOne/NScroll，不把Mac瀑布当作原帧规则。原出处/自动对照与本批Windows动态状态分别登记，见[p3-page-search.md](p3-page-search.md)、[P3收尾](p3-completion-checklist.md)。

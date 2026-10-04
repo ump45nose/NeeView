@@ -15,6 +15,16 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public IReadOnlyList<BrowseModeChoice> BrowseModes { get; } = [new(BrowseLayoutMode.Paged, "分页"), new(BrowseLayoutMode.Panorama, "原版全景"), new(BrowseLayoutMode.Continuous, "连续阅读"), new(BrowseLayoutMode.Masonry, "瀑布流")];
     public BrowseModeChoice SelectedBrowseMode => BrowseModes.First(e => e.Mode == Operation.BrowseMode);
     public SaveData SaveData { get; } = saveData;
+    public NavigationSearchViewModel PageSearch { get; } = new(() => operation.Book, keyword => PageSearchProfile.Analyze(keyword),
+        (keyword, book, token) => operation.SearchPagesAsync(keyword, book as Book, token), saveData.PageListSearchHistory, saveData.EditPageListSearchHistoryAsync);
+    public NavigationSearchViewModel FolderSearch { get; } = new(() => operation.Bookshelf.Place, SearchBookshelfCollection.Analyze,
+        (keyword, place, token) => operation.Bookshelf.SearchAsync(keyword, place as string, token), saveData.BookshelfSearchHistory, saveData.EditBookshelfSearchHistoryAsync);
+    public bool PageSearchVisible => Config.Current.PageList.IsVisibleSearchBox;
+    public bool FolderSearchVisible => Config.Current.Bookshelf.IsVisibleSearchBox;
+    public bool PageCountVisible => Config.Current.PageList.IsVisibleItemsCount;
+    public string PageCount => $"{Pages.Count} / {Operation.Book?.Pages.SourcePages.Count ?? 0} 项";
+    public string PageListTitle => Config.Current.PageList.ShowBookTitle && Operation.Book is { } book ? System.IO.Path.GetFileName(book.Path) : "页面列表";
+    public void RefreshNavigationPanel() { foreach (var name in new[] { nameof(PageSearchVisible), nameof(FolderSearchVisible), nameof(PageCountVisible), nameof(PageCount), nameof(PageListTitle) }) OnPropertyChanged(name); }
     public string Title => Operation.Book is { } book ? $"{System.IO.Path.GetFileName(book.Path)} — NeeView" : "NeeView";
     private string _address = "";
     public string Address { get => _address; set => SetProperty(ref _address, value); }
@@ -46,7 +56,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public int LastIndex => Math.Max(0, Pages.Count - 1);
     public double PageIndex => Operation.PageSelector.SelectedIndex;
     public bool SliderReversed => Operation.FilmStrip.IsSliderDirectionReversed;
-    public IReadOnlyList<int> MarkerIndices => Operation.Book?.Marker.Markers.Select(page => page.Index).ToArray() ?? [];
+    public IReadOnlyList<int> MarkerIndices => Operation.Book is { } book ? book.Marker.Markers.Where(book.Pages.Contains).Select(page => page.Index).ToArray() : [];
     public bool SliderMarksVisible => Config.Current.Slider.IsVisiblePlaylistMark;
     public bool IsPlaylistMarked => Operation.Book?.CurrentPage?.IsMarked == true;
     public object? SliderSource => Operation.Book;
@@ -123,9 +133,10 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public event EventHandler? PanelsRefreshed;
 
     /// <summary>装配业务订阅；后台回报统一切 UI 线程。</summary>
-    public void Attach() { _historySearchAttached = true; HistorySearch.Refreshed += HistorySearch_Refreshed; Layout.Changed += Layout_Changed; Operation.Changed += Operation_Changed; Operation.MarkersChanged += Markers_Changed; Operation.PageSelector.SelectionChanged += Selection_Changed; Operation.Bookshelf.Changed += Bookshelf_Changed; SaveData.Changed += SaveData_Changed; Refresh(); RefreshFolders(); }
+    public void Attach() { _historySearchAttached = true; PageSearch.Refreshed += NavigationSearch_Refreshed; FolderSearch.Refreshed += NavigationSearch_Refreshed; HistorySearch.Refreshed += HistorySearch_Refreshed; Layout.Changed += Layout_Changed; Operation.Changed += Operation_Changed; Operation.MarkersChanged += Markers_Changed; Operation.PageSelector.SelectionChanged += Selection_Changed; Operation.Bookshelf.Changed += Bookshelf_Changed; SaveData.Changed += SaveData_Changed; Refresh(); RefreshFolders(); }
     /// <summary>关闭窗口时解除订阅，避免旧窗口收到新书变化。</summary>
-    public void Detach() { _historySearchAttached = false; HistorySearch.Refreshed -= HistorySearch_Refreshed; HistorySearch.Dispose(); Layout.Changed -= Layout_Changed; Operation.Changed -= Operation_Changed; Operation.MarkersChanged -= Markers_Changed; Operation.PageSelector.SelectionChanged -= Selection_Changed; Operation.Bookshelf.Changed -= Bookshelf_Changed; SaveData.Changed -= SaveData_Changed; }
+    public void Detach() { _historySearchAttached = false; PageSearch.Refreshed -= NavigationSearch_Refreshed; FolderSearch.Refreshed -= NavigationSearch_Refreshed; PageSearch.Dispose(); FolderSearch.Dispose(); HistorySearch.Refreshed -= HistorySearch_Refreshed; HistorySearch.Dispose(); Layout.Changed -= Layout_Changed; Operation.Changed -= Operation_Changed; Operation.MarkersChanged -= Markers_Changed; Operation.PageSelector.SelectionChanged -= Selection_Changed; Operation.Bookshelf.Changed -= Bookshelf_Changed; SaveData.Changed -= SaveData_Changed; }
+    private void NavigationSearch_Refreshed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() => { if (_historySearchAttached) { OnPropertyChanged(nameof(PageSearch)); OnPropertyChanged(nameof(FolderSearch)); } });
     /// <summary>搜索只刷新导航面板，排队通知在旧窗口退订后丢弃。</summary>
     private void HistorySearch_Refreshed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() => { if (_historySearchAttached) RefreshHistory(); });
     /// <summary>全局列表编辑只更新标记绑定，不发布正文 Refreshed。</summary>
@@ -138,6 +149,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
         _refreshingFolders = true;
         try
         {
+            FolderSearch.RefreshScope();
             OnPropertyChanged(nameof(Folders)); OnPropertyChanged(nameof(FolderPlace)); OnPropertyChanged(nameof(FolderMessage));
             OnPropertyChanged(nameof(FolderOrders)); OnPropertyChanged(nameof(IsBookmarkPlace));
             SelectedFolder = Operation.Bookshelf.SelectedItem; OnPropertyChanged(nameof(SelectedFolderOrder));
@@ -165,6 +177,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     /// <summary>刷新绑定；页面对象保持原身份，不创建另一套页面模型。</summary>
     public void Refresh()
     {
+        PageSearch.RefreshScope();
         Address = Operation.Book?.Path ?? Address;
         RefreshPages();
         // 先替换列表来源，再恢复选择；反向顺序会被 ListBox 的 TwoWay 清空回报覆盖。

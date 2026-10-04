@@ -28,7 +28,7 @@
     </Grid>
     <!-- 面板内容只定义一次；停靠排布与主题独立于各功能视图。 -->
     <Grid x:Name="PanelContentStore" IsVisible="False">
-      <Border Tag="FolderPanel"><Grid RowDefinitions="Auto,Auto,Auto,*">
+      <Border Tag="FolderPanel"><Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*">
           <StackPanel Margin="8" Spacing="6">
             <Grid ColumnDefinitions="*,Auto"><TextBlock Text="{Binding FolderPlace}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding FolderPlace}" /><Button x:Name="BookshelfMore" Grid.Column="1" Content="⋯" Click="Bookshelf_More" ToolTip.Tip="书架列表菜单" /></Grid>
             <WrapPanel>
@@ -43,7 +43,12 @@
             <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>
           </ComboBox>
           <TextBlock Grid.Row="2" Text="{Binding FolderMessage}" TextWrapping="Wrap" Margin="8,0" />
-          <Grid x:Name="FolderBrowserBody" Grid.Row="3" ColumnDefinitions="0,0,*">
+          <Grid Grid.Row="3" ColumnDefinitions="*,Auto,Auto" IsVisible="{Binding FolderSearchVisible}" Margin="8,0,8,4">
+            <TextBox x:Name="FolderSearchBox" Text="{Binding FolderSearch.Keyword, Mode=TwoWay}" PlaceholderText="搜索书架" KeyDown="NavigationSearch_KeyDown" LostFocus="NavigationSearch_LostFocus" />
+            <Button Grid.Column="1" Content="×" Tag="Folder" Click="NavigationSearch_Clear" Padding="6,0" /><Button Grid.Column="2" Content="▾" Tag="Folder" Click="NavigationSearch_History" Padding="6,0" />
+          </Grid>
+          <TextBlock Grid.Row="4" Text="{Binding FolderSearch.Error}" Foreground="#D9957C" TextWrapping="Wrap" Margin="8,0" />
+          <Grid x:Name="FolderBrowserBody" Grid.Row="5" ColumnDefinitions="0,0,*">
           <local:FolderTreeView x:Name="BookshelfDirectoryTree" IsVisible="False" />
           <GridSplitter x:Name="FolderTreeSplitter" Grid.Column="1" Width="4" ResizeDirection="Columns" DragCompleted="FolderTree_DragCompleted" IsVisible="False" />
           <DockPanel x:Name="BookshelfItems" Grid.Column="2">
@@ -54,9 +59,22 @@
             <ListBox.ContextMenu><ContextMenu><MenuItem Header="打开 / 进入书签文件夹" Click="Bookshelf_Open" /><MenuItem Header="在独立书签面板中定位" Click="Bookshelf_RevealBookmark" /></ContextMenu></ListBox.ContextMenu>
 
           </ListBox></DockPanel></Grid></Grid></Border>
-      <Border Tag="PageListPanel"><Grid RowDefinitions="Auto,*">
-          <Grid ColumnDefinitions="*,Auto" Margin="8,4"><TextBlock Text="页面列表" VerticalAlignment="Center" /><Button x:Name="PageListMore" Grid.Column="1" Content="⋯" Click="PageList_More" ToolTip.Tip="页面列表显示样式" /></Grid>
-          <ListBox x:Name="PageList" Grid.Row="1" ItemsSource="{Binding Pages}" SelectedItem="{Binding SelectedPage, Mode=TwoWay}" SelectionMode="Multiple" DoubleTapped="PageList_DoubleTapped" />
+      <Border Tag="PageListPanel"><Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+          <Grid ColumnDefinitions="*,Auto" Margin="8,4"><TextBlock Text="{Binding PageListTitle}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" /><Button x:Name="PageListMore" Grid.Column="1" Content="⋯" Click="PageList_More" ToolTip.Tip="页面列表显示和目录" /></Grid>
+          <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" IsVisible="{Binding PageSearchVisible}" Margin="8,0,8,4">
+            <TextBox x:Name="PageListSearchBox" Text="{Binding PageSearch.Keyword, Mode=TwoWay}" PlaceholderText="搜索页面" KeyDown="NavigationSearch_KeyDown" LostFocus="NavigationSearch_LostFocus" />
+            <Button Grid.Column="1" Content="×" Tag="Page" Click="NavigationSearch_Clear" Padding="6,0" /><Button Grid.Column="2" Content="▾" Tag="Page" Click="NavigationSearch_History" Padding="6,0" />
+          </Grid>
+          <TextBlock Grid.Row="2" Text="{Binding PageSearch.Error}" Foreground="#D9957C" TextWrapping="Wrap" Margin="8,0" />
+          <Grid x:Name="PageBrowserBody" Grid.Row="3" ColumnDefinitions="0,0,*">
+            <TreeView x:Name="ContentsTree" IsVisible="False" KeyDown="ContentsTree_KeyDown" PointerReleased="ContentsTree_Released">
+              <TreeView.Styles><Style Selector="TreeViewItem"><Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" /></Style></TreeView.Styles>
+              <TreeView.ItemTemplate><TreeDataTemplate ItemsSource="{Binding Children}"><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" /></TreeDataTemplate></TreeView.ItemTemplate>
+            </TreeView>
+            <GridSplitter x:Name="ContentsTreeSplitter" Grid.Column="1" Width="4" ResizeDirection="Columns" DragCompleted="ContentsTree_DragCompleted" IsVisible="False" />
+            <ListBox x:Name="PageList" Grid.Column="2" ItemsSource="{Binding Pages}" SelectedItem="{Binding SelectedPage, Mode=TwoWay}" SelectionMode="Multiple" DoubleTapped="PageList_DoubleTapped" />
+          </Grid>
+          <TextBlock Grid.Row="4" Text="{Binding PageCount}" IsVisible="{Binding PageCountVisible}" Margin="8,4" FontSize="10" Opacity="0.7" />
         </Grid></Border>
       <Border Tag="HistoryPanel">          <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
             <Grid ColumnDefinitions="*,Auto" Margin="8,4">

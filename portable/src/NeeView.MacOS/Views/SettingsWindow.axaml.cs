@@ -33,7 +33,7 @@ public sealed partial class SettingsWindow : Window
     {
         _model = model;
         _inputs = model.Commands.Definitions.Select(d => new ShortcutEdit(d, model.SaveData.GetShortcut(d.Name, d.Shortcut), available?.Invoke(d.Name) ?? model.Commands.IsAvailable(d.Name), model.SaveData.GetMouseGesture(d.Name, d.MouseGesture).ToString())).ToArray();
-        this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm(); FillAutoHide(); FillView();
+        this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm(); FillAutoHide(); FillView(); FillNavigation();
         this.FindControl<CheckBox>("GestureEnabled")!.IsChecked = Config.Current.Mouse.IsGestureEnabled;
         FillNumber("GestureDistance", Config.Current.Mouse.GestureMinimumDistance, 5, 200);
         this.FindControl<ComboBox>("InputScheme")!.SelectedIndex = (int)Config.Current.Command.PresetInputScheme;
@@ -61,6 +61,7 @@ public sealed partial class SettingsWindow : Window
         this.FindControl<ScrollViewer>("FilmSettings")!.IsVisible = index == 2;
         this.FindControl<ScrollViewer>("AutoHideSettings")!.IsVisible = index == 3;
         this.FindControl<ScrollViewer>("HistorySettings")!.IsVisible = index == 4;
+        this.FindControl<ScrollViewer>("NavigationSettings")!.IsVisible = index == 5;
     }
     /// <summary>按名称及命令标识过滤编辑副本，未展示的键位也保留。</summary>
     private void InputSearch_Changed(object? sender, TextChangedEventArgs e)
@@ -277,7 +278,7 @@ public sealed partial class SettingsWindow : Window
                     _model.SaveData.SetMouseGestureDifference(input.Name, input.MouseGesture.Trim(), input.Definition.MouseGesture);
                 Config.Current.Mouse.IsGestureEnabled = this.FindControl<CheckBox>("GestureEnabled")!.IsChecked == true;
                 Config.Current.Mouse.GestureMinimumDistance = (double)(this.FindControl<NumericUpDown>("GestureDistance")!.Value ?? 30);
-                ApplyFilm(); ApplyAutoHide(); ApplyView(); _historySettings!.ApplyPolicy(Config.Current.History);
+                ApplyFilm(); ApplyAutoHide(); ApplyView(); _historySettings!.ApplyPolicy(Config.Current.History); ApplyNavigation();
                 foreach (var parameter in _parameters.Values) parameter.Apply(_model.SaveData);
                 Config.Current.Bookshelf.FolderSortOrder = (FolderSortOrder)Math.Max(0, this.FindControl<ComboBox>("BookshelfGroup")!.SelectedIndex);
                 Config.Current.Book.IsPrioritizeBookMove = this.FindControl<CheckBox>("PrioritizeBookMove")!.IsChecked == true;

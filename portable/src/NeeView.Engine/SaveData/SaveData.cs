@@ -24,6 +24,8 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
     public IReadOnlyList<HistoryEntry> HistoryEntries { get; private set; } = [];
     public HistoryStringCollection BookmarkSearchHistory { get; } = new();
     public HistoryStringCollection BookHistorySearchHistory { get; } = new();
+    public HistoryStringCollection PageListSearchHistory { get; } = new();
+    public HistoryStringCollection BookshelfSearchHistory { get; } = new();
     public event EventHandler? BookmarkSearchHistoryChanged;
     public event EventHandler? BookHistorySearchHistoryChanged;
     public event EventHandler? Changed;
@@ -99,6 +101,8 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         RefreshHistory();
         BookmarkSearchHistory.Replace(_history["BookmarkSearchHistory"]?.Deserialize<string[]>(Options));
         BookHistorySearchHistory.Replace(_history["BookHistorySearchHistory"]?.Deserialize<string[]>(Options));
+        PageListSearchHistory.Replace(_history["PageListSearchHistory"]?.Deserialize<string[]>(Options));
+        BookshelfSearchHistory.Replace(_history["BookshelfSearchHistory"]?.Deserialize<string[]>(Options));
     }
 
     /// <summary>原书签搜索历史追加/删除；复用三文件事务，失败恢复同一集合供重试。</summary>
@@ -111,6 +115,11 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
     /// <param name="keyword">已Trim的有效表达式。</param><param name="remove">删除指定表达式。</param><param name="token">排队/保存取消。</param>
     public Task EditBookHistorySearchHistoryAsync(string keyword, bool remove = false, CancellationToken token = default) =>
         EditSearchHistoryAsync(BookHistorySearchHistory, keyword, remove, token, () => BookHistorySearchHistoryChanged?.Invoke(this, EventArgs.Empty));
+    /// <summary>原页面列表与书架的表达式历史，复用唯一保存事务及原地回滚。</summary>
+    public Task EditPageListSearchHistoryAsync(string keyword, bool remove = false, CancellationToken token = default) =>
+        EditSearchHistoryAsync(PageListSearchHistory, keyword, remove, token, () => Changed?.Invoke(this, EventArgs.Empty));
+    public Task EditBookshelfSearchHistoryAsync(string keyword, bool remove = false, CancellationToken token = default) =>
+        EditSearchHistoryAsync(BookshelfSearchHistory, keyword, remove, token, () => Changed?.Invoke(this, EventArgs.Empty));
 
     /// <summary>共用原字符串历史的追加/删除及原地回滚，避免复制第二套事务。</summary>
     /// <param name="history">本次模块的原集合。</param><param name="keyword">非空表达式。</param><param name="remove">删除开关。</param>
@@ -129,13 +138,15 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         finally { _gate.Release(); notify(); }
     }
 
-    /// <summary>沿原统一保存开关写入已迁两组历史；未迁书架/页面历史及未知字段保留。</summary>
+    /// <summary>沿原统一保存开关写入书签、历史、页面和书架四类表达式历史；未知字段保留。</summary>
     private void WriteSearchHistories()
     {
         _history["BookmarkSearchHistory"] = Config.Current.History.IsKeepSearchHistory && BookmarkSearchHistory.Count > 0
             ? JsonSerializer.SerializeToNode(BookmarkSearchHistory, Options) : null;
         _history["BookHistorySearchHistory"] = Config.Current.History.IsKeepSearchHistory && BookHistorySearchHistory.Count > 0
             ? JsonSerializer.SerializeToNode(BookHistorySearchHistory, Options) : null;
+        _history["PageListSearchHistory"] = Config.Current.History.IsKeepSearchHistory && PageListSearchHistory.Count > 0 ? JsonSerializer.SerializeToNode(PageListSearchHistory, Options) : null;
+        _history["BookshelfSearchHistory"] = Config.Current.History.IsKeepSearchHistory && BookshelfSearchHistory.Count > 0 ? JsonSerializer.SerializeToNode(BookshelfSearchHistory, Options) : null;
     }
 
     /// <summary>按原 Path/Page/Props 恢复；Page 是条目名，不是数字页码。</summary>

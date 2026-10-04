@@ -1,6 +1,6 @@
 # NeeView Mac 源码迁移架构
 
-P0/P1 已建立工程骨架、原窗口区域和目录/图片/ZIP 阅读链路。P2 开发范围已收尾：RAR/7z、历史/书签及结构化搜索、胶片条/导航器、原分页/变换/页尾规则、常用书架/父子书导航、播放列表/页标记、键鼠/方向手势、动画、侧栏拖拽组合/自动隐藏/浮动及资源优化均进入同一产品链路。完整 235 条命令保留，138 个执行入口接入、97 个继续占位；数量不代表功能覆盖率。详见[开发收尾清单](p2-completion-checklist.md)。真机、Windows 动态、长期原生内存和用户新增交互验收仍待完成，P2 不标记整体验收封板。Mac 独立维护；原 Windows 工程是固定行为参考，不参与 Mac 构建。
+P0/P1 已建立工程骨架、原窗口区域和目录/图片/ZIP 阅读链路。P2 开发范围已收尾：RAR/7z、历史/书签及结构化搜索、胶片条/导航器、原分页/变换/页尾规则、常用书架/父子书导航、播放列表/页标记、键鼠/方向手势、动画、侧栏拖拽组合/自动隐藏/浮动及资源优化均进入同一产品链路。P3 开发范围也已完成：连续/瀑布、后台检查点布局、普通目录渐进索引、原帧全景、普通目录树/QuickAccess及监视、页面目录/名称和页面/书架搜索进入同一链路。完整235条命令保留，144个执行入口接入、91个继续占位；数量不代表功能覆盖率。详见[P2清单](p2-completion-checklist.md)与[P3清单](p3-completion-checklist.md)。真实设备、Windows动态及长期原生内存未完成项分别记录，不把开发完成标记为整体验收封板。Mac 独立维护；原 Windows 工程是固定行为参考，不参与 Mac 构建。
 
 ## 基线与技术栈
 
@@ -25,7 +25,7 @@ Engine 使用 `net10.0`，只引用原 MVVM 辅助库；不引用 WPF、Avalonia
 
 [源码迁移清单](source-migration.json) 记录原文件、基线 SHA256、目标和改造。位置/范围、设置按字段恢复、自然排序、页框生成等算法直接迁入。`PageFrameFactory` 保留原判断顺序，几何计算只替换实际 WPF 值类型及旋转变换。
 
-Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚未完整迁入媒体、搜索、高级过滤与高级控制。不能把“存在同名类型”当作整组功能已经迁完。新增替换点只有来源、像素、系统交互；不建立 WPF 模拟层、事件总线或插件框架。
+Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚未完整迁入高级媒体、metadata/rating、脚本和高级控制；原页面/普通书架搜索已由P3接入。不能把“存在同名类型”当作整组功能已经迁完。新增替换点只有来源、像素、系统交互；不建立 WPF 模拟层、事件总线或插件框架。
 
 原 `BookSourceFactory.ValidatePageSortMode` 对普通书籍排除播放列表注册顺序，P1 保留其回退到文件名排序的规则。自然比较器的 Win32 字符比较改为 .NET CurrentCulture；数值、全半角、日文归一逻辑保留，语言排序细节仍待 Windows 样本对照。
 
@@ -33,7 +33,13 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 
 路径 → BookOperation → Archive/ArchiveEntry → 原设置 Mix/BookPageSort → 尺寸探测 → 原 PageFrameFactory → ReaderView 当前帧需求 → BitmapFactory → 后端解码 → 像素租约 → Avalonia Bitmap/绘制。胶片条及导航器共用同一 BitmapFactory，按可见窗口申请缩略规格。胶片条/滑条共用 PageSelector，临时选择不改变正文；200ms防抖和可见序列去重，点击/Enter或滑条释放才确认。
 
-图片定位到所在目录中的条目。目录/ZIP/RAR/7z 完整索引后显示，尚未提供渐进索引。窗口级 BookOperation 使用互斥保护导航、设置与提交；打开按代次裁决，失败保留旧书。切书先保存旧状态，替换成功后释放旧来源。分割位置使用原 PagePosition.Part，不另定义身份或锚点体系。
+图片定位到所在目录中的条目。普通非递归目录支持128项有界渐进批次、已知图片先产出，原Page身份、排序/Part及末端保护保持；递归展平和ZIP/RAR/7z继续完整索引。窗口级 BookOperation 使用互斥保护导航、设置与提交；打开按代次裁决，失败保留旧书。切书先保存旧状态，替换成功后释放旧来源。分割位置使用原 PagePosition.Part，不另定义身份或锚点体系。
+
+## P3 来源集合与导航
+
+BookPageCollection.SourcePages是完整未过滤的原Page集合，Pages是经原Searcher和BookPageSort处理的当前正文。搜索/排序不创建新Page，正文Index重编号、EntryIndex保持；渐进批次追加SourcePages后重新筛选。空结果保留原CurrentPage/LastBook条目但无正文页框，清空恢复来源页。PageOrderVersion驱动正文表现数组，SourceVersion只在来源变化时驱动目录树；Smart名称及目录代表页由全源计算。
+
+BookshelfFolderList管理普通递归搜索与单个活动目录根监视，普通FolderTree管理最多32个展开节点一级监视。QuickAccess树与书架共享同一JSON节点，拖放只登记引用或重排，不移动真实文件。NavigationSearchViewModel独立管理输入、确认和关闭；四类原搜索历史共用总保存开关和五JSON事务，失败原地回滚。相关页面布局、主题和表单不承担匹配、枚举或保存算法；见[p3-page-search.md](p3-page-search.md)。
 
 ## 资源与取消
 
@@ -47,9 +53,9 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 
 ## 状态与退出
 
-`UserSetting.json`、`History.json`、`Bookmark.json`、`Foldres.json` 与原全局 `.nvpls` 是对应模块的权威数据，沿用 Path/Page/Props、差分键位和原设置枚举。未迁移配置及未知 Props 保留。Mac 用户目录为 `~/Library/Application Support/NeeView.Mac`；不修改 Windows Profile 或旧 NeeView.Portable 数据。
+`UserSetting.json`、`History.json`、`Bookmark.json`、`Foldres.json`、`QuicAccess.json` 与原全局 `.nvpls` 是对应模块的权威数据，沿用 Path/Page/Props、差分键位和原设置枚举。未迁移配置及未知 Props 保留。Mac 用户目录为 `~/Library/Application Support/NeeView.Mac`；不修改 Windows Profile 或旧 NeeView.Portable 数据。
 
-保存先准备四个临时文件，再保留副本和小型提交标记，原子替换各文件；失败恢复旧完整文件和历史内存状态，中断在下次启动恢复，兼容旧双/三文件标记。书签编辑原地回滚节点，保留选择及重试引用。阅读防抖一秒，切书和退出立即保存。关闭入口共享可等待任务，保存失败保持书籍/查看器并允许重试。非文件系统激活重建窗口时恢复最后书籍；明确打开文件优先于旧状态。该链路已在正式Mac应用中验证，见[运行记录](../acceptance/p1-macos-runtime.md)。
+保存先准备五个临时文件，再保留副本和小型提交标记，原子替换各文件；失败恢复旧完整文件和历史内存状态，中断在下次启动恢复，兼容旧双/三/四文件标记。书签编辑原地回滚节点，保留选择及重试引用。阅读防抖一秒，切书和退出立即保存。关闭入口共享可等待任务，保存失败保持书籍/查看器并允许重试。非文件系统激活重建窗口时恢复最后书籍；明确打开文件优先于旧状态。该链路已在正式Mac应用中验证，见[运行记录](../acceptance/p1-macos-runtime.md)。
 
 原 Props 无法无歧义编码 IsWide=false，Mac 增加 `MacIsSupportedWidePage` 补值；原 Props 解析算法保持。2026-10-04 同夹具复演确认早期 `MacPagePart` 导致半页恢复与 Windows/原源码不同，已收回该扩展：Find/GetLastBook 直接返回原 BookMemento，SaveAsync 不接受半页参数；普通切书/启动按原条目名恢复到阅读方向首半页，当前阅读和反向页尾仍保留原 Part 算法。旧字段不读取，更新当前记录时移除，其他未知字段保持。同书 LastBookV2 的未知嵌套字段及 Props 继续保存，不跨书传递。P2 首批接入原 BookmarkNode 字段，第五批接入原集合算法与登记编辑；完整旧版本迁移、路径映射与 .nvzip 导入在 P5，当前不能宣称任意旧 Profile 可直接使用。
 
@@ -59,11 +65,11 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 
 原 Book.Pages 仍原地排序并保持 Page 身份；排序提交递增 PageOrderVersion，表现模型按书籍引用/顺序版本发布新列表数组，使Avalonia收到排序变化。普通翻页不复制全书，getter及时读取已提交书籍，不把表现数组变成第二业务集合。名称升降序、主图/页号与选中项的真机对照见[设备资源记录](../acceptance/p2-device-resources-runtime.md)。触控板本轮按用户要求跳过，未验；多屏无环境。
 
-滚动翻页从原 PageFrameBox/NScroll/ScrollResult 迁入五种模式、分段、终端吸附和换行停顿，普通滚轮命令到边界后才进入原帧导航。精确滚动仍走表现平移，由原 DragArea.SnapView 约束；书籍阅读方向与帧移动方向分别保留。完整分页滚动参数、鼠标组合和方向手势已接入；全景 PagesAsOne 在 P3。详见 [P2 第二批契约](p2-docking-scroll.md)、[参数与变换](p2-view-transform.md)、[方向手势](p2-direction-gestures.md)。
+滚动翻页从原 PageFrameBox/NScroll/ScrollResult 迁入五种模式、分段、终端吸附和换行停顿，普通滚轮命令到边界后才进入原帧导航。精确滚动仍走表现平移，由原 DragArea.SnapView 约束；书籍阅读方向与帧移动方向分别保留。完整分页滚动参数、鼠标组合和方向手势已接入；原帧全景 PagesAsOne/NScroll已由P3迁入，同一查看器另支持Mac连续/瀑布展示。详见 [P2 第二批契约](p2-docking-scroll.md)、[参数与变换](p2-view-transform.md)、[方向手势](p2-direction-gestures.md)。
 
 第三批契约见 [页选择与导航历史](p2-selection-navigation.md)。原100项环形历史按页面条目和书籍打开顺序分别保存于进程内；重放成功后提交游标，跨书保留访问排序。JSON仍是唯一持久化权威。
 
-第四批契约见 [普通书架与文件夹页导航](p2-bookshelf-navigation.md)。BookshelfFolderList 独立维护浏览位置和选择，后台枚举目录/归档元数据；重排及翻页不重扫。普通前后书采用原分组排序，成功打开后提交选择；文件夹页只按当前书页面目录组跳页。全局默认排序及分组沿用原 JSON；每目录参数、持久随机种子、真实 Folder 页及父书定位分别由第十四/十五批接入。P3第二批已接入普通目录树展开时枚举和页面可见缩略；完整树及大目录渐进索引仍待迁。
+第四批契约见 [普通书架与文件夹页导航](p2-bookshelf-navigation.md)。BookshelfFolderList 独立维护浏览位置和选择，后台枚举目录/归档元数据；重排及翻页不重扫。普通前后书采用原分组排序，成功打开后提交选择；文件夹页只按当前书页面目录组跳页。全局默认排序及分组沿用原 JSON；每目录参数、持久随机种子、真实 Folder 页及父书定位分别由第十四/十五批接入。P3已接入普通目录树展开时枚举、Mac/挂载卷根、QuickAccess引用拖放、系统图标和有界监视，以及页面可见缩略和普通非递归渐进索引；真实文件操作在P4。
 
 第五批契约见 [书签集合操作](p2-bookmark-operations.md)。BookmarkCollection只操作原JSON节点；SaveData串行保存与失败原地回滚，Mac视图独立管理对话框/选择/拖动。登记命令保留打开编辑界面的含义，Mac异步编辑窗替换原Popup宿主；书签目录/搜索和书架联动由后续批次接入，高级树排布/修复等继续占位。
 
@@ -71,11 +77,11 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 
 第七批契约见 [底部页号与滑条设置](p2-slider-input.md)。独立 SliderTextBox 表现控件保留一起始转换、Enter/失焦及 Escape 提交，原始索引进入唯一 BookOperation.JumpAsync，不走双页滑块对齐；来源身份在原互斥中再次核对。滑条显示、SliderIndexLayout、厚度、透明度及滚轮写回原 JSON，纯外观保存不重建正文。主题资源修复15 DIP薄滑条裁切。原46.3页标记属于全局播放列表/Pagemark.nvpls，后续随原链路迁入，不新增每本书标记体系；当时完整自动隐藏/全局显隐为禁用占位，现由第九批接通。107项测试、正式构建与本地签名及真机重启/数据还原分别留证。
 
-[前端边界](frontend-boundaries.md)、[行为对照](behavior-baseline.md)、[完整命令表](command-migration.md)、[布局表](layout-migration.md)、[模块设计](modules/M01.md) 和 [阶段证据](../acceptance/stages.md) 是后续开发契约。P2 开发完成与整体验收分开；P3 大量图片、P4 fork 分类、P5 兼容/高级内容/发布仍是后续目标，未继承旧重写方案的“通过”。
+[前端边界](frontend-boundaries.md)、[行为对照](behavior-baseline.md)、[完整命令表](command-migration.md)、[布局表](layout-migration.md)、[模块设计](modules/M01.md) 和 [阶段证据](../acceptance/stages.md) 是后续开发契约。P2/P3开发完成与整体验收分开；P4 fork分类、P5兼容/高级内容/发布仍是后续目标，未继承旧重写方案的“通过”。
 
 优化只按测量热点独立修改并回归。代码删除必须说明 Windows 专属、不可达、重复或被替换的原因。构建串行、使用默认输出；不得通过 Preview 或改输出目录绕过 Xcode。本机Xcode27.0已满足构建要求；开发Host明确使用ad-hoc签名和JIT权限，最终.app在默认输出目录，RID子目录的.app只是SDK中间产物。构建及本地签名校验写入p1-validation.json；真机运行单独留证。编译、自动测试、运行、Windows 对照、用户验收、提交和发布分别报告。
 
-第八批契约见 [原播放列表与全局页标记](p2-playlist.md)。PlaylistHub沿原Default首项、真实文件自然顺序和选择关系，保留v1/v2、未知字段及别名省略规则；Mac编辑采用即时可等待的原子保存和原地回滚。BookPlaylist/BookPageMarker映射当前全局列表，书内标记和过滤/分组后的跨书列表导航独立，归档逻辑目标共用唯一加载链。主图片按原SelectedRange索引升序确定，未确认的PageSelector不改变登记对象。PlaylistView与表现模型独立，标记回报只更新绘制/菜单；未迁模板/文件管理/修复/PlaylistArchive保持占位。提交前指纹检查不提供跨进程互斥保证，完整监视后续迁入。最终121项测试、正式构建/本地签名及真机导航、编辑、列表重启和数据还原分别留证；当前清单45文件/63子集适配，数量不代表覆盖率，P2未封板。
+第八批契约见 [原播放列表与全局页标记](p2-playlist.md)。PlaylistHub沿原Default首项、真实文件自然顺序和选择关系，保留v1/v2、未知字段及别名省略规则；Mac编辑采用即时可等待的原子保存和原地回滚。BookPlaylist/BookPageMarker映射当前全局列表，书内标记和过滤/分组后的跨书列表导航独立，归档逻辑目标共用唯一加载链。主图片按原SelectedRange索引升序确定，未确认的PageSelector不改变登记对象。PlaylistView与表现模型独立，标记回报只更新绘制/菜单；未迁模板/文件管理/修复/PlaylistArchive保持占位。提交前指纹检查不提供跨进程互斥保证，完整监视后续迁入。最终121项测试、正式构建/本地签名及真机导航、编辑、列表重启和数据还原分别留证；源码迁移清单持续随阶段更新，数量不代表覆盖率，P2整体验收未封板。
 
 第九批契约见 [原窗口自动隐藏与显示控制](p2-autohide.md)。AutoHide/Window/MenuBar及原Panels/Slider字段沿用原JSON；早期Mac别名只读取，保存收归原字段。AutoHidePresenter独立管理五区的延迟、真实焦点/弹出层/捕获和一次显示锁，40ms背景计时不扫描页面。自动隐藏区域覆盖正文，弹出/收起不改变视口；原滑条与胶片条宿主联动及侧栏内容边角余量保留。已迁窗口显示命令接入，原生精确手势按实际控件命中排除覆盖层。常用输入与侧栏浮动/位置保存后续已接入；FullDesktop、主视图浮动及高级窗口细节保留占位，多屏/真实焦点待验。构建、自动回归、正式运行及用户验收分别记录。
 
@@ -111,10 +117,10 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 
 第二十五批完成预算内免排序和同规格显示缓冲复用、原无效历史清理入口、正反向单双页切换及共享循环参数，固定夹具测量与 P2 收尾证据见[p2-resources.md](p2-resources.md)。没有增加第二工厂、状态模型或长期 Preview 路线。
 
-P3第一批接入[连续/瀑布速览](p3-browse.md)：唯一ReaderView与原Book/Page/BitmapFactory/JSON共享，布局/可见资源由独立表现辅助管理。原分页不改为新内核；纵向逐图是Mac扩展，原水平/双页帧级全景、目录树及逐页缩略/大目录优化仍待迁。P3在开发，入口登记当前139/96，数量不代表完整覆盖。
+P3第一批接入[连续/瀑布速览](p3-browse.md)：唯一ReaderView与原Book/Page/BitmapFactory/JSON共享，布局/可见资源由独立表现辅助管理。原分页不改为新内核；纵向逐图是Mac扩展，原帧全景由第五批接入；目录树/逐页缩略、渐进索引与后台布局已由后续批次补齐。当前P3开发完成及验收边界见收尾清单。
 
-P3第二批契约见[p3-navigation.md](p3-navigation.md)：Bookshelf拥有唯一普通FolderTree，节点通过既有ListFoldersAsync展开时读取，树选择/确认独立于正文。页面四模板复用共享表现，原Page直接进入唯一BitmapFactory；不增加后端服务、身份模型或状态存储。当前原235命令有140个入口、95个占位，完整普通树及原帧级全景仍未完成；后台实图与正式Mac动态验收分别留证。
+P3第二批契约见[p3-navigation.md](p3-navigation.md)：Bookshelf拥有唯一普通FolderTree，节点通过既有ListFoldersAsync展开时读取，树选择/确认独立于正文。页面四模板复用共享表现，原Page直接进入唯一BitmapFactory；不增加后端服务、身份模型或状态存储。普通树/QuickAccess及原帧全景由后续批次接入；当前144个入口/91个占位，后台实图与正式Mac动态验收分别留证。
 
-P3第三批契约见[p3-performance.md](p3-performance.md)：连续/瀑布几何改为256项不可变检查点快照，尺寸补齐共享未变前缀、从最早变化段重算；完整几何和尺寸更新在单槽后台执行，UI按书籍/顺序/代次提交并保留原Page及最新滚动锚点。最短列尾部最坏仍O(n)，完整几何仍全算。原元数据收集/过滤/Page创建后台执行及逐项取消，完整索引后一次提交Book的边界保持；万项索引测量不等于渐进打开。没有新增生产项目、来源、阅读内核或状态体系。
+P3第三批契约见[p3-performance.md](p3-performance.md)：连续/瀑布几何改为256项不可变检查点快照，尺寸补齐共享未变前缀、从最早变化段重算；完整几何和尺寸更新在单槽后台执行，UI按书籍/顺序/代次提交并保留原Page及最新滚动锚点。最短列尾部最坏仍O(n)，完整几何仍全算。原元数据收集/过滤/Page创建后台执行及逐项取消，该批次万项完整元数据测量不等于渐进打开；普通非递归目录随后由第四批改为分批提交，递归及归档仍完整索引。没有新增生产项目、来源、阅读内核或状态体系。
 
-P3第四/五批已接入[渐进目录索引](p3-index.md)和[原帧全景](p3-panorama.md)，早期批次的待迁说明按该契约更新；导航高级项继续迁移，静默验收不等同设备封板。
+P3第四/五批已接入[渐进目录索引](p3-index.md)和[原帧全景](p3-panorama.md)，早期批次的待迁说明按该契约更新；普通目录高级项由第六批QuickAccess/监视和第七批页面目录/搜索补齐，静默验收不等同设备封板。
