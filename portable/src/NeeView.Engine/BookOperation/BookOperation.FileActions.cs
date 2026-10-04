@@ -34,7 +34,7 @@ public sealed partial class BookOperation
     /// <summary>原移动要求整组均为普通目录真实图片；固定复制不受源写权限开关限制。</summary>
     public bool CanTransferFileActionPages(MultiPagePolicy policy, bool requireWriteAccess = true)
     {
-        if (requireWriteAccess && !Config.Current.System.IsFileWriteAccessEnabled || IsDeletingFile || _destinationMoves is null || _destinationMoves.IsBusy || _disposed || _closing || IsLoading || Book?.IsIndexing != false) return false;
+        if (requireWriteAccess && !Config.Current.System.IsFileWriteAccessEnabled || IsRenamingBook || IsDeletingFile || _destinationMoves is null || _destinationMoves.IsBusy || _disposed || _closing || IsLoading || Book?.IsIndexing != false) return false;
         var pages = CollectFileActionPages(policy);
         return pages.Count > 0 && pages.All(page => page is { IsImage: true, ArchiveEntry.FilePath: not null } && page.ArchiveEntry.Archive.IsDirectory && !page.ArchiveEntry.IsShortcut);
     }
@@ -134,7 +134,7 @@ public sealed partial class BookOperation
         await _gate.WaitAsync(token);
         try
         {
-            if (_disposed || _closing || IsLoading) return;
+            if (_disposed || _closing || IsLoading || IsRenamingBook) return;
             _saving?.Cancel();
             book = Book; generation = _generation;
             result = await _destinationMoves.ReplayAsync(undo, token); Error = _destinationMoves.Error;

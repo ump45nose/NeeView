@@ -11,6 +11,22 @@ public sealed partial class MainWindow
         if (_platform is not null && _images is not null) _model.Operation.AttachFileDeletion(_platform, _images);
         _model.Operation.ConfirmDeleteAsync = async path => !_preparing && !_closedPrepared
             && await ConfirmAsync("删除当前图片", "将以下图片移至系统废纸篓？\n" + path, "移至废纸篓") && !_preparing && !_closedPrepared;
+        _model.Operation.AskBookNameAsync = async target =>
+        {
+            if (_preparing || _closedPrepared) return null;
+            var name = await AskNameAsync("重命名书籍", System.IO.Path.GetFileName(target.Path), selectStem: !target.IsDirectory);
+            return _preparing || _closedPrepared ? null : name;
+        };
+        _model.Operation.ConfirmBookRenameAsync = async plan =>
+        {
+            if (_preparing || _closedPrepared) return false;
+            if (plan.ExtensionChanged && !await ConfirmAsync("更改书籍扩展名", "更改扩展名可能导致无法打开该书籍。\n" + plan.Destination, "更改扩展名")) return false;
+            if (_preparing || _closedPrepared) return false;
+            if (plan.Conflict && !await ConfirmAsync("书籍名称已存在", "将使用未占用的名称：\n" + plan.Destination, "使用此名称")) return false;
+            return !_preparing && !_closedPrepared;
+        };
+        _model.Operation.RetryBookRenameAsync = async message => !_preparing && !_closedPrepared
+            && await ConfirmAsync("书籍重命名失败", message, "重试") && !_preparing && !_closedPrepared;
         var panel = this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!;
         panel.Attach(_model.Operation); panel.Failed += (_, message) => ShowError(message);
         panel.ManageAsync = ManageDestinationFoldersAsync; panel.CreateAsync = CreateDestinationChildAsync;

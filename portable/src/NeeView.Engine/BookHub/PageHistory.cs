@@ -23,6 +23,9 @@ public sealed class PageHistory
     public PageHistoryUnit? GetTarget(int direction) => direction < 0 ? (_history.CanPrevious() ? _history.GetPrevious() : null) : (_history.CanNext() ? _history.GetNext() : null);
     /// <summary>成功显示后提交游标；异步加载失败可以重试原项。</summary>
     public void CommitMove(int direction) => _history.Move(Math.Sign(direction));
+    /// <summary>替代原FileResolver对此明确改名的后退定位，不新增来源身份登记。</summary>
+    public void RenameRecursive(string source, string destination) => _history.ReplaceValues(unit => unit with
+        { BookAddress = BookMementoTools.RenamePath(unit.BookAddress, source, destination) });
     /// <summary>保留原前进/后退菜单列表的索引和顺序。</summary>
     public IReadOnlyList<KeyValuePair<int, PageHistoryUnit>> GetHistory(int direction, int size) => _history.GetHistory(direction, size);
 }
@@ -40,4 +43,6 @@ public sealed class BookHubHistory
     public string? GetTarget(int direction) => direction < 0 ? (_history.CanPrevious() ? _history.GetPrevious() : null) : (_history.CanNext() ? _history.GetNext() : null);
     /// <summary>成功打开后提交原游标。</summary>
     public void CommitMove(int direction) => _history.Move(Math.Sign(direction));
+    /// <summary>保持原打开顺序/游标，仅更新本次改名涉及的记录。</summary>
+    public void RenameRecursive(string source, string destination) => _history.ReplaceValues(path => path is null ? null : BookMementoTools.RenamePath(path, source, destination));
 }

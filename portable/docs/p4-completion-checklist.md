@@ -10,7 +10,7 @@ P4沿原fork分类与原BookPageActionControl/BookControl迁入，不增加数�
 | 多页All/AllLeftToRight | 第二批普通目录接入 | 原当前页组/两方向/实际顺序/部分失败与晚取消；Windows动态另验 |
 | CopyToFolderAs固定复制 | 第二批普通目录接入 | 三策略/Index/不随面板模式/复制不入历史；归档实体化及书籍项待后续 |
 | DeleteFile/系统废纸篓 | 第三批当前普通图片接入 | 原单主页/确认/失败保留/搜索/晚取消/关闭与缓存；AppKit真机另验，归档/链接/列表多选仍待迁 |
-| RenameBook及定位联动 | 待后续批次 | 原书籍重命名、状态/书签/播放列表明确路径更新 |
+| RenameBook及定位联动 | 第四批目录/根归档接入 | 原名称编号/扩展名/重试、阅读恢复及JSON/书签/QuickAccess/目录/列表明确路径；真实权限/NAS/Windows动态另验 |
 | CopyFile/CutFile/Paste及基础文件菜单 | 待后续批次 | macOS文件剪贴板协议、原范围/来源能力，不能由分类复制替代 |
 | 原Finder定位 | 已有桥接，设备待验 | 当前页面/当前书籍实际定位及失败 |
 
@@ -23,4 +23,4 @@ P4沿原fork分类与原BookPageActionControl/BookControl迁入，不增加数�
 - 真跨卷及已挂载NAS中断/权限/恢复材料。前台测试集中约定时段，不在开发途中抢焦点。
 - 触控板用户要求跳过；多屏无环境。签名公证/分发安装属于P5，不由ad-hoc构建继承。
 
-前三批开发增量不等同P4开发完成或P3/P4设备封板；第二/三批契约见[p4-multipage.md](p4-multipage.md)与[p4-delete.md](p4-delete.md)，继续原重命名、文件剪贴板、其他删除类型、归档复制与定位联动。
+前四批开发增量不等同P4开发完成或P3/P4设备封板；契约见[p4-multipage.md](p4-multipage.md)、[p4-delete.md](p4-delete.md)与[p4-rename.md](p4-rename.md)，继续文件剪贴板、基础书籍文件菜单、其他删除类型及归档实体化复制。

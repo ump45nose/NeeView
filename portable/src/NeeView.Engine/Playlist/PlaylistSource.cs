@@ -41,7 +41,7 @@ public sealed record PlaylistItemMemento(PlaylistItem Item, int Index);
 public sealed class Playlist(string path, PlaylistSource source)
 {
     private readonly List<PlaylistItem> _items = source.Items.Select(item => new PlaylistItem(item)).ToList();
-    public string Path { get; } = path;
+    public string Path { get; internal set; } = path;
     public PlaylistSource Source { get; } = source;
     public IReadOnlyList<PlaylistItem> Items => _items;
     internal List<PlaylistItemMemento> Removed { get; set; } = [];

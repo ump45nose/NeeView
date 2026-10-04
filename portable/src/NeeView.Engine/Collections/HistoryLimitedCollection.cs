@@ -48,6 +48,9 @@ public sealed class HistoryLimitedCollection<T>
     public T? GetHistory(int index) => Get(index);
     /// <summary>定位原从一开始的游标。</summary>
     public void SetCurrent(int index) { _current = Math.Clamp(index, 0, _bufferSize); Changed?.Invoke(this, EventArgs.Empty); }
+    /// <summary>明确文件改名后映射已有记录，保留环形顺序、容量和当前游标。</summary>
+    public void ReplaceValues(Func<T?, T?> map)
+    { for (int i = 0; i < _bufferSize; i++) Set(i, map(Get(i))); Changed?.Invoke(this, EventArgs.Empty); }
     /// <summary>按方向返回靠近游标的历史，用于前进/后退列表。</summary>
     public List<KeyValuePair<int, T>> GetHistory(int direction, int size)
     {

@@ -1526,6 +1526,66 @@
       "target": "src/NeeView.Engine/Command/CommandTable.cs",
       "sha256": "f65f5ee6745594629973c5f3e928402b5e7c5de8cbf934984039720339300962",
       "status": "保留原命令名/默认Delete键/无多页参数/当前主页执行；确认和系统替换经可等待原业务入口"
+    },
+    {
+      "source": "NeeView/BookOperation/BookControl.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.RenameBook.cs",
+      "sha256": "7b2f0d2b0b31b5a50b55dba8f48e11674ca9bcfaaad209946dba8c70c8fc6ad4",
+      "status": "原CanRenameBook/RenameBook流程；当前真实根目录/归档、写权限、异步采集确认、关闭来源/失败重试/按请求代次Resume恢复，逻辑归档内/链接不迁"
+    },
+    {
+      "source": "NeeView/System/FileIO.cs",
+      "target": "src/NeeView.Backends/FileSystem/FileOperationBackend.Rename.cs",
+      "sha256": "2b438ab676de625e70bc64861e3a10aaf081c480c65650bf76b2794d82f6561e",
+      "status": "原CheckInvalidFilename/CheckChangeExtension/CheckDuplicateFilename/RenameCore替换；同目录无覆盖、编号建议、Mac合法名称与真实大小写、快照复核及恢复三态"
+    },
+    {
+      "source": "NeeView/System/FileIO.cs",
+      "target": "src/NeeView.Engine/DestinationFolder/BookRenameContracts.cs",
+      "sha256": "2b438ab676de625e70bc64861e3a10aaf081c480c65650bf76b2794d82f6561e",
+      "status": "原重命名校验/执行替换点的小型名称方案、来源快照与真实结果契约；不携带WPF/系统对象"
+    },
+    {
+      "source": "NeeView/BookHub/BookMementoTools.cs",
+      "target": "src/NeeView.Engine/BookHub/BookMementoTools.cs",
+      "sha256": "776ab910f7fcd8d42a0e255cc0d99f4a3abd37a86017de53801c3c0792c9b5ee",
+      "status": "保留RenameRecursive明确来源前缀和目录边界；Mac反斜杠是合法字符，不猜测未知路径字符串"
+    },
+    {
+      "source": "NeeView/BookHub/BookMementoTools.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.RenameBook.cs",
+      "sha256": "776ab910f7fcd8d42a0e255cc0d99f4a3abd37a86017de53801c3c0792c9b5ee",
+      "status": "原历史/书签/QuickAccess/FolderConfig/Playlist路径联动；五JSON同一事务与小型重命名记录，实体提交后失败保留新内存地址并重试"
+    },
+    {
+      "source": "NeeView/BookMemento/BookMementoCollection.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.RenameBook.cs",
+      "sha256": "68bf3c8cd91551e32864a2b37ec5a4252b7bcbde060277fac4ee8e74abb6e268",
+      "status": "原Rename/RenameRecursive源记录替换目标记录、逐项Path更新，保留Page/Props/未知字段和原节点"
+    },
+    {
+      "source": "NeeView/FolderConfig/FolderConfig.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.RenameBook.cs",
+      "sha256": "452de3b6d2c3154660d42d1a739a9e137b53349f51357d0e9481d3bd9b507a01",
+      "status": "原RenameRecursive/RenameThumb：Place、封面书名、绝对/相对目标联动，按旧/新书地址计算，保留参数与未知字段"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/QuickAccessCollection.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.RenameBook.cs",
+      "sha256": "6f0bd6fd80a2b3a1c93c752a335f7cc202ab8b2d5a24ae24ec4614792fb5afe9",
+      "status": "原RenameRecursive路径更新，保留自定义名称、树顺序和节点身份"
+    },
+    {
+      "source": "NeeView/Playlist/PlaylistHub.cs",
+      "target": "src/NeeView.Engine/Playlist/PlaylistHub.Rename.cs",
+      "sha256": "66d22fb6172366cba7343ab716d41a1d29047231708c3b998671c4f1b7e8a7e4",
+      "status": "原RenameItemPathRecursive当前及其他.nvpls路径传播，改为可等待独立指纹/原子写入；原吞异常改为明确提示/可重试；自定义列表文件所在目录同时移动时更新已知位置"
+    },
+    {
+      "source": "NeeView/RenameControl/RenameFileDialog.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.DestinationFolders.cs",
+      "sha256": "e9d995eda18c24e687bfafbd233efbde912158dd794ee5f98d7b013c394f67be",
+      "status": "原书籍命名输入及扩展名主体选择、确认/取消/重试表现适配；主窗口复用可等待宿主文件动作，布局不承担I/O"
     }
   ],
   "rule_references": [

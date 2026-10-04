@@ -14,8 +14,8 @@
 | History/Props | Book/BookMemento.cs、Book.CreateMemento、SaveData/SaveDataProfile.cs | 保留 Path/Page/Props 和未知字段；Mac只补false-wide值；收回早期半页持久化，普通重开恢复阅读方向首半页 |
 | 差分快捷键 | Command/CommandElement.cs、CommandTable.cs | Commands[name].ShortCutKey，null恢复默认、空串禁用；Control保持 |
 | 滚动翻页 | BookPageMoveControl、PageFrameBox.ScrollToNextFrame、PageFrames/NScroll.cs、DragArea.SnapView | 原五模式、分段/终端吸附、计时与停顿顺序迁入；分页参数编辑及P3原全景/PagesAsOne已接通，真实设备验收单独记录 |
-| 九数字分类、固定移动 | MoveToDestinationFolderCommand、MoveToFolderAsCommand | 元数据保留，业务待P4 |
-| 两区分类和移动历史 | SidePanels/DestinationFolder、DestinationFolder/DestinationMoveService.cs | 完整目标登记；待P4，不能继承旧测试通过状态 |
+| 九数字分类、固定移动 | MoveToDestinationFolderCommand、MoveToFolderAsCommand | P4普通目录Once/All/AllLeftToRight与固定移动接入，Windows动态另验 |
+| 两区分类和移动历史 | SidePanels/DestinationFolder、DestinationFolder/DestinationMoveService.cs | P4原两区/无限集合/容量与成功后变栈接入，恢复协议独立验收 |
 | 原窗口/九面板/设置 | MainWindow.xaml、SidePanelFrameView.xaml、Options | 布局壳及核心面板转换；见layout-migration.md，Windows截图待验证 |
 | RAR/7z | 原Archive/阅读链 | 原来源关系下替换 SharpCompress，普通及固实夹具接入；密码/分卷/嵌套待迁移 |
 | 连续、瀑布流 | 原阅读链与Mac展示扩展 | P3纵向逐图/最短列、可见需求及原Page锚点；原帧级全景/变换/NScroll接入，见p3-browse.md及p3-panorama.md |
@@ -70,3 +70,5 @@ P4第一批：原DestinationFolder/Collection、DestinationMoveService、Destina
 P4第二批：Book.CurrentPages/CurrentPage及原CollectPages迁入，Once/All/AllLeftToRight判断顺序保留；普通目录多页移动逐项成功入栈，部分失败/晚取消仍协调已成功项。CopyToFolderAs固定复制、Index及多页参数接入，不随面板模式、不要求源写权限开关；归档实体化复制仍未迁入。静默夹具与Windows/真机集中验收分别记录，见[p4-multipage.md](p4-multipage.md)。
 
 P4第三批：原DeleteFile无MultiPagePolicy，仅CurrentPage；IsFileWriteAccessEnabled=false和IsRemoveConfirmed=true默认保持，取消不执行且删除不入分类历史。原预移除+失败reload改为系统真实成功后提交，普通目录当前图片走AppKit废纸篓，无永久回退。归档内不可逆删除/链接/列表所选页等原能力本批未迁，明确占位。空搜索保留全源锚点但不登记隐藏页历史；原空书历史不登记规则保持。自动测试与AppKit/Windows动态设备验收分别记录，见[p4-delete.md](p4-delete.md)。
+
+P4第四批：原RenameBookCommand/BookControl.RenameBook/FileIO.RenameAsync/RestoreBook的实体范围、写权限、编号名称、扩展名确认与失败重试迁入；单图打开仍改所在书籍目录。原BookMementoTools.RenameRecursive、QuickAccess/FolderConfig/Playlist明确路径联动保持未知字段与节点身份，不猜测替换未知字符串。Windows Shell改为同目录无覆盖后端，记录支持部分保存/启动恢复；原重新加载首半页和较新请求优先保留。45项专项覆盖真实临时文件、两处导航锁关闭取消、损坏记录与其他列表失败恢复；Mac/Windows动态另验，见[p4-rename.md](p4-rename.md)。

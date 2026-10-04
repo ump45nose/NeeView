@@ -417,7 +417,8 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         Context.CanvasSize = size; Context.DeviceScale = Math.Max(1, scale); RebuildFrame(MoveDirection, false);
     }
     /// <summary>立即保存，用于切书和正常退出。</summary>
-    public Task SaveAsync() => saveData.SaveAsync(Book, keepHistoryOrder: _keepHistoryOrder);
+    public async Task SaveAsync()
+    { await saveData.SaveAsync(Book, keepHistoryOrder: _keepHistoryOrder); await saveData.FlushBookRenameAsync(); }
     /// <summary>仅保存配置/集合现状，不以外观切换重新登记阅读访问；阅读防抖与退出仍保存Book。</summary>
     public Task SaveConfigurationAsync() => saveData.SaveAsync(null);
 
@@ -530,7 +531,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>观察后台保存错误，不产生未观察任务异常。</summary>
     private async Task SaveLaterAsync(CancellationTokenSource pending)
     {
-        try { await Task.Delay(1000, pending.Token); await saveData.SaveAsync(Book, pending.Token, _keepHistoryOrder); }
+        try { await Task.Delay(1000, pending.Token); await saveData.SaveAsync(Book, pending.Token, _keepHistoryOrder); await saveData.FlushBookRenameAsync(); }
         catch (OperationCanceledException) { }
         catch (Exception ex) { Error = "保存失败：" + ex.Message; Notify(); }
         finally { if (ReferenceEquals(_saving, pending)) _saving = null; pending.Dispose(); }
@@ -552,6 +553,9 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         await Task.Yield();
         _closing = true; Interlocked.Increment(ref _generation);
         _opening?.Cancel(); _saving?.Cancel();
+        // 未确认文本/重试可取消；已开始实体操作等待真实结果和路径联动，不释放仍使用的来源。
+        _renameClosing.Cancel();
+        if (_renameCompletion is { } rename) await rename.Task;
         await _gate.WaitAsync();
         try
         {
@@ -567,7 +571,10 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         }
         finally
         {
-            _gate.Release(); _closing = false;
+            _gate.Release();
+            _renameClosing.Dispose();
+            if (!_disposed) _renameClosing = new();
+            _closing = false;
             lock (_closeSync) _closeTask = null;
         }
     }

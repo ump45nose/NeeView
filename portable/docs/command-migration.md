@@ -1,10 +1,10 @@
 # 完整命令迁移表
 
-固定基线235个原命令实例全部保留。P4第三批为 **158个执行入口接入、77个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
+固定基线235个原命令实例全部保留。P4第四批为 **159个执行入口接入、76个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
 
 原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。实际键位/手势按原A/B/C、阅读方向和用户差分计算。
 
-对照[当前运行导出](../acceptance/p4-delete-commands.json)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider与ToggleHidePageSlider语义独立，前者仍占位；ToggleVisibleAddressBar入口仍占位。参数拥有者映射不等于执行能力；P4分类/P5高级能力继续逐项迁移。
+对照[当前运行导出](../acceptance/p4-rename-commands.json)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider与ToggleHidePageSlider语义独立，前者仍占位；ToggleVisibleAddressBar入口仍占位。参数拥有者映射不等于执行能力；P4分类/P5高级能力继续逐项迁移。
 
 | 原命令 | 文案 | 默认输入 | 默认方向手势 | 执行入口 | 迁移说明 | 原出处 |
 |---|---|---|---|---|---|---|
@@ -44,7 +44,7 @@
 | CopyBookToFolderAs | 复制书籍到文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/CopyBookToFolderAsCommand.cs |
 | MoveBookToFolderAs | 移动书籍到文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/MoveBookToFolderAsCommand.cs |
 | DeleteBook | 删除书籍 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/DeleteBookCommand.cs |
-| RenameBook | 重命名书籍 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/RenameBookCommand.cs |
+| RenameBook | 重命名书籍 |  |  | 已接入 | P4 目录/根归档改名及原明确路径联动；见p4-rename.md | NeeView/Command/Commands/RenameBookCommand.cs |
 | SelectArchiver | 选择归档程序 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SelectArchiverCommand.cs |
 | ClearHistory | 清理历史记录 |  |  | 已接入 | P2 原历史集合清空 | NeeView/Command/Commands/ClearHistoryCommand.cs |
 | ClearHistoryInPlace | 删除当前位置的历史记录 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/ClearHistoryInPlaceCommand.cs |

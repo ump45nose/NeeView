@@ -4,7 +4,7 @@ using System.Text.Json;
 namespace NeeView;
 
 /// <summary>唯一全局播放列表选择、串行编辑和 .nvpls 保存；没有窗口或具体后端依赖。</summary>
-public sealed class PlaylistHub(PlaylistConfig config)
+public sealed partial class PlaylistHub(PlaylistConfig config)
 {
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true, AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip };
     private readonly SemaphoreSlim _gate = new(1);
@@ -155,6 +155,9 @@ public sealed class PlaylistHub(PlaylistConfig config)
     }
     /// <summary>临时文件 Flush 后同目录原子替换；提交前校验外部变化，失败只清理自己的临时文件。</summary>
     private void WriteCore(string path, byte[] bytes, CancellationToken token)
+        => _fingerprint = WriteFileCore(path, bytes, _fingerprint, token);
+    /// <summary>独立文件使用各自指纹，不借用当前列表的外部修改保护状态。</summary>
+    private static string? WriteFileCore(string path, byte[] bytes, string? fingerprint, CancellationToken token)
     {
         var temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
@@ -162,8 +165,8 @@ public sealed class PlaylistHub(PlaylistConfig config)
             token.ThrowIfCancellationRequested(); Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path)!);
             using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None)) { stream.Write(bytes); stream.Flush(true); }
             var existing = File.Exists(path) ? File.ReadAllBytes(path) : null;
-            if (Fingerprint(existing) != _fingerprint) throw new IOException("播放列表已被外部修改，请重新打开后再编辑。");
-            token.ThrowIfCancellationRequested(); File.Move(temporary, path, true); _fingerprint = Fingerprint(bytes);
+            if (Fingerprint(existing) != fingerprint) throw new IOException("播放列表已被外部修改，请重新打开后再编辑。");
+            token.ThrowIfCancellationRequested(); File.Move(temporary, path, true); return Fingerprint(bytes);
         }
         finally { if (File.Exists(temporary)) File.Delete(temporary); }
     }

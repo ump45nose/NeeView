@@ -180,8 +180,9 @@ public sealed partial class MainWindow : Window
         "Unload" => _model?.Operation.CanUnload == true,
         "MoveToFolderAs" or "CopyToFolderAs" => IsDestinationCommandAvailable(name),
         "DeleteFile" => _model?.Operation.CanDeleteFile == true,
-        "UndoDestinationMove" => _model?.Operation is { IsDeletingFile: false } && Config.Current.System.IsFileWriteAccessEnabled && _model.Operation.DestinationMoves?.CanUndo == true,
-        "RedoDestinationMove" => _model?.Operation is { IsDeletingFile: false } && Config.Current.System.IsFileWriteAccessEnabled && _model.Operation.DestinationMoves?.CanRedo == true,
+        "RenameBook" => _model?.Operation.CanRenameBook == true,
+        "UndoDestinationMove" => _model?.Operation is { IsDeletingFile: false, IsRenamingBook: false } && Config.Current.System.IsFileWriteAccessEnabled && _model.Operation.DestinationMoves?.CanUndo == true,
+        "RedoDestinationMove" => _model?.Operation is { IsDeletingFile: false, IsRenamingBook: false } && Config.Current.System.IsFileWriteAccessEnabled && _model.Operation.DestinationMoves?.CanRedo == true,
         var command when command.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal) => IsDestinationCommandAvailable(command),
         "MoveToParentBook" => _model?.Operation.CanMoveToParentBook == true,
         "MoveToChildBook" => _model?.Operation.CanMoveToChildBook == true,
@@ -382,6 +383,7 @@ public sealed partial class MainWindow : Window
                 case "OpenContextMenu": OpenViewerContextMenu(); break;
                 case "MoveToFolderAs": case "CopyToFolderAs": await OpenDestinationMoveMenuAsync(name); break;
                 case "DeleteFile": await RunDestinationActionAsync(() => _model.Operation.DeleteFileAsync()); break;
+                case "RenameBook": await RunDestinationActionAsync(() => _model.Operation.RenameBookAsync()); break;
                 case var command when command.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal):
                     await OpenDestinationMoveMenuAsync(command); break;
                 case "UndoDestinationMove": case "RedoDestinationMove":
@@ -602,14 +604,14 @@ public sealed partial class MainWindow : Window
         }
     }
     /// <summary>小型命名对话框仅返回用户文本，业务校验由 Engine 完成。</summary>
-    private Task<string?> AskNameAsync(string title, string value)
+    private Task<string?> AskNameAsync(string title, string value, bool selectStem = false)
     {
         var input = new TextBox { Text = value }; var cancel = new Button { Content = "取消" }; var save = new Button { Content = "确定" };
         var dialog = new Window { Title = title, Width = 380, Height = 160, WindowStartupLocation = WindowStartupLocation.CenterOwner,
             Content = new StackPanel { Margin = new Thickness(16), Spacing = 12, Children = { input, new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 8, Children = { cancel, save } } } } };
         cancel.Click += (_, _) => dialog.Close(null); save.Click += (_, _) => { if (!string.IsNullOrWhiteSpace(input.Text)) dialog.Close(input.Text.Trim()); };
         input.KeyDown += (_, e) => { if (e.Key == Key.Enter && !string.IsNullOrWhiteSpace(input.Text)) { e.Handled = true; dialog.Close(input.Text.Trim()); } };
-        dialog.Opened += (_, _) => { input.Focus(); input.SelectAll(); };
+        dialog.Opened += (_, _) => { input.Focus(); input.SelectionStart = 0; input.SelectionEnd = selectStem ? System.IO.Path.GetFileNameWithoutExtension(value).Length : value.Length; };
         return dialog.ShowDialog<string?>(this);
     }
     /// <summary>范围明确的确认对话框，关闭或取消返回 false。</summary>
@@ -874,6 +876,7 @@ public sealed partial class MainWindow : Window
                 _model.Operation.Bookshelf.Changed -= FolderTree_PlaceChanged;
                 _model.Operation.PageEndDialogAsync = null;
                 _model.Operation.ConfirmDeleteAsync = null;
+                _model.Operation.AskBookNameAsync = null; _model.Operation.ConfirmBookRenameAsync = null; _model.Operation.RetryBookRenameAsync = null;
                 _model.HistoryRefreshed -= History_Refreshed;
                 _model.Operation.MarkersChanged -= Model_MarkersChanged;
                 if (_model.Operation.DestinationMoves is { } moves) { moves.StateChanged -= DestinationMove_Changed; moves.ConfirmOverwriteAsync = null; }

@@ -318,7 +318,7 @@
     "Text": "重命名书籍",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/RenameBookCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P4 当前目录/归档书籍重命名与明确路径联动已接入；设备/Windows待验",
     "MenuText": "重命名书籍（M）",
     "MouseGesture": ""
   },

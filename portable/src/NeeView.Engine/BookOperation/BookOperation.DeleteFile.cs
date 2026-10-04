@@ -11,7 +11,7 @@ public sealed partial class BookOperation
     /// <summary>沿原写权限开关，只开放已完成索引的普通真实图片；归档、书籍页及链接继续占位。</summary>
     public bool CanDeleteFile => !IsDeletingFile && CanDeleteFileCore();
     private bool CanDeleteFileCore() => Config.Current.System.IsFileWriteAccessEnabled && _filePlatform is not null
-        && !_disposed && !_closing && !IsLoading && Book?.IsIndexing == false && _destinationMoves?.IsBusy != true
+        && !IsRenamingBook && !_disposed && !_closing && !IsLoading && Book?.IsIndexing == false && _destinationMoves?.IsBusy != true
         && FileActionPage is { IsImage: true, ArchiveEntry.FilePath: not null, ArchiveEntry.IsShortcut: false } page
         && page.ArchiveEntry.Archive.IsDirectory;
 

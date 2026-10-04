@@ -17,7 +17,8 @@ public sealed partial class MacApp : Avalonia.Application
     private bool _shuttingDown;
     private Task? _openingWindow;
     private bool _explicitOpen;
-    private IFileOperationBackend? _fileOperations;
+    // 启动装配持有唯一具体后端，向各业务分别注入文件与重命名能力契约。
+    private FileOperationBackend? _fileOperations;
     private DestinationMoveService? _destinationMoves;
     /// <summary>加载转换的原主题资源和原生应用菜单。</summary>
     public override void Initialize()
@@ -87,6 +88,7 @@ public sealed partial class MacApp : Avalonia.Application
             var decoder = new MagickImageDecoder(); var operation = new BookOperation(new Backends.ArchiveFactory(), decoder, state);
             IReadOnlyList<string> recovery = [];
             if (_fileOperations is null) { _fileOperations = new FileOperationBackend(Path.Combine(directory, "FileRecovery")); recovery = await _fileOperations.RecoverAsync(); }
+            recovery = recovery.Concat(await state.RecoverBookRenameAsync(_fileOperations)).ToArray();
             _destinationMoves ??= new(_fileOperations);
             var images = new BitmapFactory(decoder); operation.AttachFileOperations(_destinationMoves, _fileOperations, images);
             var model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state);
