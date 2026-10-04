@@ -13,7 +13,7 @@ Engine.HistoryList 计算只读过滤列表、前后目标及日期分组名；S
 - OpenHistoryAsync 使用 KeepHistoryOrder/SkipSamePlace。当前书不重复加载；成功恢复原 Page 条目与 Props；失败保留旧书，目标仍可重试。PrevHistory/NextHistory 使用此过滤序列，不替代 PrevHistoryPage/NextHistoryPage 和 PrevBookHistory/NextBookHistory 的进程游标。
 - RemoveHistoryAsync 对选中路径精确比较，多选先复制批次；ClearHistoryAsync 清空全部访问条目，不受显示过滤限制。源图片、压缩包、书签、搜索历史和未知根字段保留。
 - 原集合的 Remove/Clear 与位置更新分离。适配中使用进程内登记抑制，防止当前书翻页、防抖、切书和退出保存把已移除历史加回；成功显式重新打开该路径开始新访问并解除抑制。首次打开尚无防抖记录时清空也适用。不新增删除恢复栈，不持久化抑制集合。
-- 启动/无窗口重开沿原 FirstLoader → BookHub 显式传入完整 LastBookV2，页位置、阅读设置与排序种子优先于缺失/过期的历史及普通字段恢复策略。共用原 Props 解析，独立保存 MacPagePart/MacIsSupportedWidePage 补值；自动恢复属于新访问，进程内抑制不跨启动保留。正式运行发现的“删除历史后重启落到首图”已修复，缺失/过期历史两项正式视图回归及最终 Mac 空历史重启通过。
+- 启动/无窗口重开沿原 FirstLoader → BookHub 显式传入完整 LastBookV2，页位置、阅读设置与排序种子优先于缺失/过期的历史及普通字段恢复策略。共用原 Props 解析，只保留 MacIsSupportedWidePage 补值；原条目不持久化半页，早期 MacPagePart 已在设备对照节点退役。自动恢复属于新访问，进程内抑制不跨启动保留。正式运行发现的“删除历史后重启落到首图”已修复，缺失/过期历史两项正式视图回归及最终 Mac 空历史重启通过。
 - 编辑与阅读保存共用 SaveData gate 和原三文件事务。准备/提交失败恢复 JSON、登记抑制和原展示状态；取消不提交。保存回报只通知导航表现，关闭期间拒绝界面动作/晚到菜单刷新，保存失败可重试。
 
 ## 原业务与表现适配

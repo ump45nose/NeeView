@@ -100,7 +100,7 @@ public sealed class BookshelfBookmarkTests
     {
         using var f = new Fixture(); var state = new SaveData(f.State); var token = TestContext.Current.CancellationToken; await state.LoadAsync(token);
         await using var op = f.Operation(state); await op.Bookshelf.SetPlaceAsync("bookmark:", token: token); int updates = 0; op.Bookshelf.Changed += (_, _) => updates++;
-        await state.SaveAsync(null, 0, token); Assert.Equal(0, updates);
+        await state.SaveAsync(null, token); Assert.Equal(0, updates);
         var node = await state.AddBookmarkFolderAsync(null, "New", token); Assert.Same(node, Assert.Single(op.Bookshelf.Items).Bookmark);
         op.Bookshelf.Select(op.Bookshelf.Items[0]); await op.Bookshelf.EnterAsync(token); await state.RemoveBookmarksAsync([node], token); Assert.Equal("bookmark:", op.Bookshelf.Place);
     }

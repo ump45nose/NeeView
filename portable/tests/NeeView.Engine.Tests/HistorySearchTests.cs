@@ -114,7 +114,7 @@ public sealed class HistorySearchTests
         Assert.Same(original, state.BookHistorySearchHistory); Assert.Equal(new[] { "新", "旧" }, original);
         await state.EditBookHistorySearchHistoryAsync("新", remove: true, token: TestContext.Current.CancellationToken); Assert.Equal(new[] { "旧" }, original);
         var reload = new SaveData(fixture.State); await reload.LoadAsync(TestContext.Current.CancellationToken); Assert.Equal(original, reload.BookHistorySearchHistory);
-        Config.Current.History.IsKeepSearchHistory = false; await state.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+        Config.Current.History.IsKeepSearchHistory = false; await state.SaveAsync(null, TestContext.Current.CancellationToken);
         var raw = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "History.json"), TestContext.Current.CancellationToken))!;
         Assert.Null(raw["BookHistorySearchHistory"]); Assert.Null(raw["BookmarkSearchHistory"]); Assert.Equal("书架未知", raw["BookshelfSearchHistory"]![0]!.GetValue<string>()); Assert.Equal(9, raw["Future"]!.GetValue<int>());
         Config.Current.System.SearchHistorySize = 0; await state.EditBookHistorySearchHistoryAsync("零容量", token: TestContext.Current.CancellationToken); Assert.Empty(original);

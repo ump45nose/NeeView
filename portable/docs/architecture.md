@@ -4,7 +4,7 @@ P0/P1 已建立工程骨架、原窗口区域和目录/图片/ZIP 阅读链路�
 
 ## 基线与技术栈
 
-共同基线 `686a43362dc4b3c9f2ea014240dbba2d0e9fbcaa`；分类分支 `801eab4842b9dbfc18eae7c96006f64eb7b80c30`、`84449934c86a2e7faba9a7c7a7d4ff9dfbea2229` 的真实合并为 `c5c398d89`。两条历史保留在 `integration/neeview-baseline`，本轮在 `feature/macos-port` 实施。Windows 构建未执行；已从用户实际安装的 dirty 包采集部分[动态参考](../acceptance/p2-windows-reference.md)，未证明该包与固定基线一致，也尚未完成 Mac 同步复演。
+共同基线 `686a43362dc4b3c9f2ea014240dbba2d0e9fbcaa`；分类分支 `801eab4842b9dbfc18eae7c96006f64eb7b80c30`、`84449934c86a2e7faba9a7c7a7d4ff9dfbea2229` 的真实合并为 `c5c398d89`。两条历史保留在 `integration/neeview-baseline`，本轮在 `feature/macos-port` 实施。Windows 构建未执行；已从用户实际安装的 dirty 包采集部分[动态参考](../acceptance/p2-windows-reference.md)，未证明该包与固定基线一致，已完成目录/CBZ 阅读和部分侧栏同夹具复演；差异修复、通过项与限制见[Mac 设备记录](../acceptance/p2-device-input-runtime.md)。
 
 C#/.NET 10、Avalonia 12.1.3、CommunityToolkit.Mvvm 8.4.2、Magick.NET Q8 14.17.2、SharpCompress 0.50.3。状态采用原 JSON，不增加 SQLite、Rust 或收费框架。NuGet 版本集中锁定，源码继续遵循仓库 MIT 许可。macOS API版本固定27.0，对应本机workload 27.0.10722，使正式Exe和Library编译检查使用同一NuGet锁图；这不改变最低macOS15要求。
 
@@ -49,7 +49,7 @@ Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚
 
 保存先准备四个临时文件，再保留副本和小型提交标记，原子替换各文件；失败恢复旧完整文件和历史内存状态，中断在下次启动恢复，兼容旧双/三文件标记。书签编辑原地回滚节点，保留选择及重试引用。阅读防抖一秒，切书和退出立即保存。关闭入口共享可等待任务，保存失败保持书籍/查看器并允许重试。非文件系统激活重建窗口时恢复最后书籍；明确打开文件优先于旧状态。该链路已在正式Mac应用中验证，见[运行记录](../acceptance/p1-macos-runtime.md)。
 
-原 Props 无法无歧义编码 IsWide=false，Mac 增加 `MacIsSupportedWidePage` 补值，并以 `MacPagePart` 保存半页；原 Props 解析算法保持。2026-10-04 Windows 样本重开分割图回到阅读方向的首半页；原 BookMemento 没有 Part，而 Mac 的 SaveData 独立读写该字段。这项恢复差异须在 Mac 同夹具中复核，不能列为原版一致性通过。P2 首批接入原 BookmarkNode 字段，第五批接入原集合算法与登记编辑；完整旧版本迁移、路径映射与 .nvzip 导入在 P5，当前不能宣称任意旧 Profile 可直接使用。
+原 Props 无法无歧义编码 IsWide=false，Mac 增加 `MacIsSupportedWidePage` 补值；原 Props 解析算法保持。2026-10-04 同夹具复演确认早期 `MacPagePart` 导致半页恢复与 Windows/原源码不同，已收回该扩展：Find/GetLastBook 直接返回原 BookMemento，SaveAsync 不接受半页参数；普通切书/启动按原条目名恢复到阅读方向首半页，当前阅读和反向页尾仍保留原 Part 算法。旧字段不读取，更新当前记录时移除，其他未知字段保持。同书 LastBookV2 的未知嵌套字段及 Props 继续保存，不跨书传递。P2 首批接入原 BookmarkNode 字段，第五批接入原集合算法与登记编辑；完整旧版本迁移、路径映射与 .nvzip 导入在 P5，当前不能宣称任意旧 Profile 可直接使用。
 
 ## 界面与迁移目标
 

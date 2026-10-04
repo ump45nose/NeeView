@@ -61,7 +61,7 @@ public sealed class HistoryPolicyTests
         Assert.False(File.Exists(Path.Combine(f.State, "History.json"))); Assert.Single(state.HistoryEntries);
         await state.AddBookmarkFolderAsync(null, "仍可保存", token); Assert.False(File.Exists(Path.Combine(f.State, "History.json")));
         await op.DisposeAsync(); var fresh = new SaveData(f.State); await fresh.LoadAsync(token); Assert.False(Config.Current.History.IsSaveHistory);
-        Assert.Empty(fresh.HistoryEntries); Assert.Equal("003.png", fresh.GetLastBook().Memento!.Page); Assert.Single(fresh.BookmarkRoot.Children!);
+        Assert.Empty(fresh.HistoryEntries); Assert.Equal("003.png", fresh.GetLastBook()!.Page); Assert.Single(fresh.BookmarkRoot.Children!);
         await using var restored = f.Operation(fresh); await restored.RestoreLastAsync(token); Assert.Equal(2, restored.Position.Index);
     }
     [Fact]

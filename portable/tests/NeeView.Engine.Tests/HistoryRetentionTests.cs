@@ -57,8 +57,8 @@ public sealed class HistoryRetentionTests
         var before = await ReadAsync(fixture, "History.json"); var state = new SaveData(fixture.State);
         await state.LoadAsync(TestContext.Current.CancellationToken);
         Assert.Equal(expected, state.HistoryEntries.Count); Assert.Equal(before, await ReadAsync(fixture, "History.json"));
-        Assert.Null(state.Find("/old.cbz").Memento); Assert.Single(state.BookHistorySearchHistory); Assert.Single(state.BookmarkSearchHistory);
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+        Assert.Null(state.Find("/old.cbz")); Assert.Single(state.BookHistorySearchHistory); Assert.Single(state.BookmarkSearchHistory);
+        await state.SaveAsync(null, TestContext.Current.CancellationToken);
         var history = JsonNode.Parse(await ReadAsync(fixture, "History.json"))!;
         Assert.Equal(expected, history["Items"]!.AsArray().Count); Assert.Equal("keep", history["FutureRoot"]!.GetValue<string>());
         if (expected > 0) Assert.Equal(99, history["Items"]![0]!["Future"]!.GetValue<int>());
@@ -73,14 +73,14 @@ public sealed class HistoryRetentionTests
     {
         using var fixture = new Fixture(); await SeedAsync(fixture, ("/new.cbz", 0), ("/middle.cbz", 1), ("/old.cbz", 2));
         var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken, historyLimits: (1, TimeSpan.Zero));
-        Assert.Equal(3, state.HistoryEntries.Count); Assert.NotNull(state.Find("/old.cbz").Memento);
+        await state.SaveAsync(null, TestContext.Current.CancellationToken, historyLimits: (1, TimeSpan.Zero));
+        Assert.Equal(3, state.HistoryEntries.Count); Assert.NotNull(state.Find("/old.cbz"));
         Assert.Single(JsonNode.Parse(await ReadAsync(fixture, "History.json"))!["Items"]!.AsArray());
         await state.EditBookHistorySearchHistoryAsync("latest", token: TestContext.Current.CancellationToken);
         await state.AddBookmarkFolderAsync(null, "folder", TestContext.Current.CancellationToken);
         Assert.Equal(3, state.HistoryEntries.Count); Assert.Single(JsonNode.Parse(await ReadAsync(fixture, "History.json"))!["Items"]!.AsArray());
         // 同进程放宽限制还能写出完整集合；重启后只拥有之前保存的有限历史。
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken, historyLimits: (-1, TimeSpan.Zero));
+        await state.SaveAsync(null, TestContext.Current.CancellationToken, historyLimits: (-1, TimeSpan.Zero));
         Assert.Equal(3, JsonNode.Parse(await ReadAsync(fixture, "History.json"))!["Items"]!.AsArray().Count);
     }
 
@@ -92,7 +92,7 @@ public sealed class HistoryRetentionTests
         var user = temporary + "-user/book.cbz";
         await SeedAsync(fixture, (Path.Combine(temporary, "cache", "temp.cbz"), 0), (temporary, 0), (user, 1), (fixture.Zip, 2));
         var state = new SaveData(fixture.State, temporary + Path.DirectorySeparatorChar); await state.LoadAsync(TestContext.Current.CancellationToken);
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken, historyLimits: (1, TimeSpan.Zero));
+        await state.SaveAsync(null, TestContext.Current.CancellationToken, historyLimits: (1, TimeSpan.Zero));
         Assert.Equal(4, state.HistoryEntries.Count); // 排除仅作用于文件副本，加载遵循原fromLoad算法。
         var saved = Assert.Single(JsonNode.Parse(await ReadAsync(fixture, "History.json"))!["Items"]!.AsArray());
         Assert.Equal(user, saved!["Path"]!.GetValue<string>());
@@ -104,17 +104,17 @@ public sealed class HistoryRetentionTests
     {
         using var fixture = new Fixture(); await SeedAsync(fixture, ("/new.cbz", 0), ("/old.cbz", 3));
         var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+        await state.SaveAsync(null, TestContext.Current.CancellationToken);
         var history = await ReadAsync(fixture, "History.json"); var settings = await ReadAsync(fixture, "UserSetting.json");
         var blocked = Path.Combine(fixture.State, "UserSetting.json.tmp"); Directory.CreateDirectory(blocked);
-        try { await Assert.ThrowsAnyAsync<Exception>(() => state.SaveAsync(null, 0, TestContext.Current.CancellationToken, historyLimits: (0, TimeSpan.FromDays(1)))); }
+        try { await Assert.ThrowsAnyAsync<Exception>(() => state.SaveAsync(null, TestContext.Current.CancellationToken, historyLimits: (0, TimeSpan.FromDays(1)))); }
         finally { Directory.Delete(blocked); }
         Assert.Equal(-1, Config.Current.History.LimitSize); Assert.Equal(TimeSpan.Zero, Config.Current.History.LimitSpan);
         Assert.Equal(2, state.HistoryEntries.Count); Assert.Equal(history, await ReadAsync(fixture, "History.json")); Assert.Equal(settings, await ReadAsync(fixture, "UserSetting.json"));
         using var cancelled = new CancellationTokenSource(); cancelled.Cancel();
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => state.SaveAsync(null, 0, cancelled.Token, historyLimits: (0, TimeSpan.Zero)));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => state.SaveAsync(null, cancelled.Token, historyLimits: (0, TimeSpan.Zero)));
         Assert.Equal(-1, Config.Current.History.LimitSize);
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken, historyLimits: (0, TimeSpan.Zero));
+        await state.SaveAsync(null, TestContext.Current.CancellationToken, historyLimits: (0, TimeSpan.Zero));
         Assert.Equal(0, Config.Current.History.LimitSize); Assert.Equal(2, state.HistoryEntries.Count);
         Assert.Empty(JsonNode.Parse(await ReadAsync(fixture, "History.json"))!["Items"]!.AsArray());
     }
@@ -132,7 +132,7 @@ public sealed class HistoryRetentionTests
         Assert.Empty(JsonNode.Parse(await ReadAsync(fixture, "History.json"))!["Items"]!.AsArray());
         await operation.SaveAsync((0, TimeSpan.Zero)); await operation.DisposeAsync();
         var fresh = new SaveData(fixture.State); await fresh.LoadAsync(TestContext.Current.CancellationToken);
-        Assert.Empty(fresh.HistoryEntries); Assert.Equal("004.png", fresh.GetLastBook().Memento!.Page);
+        Assert.Empty(fresh.HistoryEntries); Assert.Equal("004.png", fresh.GetLastBook()!.Page);
         await using var restored = fixture.Operation(fresh); await restored.RestoreLastAsync(TestContext.Current.CancellationToken);
         Assert.Equal(3, restored.Position.Index); Assert.Empty(fresh.HistoryEntries);
     }
@@ -189,7 +189,7 @@ public sealed class HistoryRetentionTests
             Assert.Equal(0, refreshes); Assert.Equal(2, state.HistoryEntries.Count);
             Assert.Equal(0, Config.Current.History.LimitSize); Assert.Equal(TimeSpan.FromDays(7), Config.Current.History.LimitSpan);
             var fresh = new SaveData(fixture.State); await fresh.LoadAsync(TestContext.Current.CancellationToken);
-            Assert.Empty(fresh.HistoryEntries); Assert.Equal("004.png", fresh.GetLastBook().Memento!.Page);
+            Assert.Empty(fresh.HistoryEntries); Assert.Equal("004.png", fresh.GetLastBook()!.Page);
         }
         finally { await window.PrepareShutdownAsync(); window.Close(); }
     }

@@ -69,7 +69,7 @@ public sealed class MouseInputTests
         Assert.Equal(.6, state.GetCommandParameter<ViewScrollCommandParameter>("ViewScrollDown").Scroll);
         state.SetCommandParameter("NextPage", new ReversibleCommandParameter { IsReverse = false });
         Assert.False(state.GetCommandParameter<ReversibleCommandParameter>("PrevPage").IsReverse);
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+        await state.SaveAsync(null, TestContext.Current.CancellationToken);
         var raw = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), TestContext.Current.CancellationToken))!;
         Assert.Null(raw["Commands"]!["ViewScrollRight"]); Assert.NotNull(raw["Commands"]!["ViewScrollUp"]);
     }
@@ -81,7 +81,7 @@ public sealed class MouseInputTests
         await File.WriteAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), """{"Config":{"Command":{"PresetInputScheme":1,"PresetPageReadOrder":1,"Future":9}},"Commands":{"NextPage":{"ShortCutKey":"Ctrl+Left","Parameter":{"Future":7}},"PrevScrollPage":{"ShortCutKey":""}}}""", TestContext.Current.CancellationToken);
         var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
         Assert.Equal("Ctrl+Left", state.GetShortcut("NextPage", "")); Assert.Equal("Left,WheelUp", state.GetShortcut("PrevPage", "")); Assert.Equal("", state.GetShortcut("PrevScrollPage", "WheelUp"));
-        state.SetShortcutDifference("NextPage", "Right,WheelDown", "Left,LeftClick"); await state.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+        state.SetShortcutDifference("NextPage", "Right,WheelDown", "Left,LeftClick"); await state.SaveAsync(null, TestContext.Current.CancellationToken);
         var raw = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), TestContext.Current.CancellationToken))!;
         Assert.Null(raw["Commands"]!["NextPage"]!["ShortCutKey"]); Assert.Equal(7, raw["Commands"]!["NextPage"]!["Parameter"]!["Future"]!.GetValue<int>()); Assert.Equal(9, raw["Config"]!["Command"]!["Future"]!.GetValue<int>());
         Assert.Equal(2, raw["Commands"]!.AsObject().Count);

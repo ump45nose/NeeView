@@ -193,7 +193,7 @@ public sealed class SelectionHistoryTests
         Config.Current.FilmStrip.ImageWidth = 128; Config.Current.FilmStrip.IsSelectedCenter = true;
         Config.Current.Slider.SliderDirection = SliderDirection.LeftToRight;
         state.SetCommandParameter("PrevSizePage", new MoveSizePageCommandParameter { Size = 2 });
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+        await state.SaveAsync(null, TestContext.Current.CancellationToken);
         var json = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), TestContext.Current.CancellationToken))!;
         Assert.Equal(7, json["Config"]!["FilmStrip"]!["Future"]!.GetValue<int>());
         Assert.Equal(8, json["Config"]!["Slider"]!["Future"]!.GetValue<int>());

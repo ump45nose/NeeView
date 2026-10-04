@@ -43,6 +43,6 @@ public sealed partial class BookOperation
         if (_disposed || _closing || IsLoading || Book is null) return;
         var book = Book; var memento = book.CreateMemento();
         memento.IsRecursiveFolder = !book.Setting.IsRecursiveFolder;
-        await OpenCoreAsync(book.Path, CancellationToken.None, entryName: string.IsNullOrEmpty(memento.Page) ? null : memento.Page, startupMemento: memento, startupPart: Position.Part);
+        await OpenCoreAsync(book.Path, CancellationToken.None, entryName: string.IsNullOrEmpty(memento.Page) ? null : memento.Page, startupMemento: memento);
     }
 }

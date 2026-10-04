@@ -1,0 +1,350 @@
+{
+  "date": "2026-10-04",
+  "scope": "Mac foreground directory/CBZ reading and docking replay; Retina precheck only",
+  "product_source_base_commit": "b52f4f7694024ea8c80e076a5fa7f8bc49d25aec",
+  "runtime_source_note": "The 372-test build was exercised interactively. Subsequent same-book unknown LastBookV2 fields preservation has automated coverage; final 375-test build runtime is separate.",
+  "raw_evidence_directory": "/Users/yuwk/.codex/artifacts/neeview/p2-device-20261004/evidence",
+  "original_capture_directory": "/var/folders/py/gj39wxxn3fz1r3dgt15zrh3m0000gn/T/neeview-device-preflight-2dix0xte/evidence",
+  "raw_images_committed": false,
+  "archive_verified": true,
+  "windows_reference_manifest": "p2-windows-evidence.json",
+  "windows_archived_image_count": 34,
+  "private_windows_inventory_archived": false,
+  "format_note": "CUA JPEG captures establish visible states, not lossless device pixel mapping. Paths and desktop UI require review before external publication.",
+  "headless_artifacts_directory": "/Users/yuwk/.codex/artifacts/neeview/p2-device-20261004/headless",
+  "headless_artifact_note": "27 regenerated PNGs and 3 metrics/command JSONs kept locally; earlier committed stage artifacts remain unchanged. Validation steps and counters are versioned separately.",
+  "profile_restoration": {
+    "status": "restored-and-sha256-verified",
+    "file_count": 4,
+    "backup_verified": true,
+    "test_profile_preserved": true,
+    "app_stopped_before_restore": true,
+    "report": "/Users/yuwk/.codex/artifacts/neeview/p2-device-20261004/evidence/mac-profile-restoration.json"
+  },
+  "files": [
+    {
+      "file": "mac-before-restart-combined-and-half003L.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 303697,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "7908f610129b060486c787c7ea41aad12f16f4662e203308c3c231484787dc3f"
+    },
+    {
+      "file": "mac-cbz-double-rtl-001.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 289660,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "c73383cab2f9f08d8503c4d424554515aa6644161def564281ab0cac028771f1"
+    },
+    {
+      "file": "mac-cbz-new-book-defaults.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 279754,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "c52470b0527c94076f95de802ee4e73e6f011fa0d17bd684b8d371ea23629c85"
+    },
+    {
+      "file": "mac-cbz-one-step-002.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 286289,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "1904be25fa62ac5c5be8d5076b0fc8553db40bb149f403f74b6f020d8caf4abe"
+    },
+    {
+      "file": "mac-cbz-wide-003.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 279852,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "8c8bcc3913626ca7734619f68919a5df7ed644a64094a0f629c749eeaab2f070"
+    },
+    {
+      "file": "mac-dock-cross-side-horizontal.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 884134,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "5e5537f3d5bccc1926aaf99284ff054f1ac51f638c660b094a0385141f451a87"
+    },
+    {
+      "file": "mac-dock-cross-side-vertical.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 291297,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "d2ab1fdebfe946fde8cac2e7f46ee7a902d97ba2d3872b7da5ac9507e8036feb"
+    },
+    {
+      "file": "mac-dock-leader-moves-whole-group.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 828354,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "5bb3b720f804a3f96686f401872629f89a5834732942f30e49ccf810e469fb33"
+    },
+    {
+      "file": "mac-dock-member-split-to-left-rail.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 817051,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "63251e1272c4bd1e3c35b1c1fa0506e0dcdfca302a4d67a4f814e11cc4498294"
+    },
+    {
+      "file": "mac-dock-ratio.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 294624,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "c3b2ac7f6883034cbe967883a791002b80887fcec39139598b905190bc58b778"
+    },
+    {
+      "file": "mac-explicit-image-followup-002.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 283757,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "6ebb80a453a463b1416114e68db5fa9600df7085dc6affdb7fa5a93edebc5c4e"
+    },
+    {
+      "file": "mac-explicit-image-resets-reading-options.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 275382,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "cdb21d953d8099554a3253ee41d7ccadd1ed56d65bfd0a44d065917dc8464a2d"
+    },
+    {
+      "file": "mac-half-page-before-switch-fixed-003L.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 281369,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "c3f6114147c312b44ee15093c5f29065fd78e8b593640a721db8d589236e1370"
+    },
+    {
+      "file": "mac-input-ltr-ctrl-right-last009.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 290536,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "b2c74b6a5d1441b5dd4b4a197d27fb3339190068d6993b597c84a01b8fbc8c6a"
+    },
+    {
+      "file": "mac-reading-cover-001.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 282908,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "b978ed43713471b2d54656f38b45defea09c0ae66ec5ad7793e7305f214baada"
+    },
+    {
+      "file": "mac-reading-double-ltr-004.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 304931,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "0d9c16663791b88f4ff5a12630f7f435623e569a241730ca00c7aa67baeb7862"
+    },
+    {
+      "file": "mac-reading-double-one-step-002.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 286514,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "628981c4dc7bc132d42c60b117a6338671cbb617753e1f92c5732808622d7ccb"
+    },
+    {
+      "file": "mac-reading-double-rtl-001-fixed.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 289760,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "099b556d99c20ed59cf35d5893e3e603bbc99239c050e89ffc9207023c2005fd"
+    },
+    {
+      "file": "mac-reading-double-rtl-001.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 289474,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "3a6ee4a7981f33853e2c7112e08e1d755c776d8ccf3171e216073426a5fa29b3"
+    },
+    {
+      "file": "mac-reading-double-rtl-004.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 304598,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "8531de2f9c20a10091523557587d7e3790d1ac7b8e7a61fab5bd0f5b5cec4b79"
+    },
+    {
+      "file": "mac-reading-double-wide-003.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 279875,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "7953ca943f0e515d6d98dfa8a5081c0372166a50397481644adca34aeacbe3a7"
+    },
+    {
+      "file": "mac-reading-last-008-isolated.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 279324,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "5b23105a5704fe0b6cae6b510e87384998b8b95a5749b6d83aa7515f3528fc9b"
+    },
+    {
+      "file": "mac-reading-last-pair-008.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 285900,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "c033c40d91d90d352787d7d32fd3b9410732cfcb68011f35577e4292c2fd07ff"
+    },
+    {
+      "file": "mac-reading-last-single-009.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 290539,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "f84d717ef5465bbe9b5fd4071af9da74950b962cd8cba17ca8bdc390a4992026"
+    },
+    {
+      "file": "mac-reading-single-001.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 294182,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "fa459700a0785c3090fba430b413e40bccba96c4fb762208987077b9affab5b2"
+    },
+    {
+      "file": "mac-reading-split-ltr-003L.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 280959,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "27c4b0678d4f4bbe8b2d06fd5de8fb8c6dc90428ae19f1b10eb0649061b07117"
+    },
+    {
+      "file": "mac-reading-split-ltr-003R.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 278589,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "415ce363bd4c16c37f8f8fe3b33288eca29398759be2afc84bfd94deb749e438"
+    },
+    {
+      "file": "mac-reading-split-rtl-003L.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 281019,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "ad29233c5e63083e17c9e8141e4c1bbd5bd6f5ca185c198de214686423673f1d"
+    },
+    {
+      "file": "mac-reading-split-rtl-003R.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 278639,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "d9e073431bc6f720f17433aabcaca66adf2a6d835776efd26120906784d3e637"
+    },
+    {
+      "file": "mac-restart-combined-ratio-and-half003R.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 291752,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "1a7581c4b5c0a6b986c2bfe0bc86d40fd7ef3cd978df82535715f3c9edb6417f"
+    },
+    {
+      "file": "mac-restart-half-page-fixed-003R.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 270057,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "a0b2739f1a431dd45d4646c3d23f54528a80428d1ec572eafd3b6233606bc8eb"
+    },
+    {
+      "file": "mac-retina-100-checker-1px.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 222400,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "9aecc75b9dc5d0294994cc49b3aab5d0e05a999c1c98ab224ac9e0f978a69798"
+    },
+    {
+      "file": "mac-retina-100-checker-8px.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 458225,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "a859a332fdadfb95620f95b04140d3b456f8c8ded7845cc35c8633b4369c6c37"
+    },
+    {
+      "file": "mac-retina-fit-checker-8px.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 839649,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "ba3604a379a1092b9c0bc97134f1417368e09aaad482fd98790c52a1f3ff9c74"
+    },
+    {
+      "file": "mac-switch-back-half-page-before-fix.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 274709,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "673f7e378c69ea0df24a557fe1b9346725f3aa78ecceb45eeb3f14f9906bb08a"
+    },
+    {
+      "file": "mac-switch-back-half-page-fixed-003R.jpg",
+      "media_type": "image/jpeg",
+      "bytes": 272157,
+      "width": 2400,
+      "height": 1664,
+      "sha256": "95318a1a88badb65241128e722b37590124917dcdbc06ff1a783595e16743fbe"
+    }
+  ],
+  "final_automated_build": {
+    "test_total": 375,
+    "runtime_replayed": false,
+    "executable_sha256": "e6954d7a5900d17eb09f5e261d5c8e29216187c5721a63a2a3ab257f64b0af31",
+    "source_files": {
+      "portable/src/NeeView.Engine/SaveData/SaveData.cs": "45a2be04c278be13cc6ec0955277051a821420850b77056262e44c18f60a5f4c",
+      "portable/src/NeeView.Engine/BookOperation/BookOperation.cs": "f1b75c76c308f1739f90e798e44dea56a9eb39d5abc5845e1893b4b4a8c14e7c",
+      "portable/src/NeeView.Engine/BookOperation/BookOperation.Controls.cs": "84e0e924cfee20ffdd886a29c2a97a5cc0fabe9feb9b7ae32c21f679dab677aa",
+      "portable/src/NeeView.Engine/BookOperation/BookOperation.Hierarchy.cs": "0c6a3252bc1ac9087caeb7efbc57de6b3dd541878864b3311eb2a1fffb1331ca",
+      "portable/src/NeeView.MacOS/Views/KeyboardGestureParser.cs": "d7cf83a386faa0124133345e45395a339304dc554738e09606d602c0b939915b",
+      "portable/src/NeeView.MacOS/Views/MainWindow.axaml.cs": "e68d73dee017c7561aab4ce47b5481b5bd4790cf3dee97440206291164632726",
+      "portable/src/NeeView.MacOS/Views/MenuPresenter.cs": "947b60f4f3fd535cd88c97362892880c616e5e912a97bf599ebe1c6b685e6b92"
+    }
+  },
+  "retina_precheck": {
+    "cua_window_capture_pixels": [
+      2400,
+      1664
+    ],
+    "observed_100_percent_image_extent": "approximately 800x600 capture pixels; JPEG boundary affected by compression",
+    "actual_avalonia_RenderScaling_observed": false,
+    "lossless_capture_obtained": false,
+    "post_session_system_profiler": {
+      "device": "Apple M1 Pro / internal Color LCD",
+      "reported_mode_pixels": "2992 x 1934",
+      "reported_ui_resolution": "1496 x 967 @ 120.00Hz",
+      "panel_native_pixels": "3456x2234 Retina",
+      "scope": "read after app stopped; cannot infer actual application render scale or certify earlier screenshot pipeline"
+    }
+  },
+  "observation_only_files": [
+    "mac-switch-back-half-page-before-fix.jpg",
+    "mac-explicit-image-resets-reading-options.jpg",
+    "mac-explicit-image-followup-002.jpg",
+    "mac-input-ltr-ctrl-right-last009.jpg"
+  ]
+}

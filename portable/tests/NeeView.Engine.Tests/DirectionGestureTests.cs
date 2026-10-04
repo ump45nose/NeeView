@@ -38,10 +38,10 @@ public sealed class DirectionGestureTests
         Assert.Equal("R", state.GetMouseGesture("NextPage", "").ToString());
         state.SetCommandParameter("NextPage", new ReversibleCommandParameter { IsReverse = false });
         state.SetMouseGestureDifference("NextPage", "LC", "L"); state.SetMouseGestureDifference("PrevPage", "", "R");
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+        await state.SaveAsync(null, TestContext.Current.CancellationToken);
         var fresh = new SaveData(fixture.State); await fresh.LoadAsync(TestContext.Current.CancellationToken);
         Assert.Equal("LC", fresh.GetMouseGesture("NextPage", "L").ToString()); Assert.True(fresh.GetMouseGesture("PrevPage", "R").IsEmpty);
-        fresh.SetMouseGestureDifference("NextPage", "R", "L"); await fresh.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+        fresh.SetMouseGestureDifference("NextPage", "R", "L"); await fresh.SaveAsync(null, TestContext.Current.CancellationToken);
         var json = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), TestContext.Current.CancellationToken))!;
         Assert.Null(json["Commands"]!["NextPage"]!["MouseGesture"]); Assert.False(json["Commands"]!["PrevPage"]!["Parameter"]!["IsReverse"]!.GetValue<bool>());
     }

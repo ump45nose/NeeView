@@ -31,6 +31,65 @@ public static class TestAvaloniaBuilder
 }
 public sealed class UiTests
 {
+    /// <summary>数字与原修饰键别名的提示和输入必须一致；特殊键继续沿框架解析。</summary>
+    [Theory]
+    [InlineData("0", Avalonia.Input.Key.D0, Avalonia.Input.KeyModifiers.None)]
+    [InlineData("9", Avalonia.Input.Key.D9, Avalonia.Input.KeyModifiers.None)]
+    [InlineData("Command+1", Avalonia.Input.Key.D1, Avalonia.Input.KeyModifiers.Meta)]
+    [InlineData("Control+Shift+2", Avalonia.Input.Key.D2, Avalonia.Input.KeyModifiers.Control | Avalonia.Input.KeyModifiers.Shift)]
+    [InlineData("Alt+Return", Avalonia.Input.Key.Return, Avalonia.Input.KeyModifiers.Alt)]
+    [InlineData("Left", Avalonia.Input.Key.Left, Avalonia.Input.KeyModifiers.None)]
+    [InlineData("Escape", Avalonia.Input.Key.Escape, Avalonia.Input.KeyModifiers.None)]
+    [InlineData("F11", Avalonia.Input.Key.F11, Avalonia.Input.KeyModifiers.None)]
+    public void KeyboardHintsPreserveOriginalKeyNames(string value, Avalonia.Input.Key key, Avalonia.Input.KeyModifiers modifiers)
+    {
+        var gesture = KeyboardGestureParser.TryParse(value); Assert.NotNull(gesture);
+        Assert.Equal(key, gesture.Key); Assert.Equal(modifiers, gesture.KeyModifiers);
+        Assert.True(MainWindow.MatchKey(value, new Avalonia.Input.KeyEventArgs { Key = key, KeyModifiers = modifiers }));
+    }
+
+    /// <summary>鼠标绑定及无效键位保留在原配置中，但不能冒充键盘提示或触发输入。</summary>
+    [Theory]
+    [InlineData("")]
+    [InlineData("WheelUp")]
+    [InlineData("LeftClick")]
+    [InlineData("UnknownKey")]
+    public void NonKeyboardBindingsHaveNoKeyboardHint(string value)
+    {
+        Assert.Null(KeyboardGestureParser.TryParse(value));
+        Assert.False(MainWindow.MatchKey(value, new Avalonia.Input.KeyEventArgs { Key = Avalonia.Input.Key.None }));
+    }
+
+    /// <summary>真实菜单提示必须显示原 Ctrl+1/2；对应输入执行单双页，Back 不能冒充数字键。</summary>
+    [AvaloniaFact]
+    public async Task NumericMenuHintsMatchReaderKeyboardCommands()
+    {
+        using var fixture = new Fixture(); var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
+        var operation = fixture.Operation(state); var images = new BitmapFactory(new NeeView.Backends.MagickImageDecoder());
+        var window = new MainWindow(); window.Bind(new(operation, new CommandTable(operation), state), images, new TestPlatform()); window.Show();
+        try
+        {
+            await window.OpenAsync(fixture.Images); window.UpdateLayout();
+            var pageMenu = (MenuItem)window.FindControl<Menu>("MenuBar")!.Items[4]!;
+            var single = pageMenu.Items.OfType<MenuItem>().Single(i => i.Tag as string == "SetPageModeOne");
+            var dual = pageMenu.Items.OfType<MenuItem>().Single(i => i.Tag as string == "SetPageModeTwo");
+            Assert.Equal(Avalonia.Input.Key.D1, single.InputGesture!.Key);
+            Assert.Equal(Avalonia.Input.Key.D2, dual.InputGesture!.Key);
+            Assert.Equal(Avalonia.Input.KeyModifiers.Control, dual.InputGesture.KeyModifiers);
+            Assert.False(dual.InputGesture.Matches(new Avalonia.Input.KeyEventArgs { Key = Avalonia.Input.Key.Back, KeyModifiers = Avalonia.Input.KeyModifiers.Control }));
+            Assert.True(MainWindow.MatchKey("Control+2", new Avalonia.Input.KeyEventArgs { Key = dual.InputGesture.Key, KeyModifiers = dual.InputGesture.KeyModifiers }));
+            window.Viewer.Focus();
+            window.KeyPress(Avalonia.Input.Key.D2, Avalonia.Input.RawInputModifiers.Control, Avalonia.Input.PhysicalKey.Digit2, null);
+            window.KeyRelease(Avalonia.Input.Key.D2, Avalonia.Input.RawInputModifiers.Control, Avalonia.Input.PhysicalKey.Digit2, null);
+            for (int i = 0; i < 30 && operation.Book!.Setting.PageMode != PageMode.WidePage; i++) await Task.Delay(20, TestContext.Current.CancellationToken);
+            Assert.Equal(PageMode.WidePage, operation.Book!.Setting.PageMode); Assert.True(dual.IsChecked);
+            // 菜单自身的执行入口也必须保留，不仅验证底层 CommandTable。
+            single.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(MenuItem.ClickEvent));
+            for (int i = 0; i < 30 && operation.Book.Setting.PageMode != PageMode.SinglePage; i++) await Task.Delay(20, TestContext.Current.CancellationToken);
+            Assert.Equal(PageMode.SinglePage, operation.Book.Setting.PageMode); Assert.True(single.IsChecked);
+        }
+        finally { await window.PrepareShutdownAsync(); window.Close(); }
+    }
     /// <summary>菜单保留原未实现能力；历史、书签和可见缩略图进入真实链路。</summary>
     [AvaloniaFact]
     public async Task CompleteMenusAndNavigationUseOriginalBook()

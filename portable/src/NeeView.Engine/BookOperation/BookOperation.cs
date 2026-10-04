@@ -50,13 +50,12 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     {
         var last = saveData.GetLastBook();
         if (saveData.LastBookPath is { } path)
-            await OpenCoreAsync(path, token, startupMemento: last.Memento, startupPart: last.Part);
+            await OpenCoreAsync(path, token, startupMemento: last);
     }
 
     /// <summary>共享原加载链；历史重放可指定条目并保留访问顺序，返回是否实际提交新书。</summary>
     /// <param name="startupMemento">原 FirstLoader 的显式启动快照，优先于历史和字段恢复策略。</param>
-    /// <param name="startupPart">启动快照中的 Mac 分割位置。</param>
-    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, int startupPart = 0, Playlist? expectedPlaylist = null, int? terminalDirection = null)
+    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, Playlist? expectedPlaylist = null, int? terminalDirection = null)
     {
         ObjectDisposedException.ThrowIf(_disposed || _closing, this);
         var generation = Interlocked.Increment(ref _generation);
@@ -72,13 +71,13 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             // 原BookHub锁定允许同地址重载；由来源解析实际书籍地址，不能按图片路径猜测。
             if (IsBookLocked && Book is { } locked && locked.Path != source.Path) return false;
             // 原 BookHub.LoadMainAsync 优先使用显式 BookMemento；只在普通打开时按字段混合历史。
-            var restored = startupMemento?.Path == source.Path ? (Memento: startupMemento, Part: startupPart) : saveData.Find(source.Path);
+            var restored = startupMemento?.Path == source.Path ? startupMemento : saveData.Find(source.Path);
             var setting = startupMemento?.Path == source.Path ? startupMemento.ToBookSetting()
-                : Config.Current.BookSettingPolicy.Mix(Config.Current.BookSettingDefault, Config.Current.BookSetting, restored.Memento?.ToBookSetting(), false);
+                : Config.Current.BookSettingPolicy.Mix(Config.Current.BookSettingDefault, Config.Current.BookSetting, restored?.ToBookSetting(), false);
             collection = new(source, archives, setting.IsRecursiveFolder);
             var pages = await BookSourceFactory.CreatePageCollectionAsync(collection, Config.Current.System.BookPageCollectMode, archives, opening.Token, saveData.FolderConfigs);
-            var book = new Book(source, pages, setting) { Entries = collection, IsNew = restored.Memento is null };
-            book.SortSeed = restored.Memento?.SortSeed ?? 0; book.Sort(opening.Token);
+            var book = new Book(source, pages, setting) { Entries = collection, IsNew = restored is null };
+            book.SortSeed = restored?.SortSeed ?? 0; book.Sort(opening.Token);
             var explicitEntry = entryName ?? source.RequestedEntryName;
             var requested = explicitEntry ?? (ImageFormats.IsImage(path) ? System.IO.Path.GetFileName(path) : setting.Page);
             int index = book.Pages.FindIndex(e => e.EntryName == requested);
@@ -97,7 +96,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             {
                 opening.Token.ThrowIfCancellationRequested();
                 if (_disposed || _closing || generation != _generation || IsBookLocked && Book is { } currentLocked && currentLocked.Path != book.Path || expectedPlaylist is not null && !ReferenceEquals(expectedPlaylist, _playlistHub?.Current)) return false;
-                await saveData.SaveAsync(Book, Position.Part, opening.Token, _keepHistoryOrder || keepHistoryOrder);
+                await saveData.SaveAsync(Book, opening.Token, _keepHistoryOrder || keepHistoryOrder);
                 var old = Book;
                 // 与 Remove/Clear 串行提交：取消的打开不能解除抑制，新书提交后清空仍作用于新书。
                 if (!await saveData.BeginHistoryVisitAsync(book, () =>
@@ -106,7 +105,8 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                     if (_disposed || _closing || generation != _generation || IsBookLocked && Book is { } commitLocked && commitLocked.Path != book.Path || expectedPlaylist is not null && !ReferenceEquals(expectedPlaylist, _playlistHub?.Current)) return false;
                     Book = book; source = null; collection = null; _keepHistoryOrder = keepHistoryOrder;
                     Config.Current.BookSetting = setting; Context = new(setting, Config.Current);
-                    Position = new(index, terminalDirection is not null ? terminalDirection < 0 ? 1 : 0 : explicitEntry is not null || ImageFormats.IsImage(path) ? 0 : Math.Clamp(restored.Part, 0, 1));
+                    // 原 BookMemento 没有 Part；普通打开/启动从首半页开始，反向页尾进入末半页。
+                    Position = new(index, terminalDirection < 0 ? 1 : 0);
                     RebuildFrame(terminalDirection < 0 ? -1 : 1); return true;
                 })) return false;
                 if (old is not null) await old.DisposeAsync();
@@ -361,15 +361,15 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         Context.CanvasSize = size; Context.DeviceScale = Math.Max(1, scale); RebuildFrame(MoveDirection, false);
     }
     /// <summary>立即保存，用于切书和正常退出。</summary>
-    public Task SaveAsync() => saveData.SaveAsync(Book, Position.Part, keepHistoryOrder: _keepHistoryOrder);
+    public Task SaveAsync() => saveData.SaveAsync(Book, keepHistoryOrder: _keepHistoryOrder);
     /// <summary>仅保存配置/集合现状，不以外观切换重新登记阅读访问；阅读防抖与退出仍保存Book。</summary>
-    public Task SaveConfigurationAsync() => saveData.SaveAsync(null, 0);
+    public Task SaveConfigurationAsync() => saveData.SaveAsync(null);
 
     /// <summary>保存设置表单的历史限制副本；不改阅读规则或重建帧，成功后才应用配置。</summary>
     /// <param name="historyLimits">原数量及期限；保留当前书与LastBook启动快照。</param>
     /// <returns>唯一SaveData事务的完成或失败。</returns>
     public Task SaveAsync((int Size, TimeSpan Span) historyLimits) =>
-        saveData.SaveAsync(Book, Position.Part, keepHistoryOrder: _keepHistoryOrder, historyLimits: historyLimits);
+        saveData.SaveAsync(Book, keepHistoryOrder: _keepHistoryOrder, historyLimits: historyLimits);
 
     /// <summary>设置表单在原导航锁内应用/保存；失败恢复已知字段及命令，保持原对象引用。</summary>
     /// <param name="apply">同步应用经过验证的表单草稿，不能嵌套调用导航入口。</param>
@@ -468,7 +468,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>观察后台保存错误，不产生未观察任务异常。</summary>
     private async Task SaveLaterAsync(CancellationTokenSource pending)
     {
-        try { await Task.Delay(1000, pending.Token); await saveData.SaveAsync(Book, Position.Part, pending.Token, _keepHistoryOrder); }
+        try { await Task.Delay(1000, pending.Token); await saveData.SaveAsync(Book, pending.Token, _keepHistoryOrder); }
         catch (OperationCanceledException) { }
         catch (Exception ex) { Error = "保存失败：" + ex.Message; Notify(); }
         finally { if (ReferenceEquals(_saving, pending)) _saving = null; pending.Dispose(); }

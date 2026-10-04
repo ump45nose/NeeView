@@ -1,10 +1,16 @@
 {
   "date": "2026-10-04",
-  "phase": "p2-device-preparation-and-windows-reference",
+  "phase": "p2-device-preparation-and-dynamic-replay",
   "product_source_commit": "402cdfb02",
   "fixture_preflight": {
     "png_count": 24,
-    "verified": ["sha256", "png_chunk_crc", "png_dimensions", "inflated_row_lengths", "cbz_entries_match_png"],
+    "verified": [
+      "sha256",
+      "png_chunk_crc",
+      "png_dimensions",
+      "inflated_row_lengths",
+      "cbz_entries_match_png"
+    ],
     "cbz_count": 2,
     "existing_output_refused": true,
     "dataset_scope": "synthetic correctness, device pixel mapping and memory workload; not photo or screen performance evidence"
@@ -12,7 +18,11 @@
   "sampler_preflight": {
     "subject": "temporary Python process created for this check",
     "sample_rows": 5,
-    "metrics": ["rss_bytes", "cpu_percent", "open_file_descriptors"],
+    "metrics": [
+      "rss_bytes",
+      "cpu_percent",
+      "open_file_descriptors"
+    ],
     "existing_csv_refused": true,
     "subject_stopped_after_check": true,
     "limits": "No sustained NeeView browsing; no managed/native allocation breakdown or internal cache observation"
@@ -31,17 +41,19 @@
     "windows_isolated_neeview_started": true,
     "windows_isolated_processes_normally_closed": true,
     "windows_original_process_retained": true,
-    "mac_neeview_started": false,
+    "mac_neeview_started": true,
     "system_input_sent": true,
     "windows_original_profile_intentionally_read_or_modified": false,
     "windows_test_profile_read_and_written": true,
-    "mac_profile_replaced": false,
+    "mac_profile_replaced": true,
     "input_focus_limit": "one startup focus race; cannot prove which instance received mistimed text; no intentional test-book open in original instance",
     "trackpad": "not_executed",
-    "retina": "not_executed",
-    "windows_dynamic": "reference_samples_captured; mac_replay_pending",
+    "retina": "100_percent_vs_fit_JPEG_size_precheck_only; actual_RenderScaling_and_lossless_mapping_pending",
+    "windows_dynamic": "reference_captured; mac_directory_cbz_and_partial_docking_replay_completed; fixed_baseline_match_unverified",
     "long_term_memory": "not_executed",
-    "multi_display": "no_environment"
+    "multi_display": "no_environment",
+    "mac_profile_restored_and_sha256_verified": true,
+    "mac_process_normally_closed": true
   },
   "windows_reference_evidence": {
     "record": "p2-windows-reference.md",
@@ -50,17 +62,63 @@
     "screenshot_format": "JPEG bytes retained under original .png filenames; not lossless pixel-mapping evidence",
     "fixture_zip_sha256": "22c41948935d14623f56fc5b9358374141d474f8425b3238fa67286974728cc6",
     "fixture_transfer_verified": "zip_and_24_png_sha256_match",
-    "captured": ["directory_and_cbz_paging", "wide_and_split_pages", "first_and_last_single", "read_direction", "book_switch_and_explicit_directory_reopen", "cross_side_vertical_and_horizontal_groups", "member_float_and_redock", "ratio_change", "right_autohide_and_reopen"],
-    "not_captured": ["sorting", "full_history_and_bookmark_navigation", "grouped_layout_restart", "all_focus_and_popup_hiding_conditions", "real_keyboard_bindings"],
+    "captured": [
+      "directory_and_cbz_paging",
+      "wide_and_split_pages",
+      "first_and_last_single",
+      "read_direction",
+      "book_switch_and_explicit_directory_reopen",
+      "cross_side_vertical_and_horizontal_groups",
+      "member_float_and_redock",
+      "ratio_change",
+      "right_autohide_and_reopen"
+    ],
+    "not_captured": [
+      "sorting",
+      "full_history_and_bookmark_navigation",
+      "grouped_layout_restart",
+      "all_focus_and_popup_hiding_conditions",
+      "real_keyboard_bindings"
+    ],
     "rdp_reported_window_dpi": 96,
-    "rdp_api_reported_primary_bounds": { "width": 1496, "height": 939 },
-    "client_screenshot_pixels": { "width": 2578, "height": 1682 },
+    "rdp_api_reported_primary_bounds": {
+      "width": 1496,
+      "height": 939
+    },
+    "client_screenshot_pixels": {
+      "width": 2578,
+      "height": 1682
+    },
     "display_limits": "RDP APIs may be DPI virtualized; no physical display or frame performance evidence",
-    "split_persistence_difference": "Mac writes and reads MacPagePart; original BookMemento saves entry name; dynamic Mac replay pending",
+    "split_persistence_difference": "Confirmed on Mac: MacPagePart restored second half unlike original entry-only memento. Extension retired; switch/restart first-half replay passed.",
     "keyboard_mode_restore": "ScanCode selection sent; current mode unverified after screenshot failure and CUA timeout",
     "ui_tool_state": "two consecutive timeouts; explicit reset and targeted Windows App binding recovered AX and screenshot; RDP desktop still available"
   },
-  "product_build_and_tests": "not_repeated; no product source changes",
+  "product_build_and_tests": "final_375_passed_zero_failed_skipped; Engine_library_formal_arm64_app_and_local_strict_signing_passed",
   "push_or_release": "not_performed",
-  "p2_acceptance_sealed": false
+  "p2_acceptance_sealed": false,
+  "mac_replay_evidence": {
+    "record": "p2-device-input-runtime.md",
+    "manifest": "p2-macos-device-evidence.json",
+    "screenshot_count": 36,
+    "runtime_test_build": "372-test build; final JSON unknown-field change verified by 375-test build, not re-run interactively",
+    "passed": [
+      "directory_cbz_numbered_paging",
+      "read_direction_and_split_halves",
+      "first_last_wide_rules",
+      "entry_only_restore_after_switch_and_restart",
+      "vertical_horizontal_docking",
+      "member_split",
+      "whole_group_move",
+      "ratio_and_grouped_restart"
+    ],
+    "pending": [
+      "real_trackpad",
+      "lossless_retina_and_runtime_scaling",
+      "long_term_browsing",
+      "mac_popup_floating_autohide_replay",
+      "full_history_bookmark_sorting_comparison"
+    ],
+    "profile_files_restored_and_verified": 4
+  }
 }

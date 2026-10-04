@@ -149,7 +149,7 @@ public sealed class BookshelfNavigationTests
         await File.WriteAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), """{"Config":{"Bookshelf":{"DefaultFolderOrder":7,"FolderSortOrder":2,"Future":42},"Book":{"IsPrioritizeBookMove":true}}} """, TestContext.Current.CancellationToken);
         var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
         Assert.Equal(FolderOrder.TimeStampDescending, Config.Current.Bookshelf.DefaultFolderOrder); Assert.True(Config.Current.Book.IsPrioritizeBookMove);
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken); var json = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), TestContext.Current.CancellationToken))!;
+        await state.SaveAsync(null, TestContext.Current.CancellationToken); var json = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), TestContext.Current.CancellationToken))!;
         Assert.Equal(42, json["Config"]!["Bookshelf"]!["Future"]!.GetValue<int>());
         var fresh = new SaveData(fixture.State); await fresh.LoadAsync(TestContext.Current.CancellationToken);
         Assert.Equal(FolderSortOrder.Last, Config.Current.Bookshelf.FolderSortOrder);

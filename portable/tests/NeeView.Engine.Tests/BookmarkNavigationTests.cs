@@ -95,7 +95,7 @@ public sealed class BookmarkNavigationTests
         var list = new BookmarkFolderList(state.Bookmarks); Assert.Equal(FolderOrder.FileName, list.FolderOrder); Assert.NotNull(list.CapabilityMessage);
         Assert.Throws<NotSupportedException>(() => list.ChangeOrder(FolderOrder.Size)); Assert.Equal(FolderOrder.TimeStamp, Config.Current.Bookmark.BookmarkFolderOrder);
         Assert.True(Config.Current.Bookmark.IsFolderTreeVisible); Assert.False(Config.Current.Bookmark.IsVisibleItemsCount);
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+        await state.SaveAsync(null, TestContext.Current.CancellationToken);
         var json = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), TestContext.Current.CancellationToken))!;
         Assert.Equal(6, json["Config"]!["Bookmark"]!["BookmarkFolderOrder"]!.GetValue<int>());
         Assert.False(json["Config"]!["Bookmark"]!["IsSearchIncludeSubdirectories"]!.GetValue<bool>());
@@ -108,7 +108,7 @@ public sealed class BookmarkNavigationTests
     {
         using var fixture = new Fixture(); var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
         var count = 0; state.BookmarksChanged += (_, _) => count++;
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken); Assert.Equal(0, count);
+        await state.SaveAsync(null, TestContext.Current.CancellationToken); Assert.Equal(0, count);
         var node = await state.AddBookmarkFolderAsync(null, "原名", TestContext.Current.CancellationToken); Assert.Equal(1, count);
         Directory.CreateDirectory(Path.Combine(fixture.State, "Bookmark.json.tmp"));
         try { await Assert.ThrowsAnyAsync<Exception>(() => state.RenameBookmarkAsync(node, "新名", token: TestContext.Current.CancellationToken)); }
@@ -174,9 +174,9 @@ public sealed class BookmarkNavigationTests
     public async Task ActualSortFailureRestoresSettingsAndCanRetry()
     {
         using var fixture = new Fixture(); var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
-        var node = await state.AddBookmarkFolderAsync(null, "漫画", TestContext.Current.CancellationToken); await state.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+        var node = await state.AddBookmarkFolderAsync(null, "漫画", TestContext.Current.CancellationToken); await state.SaveAsync(null, TestContext.Current.CancellationToken);
         var setting = Path.Combine(fixture.State, "UserSetting.json"); var before = await File.ReadAllTextAsync(setting, TestContext.Current.CancellationToken);
-        var view = new BookmarkListView(); view.Attach(state); view.SaveSettingsAsync = () => state.SaveAsync(null, 0);
+        var view = new BookmarkListView(); view.Attach(state); view.SaveSettingsAsync = () => state.SaveAsync(null);
         var window = new Window { Content = view, Width = 360, Height = 500 }; window.Show(); Dispatcher.UIThread.RunJobs(); window.UpdateLayout();
         try
         {

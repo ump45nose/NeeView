@@ -96,7 +96,7 @@ public sealed class SliderInputTests
             Assert.False(input.IsVisible); Assert.Equal(0, operation.Position.Index);
             await operation.JumpAsync(4, expectedBook: old); Assert.Equal(0, operation.Position.Index);
             control.BeginEdit(); input.Text = "5"; await window.PrepareShutdownAsync();
-            Assert.Equal("001.png", state.GetLastBook().Memento!.Page);
+            Assert.Equal("001.png", state.GetLastBook()!.Page);
         }
         finally { await window.PrepareShutdownAsync(); window.Close(); }
     }

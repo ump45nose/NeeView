@@ -88,7 +88,7 @@ public sealed class DockingScrollTests
         Assert.Equal(NScrollType.Vertical, state.GetScrollParameter("NextScrollPage").ScrollType);
         Assert.Equal(.5, state.GetScrollParameter("NextScrollPage").Scroll);
         layout.CombinePanel("BookmarkPanel", "HistoryPanel", PanelDock.Bottom);
-        Config.Current.Panels.Layout = layout.CreateMemento(); await state.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+        Config.Current.Panels.Layout = layout.CreateMemento(); await state.SaveAsync(null, TestContext.Current.CancellationToken);
         var saved = JsonNode.Parse(await File.ReadAllTextAsync(path, TestContext.Current.CancellationToken))!;
         Assert.Equal(99, saved["Config"]!["Panels"]!["Layout"]!["Windows"]!["Future"]!.GetValue<int>());
         Assert.Equal("future", saved["Config"]!["Panels"]!["Layout"]!["Panels"]!["FolderPanel"]!["WindowPlacement"]!.GetValue<string>());

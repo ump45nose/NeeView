@@ -117,7 +117,7 @@ public sealed class BookmarkSearchTests
         try { await Assert.ThrowsAnyAsync<Exception>(() => state.EditBookmarkSearchHistoryAsync("失败", token: TestContext.Current.CancellationToken)); }
         finally { Directory.Delete(Path.Combine(fixture.State, "History.json.tmp")); }
         Assert.Equal(new[] { "第三", "旧" }, state.BookmarkSearchHistory); await state.EditBookmarkSearchHistoryAsync("第三", remove: true, token: TestContext.Current.CancellationToken); Assert.Equal(new[] { "旧" }, state.BookmarkSearchHistory);
-        Config.Current.History.IsKeepSearchHistory = false; await state.SaveAsync(null, 0, TestContext.Current.CancellationToken); var json = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "History.json"), TestContext.Current.CancellationToken))!;
+        Config.Current.History.IsKeepSearchHistory = false; await state.SaveAsync(null, TestContext.Current.CancellationToken); var json = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "History.json"), TestContext.Current.CancellationToken))!;
         Assert.Null(json["BookmarkSearchHistory"]); Assert.Equal("保留", json["BookshelfSearchHistory"]![0]!.GetValue<string>()); Assert.Equal(7, json["Future"]!.GetValue<int>());
         Config.Current.System.SearchHistorySize = 0; await state.EditBookmarkSearchHistoryAsync("不保留", token: TestContext.Current.CancellationToken); Assert.Empty(state.BookmarkSearchHistory);
     }
@@ -173,7 +173,7 @@ public sealed class BookmarkSearchTests
         {
             view.SaveSettingsAsync = () => Task.FromException(new IOException("保存失败")); await view.SetSearchOptionAsync("recursive", false);
             Assert.True(Config.Current.Bookmark.IsSearchIncludeSubdirectories);
-            view.SaveSettingsAsync = () => state.SaveAsync(null, 0, TestContext.Current.CancellationToken); await view.SetSearchOptionAsync("recursive", false); Assert.False(Config.Current.Bookmark.IsSearchIncludeSubdirectories);
+            view.SaveSettingsAsync = () => state.SaveAsync(null, TestContext.Current.CancellationToken); await view.SetSearchOptionAsync("recursive", false); Assert.False(Config.Current.Bookmark.IsSearchIncludeSubdirectories);
             Config.Current.System.IsIncrementalSearchEnabled = false; view.FindControl<TextBox>("BookmarkSearchBox")!.Text = "/size /gt 1";
             var search = view.SearchAsync(false); await started.Task; var closing = view.PrepareCloseAsync(); Assert.False(closing.IsCompleted);
             finish.SetResult(new("漫画", fixture.Zip, false, 50)); await search; await closing;
@@ -248,7 +248,7 @@ public sealed class BookmarkSearchTests
         var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
         Assert.False(Config.Current.System.IsIncrementalSearchEnabled); Assert.Equal(3, Config.Current.System.SearchHistorySize);
         Assert.False(Config.Current.Bookmark.IsVisibleSearchBox); Assert.False(Config.Current.Bookmark.IsSearchIncludeSubdirectories); Assert.True(Config.Current.History.IsKeepSearchHistory);
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+        await state.SaveAsync(null, TestContext.Current.CancellationToken);
         var raw = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), TestContext.Current.CancellationToken))!;
         Assert.Equal(9, raw["Config"]!["System"]!["Future"]!.GetValue<int>()); Assert.Equal(10, raw["Config"]!["Bookmark"]!["Future"]!.GetValue<int>());
         Config.SetCurrent(new()); Assert.True(Config.Current.System.IsIncrementalSearchEnabled); Assert.Equal(8, Config.Current.System.SearchHistorySize);

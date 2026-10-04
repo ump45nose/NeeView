@@ -124,7 +124,7 @@ public sealed class ReadingTests
         Assert.True(settingJson["Config"]!["BookSettingDefault"]!["FutureFlag"]!.GetValue<bool>());
         var saved = System.Text.Json.Nodes.JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "History.json"), TestContext.Current.CancellationToken))!;
         Assert.Contains("FutureRule=abc", saved["Items"]![0]!["Props"]!.GetValue<string>()); Assert.Equal(99, saved["Items"]![0]!["FutureItem"]!.GetValue<int>());
-        var fresh = new SaveData(fixture.State); await fresh.LoadAsync(TestContext.Current.CancellationToken); Assert.False(fresh.Find(fixture.Images).Memento!.IsSupportedWidePage);
+        var fresh = new SaveData(fixture.State); await fresh.LoadAsync(TestContext.Current.CancellationToken); Assert.False(fresh.Find(fixture.Images)!.IsSupportedWidePage);
     }
     /// <summary>损坏 JSON 不被保存流程覆盖。</summary>
     [Fact]

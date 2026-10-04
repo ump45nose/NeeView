@@ -136,7 +136,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
     }
 
     /// <summary>按原 Path/Page/Props 恢复；Page 是条目名，不是数字页码。</summary>
-    public (BookMemento? Memento, int Part) Find(string path)
+    public BookMemento? Find(string path)
     {
         var entry = (_history["Items"] as JsonArray)?.OfType<JsonObject>().FirstOrDefault(e => e["Path"]?.GetValue<string>() == path);
         if (entry is null && BookmarkRoot.Walk().FirstOrDefault(e => e.Path == path) is { } bookmark)
@@ -145,24 +145,25 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
     }
 
     /// <summary>读取原启动快照；历史移除或存在旧记录时仍使用独立的 LastBookV2。</summary>
-    /// <returns>最后书籍的原设置与 Mac 分割位置；没有快照时返回空记录。</returns>
-    public (BookMemento? Memento, int Part) GetLastBook() => LastBookPath is { } path
-        ? ReadMemento(path, _setting["Config"]?["StartUp"]?["LastBookV2"] as JsonObject) : (null, 0);
+    /// <returns>最后书籍的原页面条目与设置；没有快照时返回空记录。</returns>
+    public BookMemento? GetLastBook() => LastBookPath is { } path
+        ? ReadMemento(path, _setting["Config"]?["StartUp"]?["LastBookV2"] as JsonObject) : null;
 
     /// <summary>共用原 Path/Page/Props 解析，不为启动恢复建立第二套状态模型。</summary>
     /// <param name="path">记录所指向的真实书籍来源。</param>
     /// <param name="entry">历史、书签或启动快照的只读 JSON 节点。</param>
-    /// <returns>可恢复的原 memento 与分割位置；缺少页面字段时 memento 为空。</returns>
-    private static (BookMemento? Memento, int Part) ReadMemento(string path, JsonObject? entry)
+    /// <returns>可恢复的原 memento；缺少页面字段时 memento 为空。</returns>
+    private static BookMemento? ReadMemento(string path, JsonObject? entry)
     {
-        if (entry is null) return (null, 0);
+        if (entry is null) return null;
         var props = entry["Props"]?.GetValue<string>();
         // 新版未知 Props 仍保留在节点中，只将当前已识别 token 传入原解析器。
         var known = FilterProps(props, true);
         var memento = BookMemento.ParseWithProperties(path, entry["Page"]?.GetValue<string>(), known);
         // 原 Props 无法无歧义编码 IsWide=false；Mac 扩展仅补充这一缺失值，不改原解析器。
         if (memento is not null && entry["MacIsSupportedWidePage"] is JsonValue wide) memento.IsSupportedWidePage = wide.GetValue<bool>();
-        return (memento, entry["MacPagePart"]?.GetValue<int>() ?? 0);
+        // 原 BookMemento 只恢复条目名；旧 MacPagePart 不再参与半页选择。
+        return memento;
     }
 
     /// <summary>读取差分命令键位；未配置时使用固定基线默认值。</summary>
@@ -426,7 +427,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
 
     /// <summary>保存阅读状态与布局，已知字段合并进原节点后原子替换文件。</summary>
     /// <param name="historyLimits">设置表单的可选数量/期限副本；事务成功后才更新运行配置。</param>
-    public async Task SaveAsync(Book? book, int part, CancellationToken token = default, bool keepHistoryOrder = false,
+    public async Task SaveAsync(Book? book, CancellationToken token = default, bool keepHistoryOrder = false,
         (int Size, TimeSpan Span)? historyLimits = null, bool clearLastBook = false)
     {
         await _gate.WaitAsync(token);
@@ -462,7 +463,8 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
                 item["Props"] = string.Join(' ', new[] { memento.ToPropertiesString(), unknownProps }.Where(e => !string.IsNullOrEmpty(e)));
                 keepHistoryOrder &= !historyConfig.IsForceUpdateHistory;
                 if (!keepHistoryOrder || old is null) item["LastAccessTime"] = DateTime.Now;
-                item["MacPagePart"] = part;
+                // 收回早期 Mac 半页扩展，打开与原版一样从阅读方向的首半页开始。
+                item.Remove("MacPagePart");
                 item["MacIsSupportedWidePage"] = memento.IsSupportedWidePage;
                 // 原 KeepHistoryOrder：阅读位置仍更新，重放不改变访问排序或原数组位置。
                 if (book.MementoControl.CanHistory(historyConfig) && (!_suppressedHistoryPaths.Contains(book.Path)
@@ -472,8 +474,18 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
                     else items.Insert(0, item);
                     historyEntry = true;
                 }
-                // LastBook 独立于可移除的历史记录，保留启动恢复所需的分割与宽图补值。
-                Object(config, "StartUp")["LastBookV2"] = new JsonObject { ["Path"] = book.Path, ["Page"] = memento.Page, ["Props"] = item["Props"]!.DeepClone(), ["MacPagePart"] = part, ["MacIsSupportedWidePage"] = memento.IsSupportedWidePage };
+                // 同一本书的启动快照保留未知字段/Props；切书不把旧书扩展带入新书。
+                // LastBook 独立于可移除的历史记录，半页扩展只退役已知的 MacPagePart。
+                var startup = Object(config, "StartUp");
+                var previousLastBook = startup["LastBookV2"] as JsonObject;
+                var lastBook = previousLastBook?["Path"]?.GetValue<string>() == book.Path
+                    ? previousLastBook.DeepClone().AsObject() : new JsonObject();
+                var lastUnknownProps = FilterProps(lastBook["Props"]?.GetValue<string>(), false);
+                lastBook["Path"] = book.Path; lastBook["Page"] = memento.Page;
+                lastBook["Props"] = string.Join(' ', (item["Props"]!.GetValue<string>() + " " + lastUnknownProps)
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries).Distinct(StringComparer.Ordinal));
+                lastBook["MacIsSupportedWidePage"] = memento.IsSupportedWidePage;
+                lastBook.Remove("MacPagePart"); startup["LastBookV2"] = lastBook;
             }
             if (clearLastBook) Object(config, "StartUp").Remove("LastBookV2");
             // 保留原 Format；新文件使用原名称和版本结构，避免添加另一套存储格式。

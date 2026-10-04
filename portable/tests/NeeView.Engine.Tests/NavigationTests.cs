@@ -69,7 +69,7 @@ public sealed class NavigationTests
             await operation.SaveAsync(); await state.ToggleBookmarkAsync(operation.Book!, TestContext.Current.CancellationToken);
         }
         var fresh = new SaveData(fixture.State); await fresh.LoadAsync(TestContext.Current.CancellationToken);
-        Assert.True(fresh.IsBookmark(fixture.Images)); Assert.Equal("003.png", fresh.Find(fixture.Images).Memento!.Page);
+        Assert.True(fresh.IsBookmark(fixture.Images)); Assert.Equal("003.png", fresh.Find(fixture.Images)!.Page);
         Assert.Equal("", fresh.GetShortcut("NextPage", "Left")); Assert.Equal("Meta+Right", fresh.GetShortcut("PrevPage", "Right"));
         Assert.Equal(fixture.Images, fresh.HistoryEntries[0].Path);
         var json = JsonNode.Parse(await File.ReadAllTextAsync(file, TestContext.Current.CancellationToken))!;
@@ -108,16 +108,16 @@ public sealed class NavigationTests
         using var fixture = new Fixture(); var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
         await using var operation = fixture.Operation(state);
         await operation.OpenAsync(fixture.Images, TestContext.Current.CancellationToken); await operation.SaveAsync();
-        var before = state.Find(fixture.Images).Memento!.Page;
+        var before = state.Find(fixture.Images)!.Page;
         Directory.CreateDirectory(Path.Combine(fixture.State, "Bookmark.json.tmp"));
         try
         {
             await operation.JumpAsync(2);
             await Assert.ThrowsAnyAsync<Exception>(() => operation.SaveAsync());
-            Assert.Equal(before, state.Find(fixture.Images).Memento!.Page);
+            Assert.Equal(before, state.Find(fixture.Images)!.Page);
             Assert.Equal(before, state.HistoryEntries[0].Page);
         }
         finally { Directory.Delete(Path.Combine(fixture.State, "Bookmark.json.tmp")); }
-        await operation.SaveAsync(); Assert.Equal("003.png", state.Find(fixture.Images).Memento!.Page);
+        await operation.SaveAsync(); Assert.Equal("003.png", state.Find(fixture.Images)!.Page);
     }
 }

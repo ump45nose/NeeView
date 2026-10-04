@@ -28,7 +28,7 @@ public sealed class ListTemplateTests
         Assert.Equal(PanelListItemImageShape.Original, Config.Current.Panels.ThumbnailItemProfile.ImageShape);
         Assert.True(Config.Current.Panels.ThumbnailItemProfile.IsTextVisible); Assert.True(Config.Current.Panels.ThumbnailItemProfile.IsTextWrapped);
         Assert.Equal(256, Config.Current.Panels.ThumbnailItemProfile.ImageWidth); Assert.Equal(50, Config.Current.Panels.BannerItemProfile.ShapeHeight);
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+        await state.SaveAsync(null, TestContext.Current.CancellationToken);
         var json = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), TestContext.Current.CancellationToken))!;
         Assert.Equal(17, json["Config"]!["Panels"]!["ThumbnailItemProfile"]!["Future"]!.GetValue<int>());
         Assert.Null(json["Config"]!["FolderList"]);

@@ -130,7 +130,7 @@ public sealed class HistoryListTests
             new JsonObject { ["Config"] = new JsonObject { ["StartUp"] = new JsonObject { ["LastBookV2"] = last },
                 ["BookSettingPolicy"] = new JsonObject { ["Page"] = 0, ["PageMode"] = 0, ["BookReadOrder"] = 0 } } }.ToJsonString(), TestContext.Current.CancellationToken);
         var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
-        Assert.Equal(1, state.GetLastBook().Part); Assert.False(state.GetLastBook().Memento!.IsSupportedWidePage);
+        Assert.False(state.GetLastBook()!.IsSupportedWidePage);
         var operation = fixture.Operation(state); var window = new MainWindow();
         window.Bind(new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state), new BitmapFactory(new NeeView.Backends.MagickImageDecoder()), new TestPlatform()); window.Show();
         try
@@ -143,7 +143,7 @@ public sealed class HistoryListTests
             await operation.JumpAsync(4); await operation.SaveAsync(); await state.RemoveHistoryAsync([fixture.Images], TestContext.Current.CancellationToken);
             await operation.SaveAsync(); Assert.Empty(state.HistoryEntries);
             var fresh = new SaveData(fixture.State); await fresh.LoadAsync(TestContext.Current.CancellationToken);
-            Assert.Equal("005.png", fresh.GetLastBook().Memento!.Page); Assert.False(fresh.GetLastBook().Memento!.IsSupportedWidePage);
+            Assert.Equal("005.png", fresh.GetLastBook()!.Page); Assert.False(fresh.GetLastBook()!.IsSupportedWidePage);
             await using var restarted = fixture.Operation(fresh); await restarted.RestoreLastAsync(TestContext.Current.CancellationToken);
             Assert.Equal("005.png", restarted.Book!.CurrentPage!.EntryName);
         }

@@ -686,20 +686,10 @@ public sealed partial class MainWindow : Window
         if (matches.Length > 1) { ShowError("快捷键冲突：" + string.Join("、", matches.Select(d => d.Text))); return; }
         await ExecuteInputAsync(matches[0].Name, true);
     }
-    /// <summary>只规范数字键名称，旧 Control 不转换为 Command。</summary>
-    internal static bool MatchKey(string value, KeyEventArgs e)
-    {
-        try
-        {
-            var tokens = value.Trim().Split('+');
-            // 仅规范旧序列化名称：Control 仍表示 Control，不改变成 Command。
-            for (int i = 0; i < tokens.Length - 1; i++)
-                tokens[i] = tokens[i] == "Control" ? "Ctrl" : tokens[i] == "Command" ? "Meta" : tokens[i];
-            if (tokens[^1].Length == 1 && char.IsAsciiDigit(tokens[^1][0])) tokens[^1] = "D" + tokens[^1];
-            return KeyGesture.Parse(string.Join('+', tokens)).Matches(e);
-        }
-        catch (ArgumentException) { return false; }
-    }
+    /// <summary>与菜单提示共用原数字键转换；旧 Control 不转换为 Command。</summary>
+    /// <param name="value">单个原快捷键。</param><param name="e">当前真实键盘输入。</param>
+    /// <returns>键及修饰键完全匹配时为 true；无效或鼠标手势为 false。</returns>
+    internal static bool MatchKey(string value, KeyEventArgs e) => KeyboardGestureParser.TryParse(value)?.Matches(e) == true;
     /// <summary>沿原方向字典登记顺序后项覆盖；精确匹配且保留未迁命令能力提示。</summary>
     private CommandDefinition? FindMouseSequence(MouseSequence sequence) => sequence.IsEmpty || _model is null ? null
         : _model.Commands.Definitions.LastOrDefault(d => _model.SaveData.GetMouseGesture(d.Name, d.MouseGesture) == sequence);

@@ -1,6 +1,6 @@
 # 原版行为对照
 
-基线 `c5c398d89`。当前只确认源码规则和自动测试，Windows 动态对照待执行。旧 Preview 的 56 项测试属于历史重写方案，不能作为本轮一致性证据。
+基线 `c5c398d89`。已采集部分 Windows 安装包动态参考与 Mac 同夹具复演；Windows dirty 包未证明匹配固定源码，完整动态对照仍待执行。旧 Preview 的 56 项测试属于历史重写方案，不能作为本轮一致性证据。
 
 | 能力 | 原出处 | 迁移方式/状态 |
 |---|---|---|
@@ -11,7 +11,7 @@
 | 普通书籍排序验证 | Book/BookSourceFactory.cs:44 | 注册顺序回退文件名；不开放播放列表排序 |
 | 自然排序 | Book/BookPageSort.cs、PageComparer.cs；NeeView.Runtime/Collections/NaturalSort | 原数字/归一规则迁入，Win32字符比较改CurrentCulture；语言细节待对照 |
 | 当前图打开、排序后保持条目 | Book/Book.cs、BookHub/BookHub.cs | 原 Page 对象和 EntryName，不使用另一套身份数据库 |
-| History/Props | Book/BookMemento.cs、SaveData/SaveDataProfile.cs | 保留 Path/Page/Props 和未知字段；Mac只补半页与false-wide值 |
+| History/Props | Book/BookMemento.cs、Book.CreateMemento、SaveData/SaveDataProfile.cs | 保留 Path/Page/Props 和未知字段；Mac只补false-wide值；收回早期半页持久化，普通重开恢复阅读方向首半页 |
 | 差分快捷键 | Command/CommandElement.cs、CommandTable.cs | Commands[name].ShortCutKey，null恢复默认、空串禁用；Control保持 |
 | 滚动翻页 | BookPageMoveControl、PageFrameBox.ScrollToNextFrame、PageFrames/NScroll.cs、DragArea.SnapView | 原五模式、分段/终端吸附、计时与停顿顺序迁入；分页及完整分页参数编辑接通，全景在P3，真鼠标待验 |
 | 九数字分类、固定移动 | MoveToDestinationFolderCommand、MoveToFolderAsCommand | 元数据保留，业务待P4 |
@@ -54,3 +54,7 @@ P2第二十二批：原LayoutPanelManager/WindowManager/WindowPlacement关系迁
 - P2第二十四批：原PageChangeType/Duration、PageFrameContainerLayout方向及静态1间距，Scroll/Fade、取消、Hover/连续轮滚优先通过自动对照；全景/幻灯片专有策略为后续阶段，Windows动态待验。
 
 - P2收尾：TogglePageMode/TogglePageModeReverseCommand.Execute 的 +1/-1 与 TogglePageModeCommandParameter.IsLoop 默认 true 迁入；两方向共享原差分参数，非循环首末停止、循环与重载绑定自动验证。RemoveUnlinkedHistory 转交既有可靠清理流程；源文件、参数出处与运行清单分别留证。
+
+## P2设备对照修复
+
+目录/CBZ单双页、左右方向、宽图/分割、首末单页与已采集Windows包动态样本一致。数字提示统一到输入层D0–D9；半页MacPagePart退出持久化，真机切书/重启恢复首半页。跨栏水平/垂直组合和比例与样本一致；Mac拆组/整组移动/组合重启已验但相应Windows样本不全。安装包dirty与固定源码对应仍未知，菜单/浮动/自动隐藏本轮Mac动态、真实手势、无损Retina及长期native未验，详见[运行记录](../acceptance/p2-device-input-runtime.md)。

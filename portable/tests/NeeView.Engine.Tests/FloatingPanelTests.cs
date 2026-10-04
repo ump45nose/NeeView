@@ -50,7 +50,7 @@ public sealed class FloatingPanelTests
         Assert.Contains("HistoryPanel", layout.Windows); Assert.Single(layout.Find("HistoryPanel")!.Value.Group);
         Assert.Equal(.7, layout.Panels["HistoryPanel"].Weight); Assert.Equal(40, layout.Panels["HistoryPanel"].WindowPlacement.Left);
         layout.Close("FolderPanel", true); Config.Current.Panels.Layout = layout.CreateMemento();
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+        await state.SaveAsync(null, TestContext.Current.CancellationToken);
         var saved = JsonNode.Parse(await File.ReadAllTextAsync(file, TestContext.Current.CancellationToken))!["Config"]!["Panels"]!["Layout"]!;
         Assert.Equal(99, saved["Windows"]!["Future"]!.GetValue<int>()); Assert.Equal(8, saved["Panels"]!["HistoryPanel"]!["Future"]!.GetValue<int>());
         Assert.Equal("future", saved["Panels"]!["FolderPanel"]!["WindowPlacement"]!.GetValue<string>());

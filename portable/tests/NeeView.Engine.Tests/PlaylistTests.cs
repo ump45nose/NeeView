@@ -50,7 +50,7 @@ public sealed class PlaylistTests
         await hub.CreateNamedAsync("中文列表", token: TestContext.Current.CancellationToken); Assert.Equal("中文列表.nvpls", hub.Config.CurrentPlaylistRaw);
         await hub.MovePlaylistAsync(1); Assert.Equal(hub.Config.DefaultPlaylist, hub.Current!.Path);
         await hub.MovePlaylistAsync(-1); Assert.Equal("中文列表.nvpls", Path.GetFileName(hub.Current!.Path));
-        await state.SaveAsync(null, 0, token: TestContext.Current.CancellationToken); var json = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), TestContext.Current.CancellationToken))!;
+        await state.SaveAsync(null, token: TestContext.Current.CancellationToken); var json = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), TestContext.Current.CancellationToken))!;
         Assert.Equal("中文列表.nvpls", json["Config"]!["Playlist"]!["CurrentPlaylist"]!.GetValue<string>());
         await Assert.ThrowsAsync<ArgumentException>(() => hub.CreateNamedAsync("../覆盖", token: TestContext.Current.CancellationToken));
         await Assert.ThrowsAsync<IOException>(() => hub.CreateNamedAsync("中文列表", token: TestContext.Current.CancellationToken));

@@ -168,7 +168,7 @@ public sealed class FolderParameterTests
     {
         using var fixture = new Fixture(); var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken);
         state.FolderConfigs.SetFolderParameter("/books", new() { FolderOrder = FolderOrder.Size });
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+        await state.SaveAsync(null, TestContext.Current.CancellationToken);
         using var cancelled = new CancellationTokenSource(); cancelled.Cancel();
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => state.EditFolderParametersAsync(
             () => state.FolderConfigs.SetFolderParameter("/books", new() { FolderOrder = FolderOrder.Random, Seed = 1 }), cancelled.Token));

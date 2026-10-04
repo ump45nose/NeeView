@@ -21,6 +21,6 @@ P2范围保持原方案：漫画阅读、RAR/7z、历史/书签、胶片条、�
 | 原命令/配置收尾 | RemoveUnlinkedHistory 转交既有可靠清理；TogglePageModeReverse 和正向命令共用原IsLoop，原默认与非循环端点/恢复验证 | 元数据与实际执行导出同步，不用参数别名或近似显隐动作冒充实现 |
 | P2开发收尾与整体验收 | 开发范围完成；最终串行构建、自动回归、静默渲染及本地签名分别留证；整体验收未封板 | 原版动态、真机和用户验收分别待验，后续阶段不算本轮完成 |
 
-Windows 已采集部分[动态参考](../acceptance/p2-windows-reference.md)，实际 dirty 安装包未证明匹配固定源码，Mac 同夹具复演仍待验。Retina/真实手势、Finder/NAS等依设备的结果继续独立待验，按[静默验证约定](validation-workflow.md)执行；未经安排不激活用户正式应用。自动验证与开发完成不冒充这些验收。
+Windows 已采集部分[动态参考](../acceptance/p2-windows-reference.md)，实际 dirty 安装包未证明匹配固定源码。Mac 目录/CBZ阅读、半页修复及跨栏组合/拆组/整组/比例/重启恢复已真机复演，见[设备记录](../acceptance/p2-device-input-runtime.md)；最终375项自动回归、正式构建及本地签名通过。Retina仅尺寸预检，真实手势、浮动/菜单/自动隐藏本轮动态复演、长期native、Finder/NAS等依设备的结果继续独立待验，按[静默验证约定](validation-workflow.md)执行；未经安排不激活用户正式应用。自动验证与开发完成不冒充这些验收。
 
 真机环境与共用夹具的执行清单见[P2设备验收](p2-device-acceptance.md)。夹具/采样器准备通过与真实输入、原版动态、长期资源结果分别留证；多屏本轮缺少环境。

@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Input;
 using NeeView;
 namespace NeeView.MacOS.Views;
 
@@ -25,8 +24,8 @@ public static class MenuPresenter
                 if (isChecked?.Invoke(name) is { } check) { item.ToggleType = MenuItemToggleType.CheckBox; item.IsChecked = check; }
                 ToolTip.SetTip(item, enabled ? name : "尚未迁移 · " + (definition?.Stage ?? "待确认"));
                 var shortcut = name == "LoadAs" ? "Meta+O" : name == "CloseWindow" ? "Meta+W" : name == "CloseApplication" ? "Meta+Q" : state.GetShortcut(name, definition?.Shortcut ?? "").Split(',')[0];
-                try { if (shortcut.Length > 0) item.InputGesture = KeyGesture.Parse(shortcut.Replace("Control+", "Ctrl+").Replace("Command+", "Meta+")); }
-                catch (ArgumentException) { /* 鼠标手势仍由命令输入层解析，不能当作键盘提示。 */ }
+                // 提示与输入共用原键名转换，避免 Ctrl+2 显示成 Ctrl+Back。
+                item.InputGesture = KeyboardGestureParser.TryParse(shortcut);
                 item.Click += async (_, e) => { e.Handled = true; await execute(name); };
             }
             foreach (var child in node.Children ?? []) item.Items.Add(Create(child));

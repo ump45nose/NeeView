@@ -95,7 +95,7 @@ public sealed class AnimationTests
         using var fixture=new Fixture();Directory.CreateDirectory(fixture.State);
         await File.WriteAllTextAsync(Path.Combine(fixture.State,"UserSetting.json"),"""{"Config":{"View":{"PageMoveType":1,"PageMoveDuration":0.3,"ScrollDuration":0.4,"Future":7},"Mouse":{"IsHoverScroll":true,"HoverScrollSensitivity":3,"IsMouseWheelScrollEnabled":true,"MouseWheelScrollDuration":0.1,"Future":9}}}""",TestContext.Current.CancellationToken);
         var state=new SaveData(fixture.State);await state.LoadAsync(TestContext.Current.CancellationToken);Assert.Equal(PageMoveType.Fade,Config.Current.View.PageMoveType);Assert.True(Config.Current.Mouse.IsHoverScroll);
-        await state.SaveAsync(null,0,TestContext.Current.CancellationToken);var json=JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State,"UserSetting.json"),TestContext.Current.CancellationToken))!;
+        await state.SaveAsync(null, TestContext.Current.CancellationToken);var json=JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State,"UserSetting.json"),TestContext.Current.CancellationToken))!;
         Assert.Equal(7,json["Config"]!["View"]!["Future"]!.GetValue<int>());Assert.Equal(9,json["Config"]!["Mouse"]!["Future"]!.GetValue<int>());
     }
     private static void SaveFrame(Window window,string mode){using var frame=window.CaptureRenderedFrame();var phase=Environment.GetEnvironmentVariable("NEEVIEW_ACCEPTANCE_PHASE")??"p2-animation";frame!.Save(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,$"../../../../../acceptance/{phase}-{mode}-layout.png")),Avalonia.Media.Imaging.PngBitmapEncoderOptions.Default);}

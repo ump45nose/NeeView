@@ -90,7 +90,7 @@ public sealed class ResourceTests
     [Fact]
     public async Task InterruptedPairSaveRestoresBothFiles()
     {
-        using var fixture = new Fixture(); var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken); await state.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+        using var fixture = new Fixture(); var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken); await state.SaveAsync(null, TestContext.Current.CancellationToken);
         var names = new[] { "History.json", "UserSetting.json" }; var originals = names.Select(name => File.ReadAllText(Path.Combine(fixture.State, name))).ToArray();
         foreach (var name in names) File.Copy(Path.Combine(fixture.State, name), Path.Combine(fixture.State, name + ".save-backup"));
         await File.WriteAllTextAsync(Path.Combine(fixture.State, ".save-pending.json"), """{"History.json":true,"UserSetting.json":true}""", TestContext.Current.CancellationToken);

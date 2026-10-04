@@ -105,7 +105,7 @@ public sealed class ViewTransformTests
             await window.ExecuteAsync("ToggleViewFlipHorizontal", true); Assert.False(window.Viewer.IsFlipHorizontal);
             await window.ExecuteAsync("ViewBaseScaleUp"); Assert.Equal(1.2, operation.Book!.Setting.BaseScale); Assert.Equal(1, window.Viewer.TransformScale);
             await window.ExecuteAsync("ViewReset"); Assert.Equal(1.2, operation.Book.Setting.BaseScale);
-            await operation.SaveAsync(); Assert.Equal(1.2, state.Find(operation.Book.Path).Memento!.BaseScale);
+            await operation.SaveAsync(); Assert.Equal(1.2, state.Find(operation.Book.Path)!.BaseScale);
             await window.ExecuteAsync("ViewScrollNTypeDown"); Assert.Equal(0, operation.Position.Index);
             state.SetCommandParameter("ViewPresetScroll", new ViewPresetScrollCommandParameter { Horizontal = LimitedHorizontalAlignment.Left, Vertical = LimitedVerticalAlignment.Top, IsSnap = true });
             await window.ExecuteAsync("ViewPresetScroll"); var rect = window.Viewer.GetContentRect(); Assert.Equal(0, rect.X, 6); Assert.Equal(0, rect.Y, 6);
@@ -166,7 +166,7 @@ public sealed class ViewTransformTests
         {
             editor.FindControl<NumericUpDown>("Angle")!.Value = 90; Assert.Equal(60, state.GetCommandParameter<ViewRotateCommandParameter>("ViewRotateRight").Angle);
             using (var screenshot = editor.CaptureRenderedFrame()) SaveImage(screenshot!, "parameter");
-            draft.Apply(state); await state.SaveAsync(null, 0, TestContext.Current.CancellationToken);
+            draft.Apply(state); await state.SaveAsync(null, TestContext.Current.CancellationToken);
             var raw = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), TestContext.Current.CancellationToken))!;
             Assert.Null(raw["Commands"]!["ViewRotateRight"]); Assert.Equal(7, raw["Commands"]!["ViewRotateLeft"]!["Parameter"]!["Future"]!.GetValue<int>()); Assert.Equal("ViewRotateCommandParameter", raw["Commands"]!["ViewRotateLeft"]!["Parameter"]!["$type"]!.GetValue<string>());
             await new SaveData(fixture.State).LoadAsync(TestContext.Current.CancellationToken); Assert.Equal(90, state.GetCommandParameter<ViewRotateCommandParameter>("ViewRotateLeft").Angle);

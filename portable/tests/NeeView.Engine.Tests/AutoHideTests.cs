@@ -47,7 +47,7 @@ public sealed class AutoHideTests
         Assert.Equal(canonical ? 28 : 17, Config.Current.AutoHide.AutoHideHitTestHorizontalMargin);
         Assert.Equal(17, Config.Current.AutoHide.AutoHideHitTestVerticalMargin); Assert.Equal(AutoHideConflictMode.Deny, Config.Current.AutoHide.AutoHideConflictTopMargin);
         Assert.Equal(AutoHideFocusLockMode.TextBoxFocusLock, Config.Current.AutoHide.AutoHideFocusLockMode); Assert.False(Config.Current.MenuBar.IsAddressBarEnabled);
-        await state.SaveAsync(null, 0, TestContext.Current.CancellationToken); await new SaveData(fixture.State).LoadAsync(TestContext.Current.CancellationToken);
+        await state.SaveAsync(null, TestContext.Current.CancellationToken); await new SaveData(fixture.State).LoadAsync(TestContext.Current.CancellationToken);
         var saved = JsonNode.Parse(await File.ReadAllTextAsync(path, TestContext.Current.CancellationToken))!;
         Assert.Null(saved["Config"]!["Panels"]!["IsLeftAutoHide"]); Assert.Equal(7, saved["Config"]!["Panels"]!["Future"]!.GetValue<int>());
         Assert.Equal(9, saved["Config"]!["AutoHide"]!["Future"]!.GetValue<int>()); Assert.Equal("preserve", saved["Config"]!["Window"]!["WindowsOnly"]!.GetValue<string>());

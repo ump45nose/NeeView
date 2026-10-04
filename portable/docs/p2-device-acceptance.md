@@ -41,6 +41,6 @@ OpenSSH 可选组件安装若失败，保留错误和系统版本再选择恢复
 
 每项记录应用提交/版本、数据 SHA256、设置、步骤、桌面/DPI、预期/实际、截图或 CSV 路径、通过/失败/未执行及限制。长期样本的空闲、浏览和关闭区间分开，不能把空闲采样当作持续浏览。真实帧完成时间与系统采样分开，不从 ps CPU 或 Headless 帧时间推导屏幕 P95。
 
-准备及当前状态见 [p2-device-preparation.json](../acceptance/p2-device-preparation.json)。用户已连接 RDP，已在 Windows 独立程序副本及临时 Profile 采集目录/CBZ 阅读、侧栏组合/浮动/停靠、自动隐藏和明确打开目录后的恢复，见 [Windows 参考记录](../acceptance/p2-windows-reference.md)及[截图哈希清单](../acceptance/p2-windows-evidence.json)。安装包 Revision 带 dirty，未证明匹配固定基线；Mac 对照、真实触控板、Retina 和长期浏览仍未执行，P2 未封板。
+准备及当前状态见 [p2-device-preparation.json](../acceptance/p2-device-preparation.json)。用户已连接 RDP，已在 Windows 独立程序副本及临时 Profile 采集目录/CBZ 阅读、侧栏组合/浮动/停靠、自动隐藏和明确打开目录后的恢复，见 [Windows 参考记录](../acceptance/p2-windows-reference.md)及[截图哈希清单](../acceptance/p2-windows-evidence.json)。安装包 Revision 带 dirty，未证明匹配固定基线；Mac 已完成目录/CBZ 阅读及跨栏组合/拆组/整组移动/比例和重启恢复复演，修复数字菜单提示及半页持久化差异，见[运行记录](../acceptance/p2-device-input-runtime.md)及[36张截图清单](../acceptance/p2-macos-device-evidence.json)。Retina 100%/适合窗口仅完成 JPEG 尺寸预检，实际 RenderScaling/无损映射待验；真实触控板及长期浏览未执行。Mac 默认 Profile 已还原，四个文件 SHA256 与原快照及备份一致；P2 未封板。
 
-此前 Windows App 0x104 排查作为历史记录保留在 [连接记录](../acceptance/p2-windows-connection.md)，不能继续将其当作当前连接状态。采集末段 CUA 连续超时，显式重置并定向绑定应用后 AX/截图恢复，远程桌面仍可读取；没有 RDP 断开的证据。客户端扫描码恢复动作已发送，当前模式仍待观察确认；后续备份 Mac 数据进行同夹具复演。
+此前 Windows App 0x104 排查作为历史记录保留在 [连接记录](../acceptance/p2-windows-connection.md)，不能继续将其当作当前连接状态。采集末段 CUA 连续超时，显式重置并定向绑定应用后 AX/截图恢复，远程桌面仍可读取；没有 RDP 断开的证据。客户端扫描码恢复动作已发送，当前模式仍待观察确认；后续同夹具 Mac 复演已完成上述子集，本轮未在 Windows 再次打开测试副本。

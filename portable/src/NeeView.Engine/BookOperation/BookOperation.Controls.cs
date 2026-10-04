@@ -18,7 +18,7 @@ public sealed partial class BookOperation
         {
             token.ThrowIfCancellationRequested();
             if (_disposed || _closing || generation != _generation) return;
-            await saveData.SaveAsync(Book, Position.Part, token, _keepHistoryOrder, clearLastBook: true);
+            await saveData.SaveAsync(Book, token, _keepHistoryOrder, clearLastBook: true);
             var old = Book; Book = null; Frame = null; Context = null; Position = PagePosition.Zero; Error = null;
             PageSelector.Synchronize(null, 0); RefreshMarkers(); RecordPageHistory();
             if (old is not null) await old.DisposeAsync();
