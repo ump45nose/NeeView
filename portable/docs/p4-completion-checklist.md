@@ -4,15 +4,15 @@
 
 | 项目 | 开发状态 | 设备/原版边界 |
 |---|---|---|
-| 两区面板、管理/新建/刷新、九数字/Index | 已接入 | 真焦点/拖动组合、Windows分类样本待集中验 |
+| 两区面板、管理/新建/刷新、九数字/Index | 已接入 | 数字分类及真实跨栏组合/拆组通过；完整焦点/浮动与固定Windows分类样本待验 |
 | 原Once/All/AllLeftToRight、固定移动/复制 | 已接入 | 原页组、方向、部分成功静默回归；Windows动态另验 |
-| 移动UndoRedo/容量/覆盖/中断恢复 | 已接入 | 真跨卷/NAS/权限另验，临时文件/链接指纹回归 |
-| DeleteFile及页面列表显式多选 | 已接入 | 普通实体废纸篓/列表只删登记/ZIP永久删除；AppKit另验 |
-| ZIP原独立写权限、不可逆确认 | 已接入，默认关闭 | ZIP流式重建和存活ID/注释回归，RAR/7z只读 |
-| DeleteBook及邻书、RenameBook和原路径联动 | 已接入 | 系统废纸篓/真实权限及Windows动态另验 |
-| CopyBookToFolderAs/MoveBookToFolderAs | 已接入 | 原整书固定语义/逻辑复制/整体覆盖，真实卷另验 |
-| CopyFile/CopyBook、归档实体化、目录复制 | 已接入 | 标准剪贴板/Finder互操作另验；内部目录提取为原版TODO |
-| Paste/Drop多来源、位图/HTML/URL与失败回退 | 已接入 | 浏览器/原生剪贴板交互另验；只有file promise无标准数据明确提示 |
+| 移动UndoRedo/容量/覆盖/中断恢复 | 已接入 | 真实覆盖Undo/权限失败通过；整书APFS→SMB通过，真断线/中断恢复仍待验 |
+| DeleteFile及页面列表显式多选 | 已接入 | AppKit普通实体多选废纸篓/列表只删登记通过；ZIP真实永久删除取消，未验 |
+| ZIP原独立写权限、不可逆确认 | 已接入，默认关闭 | ZIP流式重建和存活ID/注释回归；真机只到确认并取消，RAR/7z只读 |
+| DeleteBook及邻书、RenameBook和原路径联动 | 已接入 | 整书系统废纸篓通过；改名及固定Windows动态继续按原清单待验 |
+| CopyBookToFolderAs/MoveBookToFolderAs | 已接入 | 整书本地复制和APFS→SMB移动三文件哈希通过；逻辑/覆盖静默回归，固定Windows另验 |
+| CopyFile/CopyBook、归档实体化、目录复制 | 已接入 | Finder标准文件双向往返通过；其他范围仍按用例另验，内部目录提取为原版TODO |
+| Paste/Drop多来源、位图/HTML/URL与失败回退 | 已接入 | Safari图片/网页选区/HTTP图片链接接收通过；纯HTML独立格式未证明，只有file promise无标准数据明确提示 |
 | Mac符号链接自身操作、Finder别名打开 | 已接入 | 链接真实临时文件回归，Foundation Finder alias真机另验 |
 | Finder定位 | 已有桥接 | 当前页/书真实定位与失败另验 |
 | CutFile/CutBook | 用户决定禁用占位 | 移动使用既有分类/移至文件夹 |
@@ -31,3 +31,9 @@ P4开发收尾及本轮实际结果见[契约](p4-completion.md)与[验收记录
 - 签名公证/分发安装属于P5，ad-hoc构建不继承为发布通过。
 
 未完成设备项不妨碍可运行增量提交，但P3/P4整体验收不能封板。
+
+## 2026-10-05 集中设备结果
+
+[设备记录](../acceptance/p34-device-runtime.md)覆盖真实分类/覆盖Undo、权限/缺失目标、整书跨卷/废纸篓、Finder标准文件双向、Safari图片/链接接收、列表多选/播放列表登记删除、面板组合/拆组、文本焦点隐藏子集与Retina无损ROI。Finder file reference URL、Retina半像素边界及列表Delete作用域三处已修复并复验。
+
+全量807通过/2跳过，指定资源补跑2/2通过；正式构建/严格ad-hoc签名通过。长期自然资源测试失败，静态100次无障碍查询独立确认回调数组保留；关闭归零不替代稳定性。Mac浮动/完整弹出层、固定Windows构建与动态、ZIP真实永久删除、真NAS断线和屏幕P95仍待验，Finder alias未继承为通过。原Mac配置已完整校验恢复，私人原始材料只留本机。

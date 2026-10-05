@@ -92,3 +92,7 @@ P4第十一批：BookControl.CopyBookAsync以Book.Path创建条目；CopyBookToF
 固定出处：PageFileIO/BookPageActionControl的File、PlaylistEntry、ArchiveEntry分组与不可逆确认；ZipArchive条目/目录删除及ZipArchiveConfig独立写权限；PlaylistArchive只删登记；ContentDropReceiver按来源优先及一般失败后回退到下一数据。Mac在实际成功后移除页面，修正原先先移除后操作导致的失败丢页。ZIP流式重建保留旧Page物理ID，避免删除后读错幸存条目。
 
 符号链接操作对象为目录项自身，指纹包含原LinkTarget文字；目录树不跟随链接。Finder别名由Foundation打开其目标，不能据此删除目标；不模拟Windows .lnk/COM FileContents。普通标准图片/URL回退接入，只有未实体化文件承诺而无标准数据时明确提示。目录树任意选中对象的完整文件管理为后续扩展，当前P4目标为原当前书/当前页文件动作。设备和固定Windows动态未从静态源码或Headless继承为通过；当前证据见[p4-completion-runtime.md](../acceptance/p4-completion-runtime.md)。
+
+## P3/P4集中设备节点
+
+Finder file reference URL经Foundation转换为真实路径，保留原整批校验和接收顺序；页面列表Delete按真实焦点转交显式多选，正文仍单主图；Retina仅校正最终设备边界，不改变原页框/位置。分类/覆盖Undo、跨卷整书、废纸篓、标准文件/浏览器接收、列表删除及面板组合的实际结果见[设备记录](../acceptance/p34-device-runtime.md)。固定Windows基线未构建，dirty安装版的既有样本不外推为本节点原版一致性。长期无障碍资源增长未解决、完整浮动/弹出层仍待验，P3/P4不封板。

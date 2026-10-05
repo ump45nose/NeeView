@@ -1,0 +1,68 @@
+{
+  "utc": "2026-10-05T04:38:09.094758+00:00",
+  "steps": [
+    {
+      "name": "Engine 构建",
+      "exit_code": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:00.66\n"
+    },
+    {
+      "name": "原算法与正式视图测试",
+      "exit_code": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Engine.Tests -> portable/tests/NeeView.Engine.Tests/bin/Debug/net10.0/NeeView.Engine.Tests.dll\nportable/tests/NeeView.Engine.Tests/bin/Debug/net10.0/NeeView.Engine.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行\n总共 1 个测试文件与指定模式相匹配。\n[xUnit.net 00:00:16.55]     NeeView.Engine.Tests.PageThumbnailResourceTests.ResourceSamplesShowThumbnailsScrollAndCloseWithBoundedResources [SKIP]\n  已跳过 NeeView.Engine.Tests.PageThumbnailResourceTests.ResourceSamplesShowThumbnailsScrollAndCloseWithBoundedResources [1 ms]\n[xUnit.net 00:01:13.55]     NeeView.Engine.Tests.BrowseResourceTests.MountedResourceSubfoldersRenderAndScrollWithBoundedDisplay [SKIP]\n  已跳过 NeeView.Engine.Tests.BrowseResourceTests.MountedResourceSubfoldersRenderAndScrollWithBoundedDisplay [1 ms]\n警告: 正在覆盖结果文件: portable/tests/NeeView.Engine.Tests/TestResults/engine.trx\n结果文件: portable/tests/NeeView.Engine.Tests/TestResults/engine.trx\n\n已通过! - 失败:     0，通过:   807，已跳过:     2，总计:   809，持续时间: 1 m 51 s - NeeView.Engine.Tests.dll (net10.0)\n"
+    },
+    {
+      "name": "正式 Mac 应用构建",
+      "exit_code": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Backends -> portable/src/NeeView.Backends/bin/Debug/net10.0-macos/NeeView.Backends.dll\n  检测到的签名标识:\n  \n    Code Signing Key: \"\" (-)\n    Provisioning Profile: \"\" () - no entitlements\n    Bundle Id: com.ump45nose.NeeView\n    App Id: com.ump45nose.NeeView\n  检测到的签名标识:\n  \n    Code Signing Key: \"\" (-)\n    Provisioning Profile: \"\" () - no entitlements\n    Bundle Id: com.ump45nose.NeeView\n    App Id: com.ump45nose.NeeView\n  NeeView.MacOS -> portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/osx-arm64/NeeView.MacOS.dll\n  优化程序集以调整大小可能会更改应用的行为。请务必在发布后进行测试。请参阅: https://aka.ms/dotnet-illink\n  正在优化程序集以调整大小。此过程可能需要一段时间。\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:13.42\n"
+    },
+    {
+      "name": "正式 .app 本地签名校验",
+      "exit_code": 0,
+      "output": "portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app: valid on disk\nportable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app: satisfies its Designated Requirement\n"
+    }
+  ],
+  "scope": "p34-device 原算法、资源、来源/导航及正式XAML Headless；不代表真机/Windows对照",
+  "formal_app": "构建及本地签名校验通过；运行见独立真机记录，Developer ID/公证/安装未执行",
+  "boundaries": {
+    "production_projects": [
+      "NeeView.Backends",
+      "NeeView.Engine",
+      "NeeView.MacOS"
+    ],
+    "source_files": 62,
+    "partial_adapters": 239,
+    "upstream_source_files": 26
+  },
+  "tests": {
+    "total": "809",
+    "executed": "807",
+    "passed": "807",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "app_bundle": "portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app",
+  "path_redaction": "Repository paths are relative; original build output remains in local artifacts.",
+  "resource_rerun": {
+    "tests": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "no_build": true,
+    "resource_root": "<user-provided read-only image root>",
+    "filter": "FullyQualifiedName~BrowseResourceTests|FullyQualifiedName~PageThumbnailResourceTests",
+    "evidence": "p34-device-resource.json"
+  },
+  "distinct_test_cases_covered": 809
+}

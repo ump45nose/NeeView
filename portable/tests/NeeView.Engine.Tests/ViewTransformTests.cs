@@ -237,6 +237,39 @@ public sealed class ViewTransformTests
         Assert.Equal(1, presenter.Scale); Assert.Equal(operation.Book!.CurrentPage!.Content.PageDataSource.Size.Width / 2, presenter.GetContentRect().Width, 8);
         operation.Book.Setting.BaseScale = 1.5; Assert.Equal(operation.Book.CurrentPage.Content.PageDataSource.Size.Width * .75, presenter.GetContentRect().Width, 8);
     }
+    /// <summary>真实奇数DIP视口/工具栏原点和奇数像素图片均按最终边界吸附，翻转仍共用命中矩阵。</summary>
+    [Theory]
+    [InlineData(800, 600, 285, 60, 1)]
+    [InlineData(801, 601, 285.25, 60.25, 1)]
+    [InlineData(801, 601, 285.25, 60.25, -1)]
+    public void StaticOriginalSizeAlignsImageBoundsToRetinaPixels(int width, int height, double originX, double originY, int flip)
+    {
+        var target = new Avalonia.Rect(-width / 4d, -height / 4d, width / 2d, height / 2d);
+        var matrix = Matrix.CreateScale(flip, 1) * Matrix.CreateTranslation(315, 347.25);
+        var origin = new Point(originX, originY);
+        var aligned = ReaderTransformPresenter.AlignDevicePixels(matrix, [target], origin, 2, .5, false);
+        var bounds = target.TransformToAABB(aligned);
+        Assert.Equal(width, bounds.Width * 2, 8); Assert.Equal(height, bounds.Height * 2, 8);
+        Assert.Equal(Math.Round((bounds.X + originX) * 2), (bounds.X + originX) * 2, 8);
+        Assert.Equal(Math.Round((bounds.Y + originY) * 2), (bounds.Y + originY) * 2, 8);
+        Assert.True(aligned.TryInvert(out var inverse));
+        var point = target.TopLeft + new Avalonia.Vector(target.Width / 3, target.Height / 3);
+        Assert.Equal(point.X, inverse.Transform(aligned.Transform(point)).X, 8);
+        Assert.Equal(point.Y, inverse.Transform(aligned.Transform(point)).Y, 8);
+    }
+    /// <summary>缩放、旋转、动画与不能同时吸附的双页保持原几何，防止跳动或改变页组规则。</summary>
+    [Fact]
+    public void PixelAlignmentPreservesMotionAndIncompatiblePageGeometry()
+    {
+        var target = new Avalonia.Rect(-200, -150, 400, 300);
+        var matrix = Matrix.CreateTranslation(315, 347.25);
+        Assert.Equal(matrix, ReaderTransformPresenter.AlignDevicePixels(matrix, [target], default, 2, .5, true));
+        Assert.Equal(matrix, ReaderTransformPresenter.AlignDevicePixels(matrix, [target], default, 2, .75, false));
+        var rotated = Matrix.CreateRotation(.1) * matrix;
+        Assert.Equal(rotated, ReaderTransformPresenter.AlignDevicePixels(rotated, [target], default, 2, .5, false));
+        var other = new Avalonia.Rect(200, -150.25, 400, 300.5);
+        Assert.Equal(matrix, ReaderTransformPresenter.AlignDevicePixels(matrix, [target, other], default, 2, .5, false));
+    }
     private static MainWindow Window(BookOperation operation, SaveData state)
     { var window = new MainWindow(); window.Bind(new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state), new BitmapFactory(new NeeView.Backends.MagickImageDecoder()), new NoPlatform()); return window; }
     private static void Pump(Window window) { Dispatcher.UIThread.RunJobs(); window.UpdateLayout(); Dispatcher.UIThread.RunJobs(); }

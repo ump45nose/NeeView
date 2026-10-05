@@ -720,6 +720,9 @@ public sealed partial class MainWindow : Window
             if (this.FindControl<FolderTreeView>("BookshelfDirectoryTree")!.IsKeyboardFocusWithin && e.KeyModifiers == KeyModifiers.None && e.Key == Key.Enter) return;
             if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.Enter && this.FindControl<ListBox>("PageList")!.IsKeyboardFocusWithin)
             { e.Handled = true; await CommitPageListAsync(); if (Config.Current.PageList.FocusMainView) Viewer.Focus(); return; }
+            // 窗口Tunnel先于列表Bubble；显式多选必须在全局DeleteFile匹配前处理。
+            if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.Delete && this.FindControl<ListBox>("PageList")!.IsKeyboardFocusWithin)
+            { e.Handled = true; await DeleteSelectedPagesAsync(); return; }
             var bookmarkList = this.FindControl<BookmarkListView>("BookmarkPanelList")!;
             if (bookmarkList.IsKeyboardFocusWithin && e.KeyModifiers == KeyModifiers.None && e.Key is Key.Enter or Key.Back) return;
             if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.Delete && (bookmarkList.IsKeyboardFocusWithin || this.FindControl<TreeView>("BookmarkTree")!.IsKeyboardFocusWithin))

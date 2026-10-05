@@ -108,6 +108,37 @@ internal sealed class ReaderTransformPresenter : IShareTransformContext, IDispos
         * Matrix.CreateScale(IsFlipHorizontal ? -Scale : Scale, IsFlipVertical ? -Scale : Scale)
         * Matrix.CreateRotation(Angle * Math.PI / 180)
         * (translated ? Matrix.CreateTranslation(Viewport.Width / 2 + Pan.X, Viewport.Height / 2 + Pan.Y) : Matrix.Identity);
+    /// <summary>静止且设备像素1:1时对齐最终图像边界；不修改原页框、缩放或逻辑平移。</summary>
+    /// <param name="matrix">绘制和命中共用的最终矩阵。</param>
+    /// <param name="targets">真实页面的局部目标矩形。</param>
+    /// <param name="origin">查看器在顶层中的原点，避免侧栏及工具栏的半像素偏移。</param>
+    /// <param name="deviceScale">顶层的实际设备比例。</param>
+    /// <param name="pixelScale">一个原图像素对应的DIP大小。</param>
+    /// <param name="isMoving">动画期间保持连续插值，不吸附。</param>
+    /// <returns>所有页边界可同时对齐时的矩阵，否则保留原矩阵。</returns>
+    internal static Matrix AlignDevicePixels(Matrix matrix, IEnumerable<Avalonia.Rect> targets, Point origin,
+        double deviceScale, double pixelScale, bool isMoving)
+    {
+        const double epsilon = .000001;
+        if (isMoving || !double.IsFinite(deviceScale) || deviceScale <= 0
+            || Math.Abs(pixelScale * deviceScale - 1) > epsilon
+            || Math.Abs(matrix.M12) > epsilon || Math.Abs(matrix.M21) > epsilon) return matrix;
+        Avalonia.Vector? correction = null;
+        foreach (var target in targets)
+        {
+            var bounds = target.TransformToAABB(matrix);
+            var x = (origin.X + bounds.X) * deviceScale;
+            var y = (origin.Y + bounds.Y) * deviceScale;
+            var width = bounds.Width * deviceScale; var height = bounds.Height * deviceScale;
+            if (!double.IsFinite(x) || !double.IsFinite(y) || !double.IsFinite(width) || !double.IsFinite(height)
+                || Math.Abs(width - Math.Round(width)) > epsilon || Math.Abs(height - Math.Round(height)) > epsilon) return matrix;
+            var delta = new Avalonia.Vector((Math.Floor(x + .5) - x) / deviceScale, (Math.Floor(y + .5) - y) / deviceScale);
+            // 不同奇偶尺寸的双页可能不能共用吸附量；保持原页组几何，不能为清晰度改变排列。
+            if (correction is { } previous && (Math.Abs(previous.X - delta.X) > epsilon || Math.Abs(previous.Y - delta.Y) > epsilon)) return matrix;
+            correction = delta;
+        }
+        return correction is { } offset ? matrix * Matrix.CreateTranslation(offset) : matrix;
+    }
     /// <summary>根据唯一矩阵计算显示包围盒，滚动不使用另一套旋转尺寸。</summary>
     public NeeView.Rect GetContentRect()
     {

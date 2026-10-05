@@ -1,0 +1,600 @@
+{
+  "schema_version": 1,
+  "artifact_id": "p34-device-20261005-115015",
+  "date": "2026-10-05",
+  "source_base_commit": "02dc2f9cc596a0ed016ea8b396842fc1d2a94f30",
+  "status": "not_sealed",
+  "platform": {
+    "architecture": "Apple Silicon ARM64",
+    "macos": "27.0.1",
+    "build": "26A434",
+    "minimum_target": "macOS 15"
+  },
+  "fixes": [
+    {
+      "name": "Finder file reference URL",
+      "scope": "Backend Foundation resolves IsFileReferenceUrl/FilePathUrl after whole-batch URL validation, then validates paths, keeping order and duplicates.",
+      "verified": "Real Finder bidirectional round-trip."
+    },
+    {
+      "name": "Retina final pixel boundary",
+      "scope": "Shared render/hit/diagnostic matrix aligns static device-pixel 1:1 page groups; original page-frame geometry and logical Pan remain.",
+      "verified": "Unobscured 800x400 ROI exact; final application RenderScaling=2 mapping."
+    },
+    {
+      "name": "Page-list Delete input scope",
+      "scope": "Window Tunnel sends list-focus Delete to explicit multi-selection before global DeleteFile; redundant Bubble handler removed.",
+      "verified": "Real window KeyPress regression and final-build device repeat; viewer still deletes main image only."
+    }
+  ],
+  "source_fingerprints": [
+    {
+      "file": "portable/src/NeeView.Backends/MacFileClipboard.cs",
+      "sha256": "14336ce3024008218fe001bc39ec6eb034ef00475d2d3eaa93b1a88cca48e3c0"
+    },
+    {
+      "file": "portable/src/NeeView.MacOS/Views/ReaderTransformPresenter.cs",
+      "sha256": "6449dcde3ddc3e8a6b32d8abee408c48afca21a735d1cc7c1263aec9ed711320"
+    },
+    {
+      "file": "portable/src/NeeView.MacOS/Views/ReaderView.cs",
+      "sha256": "e0d6aed341c556ba761d671856e0d2b3fa558e51ef25ec4added22b871a3c323"
+    },
+    {
+      "file": "portable/src/NeeView.MacOS/Views/MainWindow.axaml.cs",
+      "sha256": "5537bcd160e51a2a36f2e1c964e9d17c84469ce12c54736d82dd85f55965dc2e"
+    },
+    {
+      "file": "portable/src/NeeView.MacOS/Views/MainWindow.PageList.cs",
+      "sha256": "589b7784123d0571f6ab08734500e4276dc61dea867941ec32244df86d6aa46a"
+    },
+    {
+      "file": "portable/tests/NeeView.Engine.Tests/ViewTransformTests.cs",
+      "sha256": "76de490ddc566af244a3f7b112209f8a59d785be0a4f5b0070c91b859edf7684"
+    },
+    {
+      "file": "portable/tests/NeeView.Engine.Tests/PageListDeleteInputTests.cs",
+      "sha256": "4f548fd65fc2092590907ce083e707e790422cae1e791e6af6f31935e8f7f67e"
+    }
+  ],
+  "automated": {
+    "full_run": {
+      "total": 809,
+      "passed": 807,
+      "failed": 0,
+      "skipped": 2
+    },
+    "resource_rerun": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    "distinct_cases_covered": 809,
+    "build": "passed_0_warnings_0_errors",
+    "local_adhoc_signature": "passed",
+    "developer_id_notarization_installation": "not_run_P5",
+    "validation_record": "p34-device-validation.json",
+    "resource_record": "p34-device-resource.json"
+  },
+  "device_passed": [
+    {
+      "case": "Destination numeric commands, move/copy and overwrite Undo",
+      "evidence": [
+        "evidence/file-results-initial.json",
+        "evidence/overwrite-undo.json"
+      ],
+      "destination_and_source_restored_after_undo": {
+        "destination_restored": true,
+        "source_restored": true
+      }
+    },
+    {
+      "case": "Permission and missing-target failures",
+      "source_preserved": true,
+      "page_after_failures": "2 / 3",
+      "undo_disabled": true,
+      "limitation": "Missing target is not NAS disconnection."
+    },
+    {
+      "case": "Whole-book local copy and APFS-to-mounted-SMB move",
+      "files": 3,
+      "all_hashes_equal": true,
+      "move_source_removed": true,
+      "limitation": "No mid-operation network failure tested."
+    },
+    {
+      "case": "Whole-book system trash",
+      "source_absent": true,
+      "three_file_hashes_match": true
+    },
+    {
+      "case": "Page-list multi-delete final build",
+      "confirmation_items": 2,
+      "remaining_items": 1,
+      "remaining_page": "003.png; 1/1",
+      "evidence": "evidence/multi-delete-fixed.json"
+    },
+    {
+      "case": "Playlist deletes registration only",
+      "items_before": 3,
+      "items_after": 2,
+      "all_reference_files_preserved": true
+    },
+    {
+      "case": "Finder standard files bidirectional",
+      "bytes_equal": true,
+      "source_bytes": 11663,
+      "copy_bytes": 11663,
+      "limitation": "file reference URL is distinct from Finder alias."
+    },
+    {
+      "case": "Safari image, web selection and HTTP image link Paste",
+      "image_shown": true,
+      "http_bytes_equal": true,
+      "limitation": "Web selection may provide both HTML and bitmap; pure HTML route not independently proven."
+    },
+    {
+      "case": "Real panel drag grouping",
+      "steps": [
+        "Cross-side horizontal combination",
+        "Leader moves whole group right",
+        "Member title splits back left"
+      ],
+      "no_direct_model_manipulation": true,
+      "evidence": "evidence/panel-drag.json"
+    },
+    {
+      "case": "Auto-hide text-focus subset",
+      "delay_seconds": 1,
+      "focus_mode": "LogicalTextBoxFocusLock",
+      "once_show": true,
+      "limitation": "Complete hover/focus/popup and floating windows unverified."
+    },
+    {
+      "case": "Retina 1:1",
+      "source_pixels": [
+        800,
+        600
+      ],
+      "target_dip": [
+        400,
+        300
+      ],
+      "render_scaling": 2,
+      "pixel_scale": 0.5,
+      "unobscured_roi": [
+        0,
+        200,
+        800,
+        600
+      ],
+      "roi_exact_pixels": 320000,
+      "roi_total_pixels": 320000,
+      "system_png_sha256": "b4009059f0c30963c67ac0863d39b3bcc67a6cedea66251cc64164d230a1878b",
+      "limitation": "Full 480000-pixel crop includes pointer/overlay shadow; no full-image exactness claim."
+    }
+  ],
+  "natural_resource": {
+    "result": "failed_sustained_growth",
+    "fixture": {
+      "images": 12,
+      "pixels": [
+        3840,
+        2160
+      ],
+      "formats": [
+        "PNG directory",
+        "CBZ"
+      ]
+    },
+    "measurements": {
+      "natural_start_utc": "2026-10-05T04:58:43.106819+00:00",
+      "natural_workload_end_utc": "2026-10-05T05:36:22.296000+00:00",
+      "samples": 446,
+      "rss_first_mib": 514.7,
+      "rss_last_mib": 2086.2,
+      "rss_max_mib": 2493.7,
+      "fd_range": [
+        238,
+        241
+      ],
+      "windows": [
+        {
+          "minutes": [
+            0,
+            5
+          ],
+          "samples": 60,
+          "median_mib": 1210.8
+        },
+        {
+          "minutes": [
+            5,
+            10
+          ],
+          "samples": 59,
+          "median_mib": 1368.1
+        },
+        {
+          "minutes": [
+            10,
+            15
+          ],
+          "samples": 58,
+          "median_mib": 1596.8
+        },
+        {
+          "minutes": [
+            15,
+            20
+          ],
+          "samples": 59,
+          "median_mib": 1730.1
+        },
+        {
+          "minutes": [
+            20,
+            25
+          ],
+          "samples": 59,
+          "median_mib": 1883.5
+        },
+        {
+          "minutes": [
+            25,
+            30
+          ],
+          "samples": 60,
+          "median_mib": 1920.1
+        },
+        {
+          "minutes": [
+            30,
+            35
+          ],
+          "samples": 59,
+          "median_mib": 2244.5
+        },
+        {
+          "minutes": [
+            35,
+            40
+          ],
+          "samples": 32,
+          "median_mib": 2203.9
+        }
+      ],
+      "active_browsing_seconds": 1218,
+      "complete_cycles": 143,
+      "verified_page_changes": 1573,
+      "status": "failed_sustained_growth",
+      "diagnostic_gcdump_not_part_of_natural_acceptance": true,
+      "sampler_overlap": "Primary sampler used until completion; extension only after primary final timestamp."
+    },
+    "main_cache_bytes_observed": 530841600,
+    "main_cache_budget_bytes": 536870912,
+    "steady_retired_and_pending": 0,
+    "natural_gen2_observed": true,
+    "limitation": "About 38 minutes of sample span includes idle analysis; only 1218 seconds are active browsing. Overlap excluded. Failed counters-extension attempt not counted."
+  },
+  "static_AX_diagnostic": {
+    "result": "confirmed_retained_callback_arrays",
+    "queries": 100,
+    "query_elapsed_seconds": 24.38,
+    "input_actions": 0,
+    "same_book_and_page": true,
+    "new_decode_requests": 0,
+    "gc": "Both snapshots induced full GC; diagnostic only.",
+    "surviving_counts": {
+      "Avalonia.Native.AvnAutomationPeerArray": {
+        "before": 653,
+        "after": 27853
+      },
+      "MicroCom.Runtime.MicroComShadow": {
+        "before": 1208,
+        "after": 28408
+      },
+      "Avalonia.Native.AvnAutomationPeer": {
+        "before": 517,
+        "after": 517
+      },
+      "NeeView.DecodedImageLease": {
+        "before": 8,
+        "after": 8
+      },
+      "Avalonia.Controls.TextBlock": {
+        "before": 58,
+        "after": 58
+      }
+    },
+    "heap_graph_bytes": {
+      "before": 116707465,
+      "after": 132875071
+    },
+    "limitation": "Independent diagnostic, not natural stable-memory acceptance. Other RSS contributors not fully separated.",
+    "official_code": [
+      {
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/12.1.3/native/Avalonia.Native/src/OSX/automation.mm#L666",
+        "observation": "recalculateChildren obtains GetChildren/Get references without corresponding Release in that method."
+      },
+      {
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/12.1.3/src/Avalonia.Native/AvnAutomationPeer.cs#L51",
+        "observation": "Children creates a new AvnAutomationPeerArray per query."
+      }
+    ],
+    "framework_workaround_applied": false,
+    "accessibility_disabled": false,
+    "verified_upgrade_fix": false
+  },
+  "normal_exit": [
+    {
+      "run": "natural_workload",
+      "reason": "window_closed",
+      "cache": {
+        "CachedEntries": 0,
+        "RetiredEntries": 0,
+        "PendingRequests": 0,
+        "PixelBytes": 0,
+        "DisplayBytes": 0,
+        "MainBytes": 0,
+        "ThumbnailBytes": 0,
+        "Leases": 0,
+        "WaitingConsumers": 0,
+        "DecodeSlotsInUse": 0,
+        "BackgroundSlotsInUse": 0,
+        "Budget": 536870912,
+        "ThumbnailBudget": 67108864,
+        "IsDisposed": true
+      },
+      "evidence": {
+        "local_artifact": "diagnostics-final-static/session-20261005T0458235693350-51218.jsonl",
+        "bytes": 2074522,
+        "sha256": "b194d4a701a55058998ae0ed7d1e955cc57acdd6d0cbf119ec927238ca6ae282"
+      }
+    },
+    {
+      "run": "static_AX_probe",
+      "reason": "window_closed",
+      "cache": {
+        "CachedEntries": 0,
+        "RetiredEntries": 0,
+        "PendingRequests": 0,
+        "PixelBytes": 0,
+        "DisplayBytes": 0,
+        "MainBytes": 0,
+        "ThumbnailBytes": 0,
+        "Leases": 0,
+        "WaitingConsumers": 0,
+        "DecodeSlotsInUse": 0,
+        "BackgroundSlotsInUse": 0,
+        "Budget": 536870912,
+        "ThumbnailBudget": 67108864,
+        "IsDisposed": true
+      },
+      "evidence": {
+        "local_artifact": "diagnostics-final-static/session-20261005T0546454087730-63523.jsonl",
+        "bytes": 37789,
+        "sha256": "0a40b1353453829f3c51aa1e3ddda851d4e75680669691e9f83ca631931376f7"
+      }
+    }
+  ],
+  "pending": [
+    {
+      "case": "Mac floating/docking and full hover/focus/popup",
+      "state": "unverified",
+      "reason": "AX menu action unreliable; later AXError.notImplemented. Not treated as a product defect."
+    },
+    {
+      "case": "Fixed Windows dynamic baseline",
+      "state": "unverified",
+      "installed_revision": "ddc857b511e9f04cbc356bdabb1f748963e4f9e1-dirty",
+      "required_baseline": "c5c398d89",
+      "sdk_list_empty": true,
+      "temporary_sdk_installed": false,
+      "original_windows_instance_retained": true,
+      "new_instance_started": false
+    },
+    {
+      "case": "ZIP device permanent deletion",
+      "state": "cancelled_at_real_confirmation",
+      "copy_and_backup_unchanged": true,
+      "sha256": "614f935568339eac6bcc80f624598f25268e610a9e1e7642e83e82ec2ab242c4"
+    },
+    {
+      "case": "NAS disconnect/interruption",
+      "state": "not_run",
+      "user_volume_not_unmounted": true
+    },
+    {
+      "case": "Screen first-image/page/60Hz P95",
+      "state": "not_measured"
+    },
+    {
+      "case": "Finder alias independent device check",
+      "state": "not_run"
+    },
+    {
+      "case": "File-promise-only independent device check",
+      "state": "not_run",
+      "capability": "unsupported_without_standard_alternative"
+    },
+    {
+      "case": "Pure HTML clipboard route",
+      "state": "not_independently_verified"
+    },
+    {
+      "case": "Trackpad",
+      "state": "skipped_by_user"
+    },
+    {
+      "case": "Multi-display",
+      "state": "environment_unavailable"
+    }
+  ],
+  "restoration": {
+    "profile": {
+      "restored": true,
+      "running_test_processes": 0,
+      "matches_original_snapshot": true,
+      "matches_backup": true,
+      "root_mode_matches_backup": true,
+      "entries": 4
+    },
+    "profile_isolated": false,
+    "profile_restored": true,
+    "nas": {
+      "test_root_removed": true,
+      "copied_files": 3,
+      "copy_hashes_verified": true,
+      "user_picture_root_read_only": true
+    },
+    "test_trash": {
+      "recovered_test_files": 4,
+      "other_trash_untouched": true
+    },
+    "zip_copy_and_backup_match": true,
+    "http_test_server_stopped": true,
+    "safari_fixture_tab_closed": true,
+    "safari_original_page_retained": true,
+    "windows_original_instance_retained": true
+  },
+  "privacy": "No original Profile, private image paths, screenshots, clipboard payloads, credentials or heap snapshots are committed. Raw evidence remains local; names and hashes below identify it.",
+  "local_evidence": [
+    {
+      "local_artifact": "evidence/file-results-initial.json",
+      "bytes": 383,
+      "sha256": "8ece95e4cee5b3a55d96000cc3ed9256db6a205da6b195b8f13a4c301d3efa6a"
+    },
+    {
+      "local_artifact": "evidence/overwrite-undo.json",
+      "bytes": 61,
+      "sha256": "e9fc067531cdee0351ebac3c706face9e3534b4997dc465b5ae2d42bfa1b60e6"
+    },
+    {
+      "local_artifact": "evidence/file-failure-results.json",
+      "bytes": 401,
+      "sha256": "6d9840eb598c5fbc5d0ed821859fe330cddf4b5d5afe694e98eb1687691e96bc"
+    },
+    {
+      "local_artifact": "evidence/book-transfer-results.json",
+      "bytes": 891,
+      "sha256": "e6576977955f921d5899e2efde7231c76bd61e6c54e3710b584b7185837ec6b1"
+    },
+    {
+      "local_artifact": "evidence/book-trash.json",
+      "bytes": 301,
+      "sha256": "a32b15eb5877096720d8396b39003cb78a3363ad94ab18cea3a86a59b9a17169"
+    },
+    {
+      "local_artifact": "evidence/multi-delete-fixed.json",
+      "bytes": 1145,
+      "sha256": "bad12c1cf3bc122674d4964c1159836fb9220656c3f0af40000223bfc9a38318"
+    },
+    {
+      "local_artifact": "evidence/playlist-delete.json",
+      "bytes": 582,
+      "sha256": "f33f20a1c5ae98979278f644320b183645cfd942135db83a9ead554093fa39a2"
+    },
+    {
+      "local_artifact": "evidence/finder-roundtrip.json",
+      "bytes": 245,
+      "sha256": "b04137e3bad7380e68e4cdf21f278435b965f9515aa87349258fae0e7c630aa4"
+    },
+    {
+      "local_artifact": "evidence/finder-reveal.json",
+      "bytes": 154,
+      "sha256": "c363b96f450e14aa079d7f1dfcc40cb95c17eda0b759f155d57d762e3cc232aa"
+    },
+    {
+      "local_artifact": "evidence/safari-bitmap.json",
+      "bytes": 202,
+      "sha256": "75fd987d145c250a28b247a12285498f66f41d430b7584c643b5c219336aa6e9"
+    },
+    {
+      "local_artifact": "evidence/safari-html.json",
+      "bytes": 386,
+      "sha256": "092f9275b8fd0f148d9afcfbc4896744cce717333526df9aa6bd7ab0896f80ae"
+    },
+    {
+      "local_artifact": "evidence/safari-http.json",
+      "bytes": 233,
+      "sha256": "7fe07fb2bd9f0f1c6600b9354f3284c8c0329bea249ce6195c65e33ad2b48aec"
+    },
+    {
+      "local_artifact": "evidence/panel-drag.json",
+      "bytes": 356,
+      "sha256": "342c63636ba0e9bbdc395c94fd4ada6d133e02c5839fd7cec5ca4451d3453296"
+    },
+    {
+      "local_artifact": "evidence/autohide-focus.json",
+      "bytes": 438,
+      "sha256": "69d465673af54c412d4782d29ee0a38d39d07ffcebae07938b4020a5d3c1e8b3"
+    },
+    {
+      "local_artifact": "evidence/retina-fixed.json",
+      "bytes": 104578,
+      "sha256": "d7d8be06caa385266f7f4ade4c021ab3c6f87e078aa731ce715362e9fce21962"
+    },
+    {
+      "local_artifact": "evidence/retina-final-build.json",
+      "bytes": 1174,
+      "sha256": "8d548e6c1a09c678e748f9c954cd83e97f2961f06443f53e45893bd8c6ba7723"
+    },
+    {
+      "local_artifact": "evidence/zip-delete-before.json",
+      "bytes": 856,
+      "sha256": "03bdb7e9759e91a4fa3b7e7f424e20bf202f03cacf20d079661944c16d6eef59"
+    },
+    {
+      "local_artifact": "memory/natural-summary.json",
+      "bytes": 1475,
+      "sha256": "8a341f3b6131c933ecf7dcbfeb08d266bd82688cdda889f86d2f73d9e6ddcb10"
+    },
+    {
+      "local_artifact": "memory/static-probe.json",
+      "bytes": 1195,
+      "sha256": "b0ff2f3d9e8d10d46fe4f414a80d7f1255597f79703b395944b88f1e44ee749f"
+    },
+    {
+      "local_artifact": "memory/steady-51218.csv",
+      "bytes": 28243,
+      "sha256": "118a7707d4a685b108148a893ea5d7ba5ef5d5db4d060763a6aa596ef6bb1df5"
+    },
+    {
+      "local_artifact": "memory/steady-extension-51218.csv",
+      "bytes": 10255,
+      "sha256": "1766a250228abcdc4b62f662731e96b2f15175cb9fb9cb0acb1897b688b82aa9"
+    },
+    {
+      "local_artifact": "memory/runtime-51218.csv",
+      "bytes": 1416790,
+      "sha256": "5f4acbe92e7b5a011e17438cf1470c868891200449c6957ade4db77860927660"
+    },
+    {
+      "local_artifact": "memory/runtime-late-51218.csv",
+      "bytes": 445486,
+      "sha256": "ee9c56ed9a74652cc39a5cceeaeeb4699409940ca41897a80aa91e951a1e99f6"
+    },
+    {
+      "local_artifact": "memory/vmmap-mid-51218.txt",
+      "bytes": 8310,
+      "sha256": "c0d33692cf201daeef29ab51f8fd7ccc78e7835fdc91624147a5a84116084249"
+    },
+    {
+      "local_artifact": "restoration.json",
+      "bytes": 169,
+      "sha256": "0154b61ddfd0e244de89da7358199a57e046988c339ac656df9f299eb30f5a59"
+    },
+    {
+      "local_artifact": "nas-cleanup.json",
+      "bytes": 124,
+      "sha256": "822449fadb19cbcb78c8a2c21d7632f28278c47d1a126b686619a7be66eea62a"
+    },
+    {
+      "local_artifact": "test-trash-cleanup.json",
+      "bytes": 174,
+      "sha256": "fa13cc0b6357c5e13d992bd04d3dfae8165b048d68d6f3e186d3893fe314a163"
+    }
+  ]
+}

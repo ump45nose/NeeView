@@ -17,7 +17,6 @@ public sealed partial class MainWindow
         _pagePresentation.Apply(Config.Current.PageList.PanelListItemStyle);
         list.AddHandler(PointerPressedEvent, PageList_Pressed, RoutingStrategies.Tunnel, true);
         list.AddHandler(PointerReleasedEvent, PageList_Released, RoutingStrategies.Bubble, true);
-        list.KeyDown += PageList_KeyDown;
         var menu = new ContextMenu(); var remove = new MenuItem { Header = "删除选中页面…" }; menu.Items.Add(remove);
         menu.Opening += (_, _) => remove.IsEnabled = _model?.Operation.CanDeletePages(list.SelectedItems?.OfType<Page>().ToArray() ?? []) == true;
         remove.Click += async (_, _) => await DeleteSelectedPagesAsync(); list.ContextMenu = menu;
@@ -28,11 +27,6 @@ public sealed partial class MainWindow
     {
         var pages = this.FindControl<ListBox>("PageList")!.SelectedItems?.OfType<Page>().ToArray() ?? [];
         return _model is null ? Task.CompletedTask : RunDestinationActionAsync(() => _model.Operation.DeletePagesAsync(pages));
-    }
-    private async void PageList_KeyDown(object? sender, KeyEventArgs e)
-    {
-        if (e.Key != Key.Delete || e.KeyModifiers != KeyModifiers.None) return;
-        e.Handled = true; await DeleteSelectedPagesAsync();
     }
     /// <summary>持久化原PageList样式，模板改变不跳页或创建新书籍。</summary>
     /// <param name="style">原Normal/Content/Banner/Thumbnail枚举。</param>

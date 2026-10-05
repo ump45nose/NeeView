@@ -308,7 +308,15 @@ public sealed partial class ReaderView : Control, IDisposable
         }
     }
     /// <summary>命中与绘制共享插值矩阵，动画期间不按终点点击旧画面。</summary>
-    private Matrix GetRenderedMatrix() => _transform.GetMatrix() * Matrix.CreateTranslation(_motion.GetPanOffset()+_motion.GetPageState().Incoming);
+    private Matrix GetRenderedMatrix()
+    {
+        var matrix = _transform.GetMatrix() * Matrix.CreateTranslation(_motion.GetPanOffset()+_motion.GetPageState().Incoming);
+        var top = TopLevel.GetTopLevel(this);
+        var origin = top is null ? (Point?)null : this.TranslatePoint(default, top);
+        return origin is { } point ? ReaderTransformPresenter.AlignDevicePixels(matrix,
+            _transform.GetTargets().Where(t => !t.Source.IsDummy).Select(t => t.Target), point,
+            top!.RenderScaling, _transform.PixelScale, IsMotionActive) : matrix;
+    }
     private void ReleaseOutgoing()
     { _outgoing?.Dispose(); _outgoing=null; _awaitingTransition=false; _motion.CancelPage(); }
     /// <summary>原取消滚动保留当前可见点；直接操作关闭退出帧并释放旧资源。</summary>

@@ -150,3 +150,5 @@ P4第十批见[p4-directory-copy.md](p4-directory-copy.md)：原普通目录直�
 P4第十一批见[p4-logical-book-copy.md](p4-logical-book-copy.md)：Book.Path对应条目由唯一来源提供，显式图片定位仍复制整书，包内目录保留真实归档归属。CopyBook与目标目录复制分别沿原四策略/LimitedRealization，复用既有剪贴板资源与整书后端；移动仅真实根实体，逻辑复制不更新原定位、不改变分类栈。没有新来源、传输内核、界面入口或状态模型。
 
 P4开发收尾契约见[p4-completion.md](p4-completion.md)：原三类删除/显式多选、图片/HTML/URL接收与失败回退、Mac符号链接及Finder别名接入；Archive.Zip独立写权限默认关闭，永久删除始终确认。仍只有三个项目、原JSON和唯一阅读/文件链路；设备封板另验。原目录树任意选中对象的完整文件管理不是本阶段当前书/当前页范围。
+
+P3/P4集中设备验收沿原边界修复Finder文件引用URL解析、最终Retina设备边界和列表Delete焦点分派，没有增加生产项目或状态模型。静止设备1:1对齐归ReaderTransformPresenter，Finder引用解析归MacFileClipboard，实际删除仍归原BookOperation。长期资源测试失败；静态AX查询确认第三方macOS无障碍回调数组保留，未用禁用无障碍或维护框架分支规避。详见[最新设备记录](../acceptance/p34-device-runtime.md)，原Profile已完整恢复，阶段未封板。

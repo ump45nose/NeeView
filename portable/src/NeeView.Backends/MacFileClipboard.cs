@@ -46,7 +46,7 @@ public sealed class MacFileClipboard : IFileClipboard
         var items = board.PasteboardItems ?? [];
         if (items.Length > FileClipboardCodec.MaximumItems) throw new NotSupportedException("剪贴板文件数量超过支持上限。");
         var urls = items.Where(item => item.Types.Contains(FileUrlType)).Select(item => item.GetStringForType(FileUrlType)).ToArray();
-        var files = FileClipboardCodec.DecodeFileUrls(urls);
+        var files = DecodeSystemFileUrls(urls);
         var raw = board.GetStringForType(FileClipboardCodec.QueryPathsType);
         var query = raw is null ? [] : FileClipboardCodec.DecodeQueryPaths(raw);
         ContentDropData? content = null;
@@ -75,6 +75,23 @@ public sealed class MacFileClipboard : IFileClipboard
         if (revision != board.ChangeCount) throw new IOException("读取期间剪贴板已改变，请重试。");
         return new FileClipboardContent(files, query, Content: content);
     }, token);
+    /// <summary>Finder可能发布file reference URL；由Foundation解析实际路径，不能把/.file/id写入阅读历史。</summary>
+    /// <param name="urls">同一剪贴板快照中的全部本机file URL。</param>
+    /// <returns>全部有效且已解析的路径；悬空引用或非法项使整批失败。</returns>
+    private static string[] DecodeSystemFileUrls(string?[] urls)
+    {
+        // 先整组校验协议，不能因原生解析忽略远程主机、查询参数或混合坏项。
+        var paths = FileClipboardCodec.DecodeFileUrls(urls);
+        for (int index = 0; index < urls.Length; index++)
+        {
+            using var url = new NSUrl(urls[index]!);
+            if (!url.IsFileReferenceUrl) continue;
+            using var resolved = url.FilePathUrl;
+            paths[index] = FileClipboardCodec.DecodeFileUrl(resolved?.AbsoluteString)
+                ?? throw new IOException("剪贴板文件引用暂不可访问，请在Finder中重新复制。");
+        }
+        return FileClipboardCodec.ValidatePaths(paths);
+    }
     /// <summary>原生对象只在主线程使用，取消的排队调用不得晚到改写剪贴板。</summary>
     /// <param name="action">仅在主线程执行的完整原生读取或写入。</param><param name="token">排队等待及提交前取消。</param>
     /// <returns>真实原生结果，回调开始后不提前报告取消。</returns>

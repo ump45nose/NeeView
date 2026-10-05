@@ -27,6 +27,8 @@ NSPasteboard使用标准png/tiff/jpeg/html/url；原生对象只在主线程创�
 
 Finder别名通过Foundation确认类型并解析目标，WithoutUI/WithoutMounting，无弹窗/自动挂载，循环最多8层。打开别名后的当前书是实际目标；复制/删除别名文件时不把解析目标作为文件操作对象。
 
+集中设备验收补充：Finder剪贴板的 `file:///.file/id=...` 是文件引用URL，MacFileClipboard先整批校验标准URL，再由Foundation解析真实路径，最后整批校验路径；保留条目顺序和重复项，不让虚拟引用地址进入历史。文件引用URL与Finder alias是不同能力，前者真实往返通过不自动证明后者。
+
 Windows.lnk及FileContents/FileGroupDescriptorW是Windows专属协议，不在Mac模拟COM。Mac提供标准文件/URL/图片即可接收；只有未实体化file promise而无标准替代数据时明确提示，专门NSFilePromiseReceiver为后续系统扩展，不冒充已支持。CutFile/CutBook保持用户决定的禁用占位；移动继续使用分类/移至文件夹。归档内部目录递归提取是原版TODO；完整目录树文件管理、P5旧数据导入与高级内容不扩大进本批。
 
 ## 生命周期、错误与测试
@@ -36,3 +38,5 @@ Windows.lnk及FileContents/FileGroupDescriptorW是Windows专属协议，不在Ma
 P4CompletionTests覆盖部分删除、列表重复别名/未知字段/外部改动、ZIP确认/配置/目录/幸存数据、图片alpha/失败回退/取消、关闭授权边界。P4LinkTests覆盖链接分类覆盖UndoRedo、根目录链接复制/移动/改名、指纹变化/中断/树清理；P4DropSnapshotTests装载正式Avalonia适配，验证文本、QueryPath、URL及借用Bitmap。原分类/整书/复制/删除/配置/Headless测试一并回归。实际结果和设备待项见[本轮记录](../acceptance/p4-completion-runtime.md)。
 
 扩展继续使用原Archive、BookOperation、平台替换点，公开契约变化同步文档与调用方；性能优化必须测量与行为回归。
+
+设备验收发现窗口Tunnel先于列表Bubble消费Delete。MainWindow按页面列表真实焦点先转交显式多选，删除原冗余Bubble入口；正文Delete继续仅主图。真实窗口KeyPress回归及真机复验通过。最新通过/失败/待验见[P3/P4设备记录](../acceptance/p34-device-runtime.md)，长期无障碍访问资源增长未解决，整体验收未封板。
