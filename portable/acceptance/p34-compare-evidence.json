@@ -1,0 +1,1221 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-05",
+  "phase": "P3/P4 continued comparison",
+  "status": "not_sealed",
+  "scope": "Record issues and continue independent comparisons; no implementation change or framework workaround in this batch.",
+  "source": {
+    "mac": "51b8aab4da813421dbff321247ed6ec0b3cd73d6",
+    "windows": "c5c398d89a9dd872382980769065e80c4592f4c2"
+  },
+  "environment": {
+    "mac": "macOS27.0.1 /26A434, Apple Silicon, single Retina screen, formal application",
+    "avalonia": "12.1.3",
+    "windows_sdk": "10.0.401 x64, temporary official SDK with SHA512 verification",
+    "windows_source_clean": true,
+    "windows_submodules": 4,
+    "windows_profile_isolated": true,
+    "mac_profile_isolated_during_execution": true
+  },
+  "build": {
+    "mac_rebuilt_this_batch": false,
+    "mac_formal_build_reference": "p34-device-validation.json",
+    "windows_default_output": true,
+    "windows_restore_publish": "passed",
+    "windows_executable": "NeeView-x64/NeeView.exe",
+    "windows_executable_sha256": "3BCFBF2EA68A06AD45F6E23C926107DFF7175145E2E2A4C718962B2788AFE28A",
+    "windows_product_version": "46.3+c5c398d89a9dd872382980769065e80c4592f4c2.c5c398d89a9dd872382980769065e80c4592f4c2",
+    "remote_build_receipt": "receipt.json: built_not_run at build time",
+    "remote_dynamic_receipt": "dynamic-receipt.json: dynamic_subset_verified after actual execution",
+    "remote_receipt_contents_committed": false
+  },
+  "fixture": {
+    "name": "01-reading.cbz",
+    "entries": 9,
+    "sha256": "614f935568339eac6bcc80f624598f25268e610a9e1e7642e83e82ec2ab242c4",
+    "local_directory_matches_archive": true,
+    "windows_final_directory_matches_archive": "9/9, remote receipt and screenshot",
+    "entry_hashes": [
+      {
+        "name": "001.png",
+        "bytes": 5791,
+        "sha256": "3c4549087ce7387dbb8ad89a2804a21b6318adaaab5ca95a75227897ed4f2c9d"
+      },
+      {
+        "name": "002.png",
+        "bytes": 5707,
+        "sha256": "fb6383edc84d4e892939c3d663d8a058065c322a3b6106c6524b62e9053b435e"
+      },
+      {
+        "name": "003.png",
+        "bytes": 15389,
+        "sha256": "7dce26f79bec8e5dba6094b0332e1b479807b34b4484cb64f741635ee93cf61b"
+      },
+      {
+        "name": "004.png",
+        "bytes": 5551,
+        "sha256": "a95b571d8be59bda3b6fca28a172d887a3f0681a857e17cc4b29cde417dca97a"
+      },
+      {
+        "name": "005.png",
+        "bytes": 26274,
+        "sha256": "21e20ae64d93874280da36f75a65920b2e9496b9ac71eb19349c034233ea7a8b"
+      },
+      {
+        "name": "006.png",
+        "bytes": 11663,
+        "sha256": "dc7c87420a4eaa5d0c98ae6c4b64a318c40719687a0567a0ee50142a54db672f"
+      },
+      {
+        "name": "007.png",
+        "bytes": 5759,
+        "sha256": "ea800a91f4455a1b37e24c14442c36b5bb1f887c307725c5c4816545d6da1d34"
+      },
+      {
+        "name": "008.png",
+        "bytes": 12464,
+        "sha256": "c26819e3db42a91c8e26dcd73b09c399e6c9f588c11a02a1626796381057f831"
+      },
+      {
+        "name": "009.png",
+        "bytes": 5649,
+        "sha256": "610d9177dd67bd31b61e478beef6534230e68f7120b7fe6161dd35cf349f0a42"
+      }
+    ]
+  },
+  "automated_regression": {
+    "execution": "serial --no-build; original default outputs",
+    "filter": "PagePositions|DestinationMultiPageTests|FloatingPanelTests|FileClipboardTests|DirectoryCopyTests|ArchiveRealizationTests|PageNavigationSearchTests|SelectionHistoryTests|ProgressiveIndexTests",
+    "passed": 163,
+    "failed": 0,
+    "skipped": 0,
+    "runner_duration_seconds": 21,
+    "trx_times": {
+      "creation": "2026-10-05T14:39:46.1118350+08:00",
+      "queuing": "2026-10-05T14:39:46.1118350+08:00",
+      "start": "2026-10-05T14:39:42.4457520+08:00",
+      "finish": "2026-10-05T14:40:05.5078140+08:00"
+    },
+    "binary_rebuilt_this_batch": false,
+    "headless_is_native_acceptance": false,
+    "evidence": [
+      "p34-compare.trx",
+      "targeted-tests.log"
+    ]
+  },
+  "mac_dynamic": [
+    {
+      "case": "RTL page-group and single-page navigation",
+      "status": "passed_subset",
+      "result": "Initial left002/right001; next group left004/right003; previous group returns001; next-one left003/right002. Matches fixed Windows sample.",
+      "evidence": [
+        "evidence/mac-rtl-initial.png",
+        "evidence/mac-rtl-next-group.png",
+        "evidence/mac-rtl-next-group.ax.txt",
+        "evidence/mac-rtl-prev-group.ax.txt",
+        "evidence/mac-rtl-next-one.png",
+        "evidence/mac-rtl-next-one.ax.txt"
+      ]
+    },
+    {
+      "case": "RTL divided page navigation",
+      "status": "passed_subset",
+      "result": "003 right half, left half, then complete004. Image sequence matches Windows; missing textual half indicator is tracked separately.",
+      "evidence": [
+        "evidence/mac-half-rtl-first.png",
+        "evidence/mac-half-rtl-first.ax.txt",
+        "evidence/mac-half-rtl-second.png",
+        "evidence/mac-half-rtl-second.ax.txt",
+        "evidence/mac-half-next-image.png",
+        "evidence/mac-half-next-image.ax.txt"
+      ]
+    },
+    {
+      "case": "LTR divided page and command-pair reversal",
+      "status": "passed_subset",
+      "result": "003 left half, right half, then complete004. Runtime direction change retains Part; with original reversal enabled F8 advances and F6 goes back.",
+      "evidence": [
+        "evidence/mac-direction-switch-keeps-part.png",
+        "evidence/mac-direction-switch-keeps-part.ax.txt",
+        "evidence/mac-half-ltr-first.png",
+        "evidence/mac-half-ltr-first.ax.txt",
+        "evidence/mac-half-ltr-second.png",
+        "evidence/mac-half-ltr-second.ax.txt",
+        "evidence/mac-half-ltr-next-image.ax.txt"
+      ]
+    },
+    {
+      "case": "Sort retains content anchor",
+      "status": "passed_subset",
+      "result": "Descending order keeps004 at6/9, matching fixed Windows.",
+      "evidence": [
+        "evidence/mac-sort-desc-anchor.png",
+        "evidence/mac-sort-desc-anchor.ax.txt"
+      ]
+    },
+    {
+      "case": "Exit and explicit LastBook startup restoration",
+      "status": "passed_mac_subset",
+      "result": "History.Page=004.png with LeftToRight IsDivide Sort=FileNameDescending; no-argument startup restores004 with those reading settings.",
+      "evidence": [
+        "evidence/mac-restart-lastbook.png",
+        "evidence/mac-restart-lastbook.ax.txt"
+      ],
+      "limitation": "Windows restart verifies004 anchor only; full matching-entry field-policy comparison remains incomplete."
+    },
+    {
+      "case": "Ordinary open uses field policy",
+      "status": "passed_mac_subset",
+      "result": "Address-bar Enter on same path retains004 but restores default double-page RTL ascending order at4/9.",
+      "evidence": [
+        "evidence/mac-reopen-default-policy.png",
+        "evidence/mac-reopen-default-policy.ax.txt"
+      ],
+      "limitation": "Ordinary open and explicit LastBook startup are distinct entry points, not a reproduced defect."
+    },
+    {
+      "case": "First last and wide-page rules",
+      "status": "passed_mac_subset",
+      "result": "Seed with first/last-single and wide enabled:001 alone,003 wide alone,009 alone via actual slider click; previous page008 alone.",
+      "evidence": [
+        "evidence/mac-first-alone.png",
+        "evidence/mac-first-alone.ax.txt",
+        "evidence/mac-after-first.ax.txt",
+        "evidence/mac-wide-alone.png",
+        "evidence/mac-wide-alone.ax.txt",
+        "evidence/mac-last-alone.png",
+        "evidence/mac-last-alone.ax.txt",
+        "evidence/mac-before-last-wide-policy.png",
+        "evidence/mac-before-last-wide-policy.ax.txt"
+      ],
+      "limitation": "Seed proves configuration consumption, not menu toggle execution. Windows preceding-last sample uses wide=false and007/008; do not compare these different configurations."
+    },
+    {
+      "case": "Floating text and list focus, Enter and close/reopen",
+      "status": "passed_subset",
+      "result": "Text Left and list Down/Left do not turn main page; Enter opens selected directory; Command+W closes only floating window; same-process reopen retains search01 and selection.",
+      "evidence": [
+        "evidence/floating-search.png",
+        "evidence/floating-search.ax.txt",
+        "evidence/floating-text-main.ax.txt",
+        "evidence/floating-list.ax.txt",
+        "evidence/floating-list-main.ax.txt",
+        "evidence/floating-enter-main.ax.txt",
+        "evidence/floating-reopen.png",
+        "evidence/floating-reopen.ax.txt"
+      ],
+      "limitation": "Initial floating window is seeded by original JSON, not proof of context-menu float or drag-back."
+    },
+    {
+      "case": "Retina floating size restoration",
+      "status": "failed",
+      "result": "Window images720x1064 ->1440x1702 ->2880x1696; saved placements grow in width after close/reopen and normal restart.",
+      "evidence": [
+        "evidence/floating-search.png",
+        "evidence/floating-reopen.png",
+        "evidence/floating-restart.png",
+        "evidence/floating-restart.ax.txt"
+      ],
+      "issue": "MAC-FLOAT-002",
+      "initial_placement": "Normal,650,150,360,500",
+      "saved_placements": [
+        "Normal,650,28,1440,1638",
+        "Normal,56,28,2880,1632"
+      ],
+      "limitation": "Images include title bar; working-area height clamp and scale conversions are clues, not a independently measured root cause."
+    },
+    {
+      "case": "Half-page textual indication",
+      "status": "failed_display_parity",
+      "result": "Windows title distinguishes3(R)/9 and3(L)/9; Mac title is book name and both halves show3/9 without L/R. Both Windows and Mac slider numeric labels omit L/R; image navigation itself passes.",
+      "evidence": [
+        "evidence/mac-half-rtl-first.png",
+        "evidence/mac-half-rtl-second.png",
+        "evidence/windows-half-rtl-first.png",
+        "evidence/windows-half-rtl-second.png"
+      ],
+      "issue": "MAC-READ-003"
+    }
+  ],
+  "windows_dynamic": [
+    {
+      "case": "Fixed source build",
+      "status": "passed_build",
+      "result": "Clean fixed checkout and four submodules; official10.0.401 x64 SDK SHA512 verified; default restore/publish succeeds.",
+      "evidence": [
+        "evidence/windows-build-result.png"
+      ],
+      "limitation": "Initial remote receipt built_not_run is a build-time snapshot. Subsequent dynamic receipt and screenshots document actual execution."
+    },
+    {
+      "case": "RTL group/single navigation and wide image",
+      "status": "passed_subset",
+      "result": "Initial left002/right001; next-group left004/right003; previous returns001; next-one left003/right002; wide003 alone.",
+      "evidence": [
+        "evidence/windows-rtl-initial.png",
+        "evidence/windows-rtl-next-group.png",
+        "evidence/windows-rtl-prev-group.png",
+        "evidence/windows-rtl-next-one.png",
+        "evidence/windows-wide-alone.png"
+      ]
+    },
+    {
+      "case": "RTL divided page",
+      "status": "passed_subset",
+      "result": "003 right half -> left half -> complete004; title reportsR/L.",
+      "evidence": [
+        "evidence/windows-half-rtl-first.png",
+        "evidence/windows-half-rtl-second.png",
+        "evidence/windows-half-next-image.png"
+      ]
+    },
+    {
+      "case": "LTR divided page and reversal",
+      "status": "passed_subset",
+      "result": "003 left half -> right half -> complete004. Original IsReversePageMove makesF6 previous andF8 next under this LTR configuration.",
+      "evidence": [
+        "evidence/windows-half-ltr-first.png",
+        "evidence/windows-half-ltr-second.png",
+        "evidence/windows-half-ltr-next-image.png",
+        "evidence/windows-ltr-reversed-f6.png"
+      ]
+    },
+    {
+      "case": "Sort anchor and normal restart",
+      "status": "passed_subset",
+      "result": "Descending order keeps004 at6/9; History.Page=004.png; restart keeps004.",
+      "evidence": [
+        "evidence/windows-sort-desc-anchor.png",
+        "evidence/windows-saved-history.png",
+        "evidence/windows-restart-anchor.png"
+      ],
+      "limitation": "Does not prove every field-restoration policy with the same entry point as Mac."
+    },
+    {
+      "case": "First/last single page",
+      "status": "passed_subset",
+      "result": "001 and009 alone; before-last007/008 with wide=false.",
+      "evidence": [
+        "evidence/windows-first-alone.png",
+        "evidence/windows-last-alone.png",
+        "evidence/windows-before-last-boundary.png"
+      ]
+    },
+    {
+      "case": "Numeric1/2/3 copy policies",
+      "status": "passed_subset",
+      "result": "Once copies001; All and AllLeftToRight each copy001/002. Five copies match source hashes; source remains nine images, current page retained, Undo disabled.",
+      "evidence": [
+        "evidence/windows-copy-once.png",
+        "evidence/windows-copy-all.png",
+        "evidence/windows-copy-ltr.png",
+        "evidence/windows-copy-files.png",
+        "evidence/windows-copy-summary.png"
+      ],
+      "limitation": "Final directory contents do not prove AllLeftToRight operation order. Static and automated tests cover ordering."
+    },
+    {
+      "case": "Once Move Undo Redo",
+      "status": "passed_subset",
+      "result": "Move003 ->004/005; Undo restores and locates003; Redo removes003 again; Undo restores.",
+      "evidence": [
+        "evidence/windows-move-once.png",
+        "evidence/windows-move-undo.png",
+        "evidence/windows-move-redo.png"
+      ]
+    },
+    {
+      "case": "New All move clears Redo and records each success",
+      "status": "passed_subset",
+      "result": "New move003/004 clears Redo. First Undo restores004, second restores003, one entry per successful file.",
+      "evidence": [
+        "evidence/windows-new-move-clears-redo.png",
+        "evidence/windows-all-undo.png",
+        "evidence/windows-all-undo-second.png"
+      ]
+    },
+    {
+      "case": "Collision cancellation",
+      "status": "passed_subset",
+      "result": "Existing001 triggers system collision; close/cancel preserves current page and history stack.",
+      "evidence": [
+        "evidence/windows-move-conflict.png",
+        "evidence/windows-conflict-canceled.png"
+      ],
+      "limitation": "No Windows overwrite executed in this batch."
+    },
+    {
+      "case": "Fixed process exit and source integrity",
+      "status": "passed_restoration",
+      "result": "Fixed test app exits; original installed process remains. UI Undo restores nine source images; all nine hashes match CBZ entries. Copy targets remain only in isolated test directory.",
+      "evidence": [
+        "evidence/windows-final-processes.png",
+        "evidence/windows-final-integrity.png"
+      ]
+    },
+    {
+      "case": "Temporary process environment restoration",
+      "status": "passed_restoration",
+      "result": "NEEVIEW_PROFILE and DOTNET_ROOT_X64 restored to previous values.",
+      "evidence": [
+        "evidence/windows-env-restored.png"
+      ]
+    }
+  ],
+  "static_and_automated_boundaries": [
+    {
+      "case": "Batch move history",
+      "result": "One undo entry per successful file, not one entry per command.",
+      "mac_reference": "portable/tests/NeeView.Engine.Tests/DestinationMultiPageTests.cs:65-80",
+      "windows_dynamic_confirmed": true
+    },
+    {
+      "case": "Command-pair reversal",
+      "result": "IsReversePageMove and mismatch of slider/preset direction swaps command pairs.",
+      "windows_reference": "NeeView/Command/CommandTools.cs:156-157",
+      "mac_reference": "portable/src/NeeView.Engine/Command/DefaultInputScheme.cs:29-32"
+    },
+    {
+      "case": "Restoration entry points",
+      "result": "Explicit LastBook bypasses ordinary per-field policy mixing.",
+      "mac_reference": "portable/src/NeeView.Engine/BookOperation/BookOperation.cs:56-61,94-98",
+      "full_same_entry_windows_dynamic": "incomplete"
+    },
+    {
+      "case": "Path alias deduplication",
+      "result": "Windows OrdinalIgnoreCase vs Mac Ordinal requires filesystem-specific sample; not a confirmed defect.",
+      "dynamic_sample": "not_run"
+    }
+  ],
+  "known_issues": [
+    {
+      "id": "MAC-AX-001",
+      "status": "unresolved",
+      "result": "Long-term resource test failed; repeated same-page AX queries retain callback arrays after full GC.",
+      "evidence_reference": "p34-device-evidence.json",
+      "rerun_this_batch": false
+    },
+    {
+      "id": "MAC-FLOAT-002",
+      "status": "unresolved",
+      "result": "Retina floating size grows across close/reopen and restart.",
+      "evidence_scope": "mac_dynamic"
+    },
+    {
+      "id": "MAC-READ-003",
+      "status": "unresolved",
+      "result": "Windows title L/R information absent in Mac half-page display.",
+      "navigation_correct": true
+    }
+  ],
+  "excluded_or_limited_attempts": [
+    {
+      "case": "AX slider value only",
+      "status": "not_counted",
+      "reason": "Control value changed without committing main-page navigation. Real click used for successful last-page sample.",
+      "evidence": [
+        "evidence/mac-slider-ax-value-only.png",
+        "evidence/mac-slider-ax-value-only.ax.txt"
+      ]
+    },
+    {
+      "case": "AX uncommitted slider follow-up",
+      "status": "not_counted",
+      "reason": "Previous-page result followed an uncommitted AX slider value, not a verified last-page state.",
+      "evidence": [
+        "evidence/mac-slider-uncommitted-prev.png",
+        "evidence/mac-slider-uncommitted-prev.ax.txt"
+      ]
+    },
+    {
+      "case": "Menu action without command result",
+      "status": "not_counted",
+      "reason": "No actual page-rule change observed despite API returning no error. Tool/menu execution gap, not a confirmed product defect.",
+      "evidence": [
+        "evidence/mac-menu-action-unverified.png",
+        "evidence/mac-menu-action-unverified.ax.txt"
+      ]
+    },
+    {
+      "case": "RDP keyboard-mode restoration",
+      "status": "clicked_not_state_verified",
+      "reason": "Scan-code entry clicked; no checked-menu screenshot obtained.",
+      "evidence": [
+        "evidence/rdp-after-scan-code.png"
+      ]
+    }
+  ],
+  "pending": [
+    {
+      "case": "Full docking/drag-back and hover/focus/popup",
+      "status": "unverified"
+    },
+    {
+      "case": "All fixed-Windows file-operation combinations including overwrite, whole-book and delete",
+      "status": "subset_only"
+    },
+    {
+      "case": "ZIP device permanent deletion",
+      "status": "not_executed"
+    },
+    {
+      "case": "Actual NAS disconnect/interruption",
+      "status": "not_run"
+    },
+    {
+      "case": "Screen-complete first-image/page/60Hz P95",
+      "status": "not_measured"
+    },
+    {
+      "case": "Finder alias independent device case",
+      "status": "not_run"
+    },
+    {
+      "case": "Pure HTML independent format",
+      "status": "not_independently_verified"
+    },
+    {
+      "case": "File-promise-only reception",
+      "status": "not_run",
+      "capability": "unsupported_without_standard_alternative"
+    },
+    {
+      "case": "Filesystem case aliases",
+      "status": "not_run"
+    },
+    {
+      "case": "Trackpad",
+      "status": "skipped_by_user"
+    },
+    {
+      "case": "Multi-display",
+      "status": "environment_unavailable"
+    }
+  ],
+  "restoration": {
+    "mac": {
+      "test_process_exited": true,
+      "profile_isolated": false,
+      "matches_original_snapshot": true,
+      "path_type_mode_size_hash_checked": true,
+      "root_mode_matches": true,
+      "files_verified": 4,
+      "receipt": "profile-mac-reading-restoration.json",
+      "test_profile_preserved": "profile-mac-reading-final"
+    },
+    "windows": {
+      "fixed_test_process_exited": true,
+      "original_installed_process_retained": true,
+      "source_images_restored": 9,
+      "source_images_hash_verified": 9,
+      "isolated_copy_outputs_retained": true,
+      "process_environment_restored": [
+        "NEEVIEW_PROFILE",
+        "DOTNET_ROOT_X64"
+      ],
+      "rdp_scan_code": "clicked_not_state_verified",
+      "raw_logs_and_receipts_retained_remotely": true
+    },
+    "lan_fixture_server_stopped": true,
+    "user_picture_root_written": false
+  },
+  "privacy": "No credentials, original Profile contents, user image paths, screenshots, AX text or heap snapshots committed. Relative artifact names and hashes identify private local evidence. Remote raw logs and receipts remain in isolated Windows test directory.",
+  "local_artifact_set": "p34-compare-20261005-142218",
+  "local_evidence": [
+    {
+      "local_artifact": "app-first.log",
+      "bytes": 6178,
+      "sha256": "91a35061064887aa6babf1d8fdda5fc2e19da9a3d31a81c44c265f96e4ddfd91"
+    },
+    {
+      "local_artifact": "app-floating-restart.log",
+      "bytes": 6176,
+      "sha256": "41e0e2571842333e3ae9a57d2d96be70df8a9c768d3c2d4136a98bcdcb0e0634"
+    },
+    {
+      "local_artifact": "app-floating.log",
+      "bytes": 6176,
+      "sha256": "1c0c08db60abd4297bfeefba4ee4eb41b3ae77cffe8e845a248e4ccf23a718f9"
+    },
+    {
+      "local_artifact": "app-half.log",
+      "bytes": 6178,
+      "sha256": "2ca6475f1d4c3023f9ba9d3d782e95338ad65243723571eb08ba6fe3794bca2a"
+    },
+    {
+      "local_artifact": "app-reading.log",
+      "bytes": 6176,
+      "sha256": "41e0e2571842333e3ae9a57d2d96be70df8a9c768d3c2d4136a98bcdcb0e0634"
+    },
+    {
+      "local_artifact": "diagnostics/session-20261005T0639245197080-77191.jsonl",
+      "bytes": 16218,
+      "sha256": "a7eb8b66bc1094e328c12f0c2a6aaeb510ae11487949f4044fc61983cb11714c"
+    },
+    {
+      "local_artifact": "evidence/floating-enter-main.ax.txt",
+      "bytes": 3157,
+      "sha256": "9681265ac30bf6dfecbaa1c40094a69b2f50dd9830a11c66804e13439b924c68"
+    },
+    {
+      "local_artifact": "evidence/floating-list-main.ax.txt",
+      "bytes": 2852,
+      "sha256": "036d9c33972b58b3f4c4043fbbd0c56e1e5f0fe414effe5fe7fc2bd0979e2a79"
+    },
+    {
+      "local_artifact": "evidence/floating-list.ax.txt",
+      "bytes": 1871,
+      "sha256": "ee34d757946b2569e45fd25e8f5921b2dd71b8a7327edae37f837a94e0c7faaf"
+    },
+    {
+      "local_artifact": "evidence/floating-reopen.ax.txt",
+      "bytes": 2000,
+      "sha256": "3495e977577e022dd116854b4fa4cfccf24ef246146ceee78b62261240e213ab"
+    },
+    {
+      "local_artifact": "evidence/floating-reopen.png",
+      "bytes": 91495,
+      "sha256": "3ff5814a035be9d3a8380f87e96bc810e2e925fdfff83672b75de37d60c0f208"
+    },
+    {
+      "local_artifact": "evidence/floating-restart.ax.txt",
+      "bytes": 2060,
+      "sha256": "4056c03aec16b37b768d51d774eac7bc7df3301afd086b8bd0afaa1d6d8e000b"
+    },
+    {
+      "local_artifact": "evidence/floating-restart.png",
+      "bytes": 145711,
+      "sha256": "000de5b2cff2db1bf05742dff4cbdb5fab49f1f012e427d29995b9fdf570edda"
+    },
+    {
+      "local_artifact": "evidence/floating-search.ax.txt",
+      "bytes": 1551,
+      "sha256": "f54ed9ed4e9a0eb782cb8be8c471fed042da642c47b2ff6d40ca8aabfc24f89d"
+    },
+    {
+      "local_artifact": "evidence/floating-search.png",
+      "bytes": 48504,
+      "sha256": "63ea9d1ed2c6539bf216a38307685ae473fd3d8c21fc1e9d8abe651f00769ea1"
+    },
+    {
+      "local_artifact": "evidence/floating-text-main.ax.txt",
+      "bytes": 2852,
+      "sha256": "036d9c33972b58b3f4c4043fbbd0c56e1e5f0fe414effe5fe7fc2bd0979e2a79"
+    },
+    {
+      "local_artifact": "evidence/mac-after-first.ax.txt",
+      "bytes": 744,
+      "sha256": "f0de8a6496c7dade478e52936a152471f2fe4c9abb3244306d63d4d470175526"
+    },
+    {
+      "local_artifact": "evidence/mac-before-last-wide-policy.ax.txt",
+      "bytes": 746,
+      "sha256": "475da6b89197a2436f6f784b30670dfbba723204d474b9cbeecab57bcb434756"
+    },
+    {
+      "local_artifact": "evidence/mac-before-last-wide-policy.png",
+      "bytes": 269842,
+      "sha256": "c4b5ac37d9055d667f6eaa51e7219f42083d0cfdfe3d0ad3e70e902805953e38"
+    },
+    {
+      "local_artifact": "evidence/mac-direction-switch-keeps-part.ax.txt",
+      "bytes": 2399,
+      "sha256": "28a5ce244081e3276c93aa5f701f5780aab147673cb9f5d6be1ad6b3f8b3d76c"
+    },
+    {
+      "local_artifact": "evidence/mac-direction-switch-keeps-part.png",
+      "bytes": 270016,
+      "sha256": "b94fcaa05c24c7e7d6997ee708004cf5063c95b37c8cf1a3275bd89b8be20015"
+    },
+    {
+      "local_artifact": "evidence/mac-first-alone.ax.txt",
+      "bytes": 6259,
+      "sha256": "f58b4aee1173e13e4439be1f9e87e146e682c8104f7d1ab930fb49922e243a22"
+    },
+    {
+      "local_artifact": "evidence/mac-first-alone.png",
+      "bytes": 288109,
+      "sha256": "5ee985f2dfddd32650c95a6f4d479c4d6013df1b76c6ecdabb99f3e609bc4ecc"
+    },
+    {
+      "local_artifact": "evidence/mac-half-ltr-first.ax.txt",
+      "bytes": 147,
+      "sha256": "c300e70fbfd218c487061ae67f844c988afee022341eaea3de3cdcb8dac8fdbe"
+    },
+    {
+      "local_artifact": "evidence/mac-half-ltr-first.png",
+      "bytes": 273484,
+      "sha256": "9ae801c0712e44c991377145a88ce5468a5d3fcb0fac2df8de2f457679c4d04e"
+    },
+    {
+      "local_artifact": "evidence/mac-half-ltr-next-image.ax.txt",
+      "bytes": 703,
+      "sha256": "dba08407e6084420004a607bdeafcabf0b03805229499a610ec79c84f6b59c14"
+    },
+    {
+      "local_artifact": "evidence/mac-half-ltr-second.ax.txt",
+      "bytes": 147,
+      "sha256": "c300e70fbfd218c487061ae67f844c988afee022341eaea3de3cdcb8dac8fdbe"
+    },
+    {
+      "local_artifact": "evidence/mac-half-ltr-second.png",
+      "bytes": 270013,
+      "sha256": "88c7509f2c84b3b0dd50998393b156b14ca776c17d46a5fa3f7e731e9aba2887"
+    },
+    {
+      "local_artifact": "evidence/mac-half-next-image.ax.txt",
+      "bytes": 703,
+      "sha256": "4393111a02dafcad5e0e185677b5a85f141c41aba5f2247a2ed3c39b142417b3"
+    },
+    {
+      "local_artifact": "evidence/mac-half-next-image.png",
+      "bytes": 278819,
+      "sha256": "c3b70b8aba54804b739005cc708020f62bd4b2a3f5a7e93e36617bbfa4680def"
+    },
+    {
+      "local_artifact": "evidence/mac-half-rtl-first.ax.txt",
+      "bytes": 5958,
+      "sha256": "0f89a4d6b3082ea9d64b9a35be9162eb4ed1082c5497a9be27c57202c17c25e2"
+    },
+    {
+      "local_artifact": "evidence/mac-half-rtl-first.png",
+      "bytes": 270002,
+      "sha256": "d3bb2d5ae9a3a9392ead90287f4f429be13b044f9d0fba09d71e00de3e9beb2e"
+    },
+    {
+      "local_artifact": "evidence/mac-half-rtl-second.ax.txt",
+      "bytes": 147,
+      "sha256": "c300e70fbfd218c487061ae67f844c988afee022341eaea3de3cdcb8dac8fdbe"
+    },
+    {
+      "local_artifact": "evidence/mac-half-rtl-second.png",
+      "bytes": 273460,
+      "sha256": "6a30b827e5191011fbaa5f0c066d490c2e37ada9e0613f050f33b8b9b1fdb28e"
+    },
+    {
+      "local_artifact": "evidence/mac-last-alone.ax.txt",
+      "bytes": 2525,
+      "sha256": "8471c126bfeb12ad6d8f8de2609e399a11dd2eb4f2108ec549139898c70cb02f"
+    },
+    {
+      "local_artifact": "evidence/mac-last-alone.png",
+      "bytes": 281798,
+      "sha256": "7dcb01baa6d3f9afb0258e6ef80177602be2f0c1581d9c6276ca0d497c1dd113"
+    },
+    {
+      "local_artifact": "evidence/mac-menu-action-unverified.ax.txt",
+      "bytes": 129,
+      "sha256": "d6a56a94e965ca51223250a8fe807470c4cd80615bb51ed1ad0996a17cee072e"
+    },
+    {
+      "local_artifact": "evidence/mac-menu-action-unverified.png",
+      "bytes": 269545,
+      "sha256": "440bf286e84ebbfae136d1adf7888b9eb7f53e83482297bbfd87c0a14234c44e"
+    },
+    {
+      "local_artifact": "evidence/mac-reopen-default-policy.ax.txt",
+      "bytes": 6259,
+      "sha256": "281d4154c777db3abb9638e82f33be440c1976ae29d4577771f4a24dd323fbb7"
+    },
+    {
+      "local_artifact": "evidence/mac-reopen-default-policy.png",
+      "bytes": 309016,
+      "sha256": "c1619d0c4a26eeeb4c4278ca97009313e8a246f323bfe5390468912622923533"
+    },
+    {
+      "local_artifact": "evidence/mac-restart-lastbook.ax.txt",
+      "bytes": 5783,
+      "sha256": "ad28c561526cbab033dd110b5a0e8abcc4a1502323ba07b1e4d103eadf301b51"
+    },
+    {
+      "local_artifact": "evidence/mac-restart-lastbook.png",
+      "bytes": 276014,
+      "sha256": "67c38205004f1d01fec136afa544bb57bd9dfb859a56672725b0b3dc2391280e"
+    },
+    {
+      "local_artifact": "evidence/mac-rtl-initial.png",
+      "bytes": 275291,
+      "sha256": "c768a9795eae05fa6dfd62cd36d1dea9a35a0dbb125ebd7837eb96c93e4f7485"
+    },
+    {
+      "local_artifact": "evidence/mac-rtl-next-group.ax.txt",
+      "bytes": 737,
+      "sha256": "66c272d93bd311268e11c651b95242a860b52c853b973a3a9d47563b0dd2918b"
+    },
+    {
+      "local_artifact": "evidence/mac-rtl-next-group.png",
+      "bytes": 270934,
+      "sha256": "6c39e26d116e8472346c6982f57543b00130729cb39cd96b440a6c26a81450c1"
+    },
+    {
+      "local_artifact": "evidence/mac-rtl-next-one.ax.txt",
+      "bytes": 701,
+      "sha256": "413cbeedb3ba4479fa7fb75c0da046cd5698b606d92a045221388fc92bd2b41a"
+    },
+    {
+      "local_artifact": "evidence/mac-rtl-next-one.png",
+      "bytes": 269387,
+      "sha256": "5f13f013bb176082aada1fd117b595dc3ba9753b3f6fe410d0e4ca80dbd8ff52"
+    },
+    {
+      "local_artifact": "evidence/mac-rtl-prev-group.ax.txt",
+      "bytes": 701,
+      "sha256": "2a077fc38122e3814d3c304bc3c6e08d49d8ddd49f6695dd0638b887bb5c9e2b"
+    },
+    {
+      "local_artifact": "evidence/mac-slider-ax-value-only.ax.txt",
+      "bytes": 333,
+      "sha256": "4859dd1fc40e0aeaee20cfc44d7def0bd4737af83d86d8fbe205b557765680cc"
+    },
+    {
+      "local_artifact": "evidence/mac-slider-ax-value-only.png",
+      "bytes": 270606,
+      "sha256": "6768b5fd64ad7a3dd297cf1b6b98a6a48b5f67a05ee006eb36bcbef60adbed7f"
+    },
+    {
+      "local_artifact": "evidence/mac-slider-uncommitted-prev.ax.txt",
+      "bytes": 706,
+      "sha256": "8d1a865522e542b704ca25b17878ee28316634341cbae4446fcf337a177fc348"
+    },
+    {
+      "local_artifact": "evidence/mac-slider-uncommitted-prev.png",
+      "bytes": 275701,
+      "sha256": "5546c3480fad6d83312aef21f3e18a5c7516441173c769f271d011e5a996b379"
+    },
+    {
+      "local_artifact": "evidence/mac-sort-desc-anchor.ax.txt",
+      "bytes": 2004,
+      "sha256": "fc3eba1d87273ec577f74010067dd5626cee2882adb4455881f72e056663213c"
+    },
+    {
+      "local_artifact": "evidence/mac-sort-desc-anchor.png",
+      "bytes": 279189,
+      "sha256": "9f9070983aaa96fbdf3a2c8c86984d93e9c6faaaa690eb3d74c584b3fe86d235"
+    },
+    {
+      "local_artifact": "evidence/mac-wide-alone.ax.txt",
+      "bytes": 711,
+      "sha256": "528bd82113ee004c49d16cf3871fa36356a3e851a12442a1dec92075da4bb8a5"
+    },
+    {
+      "local_artifact": "evidence/mac-wide-alone.png",
+      "bytes": 267403,
+      "sha256": "9461e5f9001ae4195134bb6fbb1cd6e1daa6d321c988aaa67d4466f0b59ff0fc"
+    },
+    {
+      "local_artifact": "evidence/rdp-after-scan-code.png",
+      "bytes": 343096,
+      "sha256": "49d451bbafaf6f5799f910ce9b6674aee2eaddca244123a6257a223d47742e6e"
+    },
+    {
+      "local_artifact": "evidence/windows-all-undo-second.png",
+      "bytes": 370970,
+      "sha256": "887c51e12d75967fb8cf83e3967df358a36ff127830a520091b2fd9faa8c52b2"
+    },
+    {
+      "local_artifact": "evidence/windows-all-undo.png",
+      "bytes": 369124,
+      "sha256": "e652ab861931d95aa1bd05d8b5c16d2b22f91c279887639edfcd833a804f8055"
+    },
+    {
+      "local_artifact": "evidence/windows-before-last-boundary.png",
+      "bytes": 370314,
+      "sha256": "848f36d75a37d03611b73aa764b0e704460760b631376c7a504aaa50e6dd5ec4"
+    },
+    {
+      "local_artifact": "evidence/windows-book-menu.png",
+      "bytes": 415145,
+      "sha256": "3b852b03087d557ff284be5a09a033f3e227d9dd35782dc408d35841e6d2d338"
+    },
+    {
+      "local_artifact": "evidence/windows-build-result.png",
+      "bytes": 566346,
+      "sha256": "72dfb4e8b5ab7bf411fe7fcc0c41aee79d0a9a3652ffffba95f2ebc024a86f0e"
+    },
+    {
+      "local_artifact": "evidence/windows-conflict-canceled.png",
+      "bytes": 373963,
+      "sha256": "265941d2a10502746bd50a6d2aae9459c501e9ad1493147e7bcc8f21546f8072"
+    },
+    {
+      "local_artifact": "evidence/windows-copy-all.png",
+      "bytes": 378488,
+      "sha256": "a07f9985480a79c9241c836f9ab4ca32c744093c7daaa80cea7416f2cdd37663"
+    },
+    {
+      "local_artifact": "evidence/windows-copy-files.png",
+      "bytes": 364501,
+      "sha256": "df618715f24ae89228cbd16ce3ebc0fc1aae8ed53363f28111698fa5494ca2ed"
+    },
+    {
+      "local_artifact": "evidence/windows-copy-ltr.png",
+      "bytes": 377878,
+      "sha256": "4dcc402508650a07ae1a6d292cf3194082c3f8c6fddd17c22efddfb9a9511b02"
+    },
+    {
+      "local_artifact": "evidence/windows-copy-once.png",
+      "bytes": 378479,
+      "sha256": "df734911d5d23938d249d23bf3bda3c206963538290205e7f7490575e0218bd9"
+    },
+    {
+      "local_artifact": "evidence/windows-copy-summary.png",
+      "bytes": 408247,
+      "sha256": "a2b2af592521e9b89389f577f68f87a99e461a3edc5cb4bafb8c2dcb0507540c"
+    },
+    {
+      "local_artifact": "evidence/windows-env-restored.png",
+      "bytes": 343117,
+      "sha256": "3d7133a5e259aef2428e7a38efa510db3e3d66364a77d650788f5bcc87d9875e"
+    },
+    {
+      "local_artifact": "evidence/windows-final-integrity.png",
+      "bytes": 279735,
+      "sha256": "e5f3860b0e13ecb5bbb4ee3d50080cbc270fa3803a4f9f6e6907c8d3191ecc06"
+    },
+    {
+      "local_artifact": "evidence/windows-final-processes.png",
+      "bytes": 366594,
+      "sha256": "ec067c0868e6ff498ae6e6ac08d92562edf5922dca3a9b7e3d3ec6e25be220f2"
+    },
+    {
+      "local_artifact": "evidence/windows-first-alone.png",
+      "bytes": 352037,
+      "sha256": "c47b995ecac37fb2ff41c3df092297ee02bd8924b77ae8fc223900c784b00f61"
+    },
+    {
+      "local_artifact": "evidence/windows-fixture-hash.png",
+      "bytes": 781995,
+      "sha256": "eded75faa62ff4baa12a44c354e5a06ae23740f75a41eb7d3ac61ffe9340a002"
+    },
+    {
+      "local_artifact": "evidence/windows-fixture-verified.png",
+      "bytes": 361022,
+      "sha256": "49454465b7732a927b0222ecd03975ed863cc5a29935cb93c13cb57b889426af"
+    },
+    {
+      "local_artifact": "evidence/windows-half-ltr-first.png",
+      "bytes": 360933,
+      "sha256": "5cb8240796d301dae9fa5cd1bb5a5bc178511d4d07934565bbcc8848f06124a2"
+    },
+    {
+      "local_artifact": "evidence/windows-half-ltr-next-image.png",
+      "bytes": 360761,
+      "sha256": "e02a1b3270e798f17caee402186f3101e5f46efe7304f54f16ea2c2a1eb06677"
+    },
+    {
+      "local_artifact": "evidence/windows-half-ltr-second.png",
+      "bytes": 358398,
+      "sha256": "a1c08b3c875b4acf037efc638bd66e7939e182c3bb42ca7feb7a2a7a82957cfc"
+    },
+    {
+      "local_artifact": "evidence/windows-half-next-image.png",
+      "bytes": 380490,
+      "sha256": "e1607cf1395a002251ac48455d32b38d8eb58b641eb9495f67f62889130f285c"
+    },
+    {
+      "local_artifact": "evidence/windows-half-rtl-first.png",
+      "bytes": 377302,
+      "sha256": "3635828a9c01d471b65a77622e8978e36287a30e7192c17edf9b1c270970176f"
+    },
+    {
+      "local_artifact": "evidence/windows-half-rtl-second.png",
+      "bytes": 379370,
+      "sha256": "29d19fabc38e50aa93dcd0620f6500f9c7fe211cc496e1fa21ff986567b68d07"
+    },
+    {
+      "local_artifact": "evidence/windows-last-alone.png",
+      "bytes": 361675,
+      "sha256": "84cfc2d172513f3e8d9c9631000215a2a473b6f71b6242da7fdc5e58b3c725a7"
+    },
+    {
+      "local_artifact": "evidence/windows-ltr-reversed-f6.png",
+      "bytes": 359174,
+      "sha256": "d4b77e55ad855687732b31ddf14f5eb7b653bdd2b8c83b398cc47b975d689655"
+    },
+    {
+      "local_artifact": "evidence/windows-move-conflict.png",
+      "bytes": 410715,
+      "sha256": "aee51c96bb9a2a9d7d1b6176f02242f24a4ce34d096c741865e872fdb784235e"
+    },
+    {
+      "local_artifact": "evidence/windows-move-once.png",
+      "bytes": 369661,
+      "sha256": "3f29b7b905a599647bd6a7979d59038eab459d0a4fafe1746bceef8b648c8a44"
+    },
+    {
+      "local_artifact": "evidence/windows-move-redo.png",
+      "bytes": 368645,
+      "sha256": "3de28ad3d346b132aa99cfceed75108ecd504e99206467415badf86a7c8478b7"
+    },
+    {
+      "local_artifact": "evidence/windows-move-undo.png",
+      "bytes": 370898,
+      "sha256": "ea6b57b87699e1036083600e7042bcfe5d348bb07d810c352a805cf5b27e3b97"
+    },
+    {
+      "local_artifact": "evidence/windows-new-move-clears-redo.png",
+      "bytes": 372955,
+      "sha256": "ec626c83cffc121f8c58e55dc83a55b56b2225db200a9a13d24357d147ba9700"
+    },
+    {
+      "local_artifact": "evidence/windows-page-menu.png",
+      "bytes": 390540,
+      "sha256": "82d4ac74210e09e72b1f463b3df99599a8c69fcf883046e3e8091afef6133cc6"
+    },
+    {
+      "local_artifact": "evidence/windows-prepare-state.png",
+      "bytes": 518191,
+      "sha256": "dd792ff62702467424bfbb7aefa9a7186c2559c356e66731fa55922aa30720f5"
+    },
+    {
+      "local_artifact": "evidence/windows-reading-initial.png",
+      "bytes": 615549,
+      "sha256": "3e735736ff2a366528b1c009afbfd52080f61b9899c8d98bd6d1cc45eaa35f2e"
+    },
+    {
+      "local_artifact": "evidence/windows-restart-anchor.png",
+      "bytes": 381171,
+      "sha256": "28108c86ecee814660ac14c8b79d2ef23d9065761beb1cdcc43cea554319a056"
+    },
+    {
+      "local_artifact": "evidence/windows-rtl-initial.png",
+      "bytes": 396966,
+      "sha256": "93b60cea6377399c6204058e522430f6adc8e590047929a3945c1c6b85ab1eb7"
+    },
+    {
+      "local_artifact": "evidence/windows-rtl-next-group.png",
+      "bytes": 392001,
+      "sha256": "ad45cddf970417724ae2114d4f3caa6413015f49318a1cc95719cd76d32cb8ea"
+    },
+    {
+      "local_artifact": "evidence/windows-rtl-next-one.png",
+      "bytes": 391887,
+      "sha256": "4eef01236dd86ac820afecf687fdfb527a09d9d23eb32517f60c112788716b52"
+    },
+    {
+      "local_artifact": "evidence/windows-rtl-prev-group.png",
+      "bytes": 397059,
+      "sha256": "6a20a3428ba7cd82fe18a9c9b5395c3e5733b984d9a91e141dd832c5f64e3d7f"
+    },
+    {
+      "local_artifact": "evidence/windows-saved-history.png",
+      "bytes": 480599,
+      "sha256": "81efe42f4835947e3ed7e1440ccdc50545a05a03c12bd9a0c33c145448db7b04"
+    },
+    {
+      "local_artifact": "evidence/windows-sdk-progress.png",
+      "bytes": 360514,
+      "sha256": "3579e35c7c46796d3006e9729b5b5afd04b812e2ae7233aeca1fbb290e0e5b03"
+    },
+    {
+      "local_artifact": "evidence/windows-sort-desc-anchor.png",
+      "bytes": 381172,
+      "sha256": "78e946a6facc1831bb61017ee656e94e72ddbbc1eae34b7a67a2313594088b4b"
+    },
+    {
+      "local_artifact": "evidence/windows-wide-alone.png",
+      "bytes": 384333,
+      "sha256": "649ee554c6c23fcfcba95433a4a8d3ecc4a78ff313ad3e6d1a25366c1ad01578"
+    },
+    {
+      "local_artifact": "headless/p34-compare-archive-settings-layout.png",
+      "bytes": 99958,
+      "sha256": "01f2c6ed4f252a3f2731c760dfe8aeb1895d9e0ff0aeaef42b47281aa0a80482"
+    },
+    {
+      "local_artifact": "headless/p34-compare-commands.json",
+      "bytes": 81184,
+      "sha256": "8cbb5d3e2a4a73afea2d3e1be454876096bedd3e60080922bd16481dc139cc89"
+    },
+    {
+      "local_artifact": "headless/p34-compare-copy-parameter.png",
+      "bytes": 12005,
+      "sha256": "90b4e1d3ef9845e0a2c6c1ed66386591b949000f17f436906a72b041afeb93c8"
+    },
+    {
+      "local_artifact": "headless/p34-compare-directory-overwrite.png",
+      "bytes": 24255,
+      "sha256": "f8a6d3ce187fd9cf17843bda9b9b0dda2687e304c53d9c3035acbf1eefbc125d"
+    },
+    {
+      "local_artifact": "headless/p34-compare-floating-layout.png",
+      "bytes": 5531,
+      "sha256": "c90f980fb0b94349436d2626e1e9d20fc23b211a1bdcd876657f6e7375d66c33"
+    },
+    {
+      "local_artifact": "headless/p34-compare-layout.png",
+      "bytes": 64418,
+      "sha256": "c714904ea83edfe432578fdfc74d155140efdb0a4bc0630c352b0e424e59ce27"
+    },
+    {
+      "local_artifact": "headless/p34-compare-page-search-layout.png",
+      "bytes": 60482,
+      "sha256": "2e014f4a15d798664688a950f1fe9d14899c125c80e0b6832a33822a75162b49"
+    },
+    {
+      "local_artifact": "headless/p34-compare-settings.png",
+      "bytes": 111267,
+      "sha256": "92758b4b8fad1029dabc401002d7604c72005f489e4b1c78e40b0f9394b2fc93"
+    },
+    {
+      "local_artifact": "original-profile-snapshot.json",
+      "bytes": 721,
+      "sha256": "3300fefcec6751039cb5e276b4f6b77ed1584bf3ef10b09cda3bbdbc79d3ed6f"
+    },
+    {
+      "local_artifact": "p34-compare.trx",
+      "bytes": 240770,
+      "sha256": "6e9a32718beb1e0e1c8a1fb01812210c0ec42de0a585b83736d51771bd44fc4c"
+    },
+    {
+      "local_artifact": "profile-after-floating-restart.json",
+      "bytes": 10834,
+      "sha256": "aed916de88b99a669fa917b17479d3197eb52772be3374ca8796a0b9e448b669"
+    },
+    {
+      "local_artifact": "profile-after-floating.json",
+      "bytes": 10835,
+      "sha256": "f2f256886ee46fd9e0b3aa750ad2aaccf3364a4ba8249dd754a7a10bc5cf9480"
+    },
+    {
+      "local_artifact": "profile-mac-reading-after-quit/Bookmark.json",
+      "bytes": 78,
+      "sha256": "36a0cc66a39948bf2a5e5db81ad73d8f29cde5f7d60fe6b6b8d3ef9c8191e766"
+    },
+    {
+      "local_artifact": "profile-mac-reading-after-quit/Foldres.json",
+      "bytes": 57,
+      "sha256": "e3c080cc2021c5cd33307f56a4ae750b35a91d5630bd2dce9888254d70905c48"
+    },
+    {
+      "local_artifact": "profile-mac-reading-after-quit/History.json",
+      "bytes": 498,
+      "sha256": "fb584f3aabc046f4d5bed6a18277f46dfb225b50586c291d99d80cb1cc2991b6"
+    },
+    {
+      "local_artifact": "profile-mac-reading-after-quit/QuicAccess.json",
+      "bytes": 59,
+      "sha256": "97b7f00dc0a1304ce48630d01397c930cac939e5ac5cf11783ed9780e4f8e10a"
+    },
+    {
+      "local_artifact": "profile-mac-reading-after-quit/UserSetting.json",
+      "bytes": 11674,
+      "sha256": "4e3e4a6c1bcf5225539ac472ba0f8b14b807989e01224faa2ad6bcfcd9ba0556"
+    },
+    {
+      "local_artifact": "profile-mac-reading-before-wide/Bookmark.json",
+      "bytes": 78,
+      "sha256": "36a0cc66a39948bf2a5e5db81ad73d8f29cde5f7d60fe6b6b8d3ef9c8191e766"
+    },
+    {
+      "local_artifact": "profile-mac-reading-before-wide/Foldres.json",
+      "bytes": 57,
+      "sha256": "e3c080cc2021c5cd33307f56a4ae750b35a91d5630bd2dce9888254d70905c48"
+    },
+    {
+      "local_artifact": "profile-mac-reading-before-wide/History.json",
+      "bytes": 462,
+      "sha256": "b729f96f19efc67fc0fa61069ddf93ddf690a1a002a850a8e8a008e6f7914923"
+    },
+    {
+      "local_artifact": "profile-mac-reading-before-wide/QuicAccess.json",
+      "bytes": 59,
+      "sha256": "97b7f00dc0a1304ce48630d01397c930cac939e5ac5cf11783ed9780e4f8e10a"
+    },
+    {
+      "local_artifact": "profile-mac-reading-before-wide/UserSetting.json",
+      "bytes": 11639,
+      "sha256": "9e3dcdd776a1f7f91d45c00a56eb4747186037cfd49a58e7d9d947d47a5093a0"
+    },
+    {
+      "local_artifact": "profile-mac-reading-final/Bookmark.json",
+      "bytes": 78,
+      "sha256": "36a0cc66a39948bf2a5e5db81ad73d8f29cde5f7d60fe6b6b8d3ef9c8191e766"
+    },
+    {
+      "local_artifact": "profile-mac-reading-final/Foldres.json",
+      "bytes": 57,
+      "sha256": "e3c080cc2021c5cd33307f56a4ae750b35a91d5630bd2dce9888254d70905c48"
+    },
+    {
+      "local_artifact": "profile-mac-reading-final/History.json",
+      "bytes": 495,
+      "sha256": "ad82c105355155359525454125e3ee49c9f68dc4b6177cbd4e56b350d81c02cc"
+    },
+    {
+      "local_artifact": "profile-mac-reading-final/QuicAccess.json",
+      "bytes": 59,
+      "sha256": "97b7f00dc0a1304ce48630d01397c930cac939e5ac5cf11783ed9780e4f8e10a"
+    },
+    {
+      "local_artifact": "profile-mac-reading-final/UserSetting.json",
+      "bytes": 11666,
+      "sha256": "2be2b930e2b59192908b8f23302e16c28059ed8f9a1d14641ebe6b7375879ec6"
+    },
+    {
+      "local_artifact": "profile-mac-reading-restoration.json",
+      "bytes": 243,
+      "sha256": "42c2d60471edff82a04a38f8c69ea04bb14694659b275931fdcde1e1688c47c1"
+    },
+    {
+      "local_artifact": "profile-mac-wide-seed/Bookmark.json",
+      "bytes": 78,
+      "sha256": "36a0cc66a39948bf2a5e5db81ad73d8f29cde5f7d60fe6b6b8d3ef9c8191e766"
+    },
+    {
+      "local_artifact": "profile-mac-wide-seed/Foldres.json",
+      "bytes": 57,
+      "sha256": "e3c080cc2021c5cd33307f56a4ae750b35a91d5630bd2dce9888254d70905c48"
+    },
+    {
+      "local_artifact": "profile-mac-wide-seed/History.json",
+      "bytes": 13,
+      "sha256": "f011fd352933290b468095367ae477608a4bf5a3d1182327f296070b19259ee3"
+    },
+    {
+      "local_artifact": "profile-mac-wide-seed/QuicAccess.json",
+      "bytes": 59,
+      "sha256": "97b7f00dc0a1304ce48630d01397c930cac939e5ac5cf11783ed9780e4f8e10a"
+    },
+    {
+      "local_artifact": "profile-mac-wide-seed/UserSetting.json",
+      "bytes": 11536,
+      "sha256": "6506ab055fbbb23a72e8589edf3c7a4bad955b5ef6c6d027066c9a34bd440902"
+    },
+    {
+      "local_artifact": "restoration.json",
+      "bytes": 131,
+      "sha256": "3f2074ad6e51b11064bfa2299ca3508b4a52d84d0317e2e9a9145031bdfd4153"
+    },
+    {
+      "local_artifact": "session.json",
+      "bytes": 277,
+      "sha256": "e3d8af17bb172abdce83fafc77ae8b0585eb016b23356b8bd21489fd55bfdcf7"
+    },
+    {
+      "local_artifact": "targeted-tests.log",
+      "bytes": 473,
+      "sha256": "2ba19c8787d0e20307a2db38fcbae94fdc51a76991e333d38fb97ace625f3644"
+    },
+    {
+      "local_artifact": "windows-fixed-lan-resume.ps1",
+      "bytes": 4139,
+      "sha256": "38d6321c24df3e9f50e417a531e670e8d8bbf0bac2a4453da2d451f0a087dd4a"
+    },
+    {
+      "local_artifact": "windows-fixed-prepare.ps1",
+      "bytes": 3692,
+      "sha256": "2519c6c0357c2950f782c8aa8fd32495c2d3ee2ad5bd557a99a5d85fe4846be7"
+    },
+    {
+      "local_artifact": "windows-fixed-resume.ps1",
+      "bytes": 4167,
+      "sha256": "40c30da346f942d0e47bc56e79d54dc5505e46c86571065868b130f21ce6831a"
+    },
+    {
+      "local_artifact": "windows-reading-seed.json",
+      "bytes": 1799,
+      "sha256": "f761559be9b2703c41884d53b0517e96564dfc0f975293c3f1b2c67422884c3c"
+    }
+  ]
+}

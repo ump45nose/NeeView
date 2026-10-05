@@ -4,8 +4,8 @@
 
 | 项目 | 开发状态 | 设备/原版边界 |
 |---|---|---|
-| 两区面板、管理/新建/刷新、九数字/Index | 已接入 | 数字分类及真实跨栏组合/拆组通过；完整焦点/浮动与固定Windows分类样本待验 |
-| 原Once/All/AllLeftToRight、固定移动/复制 | 已接入 | 原页组、方向、部分成功静默回归；Windows动态另验 |
+| 两区面板、管理/新建/刷新、九数字/Index | 已接入 | 数字分类及真实跨栏组合/拆组通过；Windows数字1/2/3分类子集通过，完整停靠/弹出层待验，浮窗尺寸恢复失败 |
+| 原Once/All/AllLeftToRight、固定移动/复制 | 已接入 | 原页组、方向、部分成功静默回归；固定Windows Copy/Move子集通过，AllLeftToRight实际执行顺序仍依静态/自动证据 |
 | 移动UndoRedo/容量/覆盖/中断恢复 | 已接入 | 真实覆盖Undo/权限失败通过；整书APFS→SMB通过，真断线/中断恢复仍待验 |
 | DeleteFile及页面列表显式多选 | 已接入 | AppKit普通实体多选废纸篓/列表只删登记通过；ZIP真实永久删除取消，未验 |
 | ZIP原独立写权限、不可逆确认 | 已接入，默认关闭 | ZIP流式重建和存活ID/注释回归；真机只到确认并取消，RAR/7z只读 |
@@ -36,4 +36,18 @@ P4开发收尾及本轮实际结果见[契约](p4-completion.md)与[验收记录
 
 [设备记录](../acceptance/p34-device-runtime.md)覆盖真实分类/覆盖Undo、权限/缺失目标、整书跨卷/废纸篓、Finder标准文件双向、Safari图片/链接接收、列表多选/播放列表登记删除、面板组合/拆组、文本焦点隐藏子集与Retina无损ROI。Finder file reference URL、Retina半像素边界及列表Delete作用域三处已修复并复验。
 
-全量807通过/2跳过，指定资源补跑2/2通过；正式构建/严格ad-hoc签名通过。长期自然资源测试失败，静态100次无障碍查询独立确认回调数组保留；关闭归零不替代稳定性。Mac浮动/完整弹出层、固定Windows构建与动态、ZIP真实永久删除、真NAS断线和屏幕P95仍待验，Finder alias未继承为通过。原Mac配置已完整校验恢复，私人原始材料只留本机。
+全量807通过/2跳过，指定资源补跑2/2通过；正式构建/严格ad-hoc签名通过。长期自然资源测试失败，静态100次无障碍查询独立确认回调数组保留；关闭归零不替代稳定性。后续固定Windows构建与动态子集已完成，见下节；完整弹出层、ZIP真实永久删除、真NAS断线和屏幕P95仍待验，Finder alias未继承为通过。原Mac配置已完整校验恢复，私人原始材料只留本机。
+
+长期资源缺陷登记为[MAC-AX-001](known-issues.md#mac-ax-001macos-无障碍查询持续保留回调数组)。按用户要求先保留问题、继续其他对照，不把它改记为通过。
+
+## 2026-10-05 后续固定原版对照
+
+[后续记录](../acceptance/p34-compare-runtime.md)与[匿名证据](../acceptance/p34-compare-evidence.json)分别记录固定 Windows 构建、动态阅读/分类、Mac 阅读、163/163 针对性回归及恢复。Windows 原默认目录 restore/publish 成功，独立副本完成两种阅读方向、半页、页组/单页、排序锚点、重启锚点、Once/All Copy/Move、逐文件 Undo/Redo 和冲突取消；没有执行 Windows 覆盖，不外推整书及删除对照。
+
+Mac 新样本确认页组/单页、左右半页顺序、排序锚点、显式 LastBook 启动恢复、普通打开按字段策略恢复及首/末/宽页。不同入口和不同 wide 设置分别记录；菜单调用未提交与 AX slider 只改控件值的尝试不计通过。
+
+- [MAC-FLOAT-002](known-issues.md#mac-float-002retina-浮窗关闭重开及重启后尺寸持续放大)：真实 Retina 浮窗关闭/重开及启动后宽度累积放大，未修。
+- [MAC-READ-003](known-issues.md#mac-read-003分割页缺少原版标题中的-lr-提示)：导航正确，原标题 L/R 提示未迁入，未修。
+- [MAC-AX-001](known-issues.md#mac-ax-001macos-无障碍查询持续保留回调数组)：长期资源失败状态保留。
+
+Mac 测试进程退出，原 Profile 四文件及权限完整校验恢复；Windows 测试副本退出，原实例保留，九张源图与 CBZ 条目哈希 9/9 匹配，临时环境恢复。剩余完整停靠/hover/popup、真 NAS 断线、ZIP真实永久删除、屏幕 P95 和 Finder alias 等仍按独立用例验收。**P3/P4 未封板。**
