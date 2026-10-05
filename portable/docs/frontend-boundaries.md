@@ -1,5 +1,7 @@
 # 前端独立调整边界
 
+P5 预览布局在 ProfileImportWindow.axaml，映射编辑与请求代次在 ProfileImportViewModel，主窗口仅调用 MainWindow.ProfileImport 入口。解析、原默认键位、路径映射和兼容报告均在 Engine；Profile/ZIP 读取仅由启动装配注入，不进入视图。样式和报告排布可以独立改动；本批没有实际导入写入按钮，原 ImportBackup 保持占位。
+
 生产界面在唯一 `NeeView.MacOS` 项目内。XAML、主题、表现和绘制各有入口；界面变化不改阅读规则、排序、保存格式和文件操作语义。
 
 | 调整 | 入口 | 保持的契约 |

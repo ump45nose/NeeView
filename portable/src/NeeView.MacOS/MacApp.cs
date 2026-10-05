@@ -116,6 +116,7 @@ public sealed partial class MacApp : Avalonia.Application
             _contentDropReceiver ??= new ContentDropReceiver(); operation.AttachContentDropReceiver(_contentDropReceiver);
             var model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state);
             _window = new MainWindow(); _window.Bind(model, images, new MacPlatformService());
+            _window.AttachProfileImport(new ProfileImportReader());
             _window.AttachPlatformInput(new MacTrackpadInput());
             _window.Closed += (_, _) => _window = null;
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) desktop.MainWindow = _window;

@@ -199,7 +199,7 @@ public sealed partial class MainWindow : Window
         _ => IsCommandImplemented(name)
     };
     /// <summary>配置/占位说明读取迁移状态，不能把当前无目标误标成尚未迁移。</summary>
-    private bool IsCommandImplemented(string name) => HostCommands.Contains(name) || _model?.Commands.IsAvailable(name) == true;
+    private bool IsCommandImplemented(string name) => name == "PreviewProfileImport" ? _profileImport is not null : HostCommands.Contains(name) || _model?.Commands.IsAvailable(name) == true;
     /// <summary>迁入完整菜单后追加 Mac 打开目录及已有交互，保持原八组顺序。</summary>
     private void BuildMenus()
     {
@@ -208,6 +208,7 @@ public sealed partial class MainWindow : Window
         root.Children![0].Children!.Insert(1, new("打开目录…", MenuElementType.Command, "OpenFolder"));
         root.Children[0].Children!.Add(new("重新载入", MenuElementType.Command, "ReLoad"));
         root.Children[0].Children!.Add(new("关闭窗口", MenuElementType.Command, "CloseWindow"));
+        root.Children[0].Children!.Add(new("旧数据导入预览…", MenuElementType.Command, "PreviewProfileImport"));
         foreach (var (text, command) in new[] { ("放大", "ViewScaleUp"), ("缩小", "ViewScaleDown") })
             root.Children[2].Children!.Add(new(text, MenuElementType.Command, command));
         // 原默认菜单未列出的定位命令追加到跳转组，原节点/占位和顺序完整保留。
@@ -338,6 +339,7 @@ public sealed partial class MainWindow : Window
         {
             switch (name)
             {
+                case "PreviewProfileImport": await ShowProfileImportAsync(); break;
                 case "LoadAs":
                     var files = await StorageProvider.OpenFilePickerAsync(new() { Title = "打开图片、ZIP / RAR / 7z", AllowMultiple = false });
                     if (files.FirstOrDefault()?.TryGetLocalPath() is { } file) await OpenAsync(file); break;

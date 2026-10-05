@@ -1862,6 +1862,18 @@
       "target": "src/NeeView.Backends/MacFileClipboard.cs",
       "sha256": "80d8e8d1f069cf8d6dfb2f6a6e49f6175d113c2daf1ed0bf99256afdf10dc11d",
       "status": "P4收尾：NSPasteboard标准图片/HTML/URL替换Windows协议，主线程有限快照"
+    },
+    {
+      "source": "NeeView/SaveData/Exporter.cs",
+      "target": "src/NeeView.Backends/Content/ProfileImportReader.cs",
+      "sha256": "e20bdec6ce1e3233965df1a2e6a90b2ccde1824791bb5e8819fa8a13b31592cb",
+      "status": "P5 原五文件/标准ZIP形状适配；只读预览不导出或解压脚本"
+    },
+    {
+      "source": "NeeView/SaveData/Importer.cs",
+      "target": "src/NeeView.Engine/SaveData/ProfileImportService.cs",
+      "sha256": "5097c3763a92995343526387beb702432061b7d660658cc880adde3c3501e876",
+      "status": "P5 原JSON和后备分支的只读预览适配；真实应用/旧版本升级待下一批"
     }
   ],
   "rule_references": [

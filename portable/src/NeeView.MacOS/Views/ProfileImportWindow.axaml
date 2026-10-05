@@ -1,0 +1,83 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="NeeView.MacOS.Views.ProfileImportWindow" Width="980" Height="720" MinWidth="740" MinHeight="500"
+        Title="旧数据导入预览" WindowStartupLocation="CenterOwner" x:CompileBindings="False">
+  <!-- 布局/主题独立；解析、映射、差分默认与能力报告均由 Engine 提供。 -->
+  <Grid Margin="16" RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" RowSpacing="12">
+    <StackPanel Spacing="8">
+      <TextBlock Text="只读预览 · 当前数据和导入来源保持不变" FontSize="18" />
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Button Content="选择 Profile 目录…" Click="ChooseDirectory" />
+        <Button Content="选择 .nvzip 备份…" Click="ChooseBackup" />
+      </StackPanel>
+      <TextBlock Text="{Binding SourceLabel}" TextWrapping="Wrap" />
+    </StackPanel>
+    <StackPanel Grid.Row="1" Spacing="6">
+      <TextBlock Text="Windows → Mac 路径映射（最长前缀优先，例如 P:\图片 → /Volumes/Picture）" />
+      <ScrollViewer MaxHeight="140">
+        <ItemsControl ItemsSource="{Binding Mappings}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Grid ColumnDefinitions="*,Auto,*,Auto" ColumnSpacing="8" Margin="0,3">
+                <TextBox Text="{Binding WindowsPrefix, Mode=TwoWay}" PlaceholderText="Windows 盘符或 UNC 前缀" />
+                <TextBlock Grid.Column="1" Text="→" VerticalAlignment="Center" />
+                <TextBox Grid.Column="2" Text="{Binding MacPrefix, Mode=TwoWay}" PlaceholderText="Mac 绝对路径" />
+                <Button Grid.Column="3" Content="移除" Click="RemoveMapping" />
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Button Content="添加映射" Click="AddMapping" />
+        <Button Content="重新预览" Click="RefreshPreview" IsEnabled="{Binding CanPreview}" />
+        <TextBlock Text="读取中…" IsVisible="{Binding IsBusy}" VerticalAlignment="Center" />
+      </StackPanel>
+    </StackPanel>
+    <TextBlock Grid.Row="2" Text="{Binding Summary}" TextWrapping="Wrap" />
+    <TextBlock Grid.Row="3" Text="{Binding Error}" Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}" TextWrapping="Wrap" />
+    <TabControl Grid.Row="4">
+      <TabItem Header="文件与兼容报告">
+        <Grid RowDefinitions="Auto,*" RowSpacing="8">
+          <ItemsControl ItemsSource="{Binding Preview.Files}">
+            <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding Description}" Margin="4" /></DataTemplate></ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <ListBox Grid.Row="1" ItemsSource="{Binding Preview.Notices}" x:Name="NoticeList">
+            <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="4" /></DataTemplate></ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+      </TabItem>
+      <TabItem Header="历史 / 书签 / 路径">
+        <ListBox ItemsSource="{Binding Preview.Paths}" x:Name="ImportPathList">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <StackPanel Margin="4" Spacing="3">
+                <TextBlock Text="{Binding Field}" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding File}" />
+                <TextBlock Text="{Binding Original}" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding Result}" TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal" Spacing="12"><TextBlock Text="{Binding StatusText}" /><TextBlock Text="Page（原条目名）:" /><TextBlock Text="{Binding Page}" /></StackPanel>
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </TabItem>
+      <TabItem Header="命令与键位">
+        <ListBox ItemsSource="{Binding Preview.Commands}" x:Name="ImportCommandList">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Grid ColumnDefinitions="2*,2*,3*" Margin="4" ColumnSpacing="12">
+                <TextBlock Text="{Binding Name}" TextWrapping="Wrap" />
+                <StackPanel Grid.Column="1"><TextBlock Text="{Binding Shortcut}" TextWrapping="Wrap" /><TextBlock Text="{Binding Origin}" /></StackPanel>
+                <TextBlock Grid.Column="2" Text="{Binding Capability}" TextWrapping="Wrap" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </TabItem>
+    </TabControl>
+    <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+      <TextBlock Text="实际导入将在后续批次开放" VerticalAlignment="Center" />
+      <Button Content="关闭" Click="ClosePreview" />
+    </StackPanel>
+  </Grid>
+</Window>
