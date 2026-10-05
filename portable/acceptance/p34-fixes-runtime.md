@@ -28,10 +28,26 @@ Avalonia 12.1.3 [Screens.mm](https://github.com/AvaloniaUI/Avalonia/blob/12.1.3/
 
 182项专项通过（179项分类/整书/改名/链接/保护及3项进度/超时/取消边界）。模拟两个不可即时中断调用证实期限到达仍占槽、新请求不能无限启动、取消准备不写目标或日志，晚到资源释放后可再次请求。
 
-正式.app构建、本地签名通过。真SMB独立挂载、代理连接已确认，普通数字分类越过旧路径枚举，写日志后却在随机暂存创建的`SystemNative_Open/open$NOCANCEL`阻塞；源两图哈希匹配，远端目标/暂存未创建、Completed=false日志留证。没有触发断线即发生此新写入阻塞，所以未外推断线/重连、部分写入和正常退出通过。Command+Q仍等待真实写操作，核对完整性及保存失败Profile后仅终止隔离应用。
+正式.app构建、本地签名通过。真SMB独立挂载、代理连接已确认，普通数字分类越过旧路径枚举，写日志后却在`CopyVerifiedAsync → FileStream → SystemNative_Open/open$NOCANCEL`阻塞；源两图哈希匹配，远端目标/暂存未创建、Completed=false日志留证。该方法先打开源再创建目标，现有栈未采集具体pathname，不能仅凭目标未创建确定是哪次open。没有触发断线即发生此新写入阻塞，所以未外推断线/重连、部分写入和正常退出通过。Command+Q仍等待真实写操作，核对完整性及保存失败Profile后仅终止隔离应用。
 
 定位探针中Python和普通net10.0 FileStream邻接随机文件可打开/写入；隔离net10.0-macos探针可打开并写出15字节，但异步顶层在未运行AppKit循环时未结束，不能当完整Mac产品流程证据。官方v10.0.0源码明确FileShare不转换成open的O_EXLOCK/O_SHLOCK，后续flock为非阻塞，因而未按这个错误推测修改共享策略。还没有确定产品原生open为何不返回，保留现场栈，不添加全局文件系统设置或第二传输框架。
 
 独立挂载从mount清单消失，diskutil命令最终报告Unmount failed，不能称命令成功；测试进程和代理已结束，原十卷保留。逐个校验并移除本轮五个15字节合成探针及独立NAS测试目录。失败日志/Profile及哈希保留本机，仍需后续定位写入阻塞并复验。
 
-本轮未访问或修改用户原图，原Profile已移入完整备份；全部缺陷复验结束后再恢复并核对哈希。
+进一步核对正式包自带的`libSystem.Native.dylib`反汇编，`SystemNative_Open`标记转换未包含O_EXLOCK/O_SHLOCK，与上述源码判断一致；不代表已捕获失败调用参数。下一次定位需要采集具体源/目标打开阶段及pathname/flags，再决定产品改动；没有引入写事务超时后丢后台或第二传输框架。
+
+## MAC-INPUT-005
+
+窗口Tunnel现在根据展示方式下拉框的实际展开状态、当前窗口/主窗/浮窗的OpenedPopups识别交互作用域，排除ToolTip。导航、确认、取消键退出全局命令匹配，不设置Handled，控件仍执行自身行为；Command+O/W/Q仍优先。Escape的正文鼠标/面板拖动取消在popup判断之后，避免抢走弹出层取消键。原命令、配置和阅读规则不变。
+
+新增4项正式控件Headless回归：普通/自动隐藏ComboBox展开但主窗逻辑焦点残留Viewer时，11种导航/确认/取消键不能改书籍或页位；popup关闭后Up/Down仍可切书。主窗及浮窗上下文菜单也隔离主窗残留焦点，关闭后原导航仍有效；浮窗Command+W仍关闭该宿主。初次组合运行发生testhost 134栈溢出，不能记为通过；测试调整为先显示并布局真实placement target，再打开popup，避免对隐藏宿主强制Arrange。测试默认键位冲突及向已销毁Headless浮窗发送KeyRelease亦已修正，没有为测试改动产品自动隐藏逻辑。
+
+最终输入/自动隐藏/浮窗/鼠标/滑条59项全部通过。完整套件834项通过、0失败、2项挂载资源用例按条件跳过；跳过项不计本轮实图性能验收。正式macOS应用串行构建0警告/0错误，本地签名校验通过。完整套件产生的旧PNG/JSON留在本机，本轮不改写已有阶段证据。
+
+正式应用逐动作AX：分页下拉框Down/Up均保留B第3页，Escape关闭；Down后Enter从分页切到原版全景，End后Enter切到瀑布流，均保留书籍/页位。瀑布流B第3页展开后Up不切到A，Escape保留模式；A第1页展开后Down不切到B。关闭popup、明确点击Viewer后Up切到A、Down切回B。主菜单展开后Up不切书。自动隐藏开启时，ShowHiddenPanels显示菜单，下拉框展开后Up保留B第3页，Escape关闭；Command+Q正常退出。历史浮窗Command+W只关闭浮窗，主窗B第3页保留。
+
+浮窗历史菜单点击后未从AX确认交互popup展开，不计真机上下文菜单通过；相关主/浮窗边界已有Headless回归。右键工具返回AXError.notImplemented，不归为产品输入缺陷。全部已计通过的步骤都有单独前/后AX及哈希，未用仅包含主窗的截图代替独立popup展开证明。
+
+## 原Profile恢复
+
+本轮未访问或修改用户原图，原Profile始终保留完整备份。测试应用正常退出并确认进程不存在后，将隔离配置移入本机证据目录，再恢复原目录。原5个文件集合与逐文件SHA256全部一致，恢复后未重新启动用户Profile。恢复回执哈希见匿名证据。AX与真实NAS写入仍未解决，P3/P4未封板。

@@ -55,13 +55,14 @@
 
 ## MAC-INPUT-005：展示方式弹出层的方向键触发全局切书
 
-- 状态：未解决，2026-10-05 正式应用逐动作复现；popup 输入作用域验收失败。
+- 状态：2026-10-05 已修复；展示方式下拉框、主菜单及自动隐藏真机复验通过，主/浮窗上下文菜单自动回归通过；完整浮窗上下文菜单真机范围仍待验。
 - 环境：产品源码 `51b8aab4d`，普通窗口、自动隐藏关闭，瀑布流，隔离合成目录。
 - 复现：在 `nas-timeout` 打开展示方式下拉框，独立 AX 观察确认四个选项及选中瀑布流均存在；只按一次 Up，再观察完整 AX。
 - 实际结果：主书变为邻书 `nas-reconnect`，弹出框仍展开且仍选中瀑布流。Escape 可以关闭，不代表方向键隔离通过。
 - 定位线索：`MacOS/Views/MainWindow.axaml.cs:703–716` 的窗口 Tunnel 按主窗口 FocusManager 与 `focusedElement is ComboBox` 判断作用域。真实 popup 使用独立窗口；具体事件 Source 和焦点对象尚未采样，因此这是修复线索而非已经证实的根因。
 - 证据边界：逐动作完整 AX 记录承担“展开后按 Up”的证明；主窗口 PNG 没包含独立 popup，不单独作为展开证明。此前重开/Up/Enter 连做且未逐步观察的尝试不计通过。
-- 当前处理：登记问题，未在本批改代码。不会把 `AXError.notImplemented` 等其他工具错误并入本缺陷。
+- 修复：按展示方式下拉框的实际展开状态及主窗/浮窗的OpenedPopups隔离交互popup，排除ToolTip。导航/确认/取消键不匹配全局命令、不设Handled，保留控件处理；系统Command+O/W/Q仍优先，查看器Escape取消在popup作用域后执行。无原阅读或键位语义改动。
+- 复验：4项新增popup测试、59项输入相关回归及完整套件834项通过（2项资源用例跳过）；正式构建/本地签名通过。分页/瀑布下拉框Up/Down不切书，Enter切换模式、Escape取消，关闭后Viewer的Up/Down仍切书；自动隐藏组合通过，浮窗Command+W仅关浮窗。初次Headless隐藏宿主布局栈溢出已修正测试时序，不计初次运行通过。浮窗菜单的实际展开未从AX确认，不计该真机子项通过；右键工具AXError.notImplemented不并入产品缺陷。
 - 关闭条件：下拉框、菜单和独立 popup 中的方向/确认/取消键只由当前输入作用域处理；回归文本、列表、浮窗、自动隐藏锁和查看器原快捷键，实际书籍/页位不得被 popup 导航误改。
 
-完整 AX、匿名哈希和取消子集见[剩余验收记录](../acceptance/p34-final-runtime.md)及[匿名证据](../acceptance/p34-final-evidence.json)。
+原失败完整AX、匿名哈希和取消子集见[剩余验收记录](../acceptance/p34-final-runtime.md)及[匿名证据](../acceptance/p34-final-evidence.json)；修复、逐动作复验及原Profile恢复见[修复记录](../acceptance/p34-fixes-runtime.md)。AX和NAS未解决项仍阻止P3/P4封板。

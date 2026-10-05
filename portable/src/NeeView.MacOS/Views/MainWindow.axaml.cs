@@ -707,9 +707,13 @@ public sealed partial class MainWindow : Window
         if (e.Handled || _model is null) return;
         var inputWindow = sender as Window ?? this;
         var focusedElement = inputWindow.FocusManager?.GetFocusedElement();
-        if (e.Key == Key.Escape && (Viewer.CancelMouseSequence() || _sidePanels?.CancelDrag() == true)) { e.Handled = true; return; }
         if (e.KeyModifiers == KeyModifiers.Meta && e.Key is Key.O or Key.W or Key.Q)
         { e.Handled = true; if (e.Key == Key.W && inputWindow is FloatingPanelWindow) inputWindow.Close(); else await ExecuteAsync(e.Key == Key.O ? "LoadAs" : e.Key == Key.W ? "CloseWindow" : "CloseApplication"); return; }
+        // 原生popup可使用独立窗口，主窗FocusManager不一定返回ComboBox或菜单项。
+        // 这里只退出全局命令匹配，不设置Handled，控件仍收到自己的导航/确认/取消键。
+        if (e.Key is Key.Up or Key.Down or Key.Left or Key.Right or Key.Home or Key.End or Key.PageUp or Key.PageDown or Key.Enter or Key.Space or Key.Escape
+            && HasPopupInputScope(inputWindow, focusedElement as Control)) return;
+        if (e.Key == Key.Escape && (Viewer.CancelMouseSequence() || _sidePanels?.CancelDrag() == true)) { e.Handled = true; return; }
         if (focusedElement is TextBox) return;
         // 弹出菜单拥有方向键，不能让原阅读快捷键抢走菜单导航/选择。
         if (this.FindControl<Menu>("MenuBar")!.IsOpen || focusedElement is MenuItem) return;
@@ -752,6 +756,17 @@ public sealed partial class MainWindow : Window
         if (matches.Length == 0) return; e.Handled = true;
         if (matches.Length > 1) { ShowError("快捷键冲突：" + string.Join("、", matches.Select(d => d.Text))); return; }
         await ExecuteInputAsync(matches[0].Name, true);
+    }
+    /// <summary>检查主窗/浮窗的实际弹出层；tooltip不占键盘作用域，不依赖原生popup的焦点回报。</summary>
+    /// <param name="inputWindow">接收键盘路由的主窗口或浮窗。</param><param name="focused">该窗口回报的逻辑焦点。</param>
+    /// <returns>交互popup展开时为true；不接管系统Command+O/W/Q。</returns>
+    private bool HasPopupInputScope(Window inputWindow, Control? focused)
+    {
+        static bool HasPopup(Window window) => window.OpenedPopups.Any(p => p.IsOpen && p.Child is not ToolTip);
+        if (this.FindControl<ComboBox>("BrowseModeView")?.IsDropDownOpen == true) return true;
+        if (focused is ComboBox { IsDropDownOpen: true } || focused?.GetVisualAncestors().OfType<ComboBox>().Any(c => c.IsDropDownOpen) == true) return true;
+        return HasPopup(inputWindow) || inputWindow != this && HasPopup(this)
+            || _sidePanels?.FloatingWindows.Any(HasPopup) == true;
     }
     /// <summary>与菜单提示共用原数字键转换；旧 Control 不转换为 Command。</summary>
     /// <param name="value">单个原快捷键。</param><param name="e">当前真实键盘输入。</param>

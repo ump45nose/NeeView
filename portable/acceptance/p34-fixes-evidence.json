@@ -199,6 +199,172 @@
       {
         "file": "nas-write-quit.ax.txt",
         "sha256": "6e634c00d1ad7560a2e42f59280a15d97b1ef471993ae2916193ba3210940591"
+      },
+      {
+        "file": "systemnative-open-disassembly.txt",
+        "sha256": "be0b28ec45b8af25138edd5c15f8934bca371ffcaeb89d71b60ce26e1fe8ac6c"
+      }
+    ],
+    "open_operand": "not_captured_source_or_destination",
+    "shipped_native_open_lock_flags": "no_O_EXLOCK_or_O_SHLOCK_mapping"
+  },
+  "MAC-INPUT-005": {
+    "status": "dropdown_navigation_regression_passed",
+    "popup_tests": {
+      "passed": 4,
+      "failed": 0
+    },
+    "targeted_tests": {
+      "passed": 59,
+      "failed": 0
+    },
+    "full_suite": {
+      "passed": 834,
+      "failed": 0,
+      "skipped": 2,
+      "total": 836
+    },
+    "formal_build": "passed_zero_warnings",
+    "local_signature": "passed",
+    "native_dropdown_no_book_navigation": "passed_paged_and_masonry",
+    "native_enter_commits_mode": "Paged_to_Panorama_and_Panorama_to_Masonry",
+    "native_escape": "passed_preserves_book_page_and_mode",
+    "viewer_navigation_after_popup": "B_to_A_with_Up_and_A_to_B_with_Down",
+    "native_main_menu_up": "book_unchanged",
+    "native_autohide_dropdown_up_escape": "passed",
+    "native_floating_command_w": "floating_closed_main_book_retained",
+    "context_popup_main_and_floating": "headless_passed",
+    "native_floating_context_popup": "not_confirmed_by_accessibility_tree",
+    "right_click_tool_error": "AXError.notImplemented_not_counted_as_product_defect",
+    "initial_headless_combination": "testhost_exit_134_incomplete_run_not_passed",
+    "test_fixture_adjustment": "visible_placement_target_before_popup_no_layout_of_hidden_host",
+    "evidence": [
+      {
+        "file": "input-open-before-down.ax.txt",
+        "sha256": "98e636889e978f8fd68da6e9a78b5202ecf5444e252d9c100bd87e74c9b783ea"
+      },
+      {
+        "file": "input-dropdown-down.ax.txt",
+        "sha256": "f75e0461022baf187c07a99bff5df700f29b03140f6334afaa8f6e3ea8e9f389"
+      },
+      {
+        "file": "input-dropdown-up.ax.txt",
+        "sha256": "f75e0461022baf187c07a99bff5df700f29b03140f6334afaa8f6e3ea8e9f389"
+      },
+      {
+        "file": "input-dropdown-escape.ax.txt",
+        "sha256": "36bdf35983a094c5eb3d4ab3b99e3e0ab9c9cec49473a2dd526307ca0bcafd58"
+      },
+      {
+        "file": "input-confirm-open.ax.txt",
+        "sha256": "98e636889e978f8fd68da6e9a78b5202ecf5444e252d9c100bd87e74c9b783ea"
+      },
+      {
+        "file": "input-confirm-down.ax.txt",
+        "sha256": "f75e0461022baf187c07a99bff5df700f29b03140f6334afaa8f6e3ea8e9f389"
+      },
+      {
+        "file": "input-confirm-enter.ax.txt",
+        "sha256": "1efd21d1e45dc5ca6dad48d998a5691945493e71e94b00bde828f2d9ebf76012"
+      },
+      {
+        "file": "input-panorama-open.ax.txt",
+        "sha256": "dd3a0441a22cc17039d2bce911d294111e4842c6e4ce0c29e6be1f6e694b6634"
+      },
+      {
+        "file": "input-end-before-enter.ax.txt",
+        "sha256": "9d113c7e7f58103e3268b2e060084f89a0fcb0b838c8cc07f7da2ef2454f0c32"
+      },
+      {
+        "file": "input-masonry-confirmed.ax.txt",
+        "sha256": "140ced62dae53de50a25e23d5d5caef89f5cf14be533bd34161c8b181792c6e0"
+      },
+      {
+        "file": "input-masonry-open.ax.txt",
+        "sha256": "e4f7cc002cf2d4ceaa853838244ddcc0345ec1d2922f546cef1295c572512aa1"
+      },
+      {
+        "file": "input-masonry-up.ax.txt",
+        "sha256": "668ab9c0bf29b34717e37f958d953bbe6b53112f04343a29844480b590b1e2c5"
+      },
+      {
+        "file": "input-masonry-cancel.ax.txt",
+        "sha256": "140ced62dae53de50a25e23d5d5caef89f5cf14be533bd34161c8b181792c6e0"
+      },
+      {
+        "file": "input-a-open.ax.txt",
+        "sha256": "cc7c936d1f01a145c6d2ad153db89358d56f3e9ae7b2be37882ba5368e141f7b"
+      },
+      {
+        "file": "input-a-down.ax.txt",
+        "sha256": "cc7c936d1f01a145c6d2ad153db89358d56f3e9ae7b2be37882ba5368e141f7b"
+      },
+      {
+        "file": "input-a-viewer.ax.txt",
+        "sha256": "ce8a4155bd6c27c12f354cf7e958a494d8cc65e81927bbc7b232f23ba503796d"
+      },
+      {
+        "file": "input-viewer-prev-book.ax.txt",
+        "sha256": "ce8a4155bd6c27c12f354cf7e958a494d8cc65e81927bbc7b232f23ba503796d"
+      },
+      {
+        "file": "input-viewer-next-book.ax.txt",
+        "sha256": "26d8835908a96b7ba6f91e234f37b4de3c580db92c7b61711cb37f366802d77e"
+      },
+      {
+        "file": "input-menu-open.ax.txt",
+        "sha256": "9d3158a857df932a1cf1eccc1e9df7a2803d44719040addf260b0f1c7fdb9286"
+      },
+      {
+        "file": "input-menu-up.ax.txt",
+        "sha256": "d843d4bf5b7f55bb12f09b1dfc5e2877a638b345b882a58041e7f5f52ceb9269"
+      },
+      {
+        "file": "input-float-command-w.ax.txt",
+        "sha256": "7f3b63091ce6e907ec36ce9dc958acb6339a08f48464a1edde93a95362d1faa8"
+      },
+      {
+        "file": "input-autohide-shown.ax.txt",
+        "sha256": "82c18430127f0f39fad5c9776d33077713beab6808e64192b70f2cee869cc05f"
+      },
+      {
+        "file": "input-autohide-open.ax.txt",
+        "sha256": "5c0dde135f4ca25cb2cc594d1087e7d38c27ce91e1eac62bcbc971ba7c9db514"
+      },
+      {
+        "file": "input-autohide-up.ax.txt",
+        "sha256": "118d287e8195f686146974e057d8396004b5b9ab5ce999e88ab7abff12538520"
+      },
+      {
+        "file": "input-autohide-escape.ax.txt",
+        "sha256": "604dd797808267131cae8ae8acce9e8ed499504474e4bb6e242acbf1e7d7cf92"
+      },
+      {
+        "file": "input-regression-passed.log",
+        "sha256": "c4c5bd6cfcc9b974eb87fb472b9cd16baac5b20a68930caa359e5b73426d79cc"
+      },
+      {
+        "file": "full-regression.log",
+        "sha256": "805c958c13d6ba778daaa8d25fd04bda592f39aa60053f61cf91a8c9fa2ae4aa"
+      },
+      {
+        "file": "input-formal-build.log",
+        "sha256": "2ab40cd2f7bede99da260d011f9a92ff092619aa24ed614ca55e4211484a4ddb"
+      }
+    ]
+  },
+  "profile_restore": {
+    "restored_at": "2026-10-05T10:41:18.875486+00:00",
+    "test_process_absent": true,
+    "file_set_matches": true,
+    "sha256_matches": true,
+    "original_file_count": 5,
+    "restored_file_count": 5,
+    "restored_user_profile_not_reopened": true,
+    "evidence": [
+      {
+        "file": "profile-restoration-receipt.json",
+        "sha256": "16c397c9949be522059907739cd19194429d9dcebd201ee0de1a0c72e76efa96"
       }
     ]
   }

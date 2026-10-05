@@ -152,3 +152,5 @@ P4第十一批见[p4-logical-book-copy.md](p4-logical-book-copy.md)：Book.Path�
 P4开发收尾契约见[p4-completion.md](p4-completion.md)：原三类删除/显式多选、图片/HTML/URL接收与失败回退、Mac符号链接及Finder别名接入；Archive.Zip独立写权限默认关闭，永久删除始终确认。仍只有三个项目、原JSON和唯一阅读/文件链路；设备封板另验。原目录树任意选中对象的完整文件管理不是本阶段当前书/当前页范围。
 
 P3/P4集中设备验收沿原边界修复Finder文件引用URL解析、最终Retina设备边界和列表Delete焦点分派，没有增加生产项目或状态模型。静止设备1:1对齐归ReaderTransformPresenter，Finder引用解析归MacFileClipboard，实际删除仍归原BookOperation。长期资源测试失败；静态AX查询确认第三方macOS无障碍回调数组保留，未用禁用无障碍或维护框架分支规避。详见[最新设备记录](../acceptance/p34-device-runtime.md)，原Profile已完整恢复，阶段未封板。
+
+后续缺陷修复仍沿同一表现边界：浮窗分别使用桌面坐标与绘制缩放；原标题来自原页框的PagePart；交互popup按实际展开状态及主/浮窗OpenedPopups隔离全局命令，控件保留自身导航。文件操作只读准备在现有有界I/O槽中超时/取消，写事务继续等待真实结果及恢复协议。真实SMB原生打开阻塞与AX回调引用保留仍未解决，详见[修复及回归记录](../acceptance/p34-fixes-runtime.md)。没有新增状态模型、传输内核或框架分支。
