@@ -40,3 +40,5 @@ CopyFile 复用唯一 `CollectFileActionPages` 的 Once、All、AllLeftToRight�
 第六批已沿原归档链迁入文件实体化复制；后续继续临时多文件播放列表和其他 Paste 类型；本批不证明 P4 全部完成或设备封板。触控板跳过、多屏无环境，签名公证/发布仍为 P5。
 
 当前目录页复制范围由[P4第十批](p4-directory-copy.md)补齐：普通目录直传/整树固定复制及内部目录四策略已接入；内部目录提取经基线核验为原版TODO，保留跳过并明确提示，不计作迁移丢失。逻辑书按策略复制、链接和其他范围继续按P4清单推进。
+
+P4第十一批[逻辑书复制](p4-logical-book-copy.md)以Book.Path对应条目接入CopyBook原四策略，QueryPath保持逻辑书；显式图片定位、空搜索和列表别名不把当前页面变成书籍目标，根.nvpls仍复制列表文件。

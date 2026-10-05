@@ -1609,7 +1609,7 @@
       "source": "NeeView/BookOperation/BookControl.cs",
       "target": "src/NeeView.Engine/BookOperation/BookOperation.Clipboard.cs",
       "sha256": "7b2f0d2b0b31b5a50b55dba8f48e11674ca9bcfaaad209946dba8c70c8fc6ad4",
-      "status": "原CopyBook实体路径复制；加载/关闭/任务忙碌适配，根归档/普通目录，不把CopyFile参数用于整书"
+      "status": "原Book.Path创建条目后CopyBook四策略；P4第十一批包内逻辑书复制接入，RequestedArchive保持书籍根、QueryPath原定位，不使用当前页/CopyFile参数"
     },
     {
       "source": "NeeView/External/ClipboardUtility.cs",
@@ -1711,7 +1711,7 @@
       "source": "NeeView/BookOperation/BookControl.cs",
       "target": "src/NeeView.Engine/BookOperation/BookOperation.BookTransfer.cs",
       "sha256": "7b2f0d2b0b31b5a50b55dba8f48e11674ca9bcfaaad209946dba8c70c8fc6ad4",
-      "status": "原CopyBookToFolderAs/MoveBookToFolderAs根实体范围、写权限差异与固定语义；移动先释放来源且不自动打开目标或邻书，失败恢复原memento，不进分类栈"
+      "status": "原固定整书复制/移动及写权限差异；P4第十一批逻辑书先经DestinationFolder原LimitedRealization策略再复用传输后端，移动仅根实体；原JSON与分类栈保持"
     },
     {
       "source": "NeeView/DestinationFolder/DestinationFolder.cs",
@@ -1754,6 +1754,18 @@
       "target": "src/NeeView.Engine/Archiver/ArchivePolicy.cs",
       "sha256": "57e2bad5fac525d8b578c308576feb7ef07179d729bc8a9a9608b5a1835c1f50",
       "status": "P4第十批原RealizeAsync四策略及普通目录直传；内部目录提取保留原TODO返回null并增加能力提示"
+    },
+    {
+      "source": "NeeView/Archiver/ArchiveEntryUtility.cs",
+      "target": "src/NeeView.Engine/Archiver/Archive.cs",
+      "sha256": "01ae8c774e5c7512ca56b2d6075902fc57061aafe528360387bf01a1c973179b",
+      "status": "P4第十一批原CreateAsync(Book.Path)条目关系；由已打开来源表达根实体/内部目录，RequestedArchive委托原根，不新开来源或持有流"
+    },
+    {
+      "source": "NeeView/Archiver/ArchiveEntryUtility.cs",
+      "target": "src/NeeView.Backends/Content/ArchiveFactory.cs",
+      "sha256": "01ae8c774e5c7512ca56b2d6075902fc57061aafe528360387bf01a1c973179b",
+      "status": "P4第十一批原CreateAsync(Book.Path)条目关系；由已打开来源表达根实体/内部目录，RequestedArchive委托原根，不新开来源或持有流"
     }
   ],
   "rule_references": [

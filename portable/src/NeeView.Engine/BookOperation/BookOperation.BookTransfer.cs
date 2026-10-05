@@ -19,7 +19,7 @@ public sealed partial class BookOperation
     private bool CanTransferBookCore(bool move) => (!move || Config.Current.System.IsFileWriteAccessEnabled)
         && _fileBackend is IBookTransferBackend && !IsRenamingBook && !IsDeletingFile && !IsUsingClipboard
         && !_disposed && !_closing && !IsLoading && _destinationMoves?.IsBusy != true
-        && Book is { IsIndexing: false } book && book.Path == book.Source.RootArchivePath && !saveData.IsTemporaryPath(book.Path)
+        && Book is { IsIndexing: false } book && (move ? book.Path == book.Source.RootArchivePath : CanCopyEntry(book.Source.CreateBookEntry())) && !saveData.IsTemporaryPath(book.Path)
         && System.IO.Path.GetDirectoryName(book.Path) is not null && book.Path != "/Volumes" && System.IO.Path.GetDirectoryName(book.Path) != "/Volumes"
         && saveData.DirectoryPath != book.Path && !saveData.DirectoryPath.StartsWith(book.Path.TrimEnd('/') + "/", StringComparison.Ordinal);
 
@@ -31,7 +31,7 @@ public sealed partial class BookOperation
         return index > 0 && folders.IsValidIndex(index - 1) ? TransferBookToFolderAsync(folders[index - 1], command == "MoveBookToFolderAs") : Task.CompletedTask;
     }
 
-    /// <summary>复制保留阅读；移动沿原FileIO关闭书籍且不跳目标/邻书，不进入分类历史。</summary>
+    /// <summary>复制按原Book.Path条目和归档策略保留阅读；移动仅真实根实体，关闭书籍且不跳目标/邻书。</summary>
     /// <param name="folder">原手动目标集合中的目录。</param><param name="move">true固定移动，false固定复制，不跟随面板模式。</param>
     /// <param name="token">确认和提交前取消；已落盘结果继续协调JSON。</param><returns>实体传输、状态联动及必要失败恢复完成的任务。</returns>
     public async Task TransferBookToFolderAsync(DestinationFolder folder, bool move, CancellationToken token = default)
@@ -41,6 +41,7 @@ public sealed partial class BookOperation
         using var prompt = CancellationTokenSource.CreateLinkedTokenSource(token, _bookTransferClosing.Token);
         lock (_bookTransferSync) _bookTransferPreparation = prompt;
         Book? requested = null; BookMemento? memory = null; BookRenamePlan? rename = null;
+        RealizedFilePathList? realized = null;
         string? search = null, failure = null, place = null; long generation = 0, actionGeneration = 0;
         bool released = false, committed = false, prepared = false, wasLocked = false;
         try
@@ -48,16 +49,25 @@ public sealed partial class BookOperation
             Notify(); await _gate.WaitAsync(prompt.Token);
             try { if (!CanTransferBookCore(move) || !folder.IsValid()) return; requested = Book!; generation = _generation; wasLocked = IsBookLocked; }
             finally { _gate.Release(); }
-            await ReadDeleteBookTargetAsync(requested.Path, prompt.Token);
+            var sourcePath = requested.Path;
+            if (requested.Path != requested.Source.RootArchivePath)
+            {
+                // 原DestinationFolder.CopyAsync先解析Book.Path，再LimitedRealization；不以当前页代替书籍。
+                realized = await ArchiveEntryUtility.RealizeArchiveEntry([requested.Source.CreateBookEntry()],
+                    Config.Current.System.ArchiveCopyPolicy.LimitedRealization(), _entryRealizer, prompt.Token);
+                if (realized.Paths.Count == 0) { failure = realized.CapabilityWarning; return; }
+                sourcePath = realized.Paths.Single();
+            }
+            await ReadDeleteBookTargetAsync(sourcePath, prompt.Token);
             var backend = (IBookTransferBackend)_fileBackend!;
-            var plan = await backend.PlanBookTransferAsync(requested.Path, folder.Path, prompt.Token);
+            var plan = await backend.PlanBookTransferAsync(sourcePath, folder.Path, prompt.Token);
             await ProtectBookTransferDestinationAsync(plan.Destination, prompt.Token);
             if (plan.DestinationHash is not null && (ConfirmBookOverwriteAsync is null || !await ConfirmBookOverwriteAsync(plan).WaitAsync(prompt.Token))) return;
             await _gate.WaitAsync(prompt.Token);
             try
             {
                 if (!CanTransferBookCore(move) || generation != _generation || !ReferenceEquals(requested, Book)) return;
-                await ReadDeleteBookTargetAsync(requested.Path, prompt.Token);
+                await ReadDeleteBookTargetAsync(sourcePath, prompt.Token);
                 await ProtectBookTransferDestinationAsync(plan.Destination, prompt.Token);
                 _saving?.Cancel(); memory = requested.CreateMemento(); search = requested.Pages.SearchKeyword; place = _bookshelf?.Place;
                 await saveData.SaveAsync(requested, prompt.Token, keepHistoryOrder: true);
@@ -118,6 +128,8 @@ public sealed partial class BookOperation
             catch (Exception ex) { failure = "书籍传输后的恢复失败：" + ex.Message; }
             finally
             {
+                try { if (realized is not null) await realized.DisposeAsync(); }
+                catch (Exception ex) { failure = "书籍复制临时材料清理失败：" + ex.Message; }
                 lock (_bookTransferSync) _bookTransferPreparation = null;
                 _bookTransferCommitting = false; Interlocked.Exchange(ref _bookTransferBusy, 0);
                 if (failure is not null && (released ? actionGeneration == _generation : generation == _generation)) Error = failure;

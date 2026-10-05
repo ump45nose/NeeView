@@ -15,7 +15,7 @@ public sealed partial class BookOperation
     public bool IsUsingClipboard => Volatile.Read(ref _clipboardBusy) != 0;
     private bool CanUseClipboard => _fileClipboard is not null && !_disposed && !_closing && !IsUsingClipboard && !IsRenamingBook && !IsTransferringBook && !IsDeletingFile && _destinationMoves?.IsBusy != true;
     public bool CanPasteFiles => CanUseClipboard && !IsLoading && _fileClipboard!.HasFileContent;
-    public bool CanCopyBook => CanUseClipboard && !IsLoading && Book is { IsIndexing: false } book && book.Path == book.Source.RootArchivePath;
+    public bool CanCopyBook => CanUseClipboard && !IsLoading && Book is { IsIndexing: false } book && CanCopyEntry(book.Source.CreateBookEntry());
     /// <summary>启动层注入系统协议；视图只转交稳定命令。</summary>
     /// <param name="clipboard">窗口使用的文件协议后端。</param>
     public void AttachFileClipboard(IFileClipboard clipboard) => _fileClipboard = clipboard;
@@ -62,13 +62,16 @@ public sealed partial class BookOperation
         && CollectFileActionPages(policy) is { Count: > 0 } pages && pages.All(CanCopyEntry);
     /// <summary>按原Page来源和装配能力判断实体化，不将归档逻辑路径当作普通文件。</summary>
     /// <param name="page">原当前页组成员，播放列表先沿实际条目判断。</param><returns>原策略能够解析的条目为true；目录不因此获得提取能力。</returns>
-    private bool CanCopyEntry(Page page)
+    private bool CanCopyEntry(Page page) => CanCopyEntry(page.ArchiveEntry);
+    /// <summary>页面与书籍条目共用原归档策略能力，不让书籍复制依赖当前页是否存在。</summary>
+    /// <param name="source">来源提供的原条目。</param><returns>能够直传、按策略解析或提取时为true。</returns>
+    private bool CanCopyEntry(ArchiveEntry source)
     {
-        var entry = page.ArchiveEntry.TargetArchiveEntry;
+        var entry = source.TargetArchiveEntry;
         return !entry.Archive.IsDisposed && !entry.IsShortcut && (entry.IsDirectory || entry.FilePath is not null || _entryRealizer is not null);
     }
-    /// <summary>复制原页组或整个实体书籍到剪贴板；归档可生成临时实体，不修改源文件或移动历史。</summary>
-    /// <param name="book">true复制原书籍目录/根归档；false按原MultiPagePolicy选页。</param>
+    /// <summary>复制原页组或书籍条目到剪贴板；沿同一归档策略解析，不修改源文件或移动历史。</summary>
+    /// <param name="book">true复制Book.Path对应条目（含内部目录）；false按原MultiPagePolicy选页。</param>
     /// <param name="token">准备及系统剪贴板提交前可取消。</param><returns>提交结束任务，失败通过Error回报。</returns>
     public async Task CopyFilesAsync(bool book = false, CancellationToken token = default)
     {
@@ -78,7 +81,7 @@ public sealed partial class BookOperation
         try
         {
             var requestedBook = Book!;
-            var entries = book ? [] : CollectFileActionPages(policy).Select(p => p.ArchiveEntry).ToArray();
+            var entries = book ? [requestedBook.Source.CreateBookEntry()] : CollectFileActionPages(policy).Select(p => p.ArchiveEntry).ToArray();
             var query = book ? [requestedBook.Path] : entries.Select(entry => entry.SystemPath).ToArray();
             var archivePolicy = Config.Current.System.ArchiveCopyPolicy;
             var textPolicy = Config.Current.System.TextCopyPolicy;
@@ -88,17 +91,16 @@ public sealed partial class BookOperation
                 if (_disposed || _closing || IsLoading || generation != _generation || !ReferenceEquals(requestedBook, Book)) return;
                 FileClipboardCodec.ValidatePaths(query);
                 // 整组选区的普通实体/根归档先确认；虚拟路径不能交给文件系统存在性检查。
-                foreach (var path in book ? query : entries.Select(entry => entry.TargetArchiveEntry).Select(entry => entry.FilePath ?? entry.Archive.RootArchivePath).Distinct(StringComparer.Ordinal))
+                foreach (var path in entries.Select(entry => entry.TargetArchiveEntry).Select(entry => entry.FilePath ?? entry.Archive.RootArchivePath).Distinct(StringComparer.Ordinal))
                 {
                     var info = await archives.GetFileMetadataAsync(path, pending.Token);
                     if (info is null) throw new FileNotFoundException("要复制的实体已不存在。", path);
                     if (info.IsSymbolicLink) throw new NotSupportedException("链接的剪贴板复制尚未迁移。");
                 }
-                RealizedFilePathList? realized = book ? new() : await ArchiveEntryUtility.RealizeArchiveEntry(entries, archivePolicy, _entryRealizer, pending.Token);
+                RealizedFilePathList? realized = await ArchiveEntryUtility.RealizeArchiveEntry(entries, archivePolicy, _entryRealizer, pending.Token);
                 var capabilityWarning = realized.CapabilityWarning;
                 try
                 {
-                    if (book) realized.Add(requestedBook.Path);
                     if (_closing || generation != _generation || !ReferenceEquals(requestedBook, Book)) return;
                     // c5c398d89 的 OriginalPath 分支再次调用同一提取策略；保留其实际输出，不能按名称另解。
                     string? text = textPolicy switch

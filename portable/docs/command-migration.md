@@ -40,8 +40,8 @@
 | OpenBookExplorer | 在资源管理器中打开书籍 |  |  | 已接入 | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/OpenBookExplorerCommand.cs |
 | OpenBookExternalAppAs | 用外部应用打开书籍 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenBookExternalAppAsCommand.cs |
 | CutBook | 剪切书籍 |  |  | 占位 | 用户选择暂保留禁用；移动使用既有文件操作 | NeeView/Command/Commands/CutBookCommand.cs |
-| CopyBook | 复制书籍 |  |  | 已接入 | P4 实体目录或根归档复制到系统剪贴板 | NeeView/Command/Commands/CopyBookCommand.cs |
-| CopyBookToFolderAs | 复制书籍到文件夹 |  |  | 已接入 | P4 根实体整书固定复制/目标Index；逻辑书按策略复制待迁，内部目录提取为原版TODO | NeeView/Command/Commands/CopyBookToFolderAsCommand.cs |
+| CopyBook | 复制书籍 |  |  | 已接入 | P4 根实体/包内逻辑书按原四策略复制，QueryPath保持Book.Path | NeeView/Command/Commands/CopyBookCommand.cs |
+| CopyBookToFolderAs | 复制书籍到文件夹 |  |  | 已接入 | P4 根实体/逻辑书按原策略固定复制/目标Index；内部目录提取保持原版TODO提示 | NeeView/Command/Commands/CopyBookToFolderAsCommand.cs |
 | MoveBookToFolderAs | 移动书籍到文件夹 |  |  | 已接入 | P4 根实体整书固定移动/卸载/原JSON路径联动；不入分类历史 | NeeView/Command/Commands/MoveBookToFolderAsCommand.cs |
 | DeleteBook | 删除书籍 |  |  | 已接入 | P4 真实根目录/文件整书废纸篓与原下一书；逻辑/临时/链接拒绝 | NeeView/Command/Commands/DeleteBookCommand.cs |
 | RenameBook | 重命名书籍 |  |  | 已接入 | P4 目录/根归档改名及原明确路径联动；见p4-rename.md | NeeView/Command/Commands/RenameBookCommand.cs |

@@ -372,6 +372,8 @@ internal sealed class RequestedArchive : Archive
     private readonly Archive _source;
     public RequestedArchive(Archive source, string entry) : base(source.Path) { _source = source; RequestedEntryName = entry; }
     public override string RootArchivePath => _source.RootArchivePath;
+    /// <summary>显式页面定位不改变当前书籍；复制仍引用原来源根条目。</summary>
+    public override ArchiveEntry CreateBookEntry() => _source.CreateBookEntry();
     public override Task<IReadOnlyList<ArchiveEntry>> GetEntriesAsync(CancellationToken token) => _source.GetEntriesAsync(token);
     public override Task<Stream> OpenEntryAsync(ArchiveEntry entry, CancellationToken token) => _source.OpenEntryAsync(entry, token);
     public override async ValueTask DisposeAsync() { await _source.DisposeAsync(); IsDisposed = true; }
@@ -382,6 +384,8 @@ internal sealed class ArchiveDirectory(Archive source, string path, string direc
 {
     private Dictionary<int, ArchiveEntry> _entries = [];
     public override string RootArchivePath => source.RootArchivePath;
+    /// <summary>保留包内目录的原条目归属，复制策略不能误取当前图片或把逻辑地址当作实体目录。</summary>
+    public override ArchiveEntry CreateBookEntry() => new(source) { RawEntryName = directory.TrimEnd('/'), IsDirectory = true };
     /// <summary>返回目录内相对名称，并保留原ID映射及流所有权。</summary>
     public override async Task<IReadOnlyList<ArchiveEntry>> GetEntriesAsync(CancellationToken token)
     {

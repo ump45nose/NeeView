@@ -12,9 +12,9 @@ P4沿原fork分类与原BookPageActionControl/BookControl迁入，不增加数�
 | DeleteFile/系统废纸篓 | 第三批当前普通图片接入 | 原单主页/确认/失败保留/搜索/晚取消/关闭与缓存；AppKit真机另验，归档/链接/列表多选仍待迁 |
 | DeleteBook/整书废纸篓及原邻项 | 第八批根目录/文件接入 | 整书独立确认/失败恢复/历史书签/下一前项/关闭/晚取消/JSON重试；AppKit与Windows动态待集中验 |
 | RenameBook及定位联动 | 第四批目录/根归档接入 | 原名称编号/扩展名/重试、阅读恢复及JSON/书签/QuickAccess/目录/列表明确路径；真实权限/NAS/Windows动态另验 |
-| CopyFile/CopyBook/Paste | 第五批实体、第六批归档策略、第七批多来源、第十批目录页接入 | 原页组/文本/标准URL/QueryPath、进程级临时租约/切书关闭及静默表单；真实Finder互操作另验，多文件保留重复/混合与原排序、运行历史/启动过滤；位图待迁；内部目录提取为原版TODO，跳过并明确提示 |
+| CopyFile/CopyBook/Paste | 第五批实体、第六批归档策略、第七批多来源、第十批目录页、第十一批逻辑书接入 | 原页组/文本/标准URL/QueryPath、进程级临时租约/切书关闭及静默表单；真实Finder互操作另验，多文件保留重复/混合与原排序、运行历史/启动过滤；位图待迁；内部目录提取为原版TODO，跳过并明确提示 |
 | CutFile/CutBook | 用户决定继续禁用占位 | 移动继续使用既有分类/移至文件夹，不伪造Windows剪切标记 |
-| CopyBookToFolderAs/MoveBookToFolderAs | 第九批根目录/文件接入 | 原固定语义/集合顺序/Index、完整目录/覆盖确认、源释放/失败恢复、原JSON联动及不入分类栈；逻辑书按策略复制/链接待迁，内部目录提取为原版TODO，Windows冲突动态另验 |
+| CopyBookToFolderAs/MoveBookToFolderAs | 第九批根目录/文件、第十一批逻辑书复制接入 | 原固定语义/集合顺序/Index、完整目录/覆盖确认、源释放/失败恢复、原JSON联动及不入分类栈；逻辑书原四策略/LimitedRealization接入，移动不扩大到容器；链接待迁，内部目录提取为原版TODO，Windows冲突动态另验 |
 | 原Finder定位 | 已有桥接，设备待验 | 当前页面/当前书籍实际定位及失败 |
 
 ## 与P3合并的集中设备验收
@@ -26,7 +26,7 @@ P4沿原fork分类与原BookPageActionControl/BookControl迁入，不增加数�
 - 真跨卷及已挂载NAS中断/权限/恢复材料。前台测试集中约定时段，不在开发途中抢焦点。
 - 触控板用户要求跳过；多屏无环境。签名公证/分发安装属于P5，不由ad-hoc构建继承。
 
-前十批开发增量不等同P4开发完成或P3/P4设备封板；契约见[p4-multipage.md](p4-multipage.md)、[p4-delete.md](p4-delete.md)、[p4-rename.md](p4-rename.md)与[p4-clipboard.md](p4-clipboard.md)，归档文件实体化剪贴板/固定复制已接入；多来源播放列表已接入；继续其他Paste内容、基础书籍移动/复制菜单及其他删除类型。
+前十一批开发增量不等同P4开发完成或P3/P4设备封板；契约见[p4-multipage.md](p4-multipage.md)、[p4-delete.md](p4-delete.md)、[p4-rename.md](p4-rename.md)与[p4-clipboard.md](p4-clipboard.md)，归档文件实体化剪贴板/固定复制已接入；多来源播放列表已接入；继续其他Paste内容、基础书籍移动/复制菜单及其他删除类型。
 
 第七批契约见[p4-multi-paste.md](p4-multi-paste.md)，静默与集中设备验收仍分别记录。
 
@@ -35,3 +35,5 @@ P4沿原fork分类与原BookPageActionControl/BookControl迁入，不增加数�
 第九批契约见[p4-book-transfer.md](p4-book-transfer.md)。根实体整书移动/复制接入；其余逻辑书按策略复制、链接、其他删除范围及Paste内容继续迁移，P4开发及集中设备验收尚未完成。
 
 第十批契约见[p4-directory-copy.md](p4-directory-copy.md)。普通目录页面复制/剪贴板、内部目录四策略及未提取提示接入；内部目录递归提取经固定源码核验为原版未完成，不列为迁移遗漏，可单独后续扩展。剩余为逻辑书按策略复制、链接、其他删除范围和Paste内容，以及P3/P4集中设备验收。P4仍未完成。
+
+第十一批契约见[p4-logical-book-copy.md](p4-logical-book-copy.md)。逻辑书CopyBook/CopyBookToFolderAs保留原Book.Path条目及归档策略，根列表只复制.nvpls；仍不支持嵌套归档打开。剩余为链接、其他删除类型/范围和Paste内容，以及P3/P4集中设备验收。P4仍未完成。

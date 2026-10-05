@@ -6,6 +6,9 @@ public abstract class Archive(string path) : IAsyncDisposable
 {
     public string Path { get; } = path;
     public virtual string RootArchivePath => Path;
+    /// <summary>对应原ArchiveEntryUtility.CreateAsync(Book.Path)的当前书籍条目；不是当前阅读页面。</summary>
+    /// <returns>普通根目录、归档或播放列表返回其实体地址，内部目录由来源保留原归属关系。</returns>
+    public virtual ArchiveEntry CreateBookEntry() => new(this) { FilePath = Path, IsDirectory = IsDirectory };
     /// <summary>来源解析的显式图片条目，普通历史恢复不能覆盖该定位。</summary>
     public string? RequestedEntryName { get; init; }
     public virtual bool IsDirectory => false;

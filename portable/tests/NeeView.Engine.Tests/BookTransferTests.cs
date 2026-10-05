@@ -233,7 +233,7 @@ public sealed class BookTransferTests
             var nested = Directory.CreateDirectory(Path.Combine(f.Root, "nested", "sub")).FullName;
             File.Copy(Path.Combine(f.Images, "001.png"), Path.Combine(nested, "001.png")); var zip = Path.Combine(f.Root, "nested.cbz");
             System.IO.Compression.ZipFile.CreateFromDirectory(Path.GetDirectoryName(nested)!, zip);
-            await op.OpenAsync(zip + "/sub", Token); Assert.NotNull(op.Book); Assert.False(op.CanMoveBookToFolder); Assert.False(op.CanCopyBookToFolder);
+            await op.OpenAsync(zip + "/sub", Token); Assert.NotNull(op.Book); Assert.False(op.CanMoveBookToFolder); Assert.True(op.CanCopyBookToFolder);
             await op.TransferBookToFolderAsync(Target(f), true, Token); Assert.Equal(0, backend.Calls); return;
         }
         var folder = f.State;

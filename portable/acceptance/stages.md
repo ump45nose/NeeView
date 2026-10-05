@@ -398,3 +398,11 @@ CopyBookToFolderAs/MoveBookToFolderAs原固定语义/目标顺序/Index接入。
 内部归档目录提取经固定源码核验为原版TODO，保持原四策略输出和null提取结果，增加未提取能力提示，不列为迁移丢失。最终757/757全量、199/199专项、Engine/正式Library/ARM64.app/严格本地ad-hoc签名通过，源码边界最终230条局部适配。235实例、167入口/68占位保持；最新只读三个子目录218页、瀑布12位置/缩略9位置及关闭归零通过，见[静默验收](p4-directory-copy-runtime.md)与[契约](../docs/p4-directory-copy.md)。
 
 合成目录覆盖窗口离线检查；未启动/激活正式应用，未操作真实剪贴板/废纸篓/Windows或用户图片。逻辑书复制、链接、其他删除范围和Paste内容继续迁移，P4尚未完成；设备/Windows/无损Retina/跨卷NAS/长期性能仍集中验收。本节点自动本地提交，不推送、公证或发布，用户.DS_Store保留。
+
+## P4 第十一批：原逻辑书籍复制
+
+Book.Path对应条目由唯一已打开来源提供，CopyBook按原四策略、CopyBookToFolderAs经LimitedRealization复用既有整书后端。显式图片定位和空搜索不把当前页当整书，根.nvpls仅复制列表文件；包内目录提取保持原TODO提示，移动仍只允许根实体，不移动归档容器、不改变分类双栈或原定位。
+
+最终779/779全量、173/173专项、Engine/正式Library/ARM64.app/严格本地ad-hoc签名通过；新增22项用例、源码边界232条局部适配。235实例、167入口/68占位保持，最新只读218页、瀑布12位置/缩略9位置及关闭归零通过。初次测试准备问题及修正见[静默验收](p4-logical-book-copy-runtime.md)，原调用链与契约见[p4-logical-book-copy.md](../docs/p4-logical-book-copy.md)。
+
+常规验证静默，未启动/激活正式应用或读写真实系统/Windows/用户图片。链接、其他删除类型/范围及Paste内容继续迁移，P4尚未完成；P3/P4设备/Windows/Retina/跨卷NAS/长期性能仍集中验收。按最新AGENTS规则，本节点校验后自动提交并推送当前分支，实际结果单独报告；公证与发布未执行，用户.DS_Store保留。

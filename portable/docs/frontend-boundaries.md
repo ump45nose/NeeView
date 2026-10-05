@@ -105,3 +105,5 @@ P4第八批：DeleteBook通过既有可等待文件任务转交；ConfirmDeleteB
 P4第九批：原整书目标菜单与Index沿既有宿主文件任务；ConfirmBookOverwriteAsync只呈现目录全部替换或单文件范围。目标、快照、指纹、来源释放/失败恢复、原JSON联动归Engine/后端；菜单与确认主题独立，不在表现层操作文件，见[p4-book-transfer.md](p4-book-transfer.md)。
 
 P4第十批目录复制沿既有CopyFile/CopyToFolderAs入口，MainWindow只呈现独立整树覆盖文案与确认/取消，关闭解除进程服务回调。目录类型/保护/指纹、当前目录索引刷新及阅读恢复均在Engine/既有后端；主题/布局不承担复制规则。原内部目录提取未完成项显示能力提示，详见[p4-directory-copy.md](p4-directory-copy.md)。
+
+P4第十一批逻辑书复制没有新增视图业务：既有菜单依赖CanCopyBook/CanCopyBookToFolder，Book.Path条目和归档策略由唯一来源及Engine处理，覆盖/取消复用原整书表单。布局/主题不感知实体化或内容类型，详见[p4-logical-book-copy.md](p4-logical-book-copy.md)。
