@@ -154,3 +154,5 @@ P4开发收尾契约见[p4-completion.md](p4-completion.md)：原三类删除/�
 P3/P4集中设备验收沿原边界修复Finder文件引用URL解析、最终Retina设备边界和列表Delete焦点分派，没有增加生产项目或状态模型。静止设备1:1对齐归ReaderTransformPresenter，Finder引用解析归MacFileClipboard，实际删除仍归原BookOperation。长期资源测试失败；静态AX查询确认第三方macOS无障碍回调数组保留，未用禁用无障碍或维护框架分支规避。详见[最新设备记录](../acceptance/p34-device-runtime.md)，原Profile已完整恢复，阶段未封板。
 
 后续缺陷修复仍沿同一表现边界：浮窗分别使用桌面坐标与绘制缩放；原标题来自原页框的PagePart；交互popup按实际展开状态及主/浮窗OpenedPopups隔离全局命令，控件保留自身导航。文件操作只读准备在现有有界I/O槽中超时/取消，写事务继续等待真实结果及恢复协议。真实SMB原生打开阻塞与AX回调引用保留仍未解决，详见[修复及回归记录](../acceptance/p34-fixes-runtime.md)。没有新增状态模型、传输内核或框架分支。
+
+NAS恢复继续使用同一随机文件日志：严格属性查询区分缺失与访问失败，回滚/清理先核验两端父目录，失联不能移除日志。普通文件在尚未安装且两端保持原样时，启动恢复可逐字节验证并清理原件前缀副本；其他变更仍保留材料。目录部分树及同机外部进程在指纹复核与删除之间的替换不作新增原子性保证。诊断开关沿用NEEVIEW_DIAGNOSTICS，只报告文件流打开阶段及原mode/access/share，不记录路径。实际断线/重新挂载/启动恢复及进程中断样本见本轮记录；原生open旧阻塞未重现，不因此宣称已修复。Avalonia官方修复PR已关闭未合并，不为AX问题引入长期Native构建维护。

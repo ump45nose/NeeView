@@ -8,8 +8,21 @@
     "official_version": "12.1.3",
     "upstream_commit": "8eeda4f6f546165b3f72e63c9f42247abb306905",
     "fix_release_found": false,
-    "temporary_source_patch_choice": "pending_user_response",
-    "accessibility_disabled": false
+    "temporary_source_patch_choice": "not_adopted_under_low_maintenance_constraint",
+    "accessibility_disabled": false,
+    "followup": {
+      "date": "2026-10-05",
+      "latest_release": "12.1.3",
+      "upstream_pr": "https://github.com/AvaloniaUI/Avalonia/pull/21950",
+      "state": "closed",
+      "merged": false,
+      "review_limitations": [
+        "cache invalidation on every tree walk",
+        "raw COM node lifetime unresolved"
+      ],
+      "dependency_changed": false,
+      "native_build_pipeline_added": false
+    }
   },
   "MAC-FLOAT-002": {
     "status": "retina_size_regression_passed",
@@ -206,7 +219,243 @@
       }
     ],
     "open_operand": "not_captured_source_or_destination",
-    "shipped_native_open_lock_flags": "no_O_EXLOCK_or_O_SHLOCK_mapping"
+    "shipped_native_open_lock_flags": "no_O_EXLOCK_or_O_SHLOCK_mapping",
+    "followup": {
+      "native_open_reproduced": false,
+      "native_open_root_cause_fixed": false,
+      "strict_recovery_availability_checks": true,
+      "verified_regular_file_prefix_recovery": true,
+      "file_share_changed": false,
+      "write_transaction_abandoned_on_timeout": false,
+      "targeted_file_tests": {
+        "passed": 142,
+        "failed": 0
+      },
+      "additional_final_focused_tests": {
+        "passed": 7,
+        "failed": 0
+      },
+      "new_recovery_cases": 6,
+      "initial_full_suite": {
+        "passed": 839,
+        "failed": 1,
+        "skipped": 2,
+        "failure": "ActualListMenusPersistAndRollbackWithoutChangingReader"
+      },
+      "full_suite_final": {
+        "passed": 840,
+        "failed": 0,
+        "skipped": 2
+      },
+      "runtime_binary_note": "real disconnect/crash/retry tests precede two final availability guards; final exact bundle additionally passed 123-byte prefix startup recovery on real SMB",
+      "healthy-result": {
+        "source_absent": true,
+        "target_matches": true
+      },
+      "server-interruption-result": {
+        "remote_entries": [
+          {
+            "name": "001.png",
+            "bytes": 5791
+          },
+          {
+            "name": ".neeview-e7990235f25f4121a75e2653c7232a3e.tmp",
+            "bytes": 0
+          }
+        ]
+      },
+      "fixed-crash-events": [
+        {
+          "event": "partial-copy-observed",
+          "bytes": 7340032,
+          "time": 1791211027.090067
+        },
+        {
+          "event": "isolated-process-interrupted",
+          "time": 1791211027.090094
+        }
+      ],
+      "fixed-crash-result": {
+        "source_matches": true,
+        "server_entries": [
+          {
+            "name": "001.png",
+            "bytes": 5791
+          },
+          {
+            "name": ".neeview-e7990235f25f4121a75e2653c7232a3e.tmp",
+            "bytes": 0
+          },
+          {
+            "name": ".neeview-841a3322c5a341b4b5ac575b83f6d823.tmp",
+            "bytes": 7340032
+          }
+        ],
+        "journal_count": 1
+      },
+      "fixed-recovery-result": {
+        "source_matches": true,
+        "server_entries": [
+          {
+            "name": "001.png",
+            "bytes": 5791
+          },
+          {
+            "name": ".neeview-e7990235f25f4121a75e2653c7232a3e.tmp",
+            "bytes": 0
+          }
+        ],
+        "journal_count": 0
+      },
+      "fixed-interruption-events": [
+        {
+          "event": "partial-copy-observed",
+          "bytes": 25173398,
+          "time": 1791211100.4979122
+        },
+        {
+          "event": "disconnect",
+          "time": 1791211100.497938
+        },
+        {
+          "event": "restore",
+          "time": 1791211105.5030951
+        }
+      ],
+      "fixed-disconnect-result": {
+        "source_matches": true,
+        "server_entries": [
+          {
+            "name": "001.png",
+            "bytes": 5791
+          },
+          {
+            "name": ".neeview-e7990235f25f4121a75e2653c7232a3e.tmp",
+            "bytes": 0
+          },
+          {
+            "name": ".neeview-38177c4e84f24e55b61cbd297143c8dd.tmp",
+            "bytes": 0
+          }
+        ],
+        "journal_count": 1
+      },
+      "fixed-reconnect-result": {
+        "source_matches": true,
+        "server_entries": [
+          {
+            "name": "001.png",
+            "bytes": 5791
+          },
+          {
+            "name": ".neeview-e7990235f25f4121a75e2653c7232a3e.tmp",
+            "bytes": 0
+          }
+        ],
+        "journal_count": 0
+      },
+      "fixed-retry-result": {
+        "source_absent": true,
+        "target_matches": true
+      },
+      "profile-restoration-receipt": {
+        "files": 5,
+        "all_hashes_match": true,
+        "application_stopped": true
+      },
+      "nas-cleanup-receipt": {
+        "exact_test_entries_verified": 3,
+        "isolated_server_directory_removed": true
+      },
+      "artifacts": [
+        {
+          "file": "formal-io.log",
+          "sha256": "43e5c84626947675f243595e2984e89a88d486e8e20c2ecbb9bacc30d2b98145"
+        },
+        {
+          "file": "fixed-runtime.log",
+          "sha256": "fe4091a4d696a3392ff09ce2be67ba18821333a2e219f1d68ed08de6598e7c05"
+        },
+        {
+          "file": "fixed-recovery-runtime.log",
+          "sha256": "0b36e898a6e10b767ca9d00c2a709ff955600f0b709b7bbe6e6cda86b3a564b5"
+        },
+        {
+          "file": "reconnect-recovery-runtime.log",
+          "sha256": "e71de4e2e421cd04ff2bbfa751a862d298a814f737e4f658e964ba5fcdc9e236"
+        },
+        {
+          "file": "recovery-tests.log",
+          "sha256": "41f24a073fab8e9f3a24b334fce475111e309ae42a2babbf0e14b4bad7e593e6"
+        },
+        {
+          "file": "file-regression.log",
+          "sha256": "db795365a1975d9fe8aba66e521e15deede7bfeebde89bb88689fe8858f0da11"
+        },
+        {
+          "file": "focused-final.log",
+          "sha256": "92dea96bba51a246948831fdeb9f506b983a715064b48d1370f0dbe5ac0a49af"
+        },
+        {
+          "file": "full-regression.log",
+          "sha256": "07cac9aef80538062f872ab1b1dcde639872a0b9b65b41045c79628329e1c9fb"
+        },
+        {
+          "file": "profile-restoration-receipt.json",
+          "sha256": "e8fa29412c89e2484e529e42b7c624a9ecfb35cbb45ac002286eb6f17136d31d"
+        },
+        {
+          "file": "nas-cleanup-receipt.json",
+          "sha256": "45e67479f4efe9af209982b5c3113f0d4c224a131f22895e09a3abfc219cd87f"
+        },
+        {
+          "file": "full-regression-final.log",
+          "sha256": "28b8ec887e1aa664c83c5a3865108f48698871b6641cf513d094fe809394dd5c"
+        },
+        {
+          "file": "formal-final-build.log",
+          "sha256": "1218d6fb176899622dd9cadd8d5c7cb03f6c921b32bc691c0d86cad85146a4ae"
+        },
+        {
+          "file": "final-bundle-smoke-result.json",
+          "sha256": "ff6ebdb9caea1fc103f3902c17e9770241990398f498ab8a9b91f97de583511b"
+        },
+        {
+          "file": "profile-restoration-final-receipt.json",
+          "sha256": "e8fa29412c89e2484e529e42b7c624a9ecfb35cbb45ac002286eb6f17136d31d"
+        }
+      ],
+      "formal_final_build": {
+        "status": "passed",
+        "warnings": 0,
+        "errors": 0,
+        "codesign": "passed"
+      },
+      "boundary_check": {
+        "production_projects": 3,
+        "source_files": 71,
+        "partial_adapters": 239,
+        "upstream_source_files": 26,
+        "status": "passed"
+      },
+      "final_bundle_smoke": {
+        "source_matches": true,
+        "partial_removed": true,
+        "journal_removed": true,
+        "remote_directory_empty": true
+      },
+      "final_smoke_fixture_correction": {
+        "incorrect_lowercase_fixture_rejected": true,
+        "normalized_to_product_uppercase_sha256": true,
+        "product_changed": false
+      },
+      "profile_restoration_final": {
+        "files": 5,
+        "all_hashes_match": true,
+        "application_stopped": true
+      },
+      "final_backend_assembly_sha256": "0f035811fcfb2c8c48539f28c1b2dc90cfc2ffc775f51dc399e29d84da81d912"
+    }
   },
   "MAC-INPUT-005": {
     "status": "dropdown_navigation_regression_passed",

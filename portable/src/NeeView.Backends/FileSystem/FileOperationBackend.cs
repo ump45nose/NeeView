@@ -160,6 +160,7 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
     private async Task RollbackAsync(Journal journal)
     {
         // 先核对全部落点和暂存，模糊情况保留日志。恢复安装仍不覆盖新目录项。
+        EnsureTransferParentsAvailable(journal);
         RejectLinkIfPresent(journal.Source, journal.PreserveLinks); RejectLinkIfPresent(journal.Destination, journal.PreserveLinks);
         bool sourceOriginal = await MatchesAsync(journal.Source, journal.SourceHash);
         bool sourceEmpty = !Exists(journal.Source);
@@ -167,6 +168,13 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
         bool targetOriginal = await MatchesAsync(journal.Destination, journal.DestinationHash);
         bool targetInstalled = await MatchesAsync(journal.Destination, journal.SourceHash);
         bool targetEmpty = !Exists(journal.Destination);
+        // 进程中断可能只留下前缀副本；两端尚未改动时才允许按原件逐字节验证后清理。
+        if (!journal.IsDirectory && sourceOriginal && targetOriginal)
+        {
+            await DeleteVerifiedPartialCopyAsync(journal.Temporary, journal.Source, journal.SourceHash);
+            if (journal.RestoreBackup is not null)
+                await DeleteVerifiedPartialCopyAsync(journal.RestoreTemporary, journal.RestoreBackup, journal.RestoreHash!);
+        }
         foreach (var (path, hash) in new[] { (journal.SourceStage, (string?)journal.SourceHash), (journal.DestinationStage, journal.DestinationHash), (journal.Temporary, journal.SourceHash), (journal.RestoreTemporary, journal.RestoreHash) })
             if (Exists(path) && !await MatchesAsync(path, hash)) throw new IOException("暂存文件已变化，恢复材料已保留。");
         if (!(sourceOriginal || sourceEmpty || sourceRestored) || !(targetOriginal || targetInstalled || targetEmpty && Exists(journal.DestinationStage))) throw new IOException("文件已被外部更改，请手动检查，未覆盖。");
@@ -202,7 +210,13 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
     private bool IsOwned(string path, string extension) => Path.GetDirectoryName(Path.GetFullPath(path)) == Path.GetFullPath(recoveryDirectory)
         && Path.GetExtension(path) == extension && Guid.TryParseExact(Path.GetFileNameWithoutExtension(path), "N", out _);
     private void DeleteOwned(string? path, string extension, bool preserveLinks = false) { if (path is not null) { if (!IsOwned(path, extension)) throw new IOException("非应用恢复材料。"); RejectLinkIfPresent(path, preserveLinks); DeleteItem(path); } }
-    private static bool Exists(string path) => File.Exists(path) || Directory.Exists(path) || new FileInfo(path).LinkTarget is not null;
+    /// <summary>只将系统明确报告的缺失视为不存在；权限和I/O失败继续报告给恢复协议。</summary>
+    private static bool Exists(string path)
+    {
+        try { File.GetAttributes(path); return true; }
+        catch (FileNotFoundException) { return false; }
+        catch (DirectoryNotFoundException) { return false; }
+    }
     private static void RejectLinkIfPresent(string path, bool preserveLinks = false) { if (Exists(path) && !preserveLinks) RejectLink(path); }
     private static void RejectLink(string path) { if ((File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0) throw new IOException("符号链接不参与分类。"); }
     /// <summary>恢复材料必须与日志随机ID及两端同目录暂存路径完全相符，禁止跟随链接。</summary>
@@ -239,12 +253,15 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
     /// <summary>只清理内容仍符合记录的应用暂存；变更材料保留，等待显式检查。</summary>
     private static async Task CleanStagesAsync(Journal journal)
     {
+        EnsureTransferParentsAvailable(journal);
         foreach (var (path, hash) in new[] { (journal.SourceStage, (string?)journal.SourceHash), (journal.DestinationStage, journal.DestinationHash), (journal.Temporary, journal.SourceHash), (journal.RestoreTemporary, journal.RestoreHash) })
         {
             if (!Exists(path)) continue;
             if (!await MatchesAsync(path, hash)) throw new IOException("暂存文件已变化，未清理。");
             DeleteItem(path);
         }
+        // 来源也可能在逐项清理期间失联；完成清理前再次确认，之后调用方才可移除日志。
+        EnsureTransferParentsAvailable(journal);
     }
     /// <summary>普通实体由系统解析；链接只解析父级，保持操作链接本身。</summary>
     private static string CanonicalFile(string path)
@@ -273,8 +290,8 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
         bool created = false;
         try
         {
-            await using (var input = new FileStream(source, FileMode.Open, FileAccess.Read, FileShare.Read, 128 * 1024, true))
-            await using (var output = new FileStream(destination, FileMode.CreateNew, FileAccess.Write, FileShare.None, 128 * 1024, true))
+            await using (var input = OpenTransferFile(source, FileMode.Open, FileAccess.Read, FileShare.Read))
+            await using (var output = OpenTransferFile(destination, FileMode.CreateNew, FileAccess.Write, FileShare.None))
             {
                 created = true; var buffer = new byte[128 * 1024]; int count;
                 while ((count = await input.ReadAsync(buffer, token)) > 0)
@@ -291,6 +308,62 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
             throw;
         }
     }
+    /// <summary>保持原打开语义；诊断模式区分源读取/暂存创建的开始与返回，不记录文件路径。</summary>
+    /// <param name="path">日志约束的原件或随机暂存地址。</param>
+    /// <param name="mode">沿用原源打开或无覆盖创建方式。</param>
+    /// <param name="access">沿用原读写权限。</param>
+    /// <param name="share">沿用原共享方式，不作NAS特例修改。</param>
+    /// <returns>由当前复制请求释放的原异步文件流。</returns>
+    private static FileStream OpenTransferFile(string path, FileMode mode, FileAccess access, FileShare share)
+    {
+        bool diagnostic = Environment.GetEnvironmentVariable("NEEVIEW_DIAGNOSTICS") == "1";
+        void Report(string phase) { if (diagnostic) System.Diagnostics.Trace.WriteLine($"FileTransfer.Open {phase} {mode}/{access}/{share}/Async thread={Environment.CurrentManagedThreadId} tick={Environment.TickCount64}"); }
+        Report("begin");
+        try
+        {
+            var stream = new FileStream(path, mode, access, share, 128 * 1024, true);
+            Report("opened"); return stream;
+        }
+        catch { Report("failed"); throw; }
+    }
+    /// <summary>无法查询父目录时保留事务，不能把断线或已卸载来源当成项目不存在。</summary>
+    /// <param name="journal">已校验随机路径的现有恢复记录。</param>
+    private static void EnsureTransferParentsAvailable(Journal journal)
+    {
+        foreach (var path in new[] { journal.Source, journal.Destination })
+            if ((File.GetAttributes(Path.GetDirectoryName(path)!) & FileAttributes.Directory) == 0)
+                throw new IOException("文件操作来源暂不可访问，恢复记录已保留。");
+    }
+
+    /// <summary>仅删除未安装且与已验证原件前缀完全一致的普通暂存文件；其他内容保留。</summary>
+    /// <param name="partial">日志约束的随机暂存路径。</param>
+    /// <param name="original">仍完整的原件或恢复副本。</param>
+    /// <param name="originalHash">日志记录的完整原件指纹。</param>
+    private static async Task DeleteVerifiedPartialCopyAsync(string partial, string original, string originalHash)
+    {
+        if (!Exists(partial) || Directory.Exists(partial) || new FileInfo(partial).LinkTarget is not null
+            || originalHash.StartsWith("L:", StringComparison.Ordinal)) return;
+        string partialHash;
+        await using (var input = new FileStream(original, FileMode.Open, FileAccess.Read, FileShare.Read, 128 * 1024, true))
+        await using (var candidate = new FileStream(partial, FileMode.Open, FileAccess.Read, FileShare.Read, 128 * 1024, true))
+        {
+            if (candidate.Length >= input.Length) return;
+            using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+            var actual = new byte[128 * 1024]; var expected = new byte[actual.Length]; int count;
+            while ((count = await candidate.ReadAsync(actual)) > 0)
+            {
+                await input.ReadExactlyAsync(expected.AsMemory(0, count));
+                if (!actual.AsSpan(0, count).SequenceEqual(expected.AsSpan(0, count)))
+                    throw new IOException("暂存文件不是原件的完整前缀，恢复材料已保留。");
+                hash.AppendData(actual, 0, count);
+            }
+            partialHash = Convert.ToHexString(hash.GetHashAndReset());
+        }
+        // 复核读取期间原件及暂存未变化，继续使用既有指纹清理规则。
+        if (!await MatchesAsync(original, originalHash) || !await MatchesAsync(partial, partialHash))
+            throw new IOException("暂存或原件已变化，恢复材料已保留。");
+        File.Delete(partial);
+    }
     /// <summary>内容指纹不变；按成功读取的字节报告进展，停住的原生调用不会伪造心跳。</summary>
     private static async Task<string> HashAsync(string path, CancellationToken token, Action? progress = null)
     {
@@ -304,8 +377,18 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
         while ((count = await stream.ReadAsync(buffer, token)) > 0) { hash.AppendData(buffer, 0, count); progress?.Invoke(); }
         progress?.Invoke(); return Convert.ToHexString(hash.GetHashAndReset());
     }
-    private static async Task<bool> MatchesAsync(string path, string? hash) => hash is null
-        ? !Exists(path) : Exists(path) && await HashAsync(path, CancellationToken.None) == hash;
+    /// <summary>事务核验使用会报告访问失败的属性查询；File.Exists不能区分不存在与断线。</summary>
+    private static async Task<bool> MatchesAsync(string path, string? hash)
+    {
+        bool exists;
+        try { File.GetAttributes(path); exists = true; }
+        catch (IOException ex) when (ex is FileNotFoundException or DirectoryNotFoundException)
+        {
+            // 末段缺失可以接受；父目录失联必须向外报告，不能清理日志。
+            File.GetAttributes(Path.GetDirectoryName(path)!); exists = false;
+        }
+        return hash is null ? !exists : exists && await HashAsync(path, CancellationToken.None) == hash;
+    }
     private static async Task WriteJournalAsync(string path, Journal journal, CancellationToken token)
     {
         var temporary = path + ".tmp";
