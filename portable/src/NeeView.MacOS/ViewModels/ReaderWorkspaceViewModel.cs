@@ -25,7 +25,8 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public string PageCount => $"{Pages.Count} / {Operation.Book?.Pages.SourcePages.Count ?? 0} 项";
     public string PageListTitle => Config.Current.PageList.ShowBookTitle && Operation.Book is { } book ? System.IO.Path.GetFileName(book.Path) : "页面列表";
     public void RefreshNavigationPanel() { foreach (var name in new[] { nameof(PageSearchVisible), nameof(FolderSearchVisible), nameof(PageCountVisible), nameof(PageCount), nameof(PageListTitle) }) OnPropertyChanged(name); }
-    public string Title => Operation.Book is { } book ? $"{System.IO.Path.GetFileName(book.Path)} — NeeView" : "NeeView";
+    private readonly TitleStringFormatter.WindowFormatter _titleFormatter = new();
+    public string Title => _titleFormatter.Format(Operation.Book, Operation.Frame, Operation.IsFrameReading);
     private string _address = "";
     public string Address { get => _address; set => SetProperty(ref _address, value); }
     private Book? _pagesBook;

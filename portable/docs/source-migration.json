@@ -372,6 +372,60 @@
       "target": "src/NeeView.Engine/Command/CopyFileCommandParameter.cs",
       "sha256": "fc72d0e4bbeabccc27d641f43381b47c6faddb3d7da6a7acade58b93e3f4090a",
       "status": "原None/CopyFilePath/OriginalPath数值与默认None保持"
+    },
+    {
+      "source": "NeeView/StringTemplate/StringFormatTools.cs",
+      "target": "src/NeeView.Engine/Title/StringFormatTools.cs",
+      "sha256": "33b311993da340ae817ec2dd91b559994127d180196e49259708d43d2553593b",
+      "status": "原标题格式/解析与内容后缀选择迁入；ViewContent替换为原PageFrameElement；Mac路径分隔和局部转义适配。Bits/Scale/ViewScale及媒体显示仍未迁，不提供假值；未知词保留。"
+    },
+    {
+      "source": "NeeView/StringTemplate/StringFormat.cs",
+      "target": "src/NeeView.Engine/Title/StringFormat.cs",
+      "sha256": "3546f0119e9dca6e4c6b03881a3bc675e92ed1c5c19ae1c59f38201547a12e83",
+      "status": "原标题格式/解析与内容后缀选择迁入；ViewContent替换为原PageFrameElement；Mac路径分隔和局部转义适配。Bits/Scale/ViewScale及媒体显示仍未迁，不提供假值；未知词保留。"
+    },
+    {
+      "source": "NeeView/StringTemplate/Formatter.cs",
+      "target": "src/NeeView.Engine/Title/Formatter.cs",
+      "sha256": "fa06635e86266d23e0f814290340f591b8940227621ae870cc2f73a13aea66f5",
+      "status": "原标题格式/解析与内容后缀选择迁入；ViewContent替换为原PageFrameElement；Mac路径分隔和局部转义适配。Bits/Scale/ViewScale及媒体显示仍未迁，不提供假值；未知词保留。"
+    },
+    {
+      "source": "NeeView/StringTemplate/StringFormatChangedAction.cs",
+      "target": "src/NeeView.Engine/Title/StringFormatChangedAction.cs",
+      "sha256": "af00ee724e7d1dfa811da145602ac90567085e0023441b49a4fb3447da26a144",
+      "status": "原标题格式/解析与内容后缀选择迁入；ViewContent替换为原PageFrameElement；Mac路径分隔和局部转义适配。Bits/Scale/ViewScale及媒体显示仍未迁，不提供假值；未知词保留。"
+    },
+    {
+      "source": "NeeView/StringTemplate/WordInfo.cs",
+      "target": "src/NeeView.Engine/Title/WordInfo.cs",
+      "sha256": "1999c5a2c2a5b0f16bd8a627027c54d7c5fa921a927bb68fec216cfb79096d57",
+      "status": "原标题格式/解析与内容后缀选择迁入；ViewContent替换为原PageFrameElement；Mac路径分隔和局部转义适配。Bits/Scale/ViewScale及媒体显示仍未迁，不提供假值；未知词保留。"
+    },
+    {
+      "source": "NeeView/StringTemplate/KeyInfo.cs",
+      "target": "src/NeeView.Engine/Title/KeyInfo.cs",
+      "sha256": "35fa9cc092f994ab5986836fc3ca0d464249168f7fcb43ce1921786073411da3",
+      "status": "原标题格式/解析与内容后缀选择迁入；ViewContent替换为原PageFrameElement；Mac路径分隔和局部转义适配。Bits/Scale/ViewScale及媒体显示仍未迁，不提供假值；未知词保留。"
+    },
+    {
+      "source": "NeeView/ExportImage/StringFormatParser.cs",
+      "target": "src/NeeView.Engine/Title/StringFormatParser.cs",
+      "sha256": "de98dfa39b57292378805092aabefaeef5b55ad998649aa67a2120190ec89687",
+      "status": "原标题格式/解析与内容后缀选择迁入；ViewContent替换为原PageFrameElement；Mac路径分隔和局部转义适配。Bits/Scale/ViewScale及媒体显示仍未迁，不提供假值；未知词保留。"
+    },
+    {
+      "source": "NeeView/MainWindow/TitleStringFormatter.cs",
+      "target": "src/NeeView.Engine/Title/TitleStringFormatter.cs",
+      "sha256": "eeeb2334fa37aa1f5026f129fa410b1696abf267ffbce79b76408b9ae9d83d75",
+      "status": "原标题格式/解析与内容后缀选择迁入；ViewContent替换为原PageFrameElement；Mac路径分隔和局部转义适配。Bits/Scale/ViewScale及媒体显示仍未迁，不提供假值；未知词保留。"
+    },
+    {
+      "source": "NeeView/Config/WindowTitleConfig.cs",
+      "target": "src/NeeView.Engine/Config/WindowTitleConfig.cs",
+      "sha256": "61775a8c52125f97078c814e91cc053d79716ac645ad8706ac9def4e483952c2",
+      "status": "原标题格式/解析与内容后缀选择迁入；ViewContent替换为原PageFrameElement；Mac路径分隔和局部转义适配。Bits/Scale/ViewScale及媒体显示仍未迁，不提供假值；未知词保留。"
     }
   ],
   "partial_adapters": [

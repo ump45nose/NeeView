@@ -21,6 +21,7 @@ public sealed class Config
     public PlaylistConfig Playlist { get; set; } = new();
     public AutoHideConfig AutoHide { get; set; } = new();
     public WindowConfig Window { get; set; } = new();
+    public WindowTitleConfig WindowTitle { get; set; } = new();
     public MenuBarConfig MenuBar { get; set; } = new();
     public MouseConfig Mouse { get; set; } = new();
     public CommandConfig Command { get; set; } = new();

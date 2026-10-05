@@ -76,6 +76,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             config.Archive = ReadBranch<ArchiveConfig>(raw, "Archive");
             config.Playlist = ReadBranch<PlaylistConfig>(raw, "Playlist");
             config.Window = ReadBranch<WindowConfig>(raw, "Window");
+            config.WindowTitle = ReadBranch<WindowTitleConfig>(raw, "WindowTitle");
             config.MenuBar = ReadBranch<MenuBarConfig>(raw, "MenuBar");
             config.Command = ReadBranch<CommandConfig>(raw, "Command");
             config.Mouse = ReadBranch<MouseConfig>(raw, "Mouse");
@@ -469,7 +470,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         try
         {
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "PageList", "History", "Bookmark", "System", "Archive", "Playlist", "AutoHide", "Window", "MenuBar", "Command", "Mouse", "StartUp" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "PageList", "History", "Bookmark", "System", "Archive", "Playlist", "AutoHide", "Window", "WindowTitle", "MenuBar", "Command", "Mouse", "StartUp" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 Merge(Object(config, branch), JsonSerializer.SerializeToNode(value, Options)!.AsObject());
