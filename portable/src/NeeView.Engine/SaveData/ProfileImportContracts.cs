@@ -6,6 +6,8 @@ public static class ProfileImportFiles
 {
     public static IReadOnlyList<string> Names { get; } = Array.AsReadOnly(new[]
         { "UserSetting.json", "History.json", "Bookmark.json", "Foldres.json", "QuicAccess.json" });
+    // 原 CreateVersionProps 用提交计数生成 build；固定合并 c5c398d89 的计数为 4340。
+    public const int BaselineBuild = 4340;
     public const long MaxFileBytes = 32 * 1024 * 1024;
     public const long MaxTotalBytes = 64 * 1024 * 1024;
     public const int MaxEntries = 10000;
@@ -49,7 +51,11 @@ public sealed class ProfileImportPreview
     public IReadOnlyList<ProfileImportCommand> Commands { get; }
     public IReadOnlyList<string> Notices { get; }
     public int UnmappedCount => Paths.Count(p => p.Status == ProfilePathStatus.Unmapped);
-    /// <summary>提供未来事务应用或检查用的独立 JSON 副本；本批没有写入入口。</summary>
+    /// <summary>确认选项并复制候选；未知/尚未支持的版本在写入前拒绝。</summary>
+    /// <param name="selection">实际恢复项目，未选择的项目不改写。</param>
+    /// <returns>与预览生命周期独立的候选快照。</returns>
+    public ProfileImportRequest CreateRequest(ProfileImportSelection selection) => new(this, selection);
+    /// <summary>提供实际导入或检查用的独立 JSON 副本。</summary>
     /// <param name="name">原五文件之一。</param><returns>完整候选，包括未知字段；缺失为 null。</returns>
     public JsonObject? GetDocument(string name) => _documents.TryGetValue(name, out var value) ? value.DeepClone().AsObject() : null;
 }

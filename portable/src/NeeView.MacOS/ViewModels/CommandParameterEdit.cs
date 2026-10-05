@@ -12,26 +12,7 @@ public sealed class CommandParameterEdit(string owner, object value)
     public object Value => value;
     /// <summary>只编辑已迁入的原参数；未迁入参数仍在唯一JSON中保留。</summary>
     [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-    public static Type? GetParameterType(string command) => DefaultInputScheme.GetParameterOwner(command) switch
-    {
-        "ViewScaleUp" or "ViewBaseScaleUp" => typeof(ViewScaleCommandParameter),
-        "CopyToFolderAs" => typeof(CopyToFolderAsCommandParameter),
-        "CopyFile" => typeof(CopyFileCommandParameter),
-        var name when name == "MoveToFolderAs" || name.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal) => typeof(MoveToFolderAsCommandParameter),
-        "ViewRotateLeft" => typeof(ViewRotateCommandParameter),
-        "ViewScrollUp" => typeof(ViewScrollCommandParameter),
-        "ViewPresetScroll" => typeof(ViewPresetScrollCommandParameter),
-        "ViewScrollNTypeUp" => typeof(ViewScrollNTypeCommandParameter),
-        "PrevScrollPage" => typeof(ScrollPageCommandParameter),
-        "PrevSizePage" => typeof(MoveSizePageCommandParameter),
-        "ToggleStretchMode" => typeof(ToggleStretchModeCommandParameter),
-        "TogglePageMode" => typeof(TogglePageModeCommandParameter),
-        "SetStretchModeUniform" => typeof(StretchModeCommandParameter),
-        "ToggleViewFlipHorizontal" or "ToggleViewFlipVertical" or "TogglePlaylistItem" or "ToggleBookLock" => typeof(ToggleCommandParameter),
-        "PrevPlaylistItemInBook" => typeof(MovePlaylistItemInBookCommandParameter),
-        "PrevPage" or "PrevOnePage" or "FirstPage" or "PrevFolderPage" => typeof(ReversibleCommandParameter),
-        _ => null
-    };
+    public static Type? GetParameterType(string command) => CommandParameterTypes.Get(command);
     /// <summary>用原读取契约创建候选，克隆用于弹窗取消和父表单取消。</summary>
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "正式Mac项目LinkMode=None保留原JSON反射；参数类型来自固定typeof表，未支持类型不能进入编辑器。")]
     public static CommandParameterEdit? Create(SaveData state, string command, CommandParameterEdit? existing = null)

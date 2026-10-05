@@ -8,6 +8,10 @@ namespace NeeView;
 public sealed partial class SaveData(string directory, string? temporaryDirectory = null)
 {
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true, PropertyNameCaseInsensitive = true, AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip };
+    // 原导出使用字符串枚举；读取兼容原字符串及早期 Mac 数值，保存格式不全局改写。
+    private static readonly JsonSerializerOptions ReadOptions = CreateReadOptions();
+    private static JsonSerializerOptions CreateReadOptions()
+    { var options = new JsonSerializerOptions(Options); options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()); return options; }
     private readonly SemaphoreSlim _gate = new(1);
     private readonly string? _temporaryDirectory = temporaryDirectory is null ? null : System.IO.Path.TrimEndingDirectorySeparator(System.IO.Path.GetFullPath(temporaryDirectory));
     private JsonObject _setting = new();
@@ -56,7 +60,26 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         _suppressedHistoryPaths.Clear();
         _activeHistoryPath = null; _activeHistoryBook = null;
         if (!BookmarkRoot.IsFolder) throw new JsonException("Bookmark.Nodes 必须是根文件夹。");
-        var raw = _setting["Config"] as JsonObject;
+        var config = ReadProfileConfig(_setting);
+        config.Playlist.DefaultFolder = System.IO.Path.Combine(DirectoryPath, "Playlists");
+        Playlists = new(config.Playlist);
+        Config.SetCurrent(config);
+        FolderConfigs.Restore(await ReadAsync(FolderConfigCollection.FileName, token));
+        // 原Restore(fromLoad:true)先按已加载配置限制；只改本次内存，不写回来源文件。
+        if (_history["Items"] is JsonArray loadedItems)
+            _history["Items"] = CreateLimitedHistoryItems(loadedItems, config.History, sort: false);
+        RefreshHistory();
+        BookmarkSearchHistory.Replace(_history["BookmarkSearchHistory"]?.Deserialize<string[]>(Options));
+        BookHistorySearchHistory.Replace(_history["BookHistorySearchHistory"]?.Deserialize<string[]>(Options));
+        PageListSearchHistory.Replace(_history["PageListSearchHistory"]?.Deserialize<string[]>(Options));
+        BookshelfSearchHistory.Replace(_history["BookshelfSearchHistory"]?.Deserialize<string[]>(Options));
+    }
+
+    /// <summary>构造独立配置投影，加载和导入验证共用；不改变 Config.Current 或访问磁盘。</summary>
+    /// <param name="setting">完整原 UserSetting 节点。</param><returns>使用原分支默认值的独立配置。</returns>
+    private static Config ReadProfileConfig(JsonObject setting)
+    {
+        var raw = setting["Config"] as JsonObject;
         var config = new Config();
         if (raw is not null)
         {
@@ -99,18 +122,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             if (panels?["IsHideRightPanel"] is null && panels?["IsRightAutoHide"] is JsonValue right) config.Panels.IsHideRightPanel = right.GetValue<bool>();
             if (raw["MenuBar"]?["IsAddressBarEnabled"] is null && raw["IsAddressBarEnabled"] is JsonValue address) config.MenuBar.IsAddressBarEnabled = address.GetValue<bool>();
         }
-        config.Playlist.DefaultFolder = System.IO.Path.Combine(DirectoryPath, "Playlists");
-        Playlists = new(config.Playlist);
-        Config.SetCurrent(config);
-        FolderConfigs.Restore(await ReadAsync(FolderConfigCollection.FileName, token));
-        // 原Restore(fromLoad:true)先按已加载配置限制；只改本次内存，不写回来源文件。
-        if (_history["Items"] is JsonArray loadedItems)
-            _history["Items"] = CreateLimitedHistoryItems(loadedItems, config.History, sort: false);
-        RefreshHistory();
-        BookmarkSearchHistory.Replace(_history["BookmarkSearchHistory"]?.Deserialize<string[]>(Options));
-        BookHistorySearchHistory.Replace(_history["BookHistorySearchHistory"]?.Deserialize<string[]>(Options));
-        PageListSearchHistory.Replace(_history["PageListSearchHistory"]?.Deserialize<string[]>(Options));
-        BookshelfSearchHistory.Replace(_history["BookshelfSearchHistory"]?.Deserialize<string[]>(Options));
+        return config;
     }
 
     /// <summary>原书签搜索历史追加/删除；复用三文件事务，失败恢复同一集合供重试。</summary>
@@ -549,13 +561,13 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         return (await JsonNode.ParseAsync(stream, documentOptions: new() { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip }, cancellationToken: token))?.AsObject() ?? new();
     }
     /// <summary>反序列化已迁移分支，缺失字段保留原默认值。</summary>
-    private static T ReadBranch<T>(JsonObject root, string name) where T : class, new() => root[name]?.Deserialize<T>(Options) ?? new();
+    private static T ReadBranch<T>(JsonObject root, string name) where T : class, new() => root[name]?.Deserialize<T>(ReadOptions) ?? new();
     /// <summary>原四种Profile各有构造默认值；差分字段在对应模板默认副本上合并，不退回空Profile默认。</summary>
     private static PanelsConfig ReadPanelsBranch(JsonObject root)
     {
         var defaults = JsonSerializer.SerializeToNode(new PanelsConfig(), Options)!.AsObject();
         if (root["Panels"] is JsonObject raw) Merge(defaults, raw);
-        return defaults.Deserialize<PanelsConfig>(Options)!;
+        return defaults.Deserialize<PanelsConfig>(ReadOptions)!;
     }
     /// <summary>获取或创建对象分支；已有未知字段保持原节点。</summary>
     private static JsonObject Object(JsonObject root, string name)
@@ -602,23 +614,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             await WriteTemporaryAsync(names[3], FolderConfigs.CreateMemento(), token);
             var preparedQuickAccess = QuickAccess.CreateMemento(_quickAccess);
             await WriteTemporaryAsync(names[4], preparedQuickAccess, token);
-            var previous = new JsonObject();
-            foreach (var name in names)
-            {
-                var path = System.IO.Path.Combine(DirectoryPath, name);
-                previous[name] = File.Exists(path);
-                if (File.Exists(path)) File.Copy(path, path + ".save-backup", true);
-            }
-            await WriteTemporaryAsync(".save-pending.json", previous, token);
-            File.Move(marker + ".tmp", marker, true);
-            // 提交阶段不接受中途取消；异常由副本回滚，崩溃由下次 Load 恢复。
-            foreach (var name in names)
-            {
-                var path = System.IO.Path.Combine(DirectoryPath, name);
-                if (name == "History.json" && !saveHistory) File.Delete(path);
-                else File.Move(path + ".tmp", path, true);
-            }
-            File.Delete(marker);
+            await CommitTemporaryFilesAsync(names, saveHistory ? [] : new HashSet<string> { "History.json" }, token);
             _bookmarks = preparedBookmarks;
             _quickAccess = preparedQuickAccess;
         }
@@ -634,6 +630,33 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             }
         }
     }
+    /// <summary>统一文件提交原语，普通保存、导入和备份恢复共用同一 marker 格式。</summary>
+    /// <param name="names">已准备临时文件的固定 Profile 名称。</param>
+    /// <param name="deleted">事务明确删除的文件；缺省文件不会误当作删除。</param>
+    /// <param name="token">提交标记前可取消，标记之后完成或回滚。</param>
+    private async Task CommitTemporaryFilesAsync(IReadOnlyList<string> names, IReadOnlySet<string> deleted, CancellationToken token)
+    {
+        var marker = System.IO.Path.Combine(DirectoryPath, ".save-pending.json");
+        var previous = new JsonObject();
+        foreach (var name in names)
+        {
+            token.ThrowIfCancellationRequested();
+            var path = System.IO.Path.Combine(DirectoryPath, name);
+            previous[name] = File.Exists(path);
+            if (File.Exists(path)) File.Copy(path, path + ".save-backup", true);
+        }
+        await WriteTemporaryAsync(".save-pending.json", previous, token);
+        token.ThrowIfCancellationRequested();
+        File.Move(marker + ".tmp", marker, true);
+        foreach (var name in names)
+        {
+            var path = System.IO.Path.Combine(DirectoryPath, name);
+            if (deleted.Contains(name)) File.Delete(path);
+            else File.Move(path + ".tmp", path, true);
+        }
+        File.Delete(marker);
+    }
+
     /// <summary>共用原Limit生成JSON副本，保留幸存条目的Page/Props与未知字段。</summary>
     /// <param name="items">权威运行集合或原磁盘序列。</param><param name="config">原数量/期限配置。</param>
     /// <param name="sort">保存按原倒序；加载遵循原文件已排序约定。</param>

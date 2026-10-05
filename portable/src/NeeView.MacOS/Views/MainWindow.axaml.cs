@@ -199,7 +199,7 @@ public sealed partial class MainWindow : Window
         _ => IsCommandImplemented(name)
     };
     /// <summary>配置/占位说明读取迁移状态，不能把当前无目标误标成尚未迁移。</summary>
-    private bool IsCommandImplemented(string name) => name == "PreviewProfileImport" ? _profileImport is not null : HostCommands.Contains(name) || _model?.Commands.IsAvailable(name) == true;
+    private bool IsCommandImplemented(string name) => name == "PreviewProfileImport" ? _profileImport is not null : name == "ImportBackup" ? _applyProfileImport is not null : HostCommands.Contains(name) || _model?.Commands.IsAvailable(name) == true;
     /// <summary>迁入完整菜单后追加 Mac 打开目录及已有交互，保持原八组顺序。</summary>
     private void BuildMenus()
     {
@@ -339,6 +339,7 @@ public sealed partial class MainWindow : Window
         {
             switch (name)
             {
+                case "ImportBackup":
                 case "PreviewProfileImport": await ShowProfileImportAsync(); break;
                 case "LoadAs":
                     var files = await StorageProvider.OpenFilePickerAsync(new() { Title = "打开图片、ZIP / RAR / 7z", AllowMultiple = false });

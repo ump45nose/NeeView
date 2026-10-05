@@ -96,3 +96,11 @@ P4第十一批：BookControl.CopyBookAsync以Book.Path创建条目；CopyBookToF
 ## P3/P4集中设备节点
 
 Finder file reference URL经Foundation转换为真实路径，保留原整批校验和接收顺序；页面列表Delete按真实焦点转交显式多选，正文仍单主图；Retina仅校正最终设备边界，不改变原页框/位置。分类/覆盖Undo、跨卷整书、废纸篓、标准文件/浏览器接收、列表删除及面板组合的实际结果见[设备记录](../acceptance/p34-device-runtime.md)。固定Windows基线未构建，dirty安装版的既有样本不外推为本节点原版一致性。长期无障碍资源增长未解决、完整浮动/弹出层仍待验，P3/P4不封板。
+
+## P5 第二批：原设置导入与恢复
+
+原 `Importer` 默认恢复设置及附属目录/快速访问；历史和书签需要显式选择，独立文件优先于旧 History.Folders/Bookmark.QuickAccess 后备。`UserSettingTools.Restore`/`ObjectMerge` 的完整默认实例语义及 `RestoreCommandCollection(reset:true)` 保持：已迁设置缺省项回原默认、来源命令差分整体恢复、Control 不替换 Command，原有和来源未知配置继续保留。原导出枚举为字符串，Mac 读取同时支持字符串/早期数值。
+
+`BookHistoryCollectionValidator` 的旧 Books 合入 Items/Page/Props、<=45Alpha4 UNC根去重，以及 `BookmarkCollectionValidator` 的 <=46Alpha1 Books/直接子项文件夹日期分支按原顺序适配。页位置仍是条目名，不是数字页码。活动旧 Books 转入兼容扩展，避免再次导入覆盖新进度；未支持的旧设置/未来build仅预览，不猜测升级。固定基线build为原Git提交计数4340。
+
+先验证、关闭并保存原窗口，再备份/提交选中文件，通过正式装配路径重建；重建失败恢复原字节及原缺失状态。无法释放失败窗口则阻止回滚；备份损坏或恢复失败明确报告且保留材料。Headless/合成故障验证见[静默验收](../acceptance/p5-profile-apply-runtime.md)，不继承为真实两分支导出或 Windows 动态对照通过。

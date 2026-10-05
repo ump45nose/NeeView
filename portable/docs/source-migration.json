@@ -1871,9 +1871,57 @@
     },
     {
       "source": "NeeView/SaveData/Importer.cs",
-      "target": "src/NeeView.Engine/SaveData/ProfileImportService.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.ProfileImport.cs",
       "sha256": "5097c3763a92995343526387beb702432061b7d660658cc880adde3c3501e876",
-      "status": "P5 原JSON和后备分支的只读预览适配；真实应用/旧版本升级待下一批"
+      "status": "P5第二批：原默认选择、独立文件优先/旧内嵌后备、来源差分恢复；复用五JSON备份/提交/失败恢复和唯一窗口重建。附属脚本/主题/播放列表本批不导入，完整旧设置validator待迁入。"
+    },
+    {
+      "source": "NeeView/SaveData/UserSettingTools.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.ProfileImport.cs",
+      "sha256": "5239375f0ee9151c5253a93d22a77f26a03856fde433cf74c97e225977c32a86",
+      "status": "P5：原设置差分经默认实例补齐、Commands reset；未知JSON字段合并保留；未迁高级设置只保留/报告。"
+    },
+    {
+      "source": "NeeView/Config/ObjectMerge.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.ProfileImport.cs",
+      "sha256": "16136c6f0f63a71a319121c858c7481cd3bad503e655754e117019de45e23ec1",
+      "status": "P5：原默认实例属性覆盖的业务语义适配为已迁Config投影与完整raw JSON递归合并；不迁WPF反射图。"
+    },
+    {
+      "source": "NeeView/BookHistory/BookHistoryCollectionValidator.cs",
+      "target": "src/NeeView.Engine/SaveData/ProfileImportCompatibility.cs",
+      "sha256": "ae106d736c14b740da16d752922bd366dcb593e676f7943aa4d0139d4233d3e8",
+      "status": "P5：44至46.3旧Books/Page/Props合并、UNC根规范、<=45Alpha4去重；活动旧记录转兼容扩展保留未知字段。"
+    },
+    {
+      "source": "NeeView/Bookamrk/BookmarkCollectionValidator.cs",
+      "target": "src/NeeView.Engine/SaveData/ProfileImportCompatibility.cs",
+      "sha256": "736ed7c5df7666a8b7cd9821fad8daab8d3887ef407b026649cf9218137b4a00",
+      "status": "P5：44至46.3原<=46Alpha1旧Books合入非文件夹、文件夹直接子项EntryTime最大值；根树及顺序保持。"
+    },
+    {
+      "source": "NeeView/FolderConfig/FolderConfigCollectionValidator.cs",
+      "target": "src/NeeView.Engine/SaveData/ProfileImportRequest.cs",
+      "sha256": "5cbf41472825140f62b0cff658fb14bbb9bffef7354e8b65a3b6417c2a55cb0f",
+      "status": "P5：独立Foldres优先、History旧Folders字典后备转原Place/Parameter；独立46.1–46.3可应用，较早独立文件仅预览。"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/QuickAccessCollectionValidator.cs",
+      "target": "src/NeeView.Engine/SaveData/ProfileImportRequest.cs",
+      "sha256": "424c8f29d3b8723a9a894b9670b5b1a31ee19af01add1f3257a527decfcf3c0b",
+      "status": "P5：独立QuicAccess优先、Bookmark旧QuickAccess后备；原格式验证及未知字段保留。"
+    },
+    {
+      "source": "NeeView/Book/UncPathTools.cs",
+      "target": "src/NeeView.Engine/SaveData/ProfileImportCompatibility.cs",
+      "sha256": "69994b067c44886db7d69ee615be4c314b6dce8383c43078bbd2eac8d96bb859",
+      "status": "P5：同共享根统一拼写，不小写其余路径；Mac映射尾部大小写保持。"
+    },
+    {
+      "source": "NeeView/NeeView/Text/Json/JsonEnumFuzzyConverter.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.cs",
+      "sha256": "0c3881ca9e32d1476517a26b499ed70dd276fc646b8447d475fa7c1c47ecb4e3",
+      "status": "P5：原JSON字符串枚举读入已迁Config，同时兼容早期Mac数值；未知值不伪造执行能力，完整fuzzy升级未迁入。"
     }
   ],
   "rule_references": [

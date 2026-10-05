@@ -23,7 +23,7 @@ public sealed partial class ProfileImportWindow : Window
             if (!_closed && _model is not null && folders.FirstOrDefault()?.TryGetLocalPath() is { } path)
                 await _model.SelectSourceAsync(new(path, ProfileImportSourceKind.Directory));
         }
-        catch (Exception ex) { if (!_closed) await ShowPickerErrorAsync(ex); }
+        catch (Exception ex) { if (!_closed) _model?.ReportError(ex.Message); }
     }
     /// <summary>选择标准 ZIP 备份，内容识别不只依赖扩展名。</summary>
     private async void ChooseBackup(object? sender, RoutedEventArgs e)
@@ -35,17 +35,31 @@ public sealed partial class ProfileImportWindow : Window
             if (!_closed && _model is not null && files.FirstOrDefault()?.TryGetLocalPath() is { } path)
                 await _model.SelectSourceAsync(new(path, ProfileImportSourceKind.Backup));
         }
-        catch (Exception ex) { if (!_closed) await ShowPickerErrorAsync(ex); }
+        catch (Exception ex) { if (!_closed) _model?.ReportError(ex.Message); }
     }
-    /// <summary>来源选择器错误独立展示，不修改预览草稿或当前阅读状态。</summary>
-    private Task ShowPickerErrorAsync(Exception ex)
-    { var dialog = new Window { Title = "来源选择失败", Width = 520, Height = 180, Content = new TextBlock { Text = ex.Message, TextWrapping = Avalonia.Media.TextWrapping.Wrap, Margin = new(16) } }; return dialog.ShowDialog(this); }
     /// <summary>新增草稿使旧候选失效，完整填写后再由用户重新预览。</summary>
     private void AddMapping(object? sender, RoutedEventArgs e) => _model?.Mappings.Add(new());
     /// <summary>移除指定映射行，不修改旧配置。</summary>
     private void RemoveMapping(object? sender, RoutedEventArgs e) { if (sender is Button { DataContext: ProfilePathMappingEdit mapping }) _model?.Mappings.Remove(mapping); }
     /// <summary>转交本次读取，验证和错误表现由独立 VM 负责。</summary>
     private async void RefreshPreview(object? sender, RoutedEventArgs e) { if (_model is not null) await _model.RefreshAsync(); }
-    /// <summary>正常关闭只取消只读需求，不调用保存事务。</summary>
+    /// <summary>二次展示影响范围；确认后只返回候选，实际事务由宿主在对话框释放后执行。</summary>
+    private async void ApplyImport(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (_model is null || await _model.CreateRequestAsync() is not { } request || _closed) return;
+            var dialog = new Window { Title = "确认导入", Width = 560, Height = 260, WindowStartupLocation = WindowStartupLocation.CenterOwner };
+            var panel = new StackPanel { Margin = new(20), Spacing = 12 };
+            panel.Children.Add(new TextBlock { Text = "将先关闭并保存当前阅读窗口、保留五文件备份，再恢复选中项目并重建窗口。\n未映射路径继续保留；附属脚本、主题、播放列表不执行或导入。\n历史保留开关与数量/期限仍按导入后的设置生效。", TextWrapping = Avalonia.Media.TextWrapping.Wrap });
+            var buttons = new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 12 };
+            var apply = new Button { Content = "备份并导入" }; var cancel = new Button { Content = "取消" };
+            apply.Click += (_, _) => dialog.Close(true); cancel.Click += (_, _) => dialog.Close(false);
+            buttons.Children.Add(apply); buttons.Children.Add(cancel); panel.Children.Add(buttons); dialog.Content = panel;
+            if (await dialog.ShowDialog<bool>(this) && !_closed) Close(request);
+        }
+        catch (Exception ex) { if (!_closed) _model?.ReportError(ex.Message); }
+    }
+    /// <summary>正常关闭取消读取，不调用保存事务。</summary>
     private void ClosePreview(object? sender, RoutedEventArgs e) => Close();
 }

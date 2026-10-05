@@ -1,10 +1,10 @@
 # 完整命令迁移表
 
-固定基线235个原命令实例全部保留。P4开发收尾为 **167个执行入口接入、68个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
+固定基线235个原命令实例全部保留。P5第二批为 **168个执行入口接入、67个能力占位**（原 ImportBackup 接入同一确认导入入口）；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
 
 原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。实际键位/手势按原A/B/C、阅读方向和用户差分计算。
 
-对照[当前运行导出](../acceptance/p4-completion-commands.json)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider与ToggleHidePageSlider语义独立，前者仍占位；ToggleVisibleAddressBar入口仍占位。参数拥有者映射不等于执行能力；P4分类/P5高级能力继续逐项迁移。
+对照[P4运行导出](../acceptance/p4-completion-commands.json)及[P5导入证据](../acceptance/p5-profile-apply-evidence.json)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider与ToggleHidePageSlider语义独立，前者仍占位；ToggleVisibleAddressBar入口仍占位。参数拥有者映射不等于执行能力；P4分类/P5高级能力继续逐项迁移。
 
 | 原命令 | 文案 | 默认输入 | 默认方向手势 | 执行入口 | 迁移说明 | 原出处 |
 |---|---|---|---|---|---|---|
@@ -235,7 +235,7 @@
 | HelpSearchOption | 搜索选项帮助 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/HelpSearchOptionCommand.cs |
 | OpenContextMenu | 打开上下文菜单 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/OpenContextMenuCommand.cs |
 | ExportBackup | 导出设置 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ExportBackupCommand.cs |
-| ImportBackup | 导入设置 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ImportBackupCommand.cs |
+| ImportBackup | 导入设置 |  |  | 已接入 | P5选择/预览、确认、备份及失败恢复；受支持版本与项目限制 | NeeView/Command/Commands/ImportBackupCommand.cs |
 | ReloadSetting | 重新载入设置 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ReloadSettingCommand.cs |
 | SaveSetting | 保存设置 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SaveSettingCommand.cs |
 | TouchEmulate | 模拟触控 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/TouchEmulateCommand.cs |

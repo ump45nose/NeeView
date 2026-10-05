@@ -1,10 +1,10 @@
 <Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        x:Class="NeeView.MacOS.Views.ProfileImportWindow" Width="980" Height="720" MinWidth="740" MinHeight="500"
-        Title="旧数据导入预览" WindowStartupLocation="CenterOwner" x:CompileBindings="False">
+        x:Class="NeeView.MacOS.Views.ProfileImportWindow" Width="980" Height="800" MinWidth="740" MinHeight="500"
+        Title="旧数据导入" WindowStartupLocation="CenterOwner" x:CompileBindings="False">
   <!-- 布局/主题独立；解析、映射、差分默认与能力报告均由 Engine 提供。 -->
-  <Grid Margin="16" RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" RowSpacing="12">
+  <Grid Margin="16" RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto" RowSpacing="12">
     <StackPanel Spacing="8">
-      <TextBlock Text="只读预览 · 当前数据和导入来源保持不变" FontSize="18" />
+      <TextBlock Text="应用前预览 · 来源只读，确认后备份当前数据并重建阅读窗口" FontSize="18" />
       <StackPanel Orientation="Horizontal" Spacing="8">
         <Button Content="选择 Profile 目录…" Click="ChooseDirectory" />
         <Button Content="选择 .nvzip 备份…" Click="ChooseBackup" />
@@ -35,7 +35,17 @@
     </StackPanel>
     <TextBlock Grid.Row="2" Text="{Binding Summary}" TextWrapping="Wrap" />
     <TextBlock Grid.Row="3" Text="{Binding Error}" Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}" TextWrapping="Wrap" />
-    <TabControl Grid.Row="4">
+    <StackPanel Grid.Row="4" Spacing="4">
+      <TextBlock Text="选择恢复项目：设置内缺省字段使用原默认值；选中集合恢复为来源内容。" TextWrapping="Wrap" />
+      <WrapPanel>
+        <CheckBox Content="设置 / 命令" IsChecked="{Binding ImportSettings}" Margin="0,0,16,0" />
+        <CheckBox Content="目录参数" IsChecked="{Binding ImportFolders}" Margin="0,0,16,0" />
+        <CheckBox Content="快速访问" IsChecked="{Binding ImportQuickAccess}" Margin="0,0,16,0" />
+        <CheckBox Content="历史 / 阅读进度" IsChecked="{Binding ImportHistory}" Margin="0,0,16,0" />
+        <CheckBox Content="书签" IsChecked="{Binding ImportBookmarks}" />
+      </WrapPanel>
+    </StackPanel>
+    <TabControl Grid.Row="5">
       <TabItem Header="文件与兼容报告">
         <Grid RowDefinitions="Auto,*" RowSpacing="8">
           <ItemsControl ItemsSource="{Binding Preview.Files}">
@@ -75,8 +85,8 @@
         </ListBox>
       </TabItem>
     </TabControl>
-    <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
-      <TextBlock Text="实际导入将在后续批次开放" VerticalAlignment="Center" />
+    <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+      <Button x:Name="ApplyImportButton" Content="备份并导入…" Click="ApplyImport" IsEnabled="{Binding CanApply}" />
       <Button Content="关闭" Click="ClosePreview" />
     </StackPanel>
   </Grid>

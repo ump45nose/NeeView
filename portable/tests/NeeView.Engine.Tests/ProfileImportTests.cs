@@ -257,7 +257,7 @@ public sealed class ProfileImportTests
     private sealed class TestPlatform : IPlatformService
     { public Task RevealAsync(string path, CancellationToken token = default) => Task.CompletedTask; public Task TrashAsync(string path, CancellationToken token = default) => Task.CompletedTask; }
     [AvaloniaFact]
-    public async Task OfficialPreviewXamlRendersPathsCommandsAndHonestReadOnlyScope()
+    public async Task OfficialPreviewXamlRendersPathsCommandsAndSourceReadOnlyScope()
     {
         using var fixture = new Fixture(); using var model = new ProfileImportViewModel(Service());
         model.Mappings.Add(new() { WindowsPrefix = @"P:\Books", MacPrefix = "/Volumes/Picture/Books" });
@@ -266,7 +266,7 @@ public sealed class ProfileImportTests
         try
         {
             Dispatcher.UIThread.RunJobs(); window.UpdateLayout();
-            Assert.Contains(window.GetVisualDescendants().OfType<TextBlock>(), t => t.Text?.Contains("只读预览") == true);
+            Assert.Contains(window.GetVisualDescendants().OfType<TextBlock>(), t => t.Text?.Contains("来源只读") == true);
             window.GetVisualDescendants().OfType<TabControl>().Single().SelectedIndex = 1;
             Dispatcher.UIThread.RunJobs(); window.UpdateLayout();
             Assert.Contains(window.FindControl<ListBox>("ImportPathList")!.Items.OfType<ProfileImportPath>(), p => p.Result == "/Volumes/Picture/Books/a.cbz");
@@ -276,7 +276,7 @@ public sealed class ProfileImportTests
             window.GetVisualDescendants().OfType<TabControl>().Single().SelectedIndex = 2;
             Dispatcher.UIThread.RunJobs(); window.UpdateLayout();
             Assert.Equal(236, window.FindControl<ListBox>("ImportCommandList")!.Items.Count);
-            Assert.DoesNotContain(window.GetVisualDescendants().OfType<Button>(), b => b.Content?.ToString() == "导入");
+            Assert.True(window.FindControl<Button>("ApplyImportButton")!.IsEnabled);
         }
         finally { window.Close(); }
     }

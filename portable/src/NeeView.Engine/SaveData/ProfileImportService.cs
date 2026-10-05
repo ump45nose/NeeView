@@ -3,7 +3,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 namespace NeeView;
 
-/// <summary>原五文件的只读预览；保留原树和差分，实际应用在后续接入 SaveData 事务。</summary>
+/// <summary>原五文件的只读预览；保留原树和差分，实际应用通过独立候选接入 SaveData 事务。</summary>
 public sealed class ProfileImportService(IProfileImportReader reader, IReadOnlyList<CommandDefinition> definitions, IReadOnlySet<string> available)
 {
     private readonly SemaphoreSlim _gate = new(1);
@@ -28,7 +28,7 @@ public sealed class ProfileImportService(IProfileImportReader reader, IReadOnlyL
         var summaries = new List<ProfileImportFileSummary>(); var notices = new List<string>
         {
             "本次仅预览，没有修改当前设置、历史、书签或来源文件。",
-            "旧版本升级、未知设置能力、旧布局转换及实际合并仍待下一批；缺失字段是原差分默认值，不能解释为删除。",
+            "可应用版本按文件单独校验；完整旧设置升级、未知设置能力及旧布局转换仍待迁移。缺失差分使用原默认值。",
             "Page 保留为原条目名，Props 与未知字段保留；归档内部页名不作为物理文件路径映射。"
         };
         foreach (var name in ProfileImportFiles.Names)
@@ -41,7 +41,7 @@ public sealed class ProfileImportService(IProfileImportReader reader, IReadOnlyL
             catch (JsonException ex) { throw new InvalidDataException(name + " JSON 损坏：" + ex.Message, ex); }
             docs.Add(name, raw); var before = paths.Count;
             var format = String(raw, "Format") ?? "未声明版本";
-            CheckFormat(name, format);
+            CheckFormat(name, format, raw);
             switch (name)
             {
                 case "History.json":
@@ -170,12 +170,13 @@ public sealed class ProfileImportService(IProfileImportReader reader, IReadOnlyL
         }
         void CheckRecordBudget()
         { if (++nodeCount > ProfileImportFiles.MaxRecords) throw new InvalidDataException("导入记录数量超限。"); }
-        void CheckFormat(string file, string format)
+        void CheckFormat(string file, string format, JsonObject raw)
         {
+            if (ProfileImportCompatibility.BlockReason(file, raw) is { } reason) { notices.Add(reason); return; }
             var parts = format.Split('/');
             if (parts.Length != 2 || !(parts[0] == "NeeView" || parts[0].StartsWith("NeeView.", StringComparison.Ordinal)) || !Version.TryParse(parts[1], out var version))
                 notices.Add(file + " 版本缺失或未识别，仅保留并预览。");
-            else if (version.Major != 46 || version.Minor != 3) notices.Add(file + " 版本 " + parts[1] + " 需要旧版本迁移/兼容核对。");
+            else if (version.Major != 46 || version.Minor != 3) notices.Add(file + " 版本 " + parts[1] + " 按文件核对旧版本兼容，应用时再次校验。");
         }
     }
     private static JsonObject? Object(JsonObject? root, string name) => root?[name] switch

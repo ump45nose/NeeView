@@ -1,0 +1,1182 @@
+{
+  "scope": "\u6B63\u5F0F\u7A97\u53E3\u5DF2\u88C5\u914D\u8BFB\u53D6\u5668\u4E0E\u5BFC\u5165\u56DE\u8C03\uFF1B\u6267\u884C\u5165\u53E3\u6570\u4E0D\u4EE3\u8868\u8986\u76D6\u7387",
+  "total": 235,
+  "implemented": 168,
+  "items": [
+    {
+      "Name": "LoadAs",
+      "Source": "NeeView/Command/Commands/LoadAsCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "LoadRecentBook",
+      "Source": "NeeView/Command/Commands/LoadRecentBookCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ReLoad",
+      "Source": "NeeView/Command/Commands/ReLoadCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "Unload",
+      "Source": "NeeView/Command/Commands/UnloadCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "OpenExplorer",
+      "Source": "NeeView/Command/Commands/OpenExplorerCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "OpenExternalApp",
+      "Source": "NeeView/Command/Commands/OpenExternalAppCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "OpenExternalAppAs",
+      "Source": "NeeView/Command/Commands/OpenExternalAppAsCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "CutFile",
+      "Source": "NeeView/Command/Commands/CutFileCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "CopyFile",
+      "Source": "NeeView/Command/Commands/CopyFileCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "CopyImage",
+      "Source": "NeeView/Command/Commands/CopyImageCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "Paste",
+      "Source": "NeeView/Command/Commands/PasteCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "CopyToFolderAs",
+      "Source": "NeeView/Command/Commands/CopyToFolderAsCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToFolderAs",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder1",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder2",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder3",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder4",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder5",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder6",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder7",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder8",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder9",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "UndoDestinationMove",
+      "Source": "NeeView/Command/Commands/UndoDestinationMoveCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "RedoDestinationMove",
+      "Source": "NeeView/Command/Commands/RedoDestinationMoveCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ExportImageAs",
+      "Source": "NeeView/Command/Commands/ExportImageAsCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ExportImage",
+      "Source": "NeeView/Command/Commands/ExportImageCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ExportBookAs",
+      "Source": "NeeView/Command/Commands/ExportBookAsCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "Print",
+      "Source": "NeeView/Command/Commands/PrintCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "DeleteFile",
+      "Source": "NeeView/Command/Commands/DeleteFileCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "OpenBookExplorer",
+      "Source": "NeeView/Command/Commands/OpenBookExplorerCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "OpenBookExternalAppAs",
+      "Source": "NeeView/Command/Commands/OpenBookExternalAppAsCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "CutBook",
+      "Source": "NeeView/Command/Commands/CutBookCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "CopyBook",
+      "Source": "NeeView/Command/Commands/CopyBookCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "CopyBookToFolderAs",
+      "Source": "NeeView/Command/Commands/CopyBookToFolderAsCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "MoveBookToFolderAs",
+      "Source": "NeeView/Command/Commands/MoveBookToFolderAsCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "DeleteBook",
+      "Source": "NeeView/Command/Commands/DeleteBookCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "RenameBook",
+      "Source": "NeeView/Command/Commands/RenameBookCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SelectArchiver",
+      "Source": "NeeView/Command/Commands/SelectArchiverCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ClearHistory",
+      "Source": "NeeView/Command/Commands/ClearHistoryCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ClearHistoryInPlace",
+      "Source": "NeeView/Command/Commands/ClearHistoryInPlaceCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "RemoveUnlinkedHistory",
+      "Source": "NeeView/Command/Commands/RemoveUnlinkedHistoryCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleStretchMode",
+      "Source": "NeeView/Command/Commands/ToggleStretchModeCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleStretchModeReverse",
+      "Source": "NeeView/Command/Commands/ToggleStretchModeReverseCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetStretchModeNone",
+      "Source": "NeeView/Command/Commands/SetStretchModeNoneCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetStretchModeUniform",
+      "Source": "NeeView/Command/Commands/SetStretchModeUniformCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetStretchModeUniformToFill",
+      "Source": "NeeView/Command/Commands/SetStretchModeUniformToFillCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetStretchModeUniformToSize",
+      "Source": "NeeView/Command/Commands/SetStretchModeUniformToSizeCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetStretchModeUniformToVertical",
+      "Source": "NeeView/Command/Commands/SetStretchModeUniformToVerticalCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetStretchModeUniformToHorizontal",
+      "Source": "NeeView/Command/Commands/SetStretchModeUniformToHorizontalCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleStretchAllowScaleUp",
+      "Source": "NeeView/Command/Commands/ToggleStretchAllowScaleUpCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleStretchAllowScaleDown",
+      "Source": "NeeView/Command/Commands/ToggleStretchAllowScaleDownCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleNearestNeighbor",
+      "Source": "NeeView/Command/Commands/ToggleNearestNeighborCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleBackground",
+      "Source": "NeeView/Command/Commands/ToggleBackgroundCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "SetBackgroundBlack",
+      "Source": "NeeView/Command/Commands/SetBackgroundBlackCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "SetBackgroundWhite",
+      "Source": "NeeView/Command/Commands/SetBackgroundWhiteCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "SetBackgroundAuto",
+      "Source": "NeeView/Command/Commands/SetBackgroundAutoCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "SetBackgroundCheck",
+      "Source": "NeeView/Command/Commands/SetBackgroundCheckCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "SetBackgroundCheckDark",
+      "Source": "NeeView/Command/Commands/SetBackgroundCheckDarkCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "SetBackgroundCustom",
+      "Source": "NeeView/Command/Commands/SetBackgroundCustomCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleTopmost",
+      "Source": "NeeView/Command/Commands/ToggleTopmostCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleAddressBar",
+      "Source": "NeeView/Command/Commands/ToggleVisibleAddressBarCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleHideMenu",
+      "Source": "NeeView/Command/Commands/ToggleHideMenuCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleSideBar",
+      "Source": "NeeView/Command/Commands/ToggleVisibleSideBarCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleHidePanel",
+      "Source": "NeeView/Command/Commands/ToggleHidePanelCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleHideLeftPanel",
+      "Source": "NeeView/Command/Commands/ToggleHideLeftPanelCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleHideRightPanel",
+      "Source": "NeeView/Command/Commands/ToggleHideRightPanelCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisiblePageSlider",
+      "Source": "NeeView/Command/Commands/ToggleVisiblePageSliderCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleHidePageSlider",
+      "Source": "NeeView/Command/Commands/ToggleHidePageSliderCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleBookshelf",
+      "Source": "NeeView/Command/Commands/ToggleVisibleBookshelfCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisiblePageList",
+      "Source": "NeeView/Command/Commands/ToggleVisiblePageListCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleBookmarkList",
+      "Source": "NeeView/Command/Commands/ToggleVisibleBookmarkListCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisiblePlaylist",
+      "Source": "NeeView/Command/Commands/ToggleVisiblePlaylistCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleHistoryList",
+      "Source": "NeeView/Command/Commands/ToggleVisibleHistoryListCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleFileInfo",
+      "Source": "NeeView/Command/Commands/ToggleVisibleFileInfoCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleNavigator",
+      "Source": "NeeView/Command/Commands/ToggleVisibleNavigatorCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleEffectInfo",
+      "Source": "NeeView/Command/Commands/ToggleVisibleEffectInfoCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleVisibleFoldersTree",
+      "Source": "NeeView/Command/Commands/ToggleVisibleFoldersTreeCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleContentsTree",
+      "Source": "NeeView/Command/Commands/ToggleVisibleContentsTreeCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "FocusFolderSearchBox",
+      "Source": "NeeView/Command/Commands/FocusFolderSearchBoxCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "FocusBookmarkSearchBox",
+      "Source": "NeeView/Command/Commands/FocusBookmarkSearchBoxCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "FocusPageListSearchBox",
+      "Source": "NeeView/Command/Commands/FocusPageListSearchBoxCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "FocusHistorySearchBox",
+      "Source": "NeeView/Command/Commands/FocusHistorySearchBoxCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "FocusBookmarkList",
+      "Source": "NeeView/Command/Commands/FocusBookmarkListCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "FocusMainView",
+      "Source": "NeeView/Command/Commands/FocusMainViewCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleFilmStrip",
+      "Source": "NeeView/Command/Commands/ToggleVisibleFilmStripCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleHideFilmStrip",
+      "Source": "NeeView/Command/Commands/ToggleHideFilmStripCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleMainViewFloating",
+      "Source": "NeeView/Command/Commands/ToggleMainViewFloatingCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleFullScreen",
+      "Source": "NeeView/Command/Commands/ToggleFullScreenCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetFullScreen",
+      "Source": "NeeView/Command/Commands/SetFullScreenCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "CancelFullScreen",
+      "Source": "NeeView/Command/Commands/CancelFullScreenCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleFullDesktop",
+      "Source": "NeeView/Command/Commands/ToggleFullDesktopCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleWindowMinimize",
+      "Source": "NeeView/Command/Commands/ToggleWindowMinimizeCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleWindowMaximize",
+      "Source": "NeeView/Command/Commands/ToggleWindowMaximizeCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ShowHiddenPanels",
+      "Source": "NeeView/Command/Commands/ShowHiddenPanelsCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleSlideShow",
+      "Source": "NeeView/Command/Commands/ToggleSlideShowCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ViewScrollNTypeUp",
+      "Source": "NeeView/Command/Commands/ViewScrollNTypeUpCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScrollNTypeDown",
+      "Source": "NeeView/Command/Commands/ViewScrollNTypeDownCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScrollUp",
+      "Source": "NeeView/Command/Commands/ViewScrollUpCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScrollDown",
+      "Source": "NeeView/Command/Commands/ViewScrollDownCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScrollLeft",
+      "Source": "NeeView/Command/Commands/ViewScrollLeftCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScrollRight",
+      "Source": "NeeView/Command/Commands/ViewScrollRightCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewPresetScroll",
+      "Source": "NeeView/Command/Commands/ViewPresetScrollCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScaleUp",
+      "Source": "NeeView/Command/Commands/ViewScaleUpCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScaleDown",
+      "Source": "NeeView/Command/Commands/ViewScaleDownCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScaleStretch",
+      "Source": "NeeView/Command/Commands/ViewScaleStretchCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewBaseScaleUp",
+      "Source": "NeeView/Command/Commands/ViewBaseScaleUpCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewBaseScaleDown",
+      "Source": "NeeView/Command/Commands/ViewBaseScaleDownCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewRotateLeft",
+      "Source": "NeeView/Command/Commands/ViewRotateLeftCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewRotateRight",
+      "Source": "NeeView/Command/Commands/ViewRotateRightCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsAutoRotateLeft",
+      "Source": "NeeView/Command/Commands/ToggleIsAutoRotateLeftCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsAutoRotateRight",
+      "Source": "NeeView/Command/Commands/ToggleIsAutoRotateRightCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsAutoRotateForcedLeft",
+      "Source": "NeeView/Command/Commands/ToggleIsAutoRotateForcedLeftCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsAutoRotateForcedRight",
+      "Source": "NeeView/Command/Commands/ToggleIsAutoRotateForcedRightCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleViewFlipHorizontal",
+      "Source": "NeeView/Command/Commands/ToggleViewFlipHorizontalCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewFlipHorizontalOn",
+      "Source": "NeeView/Command/Commands/ViewFlipHorizontalOnCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewFlipHorizontalOff",
+      "Source": "NeeView/Command/Commands/ViewFlipHorizontalOffCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleViewFlipVertical",
+      "Source": "NeeView/Command/Commands/ToggleViewFlipVerticalCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewFlipVerticalOn",
+      "Source": "NeeView/Command/Commands/ViewFlipVerticalOnCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewFlipVerticalOff",
+      "Source": "NeeView/Command/Commands/ViewFlipVerticalOffCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ViewReset",
+      "Source": "NeeView/Command/Commands/ViewResetCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "PrevPage",
+      "Source": "NeeView/Command/Commands/PrevPageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "NextPage",
+      "Source": "NeeView/Command/Commands/NextPageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "PrevOnePage",
+      "Source": "NeeView/Command/Commands/PrevOnePageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "NextOnePage",
+      "Source": "NeeView/Command/Commands/NextOnePageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "PrevScrollPage",
+      "Source": "NeeView/Command/Commands/PrevScrollPageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "NextScrollPage",
+      "Source": "NeeView/Command/Commands/NextScrollPageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "JumpPage",
+      "Source": "NeeView/Command/Commands/JumpPageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "JumpRandomPage",
+      "Source": "NeeView/Command/Commands/JumpRandomPageCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "PrevSizePage",
+      "Source": "NeeView/Command/Commands/PrevSizePageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "NextSizePage",
+      "Source": "NeeView/Command/Commands/NextSizePageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "PrevFolderPage",
+      "Source": "NeeView/Command/Commands/PrevFolderPageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "NextFolderPage",
+      "Source": "NeeView/Command/Commands/NextFolderPageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "FirstPage",
+      "Source": "NeeView/Command/Commands/FirstPageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "LastPage",
+      "Source": "NeeView/Command/Commands/LastPageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "PrevHistoryPage",
+      "Source": "NeeView/Command/Commands/PrevHistoryPageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "NextHistoryPage",
+      "Source": "NeeView/Command/Commands/NextHistoryPageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleBookLock",
+      "Source": "NeeView/Command/Commands/ToggleBookLockCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "PrevBook",
+      "Source": "NeeView/Command/Commands/PrevBookCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "NextBook",
+      "Source": "NeeView/Command/Commands/NextBookCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "RandomBook",
+      "Source": "NeeView/Command/Commands/RandomBookCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "PrevHistory",
+      "Source": "NeeView/Command/Commands/PrevHistoryCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "NextHistory",
+      "Source": "NeeView/Command/Commands/NextHistoryCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "PrevBookHistory",
+      "Source": "NeeView/Command/Commands/PrevBookHistoryCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "NextBookHistory",
+      "Source": "NeeView/Command/Commands/NextBookHistoryCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToParentBook",
+      "Source": "NeeView/Command/Commands/MoveToParentBookCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToChildBook",
+      "Source": "NeeView/Command/Commands/MoveToChildBookCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleMediaPlay",
+      "Source": "NeeView/Command/Commands/ToggleMediaPlayCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "PrevMediaPosition",
+      "Source": "NeeView/Command/Commands/PrevMediaPositionCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "NextMediaPosition",
+      "Source": "NeeView/Command/Commands/NextMediaPositionCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleBookOrder",
+      "Source": "NeeView/Command/Commands/ToggleBookOrderCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderByFileNameA",
+      "Source": "NeeView/Command/Commands/SetBookOrderByFileNameACommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderByFileNameD",
+      "Source": "NeeView/Command/Commands/SetBookOrderByFileNameDCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderByPathA",
+      "Source": "NeeView/Command/Commands/SetBookOrderByPathACommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "SetBookOrderByPathD",
+      "Source": "NeeView/Command/Commands/SetBookOrderByPathDCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "SetBookOrderByFileTypeA",
+      "Source": "NeeView/Command/Commands/SetBookOrderByFileTypeACommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderByFileTypeD",
+      "Source": "NeeView/Command/Commands/SetBookOrderByFileTypeDCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderByTimeStampA",
+      "Source": "NeeView/Command/Commands/SetBookOrderByTimeStampACommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderByTimeStampD",
+      "Source": "NeeView/Command/Commands/SetBookOrderByTimeStampDCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderByEntryTimeA",
+      "Source": "NeeView/Command/Commands/SetBookOrderByEntryTimeACommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "SetBookOrderByEntryTimeD",
+      "Source": "NeeView/Command/Commands/SetBookOrderByEntryTimeDCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "SetBookOrderBySizeA",
+      "Source": "NeeView/Command/Commands/SetBookOrderBySizeACommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderBySizeD",
+      "Source": "NeeView/Command/Commands/SetBookOrderBySizeDCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderByRandom",
+      "Source": "NeeView/Command/Commands/SetBookOrderByRandomCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "TogglePageMode",
+      "Source": "NeeView/Command/Commands/TogglePageModeCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "TogglePageModeReverse",
+      "Source": "NeeView/Command/Commands/TogglePageModeReverseCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetPageModeOne",
+      "Source": "NeeView/Command/Commands/SetPageModeOneCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetPageModeTwo",
+      "Source": "NeeView/Command/Commands/SetPageModeTwoCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsPanorama",
+      "Source": "NeeView/Command/Commands/ToggleIsPanoramaCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "TogglePageOrientation",
+      "Source": "NeeView/Command/Commands/TogglePageOrientationCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetPageOrientationHorizontal",
+      "Source": "NeeView/Command/Commands/SetPageOrientationHorizontalCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetPageOrientationVertical",
+      "Source": "NeeView/Command/Commands/SetPageOrientationVerticalCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleBookReadOrder",
+      "Source": "NeeView/Command/Commands/ToggleBookReadOrderCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookReadOrderRight",
+      "Source": "NeeView/Command/Commands/SetBookReadOrderRightCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookReadOrderLeft",
+      "Source": "NeeView/Command/Commands/SetBookReadOrderLeftCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsSupportedDividePage",
+      "Source": "NeeView/Command/Commands/ToggleIsSupportedDividePageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsSupportedWidePage",
+      "Source": "NeeView/Command/Commands/ToggleIsSupportedWidePageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsSupportedSingleFirstPage",
+      "Source": "NeeView/Command/Commands/ToggleIsSupportedSingleFirstPageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsSupportedSingleLastPage",
+      "Source": "NeeView/Command/Commands/ToggleIsSupportedSingleLastPageCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsRecursiveFolder",
+      "Source": "NeeView/Command/Commands/ToggleIsRecursiveFolderCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleSortMode",
+      "Source": "NeeView/Command/Commands/ToggleSortModeCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "SetSortModeFileName",
+      "Source": "NeeView/Command/Commands/SetSortModeFileNameCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetSortModeFileNameDescending",
+      "Source": "NeeView/Command/Commands/SetSortModeFileNameDescendingCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetSortModeTimeStamp",
+      "Source": "NeeView/Command/Commands/SetSortModeTimeStampCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetSortModeTimeStampDescending",
+      "Source": "NeeView/Command/Commands/SetSortModeTimeStampDescendingCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetSortModeSize",
+      "Source": "NeeView/Command/Commands/SetSortModeSizeCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetSortModeSizeDescending",
+      "Source": "NeeView/Command/Commands/SetSortModeSizeDescendingCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetSortModeEntry",
+      "Source": "NeeView/Command/Commands/SetSortModeEntryCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetSortModeEntryDescending",
+      "Source": "NeeView/Command/Commands/SetSortModeEntryDescendingCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetSortModeRandom",
+      "Source": "NeeView/Command/Commands/SetSortModeRandomCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetDefaultPageSetting",
+      "Source": "NeeView/Command/Commands/SetDefaultPageSettingCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleBookmark",
+      "Source": "NeeView/Command/Commands/ToggleBookmarkCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "RegisterBookmark",
+      "Source": "NeeView/Command/Commands/RegisterBookmarkCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "NextPlaylist",
+      "Source": "NeeView/Command/Commands/NextPlaylistCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "PrevPlaylist",
+      "Source": "NeeView/Command/Commands/PrevPlaylistCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "TogglePlaylistItem",
+      "Source": "NeeView/Command/Commands/TogglePlaylistItemCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "PrevPlaylistItem",
+      "Source": "NeeView/Command/Commands/PrevPlaylistItemCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "NextPlaylistItem",
+      "Source": "NeeView/Command/Commands/NextPlaylistItemCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "PrevPlaylistItemInBook",
+      "Source": "NeeView/Command/Commands/PrevPlaylistItemInBookCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "NextPlaylistItemInBook",
+      "Source": "NeeView/Command/Commands/NextPlaylistItemInBookCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "SetEffectProfile",
+      "Source": "NeeView/Command/Commands/SetEffectProfileCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "NextEffectProfile",
+      "Source": "NeeView/Command/CommandTable.cs",
+      "implemented": false
+    },
+    {
+      "Name": "PrevEffectProfile",
+      "Source": "NeeView/Command/CommandTable.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleCustomSize",
+      "Source": "NeeView/Command/Commands/ToggleCustomSizeCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleTrim",
+      "Source": "NeeView/Command/Commands/ToggleTrimCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleResizeFilter",
+      "Source": "NeeView/Command/Commands/ToggleResizeFilterCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleGrid",
+      "Source": "NeeView/Command/Commands/ToggleGridCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleEffect",
+      "Source": "NeeView/Command/Commands/ToggleEffectCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleIsLoupe",
+      "Source": "NeeView/Command/Commands/ToggleIsLoupeCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "LoupeOn",
+      "Source": "NeeView/Command/Commands/LoupeOnCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "LoupeOff",
+      "Source": "NeeView/Command/Commands/LoupeOffCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "LoupeScaleUp",
+      "Source": "NeeView/Command/Commands/LoupeScaleUpCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "LoupeScaleDown",
+      "Source": "NeeView/Command/Commands/LoupeScaleDownCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleHoverScroll",
+      "Source": "NeeView/Command/Commands/ToggleHoverScrollCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleAutoScroll",
+      "Source": "NeeView/Command/Commands/ToggleAutoScrollCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "CancelScript",
+      "Source": "NeeView/Command/Commands/CancelScriptCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "OpenOptionsWindow",
+      "Source": "NeeView/Command/Commands/OpenOptionsWindowCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "OpenSettingFilesFolder",
+      "Source": "NeeView/Command/Commands/OpenSettingFilesFolderCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "OpenScriptsFolder",
+      "Source": "NeeView/Command/Commands/OpenScriptsFolderCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "OpenVersionWindow",
+      "Source": "NeeView/Command/Commands/OpenVersionWindowCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "CloseApplication",
+      "Source": "NeeView/Command/Commands/CloseApplicationCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "TogglePermitFile",
+      "Source": "NeeView/Command/Commands/TogglePermitFileCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "HelpCommandList",
+      "Source": "NeeView/Command/Commands/HelpCommandListCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "HelpScript",
+      "Source": "NeeView/Command/Commands/HelpScriptCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "HelpMainMenu",
+      "Source": "NeeView/Command/Commands/HelpMainMenuCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "HelpSearchOption",
+      "Source": "NeeView/Command/Commands/HelpSearchOptionCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "OpenContextMenu",
+      "Source": "NeeView/Command/Commands/OpenContextMenuCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ExportBackup",
+      "Source": "NeeView/Command/Commands/ExportBackupCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "ImportBackup",
+      "Source": "NeeView/Command/Commands/ImportBackupCommand.cs",
+      "implemented": true
+    },
+    {
+      "Name": "ReloadSetting",
+      "Source": "NeeView/Command/Commands/ReloadSettingCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "SaveSetting",
+      "Source": "NeeView/Command/Commands/SaveSettingCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "TouchEmulate",
+      "Source": "NeeView/Command/Commands/TouchEmulateCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "FocusPrevApp",
+      "Source": "NeeView/Command/Commands/FocusPrevAppCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "FocusNextApp",
+      "Source": "NeeView/Command/Commands/FocusNextAppCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "StretchWindow",
+      "Source": "NeeView/Command/Commands/StretchWindowCommand.cs",
+      "implemented": false
+    },
+    {
+      "Name": "OpenConsole",
+      "Source": "NeeView/Command/Commands/OpenConsoleCommand.cs",
+      "implemented": false
+    }
+  ]
+}
