@@ -1,0 +1,636 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-05",
+  "phase": "P3/P4 remaining device acceptance",
+  "status": "not_sealed",
+  "source": {
+    "mac_checkout": "0fee3af495512aac2275d80aa193cb894206953f",
+    "mac_runtime_product_source": "51b8aab4da813421dbff321247ed6ec0b3cd73d6",
+    "windows": "c5c398d89a9dd872382980769065e80c4592f4c2"
+  },
+  "environment": {
+    "mac": "macOS27.0.1 /26A434, Apple Silicon, single Retina display",
+    "avalonia": "12.1.3",
+    "mac_formal_host": true,
+    "profiles_isolated_during_execution": true
+  },
+  "build_and_automated_tests": {
+    "rebuilt_this_batch": false,
+    "rerun_this_batch": false,
+    "product_code_changed": false,
+    "previous_evidence": [
+      "p34-device-validation.json",
+      "p34-compare-evidence.json"
+    ],
+    "new_device_failures_not_overridden_by_prior_tests": true
+  },
+  "zip_delete": {
+    "status": "passed_single_entry_subset",
+    "fixture": "zip-delete.cbz",
+    "explicit_confirmation_at_action": true,
+    "deleted_entries": [
+      "001.png"
+    ],
+    "remaining_entries": 8,
+    "remaining_hashes_match": true,
+    "comments_preserved": true,
+    "timestamps_attributes_preserved": true,
+    "crc": "passed",
+    "backup_unchanged": true,
+    "after_sha256": "d4115d027b50baaa8c559e6c44de538308f3706a798684850e813b624c656d6f",
+    "before_sha256": "a633e3277196ee9c3eca3c8400892f1dae327708354d4bea5d34403724abb01d",
+    "navigation_after_delete": "002 then003",
+    "restart_anchor": "003.png,2/8,8 items",
+    "untested": [
+      "multiple-entry delete",
+      "interrupted archive rewrite",
+      "RAR/7z writing"
+    ]
+  },
+  "windows": {
+    "status": "fixed_dynamic_subset_verified",
+    "executable_sha256": "3BCFBF2EA68A06AD45F6E23C926107DFF7175145E2E2A4C718962B2788AFE28A",
+    "new_build_this_batch": false,
+    "new_cases": [
+      {
+        "case": "Once overwrite move / Undo",
+        "result": "Move001 -> left003/right002 at1/8; Undo restores001 -> left002/right001 at1/9",
+        "difference": "Original Windows Undo does not restore overwritten old target; Mac recoverable backup is an intentional improvement"
+      },
+      {
+        "case": "whole-book copy",
+        "files": 9,
+        "matching_hashes": 9,
+        "source_files": 9,
+        "source_and_current_book_retained": true
+      },
+      {
+        "case": "rename book",
+        "result": "reading -> reading-renamed, address/title updated"
+      },
+      {
+        "case": "whole-book move",
+        "files": 9,
+        "matching_hashes": 9,
+        "old_source_exists": false,
+        "result": "Current book unloaded; no automatic target or neighbor open"
+      },
+      {
+        "case": "delete current file",
+        "result": "DeleteSample001 -> left003/right002 at1/8"
+      },
+      {
+        "case": "delete book",
+        "result": "Deletes isolated DeleteSample; opens neighbor MoveBook at1/1"
+      },
+      {
+        "case": "recycle recovery",
+        "precisely_matched_recycle_items": 2,
+        "restored_files": 9,
+        "matching_hashes": 9
+      }
+    ],
+    "remote_receipts": [
+      "copy-receipt.json",
+      "move-receipt.json",
+      "delete-receipt.json",
+      "final-restoration.json"
+    ],
+    "receipt_verification": "Visible PowerShell output and screenshots; remote JSON not downloaded",
+    "unverified": [
+      "whole-book conflicts and failure combinations",
+      "all235 commands",
+      "RDP scan-code checked state"
+    ],
+    "restoration": {
+      "test_processes_exited": true,
+      "original_instance_alive": true,
+      "temporary_profile_env_restored": true,
+      "history_saved": true,
+      "deleted_sample_hashes_matching": 9,
+      "keyboard_scan_code_restore_action_executed": true,
+      "keyboard_state_independently_confirmed": false
+    }
+  },
+  "nas": {
+    "status": "failed",
+    "issue": "MAC-NAS-004",
+    "real_independent_smb_mount_confirmed": true,
+    "proxy_outage_seconds": 5,
+    "phase": "directory canonicalization before destination write",
+    "stack": "Interop.Sys.OpenDir / Directory.EnumerateDirectories / FileOperationBackend.CanonicalDirectory / CanonicalFile / TransferCoreAsync",
+    "native_call_returned_after_reconnect": false,
+    "normal_quit_completed": false,
+    "isolated_blocked_process_terminated_after_integrity_check": true,
+    "source_hashes_intact": [
+      {
+        "case": "Reconnect",
+        "bytes": 25171615,
+        "sha256_matches": true
+      },
+      {
+        "case": "Timeout",
+        "bytes": 25171615,
+        "sha256_matches": true
+      }
+    ],
+    "destination_not_written": true,
+    "invalid_local_mount_fallback_excluded": true,
+    "unreached_cases": [
+      "partial destination write outage",
+      "timeout rollback",
+      "journal restart recovery",
+      "successful retry"
+    ],
+    "related_source_read": {
+      "status": "timed_out",
+      "images_in_sample": 59,
+      "stack": "FolderArchive.EnumerateEntryBatchesAsync / DirectoryInfo.EnumerateFileSystemInfos / Interop.Sys.OpenDir",
+      "python_enumeration_seconds_approximately": 0.4,
+      "same_root_cause_proven": false
+    },
+    "cleanup": {
+      "exact_test_directories_removed": true,
+      "empty_only_inventory": [
+        "Reconnect",
+        "Timeout"
+      ],
+      "existing_smb_mounts_retained": 10,
+      "independent_proxy_stop_requested": true,
+      "independent_mount_not_present": true,
+      "at_epoch_ms": 1791190868091.656
+    }
+  },
+  "popup_and_floating": {
+    "partial_passes": [
+      "seeded history floating window appears; Command+W closes only that window",
+      "BrowseMode popup opens and Escape closes; cancel preserves anchor"
+    ],
+    "failed": {
+      "issue": "MAC-INPUT-005",
+      "before": "nas-timeout with BrowseMode popup open, four choices, Masonry selected",
+      "input": "Up once after independent full AX observation",
+      "after": "nas-reconnect with same popup still open, Masonry selected",
+      "proof": "separate before/after full AX; main window screenshot does not include popup window"
+    },
+    "pending": [
+      "real context-menu float/dock/drag-back",
+      "complete hover/popup auto-hide lock",
+      "PageListMore menu"
+    ],
+    "tool_limitations": [
+      "AXError.notImplemented for some coordinates/right clicks",
+      "getState timeout resets kernel"
+    ],
+    "uncommitted_menu_attempts_not_passes": true,
+    "earlier_batched_up_enter_attempt_excluded": true
+  },
+  "cached_real_images": {
+    "status": "passed_local_browsing_subset",
+    "files": 12,
+    "source": "read-only byte copies from user-designated sample",
+    "local_hashes_unchanged": 12,
+    "layout": "2-column Masonry",
+    "actual_scroll_actions": 30,
+    "active_observation_window_seconds": 24.269,
+    "observed_anchor_cycle": "1 ->3 ->6 ->3 ->1",
+    "does_not_replace_failed_nas_open": true
+  },
+  "performance": {
+    "screen_p95_ms": null,
+    "status": "not_verified_complete_frame_metric_unavailable",
+    "first_recording": {
+      "duration_seconds": 45,
+      "displayed_surface_rows": 1687,
+      "target_pid_label_rows": 0,
+      "valid_scroll_load": false,
+      "accepted": false
+    },
+    "cached_recording": {
+      "pid": 99251,
+      "template": "Animation Hitches",
+      "time_limit_seconds": 45,
+      "recording_saved": true,
+      "scroll_actions": 30,
+      "screen_intervals_validated": true,
+      "schema": "displayed-surfaces-interval",
+      "recording_target_pid": 99251,
+      "recording_start": "2026-10-05T16:58:07.775+08:00",
+      "recording_duration_seconds": 45.902443,
+      "total_rows": 1261,
+      "target_pid_label_rows": 62,
+      "rows_within_scroll_observation_window": 62,
+      "distinct_target_app_frames_in_scroll_window": 62,
+      "display_names": [
+        "Built-In Display 1"
+      ],
+      "scroll_window_ns": [
+        8995000000.0,
+        33264000000.0
+      ],
+      "cpu_display_latency_types": {
+        "duration": 62
+      },
+      "reason": "Thirty discrete scroll/AX actions are not a continuous60Hz workload; composited display occupancy durations and inter-action idle gaps are not complete application frame times. Target frames are visible but insufficient for claimed target P95.",
+      "auxiliary_cpu_to_display_latency": {
+        "metric": "CPU to Display Latency from displayed-surfaces-interval, not complete frame time",
+        "n": 62,
+        "p50_ms": 34.271166,
+        "p95_ms": 49.254292,
+        "max_ms": 1156.300709,
+        "percentile_method": "nearest rank",
+        "continuous_60hz_load": false
+      },
+      "continuous_60hz_load": false,
+      "complete_frame_time_measured": false,
+      "target_pid_and_display_confirmed": true,
+      "raw_trace_retained_locally": true
+    },
+    "render_and_lifetime_durations_are_not_screen_p95": true,
+    "long_term_memory_not_rerun": true,
+    "prior_long_term_memory_issue": "MAC-AX-001"
+  },
+  "existing_unresolved": [
+    "MAC-AX-001",
+    "MAC-FLOAT-002",
+    "MAC-READ-003"
+  ],
+  "mac_restoration": {
+    "app_exited": true,
+    "original_profile_restored": true,
+    "path_type_mode_size_hash_match": true,
+    "files": 4,
+    "root_mode": 448,
+    "test_profile_retained": true,
+    "at_epoch_ms": 1791190938701.871
+  },
+  "mac_executable_sha256": "8d6e926a336d0c051242e4d34ece7ac9a5ca7885104142e1fe78bc106fc4f5b0",
+  "scope_limits": [
+    "touchpad skipped by user",
+    "multiple displays unavailable",
+    "Finder alias acceptance not completed by this batch",
+    "Developer ID/notarization/release not executed"
+  ],
+  "privacy": {
+    "raw_screenshots_profiles_and_private_data_committed": false,
+    "credentials_committed": false,
+    "user_picture_root_written": false
+  },
+  "evidence_files": [
+    {
+      "local_artifact": "evidence/autohide-current.png",
+      "bytes": 187801,
+      "sha256": "b8d67fb97b2c1cc290c03a00286d30b7038f13aa8d46b885d0a9add8abd49b74"
+    },
+    {
+      "local_artifact": "evidence/autohide-popup-keyboard.ax.txt",
+      "bytes": 3051,
+      "sha256": "5283e05e52c8429a674af3ea2665a34421e2e197bfbb79e51f33896977beb0d1"
+    },
+    {
+      "local_artifact": "evidence/autohide-popup-open.ax.txt",
+      "bytes": 2967,
+      "sha256": "b1fe54b2b35bfa22c81a151bf027e928e56809d98536c4d45ebba65598f0c5a1"
+    },
+    {
+      "local_artifact": "evidence/browse-popup-cancel.ax.txt",
+      "bytes": 4872,
+      "sha256": "dad116b01959bff8ff87724f8d6ffa2a6dae1bf37d2b59b1f01ba3124a505d2b"
+    },
+    {
+      "local_artifact": "evidence/browse-popup-continuous.ax.txt",
+      "bytes": 4864,
+      "sha256": "b09686ec6a258400946b3ddbb4431b354c6ffe96f8c352698d66756c37b5d4fa"
+    },
+    {
+      "local_artifact": "evidence/browse-popup-local.ax.txt",
+      "bytes": 5258,
+      "sha256": "f7f17d33c4a020339682fdd682fffc4d4b34911498e3273b302bf23f4beecbad"
+    },
+    {
+      "local_artifact": "evidence/browse-popup-reopen.ax.txt",
+      "bytes": 5176,
+      "sha256": "49b3b991ecd2778da08cef3ebdb7840b9067e5615eeb27a95f7fef117a738abc"
+    },
+    {
+      "local_artifact": "evidence/browse-popup-up-isolated.ax.txt",
+      "bytes": 5188,
+      "sha256": "ffd4f871f6d8ac601ca364a0182fe6a10cf4870818b9d2078b86a642f7b50b30"
+    },
+    {
+      "local_artifact": "evidence/browse-popup-up-isolated.png",
+      "bytes": 251734,
+      "sha256": "57d4ba7993bbf2415d0a6a758c354740fba59a27b11f6daee38cf5c111086def"
+    },
+    {
+      "local_artifact": "evidence/nas-directory-disconnect.ax.txt",
+      "bytes": 6896,
+      "sha256": "88e5ea26db6695fa4f7e137d593927f8fadb196f3fb22596a5849bf70ecbd366"
+    },
+    {
+      "local_artifact": "evidence/nas-responsive-popup.ax.txt",
+      "bytes": 6896,
+      "sha256": "88e5ea26db6695fa4f7e137d593927f8fadb196f3fb22596a5849bf70ecbd366"
+    },
+    {
+      "local_artifact": "evidence/page-list-popup-local.ax.txt",
+      "bytes": 4885,
+      "sha256": "00f9013172f38b7ce457eb3b945d9e55fedb22d9f61c7f13bc71162d9bcf8d15"
+    },
+    {
+      "local_artifact": "evidence/rdp-keyboard-final.ax.txt",
+      "bytes": 362,
+      "sha256": "538731899367856070953056c01250b79509b4312b009dc41e3f43fcac60d29c"
+    },
+    {
+      "local_artifact": "evidence/rdp-keyboard-restored.ax.txt",
+      "bytes": 363,
+      "sha256": "45474737a7082a987b2f72a1fbdc65e2ec124a9b9a7ba8ab0a52381b0c8c46b2"
+    },
+    {
+      "local_artifact": "evidence/rdp-keyboard-restored.png",
+      "bytes": 533088,
+      "sha256": "f737f940bd164ecbb99d2edab37f52b9b5af8f1e06e68a12873618bbdccd6b67"
+    },
+    {
+      "local_artifact": "evidence/real-cached-after-scroll.png",
+      "bytes": 475703,
+      "sha256": "6a4716e6670d0923d60c9417ca957df681b53f2b9c65f6af1920a204520a7fc7"
+    },
+    {
+      "local_artifact": "evidence/real-cached-before-scroll.png",
+      "bytes": 516883,
+      "sha256": "fd980d63e222cf7c8a1368b6384a2678ee5b60086d382dab66048230b4a14045"
+    },
+    {
+      "local_artifact": "evidence/real-cached-loaded.ax.txt",
+      "bytes": 4669,
+      "sha256": "5f96d03fc73243f9c88ba16cbcf109d0a20f34b7cd5b9278b17d7d6878d7c38f"
+    },
+    {
+      "local_artifact": "evidence/real-cached-scroll.ax.txt",
+      "bytes": 1188,
+      "sha256": "6f5efaa1a7b56dd787ca7eaa0c6044b3533701a5219a5263e285763b9004ca06"
+    },
+    {
+      "local_artifact": "evidence/real-sample-loaded.ax.txt",
+      "bytes": 4860,
+      "sha256": "3eb7de57edee31c5ed533e6969c06bc65d2003caef7fcb4707b9a918141c8cb2"
+    },
+    {
+      "local_artifact": "evidence/real-sample-retry.ax.txt",
+      "bytes": 5181,
+      "sha256": "9981733acc50e32f72fa57e77c693c4a8b0f10c2a96fc7435367e625b9a86eff"
+    },
+    {
+      "local_artifact": "evidence/windows-book-copy-result.png",
+      "bytes": 383643,
+      "sha256": "ca0ee065996c79607276e800659f2b7f356c26fa10031b559544aab2f9719031"
+    },
+    {
+      "local_artifact": "evidence/windows-book-move-result.png",
+      "bytes": 339404,
+      "sha256": "b0b1195f0071d4cfdb770b470380f345a075cc1c112bd1b2a934114c254822e4"
+    },
+    {
+      "local_artifact": "evidence/windows-copy-hash-receipt.png",
+      "bytes": 536471,
+      "sha256": "79c7e2e3dac27956ebd9118db210142ecb38cb667af01aea5d0c7c725dba5414"
+    },
+    {
+      "local_artifact": "evidence/windows-delete-book-confirm.png",
+      "bytes": 378553,
+      "sha256": "71827f8ff9c2e2151ee3393d8df1029f9b8ebeee5db0e885f5b5cb131a3b40e1"
+    },
+    {
+      "local_artifact": "evidence/windows-delete-book-result.png",
+      "bytes": 355810,
+      "sha256": "b467365ae9c0b8f20b052af39273f38621b5d137f40b9b8669afec93013c46a3"
+    },
+    {
+      "local_artifact": "evidence/windows-delete-file-confirm.png",
+      "bytes": 391973,
+      "sha256": "4210ddb216f7077925d0096eb3d0c2e1772b0cafb28f69739b7420a8403a5626"
+    },
+    {
+      "local_artifact": "evidence/windows-delete-file-result.png",
+      "bytes": 362322,
+      "sha256": "c72d7a293a8cdac5353aed4b082e62c68688433e0143aacb2635302e46434fd1"
+    },
+    {
+      "local_artifact": "evidence/windows-final-launch-unicode.png",
+      "bytes": 662491,
+      "sha256": "9ef04765ec4e3f984544bb68c05c3ad1dc5fce603aaf5423b358c325b9ccc388"
+    },
+    {
+      "local_artifact": "evidence/windows-final-launch.png",
+      "bytes": 397047,
+      "sha256": "0ad38c9f6eacb03900e92a409620514a97715294f8712b1bce7bffe7110ecab5"
+    },
+    {
+      "local_artifact": "evidence/windows-final-restoration.png",
+      "bytes": 533227,
+      "sha256": "704531eb9f1ceb58caa6edf5810d281c0a7c533ad25d159b4b7b7ad4d3075121"
+    },
+    {
+      "local_artifact": "evidence/windows-fixed-launch.png",
+      "bytes": 474572,
+      "sha256": "02cd96fff5bef6e21424eba3cf80a733593513f214c306471c1e5e39562c6953"
+    },
+    {
+      "local_artifact": "evidence/windows-move-hash-receipt.png",
+      "bytes": 554058,
+      "sha256": "799037c76f8e374878d3a1ebe18c801717093ae3865e1f0ad0334678b6e0eb4e"
+    },
+    {
+      "local_artifact": "evidence/windows-overwrite-confirm.png",
+      "bytes": 418418,
+      "sha256": "815f04c275bb8a51853720c5600170969d9283f86d8c96234e1258bbc35cef8a"
+    },
+    {
+      "local_artifact": "evidence/windows-overwrite-result.png",
+      "bytes": 377278,
+      "sha256": "c0cb6805c5c820da6189a8843b7650ff658dc716817349e69fc8416fead9f238"
+    },
+    {
+      "local_artifact": "evidence/windows-overwrite-undo.png",
+      "bytes": 380389,
+      "sha256": "0352a796a2ea74aadd1e0610d5b5e570415c59f4b796b59fef6821e901e9f337"
+    },
+    {
+      "local_artifact": "evidence/windows-rename-result.png",
+      "bytes": 382709,
+      "sha256": "dd5e7480e8c97a062911184bbb4e4d35af055a5905f43954cefbc0aea97c52a6"
+    },
+    {
+      "local_artifact": "evidence/windows-resume.png",
+      "bytes": 342112,
+      "sha256": "1b1816a0c80509072c8d3dbb7a0d24639695be700b6b049bc172c7f783d90494"
+    },
+    {
+      "local_artifact": "evidence/zip-confirm.ax.txt",
+      "bytes": 802,
+      "sha256": "f4fd76e6949ad2a1c931b12a6e08a77f3da0ae62d84ee250bff1996eac6a35f1"
+    },
+    {
+      "local_artifact": "evidence/zip-confirm.png",
+      "bytes": 65245,
+      "sha256": "34d2dfc8340afe0f3b694255f1764df326dde4143cd6c8dbe2d3cad0a03acef8"
+    },
+    {
+      "local_artifact": "evidence/zip-deleted.ax.txt",
+      "bytes": 5135,
+      "sha256": "f1c651e5267fc5464ac128bc91e8f72b742b569d95491611e1ac1825c837d8ce"
+    },
+    {
+      "local_artifact": "evidence/zip-deleted.png",
+      "bytes": 246072,
+      "sha256": "bfe77d270bf7a995f017d0300f34adefcb339eba40537ebf38a65e719368a2be"
+    },
+    {
+      "local_artifact": "evidence/zip-restarted.ax.txt",
+      "bytes": 6457,
+      "sha256": "003c647c72c3e4e0be4181ec387ebe72b0ab417aa3bc618cd56ae6707befe7c7"
+    },
+    {
+      "local_artifact": "evidence/zip-restarted.png",
+      "bytes": 265460,
+      "sha256": "2f4bc34d170ba907e400120000c8e7f9899284090138fbd5d324a5fa6e0cdee4"
+    },
+    {
+      "local_artifact": "evidence/zip-survivor-next.ax.txt",
+      "bytes": 737,
+      "sha256": "f6ecbf5ea3e42e345964dffbe49f8c0e7f863d9db895ed8e94b8b460a11584af"
+    },
+    {
+      "local_artifact": "evidence/zip-survivor-next.png",
+      "bytes": 242457,
+      "sha256": "011bad872ac6e3ca387d668baa79afa36bad55087978fcd7296cd30433b216fb"
+    },
+    {
+      "local_artifact": "zip-before.json",
+      "bytes": 2799,
+      "sha256": "191e0f39d007c4e127838d698c8161b1a60f82bd3d1ac3f1002e8ce7b546a5b8"
+    },
+    {
+      "local_artifact": "zip-after.json",
+      "bytes": 337,
+      "sha256": "7e49048dabd5d88241274ee7ae34fe411a5fbe0bb9bbe3ee7e293b0697dba207"
+    },
+    {
+      "local_artifact": "nas-before.json",
+      "bytes": 495,
+      "sha256": "8ae8096778a616da43edaa2452358b72f9a97fc5312a19d3e4ec7a9485d1a0e2"
+    },
+    {
+      "local_artifact": "nas-mounted.json",
+      "bytes": 202,
+      "sha256": "d1e2f2194a457ebb770f3652381a4eba7f8b27f60d01bdfdcf61071b81b028ce"
+    },
+    {
+      "local_artifact": "nas-directory-outage.json",
+      "bytes": 312,
+      "sha256": "08897fb9d3847c060a341b6aa572284f60decbb40f22a472b6d6083825752619"
+    },
+    {
+      "local_artifact": "nas-failure.json",
+      "bytes": 392,
+      "sha256": "f6f2f4da0bd1c55e57847f7151d8f8c2452e578270a57d4e509fe158abaebadf"
+    },
+    {
+      "local_artifact": "nas-invalid-local.json",
+      "bytes": 175,
+      "sha256": "5cb01290b8d23b8334f5be563cb98c89f64c0a9984fc823dddffe25a4d054fa0"
+    },
+    {
+      "local_artifact": "nas-busy.sample.txt",
+      "bytes": 291726,
+      "sha256": "16cf1456cf1b3f191505c6f3b8e393b0bb4f867b1b0066c1ed0429e6d1d9b063"
+    },
+    {
+      "local_artifact": "nas-busy.stack.txt",
+      "bytes": 3963,
+      "sha256": "8684fd8bddb3c0f5c2335224538904869d231e99f20b0fa1124bcd0b29283e77"
+    },
+    {
+      "local_artifact": "real-retry.stack.txt",
+      "bytes": 3991,
+      "sha256": "2a36dd034925a492d719488e82d5f8e66164013dd98c2de31f0d97855671b809"
+    },
+    {
+      "local_artifact": "smb-proxy-events.json",
+      "bytes": 1869,
+      "sha256": "02f879a96bb100ffe52e3f84b9643b13ad895f62f04e38dc8692e3763a6f8b5f"
+    },
+    {
+      "local_artifact": "real-cached.json",
+      "bytes": 1902,
+      "sha256": "a011474cb08602c2f16cd16555b2d8ba92f6ab356119b4863fd744c5b92fffba"
+    },
+    {
+      "local_artifact": "real-cached-warm.json",
+      "bytes": 6187,
+      "sha256": "fe19f9e4b7b4562c21448582493ad04724a00e33f84829540e46f6ca258764de"
+    },
+    {
+      "local_artifact": "frames-cached-load.json",
+      "bytes": 42306,
+      "sha256": "c49848ac4d63cfdccb25bad82946d5c219605988fd045217e1a78b3b46c3f6a7"
+    },
+    {
+      "local_artifact": "frames-cached-start.json",
+      "bytes": 119,
+      "sha256": "0498a20d417f424713970e30ca05c746991a3937bea1039761f45631b6fdf437"
+    },
+    {
+      "local_artifact": "frames-first-toc.xml",
+      "bytes": 37573,
+      "sha256": "887422b5a0b51aaf6c1d91f726e4bc4fad3c8bfeeea0601d9c78eba296bfb7f0"
+    },
+    {
+      "local_artifact": "frames-first-displayed.xml",
+      "bytes": 1352504,
+      "sha256": "a2b2fa3d6175fc083e8dfdae415686b636e78e037f68a6281b1aa5c312b0604b"
+    },
+    {
+      "local_artifact": "original-profile-snapshot.json",
+      "bytes": 722,
+      "sha256": "64f28efe1ef752ae5ae381e3e80cdcd9b53e6c0f17d85c23f804382c3f40c8bb"
+    },
+    {
+      "local_artifact": "restoration.json",
+      "bytes": 206,
+      "sha256": "24e7dd85a671c56d9198d0a7a1c66e0483d6d5f04eed0a81d15eaad4fa8c6180"
+    },
+    {
+      "local_artifact": "session.json",
+      "bytes": 135,
+      "sha256": "4963039d89a1f522355395d7f0c59049d3f57616ca9577d1124c82fa22e12a64"
+    },
+    {
+      "local_artifact": "nas-cleanup.json",
+      "bytes": 267,
+      "sha256": "d4ca3a00349fe2a012b2e63bd70a4fe6f52f34ba9078dfd8b0179a0543805369"
+    },
+    {
+      "local_artifact": "integrity-final.json",
+      "bytes": 409,
+      "sha256": "8bbb682a3a1b28a260993967cd3a19d74144d3b7817c1c84cc0c1854713c3b7c"
+    },
+    {
+      "local_artifact": "frames-cached-toc.xml",
+      "bytes": 37028,
+      "sha256": "616b1b32f2c75a7fa76549a8f2e276310022212a3aee7113e17fc22e1ff0b7f4"
+    },
+    {
+      "local_artifact": "frames-cached-displayed.xml",
+      "bytes": 1211514,
+      "sha256": "720c73508fb35f8b7b99806e5d52a472b5cbeebd34063923411eca5eca5a49a4"
+    },
+    {
+      "local_artifact": "frames-cached-analysis.json",
+      "bytes": 13289,
+      "sha256": "d5a999d3c57a3557e55b5574b3ffae7376cf963c7fc1dc74be38188e6ea5b0a4"
+    }
+  ]
+}

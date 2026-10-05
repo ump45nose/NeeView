@@ -59,3 +59,5 @@ python3 scripts/package_macos.py --dotnet dotnet --sign 'Developer ID Applicatio
 各批正式运行截图与Headless截图分别留证；已有组合/比例、页选择/历史、书架/排序保存、前后书及部分Windows复演记录保留，见[设备输入](acceptance/p2-device-input-runtime.md)与[设备资源](acceptance/p2-device-resources-runtime.md)。P3/P4尚需集中验证真实剪贴板/Finder/废纸篓、分类和覆盖恢复、完整焦点/弹出层、无损Retina、真跨卷/NAS、固定Windows动态与长期native。触控板按用户要求跳过，多屏无环境；只读Headless抽样不能外推屏幕P95或长期稳定性。旧重写方案证据只作历史。
 
 当前范围与验收边界见[P4收尾清单](docs/p4-completion-checklist.md)，各阶段契约与证据见[整体架构](docs/architecture.md)和[阶段验收](acceptance/stages.md)。P4开发完成不等于原全部功能已迁移，也不等于整体验收封板。已验证增量按仓库规范提交并推送；Developer ID、公证与发布尚未执行。
+
+2026-10-05 最新[剩余设备验收](acceptance/p34-final-runtime.md)补齐隔离 ZIP 真删除/重启及固定 Windows 整书/删除子集；真实 NAS 恢复和 popup 方向键隔离失败，新增两项[已知问题](docs/known-issues.md)。长期资源及 Retina 浮窗缺陷仍未修，完整停靠/自动隐藏和有效屏幕 P95 未通过；原 Profile 与十个共享挂载已核对恢复/保留。P3/P4 保持未封板。
