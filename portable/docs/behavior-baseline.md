@@ -82,3 +82,5 @@ P4第七批：原BookHubTools/ContentDropReceiver多项保存为临时.nvpls；�
 P4第八批：原DeleteBook处理根目录/根文件，用户.nvpls仅移走列表；GetNextItem下一优先/末项退前/选中回退、IsOpenNextBookWhenRemove默认true保持。原BookControl忽略ConfirmFileIO.DeleteAsync的false返回，本批明确修正为真实成功才导航，取消保持旧书、系统失败恢复memento/搜索/锁定；历史和书签不删除。AppKit废纸篓替换Windows系统实现，临时/Profile/卷根/逻辑条目/链接范围有明确限制，设备与Windows动态仍待验，见[p4-delete-book.md](p4-delete-book.md)。
 
 P4第九批：原BookControl整书固定复制/移动与1-based目标Index接入。移动先由FileIO.CloseBook释放来源，未发现该入口预捕获下一书，不套用DeleteBook的邻项流程；真实成功经FileIO.BookMementoRenameRecursive更新原明确地址。Mac复制保持阅读，移动成功保持卸载、不进分类栈，失败恢复原书是明确改进；同名目录明确整目录替换/取消，不声称等于Windows Shell的合并/冲突选择。逻辑目录提取/链接继续待迁，见[p4-book-transfer.md](p4-book-transfer.md)。
+
+P4第十批普通目录页复制对照：ArchiveEntry.RealizeAsync的IsFileSystem直接返回SystemPath，目录实际递归复制由Shell承担；Mac复用已验证目录协议。Archive.CanRealize排除归档内部目录，SendExtractFile原明确TODO返回null；其他策略仍可传根归档/逻辑路径。Mac保留范围与LimitedRealization，增加未提取能力提示。普通目录与列表别名按真实名称复制、混合组保序去重、分类双栈保持、确认取消与当前目录重载见[p4-directory-copy.md](p4-directory-copy.md)。Windows目录合并/冲突动态仍待，Mac明确整体替换/取消。

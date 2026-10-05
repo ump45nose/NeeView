@@ -902,7 +902,7 @@ public sealed partial class MainWindow : Window
                 _model.Operation.AskBookNameAsync = null; _model.Operation.ConfirmBookRenameAsync = null; _model.Operation.RetryBookRenameAsync = null;
                 _model.HistoryRefreshed -= History_Refreshed;
                 _model.Operation.MarkersChanged -= Model_MarkersChanged;
-                if (_model.Operation.DestinationMoves is { } moves) { moves.StateChanged -= DestinationMove_Changed; moves.ConfirmOverwriteAsync = null; }
+                if (_model.Operation.DestinationMoves is { } moves) { moves.StateChanged -= DestinationMove_Changed; moves.ConfirmOverwriteAsync = null; moves.ConfirmDirectoryOverwriteAsync = null; }
                 _model.Detach(); _model.Refreshed -= Model_Refreshed; _model.PanelsRefreshed -= Model_PanelsRefreshed; _model.ChromeRefreshed -= Model_ChromeRefreshed;
                 _model.Refreshed -= PageNavigation_Refreshed;
             }

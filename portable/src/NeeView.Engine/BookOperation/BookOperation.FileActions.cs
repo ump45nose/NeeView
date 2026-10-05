@@ -45,13 +45,14 @@ public sealed partial class BookOperation
         var pages = CollectFileActionPages(policy);
         return pages.Count > 0 && pages.All(page => page is { IsImage: true, ArchiveEntry.FilePath: not null } && page.ArchiveEntry.Archive.IsDirectory && !page.ArchiveEntry.IsShortcut);
     }
-    /// <summary>原固定复制允许可实体化文件页；数字分类仍限真实普通图片及写权限。</summary>
+    /// <summary>原固定复制允许文件和目录页；实体目录复用整树快照后端，数字分类仍限普通图片。</summary>
     /// <param name="policy">原页组范围。</param><returns>整组具备文件复制能力时为 true。</returns>
     public bool CanCopyToFolder(MultiPagePolicy policy = MultiPagePolicy.Once)
     {
         if (!Enum.IsDefined(policy) || IsUsingClipboard || IsRenamingBook || IsTransferringBook || IsDeletingFile || _destinationMoves is null || _destinationMoves.IsBusy || _disposed || _closing || IsLoading || Book?.IsIndexing != false) return false;
         var pages = CollectFileActionPages(policy);
-        return pages.Count > 0 && pages.All(CanRealizeFile);
+        return pages.Count > 0 && pages.All(page => CanCopyEntry(page)
+            && (page.ArchiveEntry.TargetArchiveEntry is not { IsDirectory: true, FilePath: not null } || _fileBackend is IBookTransferBackend));
     }
 
     /// <summary>唯一装配边界；图像失效仍使用原工厂，移动历史在窗口重开时继续共享。</summary>
@@ -128,38 +129,77 @@ public sealed partial class BookOperation
         var requestedBook = Book; var pages = CollectFileActionPages(policy); var generation = _generation;
         var archivePolicy = Config.Current.System.ArchiveCopyPolicy.LimitedRealization();
         RealizedFilePathList? realized = null;
+        BookMemento? refresh = null; string? refreshSearch = null, failure = null; int refreshPart = 0;
+        using var pending = CancellationTokenSource.CreateLinkedTokenSource(token);
         await _gate.WaitAsync(token);
         try
         {
             if (!CanCopyToFolder(policy) || !ReferenceEquals(requestedBook, Book) || generation != _generation || !pages.SequenceEqual(CollectFileActionPages(policy)) || !folder.IsValid()) return;
             var book = Book!; var readingAnchor = book.CurrentPage;
             _saving?.Cancel();
+            var directoryTargets = new HashSet<string>(StringComparer.Ordinal);
+            string? physicalBook = null;
+            // 确认和提交前仍可由切书/关闭取消；实体已成功的结果继续协调，不丢弃前项。
+            lock (_fileCopySync) _fileCopyPreparation = pending;
             var results = await _destinationMoves!.TransferManyAsync(async preparationToken =>
             {
-                using var pending = CancellationTokenSource.CreateLinkedTokenSource(preparationToken);
-                lock (_fileCopySync) _fileCopyPreparation = pending;
-                try
+                foreach (var entry in pages.Select(page => page.ArchiveEntry.TargetArchiveEntry).Distinct())
                 {
-                    foreach (var path in pages.Select(page => page.ArchiveEntry.TargetArchiveEntry).Select(entry => entry.FilePath ?? entry.Archive.RootArchivePath).Distinct(StringComparer.Ordinal))
-                    {
-                        var info = await archives.GetFileMetadataAsync(path, pending.Token);
-                        if (info is null) throw new FileNotFoundException("复制来源已不存在。", path);
-                        if (info.IsSymbolicLink) throw new NotSupportedException("链接复制尚未迁移。");
-                    }
-                    realized = await ArchiveEntryUtility.RealizeArchiveEntry(pages.Select(page => page.ArchiveEntry), archivePolicy, _entryRealizer, pending.Token);
-                    pending.Token.ThrowIfCancellationRequested();
-                    if (_closing || generation != _generation || !ReferenceEquals(book, Book)) throw new OperationCanceledException();
-                    return realized.Paths.Select(path => new FileTransferRequest(path, System.IO.Path.Combine(folder.Path, System.IO.Path.GetFileName(path)), false)).ToArray();
+                    var path = entry.FilePath ?? entry.Archive.RootArchivePath;
+                    var info = await archives.GetFileMetadataAsync(path, preparationToken);
+                    if (info is null) throw new FileNotFoundException("复制来源已不存在。", path);
+                    if (info.IsSymbolicLink) throw new NotSupportedException("链接复制尚未迁移。");
+                    if (entry.FilePath is not null && info.IsDirectory != entry.IsDirectory) throw new IOException("来源类型已改变，请重新操作。");
                 }
-                finally { lock (_fileCopySync) _fileCopyPreparation = null; }
-            }, token);
-            if (!_closing && generation == _generation) Error = _destinationMoves.Error;
+                realized = await ArchiveEntryUtility.RealizeArchiveEntry(pages.Select(page => page.ArchiveEntry), archivePolicy, _entryRealizer, preparationToken);
+                var requests = new List<FileTransferRequest>();
+                foreach (var path in realized.Paths)
+                {
+                    var info = await archives.GetFileMetadataAsync(path, preparationToken) ?? throw new FileNotFoundException("复制实体已不存在。", path);
+                    if (info.IsSymbolicLink) throw new NotSupportedException("链接复制尚未迁移。");
+                    if (info.IsDirectory)
+                    {
+                        await ProtectBookTransferDestinationAsync(path, preparationToken);
+                        var plan = await ((IBookTransferBackend)_fileBackend!).PlanBookTransferAsync(path, folder.Path, preparationToken);
+                        if (!plan.Target.IsDirectory) throw new IOException("目录来源类型已改变，请重新操作。");
+                        await ProtectBookTransferDestinationAsync(plan.Destination, preparationToken);
+                        directoryTargets.Add(await archives.GetPhysicalPathAsync(plan.Destination, preparationToken));
+                        requests.Add(new(plan.Target.Path, plan.Destination, false, DirectoryCopyPlan: plan));
+                    }
+                    else requests.Add(new(path, System.IO.Path.Combine(folder.Path, System.IO.Path.GetFileName(path)), false));
+                }
+                if (directoryTargets.Count > 0 && book.Source.IsDirectory) physicalBook = await archives.GetPhysicalPathAsync(book.Path, preparationToken);
+                preparationToken.ThrowIfCancellationRequested();
+                if (_closing || generation != _generation || !ReferenceEquals(book, Book)) throw new OperationCanceledException();
+                return requests;
+            }, pending.Token, async (plan, validationToken) =>
+            {
+                await ProtectBookTransferDestinationAsync(plan.Target.Path, validationToken);
+                await ProtectBookTransferDestinationAsync(plan.Destination, validationToken);
+            });
+            if (!_closing && generation == _generation) Error = _destinationMoves.Error ?? realized?.CapabilityWarning;
             bool changed = false;
+            var affectedDirectories = new List<string>();
+            if (physicalBook is not null)
+                foreach (var result in results)
+                {
+                    // 系统realpath与传输记录的系统别名可能不同，按实际结果核对，不改写原定位。
+                    var actual = await archives.GetPhysicalPathAsync(result.Destination, CancellationToken.None);
+                    if (directoryTargets.Contains(actual) && IsInsideBook(actual, physicalBook))
+                        affectedDirectories.Add(System.IO.Path.Combine(book.Path, System.IO.Path.GetRelativePath(physicalBook, actual)));
+                }
+            bool directoryChanged = affectedDirectories.Count > 0;
             foreach (var result in results)
             {
                 // 归档或其提取输出不属于当前普通目录索引；只有真正来自当前目录的文件可补入。
                 var page = pages.FirstOrDefault(page => page.ArchiveEntry.FilePath is { } path && System.IO.Path.GetFullPath(path) == result.Source);
-                if (page is not null) changed |= ApplyTransferredPage(book, page, result, copy: true, readingAnchor);
+                if (page is not null && !page.ArchiveEntry.TargetArchiveEntry.IsDirectory && !directoryChanged) changed |= ApplyTransferredPage(book, page, result, copy: true, readingAnchor);
+            }
+            if (directoryChanged)
+            {
+                // 目录覆盖可移除多个后代，不能伪造为单张图片；沿唯一打开链刷新实际索引。
+                foreach (var page in book.Pages.SourcePages.Where(page => affectedDirectories.Any(target => IsInsideBook(page.ArchiveEntry.SystemPath, target)))) _fileImages?.InvalidatePage(page);
+                refresh = book.CreateMemento(); refreshSearch = book.Pages.SearchKeyword; refreshPart = Position.Part;
             }
             if (changed) { await ProbeAroundAsync(book, Position.Index, CancellationToken.None); RebuildFrame(1); RecordPageHistory(); }
             if (results.Count > 0)
@@ -168,14 +208,36 @@ public sealed partial class BookOperation
                 try { await saveData.SaveAsync(book, keepHistoryOrder: _keepHistoryOrder); }
                 catch (Exception ex) { if (!_closing && generation == _generation) Error = "文件操作已成功，阅读状态保存失败，请重试保存：" + ex.Message; ScheduleSave(); }
             }
+            failure = Error;
         }
         finally
         {
+            lock (_fileCopySync) _fileCopyPreparation = null;
             try { if (realized is not null) await realized.DisposeAsync(); }
-            catch (Exception ex) { if (!_closing && generation == _generation) Error = "复制完成后临时实体清理失败：" + ex.Message; else System.Diagnostics.Trace.WriteLine(ex); }
+            catch (Exception ex) { if (!_closing && generation == _generation) failure = Error = "复制完成后临时实体清理失败：" + ex.Message; else System.Diagnostics.Trace.WriteLine(ex); }
             finally { _gate.Release(); Notify(); }
         }
+        if (refresh is not null && !_closing && !_disposed && generation == _generation && ReferenceEquals(requestedBook, Book))
+        {
+            var expected = generation + 1;
+            var restored = await OpenCoreAsync(refresh.Path, CancellationToken.None, keepHistoryOrder: true, startupMemento: refresh, pageSearchKeyword: refreshSearch);
+            await _gate.WaitAsync();
+            try
+            {
+                if (!_closing && !_disposed && expected == _generation)
+                {
+                    if (restored && Book?.CurrentPage?.EntryName == refresh.Page) { Position = new(Position.Index, refreshPart); RebuildFrame(MoveDirection); ScheduleSave(); }
+                    if (failure is not null) Error = failure;
+                    if (!restored) Error = "复制已完成，当前目录重载失败：" + Error;
+                    Notify();
+                }
+            }
+            finally { _gate.Release(); }
+        }
     }
+    /// <summary>保留文件系统大小写语义，按路径分隔边界判断目录覆盖影响范围。</summary>
+    /// <param name="path">实际结果或页面地址。</param><param name="root">当前书籍或目标目录。</param><returns>自身或后代路径为true。</returns>
+    private static bool IsInsideBook(string path, string root) => path == root || path.StartsWith(root.TrimEnd('/') + "/", StringComparison.Ordinal);
     /// <summary>单项结果沿原来源集合协调；批次目标已捕获，推进页面不重采集后续操作对象。</summary>
     private bool ApplyTransferredPage(Book book, Page page, FileTransferResult result, bool copy, Page? readingAnchor)
     {

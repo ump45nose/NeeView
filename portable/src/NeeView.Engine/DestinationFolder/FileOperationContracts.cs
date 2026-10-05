@@ -1,8 +1,8 @@
 namespace NeeView;
 
-/// <summary>替换原 Shell 操作的最小文件契约；路径必须是真实图片，不是归档缓存。</summary>
+/// <summary>替换原Shell操作的实体契约；目录仅固定复制且必须携带既有后端的确认快照。</summary>
 public sealed record FileTransferRequest(string Source, string Destination, bool Move, bool Overwrite = false,
-    string? RestoreBackup = null, string? ExpectedSourceHash = null, string? ExpectedRestoreHash = null);
+    string? RestoreBackup = null, string? ExpectedSourceHash = null, string? ExpectedRestoreHash = null, BookTransferPlan? DirectoryCopyPlan = null);
 /// <summary>真实落点和可恢复覆盖副本；反向操作可消费副本恢复被覆盖文件。</summary>
 public sealed record FileTransferResult(string Source, string Destination, bool Move, string? Backup, string Journal, string ContentHash, string? BackupHash);
 public interface IFileOperationBackend

@@ -56,13 +56,17 @@ public sealed partial class BookOperation
     /// <summary>从唯一原差分配置读取参数，不展开默认命令。</summary>
     /// <returns>原CopyFile当前页组参数。</returns>
     public CopyFileCommandParameter GetCopyFileParameter() => saveData.GetCommandParameter<CopyFileCommandParameter>("CopyFile");
-    /// <summary>复用原CollectPages；普通文件及已接入归档文件可以复制，链接/目录提取仍待迁。</summary>
+    /// <summary>复用原CollectPages；普通目录传原地址，归档内部目录按原四策略传路径或跳过提取。</summary>
     /// <param name="policy">原三种页组收集策略。</param><returns>整组来源及当前状态均支持复制时为true。</returns>
     public bool CanCopyFiles(MultiPagePolicy policy) => Enum.IsDefined(policy) && CanUseClipboard && !IsLoading && Book?.IsIndexing == false
-        && CollectFileActionPages(policy) is { Count: > 0 } pages && pages.All(CanRealizeFile);
+        && CollectFileActionPages(policy) is { Count: > 0 } pages && pages.All(CanCopyEntry);
     /// <summary>按原Page来源和装配能力判断实体化，不将归档逻辑路径当作普通文件。</summary>
-    /// <param name="page">原当前页组成员。</param><returns>普通实体或已装配提取能力的归档文件时为true。</returns>
-    private bool CanRealizeFile(Page page) => page.ArchiveEntry.CanRealize() && (page.ArchiveEntry.FilePath is not null || _entryRealizer is not null);
+    /// <param name="page">原当前页组成员，播放列表先沿实际条目判断。</param><returns>原策略能够解析的条目为true；目录不因此获得提取能力。</returns>
+    private bool CanCopyEntry(Page page)
+    {
+        var entry = page.ArchiveEntry.TargetArchiveEntry;
+        return !entry.Archive.IsDisposed && !entry.IsShortcut && (entry.IsDirectory || entry.FilePath is not null || _entryRealizer is not null);
+    }
     /// <summary>复制原页组或整个实体书籍到剪贴板；归档可生成临时实体，不修改源文件或移动历史。</summary>
     /// <param name="book">true复制原书籍目录/根归档；false按原MultiPagePolicy选页。</param>
     /// <param name="token">准备及系统剪贴板提交前可取消。</param><returns>提交结束任务，失败通过Error回报。</returns>
@@ -91,6 +95,7 @@ public sealed partial class BookOperation
                     if (info.IsSymbolicLink) throw new NotSupportedException("链接的剪贴板复制尚未迁移。");
                 }
                 RealizedFilePathList? realized = book ? new() : await ArchiveEntryUtility.RealizeArchiveEntry(entries, archivePolicy, _entryRealizer, pending.Token);
+                var capabilityWarning = realized.CapabilityWarning;
                 try
                 {
                     if (book) realized.Add(requestedBook.Path);
@@ -107,7 +112,7 @@ public sealed partial class BookOperation
                     if (_entryRealizer is not null) { await _entryRealizer.RetainClipboardAsync(realized); realized = null; }
                 }
                 finally { if (realized is not null) await realized.DisposeAsync(); }
-                if (!_closing && generation == _generation) Error = null;
+                if (!_closing && generation == _generation) Error = capabilityWarning;
             }
             finally { _gate.Release(); }
         }

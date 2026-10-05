@@ -40,6 +40,9 @@ public sealed partial class MainWindow
         {
             moves.ConfirmOverwriteAsync = async path => !_preparing && !_closedPrepared
                 && await ConfirmAsync("覆盖已有图片", "目标已存在：\n" + path + "\n覆盖前将保留可恢复副本。", "覆盖") && !_preparing && !_closedPrepared;
+            moves.ConfirmDirectoryOverwriteAsync = async plan => !_preparing && !_closedPrepared
+                && await ConfirmAsync("覆盖已有目录", "目标已存在：\n" + plan.Destination
+                    + "\n将替换整个目标目录及其中全部内容，不合并目录。\n提交前保留可恢复副本；成功后清理。复制不进入分类撤销历史。", "覆盖") && !_preparing && !_closedPrepared;
             moves.StateChanged += DestinationMove_Changed;
         }
     }

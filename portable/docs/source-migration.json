@@ -403,7 +403,7 @@
       "source": "NeeView/Archiver/Archive.cs",
       "target": "src/NeeView.Engine/Archiver/Archive.cs",
       "sha256": "ba65b2fb43f8ad7cdc61650ce534935d50d7336c10ea772b7d077ea1c48417f1",
-      "status": "P1 Archive/Entry读取子集，SharpCompress后端；密码/嵌套待迁入"
+      "status": "P1 Archive/Entry读取子集，SharpCompress后端；密码/嵌套待迁入；P4第十批CanRealize恢复普通目录直传，内部目录不实体化保持原规则"
     },
     {
       "source": "NeeView/Menu/MenuTree.cs",
@@ -1483,7 +1483,7 @@
       "source": "NeeView/BookOperation/BookPageActionControl.cs",
       "target": "src/NeeView.Engine/BookOperation/BookOperation.FileActions.cs",
       "sha256": "bbe456cdbfeb66d467c2838ad11670d79b0cf58188bc7c31e5f2e687f6eb2d47",
-      "status": "P4原当前页组分类/固定复制/真实成功项推进；删除和实体剪贴板分别沿同一原控制迁入，归档实体化/列表多选删除待迁"
+      "status": "原当前页组分类/固定复制/实际成功结果；归档文件实体化及P4第十批普通目录整树复制接入，目录内落点沿唯一打开链刷新位置；其他删除范围待迁"
     },
     {
       "source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
@@ -1525,7 +1525,7 @@
       "source": "NeeView/Command/Commands/CopyToFolderAsCommand.cs",
       "target": "src/NeeView.MacOS/Views/MainWindow.DestinationFolders.cs",
       "sha256": "0021b73eb89dd16acfc0dac19a7c2059329d2bce988b825eaa134f3b8f693b13",
-      "status": "原固定复制/Index菜单及多页参数；本批普通目录图片，归档实体化待后续"
+      "status": "原固定复制/Index菜单及多页参数；图片/归档文件/普通目录复制接入，目录覆盖独立整树确认；内部目录提取原版TODO明确提示"
     },
     {
       "source": "NeeView/BookOperation/BookPageActionControl.cs",
@@ -1603,7 +1603,7 @@
       "source": "NeeView/BookOperation/BookPageActionControl.cs",
       "target": "src/NeeView.Engine/BookOperation/BookOperation.Clipboard.cs",
       "sha256": "bbe456cdbfeb66d467c2838ad11670d79b0cf58188bc7c31e5f2e687f6eb2d47",
-      "status": "原CollectPages/CopyToClipboard与归档四策略实体化接入，保留原QueryPath/文本实际行为；目录提取/链接待迁，Copy不受写权限约束"
+      "status": "原CollectPages/CopyToClipboard与归档四策略接入；P4第十批普通目录/Playlist真实目标直传，内部目录按原策略传路径或跳过并提示；链接待迁，不受源写权限约束"
     },
     {
       "source": "NeeView/BookOperation/BookControl.cs",
@@ -1633,13 +1633,13 @@
       "source": "NeeView/Archiver/ArchiveEntryUtility.cs",
       "target": "src/NeeView.Engine/Archiver/ArchivePolicy.cs",
       "sha256": "01ae8c774e5c7512ca56b2d6075902fc57061aafe528360387bf01a1c973179b",
-      "status": "原RealizeArchiveEntry页组选序/路径去重迁入；资源以请求级租约替换TempFile/FileProxy，剪贴板成功后进程持有"
+      "status": "原RealizeArchiveEntry页组选序/路径去重；普通目录直传，内部目录SendExtractFile保留原null并回报未完成能力；文件请求级租约及剪贴板进程持有"
     },
     {
       "source": "NeeView/Archiver/ArchiveEntry.cs",
       "target": "src/NeeView.Backends/Content/ArchiveEntryRealizer.cs",
       "sha256": "57e2bad5fac525d8b578c308576feb7ef07179d729bc8a9a9608b5a1835c1f50",
-      "status": "原GetFileProxyAsync保持叶文件名/独立临时实体生命周期适配；只提取已支持归档文件项，链接及归档目录待迁"
+      "status": "原GetFileProxyAsync叶名/独立临时实体生命周期适配；只提取支持归档文件；内部目录提取为原版TODO，链接待适配"
     },
     {
       "source": "NeeView/Archiver/PlaylistArchive.cs",
@@ -1748,6 +1748,12 @@
       "target": "src/NeeView.Engine/Command/CommandTable.cs",
       "sha256": "bbd61cee76705a271e3bfe33b24e277e0f6b7dfa68ff960e653dd9295e34c545",
       "status": "原整书移动名称/写权限/固定参数入口，真实成功才更新原JSON与卸载，不入分类历史"
+    },
+    {
+      "source": "NeeView/Archiver/ArchiveEntry.cs",
+      "target": "src/NeeView.Engine/Archiver/ArchivePolicy.cs",
+      "sha256": "57e2bad5fac525d8b578c308576feb7ef07179d729bc8a9a9608b5a1835c1f50",
+      "status": "P4第十批原RealizeAsync四策略及普通目录直传；内部目录提取保留原TODO返回null并增加能力提示"
     }
   ],
   "rule_references": [

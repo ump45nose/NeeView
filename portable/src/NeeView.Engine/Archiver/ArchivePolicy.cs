@@ -41,7 +41,14 @@ public sealed class RealizedFilePathList : IAsyncDisposable
     public const long TemporaryByteBudget = 2L * 1024 * 1024 * 1024;
     private readonly List<RealizedFileLease> _leases = [];
     private readonly List<string> _paths = [];
+    private readonly List<string> _unrealizedDirectories = [];
     public IReadOnlyList<string> Paths => _paths;
+    /// <summary>原内部目录提取返回null的条目；向表现回报未完成能力，不把空批次当作成功复制。</summary>
+    public IReadOnlyList<string> UnrealizedDirectories => _unrealizedDirectories;
+    public string? CapabilityWarning => _unrealizedDirectories.Count == 0 ? null : "归档内部目录未提取（原版尚未实现），其他可复制条目按原策略处理：" + string.Join("、", _unrealizedDirectories);
+    /// <summary>记录原策略跳过的逻辑目录，不生成临时文件或改变条目定位。</summary>
+    /// <param name="name">原条目逻辑名称。</param>
+    internal void MarkUnrealizedDirectory(string name) { if (!_unrealizedDirectories.Contains(name, StringComparer.Ordinal)) _unrealizedDirectories.Add(name); }
     public long TemporaryBytes => _leases.Sum(lease => lease.Length);
     /// <summary>登记已生成的材料，按原完整路径去重；不根据文件名误合并不同条目。</summary>
     /// <param name="path">真实或原策略指定的逻辑路径。</param><param name="lease">仅解压输出持有租约。</param>
@@ -73,7 +80,7 @@ public static class ArchiveEntryUtility
             foreach (var entry in entries.Select(entry => entry.TargetArchiveEntry).Distinct())
             {
                 token.ThrowIfCancellationRequested();
-                if (!entry.CanRealize()) throw new NotSupportedException("此条目尚不支持实体化复制：" + entry.EntryName);
+                if (entry.Archive.IsDisposed || entry.IsShortcut) throw new NotSupportedException("此条目尚不支持复制：" + entry.EntryName);
                 if (entry.FilePath is { } path) files.Add(path);
                 else switch (policy)
                 {
@@ -81,6 +88,8 @@ public static class ArchiveEntryUtility
                     case ArchivePolicy.SendArchiveFile: files.Add(entry.Archive.RootArchivePath); break;
                     case ArchivePolicy.SendArchivePath: files.Add(entry.SystemPath); break;
                     case ArchivePolicy.SendExtractFile:
+                        // 原ArchiveEntry.RealizeAsync内部目录分支返回null，其他策略仍可传根归档/虚拟路径。
+                        if (entry.IsDirectory) { files.MarkUnrealizedDirectory(entry.EntryName); break; }
                         if (realizer is null) throw new NotSupportedException("归档实体化后端尚未装配。");
                         var lease = await realizer.ExtractAsync(entry, RealizedFilePathList.TemporaryByteBudget - files.TemporaryBytes, token);
                         files.Add(lease.Path, lease); break;

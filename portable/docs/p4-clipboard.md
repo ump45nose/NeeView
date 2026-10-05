@@ -38,3 +38,5 @@ CopyFile 复用唯一 `CollectFileActionPages` 的 Once、All、AllLeftToRight�
 `FileClipboardTests` 使用自建 PNG/ZIP/Profile 与 fake IFileClipboard，覆盖两方向三策略、分割页/瀑布选择、根书籍、文本数值、缺失/链接、失败/取消/晚取消、切书、导航锁等待/关闭、关闭失败重试、单来源/QueryPath 优先、多项拒绝、过期读取、URI/JSON 限额、正式菜单/输入/参数/保存事务。真实系统剪贴板不读写；AppKit API 通过正式 macOS 构建核验，Finder 互操作及真实剪贴板仍随 P3/P4 集中设备验收。
 
 第六批已沿原归档链迁入文件实体化复制；后续继续临时多文件播放列表和其他 Paste 类型；本批不证明 P4 全部完成或设备封板。触控板跳过、多屏无环境，签名公证/发布仍为 P5。
+
+当前目录页复制范围由[P4第十批](p4-directory-copy.md)补齐：普通目录直传/整树固定复制及内部目录四策略已接入；内部目录提取经基线核验为原版TODO，保留跳过并明确提示，不计作迁移丢失。逻辑书按策略复制、链接和其他范围继续按P4清单推进。

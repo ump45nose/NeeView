@@ -49,8 +49,8 @@ public class ArchiveEntry(Archive archive)
     public bool IsImage() => !ReferenceEquals(TargetArchiveEntry, this) ? TargetArchiveEntry.IsImage() : !IsDirectory && ImageFormats.IsImage(EntryName);
     /// <summary>原书籍候选：目录或已接入的压缩格式。</summary>
     public bool IsBook() => !ReferenceEquals(TargetArchiveEntry, this) ? TargetArchiveEntry.IsBook() : IsDirectory || ArchiveFormats.IsArchive(EntryName);
-    /// <summary>当前可实体化的文件；归档内目录提取和链接复制继续保留明确能力限制。</summary>
-    /// <returns>普通文件或已支持归档文件项为 true。</returns>
-    public bool CanRealize() => !Archive.IsDisposed && (!ReferenceEquals(TargetArchiveEntry, this) ? TargetArchiveEntry.CanRealize() : !IsDirectory && !IsShortcut);
+    /// <summary>沿原Archive.CanRealize：普通目录直接传实体地址，归档内部目录不能提取；链接仍待适配。</summary>
+    /// <returns>普通实体或归档文件项为true，归档内部目录为false。</returns>
+    public bool CanRealize() => !Archive.IsDisposed && (!ReferenceEquals(TargetArchiveEntry, this) ? TargetArchiveEntry.CanRealize() : !IsShortcut && (FilePath is not null || !IsDirectory));
     public override string ToString() => EntryName;
 }
