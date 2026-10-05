@@ -17,6 +17,30 @@ namespace NeeView.Engine.Tests;
 
 public sealed class FloatingPanelTests
 {
+    /// <summary>macOS桌面坐标缩放1/Retina绘制缩放2，重复恢复保存不放大；其他桌面缩放同样闭合。</summary>
+    [Theory]
+    [InlineData(1, 2)]
+    [InlineData(1, 1)]
+    [InlineData(2, 2)]
+    [InlineData(1, 1.5)]
+    public void PhysicalClientSizeRoundTripsAcrossDistinctCoordinateScales(double desktopScale, double renderScale)
+    {
+        var saved = new WindowPlacement(WindowStateEx.Normal, 650, 150, 720, 1000);
+        for (int i = 0; i < 10; i++)
+        {
+            var restored = FloatingPanelWindow.CalculatePlacement(saved, new(saved.Left, saved.Top), new(320, 480), new(180, 160), new PixelRect(0, 0, 3000, 2000), desktopScale, renderScale);
+            Assert.Equal(720 / renderScale, restored.Size.Width); Assert.Equal(1000 / renderScale, restored.Size.Height);
+            saved = new(WindowStateEx.Normal, restored.Position.X, restored.Position.Y, (int)Math.Round(restored.Size.Width * renderScale), (int)Math.Round(restored.Size.Height * renderScale));
+            Assert.Equal(720, saved.Width); Assert.Equal(1000, saved.Height);
+        }
+    }
+    /// <summary>Retina工作区是桌面坐标，不能再除绘制缩放；离屏位置及超大尺寸安全约束。</summary>
+    [Fact]
+    public void RetinaWorkAreaUsesDesktopCoordinates()
+    {
+        var restored = FloatingPanelWindow.CalculatePlacement(new(WindowStateEx.Normal, int.MaxValue, int.MinValue, 2880, 2000), new(int.MaxValue, int.MinValue), new(320, 480), new(180, 160), new PixelRect(0, 28, 1728, 1080), 1, 2);
+        Assert.Equal(new Size(1440, 1000), restored.Size); Assert.Equal(new PixelPoint(288, 28), restored.Position);
+    }
     /// <summary>固定原浮动/关闭/重开/停靠及拆组顺序；关闭位置与打开窗口集合独立。</summary>
     [Fact]
     public void OriginalFloatCloseAndDockKeepDistinctState()

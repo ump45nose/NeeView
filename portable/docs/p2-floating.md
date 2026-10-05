@@ -18,7 +18,7 @@ SidePanelPresenter只管理宿主、坐标、拖放和输入转交；FloatingPan
 
 非模态浮窗不触发主窗自动隐藏的对话框锁，也不禁止主查看器手势；真实对话框仍锁定。键盘沿同一命令入口按实际窗口焦点区分文本、列表和菜单。Command+W关闭当前浮窗，Command+Q退出应用。
 
-位置恢复将原物理像素转为当前屏幕DIP，断开屏幕后限制在工作区。客户端尺寸按RenderScaling回存；最大化保留正常位置。最小化/Windows FullDesktop不作为启动状态，保持可访问。Windows外框和Mac客户端尺寸有平台差别，Retina/多屏与Windows动态对照仍待验。
+客户端物理像素尺寸在窗口Opened后按实际RenderScaling转为DIP，恢复中的事件不回存中间值；工作区/位置单独使用Screen.Scaling的桌面单位（macOS为1，不能替代Retina绘制缩放）。客户端尺寸按RenderScaling回存；最大化保留正常位置。最小化/Windows FullDesktop不作为启动状态，保持可访问。Windows外框和Mac客户端尺寸有平台差别；单屏Retina重开/重启尺寸复验通过，详见[缺陷修复](../acceptance/p34-fixes-runtime.md)，多屏与完整Windows浮窗动态对照仍待验。
 
 ## 测试、验收与扩展
 

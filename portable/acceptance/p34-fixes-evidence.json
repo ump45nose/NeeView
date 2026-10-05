@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-05",
+  "phase": "P3/P4 defect corrections",
+  "stage_status": "not_sealed",
+  "MAC-AX-001": {
+    "status": "open",
+    "official_version": "12.1.3",
+    "upstream_commit": "8eeda4f6f546165b3f72e63c9f42247abb306905",
+    "fix_release_found": false,
+    "temporary_source_patch_choice": "pending_user_response",
+    "accessibility_disabled": false
+  },
+  "MAC-FLOAT-002": {
+    "status": "retina_size_regression_passed",
+    "targeted_tests": {
+      "passed": 12,
+      "failed": 0
+    },
+    "formal_build": "passed",
+    "local_signature": "passed",
+    "seed": "Normal,650,150,360,500",
+    "after_reopen": "Normal,650,150,360,500",
+    "after_restart": "Normal,650,150,360,500",
+    "screenshots": [
+      {
+        "file": "floating-first.png",
+        "pixels": [
+          4718592,
+          4292935744
+        ],
+        "sha256": "f11da62211d326d9766d020c1168a9331a5295192b800d5a1e87e34a75f9d6a8"
+      },
+      {
+        "file": "floating-reopened-second.png",
+        "pixels": [
+          4718592,
+          4292935744
+        ],
+        "sha256": "4e333cd55f5fd2718972881e55ca99aada6b2c8c79e6c54df81eb4b06fabc20f"
+      },
+      {
+        "file": "floating-reopened.png",
+        "pixels": [
+          4718592,
+          4292935744
+        ],
+        "sha256": "4e333cd55f5fd2718972881e55ca99aada6b2c8c79e6c54df81eb4b06fabc20f"
+      },
+      {
+        "file": "floating-restarted.png",
+        "pixels": [
+          4718592,
+          4292935744
+        ],
+        "sha256": "2677811a4ace798aec09fada3d2db57a02266fd0406da6f34ab980f2da438582"
+      }
+    ],
+    "multi_screen": "not_tested"
+  }
+}
