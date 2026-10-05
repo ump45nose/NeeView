@@ -1,5 +1,6 @@
 # P4 第十批：原普通目录页复制与归档目录策略
 
+本文件描述当批增量；当前删除、图片接收与链接范围以[P4收尾契约](p4-completion.md)为准。
 固定出处为 `c5c398d89`：`ArchiveEntry.cs:581–611` 的文件系统直传及四归档策略、`Archive.cs:537–543` 的 CanRealize、`ArchiveEntryUtility.cs:275–300` 的保序/去重，以及 `DestinationFolder.cs:52–111` 的固定复制链。原内部归档目录的 SendExtractFile 分支明确写有 `TODO: ArchiveDirectory 対応` 并返回 null，**内部目录递归提取属于原版未完成能力，不列为迁移丢失**。不通过重新设计增加目录提取内核。
 
 ## 职责、依赖与契约

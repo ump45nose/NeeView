@@ -34,13 +34,13 @@ public sealed partial class BookOperation
             Notify(); await _gate.WaitAsync(prompt.Token);
             try { if (!CanDeleteBookCore()) return; requested = Book!; generation = _generation; wasLocked = IsBookLocked; }
             finally { _gate.Release(); }
-            var target = await ReadDeleteBookTargetAsync(requested.Path, prompt.Token);
+            var target = await ReadDeleteBookTargetAsync(requested.Path, prompt.Token, requested.Source.CreateBookEntry().IsShortcut);
             if (Config.Current.System.IsRemoveConfirmed && (ConfirmDeleteBookAsync is null || !await ConfirmDeleteBookAsync(target.Path).WaitAsync(prompt.Token))) return;
             await _gate.WaitAsync(prompt.Token);
             try
             {
                 if (!CanDeleteBookCore() || generation != _generation || !ReferenceEquals(requested, Book)) return;
-                var current = await ReadDeleteBookTargetAsync(target.Path, prompt.Token);
+                var current = await ReadDeleteBookTargetAsync(target.Path, prompt.Token, requested.Source.CreateBookEntry().IsShortcut);
                 if (target != current) throw new IOException("书籍在确认期间已改变，请重新确认。");
                 memory = requested.CreateMemento(); search = requested.Pages.SearchKeyword;
                 place = _bookshelf?.Place;
@@ -107,14 +107,16 @@ public sealed partial class BookOperation
         }
     }
 
-    /// <summary>确认前后均核对实体元数据；链接和根地址不交给普通整书删除。</summary>
+    /// <summary>确认前后核对实体元数据；已捕获的末段链接只删除自身，卷根/Profile继续保护。</summary>
     /// <param name="path">捕获的当前书籍根地址。</param><param name="token">准备/确认阶段取消。</param>
     /// <returns>通过实际路径保护的实体快照；不提供跨进程原子身份保证。</returns>
-    private async Task<FolderItem> ReadDeleteBookTargetAsync(string path, CancellationToken token)
+    private async Task<FolderItem> ReadDeleteBookTargetAsync(string path, CancellationToken token, bool allowLink = false)
     {
         var target = await archives.GetFileMetadataAsync(path, token) ?? throw new FileNotFoundException("书籍实体已不存在。", path);
-        if (target.IsSymbolicLink) throw new NotSupportedException("链接的整书删除尚未迁移。");
-        var physical = await archives.GetPhysicalPathAsync(path, token);
+        if (target.IsSymbolicLink && !allowLink) throw new IOException("实体已被替换成链接，请重新加载。");
+        // 末段链接是操作对象，保护检查只解析父目录，不解析链接目标。
+        var physical = target.IsSymbolicLink ? System.IO.Path.Combine(await archives.GetPhysicalPathAsync(System.IO.Path.GetDirectoryName(path)!, token), System.IO.Path.GetFileName(path))
+            : await archives.GetPhysicalPathAsync(path, token);
         var profile = await archives.GetPhysicalPathAsync(saveData.DirectoryPath, token);
         if (System.IO.Path.GetDirectoryName(physical) is null || physical == "/Volumes" || System.IO.Path.GetDirectoryName(physical) == "/Volumes")
             throw new NotSupportedException("不能删除卷根目录。");

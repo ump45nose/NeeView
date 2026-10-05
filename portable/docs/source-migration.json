@@ -403,7 +403,7 @@
       "source": "NeeView/Archiver/Archive.cs",
       "target": "src/NeeView.Engine/Archiver/Archive.cs",
       "sha256": "ba65b2fb43f8ad7cdc61650ce534935d50d7336c10ea772b7d077ea1c48417f1",
-      "status": "P1 Archive/Entry读取子集，SharpCompress后端；密码/嵌套待迁入；P4第十批CanRealize恢复普通目录直传，内部目录不实体化保持原规则"
+      "status": "P4收尾：原CanDelete/DeleteAsync来源能力，回报真实成功项；保留根链接对象信息"
     },
     {
       "source": "NeeView/Menu/MenuTree.cs",
@@ -1375,7 +1375,7 @@
       "source": "NeeView/SidePanels/PageList/PageListBox.xaml.cs",
       "target": "src/NeeView.MacOS/Views/MainWindow.PageList.cs",
       "sha256": "f8ed3754f8bcebf370082e991a5a01c21aa35d000a0397b0a3e07bc55f113b41",
-      "status": "原方向键仅选行、无修饰按下定位/释放焦点、Enter及目录页双击；原Page/当前Book核对；高级组/拖放仍待迁"
+      "status": "P4收尾：显式选区Delete/上下文菜单转交同一Engine API，不改变主页删除语义"
     },
     {
       "source": "NeeView/SidePanels/Bookshelf/FolterTree/FolderTreeView.xaml.cs",
@@ -1549,7 +1549,7 @@
       "source": "NeeView/System/FileIO.cs",
       "target": "src/NeeView.Backends/FileSystem/FileOperationBackend.Rename.cs",
       "sha256": "2b438ab676de625e70bc64861e3a10aaf081c480c65650bf76b2794d82f6561e",
-      "status": "原CheckInvalidFilename/CheckChangeExtension/CheckDuplicateFilename/RenameCore替换；同目录无覆盖、编号建议、Mac合法名称与真实大小写、快照复核及恢复三态"
+      "status": "原CheckInvalidFilename/CheckChangeExtension/CheckDuplicateFilename/RenameCore替换；同目录无覆盖、编号建议、Mac合法名称与真实大小写、快照复核及恢复三态；P4收尾捕获链接快照，链接自身改名/恢复、外部类型变化拒绝"
     },
     {
       "source": "NeeView/System/FileIO.cs",
@@ -1621,7 +1621,7 @@
       "source": "NeeView/System/ContentDropReceiver.cs",
       "target": "src/NeeView.Engine/BookOperation/BookOperation.Clipboard.cs",
       "sha256": "80d8e8d1f069cf8d6dfb2f6a6e49f6175d113c2daf1ed0bf99256afdf10dc11d",
-      "status": "原QueryPath优先/单来源加载及P4第七批多项临时列表；位图/文本/网络地址等待迁"
+      "status": "P4收尾：Paste/Drop唯一打开链、QueryPath与标准文件优先、晚到代次/关闭取消"
     },
     {
       "source": "NeeView/External/ArchivePolicy.cs",
@@ -1723,7 +1723,7 @@
       "source": "NeeView/System/FileIO.cs",
       "target": "src/NeeView.Backends/FileSystem/FileOperationBackend.BookTransfer.cs",
       "sha256": "2b438ab676de625e70bc64861e3a10aaf081c480c65650bf76b2794d82f6561e",
-      "status": "原SHCopy/SHMoveToFolder及真实成功结果替换；复用既有后台槽/日志/暂存/指纹协议，完整目录含空项，失败保守恢复；Mac明确目录覆盖替换不合并，链接不迁"
+      "status": "原SHCopy/SHMoveToFolder及真实成功结果替换；复用既有后台槽/日志/暂存/指纹协议，完整目录含空项，失败保守恢复；Mac明确目录覆盖替换不合并，P4收尾保留树内/根链接文字、不跟随，复用原指纹/恢复协议"
     },
     {
       "source": "NeeView/DestinationFolder/CopyBookToFolderMenuFactory.cs",
@@ -1766,6 +1766,48 @@
       "target": "src/NeeView.Backends/Content/ArchiveFactory.cs",
       "sha256": "01ae8c774e5c7512ca56b2d6075902fc57061aafe528360387bf01a1c973179b",
       "status": "P4第十一批原CreateAsync(Book.Path)条目关系；由已打开来源表达根实体/内部目录，RequestedArchive委托原根，不新开来源或持有流"
+    },
+    {
+      "source": "NeeView/System/PageFileIO.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.DeleteFile.cs",
+      "sha256": "91e27f102441a23ef73f50ff644777b6cd6eb701b27f59b6cbe4d1d9301e24aa",
+      "status": "P4收尾：原删除类型分组/不可逆确认，主页单页与页面列表显式多选分离；成功后协调索引/缓存"
+    },
+    {
+      "source": "NeeView/Archiver/ZipArchive.cs",
+      "target": "src/NeeView.Backends/Content/ArchiveDeletion.cs",
+      "sha256": "13e580c089ff09ad5d8bce81889407f6d1316aa1a31f45657ed2c3a477810b0c",
+      "status": "P4收尾：原ZIP条目删除/目录展开；流式重建保留活跃物理ID、注释/时间/属性，独立写权限默认关闭"
+    },
+    {
+      "source": "NeeView/Archiver/PlaylistArchive.cs",
+      "target": "src/NeeView.Backends/Content/ArchiveDeletion.cs",
+      "sha256": "61376d1bb824c99466a80dc0b9b3ab06841ae7b6521c71e6b90cd2f4d9776afb",
+      "status": "P4收尾：只删除对应原列表登记；别名/重复/未知字段保持，指纹原子保存"
+    },
+    {
+      "source": "NeeView/System/ContentDropReceiver.cs",
+      "target": "src/NeeView.Backends/Content/ContentDropReceiver.cs",
+      "sha256": "80d8e8d1f069cf8d6dfb2f6a6e49f6175d113c2daf1ed0bf99256afdf10dc11d",
+      "status": "P4收尾：原内联/浏览器文件/网页/位图顺序及失败回退，有界批次与进程材料，位图丢弃alpha"
+    },
+    {
+      "source": "NeeView/System/ContentDropReceiver.cs",
+      "target": "src/NeeView.MacOS/Views/ContentDropSnapshot.cs",
+      "sha256": "80d8e8d1f069cf8d6dfb2f6a6e49f6175d113c2daf1ed0bf99256afdf10dc11d",
+      "status": "P4收尾：只借用有限标准数据，不释放发送者Bitmap，不下载/枚举/落盘"
+    },
+    {
+      "source": "NeeView/Config/ZipArchiveConfig.cs",
+      "target": "src/NeeView.Engine/Config/Config.cs",
+      "sha256": "c8965952f6158e7ed0c1a93de91fb9909f9d51f56e13822e83014ba4b95a05cf",
+      "status": "P4收尾：原Archive.Zip.IsFileWriteAccessEnabled及默认false；未知归档配置保持"
+    },
+    {
+      "source": "NeeView/System/ContentDropReceiver.cs",
+      "target": "src/NeeView.Backends/MacFileClipboard.cs",
+      "sha256": "80d8e8d1f069cf8d6dfb2f6a6e49f6175d113c2daf1ed0bf99256afdf10dc11d",
+      "status": "P4收尾：NSPasteboard标准图片/HTML/URL替换Windows协议，主线程有限快照"
     }
   ],
   "rule_references": [
@@ -2168,6 +2210,10 @@
     {
       "target": "src/NeeView.Backends/Content/ArchiveFactory.Paths.cs",
       "status": "P4实体删除的系统realpath替换点：只在动作准备复核中解析实际大小写/系统链接及缺失末段，无新依赖/身份/持久状态；原调用关系之外的保护改造"
+    },
+    {
+      "target": "src/NeeView.Backends/MacFileAliases.cs",
+      "status": "Foundation Finder alias解析替换Windows快捷方式，不弹窗/挂载；符号链接文件动作操作链接本身，Windows COM不模拟"
     }
   ]
 }

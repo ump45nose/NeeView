@@ -1,5 +1,6 @@
 # P4 第六批：原归档文件实体化复制
 
+本文件描述当批增量；当前删除、图片接收与链接范围以[P4收尾契约](p4-completion.md)为准。
 迁入固定 `c5c398d89` 的 `ArchivePolicy`、`ArchiveEntryUtility.RealizeArchiveEntry`、`ArchiveEntry.RealizeAsync/GetFileProxyAsync` 及原 `ClipboardUtility` 调用关系。使用既有 Archive/ArchiveEntry、BookOperation、DestinationMoveService 和原 JSON，不建立另一来源或文件身份体系。
 
 ## 职责与依赖

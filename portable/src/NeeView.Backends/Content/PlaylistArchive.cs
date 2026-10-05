@@ -3,7 +3,7 @@ using NeeView;
 namespace NeeView.Backends;
 
 /// <summary>原.nvpls作为一本书的来源；不读取或改变全局PlaylistHub。</summary>
-public sealed class PlaylistArchive(string path, IArchiveFactory archives) : Archive(path)
+public sealed partial class PlaylistArchive(string path, IArchiveFactory archives) : Archive(path)
 {
     private readonly SemaphoreSlim _gate = new(1);
     private readonly Dictionary<string, Archive> _owned = new(StringComparer.Ordinal);
@@ -11,6 +11,9 @@ public sealed class PlaylistArchive(string path, IArchiveFactory archives) : Arc
     private readonly Dictionary<string, ArchiveEntry> _resolved = new(StringComparer.Ordinal);
     private readonly Dictionary<string, int> _physicalIds = new(StringComparer.Ordinal);
     private IReadOnlyList<ArchiveEntry>? _entries;
+    private byte[]? _sourceBytes;
+    private PlaylistSource? _source;
+    private readonly Dictionary<ArchiveEntry, PlaylistSourceItem> _sourceItems = [];
     public override bool IsPlaylist => true;
     public int SkippedEntryCount { get; private set; }
     /// <summary>严格按源顺序构造代理；缺失/不支持项按原实现跳过，成功Id连续。</summary>
@@ -34,7 +37,7 @@ public sealed class PlaylistArchive(string path, IArchiveFactory archives) : Arc
                 }
                 return output.ToArray();
             }, token).ConfigureAwait(false);
-            var playlist = PlaylistSourceTools.Deserialize(bytes);
+            var playlist = PlaylistSourceTools.Deserialize(bytes); _sourceBytes = bytes; _source = playlist;
             if (playlist.Items.Count > 10000) throw new NotSupportedException("播放列表超过一万项来源预算。");
             var result = new List<ArchiveEntry>(); SkippedEntryCount = 0;
             foreach (var item in playlist.Items)
@@ -44,7 +47,8 @@ public sealed class PlaylistArchive(string path, IArchiveFactory archives) : Arc
                 {
                     var target = System.IO.Path.GetFullPath(item.Path, System.IO.Path.GetDirectoryName(Path)!);
                     var inner = await ResolveAsync(target, token).ConfigureAwait(false);
-                    result.Add(new PlaylistArchiveEntry(this, inner, result.Count, item.Name));
+                    var proxy = new PlaylistArchiveEntry(this, inner, result.Count, item.Name);
+                    result.Add(proxy); _sourceItems.Add(proxy, item);
                 }
                 catch (OperationCanceledException) { throw; }
                 catch (Exception ex) { SkippedEntryCount++; System.Diagnostics.Trace.WriteLine("列表来源条目：" + ex.Message); }

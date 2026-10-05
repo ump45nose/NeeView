@@ -6,6 +6,7 @@ public sealed partial class BookOperation
     private IFileClipboard? _fileClipboard;
     private IArchiveEntryRealizer? _entryRealizer;
     private ITemporaryPlaylistService? _temporaryPlaylists;
+    private IContentDropReceiver? _contentDropReceiver;
     private int _clipboardBusy;
     private CancellationTokenSource _clipboardClosing = new();
     private TaskCompletionSource? _clipboardCompletion;
@@ -24,6 +25,8 @@ public sealed partial class BookOperation
     public void AttachArchiveEntryRealizer(IArchiveEntryRealizer realizer) => _entryRealizer = realizer;
     /// <summary>注入原多来源临时列表能力；文件由进程服务持有，不改变全局PlaylistHub。</summary>
     public void AttachTemporaryPlaylists(ITemporaryPlaylistService playlists) => _temporaryPlaylists = playlists;
+    /// <summary>启动装配原图片/网页接收替换点；视图不解码、下载或落盘。</summary>
+    public void AttachContentDropReceiver(IContentDropReceiver receiver) => _contentDropReceiver = receiver;
     /// <summary>宿主关闭前取消当前准备；已提交的原生写入仍等待真实结果，不永久禁用后续复制。</summary>
     public void CancelClipboardPreparation()
     { lock (_clipboardSync) _clipboardPending?.Cancel(); }
@@ -68,7 +71,7 @@ public sealed partial class BookOperation
     private bool CanCopyEntry(ArchiveEntry source)
     {
         var entry = source.TargetArchiveEntry;
-        return !entry.Archive.IsDisposed && !entry.IsShortcut && (entry.IsDirectory || entry.FilePath is not null || _entryRealizer is not null);
+        return !entry.Archive.IsDisposed && (!entry.IsShortcut || entry.FilePath is not null) && (entry.IsDirectory || entry.FilePath is not null || _entryRealizer is not null);
     }
     /// <summary>复制原页组或书籍条目到剪贴板；沿同一归档策略解析，不修改源文件或移动历史。</summary>
     /// <param name="book">true复制Book.Path对应条目（含内部目录）；false按原MultiPagePolicy选页。</param>
@@ -95,7 +98,8 @@ public sealed partial class BookOperation
                 {
                     var info = await archives.GetFileMetadataAsync(path, pending.Token);
                     if (info is null) throw new FileNotFoundException("要复制的实体已不存在。", path);
-                    if (info.IsSymbolicLink) throw new NotSupportedException("链接的剪贴板复制尚未迁移。");
+                    var captured = entries.Select(e => e.TargetArchiveEntry).First(e => (e.FilePath ?? e.Archive.RootArchivePath) == path);
+                    if (info.IsSymbolicLink != (captured.FilePath is not null && captured.IsShortcut || captured.Archive.IsRootShortcut)) throw new IOException("复制目标链接类型已改变，请重新加载。");
                 }
                 RealizedFilePathList? realized = await ArchiveEntryUtility.RealizeArchiveEntry(entries, archivePolicy, _entryRealizer, pending.Token);
                 var capabilityWarning = realized.CapabilityWarning;
@@ -133,7 +137,7 @@ public sealed partial class BookOperation
             Notify();
             var content = await _fileClipboard!.ReadAsync(pending.Token);
             if (_disposed || _closing || generation != _generation) return;
-            var paths = FileClipboardCodec.ValidatePaths(content.QueryPaths.Count > 0 ? content.QueryPaths : content.Files);
+            var paths = await GetDroppedPathsAsync(content, pending.Token);
             if (paths.Length == 0) return;
             if (_disposed || _closing || generation != _generation) return;
             await OpenCoreAsync(paths[0], pending.Token, openPaths: paths);
@@ -141,5 +145,31 @@ public sealed partial class BookOperation
         catch (OperationCanceledException) { }
         catch (Exception ex) { if (!_closing && generation == _generation) Error = "剪贴板加载失败：" + ex.Message; }
         finally { EndClipboard(pending, completion); }
+    }
+    /// <summary>拖入与Paste复用原接收优先级和唯一打开流程，不将普通路径文本冒充文件。</summary>
+    public async Task OpenDroppedContentAsync(FileClipboardContent content, CancellationToken token = default)
+    {
+        if (_disposed || _closing || !BeginClipboard(false, token, out var pending, out var completion)) return;
+        var generation = _generation;
+        try
+        {
+            Notify(); var paths = await GetDroppedPathsAsync(content, pending.Token);
+            if (_disposed || _closing || generation != _generation || paths.Length == 0) return;
+            await OpenCoreAsync(paths[0], pending.Token, openPaths: paths);
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex) { if (!_closing && generation == _generation) Error = "拖入内容加载失败：" + ex.Message; }
+        finally { EndClipboard(pending, completion); }
+    }
+    /// <summary>原QueryPath优先；文件先于普通位图，网页内联图片由同一接收器处理。</summary>
+    private async Task<string[]> GetDroppedPathsAsync(FileClipboardContent content, CancellationToken token)
+    {
+        if (content.QueryPaths.Count > 0) return FileClipboardCodec.ValidatePaths(content.QueryPaths);
+        if (content.Content?.WebUrls?.Count > 0 && _contentDropReceiver is not null)
+            return FileClipboardCodec.ValidatePaths(await _contentDropReceiver.ReceiveAsync(content.Content with { BrowserFiles = content.Files }, token));
+        if (content.Files.Count > 0) return FileClipboardCodec.ValidatePaths(content.Files);
+        if (content.Content is null) return [];
+        if (_contentDropReceiver is null) throw new NotSupportedException("图片/网页内容接收器尚未装配。");
+        return FileClipboardCodec.ValidatePaths(await _contentDropReceiver.ReceiveAsync(content.Content, token));
     }
 }

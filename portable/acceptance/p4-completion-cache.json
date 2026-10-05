@@ -1,0 +1,19 @@
+{
+  "scope": "\u7F13\u5B58\u79DF\u7EA6\u5FAE\u6D4B\u91CF\uFF0C\u975E\u7AEF\u5230\u7AEF\u6027\u80FD",
+  "results": [
+    {
+      "entries": 256,
+      "iterations": 1000,
+      "elapsed_ms": 30.9534,
+      "allocated_bytes": 1336040,
+      "decode_calls_after_warmup": 0
+    },
+    {
+      "entries": 1024,
+      "iterations": 1000,
+      "elapsed_ms": 144.0047,
+      "allocated_bytes": 1336040,
+      "decode_calls_after_warmup": 0
+    }
+  ]
+}

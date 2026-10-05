@@ -1,14 +1,14 @@
 namespace NeeView;
 
-/// <summary>真实书籍项快照；不把归档内部目录或链接当作可写来源。</summary>
-public sealed record BookRenameTarget(string Path, bool IsDirectory, DateTime CreationTimeUtc, DateTime LastWriteTimeUtc, long Length);
+/// <summary>真实书籍项快照；链接捕获目标文字并只操作链接本身，归档内部目录不是实体。</summary>
+public sealed record BookRenameTarget(string Path, bool IsDirectory, DateTime CreationTimeUtc, DateTime LastWriteTimeUtc, long Length, string? LinkTarget = null);
 /// <summary>原路径联动记录；改名限同父目录，整书移动扩展带完整指纹及原目标指纹。</summary>
 public sealed record BookRenamePlan(BookRenameTarget Target, string Destination, bool ExtensionChanged, bool Conflict,
     bool IsMove = false, string? ContentHash = null, string? PreviousDestinationHash = null);
 /// <summary>重命名仅替换一个同目录项，独立于分类移动历史和跨卷协议。</summary>
 public interface IBookRenameBackend
 {
-    /// <summary>后台捕获普通实体；不存在、链接及逻辑归档地址明确拒绝。</summary>
+    /// <summary>后台捕获实体或链接目录项；不存在及逻辑归档地址明确拒绝。</summary>
     /// <param name="path">当前实体书籍的绝对路径。</param><param name="token">排队及探测的取消令牌。</param>
     /// <returns>用于后续规划和提交核对的来源快照。</returns>
     Task<BookRenameTarget> GetRenameTargetAsync(string path, CancellationToken token);

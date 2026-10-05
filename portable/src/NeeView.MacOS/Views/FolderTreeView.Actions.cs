@@ -63,7 +63,7 @@ public sealed partial class FolderTreeView
         if (node is QuickAccessDirectoryNode q)
         { Add("添加当前位置", "add", q.Value.IsFolder); Add("新建快速访问文件夹", "folder", q.Value.IsFolder); Add("重命名", "rename", q.Parent is not null); Add("属性", "properties", !q.Value.IsFolder); Add("删除快速访问项", "remove", q.Parent is not null); Add("上移", "up", q.Parent is not null); Add("下移", "down", q.Parent is not null); }
         menu.Items.Add(new Separator()); Add("刷新", "refresh");
-        foreach (var text in new[] { "新建目录", "复制文件", "移动文件", "重命名文件", "移至废纸篓" }) menu.Items.Add(new MenuItem { Header = text + "（P4 待迁移）", IsEnabled = false });
+        foreach (var text in new[] { "新建目录", "复制文件", "移动文件", "重命名文件", "移至废纸篓" }) menu.Items.Add(new MenuItem { Header = text + "（后续文件管理扩展）", IsEnabled = false });
         ContextMenu = menu; menu.Open(this);
     }
 }

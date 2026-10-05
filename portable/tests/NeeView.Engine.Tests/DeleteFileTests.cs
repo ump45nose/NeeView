@@ -151,13 +151,14 @@ public sealed class DeleteFileTests
         Assert.DoesNotContain(op.Book.Pages, page => page.EntryName == "003.png");
     }
     [Fact]
-    public async Task ArchiveAndBookPageAreDisabledAndMasonryRequiresExplicitSelection()
+    public async Task ArchiveAndDirectoryDeletionAreAvailableAndMasonryRequiresExplicitSelection()
     {
         using var f = new Fixture(); var state = new SaveData(f.State); await state.LoadAsync(TestContext.Current.CancellationToken);
         Directory.CreateDirectory(Path.Combine(f.Images, "000-child"));
         await using var op = f.Operation(state); using var images = new BitmapFactory(new MagickImageDecoder()); var trash = Attach(f, op, images);
-        await op.OpenAsync(f.Zip, TestContext.Current.CancellationToken); Assert.False(op.CanDeleteFile); await op.DeleteFileAsync(TestContext.Current.CancellationToken);
-        await op.OpenAsync(f.Images, TestContext.Current.CancellationToken); Assert.False(op.Book!.CurrentPage!.IsImage); Assert.False(op.CanDeleteFile);
+        await op.OpenAsync(f.Zip, TestContext.Current.CancellationToken); Assert.False(op.CanDeleteFile);
+        Config.Current.Archive.Zip.IsFileWriteAccessEnabled = true; Assert.True(op.CanDeleteFile);
+        await op.OpenAsync(f.Images, TestContext.Current.CancellationToken); Assert.False(op.Book!.CurrentPage!.IsImage); Assert.True(op.CanDeleteFile);
         await op.SetBrowseModeAsync(BrowseLayoutMode.Masonry); Assert.False(op.CanDeleteFile);
         var page = op.Book.Pages.First(page => page.EntryName == "003.png"); await op.SelectFileActionPageAsync(op.Book, page);
         Assert.True(op.CanDeleteFile); await op.DeleteFileAsync(TestContext.Current.CancellationToken); Assert.Equal("003.png", Path.GetFileName(Assert.Single(trash.Calls)));
@@ -228,15 +229,15 @@ public sealed class DeleteFileTests
             await File.WriteAllTextAsync(export, System.Text.Json.JsonSerializer.Serialize(new
             { scope = "当前执行入口登记，不等于完整原功能覆盖；未迁能力保留原命令/菜单占位", total = items.Length, implemented = items.Count(item => item.implemented), items },
                 new System.Text.Json.JsonSerializerOptions { WriteIndented = true }) + "\n", TestContext.Current.CancellationToken);
-            var action = window.ExecuteAsync("DeleteFile"); var dialog = Assert.Single(window.OwnedWindows); dialog.Close(false); await action;
+            var action = window.ExecuteAsync("DeleteFile"); await WaitAsync(() => window.OwnedWindows.Count() == 1); var dialog = Assert.Single(window.OwnedWindows); dialog.Close(false); await action;
             Assert.Empty(trash.Calls); Assert.Equal(5, op.Book!.Pages.Count);
-            action = window.ExecuteAsync("DeleteFile"); dialog = Assert.Single(window.OwnedWindows);
+            action = window.ExecuteAsync("DeleteFile"); await WaitAsync(() => window.OwnedWindows.Count() == 1); dialog = Assert.Single(window.OwnedWindows);
             Dispatcher.UIThread.RunJobs(); dialog.UpdateLayout();
             using (var bitmap = new RenderTargetBitmap(new PixelSize((int)Math.Ceiling(dialog.Bounds.Width), (int)Math.Ceiling(dialog.Bounds.Height))))
             { bitmap.Render(dialog); bitmap.Save(Output(phase + "-confirm.png"), PngBitmapEncoderOptions.Default); }
             dialog.Close(true); await action;
-            Assert.Single(trash.Calls); Assert.Equal("002.png", op.Book!.CurrentPage!.EntryName);
-            action = window.ExecuteAsync("DeleteFile"); Assert.Single(window.OwnedWindows); await window.PrepareShutdownAsync(); await action;
+            Assert.True(trash.Calls.Count == 1, op.Error ?? "没有执行删除"); Assert.Equal("002.png", op.Book!.CurrentPage!.EntryName);
+            action = window.ExecuteAsync("DeleteFile"); await WaitAsync(() => window.OwnedWindows.Count() == 1); Assert.Single(window.OwnedWindows); await window.PrepareShutdownAsync(); await action;
             Assert.Single(trash.Calls); Assert.True(File.Exists(Path.Combine(f.Images, "002.png")));
         }
         finally { await window.PrepareShutdownAsync(); window.Close(); }

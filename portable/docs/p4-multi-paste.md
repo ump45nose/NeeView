@@ -1,5 +1,6 @@
 # P4 第七批：多来源加载与原播放列表来源
 
+本文件描述当批增量；当前删除、图片接收与链接范围以[P4收尾契约](p4-completion.md)为准。
 固定基线 `c5c398d89` 的 BookHubTools、ContentDropReceiver、PlaylistArchive/PlaylistArchiveEntry 和 PlaylistSourceTools 是本批行为依据。沿用 BookOperation、Archive、Page、PlaylistHub 与原 JSON，三个生产项目及唯一窗口入口保持。
 
 ## 职责、依赖与契约

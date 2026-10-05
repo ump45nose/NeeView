@@ -43,6 +43,7 @@ public sealed partial class BookOperation
             }
             finally { _gate.Release(); }
             var target = await backend.GetRenameTargetAsync(requestedBook.Path, prompt.Token);
+            if ((target.LinkTarget is not null) != requestedBook.Source.CreateBookEntry().IsShortcut) throw new IOException("书籍链接类型已改变，请重新加载。");
             if (AskBookNameAsync is null || await AskBookNameAsync(target).WaitAsync(prompt.Token) is not { } name) return;
             plan = await backend.PlanRenameAsync(target, name, prompt.Token);
             if (plan.Destination == target.Path) return;

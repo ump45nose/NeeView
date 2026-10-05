@@ -45,12 +45,12 @@ public sealed partial class FileOperationBackend : IBookTransferBackend
         {
             return await Task.Run(async () =>
             {
-                var target = ReadRenameTarget(source);
+                var target = ReadRenameTarget(source, true);
                 if (!Directory.Exists(folder)) throw new DirectoryNotFoundException("目标目录已不存在。");
                 var destination = Path.Combine(Path.GetFullPath(folder), Path.GetFileName(target.Path));
                 ValidateBookPaths(CanonicalFile(target.Path), CanonicalFile(destination));
-                RejectLinkIfPresent(destination);
-                if (Exists(destination) && Directory.Exists(destination) != target.IsDirectory) throw new IOException("源和目标类型不同，不能覆盖。");
+
+                if (Exists(destination) && (Directory.Exists(destination) && new FileInfo(destination).LinkTarget is null) != target.IsDirectory) throw new IOException("源和目标类型不同，不能覆盖。");
                 return new BookTransferPlan(target, destination, await HashAsync(target.Path, token), Exists(destination) ? await HashAsync(destination, token) : null);
             }, token);
         }
@@ -64,7 +64,7 @@ public sealed partial class FileOperationBackend : IBookTransferBackend
         try
         {
             return await Task.Run(() => TransferCoreAsync(new(plan.Target.Path, plan.Destination, move,
-                plan.DestinationHash is not null, ExpectedSourceHash: plan.ContentHash), token, plan), token);
+                plan.DestinationHash is not null, ExpectedSourceHash: plan.ContentHash, PreserveSourceLink: true), token, plan), token);
         }
         finally { _slot.Release(); }
     }
@@ -86,11 +86,12 @@ public sealed partial class FileOperationBackend : IBookTransferBackend
         hash.AppendData("NeeView.Directory.v1"u8);
         foreach (var child in Directory.EnumerateFileSystemEntries(path).Order(StringComparer.Ordinal))
         {
-            token.ThrowIfCancellationRequested(); RejectLink(child);
+            token.ThrowIfCancellationRequested();
             var name = Encoding.UTF8.GetBytes(Path.GetFileName(child));
             hash.AppendData(Encoding.UTF8.GetBytes(name.Length.ToString(System.Globalization.CultureInfo.InvariantCulture) + ":"));
-            hash.AppendData(name); hash.AppendData(Directory.Exists(child) ? "D"u8 : "F"u8);
-            hash.AppendData(Convert.FromHexString(await HashAsync(child, token)));
+            var childHash = await HashAsync(child, token); bool link = childHash.StartsWith("L:", StringComparison.Ordinal);
+            hash.AppendData(name); hash.AppendData(link ? "L"u8 : Directory.Exists(child) ? "D"u8 : "F"u8);
+            hash.AppendData(Convert.FromHexString(link ? childHash[2..] : childHash));
         }
         return Convert.ToHexString(hash.GetHashAndReset());
     }
@@ -105,7 +106,7 @@ public sealed partial class FileOperationBackend : IBookTransferBackend
         {
             foreach (var child in Directory.EnumerateFileSystemEntries(source).Order(StringComparer.Ordinal))
             {
-                token.ThrowIfCancellationRequested(); RejectLink(child);
+                token.ThrowIfCancellationRequested();
                 var output = Path.Combine(destination, Path.GetFileName(child)); var childHash = await HashAsync(child, token);
                 await CopyVerifiedAsync(child, output, childHash, token); copied.Add((output, childHash));
             }
@@ -123,23 +124,20 @@ public sealed partial class FileOperationBackend : IBookTransferBackend
     /// <summary>同父级暂存和安装都是无覆盖改名；跨卷只发生在验证复制阶段。</summary>
     private static void MoveItem(string source, string destination)
     {
+        // .NET File.Move拒绝指向目录的链接；Directory.Move仍是目录项改名，不递归搬动目标。
         if (Directory.Exists(source)) Directory.Move(source, destination);
         else File.Move(source, destination, false);
     }
 
-    /// <summary>只清理已验证的应用材料；目录内有链接时保留材料并提示。</summary>
+    /// <summary>只清理已验证的应用材料；删除链接对象，目录递归删除不跟随链接。</summary>
     private static void DeleteItem(string path)
     {
         if (!Exists(path)) return;
-        RejectLink(path);
+        if (new FileInfo(path).LinkTarget is not null) { File.Delete(path); return; }
         if (Directory.Exists(path))
         {
-            CheckTree(path); Directory.Delete(path, true);
+            Directory.Delete(path, true);
         }
         else File.Delete(path);
-        static void CheckTree(string root)
-        {
-            foreach (var item in Directory.EnumerateFileSystemEntries(root)) { RejectLink(item); if (Directory.Exists(item)) CheckTree(item); }
-        }
     }
 }

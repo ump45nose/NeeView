@@ -1,5 +1,6 @@
 # P4 第二批：原当前页组策略与固定复制
 
+本文件描述当批增量；当前删除、图片接收与链接范围以[P4收尾契约](p4-completion.md)为准。
 本批在第一批分类链路上迁入原 `Book.CurrentPages/CurrentPage` 关系和 `BookPageActionControl.CollectPages` 判断顺序，补齐普通目录的多页分类及固定 `CopyToFolderAs`。仍只有三个生产项目，使用同一 BookOperation、来源索引、文件后端和原 JSON。
 
 本文记录第二批交付边界；当前普通图片 DeleteFile/废纸篓已在第三批接入，最新范围见 [p4-delete.md](p4-delete.md)。

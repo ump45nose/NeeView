@@ -9,7 +9,8 @@ public sealed class MacFileClipboard : IFileClipboard
     private const string FileUrlType = "public.file-url";
     private const string TextType = "public.utf8-plain-text";
     // 能力查询由UI菜单/输入调用；不在后台同步等待主线程，防止关闭互锁。
-    public bool HasFileContent => NSThread.IsMain && NSPasteboard.GeneralPasteboard.Types?.Any(type => type == FileUrlType || type == FileClipboardCodec.QueryPathsType) == true;
+    public bool HasFileContent => NSThread.IsMain && NSPasteboard.GeneralPasteboard.Types?.Any(type => type == FileUrlType || type == FileClipboardCodec.QueryPathsType
+        || type is "public.png" or "public.tiff" or "public.jpeg" or "public.html" or "public.url") == true;
     /// <summary>主线程创建完整原生对象后再清空系统剪贴板，提交点后不检查晚取消。</summary>
     /// <param name="content">业务核对过的有限实体和逻辑地址。</param><param name="token">排队/提交前取消。</param>
     /// <returns>写入成功任务；系统拒绝写入时抛出。</returns>
@@ -38,7 +39,7 @@ public sealed class MacFileClipboard : IFileClipboard
         finally { foreach (var item in items) item.Dispose(); }
     }, token);
     /// <summary>读取同一原生快照，QueryPath与file URL分别保留，不消费剪贴板或加载文件。</summary>
-    /// <param name="token">排队/读取前取消。</param><returns>有限只读地址快照；未支持文本/位图返回空。</returns>
+    /// <param name="token">排队/读取前取消。</param><returns>有限文件/图片/HTML/URL快照；普通文本不作为文件。</returns>
     public Task<FileClipboardContent> ReadAsync(CancellationToken token) => OnMainThreadAsync(() =>
     {
         var board = NSPasteboard.GeneralPasteboard; var revision = board.ChangeCount;
@@ -48,8 +49,31 @@ public sealed class MacFileClipboard : IFileClipboard
         var files = FileClipboardCodec.DecodeFileUrls(urls);
         var raw = board.GetStringForType(FileClipboardCodec.QueryPathsType);
         var query = raw is null ? [] : FileClipboardCodec.DecodeQueryPaths(raw);
+        ContentDropData? content = null;
+        if (query.Length == 0)
+        {
+            var web = items.Where(i => i.Types.Contains("public.url")).Select(i => i.GetStringForType("public.url"))
+                .OfType<string>().Where(s => s.StartsWith("http:", StringComparison.OrdinalIgnoreCase) || s.StartsWith("https:", StringComparison.OrdinalIgnoreCase)).ToArray();
+            if (files.Length == 0 || web.Length > 0)
+            {
+                var html = board.GetStringForType("public.html");
+                if (html?.Length > 1024 * 1024) throw new NotSupportedException("剪贴板HTML超过1MiB预算。");
+                var images = new List<ContentDropImage>();
+                foreach (var item in items)
+                {
+                    var type = new[] { "public.png", "public.tiff", "public.jpeg" }.FirstOrDefault(item.Types.Contains);
+                    if (type is null) continue;
+                    if (images.Count >= 16) throw new NotSupportedException("剪贴板图片超过16项预算。");
+                    using var data = item.GetDataForType(type);
+                    if (data is null) continue;
+                    if (data.Length > ContentDropReceiver.MaximumFileBytes) throw new NotSupportedException("剪贴板图片超过64MiB预算。");
+                    images.Add(new(data.ToArray(), IsBitmap: true));
+                }
+                content = new(images, html, web);
+            }
+        }
         if (revision != board.ChangeCount) throw new IOException("读取期间剪贴板已改变，请重试。");
-        return new FileClipboardContent(files, query);
+        return new FileClipboardContent(files, query, Content: content);
     }, token);
     /// <summary>原生对象只在主线程使用，取消的排队调用不得晚到改写剪贴板。</summary>
     /// <param name="action">仅在主线程执行的完整原生读取或写入。</param><param name="token">排队等待及提交前取消。</param>

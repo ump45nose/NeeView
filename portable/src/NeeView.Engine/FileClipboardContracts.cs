@@ -1,12 +1,23 @@
 namespace NeeView;
 
 /// <summary>文件剪贴板快照：系统文件地址（可为原虚拟策略）、原QueryPath及可选文本独立。</summary>
-public sealed record FileClipboardContent(IReadOnlyList<string> Files, IReadOnlyList<string> QueryPaths, string? Text = null);
+public sealed record FileClipboardContent(IReadOnlyList<string> Files, IReadOnlyList<string> QueryPaths, string? Text = null, ContentDropData? Content = null);
+
+/// <summary>原ContentDropReceiver的跨平台数据快照，没有控件/原生对象；普通文本不是文件对象。</summary>
+public sealed record ContentDropData(IReadOnlyList<ContentDropImage> Images, string? Html = null, IReadOnlyList<string>? WebUrls = null, IReadOnlyList<string>? BrowserFiles = null);
+/// <summary>位图采用原Bgr32语义丢弃alpha，内联/下载文件保留原编码。</summary>
+public sealed record ContentDropImage(byte[] Bytes, string? Name = null, bool IsBitmap = false);
+/// <summary>原接收器的临时落盘替换点，生成资源由进程持有供历史导航使用。</summary>
+public interface IContentDropReceiver
+{
+    /// <summary>准备有限完整批次，失败/取消清理已写项，不返回部分结果。</summary>
+    Task<IReadOnlyList<string>> ReceiveAsync(ContentDropData content, CancellationToken token);
+}
 
 /// <summary>替代原ClipboardUtility的系统边界，不包含AppKit/控件或文件写入。</summary>
 public interface IFileClipboard
 {
-    /// <summary>只探测文件/QueryPath类型，不读取图片或任意文本。</summary>
+    /// <summary>只探测文件/QueryPath/图片/HTML/URL类型，不读取图片或任意文本。</summary>
     bool HasFileContent { get; }
     /// <summary>写入捕获快照；提交后不以晚取消掩盖真实结果。</summary>
     /// <param name="content">已由业务核对的实体与逻辑地址。</param><param name="token">原生提交前的取消令牌。</param>

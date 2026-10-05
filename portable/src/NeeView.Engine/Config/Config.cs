@@ -17,6 +17,7 @@ public sealed class Config
     public HistoryConfig History { get; set; } = new();
     public BookmarkConfig Bookmark { get; set; } = new();
     public SystemConfig System { get; set; } = new();
+    public ArchiveConfig Archive { get; set; } = new();
     public PlaylistConfig Playlist { get; set; } = new();
     public AutoHideConfig AutoHide { get; set; } = new();
     public WindowConfig Window { get; set; } = new();
@@ -29,6 +30,17 @@ public sealed class Config
     public bool IsAddressBarEnabled { get => MenuBar.IsAddressBarEnabled; set => MenuBar.IsAddressBarEnabled = value; }
     /// <summary>启动时装配唯一配置，读取前不初始化具体窗口。</summary>
     public static void SetCurrent(Config config) => Current = config;
+}
+
+/// <summary>原Archive配置子集；其余归档字段由既有JSON合并保存。</summary>
+public sealed class ArchiveConfig
+{
+    public ZipArchiveConfig Zip { get; set; } = new();
+}
+/// <summary>沿原ZIP独立写权限，默认关闭；不能以普通文件权限隐式授权不可逆修改。</summary>
+public sealed class ZipArchiveConfig
+{
+    public bool IsFileWriteAccessEnabled { get; set; }
 }
 
 /// <summary>原 SystemConfig 搜索分支；其余系统设置仍在原 JSON 中保留。</summary>

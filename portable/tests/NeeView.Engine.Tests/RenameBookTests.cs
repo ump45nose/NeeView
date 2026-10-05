@@ -203,11 +203,12 @@ public sealed class RenameBookTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task MissingAndSymbolicSourcesAreRejectedWithoutFollowingLinks(bool directory)
+    public async Task MissingSourcesAreRejectedAndSymbolicSnapshotsRetainLinkWithoutFollowing(bool directory)
     {
         using var f = new Fixture(); var backend = Backend(f); var path = Path.Combine(f.Root, "link");
         if (directory) Directory.CreateSymbolicLink(path, f.Images); else File.CreateSymbolicLink(path, f.Zip);
-        await Assert.ThrowsAsync<IOException>(() => backend.GetRenameTargetAsync(path, TestContext.Current.CancellationToken));
+        var target = await backend.GetRenameTargetAsync(path, TestContext.Current.CancellationToken);
+        Assert.Equal(directory ? f.Images : f.Zip, target.LinkTarget); Assert.False(target.IsDirectory);
         await Assert.ThrowsAsync<FileNotFoundException>(() => backend.GetRenameTargetAsync(Path.Combine(f.Root, "missing"), TestContext.Current.CancellationToken));
         Assert.True(Directory.Exists(f.Images)); Assert.True(File.Exists(f.Zip));
     }

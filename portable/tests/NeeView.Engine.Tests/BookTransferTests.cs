@@ -113,12 +113,18 @@ public sealed class BookTransferTests
 
     [Theory]
     [InlineData(false)] [InlineData(true)]
-    public async Task TreeAndTargetLinksAreExplicitlyUnsupported(bool targetLink)
+    public async Task TreeLinksArePreservedWhileLinkDirectoryTargetTypeConflictsRemainRejected(bool targetLink)
     {
         using var f = new Fixture(); var backend = Backend(f); var folder = Target(f).Path;
         if (targetLink) Directory.CreateSymbolicLink(Path.Combine(folder, Path.GetFileName(f.Images)), f.Images);
         else File.CreateSymbolicLink(Path.Combine(f.Images, "linked.png"), Path.Combine(f.Images, "001.png"));
-        await Assert.ThrowsAsync<IOException>(() => backend.PlanBookTransferAsync(f.Images, folder, Token)); Assert.True(File.Exists(Path.Combine(f.Images, "001.png")));
+        if (targetLink) await Assert.ThrowsAsync<IOException>(() => backend.PlanBookTransferAsync(f.Images, folder, Token));
+        else
+        {
+            var plan = await backend.PlanBookTransferAsync(f.Images, folder, Token); var result = await backend.TransferBookAsync(plan, false, Token);
+            Assert.Equal(Path.Combine(f.Images, "001.png"), new FileInfo(Path.Combine(result.Destination, "linked.png")).LinkTarget); await backend.ReleaseAsync(result);
+        }
+        Assert.True(File.Exists(Path.Combine(f.Images, "001.png")));
     }
 
     [Theory]

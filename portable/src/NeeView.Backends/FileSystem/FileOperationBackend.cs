@@ -23,12 +23,13 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
         public string? DestinationHash { get; set; }
         public bool Move { get; set; }
         public bool IsDirectory { get; set; }
+        public bool PreserveLinks { get; set; }
         public bool Completed { get; set; }
     }
     [JsonSerializable(typeof(Journal))]
     private partial class RecoveryJsonContext : JsonSerializerContext { }
     /// <summary>文件存在检查进入后台；UI不直接阻塞挂载目录。</summary>
-    public Task<bool> FileExistsAsync(string path, CancellationToken token) => Task.Run(() => { token.ThrowIfCancellationRequested(); return File.Exists(path); }, token);
+    public Task<bool> FileExistsAsync(string path, CancellationToken token) => Task.Run(() => { token.ThrowIfCancellationRequested(); return Exists(path); }, token);
 
     /// <summary>安装前检查原图与目标指纹；取消/错误保守回滚，无法回滚时保留日志。</summary>
     public async Task<FileTransferResult> TransferAsync(FileTransferRequest request, CancellationToken token)
@@ -41,27 +42,28 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
     {
         string source = CanonicalFile(Path.GetFullPath(request.Source)), destination = CanonicalFile(Path.GetFullPath(request.Destination));
         if (!Exists(source)) throw new FileNotFoundException("源项目已不存在。", source);
-        bool directory = Directory.Exists(source);
+        bool preserveLinks = request.PreserveSourceLink || request.ExpectedSourceHash?.StartsWith("L:", StringComparison.Ordinal) == true || bookPlan is not null;
+        bool directory = Directory.Exists(source) && new FileInfo(source).LinkTarget is null;
         if (directory && bookPlan is null) throw new IOException("图片传输不能处理目录。 ");
         if (bookPlan is not null)
         {
             ValidateBookPaths(source, destination);
-            if (ReadRenameTarget(request.Source) != bookPlan.Target) throw new IOException("书籍在确认期间已变化，请重新确认。");
+            if (ReadRenameTarget(request.Source, true) != bookPlan.Target) throw new IOException("书籍在确认期间已变化，请重新确认。");
         }
         if (!Directory.Exists(Path.GetDirectoryName(destination))) throw new DirectoryNotFoundException("目标目录已不存在。");
         // 不跟随符号链接分类；别名/大小写解析后同一目录项不能覆盖自身。
-        RejectLink(source); RejectLinkIfPresent(destination);
+        RejectLinkIfPresent(source, preserveLinks); RejectLinkIfPresent(destination, preserveLinks);
         if (CanonicalFile(source) == CanonicalFile(destination)) throw new IOException("源和目标是同一个文件。");
-        if (Exists(destination) && Directory.Exists(destination) != directory) throw new IOException("源和目标类型不同，不能覆盖。");
+        if (Exists(destination) && (Directory.Exists(destination) && new FileInfo(destination).LinkTarget is null) != directory) throw new IOException("源和目标类型不同，不能覆盖。");
         if (Exists(destination) && !request.Overwrite) throw new IOException("目标存在，尚未确认覆盖。");
         if (request.RestoreBackup is not null)
         {
-            if (!IsOwned(request.RestoreBackup, ".backup") || !File.Exists(request.RestoreBackup) || !request.Move) throw new IOException("覆盖恢复副本已不存在。");
-            RejectLink(request.RestoreBackup);
+            if (!IsOwned(request.RestoreBackup, ".backup") || !Exists(request.RestoreBackup) || !request.Move) throw new IOException("覆盖恢复副本已不存在。");
+            RejectLinkIfPresent(request.RestoreBackup, preserveLinks);
         }
         Directory.CreateDirectory(recoveryDirectory);
         string id = Guid.NewGuid().ToString("N"), journalPath = Path.Combine(recoveryDirectory, id + ".json");
-        var journal = new Journal { Source = source, Destination = destination, Move = request.Move, IsDirectory = directory,
+        var journal = new Journal { Source = source, Destination = destination, Move = request.Move, IsDirectory = directory, PreserveLinks = preserveLinks,
             Temporary = Sibling(destination, id, ".tmp"), Backup = Path.Combine(Path.GetFullPath(recoveryDirectory), id + ".backup"), RestoreBackup = request.RestoreBackup,
             SourceStage = Sibling(source, id, ".source"), DestinationStage = Sibling(destination, id, ".destination"), RestoreTemporary = Sibling(source, id, ".restore") };
         journal.SourceHash = await HashAsync(source, token);
@@ -100,7 +102,7 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
         }
         catch (Exception ex)
         {
-            try { await RollbackAsync(journal); DeleteOwned(journal.Backup, ".backup"); File.Delete(journalPath); }
+            try { await RollbackAsync(journal); DeleteOwned(journal.Backup, ".backup", journal.PreserveLinks); File.Delete(journalPath); }
             catch (Exception rollback) { throw new IOException("操作未完成，恢复记录已保留。" + rollback.Message, ex); }
             throw;
         }
@@ -112,7 +114,7 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
         var journal = await ReadJournalAsync(result.Journal, CancellationToken.None);
         if (!journal.Completed) throw new IOException("未完成的恢复材料不能清理。");
         await CleanStagesAsync(journal);
-        DeleteOwned(journal.Backup, ".backup"); DeleteOwned(result.Journal, ".json");
+        DeleteOwned(journal.Backup, ".backup", journal.PreserveLinks); DeleteOwned(result.Journal, ".json");
     });
 
     /// <summary>退出不持久化历史；启动仅自动恢复可由内容指纹确认的中断。</summary>
@@ -133,7 +135,7 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
                         var journal = await ReadJournalAsync(path, token);
                         if (!journal.Completed) await RollbackAsync(journal);
                         else await CleanStagesAsync(journal);
-                        DeleteOwned(journal.Backup, ".backup"); File.Delete(path);
+                        DeleteOwned(journal.Backup, ".backup", journal.PreserveLinks); File.Delete(path);
                     }
                     catch (Exception ex) when (ex is not OperationCanceledException) { warnings.Add("文件恢复需要检查：" + Path.GetFileName(path) + "：" + ex.Message); }
                 }
@@ -145,7 +147,7 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
     private async Task RollbackAsync(Journal journal)
     {
         // 先核对全部落点和暂存，模糊情况保留日志。恢复安装仍不覆盖新目录项。
-        RejectLinkIfPresent(journal.Source); RejectLinkIfPresent(journal.Destination);
+        RejectLinkIfPresent(journal.Source, journal.PreserveLinks); RejectLinkIfPresent(journal.Destination, journal.PreserveLinks);
         bool sourceOriginal = await MatchesAsync(journal.Source, journal.SourceHash);
         bool sourceEmpty = !Exists(journal.Source);
         bool sourceRestored = journal.RestoreHash is not null && await MatchesAsync(journal.Source, journal.RestoreHash);
@@ -186,9 +188,9 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
     private static string Sibling(string path, string id, string suffix) => Path.Combine(Path.GetDirectoryName(path)!, ".neeview-" + id + suffix);
     private bool IsOwned(string path, string extension) => Path.GetDirectoryName(Path.GetFullPath(path)) == Path.GetFullPath(recoveryDirectory)
         && Path.GetExtension(path) == extension && Guid.TryParseExact(Path.GetFileNameWithoutExtension(path), "N", out _);
-    private void DeleteOwned(string? path, string extension) { if (path is not null) { if (!IsOwned(path, extension)) throw new IOException("非应用恢复材料。"); RejectLinkIfPresent(path); DeleteItem(path); } }
+    private void DeleteOwned(string? path, string extension, bool preserveLinks = false) { if (path is not null) { if (!IsOwned(path, extension)) throw new IOException("非应用恢复材料。"); RejectLinkIfPresent(path, preserveLinks); DeleteItem(path); } }
     private static bool Exists(string path) => File.Exists(path) || Directory.Exists(path) || new FileInfo(path).LinkTarget is not null;
-    private static void RejectLinkIfPresent(string path) { if (Exists(path)) RejectLink(path); }
+    private static void RejectLinkIfPresent(string path, bool preserveLinks = false) { if (Exists(path) && !preserveLinks) RejectLink(path); }
     private static void RejectLink(string path) { if ((File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0) throw new IOException("符号链接不参与分类。"); }
     /// <summary>恢复材料必须与日志随机ID及两端同目录暂存路径完全相符，禁止跟随链接。</summary>
     private async Task<Journal> ReadJournalAsync(string path, CancellationToken token)
@@ -207,14 +209,15 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
             if (journal.RestoreBackup is not null || journal.RestoreHash is not null) throw new IOException("目录记录不能用于图片撤销。");
             ValidateBookPaths(journal.Source, journal.Destination);
         }
-        foreach (var material in new[] { journal.Backup, journal.Temporary, journal.SourceStage, journal.DestinationStage, journal.RestoreTemporary }) RejectLinkIfPresent(material);
-        if (journal.RestoreBackup is not null) { if (!IsOwned(journal.RestoreBackup, ".backup")) throw new IOException("恢复副本名称无效。"); RejectLinkIfPresent(journal.RestoreBackup); }
+        foreach (var material in new[] { journal.Backup, journal.Temporary, journal.SourceStage, journal.DestinationStage, journal.RestoreTemporary }) RejectLinkIfPresent(material, journal.PreserveLinks);
+        if (journal.RestoreBackup is not null) { if (!IsOwned(journal.RestoreBackup, ".backup")) throw new IOException("恢复副本名称无效。"); RejectLinkIfPresent(journal.RestoreBackup, journal.PreserveLinks); }
+        if (journal.Completed && Exists(journal.Backup) && !await MatchesAsync(journal.Backup, journal.DestinationHash)) throw new IOException("覆盖副本已被外部替换，保留记录。");
         return journal;
     }
     /// <summary>原子取走后验证，变化的对象原路无覆盖退还；退还失败保留暂存供检查。</summary>
     private static async Task ClaimAsync(string path, string stage, string hash)
     {
-        RejectLinkIfPresent(path);
+        RejectLinkIfPresent(path, hash.StartsWith("L:", StringComparison.Ordinal));
         MoveItem(path, stage);
         if (await MatchesAsync(stage, hash)) return;
         if (!Exists(path)) MoveItem(stage, path);
@@ -253,7 +256,14 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
     }
     private static async Task CopyVerifiedAsync(string source, string destination, string hash, CancellationToken token)
     {
-        RejectLink(source);
+        if (new FileInfo(source).LinkTarget is { } target)
+        {
+            token.ThrowIfCancellationRequested();
+            if (Exists(destination)) throw new IOException("临时链接落点已被占用。");
+            File.CreateSymbolicLink(destination, target);
+            if (!await MatchesAsync(destination, hash)) { File.Delete(destination); throw new IOException("链接完整性校验失败。"); }
+            return;
+        }
         if (Directory.Exists(source)) { await CopyDirectoryVerifiedAsync(source, destination, hash, token); return; }
         using var written = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
         bool created = false;
@@ -278,7 +288,7 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
         }
     }
     private static async Task<string> HashAsync(string path, CancellationToken token)
-    { RejectLink(path); if (Directory.Exists(path)) return await HashDirectoryAsync(path, token); await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 128 * 1024, true); return Convert.ToHexString(await SHA256.HashDataAsync(stream, token)); }
+    { if (new FileInfo(path).LinkTarget is { } target) { token.ThrowIfCancellationRequested(); return "L:" + Convert.ToHexString(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(target))); } if (Directory.Exists(path)) return await HashDirectoryAsync(path, token); await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 128 * 1024, true); return Convert.ToHexString(await SHA256.HashDataAsync(stream, token)); }
     private static async Task<bool> MatchesAsync(string path, string? hash) => hash is null
         ? !Exists(path) : Exists(path) && await HashAsync(path, CancellationToken.None) == hash;
     private static async Task WriteJournalAsync(string path, Journal journal, CancellationToken token)

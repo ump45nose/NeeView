@@ -120,7 +120,7 @@ public sealed class DirectoryCopyTests
 
     [Theory]
     [InlineData("same")] [InlineData("child")] [InlineData("profile")]
-    [InlineData("profile-alias")] [InlineData("tree-link")] [InlineData("type-change")]
+    [InlineData("profile-alias")] [InlineData("type-change")]
     public async Task UnsafeOrChangedDirectoryTargetsAreRejectedBeforeTransfer(string kind)
     {
         using var f = new Fixture(); var child = Child(f); var state = await State(f); await using var op = f.Operation(state); using var images = new BitmapFactory(new MagickImageDecoder());

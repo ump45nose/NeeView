@@ -1,5 +1,6 @@
 # P4 第九批：原整书目标菜单与实体传输
 
+本文件描述当批增量；当前删除、图片接收与链接范围以[P4收尾契约](p4-completion.md)为准。
 固定 `c5c398d89` 为出处：`BookControl.cs:212–258` 的整书复制/移动资格与调用、`DestinationFolder.cs:52–111` 的真实目标目录、两个整书菜单工厂的集合顺序与 1-based Index、`FileIO.cs:645–657,705–712,930–935` 的来源关闭/实际成功路径联动，以及 `BookMementoTools.cs:158–168` 的原引用更新。原移动入口没有调用分类 DestinationMoveService，也没有 DeleteBook 的邻项预捕获；不能凭目录监视猜测成功后会打开目标或下一书。Windows 安装包动态仍待集中对照。
 
 ## 职责、依赖与契约

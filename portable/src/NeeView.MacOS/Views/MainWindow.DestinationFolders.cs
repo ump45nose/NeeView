@@ -10,7 +10,7 @@ public sealed partial class MainWindow
         if (_model is null) return;
         if (_platform is not null && _images is not null) _model.Operation.AttachFileDeletion(_platform, _images);
         _model.Operation.ConfirmDeleteAsync = async path => !_preparing && !_closedPrepared
-            && await ConfirmAsync("删除当前图片", "将以下图片移至系统废纸篓？\n" + path, "移至废纸篓") && !_preparing && !_closedPrepared;
+            && await ConfirmAsync("删除页面条目", path + "\n实体文件进入废纸篓；列表只移除登记；归档修改不可逆。", "删除") && !_preparing && !_closedPrepared;
         _model.Operation.ConfirmDeleteBookAsync = async path => !_preparing && !_closedPrepared
             && await ConfirmAsync("删除当前书籍", "将整本书籍移至系统废纸篓？目录书籍将包含目录中的全部文件。\n" + path, "移至废纸篓") && !_preparing && !_closedPrepared;
         _model.Operation.AskBookNameAsync = async target =>

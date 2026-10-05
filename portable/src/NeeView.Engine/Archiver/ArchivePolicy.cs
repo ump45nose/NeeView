@@ -80,7 +80,7 @@ public static class ArchiveEntryUtility
             foreach (var entry in entries.Select(entry => entry.TargetArchiveEntry).Distinct())
             {
                 token.ThrowIfCancellationRequested();
-                if (entry.Archive.IsDisposed || entry.IsShortcut) throw new NotSupportedException("此条目尚不支持复制：" + entry.EntryName);
+                if (entry.Archive.IsDisposed || entry.IsShortcut && entry.FilePath is null) throw new NotSupportedException("此条目尚不支持复制：" + entry.EntryName);
                 if (entry.FilePath is { } path) files.Add(path);
                 else switch (policy)
                 {

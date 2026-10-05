@@ -43,7 +43,7 @@ public sealed partial class BookOperation
         if (!requireWriteAccess) return CanCopyToFolder(policy);
         if (requireWriteAccess && !Config.Current.System.IsFileWriteAccessEnabled || IsUsingClipboard || IsRenamingBook || IsTransferringBook || IsDeletingFile || _destinationMoves is null || _destinationMoves.IsBusy || _disposed || _closing || IsLoading || Book?.IsIndexing != false) return false;
         var pages = CollectFileActionPages(policy);
-        return pages.Count > 0 && pages.All(page => page is { IsImage: true, ArchiveEntry.FilePath: not null } && page.ArchiveEntry.Archive.IsDirectory && !page.ArchiveEntry.IsShortcut);
+        return pages.Count > 0 && pages.All(page => page is { IsImage: true, ArchiveEntry.FilePath: not null } && page.ArchiveEntry.Archive.IsDirectory);
     }
     /// <summary>原固定复制允许文件和目录页；实体目录复用整树快照后端，数字分类仍限普通图片。</summary>
     /// <param name="policy">原页组范围。</param><returns>整组具备文件复制能力时为 true。</returns>
@@ -103,7 +103,7 @@ public sealed partial class BookOperation
             _saving?.Cancel();
             var book = Book!; var readingAnchor = book.CurrentPage;
             var results = await _destinationMoves!.TransferManyAsync(pages.Select(page => new FileTransferRequest(page.ArchiveEntry.FilePath!,
-                System.IO.Path.Combine(folder.Path, System.IO.Path.GetFileName(page.ArchiveEntry.FilePath!)), !copy)).ToArray(), token);
+                System.IO.Path.Combine(folder.Path, System.IO.Path.GetFileName(page.ArchiveEntry.FilePath!)), !copy, PreserveSourceLink: page.ArchiveEntry.IsShortcut)).ToArray(), token);
             Error = _destinationMoves.Error;
             if (results.Count == 0) { Notify(); return; }
             bool changed = false;
@@ -148,7 +148,7 @@ public sealed partial class BookOperation
                     var path = entry.FilePath ?? entry.Archive.RootArchivePath;
                     var info = await archives.GetFileMetadataAsync(path, preparationToken);
                     if (info is null) throw new FileNotFoundException("复制来源已不存在。", path);
-                    if (info.IsSymbolicLink) throw new NotSupportedException("链接复制尚未迁移。");
+                    if (info.IsSymbolicLink != (entry.FilePath is not null && entry.IsShortcut || entry.Archive.IsRootShortcut)) throw new IOException("复制来源链接类型已改变，请重新加载。");
                     if (entry.FilePath is not null && info.IsDirectory != entry.IsDirectory) throw new IOException("来源类型已改变，请重新操作。");
                 }
                 realized = await ArchiveEntryUtility.RealizeArchiveEntry(pages.Select(page => page.ArchiveEntry), archivePolicy, _entryRealizer, preparationToken);
@@ -156,8 +156,8 @@ public sealed partial class BookOperation
                 foreach (var path in realized.Paths)
                 {
                     var info = await archives.GetFileMetadataAsync(path, preparationToken) ?? throw new FileNotFoundException("复制实体已不存在。", path);
-                    if (info.IsSymbolicLink) throw new NotSupportedException("链接复制尚未迁移。");
-                    if (info.IsDirectory)
+                    if (info.IsSymbolicLink != pages.Any(p => p.ArchiveEntry.TargetArchiveEntry.FilePath == path && p.ArchiveEntry.TargetArchiveEntry.IsShortcut)) throw new IOException("复制来源链接类型已改变，请重新加载。");
+                    if (info.IsDirectory && !info.IsSymbolicLink)
                     {
                         await ProtectBookTransferDestinationAsync(path, preparationToken);
                         var plan = await ((IBookTransferBackend)_fileBackend!).PlanBookTransferAsync(path, folder.Path, preparationToken);
@@ -166,7 +166,7 @@ public sealed partial class BookOperation
                         directoryTargets.Add(await archives.GetPhysicalPathAsync(plan.Destination, preparationToken));
                         requests.Add(new(plan.Target.Path, plan.Destination, false, DirectoryCopyPlan: plan));
                     }
-                    else requests.Add(new(path, System.IO.Path.Combine(folder.Path, System.IO.Path.GetFileName(path)), false));
+                    else requests.Add(new(path, System.IO.Path.Combine(folder.Path, System.IO.Path.GetFileName(path)), false, PreserveSourceLink: info.IsSymbolicLink));
                 }
                 if (directoryTargets.Count > 0 && book.Source.IsDirectory) physicalBook = await archives.GetPhysicalPathAsync(book.Path, preparationToken);
                 preparationToken.ThrowIfCancellationRequested();

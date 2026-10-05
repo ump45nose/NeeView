@@ -1,0 +1,76 @@
+{
+  "utc": "2026-10-05T03:33:20.917033+00:00",
+  "scope": "P4最终专项与设置文案复核；不替代803项全量或真机验收",
+  "boundaries": {
+    "production_projects": [
+      "NeeView.Backends",
+      "NeeView.Engine",
+      "NeeView.MacOS"
+    ],
+    "source_files": 62,
+    "partial_adapters": 239,
+    "upstream_source_files": 26
+  },
+  "tests": {
+    "file_operations": {
+      "total": "205",
+      "executed": "205",
+      "passed": "205",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    },
+    "settings_after_copy_correction": {
+      "total": "1",
+      "executed": "1",
+      "passed": "1",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    }
+  },
+  "steps": [
+    {
+      "name": "最终正式入口Library编译",
+      "exit_code": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Backends -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Backends/bin/Debug/net10.0-macos/NeeView.Backends.dll\n  NeeView.MacOS -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:07.12\n"
+    },
+    {
+      "name": "最终正式ARM64应用构建",
+      "exit_code": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Backends -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Backends/bin/Debug/net10.0-macos/NeeView.Backends.dll\n  检测到的签名标识:\n  \n    Code Signing Key: \"\" (-)\n    Provisioning Profile: \"\" () - no entitlements\n    Bundle Id: com.ump45nose.NeeView\n    App Id: com.ump45nose.NeeView\n  检测到的签名标识:\n  \n    Code Signing Key: \"\" (-)\n    Provisioning Profile: \"\" () - no entitlements\n    Bundle Id: com.ump45nose.NeeView\n    App Id: com.ump45nose.NeeView\n  NeeView.MacOS -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/osx-arm64/NeeView.MacOS.dll\n  优化程序集以调整大小可能会更改应用的行为。请务必在发布后进行测试。请参阅: https://aka.ms/dotnet-illink\n  正在优化程序集以调整大小。此过程可能需要一段时间。\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:10.67\n"
+    },
+    {
+      "name": "最终严格本地签名校验",
+      "exit_code": 0,
+      "output": "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app: valid on disk\n/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app: satisfies its Designated Requirement\n"
+    },
+    {
+      "name": "正式可执行文件架构",
+      "exit_code": 0,
+      "output": "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app/Contents/MacOS/NeeView.MacOS: Mach-O 64-bit executable arm64\n"
+    }
+  ],
+  "formal_app": "默认输出ARM64构建及ad-hoc签名通过；未启动/激活，未Developer ID/公证/安装验收",
+  "app_bundle": "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app"
+}

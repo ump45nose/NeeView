@@ -7,6 +7,7 @@ public sealed partial class SettingsWindow
     private void FillFiles()
     {
         this.FindControl<CheckBox>("FileWriteAccess")!.IsChecked = Config.Current.System.IsFileWriteAccessEnabled;
+        this.FindControl<CheckBox>("ZipWriteAccess")!.IsChecked = Config.Current.Archive.Zip.IsFileWriteAccessEnabled;
         this.FindControl<CheckBox>("RemoveConfirmed")!.IsChecked = Config.Current.System.IsRemoveConfirmed;
         this.FindControl<CheckBox>("OpenNextBookWhenRemove")!.IsChecked = Config.Current.Bookshelf.IsOpenNextBookWhenRemove;
         var textPolicy = this.FindControl<ComboBox>("TextCopyPolicy")!;
@@ -17,6 +18,7 @@ public sealed partial class SettingsWindow
     private void ApplyFiles()
     {
         Config.Current.System.IsFileWriteAccessEnabled = this.FindControl<CheckBox>("FileWriteAccess")!.IsChecked == true;
+        Config.Current.Archive.Zip.IsFileWriteAccessEnabled = this.FindControl<CheckBox>("ZipWriteAccess")!.IsChecked == true;
         Config.Current.System.IsRemoveConfirmed = this.FindControl<CheckBox>("RemoveConfirmed")!.IsChecked == true;
         Config.Current.Bookshelf.IsOpenNextBookWhenRemove = this.FindControl<CheckBox>("OpenNextBookWhenRemove")!.IsChecked == true;
         // 未认识的旧值保留；只有用户选择了受支持的项才提交。

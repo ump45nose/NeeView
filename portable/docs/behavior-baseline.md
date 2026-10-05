@@ -86,3 +86,9 @@ P4第九批：原BookControl整书固定复制/移动与1-based目标Index接入
 P4第十批普通目录页复制对照：ArchiveEntry.RealizeAsync的IsFileSystem直接返回SystemPath，目录实际递归复制由Shell承担；Mac复用已验证目录协议。Archive.CanRealize排除归档内部目录，SendExtractFile原明确TODO返回null；其他策略仍可传根归档/逻辑路径。Mac保留范围与LimitedRealization，增加未提取能力提示。普通目录与列表别名按真实名称复制、混合组保序去重、分类双栈保持、确认取消与当前目录重载见[p4-directory-copy.md](p4-directory-copy.md)。Windows目录合并/冲突动态仍待，Mac明确整体替换/取消。
 
 P4第十一批：BookControl.CopyBookAsync以Book.Path创建条目；CopyBookToFolderAs经DestinationFolder.CopyAsync路径转条目后LimitedRealization，不能误解为直接原始路径复制。Mac的CreateBookEntry保留当前书籍归属，RequestedArchive不把显式图片当作书；包内目录按原四策略，内部提取TODO保持。用户.nvpls整书复制其文件，不复制列表引用目标；移动仍仅根实体，见[p4-logical-book-copy.md](p4-logical-book-copy.md)。
+
+## P4开发收尾
+
+固定出处：PageFileIO/BookPageActionControl的File、PlaylistEntry、ArchiveEntry分组与不可逆确认；ZipArchive条目/目录删除及ZipArchiveConfig独立写权限；PlaylistArchive只删登记；ContentDropReceiver按来源优先及一般失败后回退到下一数据。Mac在实际成功后移除页面，修正原先先移除后操作导致的失败丢页。ZIP流式重建保留旧Page物理ID，避免删除后读错幸存条目。
+
+符号链接操作对象为目录项自身，指纹包含原LinkTarget文字；目录树不跟随链接。Finder别名由Foundation打开其目标，不能据此删除目标；不模拟Windows .lnk/COM FileContents。普通标准图片/URL回退接入，只有未实体化文件承诺而无标准数据时明确提示。目录树任意选中对象的完整文件管理为后续扩展，当前P4目标为原当前书/当前页文件动作。设备和固定Windows动态未从静态源码或Headless继承为通过；当前证据见[p4-completion-runtime.md](../acceptance/p4-completion-runtime.md)。

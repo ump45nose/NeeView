@@ -22,6 +22,7 @@ public sealed partial class MacApp : Avalonia.Application
     private DestinationMoveService? _destinationMoves;
     private ArchiveEntryRealizer? _entryRealizer;
     private TemporaryPlaylistService? _temporaryPlaylists;
+    private ContentDropReceiver? _contentDropReceiver;
     /// <summary>加载转换的原主题资源和原生应用菜单。</summary>
     public override void Initialize()
     {
@@ -53,6 +54,7 @@ public sealed partial class MacApp : Avalonia.Application
                     // 已释放实例不留给退出失败后的窗口重开；清理失败实例仍保留供重试。
                     if (_entryRealizer is not null) { await _entryRealizer.DisposeAsync(); _entryRealizer = null; }
                     if (_temporaryPlaylists is not null) { await _temporaryPlaylists.DisposeAsync(); _temporaryPlaylists = null; }
+                    if (_contentDropReceiver is not null) { await _contentDropReceiver.DisposeAsync(); _contentDropReceiver = null; }
                     desktop.Shutdown();
                 }
                 catch (Exception ex) { _shuttingDown = false; System.Diagnostics.Trace.WriteLine(ex); }
@@ -105,12 +107,13 @@ public sealed partial class MacApp : Avalonia.Application
             if (_fileOperations is null) { _fileOperations = new FileOperationBackend(Path.Combine(directory, "FileRecovery")); recovery = await _fileOperations.RecoverAsync(); }
             recovery = recovery.Concat(await state.RecoverBookRenameAsync(_fileOperations)).ToArray();
             if (_shuttingDown) return;
-            var decoder = new MagickImageDecoder(); var operation = new BookOperation(new Backends.ArchiveFactory(), decoder, state);
+            var decoder = new MagickImageDecoder(); var operation = new BookOperation(new Backends.ArchiveFactory(MacFileAliases.Resolve), decoder, state);
             _destinationMoves ??= new(_fileOperations);
             var images = new BitmapFactory(decoder); operation.AttachFileOperations(_destinationMoves, _fileOperations, images);
             operation.AttachFileClipboard(new MacFileClipboard());
             _entryRealizer ??= new ArchiveEntryRealizer(); operation.AttachArchiveEntryRealizer(_entryRealizer);
             _temporaryPlaylists ??= new TemporaryPlaylistService(); operation.AttachTemporaryPlaylists(_temporaryPlaylists);
+            _contentDropReceiver ??= new ContentDropReceiver(); operation.AttachContentDropReceiver(_contentDropReceiver);
             var model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state);
             _window = new MainWindow(); _window.Bind(model, images, new MacPlatformService());
             _window.AttachPlatformInput(new MacTrackpadInput());

@@ -107,3 +107,5 @@ P4第九批：原整书目标菜单与Index沿既有宿主文件任务；Confirm
 P4第十批目录复制沿既有CopyFile/CopyToFolderAs入口，MainWindow只呈现独立整树覆盖文案与确认/取消，关闭解除进程服务回调。目录类型/保护/指纹、当前目录索引刷新及阅读恢复均在Engine/既有后端；主题/布局不承担复制规则。原内部目录提取未完成项显示能力提示，详见[p4-directory-copy.md](p4-directory-copy.md)。
 
 P4第十一批逻辑书复制没有新增视图业务：既有菜单依赖CanCopyBook/CanCopyBookToFolder，Book.Path条目和归档策略由唯一来源及Engine处理，覆盖/取消复用原整书表单。布局/主题不感知实体化或内容类型，详见[p4-logical-book-copy.md](p4-logical-book-copy.md)。
+
+P4收尾：ContentDropSnapshot只借用拖放数据并复制有限字节，Bitmap所有权仍归发送者；下载/编码探测/临时材料由后端接收器处理。页面列表Delete只转交原Page显式选区，类型分组、ZIP权限/强制确认及真实成功项协调归Engine/来源。SettingsWindow.Files只编辑原ZIP权限草稿；样式、布局和对话框文案独立，见[p4-completion.md](p4-completion.md)。

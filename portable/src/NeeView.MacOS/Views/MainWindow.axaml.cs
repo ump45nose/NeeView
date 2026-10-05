@@ -828,9 +828,14 @@ public sealed partial class MainWindow : Window
     /// <summary>Finder 拖入使用与菜单相同的打开链路。</summary>
     private async void Drop(object? sender, DragEventArgs e)
     {
-        if (e.DataTransfer.TryGetFiles() is not { } files) return;
-        var paths = files.Select(file => file.TryGetLocalPath()).OfType<string>().ToArray();
-        if (paths.Length > 0) { e.Handled = true; try { await OpenFilesAsync(paths); } catch (Exception ex) { ShowError(ex.Message); } }
+        if (e.Handled || _model is null || _preparing || _closedPrepared) return;
+        try
+        {
+            var content = ContentDropSnapshot.Read(e.DataTransfer);
+            if (content.Files.Count == 0 && content.QueryPaths.Count == 0 && content.Content is null) return;
+            e.Handled = true; await RunDestinationActionAsync(() => _model.Operation.OpenDroppedContentAsync(content));
+        }
+        catch (Exception ex) { e.Handled = true; ShowError(ex.Message); }
     }
     /// <summary>显示完整基线命令及迁移状态，已登记数量不当作功能覆盖率。</summary>
     private Task ShowCommandStatusAsync()

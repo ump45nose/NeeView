@@ -8,7 +8,9 @@ public abstract class Archive(string path) : IAsyncDisposable
     public virtual string RootArchivePath => Path;
     /// <summary>对应原ArchiveEntryUtility.CreateAsync(Book.Path)的当前书籍条目；不是当前阅读页面。</summary>
     /// <returns>普通根目录、归档或播放列表返回其实体地址，内部目录由来源保留原归属关系。</returns>
-    public virtual ArchiveEntry CreateBookEntry() => new(this) { FilePath = Path, IsDirectory = IsDirectory };
+    public virtual ArchiveEntry CreateBookEntry() => new(this) { FilePath = Path, IsDirectory = IsDirectory, IsShortcut = IsRootShortcut };
+    /// <summary>根来源是否由链接打开；文件动作仍针对链接本身。</summary>
+    public bool IsRootShortcut { get; init; }
     /// <summary>来源解析的显式图片条目，普通历史恢复不能覆盖该定位。</summary>
     public string? RequestedEntryName { get; init; }
     public virtual bool IsDirectory => false;
@@ -27,9 +29,19 @@ public abstract class Archive(string path) : IAsyncDisposable
     }
     /// <summary>打开指定条目，返回流所有权转交调用方。</summary>
     public abstract Task<Stream> OpenEntryAsync(ArchiveEntry entry, CancellationToken token);
+    /// <summary>原CanDelete：能力属于条目实际来源；默认只读，不能推测RAR/7z可写。</summary>
+    public virtual bool CanDelete(IReadOnlyList<ArchiveEntry> entries) => false;
+    /// <summary>删除原条目，返回真实成功项；部分失败也必须回报已提交项。</summary>
+    public virtual Task<PageDeleteResult> DeleteAsync(IReadOnlyList<ArchiveEntry> entries, IPlatformService platform, CancellationToken token)
+        => throw new NotSupportedException("此来源不支持删除条目。");
     /// <summary>释放来源及应用生成的临时文件。</summary>
     public abstract ValueTask DisposeAsync();
 }
+
+/// <summary>原DeleteEntryType：列表删除登记、文件进入废纸篓、归档条目不可逆。</summary>
+public enum DeleteEntryType { None, File, PlaylistEntry, ArchiveEntry, Various }
+/// <summary>部分批次失败时也回报真实提交集合，不伪装原子回滚。</summary>
+public sealed record PageDeleteResult(IReadOnlyList<ArchiveEntry> Removed, string? Error = null);
 
 /// <summary>原 ArchiveEntry 的只读子集，ID 区分归档中同名条目。</summary>
 public class ArchiveEntry(Archive archive)
@@ -54,6 +66,6 @@ public class ArchiveEntry(Archive archive)
     public bool IsBook() => !ReferenceEquals(TargetArchiveEntry, this) ? TargetArchiveEntry.IsBook() : IsDirectory || ArchiveFormats.IsArchive(EntryName);
     /// <summary>沿原Archive.CanRealize：普通目录直接传实体地址，归档内部目录不能提取；链接仍待适配。</summary>
     /// <returns>普通实体或归档文件项为true，归档内部目录为false。</returns>
-    public bool CanRealize() => !Archive.IsDisposed && (!ReferenceEquals(TargetArchiveEntry, this) ? TargetArchiveEntry.CanRealize() : !IsShortcut && (FilePath is not null || !IsDirectory));
+    public bool CanRealize() => !Archive.IsDisposed && (!ReferenceEquals(TargetArchiveEntry, this) ? TargetArchiveEntry.CanRealize() : FilePath is not null || !IsShortcut && !IsDirectory);
     public override string ToString() => EntryName;
 }

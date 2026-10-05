@@ -1,5 +1,6 @@
 # P4 第八批：原整书删除与书架邻项
 
+本文件描述当批增量；当前删除、图片接收与链接范围以[P4收尾契约](p4-completion.md)为准。
 固定 `c5c398d89` 的 `DeleteBookCommand`、`BookControl.DeleteBook`、`ConfirmFileIO.DeleteAsync` 和 `NextFolderListBookLoader/GetNextItem` 是行为依据。沿用原 Book/BookOperation、书架集合及 JSON，不增加文件身份模型、数据库或第二内核。
 
 ## 职责、依赖与契约

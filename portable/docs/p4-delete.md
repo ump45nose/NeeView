@@ -1,5 +1,6 @@
 # P4 第三批：当前主页删除与系统废纸篓
 
+本文件描述当批增量；当前删除、图片接收与链接范围以[P4收尾契约](p4-completion.md)为准。
 沿原 `DeleteFileCommand` → `BookPageActionControl.DeleteFileAsync` → `PageFileIO` 的目标、写权限和确认规则迁移。全局命令仍只处理当前主页，没有 MultiPagePolicy；原页面列表所选页删除是另一入口，尚未迁入。仍只有三个生产项目、同一原 Book/Page/BookOperation 和原 JSON。
 
 ## 职责、依赖与契约

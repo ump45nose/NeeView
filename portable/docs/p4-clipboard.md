@@ -1,5 +1,6 @@
 # P4 第五批：原文件剪贴板与粘贴加载
 
+本文件描述当批增量；当前删除、图片接收与链接范围以[P4收尾契约](p4-completion.md)为准。
 沿固定 Windows 基线 `c5c398d89` 的 `CopyFileCommandParameter`、`BookPageActionControl.CollectPages/CopyToClipboard`、`BookControl.CopyBookToClipboard`、`ClipboardUtility` 及 `ContentDropReceiver` 迁入。保留原命令、页组选序及 JSON，使用 NSPasteboard 替换 Windows 剪贴板，不增加阅读内核、存储或通用平台框架。
 
 ## 职责、依赖与契约

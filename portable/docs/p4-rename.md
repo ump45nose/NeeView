@@ -1,5 +1,6 @@
 # P4 第四批：原书籍重命名与路径联动
 
+本文件描述当批增量；当前删除、图片接收与链接范围以[P4收尾契约](p4-completion.md)为准。
 沿固定基线 `c5c398d89` 的 `RenameBookCommand` → `BookControl.RenameBook` → `FileIO.RenameAsync` → `RestoreBook` 迁移。保留原实体书籍、写权限、名称编号、扩展名确认及重新加载语义；用同目录文件操作替换 Windows Shell。仍使用三个生产项目、唯一 Book/Page/BookOperation 和原 JSON，不增加身份数据库或重命名撤销栈。
 
 ## 职责、依赖与契约

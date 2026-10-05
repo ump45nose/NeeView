@@ -58,7 +58,7 @@ public sealed partial class BookOperation
                 if (realized.Paths.Count == 0) { failure = realized.CapabilityWarning; return; }
                 sourcePath = realized.Paths.Single();
             }
-            await ReadDeleteBookTargetAsync(sourcePath, prompt.Token);
+            await ReadDeleteBookTargetAsync(sourcePath, prompt.Token, requested.Source.CreateBookEntry().IsShortcut);
             var backend = (IBookTransferBackend)_fileBackend!;
             var plan = await backend.PlanBookTransferAsync(sourcePath, folder.Path, prompt.Token);
             await ProtectBookTransferDestinationAsync(plan.Destination, prompt.Token);
@@ -67,7 +67,7 @@ public sealed partial class BookOperation
             try
             {
                 if (!CanTransferBookCore(move) || generation != _generation || !ReferenceEquals(requested, Book)) return;
-                await ReadDeleteBookTargetAsync(sourcePath, prompt.Token);
+                await ReadDeleteBookTargetAsync(sourcePath, prompt.Token, requested.Source.CreateBookEntry().IsShortcut);
                 await ProtectBookTransferDestinationAsync(plan.Destination, prompt.Token);
                 _saving?.Cancel(); memory = requested.CreateMemento(); search = requested.Pages.SearchKeyword; place = _bookshelf?.Place;
                 await saveData.SaveAsync(requested, prompt.Token, keepHistoryOrder: true);

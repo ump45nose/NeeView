@@ -1,5 +1,6 @@
 # P4 第十一批：原逻辑书籍复制
 
+本文件描述当批增量；当前删除、图片接收与链接范围以[P4收尾契约](p4-completion.md)为准。
 固定出处 `c5c398d89`：`BookControl.cs:138–161` 创建Book.Path对应条目后复制到剪贴板；`BookControl.cs:215–235` 调用DestinationFolder.TryCopyAsync；`DestinationFolder.cs:76–111` 将路径转回ArchiveEntry，再经RealizeArchiveEntry及LimitedRealization输出实体；`ArchiveEntry.cs:581–611` 为原四策略。不能仅根据BookControl传字符串就把目标目录复制理解为原始文件路径操作，也不能用CurrentPage代替书籍条目。
 
 ## 职责与依赖
