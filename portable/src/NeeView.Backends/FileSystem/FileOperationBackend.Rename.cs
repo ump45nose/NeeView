@@ -4,9 +4,9 @@ namespace NeeView.Backends;
 public sealed partial class FileOperationBackend : IBookRenameBackend
 {
     /// <summary>与分类共用单槽，文件系统检查不阻塞UI。</summary>
-    public Task<BookRenameTarget> GetRenameTargetAsync(string path, CancellationToken token) => RenameWorkAsync(() => ReadRenameTarget(path, true), token);
+    public Task<BookRenameTarget> GetRenameTargetAsync(string path, CancellationToken token) => RenameReadAsync(() => ReadRenameTarget(path, true), token);
     /// <summary>名称只占一个目录项；允许Mac合法字符，不延续Windows设备名限制。</summary>
-    public Task<BookRenamePlan> PlanRenameAsync(BookRenameTarget target, string name, CancellationToken token) => RenameWorkAsync<BookRenamePlan>(() =>
+    public Task<BookRenamePlan> PlanRenameAsync(BookRenameTarget target, string name, CancellationToken token) => RenameReadAsync<BookRenamePlan>(() =>
     {
         name = name.Trim();
         if (string.IsNullOrWhiteSpace(name) || name is "." or ".." || name.IndexOfAny(['/', '\0']) >= 0)
@@ -27,27 +27,35 @@ public sealed partial class FileOperationBackend : IBookRenameBackend
     /// <summary>关闭来源后执行同目录无覆盖改名；提交点后不再检查取消。</summary>
     public async Task RenameAsync(BookRenamePlan plan, CancellationToken token)
     {
-        await RenameWorkAsync(() =>
+        await _slot.WaitAsync(token);
+        try
         {
+            var target = await SourceIo.RunReadAsync(t =>
+            {
             var target = ReadRenameTarget(plan.Target.Path, true);
             if (target != plan.Target) throw new IOException("书籍已被外部修改，请重新发起重命名。");
             if (Path.GetDirectoryName(plan.Destination) != Path.GetDirectoryName(target.Path)) throw new IOException("重命名不能移出原目录。");
             if (Exists(plan.Destination) && ActualRenamePath(plan.Destination) != ActualRenamePath(target.Path)) throw new IOException("目标名称已被占用，请重新发起重命名。");
-            token.ThrowIfCancellationRequested();
-            if (target.Path != plan.Destination)
+                t.ThrowIfCancellationRequested();
+                return Task.FromResult(target);
+            }, token);
+            // 只有及时完成的只读结果才能授权写入；改名开始后等真实系统结果。
+            await Task.Run(() =>
             {
-                MoveItem(target.Path, plan.Destination);
-            }
-            return true;
-        }, token);
-    }
-    private async Task<T> RenameWorkAsync<T>(Func<T> work, CancellationToken token)
-    {
-        await _slot.WaitAsync(token);
-        try { return await Task.Run(() => { token.ThrowIfCancellationRequested(); return work(); }, token); }
+                token.ThrowIfCancellationRequested();
+                if (target.Path != plan.Destination) MoveItem(target.Path, plan.Destination);
+            }, token);
+        }
         finally { _slot.Release(); }
     }
-    public Task<bool?> WasRenamedAsync(BookRenamePlan plan, CancellationToken token) => plan.IsMove ? VerifyMovedBookAsync(plan, token) : RenameWorkAsync<bool?>(() =>
+    /// <summary>仅确认和查询使用可超时准备；写入不能进入此入口。</summary>
+    private async Task<T> RenameReadAsync<T>(Func<T> work, CancellationToken token)
+    {
+        await _slot.WaitAsync(token);
+        try { return await SourceIo.RunReadAsync(t => { t.ThrowIfCancellationRequested(); return Task.FromResult(work()); }, token); }
+        finally { _slot.Release(); }
+    }
+    public Task<bool?> WasRenamedAsync(BookRenamePlan plan, CancellationToken token) => plan.IsMove ? VerifyMovedBookAsync(plan, token) : RenameReadAsync<bool?>(() =>
     {
         if (!Path.IsPathFullyQualified(plan.Target.Path) || !Path.IsPathFullyQualified(plan.Destination)
             || Path.GetDirectoryName(plan.Target.Path) != Path.GetDirectoryName(plan.Destination)
@@ -75,10 +83,9 @@ public sealed partial class FileOperationBackend : IBookRenameBackend
         FileSystemInfo info = directory ? new DirectoryInfo(path) : new FileInfo(path);
         return new(path, directory, info.CreationTimeUtc, info.LastWriteTimeUtc, directory ? 0 : link is not null ? System.Text.Encoding.UTF8.GetByteCount(link) : ((FileInfo)info).Length, link);
     }
-    /// <summary>Exists确认别名确实存在后才比较枚举到的真实名称，区分大小写卷上的不同项。</summary>
+    /// <summary>保留请求父路径，只有最后名称按系统解析；改名恢复不能把/var等别名改写。</summary>
     private static string ActualRenamePath(string path)
     {
-        var entries = Directory.EnumerateFileSystemEntries(Path.GetDirectoryName(path)!).ToArray();
-        return entries.FirstOrDefault(p => p == path) ?? entries.FirstOrDefault(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase)) ?? path;
+        return Path.Combine(Path.GetDirectoryName(path)!, Path.GetFileName(CanonicalFile(path)));
     }
 }

@@ -29,7 +29,7 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
     [JsonSerializable(typeof(Journal))]
     private partial class RecoveryJsonContext : JsonSerializerContext { }
     /// <summary>文件存在检查进入后台；UI不直接阻塞挂载目录。</summary>
-    public Task<bool> FileExistsAsync(string path, CancellationToken token) => Task.Run(() => { token.ThrowIfCancellationRequested(); return Exists(path); }, token);
+    public Task<bool> FileExistsAsync(string path, CancellationToken token) => SourceIo.RunAsync(() => { token.ThrowIfCancellationRequested(); return Exists(path); }, token);
 
     /// <summary>安装前检查原图与目标指纹；取消/错误保守回滚，无法回滚时保留日志。</summary>
     public async Task<FileTransferResult> TransferAsync(FileTransferRequest request, CancellationToken token)
@@ -40,38 +40,12 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
     }
     private async Task<FileTransferResult> TransferCoreAsync(FileTransferRequest request, CancellationToken token, BookTransferPlan? bookPlan = null)
     {
-        string source = CanonicalFile(Path.GetFullPath(request.Source)), destination = CanonicalFile(Path.GetFullPath(request.Destination));
-        if (!Exists(source)) throw new FileNotFoundException("源项目已不存在。", source);
-        bool preserveLinks = request.PreserveSourceLink || request.ExpectedSourceHash?.StartsWith("L:", StringComparison.Ordinal) == true || bookPlan is not null;
-        bool directory = Directory.Exists(source) && new FileInfo(source).LinkTarget is null;
-        if (directory && bookPlan is null) throw new IOException("图片传输不能处理目录。 ");
-        if (bookPlan is not null)
-        {
-            ValidateBookPaths(source, destination);
-            if (ReadRenameTarget(request.Source, true) != bookPlan.Target) throw new IOException("书籍在确认期间已变化，请重新确认。");
-        }
-        if (!Directory.Exists(Path.GetDirectoryName(destination))) throw new DirectoryNotFoundException("目标目录已不存在。");
-        // 不跟随符号链接分类；别名/大小写解析后同一目录项不能覆盖自身。
-        RejectLinkIfPresent(source, preserveLinks); RejectLinkIfPresent(destination, preserveLinks);
-        if (CanonicalFile(source) == CanonicalFile(destination)) throw new IOException("源和目标是同一个文件。");
-        if (Exists(destination) && (Directory.Exists(destination) && new FileInfo(destination).LinkTarget is null) != directory) throw new IOException("源和目标类型不同，不能覆盖。");
-        if (Exists(destination) && !request.Overwrite) throw new IOException("目标存在，尚未确认覆盖。");
-        if (request.RestoreBackup is not null)
-        {
-            if (!IsOwned(request.RestoreBackup, ".backup") || !Exists(request.RestoreBackup) || !request.Move) throw new IOException("覆盖恢复副本已不存在。");
-            RejectLinkIfPresent(request.RestoreBackup, preserveLinks);
-        }
+        var progress = new SourceIo.ReadProgress();
+        var prepared = await SourceIo.RunReadAsync(t => PrepareTransferAsync(request, bookPlan, t, progress.Mark), token, progress: progress);
+        var journal = prepared.Journal; var journalPath = prepared.Path;
+        var source = journal.Source; var destination = journal.Destination;
+        token.ThrowIfCancellationRequested();
         Directory.CreateDirectory(recoveryDirectory);
-        string id = Guid.NewGuid().ToString("N"), journalPath = Path.Combine(recoveryDirectory, id + ".json");
-        var journal = new Journal { Source = source, Destination = destination, Move = request.Move, IsDirectory = directory, PreserveLinks = preserveLinks,
-            Temporary = Sibling(destination, id, ".tmp"), Backup = Path.Combine(Path.GetFullPath(recoveryDirectory), id + ".backup"), RestoreBackup = request.RestoreBackup,
-            SourceStage = Sibling(source, id, ".source"), DestinationStage = Sibling(destination, id, ".destination"), RestoreTemporary = Sibling(source, id, ".restore") };
-        journal.SourceHash = await HashAsync(source, token);
-        if (request.ExpectedSourceHash is not null && journal.SourceHash != request.ExpectedSourceHash) throw new IOException("移动后的图片已被外部替换，撤销记录保留。");
-        journal.DestinationHash = Exists(destination) ? await HashAsync(destination, token) : null;
-        if (bookPlan is not null && journal.DestinationHash != bookPlan.DestinationHash) throw new IOException("目标在确认期间已变化，请重新确认。");
-        if (request.RestoreBackup is not null) journal.RestoreHash = await HashAsync(request.RestoreBackup, token);
-        if (request.ExpectedRestoreHash is not null && journal.RestoreHash != request.ExpectedRestoreHash) throw new IOException("覆盖恢复副本已变化，撤销记录保留。");
         // 日志先于任何写入用户目录；副本只使用本应用随机文件名。
         await WriteJournalAsync(journalPath, journal, token);
         try
@@ -106,6 +80,45 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
             catch (Exception rollback) { throw new IOException("操作未完成，恢复记录已保留。" + rollback.Message, ex); }
             throw;
         }
+    }
+    private sealed record PreparedTransfer(Journal Journal, string Path);
+    /// <summary>写日志前的独立只读快照；超时晚到时永远不会继续复制或安装。</summary>
+    private async Task<PreparedTransfer> PrepareTransferAsync(FileTransferRequest request, BookTransferPlan? bookPlan, CancellationToken token, Action progress)
+    {
+        string source = CanonicalFile(Path.GetFullPath(request.Source)); progress();
+        string destination = CanonicalFile(Path.GetFullPath(request.Destination)); progress();
+        if (!Exists(source)) throw new FileNotFoundException("源项目已不存在。", source);
+        bool preserveLinks = request.PreserveSourceLink || request.ExpectedSourceHash?.StartsWith("L:", StringComparison.Ordinal) == true || bookPlan is not null;
+        bool directory = Directory.Exists(source) && new FileInfo(source).LinkTarget is null;
+        if (directory && bookPlan is null) throw new IOException("图片传输不能处理目录。 ");
+        if (bookPlan is not null)
+        {
+            ValidateBookPaths(source, destination);
+            if (ReadRenameTarget(request.Source, true) != bookPlan.Target) throw new IOException("书籍在确认期间已变化，请重新确认。");
+        }
+        if (!Directory.Exists(Path.GetDirectoryName(destination))) throw new DirectoryNotFoundException("目标目录已不存在。");
+        // 不跟随符号链接分类；别名/大小写解析后同一目录项不能覆盖自身。
+        RejectLinkIfPresent(source, preserveLinks); RejectLinkIfPresent(destination, preserveLinks);
+        if (source == destination) throw new IOException("源和目标是同一个文件。");
+        if (Exists(destination) && (Directory.Exists(destination) && new FileInfo(destination).LinkTarget is null) != directory) throw new IOException("源和目标类型不同，不能覆盖。");
+        if (Exists(destination) && !request.Overwrite) throw new IOException("目标存在，尚未确认覆盖。");
+        if (request.RestoreBackup is not null)
+        {
+            if (!IsOwned(request.RestoreBackup, ".backup") || !Exists(request.RestoreBackup) || !request.Move) throw new IOException("覆盖恢复副本已不存在。");
+            RejectLinkIfPresent(request.RestoreBackup, preserveLinks);
+        }
+        string id = Guid.NewGuid().ToString("N"), journalPath = Path.Combine(recoveryDirectory, id + ".json");
+        var journal = new Journal { Source = source, Destination = destination, Move = request.Move, IsDirectory = directory, PreserveLinks = preserveLinks,
+            Temporary = Sibling(destination, id, ".tmp"), Backup = Path.Combine(Path.GetFullPath(recoveryDirectory), id + ".backup"), RestoreBackup = request.RestoreBackup,
+            SourceStage = Sibling(source, id, ".source"), DestinationStage = Sibling(destination, id, ".destination"), RestoreTemporary = Sibling(source, id, ".restore") };
+        journal.SourceHash = await HashAsync(source, token, progress);
+        if (request.ExpectedSourceHash is not null && journal.SourceHash != request.ExpectedSourceHash) throw new IOException("移动后的图片已被外部替换，撤销记录保留。");
+        journal.DestinationHash = Exists(destination) ? await HashAsync(destination, token, progress) : null;
+        if (bookPlan is not null && journal.DestinationHash != bookPlan.DestinationHash) throw new IOException("目标在确认期间已变化，请重新确认。");
+        if (request.RestoreBackup is not null) journal.RestoreHash = await HashAsync(request.RestoreBackup, token, progress);
+        if (request.ExpectedRestoreHash is not null && journal.RestoreHash != request.ExpectedRestoreHash) throw new IOException("覆盖恢复副本已变化，撤销记录保留。");
+        token.ThrowIfCancellationRequested();
+        return new(journal, journalPath);
     }
     /// <summary>只接受应用恢复根内的生成材料，禁止任意路径清理。</summary>
     public Task ReleaseAsync(FileTransferResult result) => Task.Run(async () =>
@@ -233,26 +246,17 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
             DeleteItem(path);
         }
     }
+    /// <summary>普通实体由系统解析；链接只解析父级，保持操作链接本身。</summary>
     private static string CanonicalFile(string path)
     {
-        path = Path.Combine(CanonicalDirectory(Path.GetDirectoryName(path)!), Path.GetFileName(path));
-        if (!Exists(path)) return path;
-        var names = Directory.EnumerateFileSystemEntries(Path.GetDirectoryName(path)!).Select(Path.GetFullPath).ToArray();
+        path = Path.GetFullPath(path);
+        var parent = Path.GetDirectoryName(path);
+        if (parent is null) return UnixPhysicalPath.Resolve(path);
+        path = Path.Combine(UnixPhysicalPath.Resolve(parent), Path.GetFileName(path));
+        if (new FileInfo(path).LinkTarget is null) return UnixPhysicalPath.Resolve(path);
+        // realpath会跟随末段链接。仅链接自身需要一次直接父目录查询，不扫描祖先。
+        var names = Directory.EnumerateFileSystemEntries(Path.GetDirectoryName(path)!).ToArray();
         return names.FirstOrDefault(p => p == path) ?? names.FirstOrDefault(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase)) ?? path;
-    }
-    /// <summary>解析父级别名，按实际文件系统目录项比较；Mac合法大小写文件仍区分。</summary>
-    private static string CanonicalDirectory(string path)
-    {
-        var info = new DirectoryInfo(path);
-        if (info.Parent is null) return info.FullName;
-        var actual = new DirectoryInfo(Path.Combine(CanonicalDirectory(info.Parent.FullName), info.Name));
-        if (!actual.Exists && actual.LinkTarget is null) return actual.FullName;
-        var link = actual.ResolveLinkTarget(true);
-        if (link is not null) return CanonicalDirectory(link.FullName);
-        var resolved = actual.FullName;
-        if (!Directory.Exists(resolved) || actual.Parent is null) return resolved;
-        var entries = Directory.EnumerateDirectories(Path.GetDirectoryName(resolved)!);
-        return entries.FirstOrDefault(p => p == resolved) ?? Directory.EnumerateDirectories(Path.GetDirectoryName(resolved)!).FirstOrDefault(p => string.Equals(p, resolved, StringComparison.OrdinalIgnoreCase)) ?? resolved;
     }
     private static async Task CopyVerifiedAsync(string source, string destination, string hash, CancellationToken token)
     {
@@ -287,8 +291,19 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
             throw;
         }
     }
-    private static async Task<string> HashAsync(string path, CancellationToken token)
-    { if (new FileInfo(path).LinkTarget is { } target) { token.ThrowIfCancellationRequested(); return "L:" + Convert.ToHexString(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(target))); } if (Directory.Exists(path)) return await HashDirectoryAsync(path, token); await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 128 * 1024, true); return Convert.ToHexString(await SHA256.HashDataAsync(stream, token)); }
+    /// <summary>内容指纹不变；按成功读取的字节报告进展，停住的原生调用不会伪造心跳。</summary>
+    private static async Task<string> HashAsync(string path, CancellationToken token, Action? progress = null)
+    {
+        token.ThrowIfCancellationRequested();
+        if (new FileInfo(path).LinkTarget is { } target)
+        { progress?.Invoke(); return "L:" + Convert.ToHexString(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(target))); }
+        if (Directory.Exists(path)) return await HashDirectoryAsync(path, token, progress);
+        await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 128 * 1024, true);
+        using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        var buffer = new byte[128 * 1024]; int count;
+        while ((count = await stream.ReadAsync(buffer, token)) > 0) { hash.AppendData(buffer, 0, count); progress?.Invoke(); }
+        progress?.Invoke(); return Convert.ToHexString(hash.GetHashAndReset());
+    }
     private static async Task<bool> MatchesAsync(string path, string? hash) => hash is null
         ? !Exists(path) : Exists(path) && await HashAsync(path, CancellationToken.None) == hash;
     private static async Task WriteJournalAsync(string path, Journal journal, CancellationToken token)

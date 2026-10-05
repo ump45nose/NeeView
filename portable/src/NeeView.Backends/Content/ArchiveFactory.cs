@@ -116,6 +116,46 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
 public static class SourceIo
 {
     private static readonly SemaphoreSlim Slots = new(2);
+    /// <summary>只读阶段的已完成工作计数；持续读取大书籍不等于系统调用失联。</summary>
+    internal sealed class ReadProgress
+    {
+        private long _version;
+        internal long Version => Interlocked.Read(ref _version);
+        internal void Mark() => Interlocked.Increment(ref _version);
+    }
+    /// <summary>只读异步准备有界等待；晚到调用继续占槽，取消后不能由调用方进入写入阶段。</summary>
+    /// <param name="action">只能检查、读取或计算快照，禁止写入实体或恢复日志。</param>
+    /// <param name="token">调用方取消。</param><param name="timeout">默认十五秒检查周期；短期限用于资源边界回归。</param>
+    /// <param name="progress">已完成的读取/哈希进度；一个完整周期无进展才超时。</param>
+    /// <returns>及时完成的只读结果；超时后结果仅供清理。</returns>
+    internal static async Task<T> RunReadAsync<T>(Func<CancellationToken, Task<T>> action, CancellationToken token, TimeSpan? timeout = null, ReadProgress? progress = null)
+    {
+        var limit = timeout ?? TimeSpan.FromSeconds(15);
+        if (!await Slots.WaitAsync(limit, token)) throw new TimeoutException("来源暂不可访问：I/O 队列等待超时。");
+        var cancellation = CancellationTokenSource.CreateLinkedTokenSource(token);
+        var work = Task.Run(async () =>
+        {
+            try { cancellation.Token.ThrowIfCancellationRequested(); return await action(cancellation.Token); }
+            finally { Slots.Release(); }
+        });
+        try
+        {
+            while (true)
+            {
+                var checkpoint = progress?.Version;
+                try { return await work.WaitAsync(limit, token); }
+                catch (TimeoutException) when (!work.IsCompleted && progress is not null && progress.Version != checkpoint) { }
+            }
+        }
+        catch { cancellation.Cancel(); _ = ObserveLateAsync(work); throw; }
+        finally
+        {
+            // 原生调用可能尚未返回，不能提前释放它仍引用的取消源。
+            _ = DisposeCancellationAsync(work, cancellation);
+        }
+    }
+    private static async Task DisposeCancellationAsync<T>(Task<T> work, CancellationTokenSource cancellation)
+    { try { await work; } catch { } finally { cancellation.Dispose(); } }
     /// <summary>后台运行同步系统调用；十五秒等待超时不会释放仍在使用的槽。</summary>
     public static async Task<T> RunAsync<T>(Func<T> action, CancellationToken token)
     {

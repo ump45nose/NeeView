@@ -13,7 +13,7 @@ public sealed partial class FileOperationBackend : IBookTransferBackend
         await _slot.WaitAsync(token);
         try
         {
-            return await Task.Run<bool?>(async () =>
+            return await SourceIo.RunReadAsync<bool?>(async token =>
             {
                 if (!Path.IsPathFullyQualified(plan.Target.Path) || !Path.IsPathFullyQualified(plan.Destination) || string.IsNullOrEmpty(plan.ContentHash))
                     throw new IOException("移动恢复路径或完整性指纹无效。");
@@ -43,7 +43,8 @@ public sealed partial class FileOperationBackend : IBookTransferBackend
         await _slot.WaitAsync(token);
         try
         {
-            return await Task.Run(async () =>
+            var progress = new SourceIo.ReadProgress();
+            return await SourceIo.RunReadAsync(async token =>
             {
                 var target = ReadRenameTarget(source, true);
                 if (!Directory.Exists(folder)) throw new DirectoryNotFoundException("目标目录已不存在。");
@@ -51,8 +52,8 @@ public sealed partial class FileOperationBackend : IBookTransferBackend
                 ValidateBookPaths(CanonicalFile(target.Path), CanonicalFile(destination));
 
                 if (Exists(destination) && (Directory.Exists(destination) && new FileInfo(destination).LinkTarget is null) != target.IsDirectory) throw new IOException("源和目标类型不同，不能覆盖。");
-                return new BookTransferPlan(target, destination, await HashAsync(target.Path, token), Exists(destination) ? await HashAsync(destination, token) : null);
-            }, token);
+                return new BookTransferPlan(target, destination, await HashAsync(target.Path, token, progress.Mark), Exists(destination) ? await HashAsync(destination, token, progress.Mark) : null);
+            }, token, progress: progress);
         }
         finally { _slot.Release(); }
     }
@@ -79,7 +80,7 @@ public sealed partial class FileOperationBackend : IBookTransferBackend
     }
 
     /// <summary>按名称排序逐级计算结构/内容指纹，包含空目录；不跟随任何链接。</summary>
-    private static async Task<string> HashDirectoryAsync(string path, CancellationToken token)
+    private static async Task<string> HashDirectoryAsync(string path, CancellationToken token, Action? progress = null)
     {
         RejectLink(path);
         using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
@@ -89,11 +90,11 @@ public sealed partial class FileOperationBackend : IBookTransferBackend
             token.ThrowIfCancellationRequested();
             var name = Encoding.UTF8.GetBytes(Path.GetFileName(child));
             hash.AppendData(Encoding.UTF8.GetBytes(name.Length.ToString(System.Globalization.CultureInfo.InvariantCulture) + ":"));
-            var childHash = await HashAsync(child, token); bool link = childHash.StartsWith("L:", StringComparison.Ordinal);
+            var childHash = await HashAsync(child, token, progress); bool link = childHash.StartsWith("L:", StringComparison.Ordinal);
             hash.AppendData(name); hash.AppendData(link ? "L"u8 : Directory.Exists(child) ? "D"u8 : "F"u8);
             hash.AppendData(Convert.FromHexString(link ? childHash[2..] : childHash));
         }
-        return Convert.ToHexString(hash.GetHashAndReset());
+        progress?.Invoke(); return Convert.ToHexString(hash.GetHashAndReset());
     }
 
     /// <summary>创建独立目录树并逐文件验证，最后核对整个树；任何源变化均拒绝安装。</summary>

@@ -140,5 +140,66 @@
         "sha256": "95ee48e0d0523a76dfb0fe0ac08a712beaa317354ac32fa35437afa6aae0fb3c"
       }
     ]
+  },
+  "MAC-NAS-004": {
+    "status": "preparation_fixed_device_write_still_blocked",
+    "targeted_tests": {
+      "passed": 182,
+      "failed": 0
+    },
+    "real_smb_write": "blocked_native_open",
+    "outage_retest": "not_reached",
+    "normal_exit": "blocked_waiting_for_write",
+    "source_hashes_match": true,
+    "target_installed": false,
+    "journal_completed": false,
+    "isolated_test_process_terminated": true,
+    "existing_mounts_retained": 10,
+    "evidence": [
+      {
+        "file": "nas-abort-receipt.json",
+        "sha256": "aa6d69d3de657bcb8e4216e0f0f7e7637c0b7119f7fd50e98f51ae360729951d"
+      },
+      {
+        "file": "nas-cleanup.json",
+        "sha256": "7b9604fd34864333bf5f92dbc6d4388887dcb3f8bfa60b72e7cd6c0f10252589"
+      },
+      {
+        "file": "nas-healthy-move.ax.txt",
+        "sha256": "a6b37b52ad018083305eef20c04e2da7d8b0c86b663ba5758cf0d6ebc7c44a52"
+      },
+      {
+        "file": "nas-healthy-result.ax.txt",
+        "sha256": "805a54baca4acc655a4f978b0c98dfb81b940ada138968e19dac09a3845e20cd"
+      },
+      {
+        "file": "nas-healthy.stack.txt",
+        "sha256": "47b86df91ca24649ea0e6da71e40532b3f0f79d2e8c64f6bcc6adf2ee43e5b1b"
+      },
+      {
+        "file": "nas-macos-probe.stack.txt",
+        "sha256": "45157bbc874e96374842e4093aacaf050f4b1c3872d3ccd8cfedcdd4c9c396f8"
+      },
+      {
+        "file": "nas-native-probes.json",
+        "sha256": "9115bd2b5b48df7b6677a41a7a2ab7d082dabe02c56a3e87c145031f15f28259"
+      },
+      {
+        "file": "nas-seed.json",
+        "sha256": "c7f33033fb9b6e9d9a520cff35e51ef334b1d2389e86768c1efa30b37049ff24"
+      },
+      {
+        "file": "nas-write-failure.json",
+        "sha256": "988e5d90acd6c3b548b275035f8e08d06cfc3f6ce20674591e560857a052f755"
+      },
+      {
+        "file": "nas-write-native.sample.txt",
+        "sha256": "cfd26cabeaa92459b6e885371fe154946c8f8ddefedd5b721140d54deaf43c51"
+      },
+      {
+        "file": "nas-write-quit.ax.txt",
+        "sha256": "6e634c00d1ad7560a2e42f59280a15d97b1ef471993ae2916193ba3210940591"
+      }
+    ]
   }
 }
