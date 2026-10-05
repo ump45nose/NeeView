@@ -1,5 +1,7 @@
 # P5 第二批：原 Profile 实际应用与失败恢复
 
+本文件保留第二批范围；当前旧设置版本/三代布局及预览升级扩展以[P5第三批契约](p5-legacy-compatibility.md)为准。备份/事务/窗口重建协议不变。
+
 ## 职责与原出处
 
 在第一批只读预览上恢复原五文件的实际导入。保留 `UserSetting.json`、`History.json`、`Bookmark.json`、`Foldres.json`、`QuicAccess.json`，没有数据库或新生产项目。

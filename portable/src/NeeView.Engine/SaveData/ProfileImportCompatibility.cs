@@ -17,20 +17,25 @@ internal static class ProfileImportCompatibility
         string expected = name switch { "UserSetting.json" => "NeeView", "History.json" => "NeeView.History", "Bookmark.json" => "NeeView.Bookmark", "Foldres.json" => "NeeView.Folders", _ => "NeeView.QuickAccess" };
         if (parts.Length != 2 || !(parts[0] == expected || parts[0] == "NeeView" || name == "UserSetting.json" && parts[0] == "NeeView.UserSetting") || !Version.TryParse(parts[1], out var version))
             return name + " 版本缺失或格式类型不匹配，只允许预览。";
-        bool settings = name is not ("History.json" or "Bookmark.json");
-        int minimum = settings ? 46 : 44;
-        // 原 Ver46_Alpha5=(46,0,4209)；本批设置/目录仅放行 46.1+，46.0 留待完整 validator。
+        bool ancillary = name is "Foldres.json" or "QuicAccess.json";
+        int minimum = name == "UserSetting.json" ? 38 : ancillary ? 46 : 44;
+        // 目录旧递归继承 validator 尚未迁入；不能随设置扩大独立 Foldres 的范围。
         if (version.Major < minimum || version.Major > 46 || version.Major == 46 && version.Minor > 3 || version.Build > ProfileImportFiles.BaselineBuild || version.Revision > 0 ||
-            settings && version.Major == 46 && version.Minor == 0)
+            ancillary && version.Major == 46 && version.Minor == 0)
             return $"{name} 版本 {parts[1]} 的旧版本升级或未来兼容尚未完成，只允许预览。";
+        // <39 的原字体缩放依赖来源 Windows MessageFontSize，不能猜测为当前 Mac 字体。
+        if (name == "UserSetting.json" && version < new Version(39, 0, 0) && raw["Config"]?["Panels"] is JsonObject panels &&
+            new[] { "FontSize", "FolderTreeFontSize" }.Any(field => panels[field] is { } value && value.GetValue<double>() != 0))
+            return "UserSetting.json 旧字体尺寸需要来源 Windows 的 MessageFontSize，暂只允许预览；原值保留。";
         return null;
     }
     /// <summary>在原 JSON 副本上复用明确的旧 Books 合并、UNC 根规范和日期更新；未知元数据留在兼容扩展。</summary>
     internal static JsonObject Upgrade(string name, JsonObject raw)
     {
         if (BlockReason(name, raw) is { } reason) throw new InvalidDataException(reason);
-        if (name is not ("History.json" or "Bookmark.json")) return raw;
         var version = Version.Parse(raw["Format"]!.GetValue<string>().Split('/')[1]);
+        if (name == "UserSetting.json") { LegacyUserSettingUpgrade.Upgrade(raw, version); return raw; }
+        if (name is not ("History.json" or "Bookmark.json")) return raw;
         var roots = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var targets = name == "History.json" ? (raw["Items"] as JsonArray)?.OfType<JsonObject>() ?? [] : Walk(raw["Nodes"] as JsonObject);
         foreach (var item in targets.Concat((raw["Books"] as JsonArray)?.OfType<JsonObject>() ?? []))

@@ -42,7 +42,7 @@ public sealed class LayoutPanelManager
     private readonly LayoutPanelManagerMemento _original;
     public event EventHandler? Changed;
 
-    /// <summary>恢复原 PanelLayoutV2、选择与 GridLength；缺失的原面板补回默认栏。</summary>
+    /// <summary>恢复原三代布局、选择与 GridLength；缺失的原面板补回默认栏。</summary>
     public LayoutPanelManager(LayoutPanelManagerMemento? memento)
     {
         _original = memento ?? new();
@@ -61,8 +61,9 @@ public sealed class LayoutPanelManager
             // 完整旧布局可能把默认栏成员移到另一栏；在读取两边后统一补缺项。
             if (saved is null && _original.Docks is null)
                 foreach (var key in defaults.Where(seen.Add)) dock.Items.Add(new() { Panels[key] });
-            dock.SelectedItem = saved is not null && saved.SelectedItem is null ? null :
-                dock.Items.FirstOrDefault(g => g.Any(p => p.Key == saved?.SelectedItem)) ?? dock.Items.FirstOrDefault();
+            // 原 Restore 未找到选择成员时保持关闭，未知旧面板不能意外打开首组。
+            dock.SelectedItem = saved is null ? dock.Items.FirstOrDefault() :
+                dock.Items.FirstOrDefault(g => g.Any(p => p.Key == saved.SelectedItem));
         }
         foreach (var key in Panels.Keys.Where(k => !seen.Contains(k)))
             Docks[LeftDefaults.Contains(key) ? "Left" : "Right"].Items.Add(new() { Panels[key] });
@@ -181,6 +182,13 @@ public sealed class LayoutPanelManager
         foreach (var (side, dock) in Docks)
         {
             if (!_original.Docks.TryGetValue(side, out var saved)) _original.Docks[side] = saved = new();
+            // 不让当前已知面板过滤静默删除旧/扩展面板的布局信息；旁路材料不参与运行恢复。
+            if (saved.PanelLayout.Any(g => g.Panels.Any(key => !Panels.ContainsKey(key))))
+            {
+                saved.Extra ??= [];
+                if (!saved.Extra.ContainsKey("MacImportedUnrecognizedLayout"))
+                    saved.Extra["MacImportedUnrecognizedLayout"] = JsonSerializer.SerializeToElement(saved.PanelLayout);
+            }
             saved.PanelLayout = dock.Items.Select(g => new LayoutDockPanelLayout { Orientation = g.Orientation, Panels = g.Select(p => p.Key).ToList() }).ToList();
             saved.SelectedItem = dock.SelectedItem?.FirstOrDefault()?.Key;
         }
@@ -222,11 +230,21 @@ public sealed class LayoutPanelWindowManagerMemento
     public List<string> Panels { get; set; } = [];
     [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
 }
-public sealed class LayoutDockPanelContentMemento
+public sealed class LayoutDockPanelContentMemento : IJsonOnDeserialized
 {
     [JsonPropertyName("PanelLayoutV2")] public List<LayoutDockPanelLayout> PanelLayout { get; set; } = [];
+    /// <summary>Mac原JSON合并必须显式写null清除旧选择，否则关闭后保存会重新打开。</summary>
     public string? SelectedItem { get; set; }
     [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
+    /// <summary>普通配置载入同样恢复旧布局；无需先经过导入窗口。</summary>
+    public void OnDeserialized()
+    {
+        PanelLayout ??= [];
+        if (PanelLayout.Count != 0 || Extra is null) return;
+        var raw = new System.Text.Json.Nodes.JsonObject();
+        foreach (var pair in Extra) raw[pair.Key] = System.Text.Json.Nodes.JsonNode.Parse(pair.Value.GetRawText());
+        if (LayoutPanelCompatibility.ReadLegacy(raw) is { } groups) PanelLayout = groups;
+    }
 }
 
 /// <summary>沿用原 Orientation:key1,key2 字符串格式。</summary>

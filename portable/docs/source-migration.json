@@ -1922,6 +1922,42 @@
       "target": "src/NeeView.Engine/SaveData/SaveData.cs",
       "sha256": "0c3881ca9e32d1476517a26b499ed70dd276fc646b8447d475fa7c1c47ecb4e3",
       "status": "P5：原JSON字符串枚举读入已迁Config，同时兼容早期Mac数值；未知值不伪造执行能力，完整fuzzy升级未迁入。"
+    },
+    {
+      "source": "NeeView/SaveData/UserSettingValidator.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyUserSettingUpgrade.cs",
+      "sha256": "a343581ccf9dbc32652c15824e953698e32f7195385d7cb7806df2f51e589407",
+      "status": "P5原版本规则的JSON适配；38+字体尺寸有明确门槛，旧效果层/预设升级明确保留待迁；不是完整原validator"
+    },
+    {
+      "source": "NeeView/MainWindow/TitleStringValidator.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyUserSettingUpgrade.cs",
+      "sha256": "50a5698c5cea91c89dbb5a08ff898ba7ee5e3fb703ea15ff58cbb9ef59aab4e5",
+      "status": "P5保留原占位符替换表及前缀顺序"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyUserSettingUpgrade.cs",
+      "sha256": "9fb08a5fc71bab670fd98306cf2e592ef60a4801c9aad9dcf0743efc9bd1a23d",
+      "status": "P5旧Type/Value和拼写错误规范为原$type；未知材料保留，已迁参数类型校验"
+    },
+    {
+      "source": "NeeView/MouseInput/DragActionParameter.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyUserSettingUpgrade.cs",
+      "sha256": "eb43eb8cea9ea36a32b8eb2743fe0687f2b49cc938865672ab8af88137690da6",
+      "status": "P5MoveScale/Sensitive原真实参数形状与构造默认；自定义拖动执行未接入"
+    },
+    {
+      "source": "NeeView/NeeView/Runtime/LayoutPanel/LayoutDockPanelContent.cs",
+      "target": "src/NeeView.Engine/SidePanels/LayoutPanelCompatibility.cs",
+      "sha256": "20c39f51fcf47ef76e7d9aaffb89369c26277204bdedef829ce83ae5fd94c77a",
+      "status": "P5原V2/V1/V0优先级、方向及分组适配；未知字段保留，无UI类型"
+    },
+    {
+      "source": "NeeView/Command/CommandNameSource.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyUserSettingUpgrade.cs",
+      "sha256": "e38dc2b2e978cd15ec83345c38ad1beaa1404dbb9a8797c9575993568e87c3c6",
+      "status": "P5命令Name:Number语法与编号保留；新名碰撞优先且旧材料保留"
     }
   ],
   "rule_references": [

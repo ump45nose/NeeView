@@ -130,6 +130,10 @@ public sealed partial class SaveData
                 _ = command["ShortCutKey"]?.GetValue<string>(); _ = command["MouseGesture"]?.GetValue<string>();
                 if (command["Parameter"] is { } parameter && CommandParameterTypes.Get(pair.Key) is { } type)
                 {
+                    var discriminator = parameter["$type"]?.GetValue<string>();
+                    var expected = type.Name[..^"CommandParameter".Length];
+                    if (discriminator is not null && discriminator != expected)
+                        throw new InvalidDataException($"命令 {pair.Key} 的参数类型 {discriminator} 与原 {expected} 不匹配。");
                     var options = new JsonSerializerOptions(Options);
                     options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
                     _ = parameter.Deserialize(type, options);

@@ -28,7 +28,7 @@ public sealed class ProfileImportService(IProfileImportReader reader, IReadOnlyL
         var summaries = new List<ProfileImportFileSummary>(); var notices = new List<string>
         {
             "本次仅预览，没有修改当前设置、历史、书签或来源文件。",
-            "可应用版本按文件单独校验；完整旧设置升级、未知设置能力及旧布局转换仍待迁移。缺失差分使用原默认值。",
+            "已支持版本先按原规则升级再展示；未知设置能力完整保留，不代表已有执行入口。缺失差分使用原默认值。",
             "Page 保留为原条目名，Props 与未知字段保留；归档内部页名不作为物理文件路径映射。"
         };
         foreach (var name in ProfileImportFiles.Names)
@@ -39,9 +39,15 @@ public sealed class ProfileImportService(IProfileImportReader reader, IReadOnlyL
             try { raw = JsonNode.Parse(text, documentOptions: new() { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip, MaxDepth = 64 }) as JsonObject
                     ?? throw new InvalidDataException(name + " 的根必须是对象。"); }
             catch (JsonException ex) { throw new InvalidDataException(name + " JSON 损坏：" + ex.Message, ex); }
-            docs.Add(name, raw); var before = paths.Count;
+            var before = paths.Count;
             var format = String(raw, "Format") ?? "未声明版本";
             CheckFormat(name, format, raw);
+            if (ProfileImportCompatibility.BlockReason(name, raw) is null)
+            {
+                raw = ProfileImportCompatibility.Upgrade(name, raw);
+                if (format != String(raw, "Format")) notices.Add(name + " 已按原版本规则升级候选：" + format + " → " + String(raw, "Format") + "；来源只读。");
+            }
+            docs.Add(name, raw);
             switch (name)
             {
                 case "History.json":
@@ -72,6 +78,9 @@ public sealed class ProfileImportService(IProfileImportReader reader, IReadOnlyL
                     foreach (var field in new[] { "DestinationFolderCollection", "DestinationFodlerCollection" })
                         Walk(Array(Object(config, "System"), field), "Config.System." + field, "Path");
                     Map(Object(config, "Playlist"), "PlaylistFolderRaw", "Config.Playlist");
+                    Map(Object(Object(config, "Book"), "ExportImageParameter"), "ExportFolder", "Config.Book.ExportImageParameter");
+                    if (raw["MacImportedLegacyEffectFormat"] is not null)
+                        notices.Add("旧 ImageEffect 的原参数与缓存保留，效果层/效果预设升级及执行尚未接入，不能按本次导入视为完成。");
                     break;
             }
             summaries.Add(new(name, true, format, paths.Count - before));
@@ -108,10 +117,12 @@ public sealed class ProfileImportService(IProfileImportReader reader, IReadOnlyL
         }
         var setting = docs.GetValueOrDefault("UserSetting.json"); var commandConfig = new CommandConfig();
         ReportSettings(Object(setting, "Config"), typeof(Config), "Config", 0);
-        foreach (var section in new[] { "ContextMenu", "SusiePlugins", "DragActions" })
-            if (setting?[section] is not null) notices.Add(section + " 的原配置保留；自定义菜单/Windows 插件/拖动动作的兼容尚未核对。");
+        if (setting?["ContextMenu"] is not null) notices.Add("ContextMenu 原树与版本命令改名保留；自定义菜单的实际显示/执行仍需按能力清单核对。");
+        if (setting?["SusiePlugins"] is not null) notices.Add("SusiePlugins 原配置保留；Windows 专属插件不能在 Mac 执行。");
+        if (setting?["DragActions"] is not null) notices.Add("DragActions 原配置及已核对的版本参数升级保留；自定义拖动执行尚未接入。");
         foreach (var pair in setting ?? new JsonObject())
-            if (pair.Key is not ("Format" or "Config" or "Commands" or "ContextMenu" or "SusiePlugins" or "DragActions"))
+            if (pair.Key is not ("Format" or "Config" or "Commands" or "ContextMenu" or "SusiePlugins" or "DragActions" or
+                "MacImportedSourceFormat" or "MacImportedLegacyEffectFormat" or "MacImportedLegacyCommands" or "MacImportedLegacyDragActions"))
             {
                 token.ThrowIfCancellationRequested(); CheckRecordBudget();
                 notices.Add("未知 UserSetting 字段保留，兼容待核对：" + pair.Key);

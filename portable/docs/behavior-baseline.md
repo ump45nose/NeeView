@@ -104,3 +104,9 @@ Finder file reference URL经Foundation转换为真实路径，保留原整批校
 `BookHistoryCollectionValidator` 的旧 Books 合入 Items/Page/Props、<=45Alpha4 UNC根去重，以及 `BookmarkCollectionValidator` 的 <=46Alpha1 Books/直接子项文件夹日期分支按原顺序适配。页位置仍是条目名，不是数字页码。活动旧 Books 转入兼容扩展，避免再次导入覆盖新进度；未支持的旧设置/未来build仅预览，不猜测升级。固定基线build为原Git提交计数4340。
 
 先验证、关闭并保存原窗口，再备份/提交选中文件，通过正式装配路径重建；重建失败恢复原字节及原缺失状态。无法释放失败窗口则阻止回滚；备份损坏或恢复失败明确报告且保留材料。Headless/合成故障验证见[静默验收](../acceptance/p5-profile-apply-runtime.md)，不继承为真实两分支导出或 Windows 动态对照通过。
+
+## P5 第三批：原旧设置与布局
+
+原 UserSettingValidator 的可移植分支、TitleStringValidator 原替换顺序、真实参数 Type/Value/$type 和三代布局回退进入唯一导入链。38的非零旧字体尺寸因来源 Windows MessageFontSize 缺失阻止实际应用；旧效果层/预设转换与执行明确保留待迁，不能以未知字段保存宣称通过。固定基线两个旧移动限制 setter为空，Mac保留实际原行为；不从旧布尔字段重建规则。
+
+V2非空优先，V1保方向，V0纵向；未知选择不回退首组，损坏当前布局不由旧布局覆盖。JSON合并显式写SelectedItem:null清除旧选择，是与原差分null省略的明确格式区别。预览/事务/普通保存合成往返见[本批验收](../acceptance/p5-legacy-compatibility-runtime.md)；真实导出和Windows对照待验。

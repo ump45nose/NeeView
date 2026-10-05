@@ -150,7 +150,7 @@ public sealed class ProfileImportTests
     }
 
     [Fact]
-    public async Task OriginalLegacyJsonPropertyNamesAreMappedAndReportedWithoutApplyingMigrations()
+    public async Task OriginalLegacyJsonPropertyNamesAreMappedAndReportedInReadOnlyCandidate()
     {
         using var fixture = new Fixture(false);
         await File.WriteAllTextAsync(Path.Combine(fixture.Root, "History.json"), """{"Format":"NeeView.History/44.0.0","Folders":{"P:\\Books":{"Future":7}},"Books":[{"Path":"P:\\Books\\a.cbz","Page":"001.png"}]}""", TestContext.Current.CancellationToken);

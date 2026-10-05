@@ -60,4 +60,6 @@ python3 scripts/package_macos.py --dotnet dotnet --sign 'Developer ID Applicatio
 
 当前范围与验收边界见[P4收尾清单](docs/p4-completion-checklist.md)，各阶段契约与证据见[整体架构](docs/architecture.md)和[阶段验收](acceptance/stages.md)。P4开发完成不等于原全部功能已迁移，也不等于整体验收封板。已验证增量按仓库规范提交并推送；Developer ID、公证与发布尚未执行。
 
+当前开发为P5：原Profile选择/备份/事务之后，第三批接入原旧设置规则、真实参数与三代布局。范围和待迁入字体/效果/旧目录升级见[P5清单](docs/p5-completion-checklist.md)与[兼容契约](docs/p5-legacy-compatibility.md)。常规验证采用后台Headless，不激活用户桌面应用。
+
 2026-10-05 最新[剩余设备验收](acceptance/p34-final-runtime.md)补齐隔离 ZIP 真删除/重启及固定 Windows 整书/删除子集；真实 NAS 恢复和 popup 方向键隔离失败，新增两项[已知问题](docs/known-issues.md)。长期资源及 Retina 浮窗缺陷仍未修，完整停靠/自动隐藏和有效屏幕 P95 未通过；原 Profile 与十个共享挂载已核对恢复/保留。P3/P4 保持未封板。

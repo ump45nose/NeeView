@@ -105,8 +105,7 @@ public sealed class ProfileImportApplyTests
         Assert.Equal(bytes, File.ReadAllBytes(Path.Combine(fixture.Root, "QuicAccess.json")));
     }
     [Theory]
-    [InlineData("NeeView/45.0.4000")]
-    [InlineData("NeeView/46.0.4209")]
+    [InlineData("NeeView/37.0.0")]
     [InlineData("NeeView/47.0.0")]
     [InlineData("NeeView/46.3.4341")]
     [InlineData("wrong/46.3.0")]

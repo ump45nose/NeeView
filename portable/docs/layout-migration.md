@@ -34,7 +34,7 @@ Headless 测试检查区域顺序、栏宽、图像绘制、调整列宽/显隐�
 - 组内分隔比例、组顺序、选择及窗口重开恢复；保存原 PanelLayoutV2/SelectedItem/GridLength。
 - 拖动期间两栏自动隐藏锁定；Escape、捕获丢失和无效落点取消，不改变布局。
 - 未迁入面板可组合、选择并显示明确占位。
-- 单面板浮动/停靠、位置保存、关闭重开和跨窗拖回已接入；旧 V0/V1 布局导入及高级窗口/输入细节未迁入，未知旧字段只保留。
+- 单面板浮动/停靠、位置保存、关闭重开和跨窗拖回已接入；P5第三批恢复原 V0/V1/V2 优先级、方向和选择，未知旧元数据保留。高级窗口/输入细节仍需分别验收，见[p5-legacy-compatibility.md](p5-legacy-compatibility.md)。
 
 依据原 CustomLayoutPanelManager、SidePanelFrameView、SidePanelIcon、SidePanelViewModel、LayoutDockPanel 与 SidePanelDropAcceptor；不增加大型停靠框架。
 

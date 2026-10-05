@@ -1,0 +1,627 @@
+{
+  "source": {
+    "Format": "NeeView/46.0.4065",
+    "Config": {
+      "Panels": {
+        "Layout": {
+          "Panels": {
+            "HistoryPanel": {
+              "GridLength": ".7*",
+              "WindowPlacement": "Normal,40,50,300,500",
+              "Future": 7
+            }
+          },
+          "Docks": {
+            "Left": {
+              "PanelLayout": [
+                {
+                  "Orientation": "Horizontal",
+                  "Panels": [
+                    "FolderPanel",
+                    "HistoryPanel"
+                  ],
+                  "Future": 8
+                }
+              ],
+              "SelectedItem": "HistoryPanel"
+            }
+          },
+          "Windows": {
+            "Panels": [
+              "HistoryPanel",
+              "UnknownPanel"
+            ]
+          },
+          "AlternativePanelSource": {
+            "Future": 9
+          }
+        }
+      },
+      "ImageEffect": {
+        "EffectType": "Level",
+        "LevelEffect": {
+          "Future": 42
+        }
+      },
+      "Future": {
+        "X": [
+          1,
+          2
+        ]
+      }
+    },
+    "Commands": {
+      "ToggleVisibleThumbnailList": {
+        "ShortCutKey": "Ctrl\u002BF"
+      },
+      "PrevPage": {
+        "Parameter": {
+          "Type": "ReversibleCommandParameter",
+          "Value": {
+            "IsReverse": false,
+            "Future": 42
+          }
+        }
+      },
+      "ExportImageAs": {
+        "Parameter": {
+          "$type": "ExportImageAs",
+          "ExportFolder": "P:\\Exports",
+          "QualityLevel": 80
+        }
+      }
+    }
+  },
+  "upgraded": {
+    "Format": "NeeView/46.3.0",
+    "Config": {
+      "Panels": {
+        "Layout": {
+          "Panels": {
+            "HistoryPanel": {
+              "GridLength": ".7*",
+              "WindowPlacement": "Normal,40,50,300,500",
+              "Future": 7
+            }
+          },
+          "Docks": {
+            "Left": {
+              "PanelLayout": [
+                {
+                  "Orientation": "Horizontal",
+                  "Panels": [
+                    "FolderPanel",
+                    "HistoryPanel"
+                  ],
+                  "Future": 8
+                }
+              ],
+              "SelectedItem": "HistoryPanel",
+              "PanelLayoutV2": [
+                "Horizontal:FolderPanel,HistoryPanel"
+              ]
+            }
+          },
+          "Windows": {
+            "Panels": [
+              "HistoryPanel",
+              "UnknownPanel"
+            ]
+          },
+          "AlternativePanelSource": {
+            "Future": 9
+          }
+        },
+        "ThumbnailItemProfile": {
+          "IsIconOverlay": false
+        }
+      },
+      "ImageEffect": {
+        "EffectType": "Level",
+        "LevelEffect": {
+          "Future": 42
+        }
+      },
+      "Future": {
+        "X": [
+          1,
+          2
+        ]
+      },
+      "Book": {
+        "ExportImageParameter": {
+          "ExportFolder": "/Exports",
+          "QualityLevel": 80
+        }
+      },
+      "FilmStrip": {
+        "IsHideFilmStripInAutoHideMode": true
+      },
+      "Window": {
+        "IsAutoHideInFullDesktop": true
+      }
+    },
+    "Commands": {
+      "PrevPage": {
+        "Parameter": {
+          "$type": "Reversible",
+          "IsReverse": false,
+          "Future": 42
+        },
+        "MacImportedLegacyParameter": {
+          "Type": "ReversibleCommandParameter",
+          "Value": {
+            "IsReverse": false,
+            "Future": 42
+          }
+        }
+      },
+      "ExportImageAs": {
+        "Parameter": null,
+        "MacImportedLegacyParameter": {
+          "$type": "ExportImageAs",
+          "ExportFolder": "P:\\Exports",
+          "QualityLevel": 80
+        }
+      },
+      "ToggleVisibleFilmStrip": {
+        "ShortCutKey": "Ctrl\u002BF"
+      },
+      "ToggleFullDesktop": {
+        "ShortCutKey": "Shift\u002BF11",
+        "MouseGesture": "",
+        "TouchGesture": "",
+        "IsShowMessage": false,
+        "Parameter": {
+          "$type": "Toggle"
+        }
+      }
+    },
+    "MacImportedLegacyEffectFormat": "NeeView/46.0.4065",
+    "MacImportedSourceFormat": "NeeView/46.0.4065"
+  },
+  "saved": {
+    "Config": {
+      "BookSetting": {
+        "PageMode": 0,
+        "BookReadOrder": 0,
+        "IsSupportedDividePage": false,
+        "IsSupportedSingleFirstPage": false,
+        "IsSupportedSingleLastPage": false,
+        "IsSupportedWidePage": true,
+        "IsRecursiveFolder": false,
+        "SortMode": 8,
+        "AutoRotate": 0,
+        "BaseScale": 1,
+        "EffectProfileId": 0
+      },
+      "BookSettingDefault": {
+        "PageMode": 0,
+        "BookReadOrder": 0,
+        "IsSupportedDividePage": false,
+        "IsSupportedSingleFirstPage": false,
+        "IsSupportedSingleLastPage": false,
+        "IsSupportedWidePage": true,
+        "IsRecursiveFolder": false,
+        "SortMode": 8,
+        "AutoRotate": 0,
+        "BaseScale": 1,
+        "EffectProfileId": 0
+      },
+      "BookSettingPolicy": {
+        "Page": 1,
+        "PageMode": 2,
+        "BookReadOrder": 2,
+        "IsSupportedDividePage": 2,
+        "IsSupportedSingleFirstPage": 2,
+        "IsSupportedSingleLastPage": 2,
+        "IsSupportedWidePage": 2,
+        "IsRecursiveFolder": 2,
+        "SortMode": 2,
+        "AutoRotate": 3,
+        "BaseScale": 2,
+        "EffectProfileId": 1
+      },
+      "Book": {
+        "IsPanorama": false,
+        "MacPanoramaLayout": 3,
+        "MacGalleryColumnWidth": 320,
+        "MacContinuousScale": 1,
+        "FrameSpace": -1,
+        "PageEndAction": 0,
+        "ResetNextBookPageMode": 2,
+        "IsNotifyPageLoop": false,
+        "Orientation": 0,
+        "BookThumbnailDepth": 2,
+        "BookThumbnailRegex": "^folder\\.jpg$",
+        "IsPrioritizeBookMove": false,
+        "WideRatio": 1,
+        "DividePageRate": 0.5,
+        "IsStaticWidePage": false,
+        "IsInsertDummyPage": false,
+        "IsInsertDummyFirstPage": false,
+        "IsInsertDummyLastPage": true,
+        "FolderSortOrder": 1,
+        "WidePageStretch": 1,
+        "ContentsSpace": -1,
+        "ExportImageParameter": {
+          "ExportFolder": "/Exports",
+          "QualityLevel": 80
+        }
+      },
+      "View": {
+        "StretchMode": 1,
+        "AllowStretchScaleUp": true,
+        "AllowStretchScaleDown": true,
+        "IsBaseScaleEnabled": true,
+        "ScaleCenter": 0,
+        "RotateCenter": 0,
+        "FlipCenter": 0,
+        "IsKeepScale": false,
+        "IsKeepAngle": false,
+        "IsKeepFlip": false,
+        "IsKeepScaleBooks": false,
+        "IsKeepAngleBooks": false,
+        "IsKeepFlipBooks": false,
+        "IsKeepPageTransform": false,
+        "IsScaleStretchTracking": false,
+        "ViewHorizontalOrigin": 7,
+        "ViewVerticalOrigin": 6,
+        "ViewOriginCenterRatio": 1,
+        "AngleFrequency": 0,
+        "MovementConstraint": 2,
+        "ScrollDuration": 0.2,
+        "PageMoveType": 0,
+        "PageMoveDuration": 0
+      },
+      "Panels": {
+        "IsDestinationFolderCopyMode": false,
+        "IsDestinationFolderAutoRefreshEnabled": true,
+        "IsDestinationFolderPanelInitialized": false,
+        "DestinationMoveHistoryCapacity": 300,
+        "DestinationFolderSectionRatio": 0.5,
+        "NormalItemProfile": {
+          "ImageShape": 1,
+          "ImageWidth": 0,
+          "IsDetailPopupEnabled": true,
+          "IsImagePopupEnabled": false,
+          "IsTextVisible": true,
+          "IsTextWrapped": false,
+          "IsTagVisible": true,
+          "IsIconOverlay": false
+        },
+        "ContentItemProfile": {
+          "ImageShape": 1,
+          "ImageWidth": 64,
+          "IsDetailPopupEnabled": true,
+          "IsImagePopupEnabled": true,
+          "IsTextVisible": true,
+          "IsTextWrapped": false,
+          "IsTagVisible": true,
+          "IsIconOverlay": false
+        },
+        "BannerItemProfile": {
+          "ImageShape": 3,
+          "ImageWidth": 200,
+          "IsDetailPopupEnabled": true,
+          "IsImagePopupEnabled": false,
+          "IsTextVisible": true,
+          "IsTextWrapped": false,
+          "IsTagVisible": true,
+          "IsIconOverlay": false
+        },
+        "ThumbnailItemProfile": {
+          "ImageShape": 0,
+          "ImageWidth": 128,
+          "IsDetailPopupEnabled": true,
+          "IsImagePopupEnabled": false,
+          "IsTextVisible": true,
+          "IsTextWrapped": true,
+          "IsTagVisible": true,
+          "IsIconOverlay": false
+        },
+        "OpenWithDoubleClick": false,
+        "Layout": {
+          "Panels": {
+            "HistoryPanel": {
+              "GridLength": "0.69999999999999996*",
+              "WindowPlacement": "Normal,40,50,300,500",
+              "Future": 7
+            },
+            "FolderPanel": {
+              "GridLength": "1*",
+              "WindowPlacement": ""
+            },
+            "PageListPanel": {
+              "GridLength": "1*",
+              "WindowPlacement": ""
+            },
+            "FileInformationPanel": {
+              "GridLength": "1*",
+              "WindowPlacement": ""
+            },
+            "NavigatePanel": {
+              "GridLength": "1*",
+              "WindowPlacement": ""
+            },
+            "ImageEffectPanel": {
+              "GridLength": "1*",
+              "WindowPlacement": ""
+            },
+            "BookmarkPanel": {
+              "GridLength": "1*",
+              "WindowPlacement": ""
+            },
+            "PlaylistPanel": {
+              "GridLength": "1*",
+              "WindowPlacement": ""
+            },
+            "DestinationFolderPanel": {
+              "GridLength": "1*",
+              "WindowPlacement": ""
+            }
+          },
+          "Docks": {
+            "Left": {
+              "PanelLayoutV2": [
+                "Horizontal:FolderPanel",
+                "Vertical:HistoryPanel",
+                "Vertical:PageListPanel"
+              ],
+              "SelectedItem": "FolderPanel",
+              "PanelLayout": [
+                {
+                  "Orientation": "Horizontal",
+                  "Panels": [
+                    "FolderPanel",
+                    "HistoryPanel"
+                  ],
+                  "Future": 8
+                }
+              ]
+            },
+            "Right": {
+              "PanelLayoutV2": [
+                "Vertical:FileInformationPanel",
+                "Vertical:NavigatePanel",
+                "Vertical:ImageEffectPanel",
+                "Vertical:BookmarkPanel",
+                "Vertical:PlaylistPanel",
+                "Vertical:DestinationFolderPanel"
+              ],
+              "SelectedItem": "FileInformationPanel"
+            }
+          },
+          "Windows": {
+            "Panels": [
+              "UnknownPanel",
+              "HistoryPanel"
+            ]
+          },
+          "AlternativePanelSource": {
+            "Future": 9
+          }
+        },
+        "LeftWidth": 240,
+        "RightWidth": 240,
+        "IsLeftVisible": true,
+        "IsRightVisible": true,
+        "IsHideLeftPanel": false,
+        "IsHideRightPanel": false,
+        "IsHideLeftPanelInAutoHideMode": true,
+        "IsHideRightPanelInAutoHideMode": true,
+        "IsSideBarEnabled": true,
+        "ConflictTopMargin": 32,
+        "ConflictBottomMargin": 20
+      },
+      "FilmStrip": {
+        "IsEnabled": false,
+        "IsHideFilmStrip": false,
+        "ImageWidth": 96,
+        "IsVisibleNumber": false,
+        "IsSelectedCenter": false,
+        "IsHideFilmStripInAutoHideMode": true,
+        "IsManipulationBoundaryFeedbackEnabled": true,
+        "IsVisiblePlaylistMark": false,
+        "MouseWheelAction": 0,
+        "IsDetailPopupEnabled": true
+      },
+      "Slider": {
+        "IsEnabled": true,
+        "IsHidePageSlider": false,
+        "IsHidePageSliderInAutoHideMode": true,
+        "SliderIndexLayout": 2,
+        "Thickness": 25,
+        "Opacity": 1,
+        "SliderDirection": 2,
+        "IsSliderLinkedFilmStrip": true,
+        "IsSyncPageMode": false,
+        "MouseWheelAction": 0,
+        "IsVisiblePlaylistMark": false
+      },
+      "Bookshelf": {
+        "IsOpenNextBookWhenRemove": true,
+        "IsSearchIncludeSubdirectories": true,
+        "IsSyncFolderTree": false,
+        "IsSyncFolderTreeAuto": false,
+        "DefaultFolderOrder": 0,
+        "PlaylistFolderOrder": 0,
+        "FolderSortOrder": 1,
+        "IsVisibleSearchBox": true,
+        "IsVisibleItemsCount": true,
+        "PanelListItemStyle": 1,
+        "FolderTreeLayout": 1,
+        "IsFolderTreeVisible": false,
+        "FolderTreeAreaWidth": 128,
+        "FolderTreeAreaHeight": 72
+      },
+      "PageList": {
+        "FocusMainView": false,
+        "Format": 0,
+        "ShowBookTitle": true,
+        "IsGroupBy": false,
+        "IsVisibleSearchBox": true,
+        "IsVisibleItemsCount": true,
+        "PanelListItemStyle": 1,
+        "FolderTreeLayout": 1,
+        "IsFolderTreeVisible": false,
+        "FolderTreeAreaWidth": 128,
+        "FolderTreeAreaHeight": 72
+      },
+      "History": {
+        "PanelListItemStyle": 1,
+        "IsSaveHistory": true,
+        "IsForceUpdateHistory": false,
+        "HistoryEntryPageCount": 0,
+        "IsInnerArchiveHistoryEnabled": true,
+        "IsUncHistoryEnabled": true,
+        "IsAutoCleanupEnabled": false,
+        "LimitSize": -1,
+        "LimitSpan": "00:00:00",
+        "IsCurrentFolder": false,
+        "IsGroupBy": false,
+        "IsVisibleItemsCount": true,
+        "IsVisibleSearchBox": true,
+        "IsKeepSearchHistory": true,
+        "IsKeepFolderStatus": true
+      },
+      "Bookmark": {
+        "PanelListItemStyle": 1,
+        "IsSyncBookshelfEnabled": true,
+        "BookmarkFolderOrder": 0,
+        "IsFolderTreeVisible": false,
+        "IsVisibleItemsCount": true,
+        "IsVisibleSearchBox": true,
+        "IsSearchIncludeSubdirectories": true
+      },
+      "System": {
+        "IsFileWriteAccessEnabled": false,
+        "IsRemoveConfirmed": true,
+        "TextCopyPolicy": 0,
+        "ArchiveCopyPolicy": 3,
+        "DestinationFolderCollection": [],
+        "BookPageCollectMode": 1,
+        "ArchiveRecursiveMode": 2,
+        "IsIncrementalSearchEnabled": true,
+        "SearchHistorySize": 8
+      },
+      "Archive": {
+        "Zip": {
+          "IsFileWriteAccessEnabled": false
+        }
+      },
+      "Playlist": {
+        "PanelListItemStyle": 0,
+        "IsGroupBy": false,
+        "IsCurrentBookFilterEnabled": false,
+        "IsFirstIn": false,
+        "PlaylistFolder": null,
+        "CurrentPlaylist": null
+      },
+      "AutoHide": {
+        "AutoHideDelayTime": 1,
+        "AutoHideDelayVisibleTime": 0,
+        "AutoHideHitTestHorizontalMargin": 32,
+        "AutoHideHitTestVerticalMargin": 32,
+        "AutoHideFocusLockMode": 2,
+        "IsAutoHideKeyDownDelay": true,
+        "AutoHideConflictTopMargin": 1,
+        "AutoHideConflictBottomMargin": 0
+      },
+      "Window": {
+        "IsTopmost": false,
+        "IsAutoHideInNormal": false,
+        "IsAutoHideInMaximized": false,
+        "IsAutoHideInFullScreen": true,
+        "IsAutoHideInFullDesktop": true
+      },
+      "WindowTitle": {
+        "WindowTitleFormat1": "{Book} ({Page}{Part: (#)} / {PageMax}) - {EntryPath:/ \u003E }",
+        "WindowTitleFormat2": "{Book} ({Page}{Part: (#)} / {PageMax}) - {EntryPathL:/ \u003E } | {NameR}",
+        "WindowTitleFormatMedia": "{Book}"
+      },
+      "MenuBar": {
+        "IsHideMenu": false,
+        "IsHideMenuInAutoHideMode": true,
+        "IsAddressBarEnabled": true
+      },
+      "Mouse": {
+        "IsGestureEnabled": true,
+        "GestureMinimumDistance": 30,
+        "IsHoverScroll": false,
+        "HoverScrollSensitivity": 2,
+        "HoverScrollDuration": 0.5,
+        "IsMouseWheelScrollEnabled": false,
+        "MouseWheelScrollSensitivity": 1,
+        "MouseWheelScrollDuration": 0.2
+      },
+      "Command": {
+        "PresetInputScheme": 0,
+        "PresetPageReadOrder": 0,
+        "IsAccessKeyEnabled": true,
+        "IsReversePageMove": true,
+        "IsReversePageMoveWheel": false,
+        "IsReversePageMoveHorizontalWheel": true,
+        "IsHorizontalWheelLimitedOnce": true
+      },
+      "StartUp": {
+        "IsOpenLastFolder": false,
+        "IsOpenLastBookmarkFolder": false,
+        "LastFolder": null,
+        "LastBookmarkFolder": null
+      },
+      "ImageEffect": {
+        "EffectType": "Level",
+        "LevelEffect": {
+          "Future": 42
+        }
+      },
+      "Future": {
+        "X": [
+          1,
+          2
+        ]
+      }
+    },
+    "Format": "NeeView/46.3.0",
+    "Commands": {
+      "PrevPage": {
+        "Parameter": {
+          "$type": "Reversible",
+          "IsReverse": false,
+          "Future": 42
+        },
+        "MacImportedLegacyParameter": {
+          "Type": "ReversibleCommandParameter",
+          "Value": {
+            "IsReverse": false,
+            "Future": 42
+          }
+        }
+      },
+      "ExportImageAs": {
+        "Parameter": null,
+        "MacImportedLegacyParameter": {
+          "$type": "ExportImageAs",
+          "ExportFolder": "P:\\Exports",
+          "QualityLevel": 80
+        }
+      },
+      "ToggleVisibleFilmStrip": {
+        "ShortCutKey": "Ctrl\u002BF"
+      },
+      "ToggleFullDesktop": {
+        "ShortCutKey": "Shift\u002BF11",
+        "MouseGesture": "",
+        "TouchGesture": "",
+        "IsShowMessage": false,
+        "Parameter": {
+          "$type": "Toggle"
+        }
+      }
+    },
+    "MacImportedLegacyEffectFormat": "NeeView/46.0.4065",
+    "MacImportedSourceFormat": "NeeView/46.0.4065"
+  },
+  "scope": "\u5408\u6210 Profile\uFF1B\u9884\u89C8/\u9A8C\u8BC1/\u4E8B\u52A1\u5E94\u7528/\u666E\u901A\u5E03\u5C40\u4FDD\u5B58\uFF0C\u975E\u771F\u5B9E\u7528\u6237\u5BFC\u51FA\u6216\u8BBE\u5907\u9A8C\u6536"
+}

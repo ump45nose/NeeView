@@ -6,6 +6,8 @@
 
 对照[P4运行导出](../acceptance/p4-completion-commands.json)及[P5导入证据](../acceptance/p5-profile-apply-evidence.json)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider与ToggleHidePageSlider语义独立，前者仍占位；ToggleVisibleAddressBar入口仍占位。参数拥有者映射不等于执行能力；P4分类/P5高级能力继续逐项迁移。
 
+P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Value参数、默认键位冲突和参数退役规则。预览显示升级后的清单，实际应用使用同一候选。没有新增执行入口，Cut仍按用户要求占位，见[兼容契约](p5-legacy-compatibility.md)。
+
 | 原命令 | 文案 | 默认输入 | 默认方向手势 | 执行入口 | 迁移说明 | 原出处 |
 |---|---|---|---|---|---|---|
 | LoadAs | 打开文件 | Ctrl+O |  | 已接入 | P1 宿主适配 | NeeView/Command/Commands/LoadAsCommand.cs |

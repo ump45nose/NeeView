@@ -1,6 +1,6 @@
 # NeeView Mac 源码迁移架构
 
-当前进入 P5：第二批在原 Profile/.nvzip 预览上接入选择、持久备份、实际应用和失败恢复。Engine 复用唯一 SaveData 五文件事务，MacApp 关闭旧阅读上下文后经唯一装配路径重建全部配置引用，视图只回传确认请求；没有第二状态体系。完整浮窗菜单/停靠和屏幕 P95 按用户要求[跳过](../acceptance/p34-skipped-validation.md)，AX/NAS 未解决项保留，不宣称 P3/P4 整体验收通过。详见[P5应用契约](p5-profile-apply.md)和[清单](p5-completion-checklist.md)。
+当前 P5 第三批接入原旧设置版本规则、真实参数包装和 V0/V1/V2 侧栏布局，预览与事务应用共用升级候选。旧字体尺寸与旧效果有明确未迁入边界，见[兼容契约](p5-legacy-compatibility.md)。Engine 继续复用唯一 SaveData 五文件事务，MacApp 关闭旧阅读上下文后经唯一装配路径重建配置引用；视图只回传确认请求，没有第二状态体系。完整浮窗菜单/停靠和屏幕 P95 按用户要求[跳过](../acceptance/p34-skipped-validation.md)，AX/NAS 未解决项保留，不宣称 P3/P4 整体验收通过。P5整体见[清单](p5-completion-checklist.md)。
 
 P0/P1 已建立工程骨架、原窗口区域和目录/图片/ZIP 阅读链路。P2 开发范围已收尾：RAR/7z、历史/书签及结构化搜索、胶片条/导航器、原分页/变换/页尾规则、常用书架/父子书导航、播放列表/页标记、键鼠/方向手势、动画、侧栏拖拽组合/自动隐藏/浮动及资源优化均进入同一产品链路。P3 开发范围也已完成：连续/瀑布、后台检查点布局、普通目录渐进索引、原帧全景、普通目录树/QuickAccess及监视、页面目录/名称和页面/书架搜索进入同一链路。完整235条命令保留；P5第二批为168个执行入口接入、67个继续占位（原ImportBackup接通），数量不代表功能覆盖率。详见[P2清单](p2-completion-checklist.md)与[P3清单](p3-completion-checklist.md)。真实设备、Windows动态及长期原生内存未完成项分别记录，不把开发完成标记为整体验收封板。Mac 独立维护；原 Windows 工程是固定行为参考，不参与 Mac 构建。
 
