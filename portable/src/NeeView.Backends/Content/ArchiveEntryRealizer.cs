@@ -2,11 +2,15 @@ using NeeView;
 namespace NeeView.Backends;
 
 /// <summary>原 GetFileProxy/TempFile 的 Mac 替换点；请求级提取、进程级剪贴板租约。</summary>
-public sealed class ArchiveEntryRealizer(string? temporaryRoot = null) : IArchiveEntryRealizer, IAsyncDisposable
+public sealed class ArchiveEntryRealizer(string? temporaryRoot = null, long temporaryByteBudget = RealizedFilePathList.TemporaryByteBudget) : IArchiveEntryRealizer, IAsyncDisposable
 {
     private readonly string _root = temporaryRoot ?? Path.Combine(ArchiveFactory.TemporaryDirectory, "Realized");
     private readonly SemaphoreSlim _gate = new(1);
     private readonly List<RealizedFilePathList> _retired = [];
+    private readonly List<RealizedFilePathList> _external = [];
+    private readonly long _budget = temporaryByteBudget is >= 0 and <= RealizedFilePathList.TemporaryByteBudget ? temporaryByteBudget : throw new ArgumentOutOfRangeException(nameof(temporaryByteBudget));
+    private long _ownedBytes;
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, long> _ownedLengths = new(StringComparer.Ordinal);
     // 请求租约可能在失败后离开作用域；后端仍持有清理失败目录，退出可重试。
     private readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte> _pendingCleanup = new(StringComparer.Ordinal);
     private RealizedFilePathList? _clipboard;
@@ -22,6 +26,7 @@ public sealed class ArchiveEntryRealizer(string? temporaryRoot = null) : IArchiv
             ObjectDisposedException.ThrowIf(_disposed, this);
             if (_retired.Count > 0 || !_pendingCleanup.IsEmpty) throw new IOException("上一批临时实体尚未清理，暂停新的解压复制。");
             if (!entry.CanRealize() || entry.FilePath is not null) throw new NotSupportedException("只提取归档中的文件条目。");
+            remainingBytes = Math.Min(remainingBytes, _budget - Interlocked.Read(ref _ownedBytes));
             if (remainingBytes < 0 || entry.Length > remainingBytes) throw new NotSupportedException("归档实体化批次超过 2 GiB 临时预算。");
             return await Task.Run(async () =>
             {
@@ -53,6 +58,8 @@ public sealed class ArchiveEntryRealizer(string? temporaryRoot = null) : IArchiv
                         await output.FlushAsync(token).ConfigureAwait(false);
                     }
                     token.ThrowIfCancellationRequested();
+                    // 提交前已占有进程预算，外部程序启动后转交不再失败于预算。
+                    _ownedLengths[directory] = length; Interlocked.Add(ref _ownedBytes, length);
                     return new RealizedFileLease(path, length, () => DeleteOwnedAsync(directory));
                 }
                 catch { await DeleteOwnedAsync(directory); throw; }
@@ -79,6 +86,18 @@ public sealed class ArchiveEntryRealizer(string? temporaryRoot = null) : IArchiv
         }
         finally { _gate.Release(); }
     }
+    /// <summary>外部应用整批租约驻留至进程退出；不受剪贴板替换或窗口关闭影响。</summary>
+    public async Task RetainExternalAsync(RealizedFilePathList files)
+    {
+        await _gate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+            if (!files.HasTemporaryFiles) return;
+            if (!_external.Contains(files)) _external.Add(files);
+        }
+        finally { _gate.Release(); }
+    }
     /// <summary>正常进程退出清理剪贴板临时材料，关窗驻留不调用。</summary>
     public async ValueTask DisposeAsync()
     {
@@ -89,6 +108,8 @@ public sealed class ArchiveEntryRealizer(string? temporaryRoot = null) : IArchiv
             List<Exception> errors = [];
             foreach (var old in _retired.ToArray())
             { try { await old.DisposeAsync(); _retired.Remove(old); } catch (Exception ex) { errors.Add(ex); } }
+            foreach (var external in _external.ToArray())
+            { try { await external.DisposeAsync(); _external.Remove(external); } catch (Exception ex) { errors.Add(ex); } }
             foreach (var directory in _pendingCleanup.Keys)
             { try { await DeleteOwnedAsync(directory); } catch (Exception ex) { errors.Add(ex); } }
             if (errors.Count > 0) throw new AggregateException("进程临时实体清理失败，可重试退出。", errors);
@@ -100,7 +121,11 @@ public sealed class ArchiveEntryRealizer(string? temporaryRoot = null) : IArchiv
     /// <param name="directory">本次提取拥有的独立目录。</param><returns>清理任务；失败仍向调用方回报。</returns>
     private async ValueTask DeleteOwnedAsync(string directory)
     {
-        try { await DeleteAsync(directory); _pendingCleanup.TryRemove(directory, out _); }
+        try
+        {
+            await DeleteAsync(directory); _pendingCleanup.TryRemove(directory, out _);
+            if (_ownedLengths.TryRemove(directory, out var length)) Interlocked.Add(ref _ownedBytes, -length);
+        }
         catch { _pendingCleanup.TryAdd(directory, 0); throw; }
     }
     /// <summary>只移除本次随机目录；被外部替换成链接时拒绝递归删除。</summary>

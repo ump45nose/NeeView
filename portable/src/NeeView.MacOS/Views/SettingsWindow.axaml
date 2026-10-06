@@ -243,6 +243,7 @@
         <CheckBox x:Name="RemoveConfirmed" Content="删除文件前确认" />
         <CheckBox x:Name="ZipWriteAccess" Content="允许删除 ZIP/CBZ 内部条目（永久删除，始终确认）" />
         <CheckBox x:Name="OpenNextBookWhenRemove" Content="删除当前书籍后打开书架相邻项" />
+        <Button Content="管理外部应用…" Click="ExternalApplications_Click" />
         <TextBlock Text="主页删除处理当前主图片；页面列表可删除显式选中项。删除书籍处理整本目录或根文件。" TextWrapping="Wrap" />
         <TextBlock Text="普通文件或目录送入废纸篓；播放列表仅移除登记；ZIP/CBZ 内部条目永久删除。RAR/7z 内部条目只读。" TextWrapping="Wrap" />
         <TextBlock Text="复制文件时附加路径文本" />

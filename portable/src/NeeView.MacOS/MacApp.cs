@@ -126,6 +126,7 @@ public sealed partial class MacApp : Avalonia.Application
             _contentDropReceiver ??= new ContentDropReceiver(); operation.AttachContentDropReceiver(_contentDropReceiver);
             model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state);
             var platform = new MacPlatformService();
+            operation.AttachExternalApplications(platform, Environment.ProcessPath ?? "");
             candidate = new MainWindow(); _window = candidate; candidate.Bind(model, images, platform);
             candidate.AttachFonts(new FontPresenter(this, Config.Current.Fonts, MacFontEnvironment.Read(Avalonia.Media.FontManager.Current.DefaultFontFamily.Name)));
             var theme = new ThemePresenter(this, Config.Current.Theme); candidate.AttachTheme(theme);

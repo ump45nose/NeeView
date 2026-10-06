@@ -26,6 +26,9 @@ public static class CommandParameterTypes
         "TogglePermitFile" or "ToggleNearestNeighbor" or "ToggleVisibleAddressBar" or "ToggleVisiblePageSlider" or "ToggleViewFlipHorizontal" or "ToggleViewFlipVertical" or "TogglePlaylistItem" or "ToggleBookLock" or "ToggleSlideShow" => typeof(ToggleCommandParameter),
         "PrevPlaylistItemInBook" => typeof(MovePlaylistItemInBookCommandParameter),
         "PrevMediaPosition" or "NextMediaPosition" => typeof(MoveMediaPositionCommandParameter),
+        "OpenExternalApp" => typeof(OpenExternalAppCommandParameter),
+        "OpenExternalAppAs" => typeof(OpenExternalAppAsCommandParameter),
+        "OpenBookExternalAppAs" => typeof(OpenBookExternalAppAsCommandParameter),
         "PrevPage" or "PrevOnePage" or "FirstPage" or "PrevFolderPage" => typeof(ReversibleCommandParameter),
         _ => null
     };

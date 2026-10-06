@@ -44,7 +44,7 @@ public sealed partial class MainWindow : Window
         "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ToggleBookLock", "Unload", "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff",
         "ToggleViewFlipVertical", "ViewFlipVerticalOn", "ViewFlipVerticalOff", "ViewReset", "ViewScaleStretch", "ViewPresetScroll", "ViewScrollNTypeUp", "ViewScrollNTypeDown",
         "ToggleStretchMode", "ToggleStretchModeReverse", "SetStretchModeUniformToFill", "SetStretchModeUniformToSize", "SetStretchModeUniformToVertical", "SetStretchModeUniformToHorizontal", "ToggleStretchAllowScaleUp", "ToggleStretchAllowScaleDown", "ToggleHoverScroll",
-        "OpenVersionWindow", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
+        "OpenExternalApp", "OpenExternalAppAs", "OpenBookExternalAppAs", "OpenVersionWindow", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
         "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "ToggleVisibleFoldersTree", "ToggleVisibleContentsTree", "FocusMainView", "FocusFolderSearchBox", "FocusPageListSearchBox", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkList", "FocusBookmarkSearchBox", "ClearHistory", "ClearHistoryInPlace", "RemoveUnlinkedHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
@@ -190,6 +190,9 @@ public sealed partial class MainWindow : Window
     public bool IsCommandAvailable(string name) => name switch
     {
         "SetDefaultPageSetting" => _model?.Operation.IsLoading == false,
+        "OpenExternalApp" => _model?.Operation is { } ext && ext.CanOpenExternalApplication(ext.GetExternalApplicationPolicy(name)),
+        "OpenExternalAppAs" or "OpenBookExternalAppAs" => _model?.Operation is { } external && external.CanOpenExternalApplication(external.GetExternalApplicationPolicy(name), name == "OpenBookExternalAppAs")
+            && (external.GetExternalApplicationIndex(name) == 0 || Config.Current.System.ExternalAppCollection.IsValidIndex(external.GetExternalApplicationIndex(name) - 1)),
         "OpenVersionWindow" => _platform is not null,
         "SaveSetting" or "ReloadSetting" or "ExportBackup" => !_profileBusy && _model?.Operation.CanManageProfile == true,
         "OpenSettingFilesFolder" => _platform is not null && _settingFolderAction.IsCompleted,
@@ -374,6 +377,9 @@ public sealed partial class MainWindow : Window
             switch (name)
             {
                 case "OpenVersionWindow": await ShowVersionAsync(); break;
+                case "OpenExternalApp": await ExecuteExternalApplicationAsync(name, false); break;
+                case "OpenExternalAppAs": await ExecuteExternalApplicationAsync(name, false); break;
+                case "OpenBookExternalAppAs": await ExecuteExternalApplicationAsync(name, true); break;
                 case "TogglePermitFile": await _model.Operation.ToggleFileWriteAccessAsync(fromMenu); break;
                 case "ToggleNearestNeighbor": await _model.Operation.ToggleNearestNeighborAsync(fromMenu); break;
                 case "ToggleVisibleAddressBar": case "ToggleVisiblePageSlider":
@@ -944,6 +950,7 @@ public sealed partial class MainWindow : Window
         await Task.Yield();
         _preparing = true;
         StopSlideShowForClose();
+        _externalMenu?.Close(); _model?.Operation.CancelExternalApplicationPreparation();
         _model?.Operation.CancelClipboardPreparation();
         _model?.Operation.CancelFileCopyPreparation();
         _sidePanels?.PrepareClose();

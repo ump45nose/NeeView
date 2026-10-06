@@ -5,7 +5,7 @@ using NeeView;
 namespace NeeView.Backends;
 
 /// <summary>正式 macOS 文件能力，使用 AppKit/Foundation 的真实系统结果。</summary>
-public sealed class MacPlatformService : IPlatformService
+public sealed partial class MacPlatformService : IPlatformService
 {
     /// <summary>版本窗口链接替换原ExternalProcess；只允许网页和本机文件。</summary>
     /// <param name="uri">绝对http/https或本机file URI。</param><param name="token">系统提交前取消，提交后返回实际结果。</param>

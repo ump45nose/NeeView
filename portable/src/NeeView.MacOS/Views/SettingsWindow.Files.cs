@@ -1,8 +1,18 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using NeeView;
 namespace NeeView.MacOS.Views;
 
 public sealed partial class SettingsWindow
 {
+    private ExternalAppCollection? _externalApplicationsDraft;
+    private async void ExternalApplications_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_saving) return;
+        var source = _externalApplicationsDraft ?? Config.Current.System.ExternalAppCollection;
+        var result = await new ExternalAppDialog(source).ShowDialog<ExternalAppCollection?>(this);
+        if (result is not null && IsVisible && !_saving) _externalApplicationsDraft = result;
+    }
     /// <summary>原System设置的表单副本；打开/取消不修改业务配置。</summary>
     private void FillFiles()
     {
@@ -26,5 +36,10 @@ public sealed partial class SettingsWindow
             Config.Current.System.TextCopyPolicy = (TextCopyPolicy)index;
         if (this.FindControl<ComboBox>("ArchiveCopyPolicy")!.SelectedIndex is >= 0 and <= 3 and var archiveIndex)
             Config.Current.System.ArchiveCopyPolicy = (ArchivePolicy)archiveIndex;
+        if (_externalApplicationsDraft is not null)
+        {
+            // 提交副本，失败回滚或再编辑均不能丢失父草稿。
+            Config.Current.System.ExternalAppCollection = new(_externalApplicationsDraft.Select(app => (ExternalApp)app.Clone()));
+        }
     }
 }

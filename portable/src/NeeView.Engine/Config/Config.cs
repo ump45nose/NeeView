@@ -56,6 +56,8 @@ public sealed class ZipArchiveConfig
 /// <summary>原 SystemConfig 搜索分支；其余系统设置仍在原 JSON 中保留。</summary>
 public sealed class SystemConfig
 {
+    /// <summary>用户配置的外部应用；默认保留一个系统关联应用槽位。</summary>
+    public ExternalAppCollection ExternalAppCollection { get; set; } = new() { new ExternalApp() };
     public bool IsFileWriteAccessEnabled { get; set; }
     /// <summary>原普通文件删除默认确认；Mac始终使用系统废纸篓，不降级永久删除。</summary>
     public bool IsRemoveConfirmed { get; set; } = true;

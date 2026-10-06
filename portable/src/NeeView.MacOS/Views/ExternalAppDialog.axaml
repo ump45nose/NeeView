@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="NeeView.MacOS.Views.ExternalAppDialog" x:CompileBindings="False"
+        Width="760" Height="460" MinWidth="650" MinHeight="420" Title="外部应用" WindowStartupLocation="CenterOwner">
+  <Grid RowDefinitions="*,Auto" Margin="16" RowSpacing="14">
+    <Grid ColumnDefinitions="210,14,*">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" Margin="0,8,0,0">
+          <Button x:Name="AddApplication" Content="新增" Click="Add_Click"/>
+          <Button x:Name="RemoveApplication" Content="删除" Click="Remove_Click" IsEnabled="{Binding HasSelection}"/>
+          <Button Content="↑" Click="Up_Click" IsEnabled="{Binding HasSelection}"/>
+          <Button Content="↓" Click="Down_Click" IsEnabled="{Binding HasSelection}"/>
+        </StackPanel>
+        <ListBox x:Name="ApplicationsList" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
+          <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis"/></DataTemplate></ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+      <StackPanel Grid.Column="2" Spacing="8" IsEnabled="{Binding HasSelection}">
+        <TextBlock Text="名称"/><TextBox x:Name="ApplicationName" Text="{Binding SelectedItem.Name, Mode=TwoWay}"/>
+        <TextBlock Text="应用命令（空白使用系统默认应用）"/><TextBox x:Name="ApplicationCommand" Text="{Binding SelectedItem.Command, Mode=TwoWay}"/>
+        <TextBlock Text="参数"/><TextBox x:Name="ApplicationParameter" Text="{Binding SelectedItem.Parameter, Mode=TwoWay}"/>
+        <TextBlock Text="{}{File} 文件路径 · {Uri} 编码路径 · 命令可用 {NeeView}" FontSize="11" TextWrapping="Wrap"/>
+        <TextBlock Text="工作目录"/><TextBox x:Name="ApplicationWorkingDirectory" Text="{Binding SelectedItem.WorkingDirectory, Mode=TwoWay}"/>
+        <TextBlock Text="归档条目发送方式"/>
+        <ComboBox x:Name="ApplicationArchivePolicy" ItemsSource="{Binding ArchivePolicies}" SelectedIndex="{Binding SelectedArchiveIndex, Mode=TwoWay}"/>
+      </StackPanel>
+    </Grid>
+    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+      <Button Content="取消" Click="Cancel_Click"/><Button x:Name="AcceptApplications" Content="确定" Click="Ok_Click" IsDefault="True"/>
+    </StackPanel>
+  </Grid>
+</Window>

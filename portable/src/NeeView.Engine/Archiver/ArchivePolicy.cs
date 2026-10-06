@@ -22,6 +22,8 @@ public interface IArchiveEntryRealizer
     /// <param name="files">已写入系统剪贴板的整批文件；即使没有临时文件也替换旧批。</param>
     /// <returns>转交完成任务；清理失败保留旧材料并由进程退出重试。</returns>
     Task RetainClipboardAsync(RealizedFilePathList files);
+    /// <summary>平台提交外部应用后转交临时材料所有权；失败时调用方仍负责释放。</summary>
+    Task RetainExternalAsync(RealizedFilePathList files) => throw new NotSupportedException("外部应用材料保留尚未实现。");
 }
 
 /// <summary>单个临时实体的所有权；普通文件引用无需此租约。</summary>
@@ -49,6 +51,8 @@ public sealed class RealizedFilePathList : IAsyncDisposable
     /// <summary>记录原策略跳过的逻辑目录，不生成临时文件或改变条目定位。</summary>
     /// <param name="name">原条目逻辑名称。</param>
     internal void MarkUnrealizedDirectory(string name) { if (!_unrealizedDirectories.Contains(name, StringComparer.Ordinal)) _unrealizedDirectories.Add(name); }
+    /// <summary>零字节条目仍持有真实临时文件，不能以字节数推断所有权。</summary>
+    public bool HasTemporaryFiles => _leases.Count > 0;
     public long TemporaryBytes => _leases.Sum(lease => lease.Length);
     /// <summary>登记已生成的材料，按原完整路径去重；不根据文件名误合并不同条目。</summary>
     /// <param name="path">真实或原策略指定的逻辑路径。</param><param name="lease">仅解压输出持有租约。</param>

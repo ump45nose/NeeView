@@ -72,6 +72,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         ObjectDisposedException.ThrowIf(_disposed || _closing, this);
         // 设置重收集不能抢占在导航锁释放后发起的新打开；原普通打开仍按新代次优先。
         if (expectedGeneration is { } expected && Interlocked.CompareExchange(ref _generation, expected + 1, expected) != expected) return false;
+        CancelExternalApplicationPreparation();
         CancelCopyPreparation();
         CancelFileCopyPreparation();
         CancelBookTransferPreparation();
@@ -578,6 +579,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         // 关闭请求当场使准备失效；先 Yield 会给原生晚到结果留下继续提交的间隙。
         _closing = true; Interlocked.Increment(ref _generation);
         _slideShow?.Stop();
+        _externalClosing.Cancel(); CancelExternalApplicationPreparation();
         _bookDeleteClosing.Cancel(); _bookTransferClosing.Cancel();
         CancelClipboardPreparation();
         CancelFileCopyPreparation();
@@ -592,6 +594,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         CancelClipboardPreparation();
         CancelFileCopyPreparation();
         CancelBookTransferPreparation();
+        if (_externalCompletion is { } external) await external.Task;
         if (_renameCompletion is { } rename) await rename.Task;
         if (_clipboardCompletion is { } clipboard) await clipboard.Task;
         if (_bookDeleteCompletion is { } deletion) await deletion.Task;
@@ -612,6 +615,8 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         finally
         {
             _gate.Release();
+            _externalClosing.Dispose();
+            if (!_disposed) _externalClosing = new();
             _renameClosing.Dispose();
             _clipboardClosing.Dispose();
             _bookDeleteClosing.Dispose(); _bookTransferClosing.Dispose();

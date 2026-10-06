@@ -2678,6 +2678,78 @@
       "target": "src/NeeView.MacOS/ViewModels/VersionWindowViewModel.cs",
       "sha256": "97b4c9fc1744f46e50aad6f20b02c41eb2bcd819b3377bff87f1097ef5007b1d",
       "status": "P5 原版本布局/图标及版本复制/链接；Mac实际程序集版本，系统接口适配；Windows更新检查保留占位"
+    },
+    {
+      "source": "NeeView/External/IExternalApp.cs",
+      "target": "src/NeeView.Engine/External/IExternalApp.cs",
+      "sha256": "cbc82d43defb7321d9045f1ad428b8e066947a23895a94f40e19a5cd280c7a47",
+      "status": "P5第二十五批：原外部应用字段、页组/整书策略、参数与索引；Mac系统替换、字面参数及资源生命周期适配"
+    },
+    {
+      "source": "NeeView/External/ExternalApp.cs",
+      "target": "src/NeeView.Engine/External/ExternalApp.cs",
+      "sha256": "b8c20e1a1dca811aa33fff26dd3e79e9df8df87ebe17b466e3ca739ec2e5c17c",
+      "status": "P5第二十五批：原外部应用字段、页组/整书策略、参数与索引；Mac系统替换、字面参数及资源生命周期适配"
+    },
+    {
+      "source": "NeeView/External/ExternalAppCollection.cs",
+      "target": "src/NeeView.Engine/External/ExternalAppCollection.cs",
+      "sha256": "c2ed4b568e9608ca4c9f40d2462b2d84d5732244034c487f578a9189745ea382",
+      "status": "P5第二十五批：原外部应用字段、页组/整书策略、参数与索引；Mac系统替换、字面参数及资源生命周期适配"
+    },
+    {
+      "source": "NeeView/External/ExternalAppUtility.cs",
+      "target": "src/NeeView.Engine/External/ExternalAppUtility.cs",
+      "sha256": "5ecdccca498d7500e9de0112f7a068e8c355a3654ce367218bc91d7063eadd52",
+      "status": "P5第二十五批：原外部应用字段、页组/整书策略、参数与索引；Mac系统替换、字面参数及资源生命周期适配"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/OpenExternalAppCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/ExternalAppCommandParameters.cs",
+      "sha256": "36a4dea7b3bbbcd54f8c0307e8db97a910310700c5ae71aa9153b7b901d49de8",
+      "status": "P5第二十五批：原外部应用字段、页组/整书策略、参数与索引；Mac系统替换、字面参数及资源生命周期适配"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/OpenExternalAppAsCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/ExternalAppCommandParameters.cs",
+      "sha256": "f65362fe37dba92b9d4a3035a01d053462ef473a34d4289d5d4d968a0dbb8c4a",
+      "status": "P5第二十五批：原外部应用字段、页组/整书策略、参数与索引；Mac系统替换、字面参数及资源生命周期适配"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/OpenBookExternalAppAsCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/ExternalAppCommandParameters.cs",
+      "sha256": "4b809cdc5540eadad8a3cb025b55fb27f649e470c27657ad7c5e43e0a2c9d855",
+      "status": "P5第二十五批：原外部应用字段、页组/整书策略、参数与索引；Mac系统替换、字面参数及资源生命周期适配"
+    },
+    {
+      "source": "NeeView/BookOperation/BookPageActionControl.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.External.cs",
+      "sha256": "bbe456cdbfeb66d467c2838ad11670d79b0cf58188bc7c31e5f2e687f6eb2d47",
+      "status": "P5第二十五批：原外部应用字段、页组/整书策略、参数与索引；Mac系统替换、字面参数及资源生命周期适配"
+    },
+    {
+      "source": "NeeView/BookOperation/BookControl.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.External.cs",
+      "sha256": "7b2f0d2b0b31b5a50b55dba8f48e11674ca9bcfaaad209946dba8c70c8fc6ad4",
+      "status": "P5第二十五批：原外部应用字段、页组/整书策略、参数与索引；Mac系统替换、字面参数及资源生命周期适配"
+    },
+    {
+      "source": "NeeView/Command/Commands/OpenExternalAppCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.External.cs",
+      "sha256": "f27d75ed03b896be5841e0a0424bcb60fec8eadf955e8b2b67637080c7e66c98",
+      "status": "P5第二十五批：原外部应用字段、页组/整书策略、参数与索引；Mac系统替换、字面参数及资源生命周期适配"
+    },
+    {
+      "source": "NeeView/Command/Commands/OpenExternalAppAsCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.External.cs",
+      "sha256": "a5f73b6e455d277d69e75a6de7f80601091457b2c2fe9e2c4fa42aaa6364cbc4",
+      "status": "P5第二十五批：原外部应用字段、页组/整书策略、参数与索引；Mac系统替换、字面参数及资源生命周期适配"
+    },
+    {
+      "source": "NeeView/Command/Commands/OpenBookExternalAppAsCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.External.cs",
+      "sha256": "ce1347c9dcaafde095ed4f08f35a2da0b89b8c36e575bf79c3b52a520d110972",
+      "status": "P5第二十五批：原外部应用字段、页组/整书策略、参数与索引；Mac系统替换、字面参数及资源生命周期适配"
     }
   ],
   "rule_references": [

@@ -31,6 +31,7 @@ public sealed class CommandParameterEdit(string owner, object value)
         "Scroll" => "滚动步幅（视口比例）", "AllowCrossScroll" => "到边界后滚动另一轴", "Horizontal" => "水平对齐", "Vertical" => "垂直对齐", "IsSnap" => "强制对齐小于视口的图像",
         "ScrollType" => "滚动路径", "LineBreakStopTime" => "换行停顿（秒）", "EndMargin" => "终端容差（DIP）", "LineBreakStopMode" => "停顿位置", "PagesAsOne" => "全景页面作为整体（P3）",
         "IsReverse" => "允许随滑条方向反转", "IsLoop" => "循环切换", "IsToggle" => "再次选择此模式时切回原始大小", "Size" => "步进页数", "ToggleMode" => "快捷键开关动作", "IsIncludeTerminal" => "包含书籍首尾",
+        "Command" => "外部应用命令（空白使用系统关联）", "Parameter" => "外部应用参数（{File} 为文件路径）", "WorkingDirectory" => "工作目录", "ArchivePolicy" => "归档文件处理方式", "Index" => "外部应用索引（1 起始，0 选择）",
         "IsEnableNone" => "原始大小", "IsEnableUniform" => "适应窗口", "IsEnableUniformToFill" => "填满窗口", "IsEnableUniformToSize" => "适应面积", "IsEnableUniformToVertical" => "适应高度", "IsEnableUniformToHorizontal" => "适应宽度", _ => property
     };
     /// <summary>枚举沿用原数值，界面只转换名称。</summary>
