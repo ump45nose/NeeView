@@ -91,3 +91,5 @@ P5 已开始。P3/P4 的两项真机检查按用户要求 [跳过并记录](../a
 第二十八批：[原图像效果契约](p5-image-effects.md)；四类实际shader、自定义尺寸/裁剪/DPI、网格、预设/缓存及原命令接入；十类第三方效果、缩放滤镜和P5其他能力继续推进。全量/正式构建/签名见[本批静默验收](../acceptance/p5-image-effects-runtime.md)。
 
 第二十九批：[书架排序契约](p5-book-order.md)；四个原命令与Full/WithPath/Normal/None资格迁入，静默验证见[验收](../acceptance/p5-book-order-runtime.md)。P5整体继续推进。
+
+第三十批：[原本地帮助契约](p5-help-manuals.md)与[静默验收](../acceptance/p5-help-manuals-runtime.md)。原菜单备注、八张搜索表、动态profile和关闭资源链路接通；真实浏览器/Windows另验，P5整体仍未完成。

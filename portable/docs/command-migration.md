@@ -233,8 +233,8 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | TogglePermitFile | 启用/禁用文件操作 |  |  | 已接入 | P5 原默认复制/重收集与文件权限；见p5-default-settings | NeeView/Command/Commands/TogglePermitFileCommand.cs |
 | HelpCommandList | 显示命令帮助 |  |  | 已接入 | P1 宿主适配 | NeeView/Command/Commands/HelpCommandListCommand.cs |
 | HelpScript | 显示脚本帮助 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/HelpScriptCommand.cs |
-| HelpMainMenu | 显示主菜单帮助 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/HelpMainMenuCommand.cs |
-| HelpSearchOption | 搜索选项帮助 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/HelpSearchOptionCommand.cs |
+| HelpMainMenu | 显示主菜单帮助 |  |  | 已接入 | P5第三十批原本地HTML/八表/备注/未迁说明；见p5-help-manuals.md | NeeView/Command/Commands/HelpMainMenuCommand.cs |
+| HelpSearchOption | 搜索选项帮助 |  |  | 已接入 | P5第三十批原本地HTML/八表/备注/未迁说明；见p5-help-manuals.md | NeeView/Command/Commands/HelpSearchOptionCommand.cs |
 | OpenContextMenu | 打开上下文菜单 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/OpenContextMenuCommand.cs |
 | ExportBackup | 导出设置 |  |  | 已接入 | P5 原Profile串流备份/FileName及保存对话框；不执行脚本 | NeeView/Command/Commands/ExportBackupCommand.cs |
 | ImportBackup | 导入设置 |  |  | 已接入 | P5选择/预览、确认、备份及失败恢复；受支持版本与项目限制 | NeeView/Command/Commands/ImportBackupCommand.cs |

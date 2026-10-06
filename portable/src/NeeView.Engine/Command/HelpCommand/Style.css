@@ -1,0 +1,111 @@
+body {
+    margin: 5%;
+    font-family: sans-serif;
+    background-color: white;
+}
+
+h1 {
+    font-family: "Trebuchet MS", Trebuchet, Verdana, sans-serif;
+    text-align: center;
+    background-color: #002244;
+    font-size: 2.0em;
+    color: #ffffff;
+    margin: 40px 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+h2 {
+    color: #444444;
+    margin-top: 40px;
+    padding-top: 2px;
+    padding-left: 10px;
+    border-left: 8px solid #444444;
+}
+
+h3 {
+    color: #444444;
+    margin-top: 40px;
+    padding-top: 2px;
+    padding-left: 10px;
+    border-left: 8px solid #AAAAAA;
+}
+
+p {
+    text-align: left;
+}
+
+pre {
+    font-family: auto;
+}
+
+code {
+    background-color: #EEEEEE;
+    padding: 0px 10px;
+    display: block;
+    border: 1px solid #CCC;
+    font-family: Consolas, sans-serif;
+}
+
+pre code {
+    padding: 10px 20px;
+    border: 0px;
+}
+
+code.inline {
+    background-color: #EEEEEE;
+    font-family: Consolas, sans-serif;
+}
+
+code.example {
+    padding: 15px 60px;
+}
+
+blockquote {
+    position: relative;
+    padding: 5px 20px;
+    box-sizing: border-box;
+    background: #efefef;
+    color: #555;
+}
+
+hr {
+    margin: 50px 0px;
+}
+
+table {
+    border: 0px;
+    border-collapse: collapse;
+    margin: 20px 0 30px;
+}
+
+td,
+th {
+    border: 0px;
+    text-align: left;
+    padding: 10px 20px;
+}
+
+td {
+    border-top: 1px solid #CCC;
+    border-bottom: 1px solid #CCC;
+}
+
+th {
+    color: initial;
+    background: none;
+    font-weight: bold;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+.td-middle {
+    min-width: 300px;
+}
+
+.remarks {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}

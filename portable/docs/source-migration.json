@@ -3110,6 +3110,72 @@
       "target": "src/NeeView.Engine/Command/CommandTable.cs",
       "sha256": "02ca7f4764f2126b8ef127d0c1dbed666689a3d8244802bea1e93cb245bb8b2d",
       "status": "P5第二十九批：原Full/WithPath/Normal/None资格、书签注册索引及搜索完整路径排序；四命令共用原目录参数和保存回滚。见p5-book-order.md"
+    },
+    {
+      "source": "NeeView/Command/HelpCommand/MainMenuManual.cs",
+      "target": "src/NeeView.Engine/Command/HelpCommand/MainMenuManual.cs",
+      "sha256": "a16152ee278a6e5a861875589671a8338a9249c8dda9615cb23110c13b292e24",
+      "status": "P5第三十批：原本地HTML、八表、CSS、帮助文案和非Extras键表；不承诺未迁元数据支持。见p5-help-manuals.md"
+    },
+    {
+      "source": "NeeView/Command/HelpCommand/SearchOptionManual.cs",
+      "target": "src/NeeView.Engine/Command/HelpCommand/SearchOptionManual.cs",
+      "sha256": "3fdee4f0207e4a4334f91a1b9d69d70fc247402b4a71788dee48abf97fcad6aa",
+      "status": "P5第三十批：原本地HTML、八表、CSS、帮助文案和非Extras键表；不承诺未迁元数据支持。见p5-help-manuals.md"
+    },
+    {
+      "source": "NeeView/Command/HelpCommand/HtmlHelpUtility.cs",
+      "target": "src/NeeView.Engine/Command/HelpCommand/HtmlHelpUtility.cs",
+      "sha256": "7e08d3bf65b3573551d20f1f6d897ba01790b5f9c35f57cd7af4b4ed214e1034",
+      "status": "P5第三十批：原本地HTML、八表、CSS、帮助文案和非Extras键表；不承诺未迁元数据支持。见p5-help-manuals.md"
+    },
+    {
+      "source": "NeeView/NeeView/Text/SimpleHtmlBuilder/HtmlNode.cs",
+      "target": "src/NeeView.Engine/Command/HelpCommand/HtmlNode.cs",
+      "sha256": "a3739d7a8acf8dc6a94d07f8180abf4caeffd067e8e0e2036d13aa47d0003d10",
+      "status": "P5第三十批：原本地HTML、八表、CSS、帮助文案和非Extras键表；不承诺未迁元数据支持。见p5-help-manuals.md"
+    },
+    {
+      "source": "NeeView/Resources/Style.css",
+      "target": "src/NeeView.Engine/Command/HelpCommand/Style.css",
+      "sha256": "a2c74312ffd98fbae74f52c06b0302a8ed65723f83949cc1497b2f1dfdcdbafd",
+      "status": "P5第三十批：原本地HTML、八表、CSS、帮助文案和非Extras键表；不承诺未迁元数据支持。见p5-help-manuals.md"
+    },
+    {
+      "source": "NeeView/Languages/en.restext",
+      "target": "src/NeeView.Engine/Command/HelpCommand/help-text.json",
+      "sha256": "c1dde083225b4202c0dc3f6fffc41377c4fdcd041d9bcf42047c398fa990aa53",
+      "status": "P5第三十批：原本地HTML、八表、CSS、帮助文案和非Extras键表；不承诺未迁元数据支持。见p5-help-manuals.md"
+    },
+    {
+      "source": "NeeView/Languages/zh-Hans.restext",
+      "target": "src/NeeView.Engine/Command/HelpCommand/help-text.json",
+      "sha256": "499108d4cf3b1b9c95dfc52eb4f53a128b73a364285665c5289b46895da5eb52",
+      "status": "P5第三十批：原本地HTML、八表、CSS、帮助文案和非Extras键表；不承诺未迁元数据支持。见p5-help-manuals.md"
+    },
+    {
+      "source": "NeeView/Languages/shared.restext",
+      "target": "src/NeeView.Engine/Command/HelpCommand/help-text.json",
+      "sha256": "c23b80f9757f82436791b31550e2d2ebdbe891f5f3a49b6ab5d1b86aad8833bb",
+      "status": "P5第三十批：原本地HTML、八表、CSS、帮助文案和非Extras键表；不承诺未迁元数据支持。见p5-help-manuals.md"
+    },
+    {
+      "source": "NeeView/SidePanels/FileInfo/InformationKey.cs",
+      "target": "src/NeeView.Engine/Command/HelpCommand/metadata-keys.json",
+      "sha256": "986deafbadb555352a3fdca0ae1ac5292705e0946e90e81169390d07df6867da",
+      "status": "P5第三十批：原本地HTML、八表、CSS、帮助文案和非Extras键表；不承诺未迁元数据支持。见p5-help-manuals.md"
+    },
+    {
+      "source": "NeeView/Command/Commands/HelpMainMenuCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.Help.cs",
+      "sha256": "33f6f65bc761353ed1dcff3f6d9ce67c8daa1cff12d3e905cca2f5b4677541ea",
+      "status": "P5第三十批原帮助HTML→随机临时文件→唯一平台打开；关闭取消和清理。见p5-help-manuals.md"
+    },
+    {
+      "source": "NeeView/Command/Commands/HelpSearchOptionCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.Help.cs",
+      "sha256": "ad7691d75130bd0713d02c386266a1a9ae4a21ade537ccb72febb62abbb209b5",
+      "status": "P5第三十批原帮助HTML→随机临时文件→唯一平台打开；关闭取消和清理。见p5-help-manuals.md"
     }
   ],
   "rule_references": [

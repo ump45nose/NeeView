@@ -193,6 +193,7 @@ public sealed partial class MainWindow : Window
     /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
     public bool IsCommandAvailable(string name) => name switch
     {
+        "HelpMainMenu" or "HelpSearchOption" => _platform is not null && _helpAction.IsCompleted,
         var command when CommandTable.BookOrderCommands.TryGetValue(command, out var order) => _model?.Operation.CanChangeFolderOrder(order) == true,
         "ToggleBookOrder" => _model?.Operation is { } sorting && sorting.Bookshelf.FolderOrders.Count > 1 && sorting.CanChangeFolderOrder(sorting.Bookshelf.FolderOrder),
         "ExportImage" => !_preparing && _exportAction.IsCompleted && _model?.Operation.CanExportImage == true
@@ -228,7 +229,7 @@ public sealed partial class MainWindow : Window
         _ => IsCommandImplemented(name)
     };
     /// <summary>配置/占位说明读取迁移状态，不能把当前无目标误标成尚未迁移。</summary>
-    private bool IsCommandImplemented(string name) => name == "PreviewProfileImport" ? _profileImport is not null : name == "ImportBackup" ? _applyProfileImport is not null : HostCommands.Contains(name) || _model?.Commands.IsAvailable(name) == true;
+    private bool IsCommandImplemented(string name) => name is "HelpMainMenu" or "HelpSearchOption" ? _platform is not null : name == "PreviewProfileImport" ? _profileImport is not null : name == "ImportBackup" ? _applyProfileImport is not null : HostCommands.Contains(name) || _model?.Commands.IsAvailable(name) == true;
     /// <summary>迁入完整菜单后追加 Mac 打开目录及已有交互，保持原八组顺序。</summary>
     private void BuildMenus()
     {
@@ -511,6 +512,7 @@ public sealed partial class MainWindow : Window
                 case "OpenOptionsWindow":
                     await ShowOptionsAsync(); break;
                 case "HelpCommandList": await ShowCommandStatusAsync(); break;
+                case "HelpMainMenu": case "HelpSearchOption": await OpenManualAsync(name); break;
                 case "ToggleBookmark":
                     if (_model.Operation.Book is { } marked) { await _model.Operation.SaveAsync(); await _model.SaveData.ToggleBookmarkAsync(marked); } break;
                 case "RegisterBookmark":
@@ -987,6 +989,8 @@ public sealed partial class MainWindow : Window
             _model?.Operation.CancelBookTransferPreparation();
             _profileCancellation?.Cancel(); await _profileAction;
             _settingFolderCancellation?.Cancel(); await _settingFolderAction;
+            _helpCancellation?.Cancel(); await _helpAction;
+            if (_helpDocuments is not null) { await _helpDocuments.DisposeAsync(); _helpDocuments = null; }
             await _destinationAction;
             await this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.PrepareCloseAsync();
             await _listStyleTask;
