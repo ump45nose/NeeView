@@ -43,7 +43,9 @@ public sealed class DirectionGestureTests
         Assert.Equal("LC", fresh.GetMouseGesture("NextPage", "L").ToString()); Assert.True(fresh.GetMouseGesture("PrevPage", "R").IsEmpty);
         fresh.SetMouseGestureDifference("NextPage", "R", "L"); await fresh.SaveAsync(null, TestContext.Current.CancellationToken);
         var json = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), TestContext.Current.CancellationToken))!;
-        Assert.Null(json["Commands"]!["NextPage"]!["MouseGesture"]); Assert.False(json["Commands"]!["PrevPage"]!["Parameter"]!["IsReverse"]!.GetValue<bool>());
+        Assert.Null(json["Commands"]?["NextPage"]?["MouseGesture"]); Assert.False(json["Commands"]!["PrevPage"]!["Parameter"]!["IsReverse"]!.GetValue<bool>());
+        var restored = new SaveData(fixture.State); await restored.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.Equal("R", restored.GetMouseGesture("NextPage", "L").ToString());
     }
     [Fact]
     public void DirectionEditorSeparatesSequencesAndShowsConflicts()

@@ -92,8 +92,11 @@ public sealed class DockingScrollTests
         var saved = JsonNode.Parse(await File.ReadAllTextAsync(path, TestContext.Current.CancellationToken))!;
         Assert.Equal(99, saved["Config"]!["Panels"]!["Layout"]!["Windows"]!["Future"]!.GetValue<int>());
         Assert.Equal("future", saved["Config"]!["Panels"]!["Layout"]!["Panels"]!["FolderPanel"]!["WindowPlacement"]!.GetValue<string>());
-        Assert.Equal(7, saved["Commands"]!["NextScrollPage"]!["Parameter"]!["Future"]!.GetValue<int>());
+        Assert.Null(saved["Commands"]!["NextScrollPage"]!["Parameter"]);
+        Assert.Equal(7, saved["Commands"]!["PrevScrollPage"]!["Parameter"]!["Future"]!.GetValue<int>());
         var fresh = new SaveData(fixture.State); await fresh.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(NScrollType.Vertical, fresh.GetScrollParameter("NextScrollPage").ScrollType);
+        Assert.Equal(.5, fresh.GetScrollParameter("NextScrollPage").Scroll);
         var restored = new LayoutPanelManager(Config.Current.Panels.Layout);
         Assert.Equal("Left", restored.Find("BookmarkPanel")!.Value.Side);
         Assert.Equal(new[] { "FolderPanel", "HistoryPanel", "BookmarkPanel" }, restored.Docks["Left"].SelectedItem!.Select(p => p.Key));

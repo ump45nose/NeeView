@@ -83,9 +83,11 @@ public sealed class MouseInputTests
         Assert.Equal("Ctrl+Left", state.GetShortcut("NextPage", "")); Assert.Equal("Left,WheelUp", state.GetShortcut("PrevPage", "")); Assert.Equal("", state.GetShortcut("PrevScrollPage", "WheelUp"));
         state.SetShortcutDifference("NextPage", "Right,WheelDown", "Left,LeftClick"); await state.SaveAsync(null, TestContext.Current.CancellationToken);
         var raw = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), TestContext.Current.CancellationToken))!;
-        Assert.Null(raw["Commands"]!["NextPage"]!["ShortCutKey"]); Assert.Equal(7, raw["Commands"]!["NextPage"]!["Parameter"]!["Future"]!.GetValue<int>()); Assert.Equal(9, raw["Config"]!["Command"]!["Future"]!.GetValue<int>());
+        Assert.Null(raw["Commands"]!["NextPage"]!["ShortCutKey"]); Assert.Null(raw["Commands"]!["NextPage"]!["Parameter"]);
+        Assert.Equal(7, raw["Commands"]!["PrevPage"]!["Parameter"]!["Future"]!.GetValue<int>()); Assert.Equal(9, raw["Config"]!["Command"]!["Future"]!.GetValue<int>());
         Assert.Equal(2, raw["Commands"]!.AsObject().Count);
-        await new SaveData(fixture.State).LoadAsync(TestContext.Current.CancellationToken); Assert.Equal(InputScheme.TypeB, Config.Current.Command.PresetInputScheme);
+        var reloaded = new SaveData(fixture.State); await reloaded.LoadAsync(TestContext.Current.CancellationToken); Assert.Equal(InputScheme.TypeB, Config.Current.Command.PresetInputScheme);
+        Assert.Equal("Right,WheelDown", reloaded.GetShortcut("NextPage", ""));
     }
     /// <summary>普通轮滚多格执行、不强制Ctrl缩放；半格按作用域/修饰及反方向分开累积。</summary>
     [AvaloniaFact]

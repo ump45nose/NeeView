@@ -157,8 +157,9 @@ public sealed class SliderInputTests
             var json = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), TestContext.Current.CancellationToken))!;
             Assert.Equal(17, json["Config"]!["Slider"]!["Future"]!.GetValue<int>());
             Assert.True(json["Config"]!["Slider"]!["IsHidePageSlider"]!.GetValue<bool>());
-            Assert.False(json["Config"]!["Slider"]!["IsVisiblePlaylistMark"]!.GetValue<bool>());
+            Assert.Null(json["Config"]!["Slider"]!["IsVisiblePlaylistMark"]);
             var fresh = new SaveData(fixture.State); await fresh.LoadAsync(TestContext.Current.CancellationToken);
+            Assert.False(Config.Current.Slider.IsVisiblePlaylistMark);
             Assert.Equal(SliderIndexLayout.Left, Config.Current.Slider.SliderIndexLayout); Assert.Equal(37, Config.Current.Slider.Thickness);
             Assert.Equal(SliderMouseWheelAction.CommandDependent, Config.Current.Slider.MouseWheelAction);
             Config.Current.Slider.SliderIndexLayout = SliderIndexLayout.None; model.RefreshSelection(); Pump(window);

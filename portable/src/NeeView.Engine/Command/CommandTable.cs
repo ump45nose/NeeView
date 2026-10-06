@@ -3,7 +3,8 @@ using System.Text.Json;
 namespace NeeView;
 
 /// <summary>固定 Windows 命令元数据；暂未迁移命令保留名称和默认输入。</summary>
-public sealed record CommandDefinition(string Name, string Text, string Shortcut, string Source, string Stage, string? MenuText = null, string MouseGesture = "");
+public sealed record CommandDefinition(string Name, string Text, string Shortcut, string Source, string Stage, string? MenuText = null,
+    string MouseGesture = "", string TouchGesture = "", bool IsShowMessage = false);
 
 /// <summary>原命令表的 P1 登记，菜单和输入使用同一命令标识。</summary>
 public sealed class CommandTable

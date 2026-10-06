@@ -6,7 +6,9 @@
     "Source": "NeeView/Command/Commands/LoadAsCommand.cs",
     "Stage": "P1 宿主适配",
     "MenuText": "打开(O)...",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "LoadRecentBook",
@@ -14,7 +16,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/LoadRecentBookCommand.cs",
     "Stage": "P2 宿主接入；具体范围见验收表",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ReLoad",
@@ -22,7 +26,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ReLoadCommand.cs",
     "Stage": "P1 宿主适配",
-    "MouseGesture": "UD"
+    "MouseGesture": "UD",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "Unload",
@@ -30,7 +36,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/UnloadCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "OpenExplorer",
@@ -38,7 +46,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/OpenExplorerCommand.cs",
     "Stage": "P1 宿主适配",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "OpenExternalApp",
@@ -46,7 +56,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/OpenExternalAppCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "OpenExternalAppAs",
@@ -55,7 +67,9 @@
     "Source": "NeeView/Command/Commands/OpenExternalAppAsCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "在外部应用中打开(A)",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "CutFile",
@@ -64,7 +78,9 @@
     "Source": "NeeView/Command/Commands/CutFileCommand.cs",
     "Stage": "用户选择暂保留禁用；移动使用分类/移至文件夹",
     "MenuText": "剪切(T)",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "CopyFile",
@@ -73,7 +89,9 @@
     "Source": "NeeView/Command/Commands/CopyFileCommand.cs",
     "Stage": "P4 原页组/普通实体及归档四策略剪贴板复制；目录提取/链接待迁",
     "MenuText": "复制(C)",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "CopyImage",
@@ -82,7 +100,9 @@
     "Source": "NeeView/Command/Commands/CopyImageCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "复制图像",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "Paste",
@@ -91,7 +111,9 @@
     "Source": "NeeView/Command/Commands/PasteCommand.cs",
     "Stage": "P4 QueryPath优先/单来源及多项临时列表加载；位图等其他内容待迁",
     "MenuText": "粘贴(V)",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "CopyToFolderAs",
@@ -100,7 +122,9 @@
     "Source": "NeeView/Command/Commands/CopyToFolderAsCommand.cs",
     "Stage": "P4 原页组固定复制/归档LimitedRealization；整目录复制待后续",
     "MenuText": "复制到文件夹(Y)",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "MoveToFolderAs",
@@ -109,7 +133,9 @@
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
     "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹(E)",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "MoveToDestinationFolder1",
@@ -118,7 +144,9 @@
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
     "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 1",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "MoveToDestinationFolder2",
@@ -127,7 +155,9 @@
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
     "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 2",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "MoveToDestinationFolder3",
@@ -136,7 +166,9 @@
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
     "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 3",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "MoveToDestinationFolder4",
@@ -145,7 +177,9 @@
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
     "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 4",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "MoveToDestinationFolder5",
@@ -154,7 +188,9 @@
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
     "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "MoveToDestinationFolder6",
@@ -163,7 +199,9 @@
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
     "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 6",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "MoveToDestinationFolder7",
@@ -172,7 +210,9 @@
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
     "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 7",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "MoveToDestinationFolder8",
@@ -181,7 +221,9 @@
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
     "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 8",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "MoveToDestinationFolder9",
@@ -190,7 +232,9 @@
     "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
     "Stage": "P4 普通目录分类/原多页策略",
     "MenuText": "移动到文件夹 9",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "UndoDestinationMove",
@@ -198,7 +242,9 @@
     "Shortcut": "Ctrl+Z",
     "Source": "NeeView/Command/Commands/UndoDestinationMoveCommand.cs",
     "Stage": "P4 分类首批",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "RedoDestinationMove",
@@ -206,7 +252,9 @@
     "Shortcut": "Ctrl+Y",
     "Source": "NeeView/Command/Commands/RedoDestinationMoveCommand.cs",
     "Stage": "P4 分类首批",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ExportImageAs",
@@ -215,7 +263,9 @@
     "Source": "NeeView/Command/Commands/ExportImageAsCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "另存为(S)...",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ExportImage",
@@ -224,7 +274,9 @@
     "Source": "NeeView/Command/Commands/ExportImageCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "保存(S)",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ExportBookAs",
@@ -233,7 +285,9 @@
     "Source": "NeeView/Command/Commands/ExportBookAsCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "导出书籍...",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "Print",
@@ -242,7 +296,9 @@
     "Source": "NeeView/Command/Commands/PrintCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "打印(P)...",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "DeleteFile",
@@ -251,7 +307,9 @@
     "Source": "NeeView/Command/Commands/DeleteFileCommand.cs",
     "Stage": "P4 普通目录当前图片/系统废纸篓；归档/列表多选待后续",
     "MenuText": "删除(D)",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "OpenBookExplorer",
@@ -259,7 +317,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/OpenBookExplorerCommand.cs",
     "Stage": "P2 宿主接入；具体范围见验收表",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "OpenBookExternalAppAs",
@@ -268,7 +328,9 @@
     "Source": "NeeView/Command/Commands/OpenBookExternalAppAsCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "用外部应用打开书籍(A)",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "CutBook",
@@ -277,7 +339,9 @@
     "Source": "NeeView/Command/Commands/CutBookCommand.cs",
     "Stage": "用户选择暂保留禁用；移动使用既有文件操作",
     "MenuText": "剪切书籍(T)",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "CopyBook",
@@ -286,7 +350,9 @@
     "Source": "NeeView/Command/Commands/CopyBookCommand.cs",
     "Stage": "P4 实体目录或根归档复制到系统剪贴板",
     "MenuText": "复制书籍(C)",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "CopyBookToFolderAs",
@@ -294,7 +360,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/CopyBookToFolderAsCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "MoveBookToFolderAs",
@@ -302,7 +370,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/MoveBookToFolderAsCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "DeleteBook",
@@ -311,7 +381,9 @@
     "Source": "NeeView/Command/Commands/DeleteBookCommand.cs",
     "Stage": "P4 真实根目录/文件整书废纸篓与原下一书；逻辑/临时/链接拒绝",
     "MenuText": "删除书籍(D)",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "RenameBook",
@@ -320,7 +392,9 @@
     "Source": "NeeView/Command/Commands/RenameBookCommand.cs",
     "Stage": "P4 当前目录/归档书籍重命名与明确路径联动已接入；设备/Windows待验",
     "MenuText": "重命名书籍（M）",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "SelectArchiver",
@@ -328,7 +402,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SelectArchiverCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ClearHistory",
@@ -336,7 +412,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ClearHistoryCommand.cs",
     "Stage": "P2 原历史集合清空",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ClearHistoryInPlace",
@@ -344,7 +422,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ClearHistoryInPlaceCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "RemoveUnlinkedHistory",
@@ -352,7 +432,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/RemoveUnlinkedHistoryCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleStretchMode",
@@ -360,7 +442,9 @@
     "Shortcut": "LeftButton+WheelDown",
     "Source": "NeeView/Command/Commands/ToggleStretchModeCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleStretchModeReverse",
@@ -368,7 +452,9 @@
     "Shortcut": "LeftButton+WheelUp",
     "Source": "NeeView/Command/Commands/ToggleStretchModeReverseCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetStretchModeNone",
@@ -376,7 +462,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetStretchModeNoneCommand.cs",
     "Stage": "P1 宿主适配",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetStretchModeUniform",
@@ -384,7 +472,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetStretchModeUniformCommand.cs",
     "Stage": "P1 宿主适配",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetStretchModeUniformToFill",
@@ -392,7 +482,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetStretchModeUniformToFillCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetStretchModeUniformToSize",
@@ -400,7 +492,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetStretchModeUniformToSizeCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetStretchModeUniformToVertical",
@@ -408,7 +502,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetStretchModeUniformToVerticalCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetStretchModeUniformToHorizontal",
@@ -416,7 +512,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetStretchModeUniformToHorizontalCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleStretchAllowScaleUp",
@@ -424,7 +522,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleStretchAllowScaleUpCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleStretchAllowScaleDown",
@@ -432,7 +532,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleStretchAllowScaleDownCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleNearestNeighbor",
@@ -441,7 +543,9 @@
     "Source": "NeeView/Command/Commands/ToggleNearestNeighborCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "逐点放大",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleBackground",
@@ -449,7 +553,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleBackgroundCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBackgroundBlack",
@@ -457,7 +563,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundBlackCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBackgroundWhite",
@@ -465,7 +573,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundWhiteCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBackgroundAuto",
@@ -473,7 +583,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundAutoCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBackgroundCheck",
@@ -481,7 +593,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundCheckCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBackgroundCheckDark",
@@ -489,7 +603,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundCheckDarkCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBackgroundCustom",
@@ -497,7 +613,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundCustomCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleTopmost",
@@ -506,7 +624,9 @@
     "Source": "NeeView/Command/Commands/ToggleTopmostCommand.cs",
     "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "总是置顶显示",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleVisibleAddressBar",
@@ -515,7 +635,9 @@
     "Source": "NeeView/Command/Commands/ToggleVisibleAddressBarCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "地址栏",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleHideMenu",
@@ -524,7 +646,9 @@
     "Source": "NeeView/Command/Commands/ToggleHideMenuCommand.cs",
     "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "自动隐藏菜单",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleVisibleSideBar",
@@ -533,7 +657,9 @@
     "Source": "NeeView/Command/Commands/ToggleVisibleSideBarCommand.cs",
     "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "侧边栏",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleHidePanel",
@@ -542,7 +668,9 @@
     "Source": "NeeView/Command/Commands/ToggleHidePanelCommand.cs",
     "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "自动隐藏面板",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleHideLeftPanel",
@@ -551,7 +679,9 @@
     "Source": "NeeView/Command/Commands/ToggleHideLeftPanelCommand.cs",
     "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "自动隐藏左面板",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleHideRightPanel",
@@ -560,7 +690,9 @@
     "Source": "NeeView/Command/Commands/ToggleHideRightPanelCommand.cs",
     "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "自动隐藏右面板",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleVisiblePageSlider",
@@ -569,7 +701,9 @@
     "Source": "NeeView/Command/Commands/ToggleVisiblePageSliderCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "滚动条",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleHidePageSlider",
@@ -578,7 +712,9 @@
     "Source": "NeeView/Command/Commands/ToggleHidePageSliderCommand.cs",
     "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "自动隐藏滚动条",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleVisibleBookshelf",
@@ -587,7 +723,9 @@
     "Source": "NeeView/Command/Commands/ToggleVisibleBookshelfCommand.cs",
     "Stage": "P2 宿主接入；具体范围见验收表",
     "MenuText": "书架",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleVisiblePageList",
@@ -596,7 +734,9 @@
     "Source": "NeeView/Command/Commands/ToggleVisiblePageListCommand.cs",
     "Stage": "P2 宿主接入；具体范围见验收表",
     "MenuText": "页面列表面板",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleVisibleBookmarkList",
@@ -605,7 +745,9 @@
     "Source": "NeeView/Command/Commands/ToggleVisibleBookmarkListCommand.cs",
     "Stage": "P2 宿主接入；具体范围见验收表",
     "MenuText": "书签面板",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleVisiblePlaylist",
@@ -614,7 +756,9 @@
     "Source": "NeeView/Command/Commands/ToggleVisiblePlaylistCommand.cs",
     "Stage": "P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁",
     "MenuText": "播放列表面板",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleVisibleHistoryList",
@@ -623,7 +767,9 @@
     "Source": "NeeView/Command/Commands/ToggleVisibleHistoryListCommand.cs",
     "Stage": "P2 宿主接入；具体范围见验收表",
     "MenuText": "历史记录面板",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleVisibleFileInfo",
@@ -632,7 +778,9 @@
     "Source": "NeeView/Command/Commands/ToggleVisibleFileInfoCommand.cs",
     "Stage": "P2 宿主接入；具体范围见验收表",
     "MenuText": "信息面板",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleVisibleNavigator",
@@ -641,7 +789,9 @@
     "Source": "NeeView/Command/Commands/ToggleVisibleNavigatorCommand.cs",
     "Stage": "P2 宿主接入；具体范围见验收表",
     "MenuText": "导航面板",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleVisibleEffectInfo",
@@ -650,7 +800,9 @@
     "Source": "NeeView/Command/Commands/ToggleVisibleEffectInfoCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "效果面板",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleVisibleFoldersTree",
@@ -659,7 +811,9 @@
     "Source": "NeeView/Command/Commands/ToggleVisibleFoldersTreeCommand.cs",
     "Stage": "P3普通/QuickAccess目录树宿主显隐；完整脚本参数待P5",
     "MenuText": "目录树",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleVisibleContentsTree",
@@ -668,7 +822,9 @@
     "Source": "NeeView/Command/Commands/ToggleVisibleContentsTreeCommand.cs",
     "Stage": "P3全源目录组树宿主显隐；完整脚本参数待P5",
     "MenuText": "目录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "FocusFolderSearchBox",
@@ -677,7 +833,9 @@
     "Source": "NeeView/Command/Commands/FocusFolderSearchBoxCommand.cs",
     "Stage": "P3普通书架搜索框显示与焦点；虚拟位置能力边界见契约",
     "MenuText": "书架搜索框",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "FocusBookmarkSearchBox",
@@ -686,7 +844,9 @@
     "Source": "NeeView/Command/Commands/FocusBookmarkSearchBoxCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MenuText": "书签搜索框",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "FocusPageListSearchBox",
@@ -695,7 +855,9 @@
     "Source": "NeeView/Command/Commands/FocusPageListSearchBoxCommand.cs",
     "Stage": "P3原页面搜索框显示与焦点，输入和正文作用域隔离",
     "MenuText": "页面列表搜索框",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "FocusHistorySearchBox",
@@ -704,7 +866,9 @@
     "Source": "NeeView/Command/Commands/FocusHistorySearchBoxCommand.cs",
     "Stage": "P2 原历史面板焦点",
     "MenuText": "历史记录搜索框",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "FocusBookmarkList",
@@ -713,7 +877,9 @@
     "Source": "NeeView/Command/Commands/FocusBookmarkListCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MenuText": "书签面板",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "FocusMainView",
@@ -722,7 +888,9 @@
     "Source": "NeeView/Command/Commands/FocusMainViewCommand.cs",
     "Stage": "P3原主查看器焦点宿主接入",
     "MenuText": "主视图",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleVisibleFilmStrip",
@@ -731,7 +899,9 @@
     "Source": "NeeView/Command/Commands/ToggleVisibleFilmStripCommand.cs",
     "Stage": "P2 宿主接入；具体范围见验收表",
     "MenuText": "幻灯条",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleHideFilmStrip",
@@ -740,7 +910,9 @@
     "Source": "NeeView/Command/Commands/ToggleHideFilmStripCommand.cs",
     "Stage": "P2 宿主接入；具体范围见验收表",
     "MenuText": "自动隐藏幻灯条",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleMainViewFloating",
@@ -749,7 +921,9 @@
     "Source": "NeeView/Command/Commands/ToggleMainViewFloatingCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "主视图窗口",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleFullScreen",
@@ -758,7 +932,9 @@
     "Source": "NeeView/Command/Commands/ToggleFullScreenCommand.cs",
     "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "全屏",
-    "MouseGesture": "U"
+    "MouseGesture": "U",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "SetFullScreen",
@@ -766,7 +942,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetFullScreenCommand.cs",
     "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "CancelFullScreen",
@@ -774,7 +952,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/CancelFullScreenCommand.cs",
     "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleFullDesktop",
@@ -783,7 +963,9 @@
     "Source": "NeeView/Command/Commands/ToggleFullDesktopCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "全桌面",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleWindowMinimize",
@@ -792,7 +974,9 @@
     "Source": "NeeView/Command/Commands/ToggleWindowMinimizeCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "最小化",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleWindowMaximize",
@@ -801,7 +985,9 @@
     "Source": "NeeView/Command/Commands/ToggleWindowMaximizeCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "最大化",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ShowHiddenPanels",
@@ -810,7 +996,9 @@
     "Source": "NeeView/Command/Commands/ShowHiddenPanelsCommand.cs",
     "Stage": "P2 Mac 原窗口显示控制；见 p2-autohide.md",
     "MenuText": "临时显示面板",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "TouchCenter",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleSlideShow",
@@ -819,7 +1007,9 @@
     "Source": "NeeView/Command/Commands/ToggleSlideShowCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "幻灯片",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ViewScrollNTypeUp",
@@ -827,7 +1017,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewScrollNTypeUpCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewScrollNTypeDown",
@@ -835,7 +1027,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewScrollNTypeDownCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewScrollUp",
@@ -843,7 +1037,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewScrollUpCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewScrollDown",
@@ -851,7 +1047,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewScrollDownCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewScrollLeft",
@@ -859,7 +1057,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewScrollLeftCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewScrollRight",
@@ -867,7 +1067,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewScrollRightCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewPresetScroll",
@@ -875,7 +1077,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewPresetScrollCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewScaleUp",
@@ -883,7 +1087,9 @@
     "Shortcut": "RightButton+WheelUp",
     "Source": "NeeView/Command/Commands/ViewScaleUpCommand.cs",
     "Stage": "P1 宿主适配",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewScaleDown",
@@ -891,7 +1097,9 @@
     "Shortcut": "RightButton+WheelDown",
     "Source": "NeeView/Command/Commands/ViewScaleDownCommand.cs",
     "Stage": "P1 宿主适配",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewScaleStretch",
@@ -899,7 +1107,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewScaleStretchCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewBaseScaleUp",
@@ -907,7 +1117,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewBaseScaleUpCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewBaseScaleDown",
@@ -915,7 +1127,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewBaseScaleDownCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewRotateLeft",
@@ -923,7 +1137,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewRotateLeftCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewRotateRight",
@@ -931,7 +1147,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewRotateRightCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleIsAutoRotateLeft",
@@ -940,7 +1158,9 @@
     "Source": "NeeView/Command/Commands/ToggleIsAutoRotateLeftCommand.cs",
     "Stage": "P2 Engine 接入；Windows动态对照待验",
     "MenuText": "自动左旋转",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleIsAutoRotateRight",
@@ -949,7 +1169,9 @@
     "Source": "NeeView/Command/Commands/ToggleIsAutoRotateRightCommand.cs",
     "Stage": "P2 Engine 接入；Windows动态对照待验",
     "MenuText": "自动右旋转",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleIsAutoRotateForcedLeft",
@@ -958,7 +1180,9 @@
     "Source": "NeeView/Command/Commands/ToggleIsAutoRotateForcedLeftCommand.cs",
     "Stage": "P2 Engine 接入；Windows动态对照待验",
     "MenuText": "强制左旋转",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleIsAutoRotateForcedRight",
@@ -967,7 +1191,9 @@
     "Source": "NeeView/Command/Commands/ToggleIsAutoRotateForcedRightCommand.cs",
     "Stage": "P2 Engine 接入；Windows动态对照待验",
     "MenuText": "强制右旋转",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleViewFlipHorizontal",
@@ -975,7 +1201,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleViewFlipHorizontalCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewFlipHorizontalOn",
@@ -983,7 +1211,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewFlipHorizontalOnCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewFlipHorizontalOff",
@@ -991,7 +1221,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewFlipHorizontalOffCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleViewFlipVertical",
@@ -999,7 +1231,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleViewFlipVerticalCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewFlipVerticalOn",
@@ -1007,7 +1241,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewFlipVerticalOnCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewFlipVerticalOff",
@@ -1015,7 +1251,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewFlipVerticalOffCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ViewReset",
@@ -1023,7 +1261,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ViewResetCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "PrevPage",
@@ -1031,7 +1271,9 @@
     "Shortcut": "Right,RightClick",
     "Source": "NeeView/Command/Commands/PrevPageCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": "R"
+    "MouseGesture": "R",
+    "TouchGesture": "TouchR1,TouchR2",
+    "IsShowMessage": false
   },
   {
     "Name": "NextPage",
@@ -1039,7 +1281,9 @@
     "Shortcut": "Left,LeftClick",
     "Source": "NeeView/Command/Commands/NextPageCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": "L"
+    "MouseGesture": "L",
+    "TouchGesture": "TouchL1,TouchL2",
+    "IsShowMessage": false
   },
   {
     "Name": "PrevOnePage",
@@ -1047,7 +1291,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/PrevOnePageCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": "LR"
+    "MouseGesture": "LR",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "NextOnePage",
@@ -1055,7 +1301,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/NextOnePageCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": "RL"
+    "MouseGesture": "RL",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "PrevScrollPage",
@@ -1063,7 +1311,9 @@
     "Shortcut": "WheelUp",
     "Source": "NeeView/Command/Commands/PrevScrollPageCommand.cs",
     "Stage": "P2/P3原分页及全景NScroll、边界翻页与参数接入；真机动态待验",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "NextScrollPage",
@@ -1071,7 +1321,9 @@
     "Shortcut": "WheelDown",
     "Source": "NeeView/Command/Commands/NextScrollPageCommand.cs",
     "Stage": "P2/P3原分页及全景NScroll、边界翻页与参数接入；真机动态待验",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "JumpPage",
@@ -1079,7 +1331,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/JumpPageCommand.cs",
     "Stage": "P2 原定位/共享步长宿主接入；具体范围见验收表",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "JumpRandomPage",
@@ -1087,7 +1341,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/JumpRandomPageCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "PrevSizePage",
@@ -1095,7 +1351,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/PrevSizePageCommand.cs",
     "Stage": "P2 原定位/共享步长宿主接入；具体范围见验收表",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "NextSizePage",
@@ -1103,7 +1361,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/NextSizePageCommand.cs",
     "Stage": "P2 原定位/共享步长宿主接入；具体范围见验收表",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "PrevFolderPage",
@@ -1111,7 +1371,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/PrevFolderPageCommand.cs",
     "Stage": "P2 普通书架/文件夹页导航接入；巡回及子书边界见验收表",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "NextFolderPage",
@@ -1119,7 +1381,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/NextFolderPageCommand.cs",
     "Stage": "P2 普通书架/文件夹页导航接入；巡回及子书边界见验收表",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "FirstPage",
@@ -1127,7 +1391,9 @@
     "Shortcut": "Ctrl+Right",
     "Source": "NeeView/Command/Commands/FirstPageCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": "UR"
+    "MouseGesture": "UR",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "LastPage",
@@ -1135,7 +1401,9 @@
     "Shortcut": "Ctrl+Left",
     "Source": "NeeView/Command/Commands/LastPageCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": "UL"
+    "MouseGesture": "UL",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "PrevHistoryPage",
@@ -1143,7 +1411,9 @@
     "Shortcut": "Back",
     "Source": "NeeView/Command/Commands/PrevHistoryPageCommand.cs",
     "Stage": "P2 原导航历史接入；具体范围见验收表",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "NextHistoryPage",
@@ -1151,7 +1421,9 @@
     "Shortcut": "Shift+Back",
     "Source": "NeeView/Command/Commands/NextHistoryPageCommand.cs",
     "Stage": "P2 原导航历史接入；具体范围见验收表",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleBookLock",
@@ -1160,7 +1432,9 @@
     "Source": "NeeView/Command/Commands/ToggleBookLockCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MenuText": "书籍锁定",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "PrevBook",
@@ -1168,7 +1442,9 @@
     "Shortcut": "Up",
     "Source": "NeeView/Command/Commands/PrevBookCommand.cs",
     "Stage": "P2 普通书架/文件夹页导航接入；巡回及子书边界见验收表",
-    "MouseGesture": "LU"
+    "MouseGesture": "LU",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "NextBook",
@@ -1176,7 +1452,9 @@
     "Shortcut": "Down",
     "Source": "NeeView/Command/Commands/NextBookCommand.cs",
     "Stage": "P2 普通书架/文件夹页导航接入；巡回及子书边界见验收表",
-    "MouseGesture": "LD"
+    "MouseGesture": "LD",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "RandomBook",
@@ -1184,7 +1462,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/RandomBookCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "PrevHistory",
@@ -1192,7 +1472,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/PrevHistoryCommand.cs",
     "Stage": "P2 原过滤后历史列表导航",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "NextHistory",
@@ -1200,7 +1482,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/NextHistoryCommand.cs",
     "Stage": "P2 原过滤后历史列表导航",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "PrevBookHistory",
@@ -1208,7 +1492,9 @@
     "Shortcut": "Alt+Left",
     "Source": "NeeView/Command/Commands/PrevBookHistoryCommand.cs",
     "Stage": "P2 原导航历史接入；具体范围见验收表",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "NextBookHistory",
@@ -1216,7 +1502,9 @@
     "Shortcut": "Alt+Right",
     "Source": "NeeView/Command/Commands/NextBookHistoryCommand.cs",
     "Stage": "P2 原导航历史接入；具体范围见验收表",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "MoveToParentBook",
@@ -1224,7 +1512,9 @@
     "Shortcut": "Alt+Up",
     "Source": "NeeView/Command/Commands/MoveToParentBookCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "MoveToChildBook",
@@ -1232,7 +1522,9 @@
     "Shortcut": "Alt+Down",
     "Source": "NeeView/Command/Commands/MoveToChildBookCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleMediaPlay",
@@ -1240,7 +1532,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleMediaPlayCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "PrevMediaPosition",
@@ -1248,7 +1542,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/PrevMediaPositionCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "NextMediaPosition",
@@ -1256,7 +1552,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/NextMediaPositionCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleBookOrder",
@@ -1264,7 +1562,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleBookOrderCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBookOrderByFileNameA",
@@ -1272,7 +1572,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByFileNameACommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBookOrderByFileNameD",
@@ -1280,7 +1582,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByFileNameDCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBookOrderByPathA",
@@ -1288,7 +1592,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByPathACommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBookOrderByPathD",
@@ -1296,7 +1602,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByPathDCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBookOrderByFileTypeA",
@@ -1304,7 +1612,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByFileTypeACommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBookOrderByFileTypeD",
@@ -1312,7 +1622,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByFileTypeDCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBookOrderByTimeStampA",
@@ -1320,7 +1632,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByTimeStampACommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBookOrderByTimeStampD",
@@ -1328,7 +1642,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByTimeStampDCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBookOrderByEntryTimeA",
@@ -1336,7 +1652,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByEntryTimeACommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBookOrderByEntryTimeD",
@@ -1344,7 +1662,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByEntryTimeDCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBookOrderBySizeA",
@@ -1352,7 +1672,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderBySizeACommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBookOrderBySizeD",
@@ -1360,7 +1682,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderBySizeDCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBookOrderByRandom",
@@ -1368,7 +1692,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookOrderByRandomCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "TogglePageMode",
@@ -1376,7 +1702,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/TogglePageModeCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "TogglePageModeReverse",
@@ -1384,7 +1712,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/TogglePageModeReverseCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetPageModeOne",
@@ -1392,7 +1722,9 @@
     "Shortcut": "Ctrl+1",
     "Source": "NeeView/Command/Commands/SetPageModeOneCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": "RU"
+    "MouseGesture": "RU",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetPageModeTwo",
@@ -1400,7 +1732,9 @@
     "Shortcut": "Ctrl+2",
     "Source": "NeeView/Command/Commands/SetPageModeTwoCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": "RD"
+    "MouseGesture": "RD",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleIsPanorama",
@@ -1408,7 +1742,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsPanoramaCommand.cs",
     "Stage": "P3原帧级全景、PagesAsOne/NScroll与Mac连续/瀑布接入；设备/Windows动态独立验收",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "TogglePageOrientation",
@@ -1416,7 +1752,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/TogglePageOrientationCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetPageOrientationHorizontal",
@@ -1425,7 +1763,9 @@
     "Source": "NeeView/Command/Commands/SetPageOrientationHorizontalCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MenuText": "水平",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetPageOrientationVertical",
@@ -1434,7 +1774,9 @@
     "Source": "NeeView/Command/Commands/SetPageOrientationVerticalCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MenuText": "垂直",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleBookReadOrder",
@@ -1442,7 +1784,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleBookReadOrderCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBookReadOrderRight",
@@ -1450,7 +1794,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookReadOrderRightCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetBookReadOrderLeft",
@@ -1458,7 +1804,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBookReadOrderLeftCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleIsSupportedDividePage",
@@ -1466,7 +1814,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsSupportedDividePageCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleIsSupportedWidePage",
@@ -1474,7 +1824,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsSupportedWidePageCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleIsSupportedSingleFirstPage",
@@ -1482,7 +1834,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsSupportedSingleFirstPageCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleIsSupportedSingleLastPage",
@@ -1490,7 +1844,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsSupportedSingleLastPageCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleIsRecursiveFolder",
@@ -1498,7 +1854,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleIsRecursiveFolderCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleSortMode",
@@ -1506,7 +1864,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleSortModeCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetSortModeFileName",
@@ -1514,7 +1874,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetSortModeFileNameCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetSortModeFileNameDescending",
@@ -1522,7 +1884,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetSortModeFileNameDescendingCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetSortModeTimeStamp",
@@ -1530,7 +1894,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetSortModeTimeStampCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetSortModeTimeStampDescending",
@@ -1538,7 +1904,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetSortModeTimeStampDescendingCommand.cs",
     "Stage": "P2 Engine 接入；Windows动态对照待验",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetSortModeSize",
@@ -1546,7 +1914,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetSortModeSizeCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetSortModeSizeDescending",
@@ -1554,7 +1924,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetSortModeSizeDescendingCommand.cs",
     "Stage": "P2 Engine 接入；Windows动态对照待验",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetSortModeEntry",
@@ -1562,7 +1934,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetSortModeEntryCommand.cs",
     "Stage": "P4 原Playlist来源登记顺序排序；普通来源禁用",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetSortModeEntryDescending",
@@ -1570,7 +1944,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetSortModeEntryDescendingCommand.cs",
     "Stage": "P4 原Playlist来源登记顺序排序；普通来源禁用",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetSortModeRandom",
@@ -1578,7 +1954,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetSortModeRandomCommand.cs",
     "Stage": "P1 Engine",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "SetDefaultPageSetting",
@@ -1586,7 +1964,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetDefaultPageSettingCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleBookmark",
@@ -1595,7 +1975,9 @@
     "Source": "NeeView/Command/Commands/ToggleBookmarkCommand.cs",
     "Stage": "P2 宿主接入；具体范围见验收表",
     "MenuText": "书签",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "RegisterBookmark",
@@ -1603,7 +1985,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/RegisterBookmarkCommand.cs",
     "Stage": "P2 第五批宿主适配；登记字段/动作接入，原Popup/标签/树选择器待迁",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "NextPlaylist",
@@ -1611,7 +1995,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/NextPlaylistCommand.cs",
     "Stage": "P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "PrevPlaylist",
@@ -1619,7 +2005,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/PrevPlaylistCommand.cs",
     "Stage": "P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "TogglePlaylistItem",
@@ -1628,7 +2016,9 @@
     "Source": "NeeView/Command/Commands/TogglePlaylistItemCommand.cs",
     "Stage": "P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁",
     "MenuText": "添加到播放列表",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "PrevPlaylistItem",
@@ -1636,7 +2026,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/PrevPlaylistItemCommand.cs",
     "Stage": "P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "NextPlaylistItem",
@@ -1644,7 +2036,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/NextPlaylistItemCommand.cs",
     "Stage": "P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "PrevPlaylistItemInBook",
@@ -1652,7 +2046,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/PrevPlaylistItemInBookCommand.cs",
     "Stage": "P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "NextPlaylistItemInBook",
@@ -1660,7 +2056,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/NextPlaylistItemInBookCommand.cs",
     "Stage": "P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "SetEffectProfile",
@@ -1668,7 +2066,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetEffectProfileCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "NextEffectProfile",
@@ -1676,7 +2076,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/CommandTable.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "PrevEffectProfile",
@@ -1684,7 +2086,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/CommandTable.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleCustomSize",
@@ -1693,7 +2097,9 @@
     "Source": "NeeView/Command/Commands/ToggleCustomSizeCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "自定义大小",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleTrim",
@@ -1702,7 +2108,9 @@
     "Source": "NeeView/Command/Commands/ToggleTrimCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "裁剪",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleResizeFilter",
@@ -1711,7 +2119,9 @@
     "Source": "NeeView/Command/Commands/ToggleResizeFilterCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "调整大小滤镜",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleGrid",
@@ -1720,7 +2130,9 @@
     "Source": "NeeView/Command/Commands/ToggleGridCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "网格",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleEffect",
@@ -1729,7 +2141,9 @@
     "Source": "NeeView/Command/Commands/ToggleEffectCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "效果",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleIsLoupe",
@@ -1738,7 +2152,9 @@
     "Source": "NeeView/Command/Commands/ToggleIsLoupeCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "放大镜",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "LoupeOn",
@@ -1746,7 +2162,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/LoupeOnCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "LoupeOff",
@@ -1754,7 +2172,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/LoupeOffCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "LoupeScaleUp",
@@ -1762,7 +2182,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/LoupeScaleUpCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "LoupeScaleDown",
@@ -1770,7 +2192,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/LoupeScaleDownCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ToggleHoverScroll",
@@ -1779,7 +2203,9 @@
     "Source": "NeeView/Command/Commands/ToggleHoverScrollCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
     "MenuText": "悬停滚动",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "ToggleAutoScroll",
@@ -1788,7 +2214,9 @@
     "Source": "NeeView/Command/Commands/ToggleAutoScrollCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "自动滚动",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "CancelScript",
@@ -1796,7 +2224,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/CancelScriptCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "OpenOptionsWindow",
@@ -1805,7 +2235,9 @@
     "Source": "NeeView/Command/Commands/OpenOptionsWindowCommand.cs",
     "Stage": "P1 宿主适配",
     "MenuText": "设置(S)...",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "OpenSettingFilesFolder",
@@ -1813,7 +2245,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/OpenSettingFilesFolderCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "OpenScriptsFolder",
@@ -1821,7 +2255,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/OpenScriptsFolderCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "OpenVersionWindow",
@@ -1830,7 +2266,9 @@
     "Source": "NeeView/Command/Commands/OpenVersionWindowCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "关于本程序(A)...",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "CloseApplication",
@@ -1839,7 +2277,9 @@
     "Source": "NeeView/Command/Commands/CloseApplicationCommand.cs",
     "Stage": "P1 宿主适配",
     "MenuText": "退出(X)",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "TogglePermitFile",
@@ -1848,7 +2288,9 @@
     "Source": "NeeView/Command/Commands/TogglePermitFileCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "允许文件操作(P)",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "HelpCommandList",
@@ -1857,7 +2299,9 @@
     "Source": "NeeView/Command/Commands/HelpCommandListCommand.cs",
     "Stage": "P1 宿主适配",
     "MenuText": "命令帮助",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "HelpScript",
@@ -1866,7 +2310,9 @@
     "Source": "NeeView/Command/Commands/HelpScriptCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "脚本帮助",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "HelpMainMenu",
@@ -1875,7 +2321,9 @@
     "Source": "NeeView/Command/Commands/HelpMainMenuCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "主菜单帮助",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "HelpSearchOption",
@@ -1883,7 +2331,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/HelpSearchOptionCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "OpenContextMenu",
@@ -1891,7 +2341,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/OpenContextMenuCommand.cs",
     "Stage": "P2 执行入口已接入；参数/行为范围见模块验收记录",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ExportBackup",
@@ -1900,7 +2352,9 @@
     "Source": "NeeView/Command/Commands/ExportBackupCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "导出设置...",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ImportBackup",
@@ -1909,7 +2363,9 @@
     "Source": "NeeView/Command/Commands/ImportBackupCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "导入设置...",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "ReloadSetting",
@@ -1917,7 +2373,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ReloadSettingCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "SaveSetting",
@@ -1925,7 +2383,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SaveSettingCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": true
   },
   {
     "Name": "TouchEmulate",
@@ -1933,7 +2393,9 @@
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/TouchEmulateCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "FocusPrevApp",
@@ -1941,7 +2403,9 @@
     "Shortcut": "Ctrl+Shift+Tab",
     "Source": "NeeView/Command/Commands/FocusPrevAppCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "FocusNextApp",
@@ -1949,7 +2413,9 @@
     "Shortcut": "Ctrl+Tab",
     "Source": "NeeView/Command/Commands/FocusNextAppCommand.cs",
     "Stage": "待 P2–P5",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "StretchWindow",
@@ -1958,7 +2424,9 @@
     "Source": "NeeView/Command/Commands/StretchWindowCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "调整窗口大小",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   },
   {
     "Name": "OpenConsole",
@@ -1967,6 +2435,8 @@
     "Source": "NeeView/Command/Commands/OpenConsoleCommand.cs",
     "Stage": "待 P2–P5",
     "MenuText": "打开脚本控制台(C)...",
-    "MouseGesture": ""
+    "MouseGesture": "",
+    "TouchGesture": "",
+    "IsShowMessage": false
   }
 ]

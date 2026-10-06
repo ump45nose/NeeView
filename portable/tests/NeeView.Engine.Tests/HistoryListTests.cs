@@ -249,7 +249,8 @@ public sealed class HistoryListTests
             Assert.Equal(2, state.HistoryEntries.Count);
             await window.ExecuteAsync("ClearHistory"); Assert.Empty(state.HistoryEntries);
             await operation.SaveAsync(); var saved = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(fixture.State, "UserSetting.json"), TestContext.Current.CancellationToken))!["Config"]!["History"]!;
-            Assert.True(saved["IsGroupBy"]!.GetValue<bool>()); Assert.True(saved["IsVisibleSearchBox"]!.GetValue<bool>());
+            Assert.True(saved["IsGroupBy"]!.GetValue<bool>()); Assert.Null(saved["IsVisibleSearchBox"]);
+            await new SaveData(fixture.State).LoadAsync(TestContext.Current.CancellationToken); Assert.True(Config.Current.History.IsVisibleSearchBox);
             Assert.Equal(3, saved["PanelListItemStyle"]!.GetValue<int>()); Assert.Equal(50, saved["LimitSize"]!.GetValue<int>()); Assert.True(saved["Future"]!["enabled"]!.GetValue<bool>());
         }
         finally { await window.PrepareShutdownAsync(); window.Close(); }

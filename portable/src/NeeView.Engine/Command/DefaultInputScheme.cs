@@ -14,6 +14,12 @@ public static class DefaultInputScheme
         ["FirstPage"] = "LastPage", ["LastPage"] = "FirstPage"
     };
     private static readonly IReadOnlyDictionary<string, CommandDefinition> Baseline = LoadBaseline();
+    /// <summary>仅对固定原登记表中的命令做默认裁剪；未来命令保持原节点。</summary>
+    public static bool IsKnownCommand(string name) => Baseline.ContainsKey(name);
+    /// <summary>原默认触摸区域不随阅读方向或输入方案交换；本阶段只保留配置，不启用触摸执行。</summary>
+    public static string GetTouchGesture(string name) => Baseline.GetValueOrDefault(name)?.TouchGesture ?? "";
+    /// <summary>原命令构造器通知默认值；保存差分不改变当前执行入口的能力范围。</summary>
+    public static bool GetShowMessage(string name) => Baseline.GetValueOrDefault(name)?.IsShowMessage ?? false;
     /// <summary>原SetShare参数关系；键位各自独立，参数仅保留一份。</summary>
     public static string GetParameterOwner(string name) => name switch
     {

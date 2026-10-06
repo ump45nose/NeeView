@@ -1,0 +1,92 @@
+{
+  "scope": "isolated synthetic Profile; no desktop activation or Windows run",
+  "baseline": "c5c398d89 / build4340",
+  "source": {
+    "Format": "NeeView.UserSetting/46.3.0",
+    "Config": {
+      "Book": {
+        "IsPanorama": true,
+        "Future": 9
+      },
+      "Panels": {
+        "BannerItemProfile": {
+          "ImageWidth": 200,
+          "Future": 7
+        }
+      },
+      "AutoHide": {
+        "AutoHideHitTestMargin": 17
+      }
+    },
+    "Commands": {
+      "NextScrollPage": {
+        "Parameter": {
+          "$type": "ScrollPage",
+          "IsNScroll": false,
+          "PageMoveMargin": 4,
+          "Future": 42
+        }
+      },
+      "MoveToDestinationFolder9": {
+        "Parameter": {
+          "Index": 9
+        }
+      }
+    }
+  },
+  "savedDifference": {
+    "Format": "NeeView.UserSetting/46.3.0",
+    "Config": {
+      "Book": {
+        "Future": 9
+      },
+      "Panels": {
+        "BannerItemProfile": {
+          "Future": 7
+        }
+      },
+      "AutoHide": {
+        "AutoHideHitTestHorizontalMargin": 17,
+        "AutoHideHitTestVerticalMargin": 17
+      }
+    },
+    "Commands": {
+      "NextScrollPage": {
+        "MacImportedSharedParameter": {
+          "Parameter": {
+            "$type": "ScrollPage",
+            "IsNScroll": false,
+            "PageMoveMargin": 4,
+            "Future": 42
+          }
+        }
+      },
+      "PrevScrollPage": {
+        "Parameter": {
+          "$type": "ScrollPage",
+          "Future": 42,
+          "ScrollType": 2,
+          "LineBreakStopTime": 4,
+          "LineBreakStopMode": 1
+        },
+        "MacImportedLegacyParameterFields": {
+          "IsNScroll": false,
+          "PageMoveMargin": 4
+        }
+      }
+    },
+    "MacImportedLegacyConfigFields": {
+      "AutoHide": {
+        "AutoHideHitTestMargin": 17
+      }
+    }
+  },
+  "restored": {
+    "panorama": false,
+    "bannerWidth": 200,
+    "digit9Index": 9,
+    "scrollType": "Diagonal",
+    "stopTime": 4,
+    "importValidation": true
+  }
+}

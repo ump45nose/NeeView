@@ -426,6 +426,12 @@
       "target": "src/NeeView.Engine/Config/WindowTitleConfig.cs",
       "sha256": "61775a8c52125f97078c814e91cc053d79716ac645ad8706ac9def4e483952c2",
       "status": "原标题格式/解析与内容后缀选择迁入；ViewContent替换为原PageFrameElement；Mac路径分隔和局部转义适配。Bits/Scale/ViewScale及媒体显示仍未迁，不提供假值；未知词保留。"
+    },
+    {
+      "source": "NeeView/Config/DiffJsonConverter.cs",
+      "target": "src/NeeView.Engine/Config/DiffJsonConverter.cs",
+      "sha256": "8af38463d3505d6bbcce4a6124350a00cb4ae7e5a0a1269be6185d3cc1b82c11",
+      "status": "P5: retain writable-property metadata, Equals/IDefaultable and original read/write; exclude JsonExtensionData and expose parent-specific defaults for the raw JSON write copy."
     }
   ],
   "partial_adapters": [
@@ -1513,13 +1519,13 @@
       "source": "NeeView/DestinationFolder/DestinationFolder.cs",
       "target": "src/NeeView.Engine/DestinationFolder/DestinationFolder.cs",
       "sha256": "4cdafbd8ed9e9c131d5505ff2778cc03f6d086985e96b827d00cbdaeaa62ea50",
-      "status": "保留原Name/Path/Trim/Clone；Shell实现分离至文件后端"
+      "status": "Original Name/Path/Trim/Clone; preserve per-entry extension data through typed edits and clones. Shell actions remain in the backend."
     },
     {
       "source": "NeeView/DestinationFolder/DestinationFolderCollection.cs",
       "target": "src/NeeView.Engine/DestinationFolder/DestinationFolder.cs",
       "sha256": "99a0d20aabed7ebf1ea8528b3769344266ad86fe2fe56942ca1eb5ba9a040a16",
-      "status": "原无限集合/CreateNew/Index保留，与DestinationFolder合并文件"
+      "status": "Original unbounded collection, CreateNew/Index and SequenceEqual defaults retained; merged target file."
     },
     {
       "source": "NeeView/DestinationFolder/DestinationMoveService.cs",
@@ -1771,7 +1777,7 @@
       "source": "NeeView/DestinationFolder/DestinationFolder.cs",
       "target": "src/NeeView.Engine/DestinationFolder/BookTransferContracts.cs",
       "sha256": "4cdafbd8ed9e9c131d5505ff2778cc03f6d086985e96b827d00cbdaeaa62ea50",
-      "status": "真实存在目标目录和实际落点的小型整书接口；目录与文件快照/完整性，不伪装为图片动作"
+      "status": "Original Name/Path/Trim/Clone; preserve per-entry extension data through typed edits and clones. Shell actions remain in the backend."
     },
     {
       "source": "NeeView/System/FileIO.cs",
@@ -1987,7 +1993,25 @@
       "source": "NeeView/Config/DiffJsonConverter.cs",
       "target": "src/NeeView.Engine/SaveData/SaveData.cs",
       "sha256": "8af38463d3505d6bbcce4a6124350a00cb4ae7e5a0a1269be6185d3cc1b82c11",
-      "status": "P5第四批：原兼容setter默认省略规则用于ScrollPage差分编辑；完整converter尚未迁入，旧材料移至非执行字段，未知参数保持。"
+      "status": "P5: original converter now ported; the five-file write transaction consumes its separate raw JSON difference copy. Legacy ScrollPage setters archived before trimming."
+    },
+    {
+      "source": "NeeView/SaveData/UserSettingTools.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.Difference.cs",
+      "sha256": "5239375f0ee9151c5253a93d22a77f26a03856fde433cf74c97e225977c32a86",
+      "status": "P5: trim migrated configuration on the existing write copy; retain unknown branches and complete Mac layout snapshots; no second settings store."
+    },
+    {
+      "source": "NeeView/Command/CommandElement.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.Difference.cs",
+      "sha256": "9c6799767b9eb5d5bf9e1abee220053ad55f97427afc279a492fc1b66f59823d",
+      "status": "P5: default gestures/notification and owner-only parameter differences; archive early Mac alias data; preserve explicit unbinding and instance Index defaults."
+    },
+    {
+      "source": "NeeView/Command/CommandParameters.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.Difference.cs",
+      "sha256": "9fb08a5fc71bab670fd98306cf2e592ef60a4801c9aad9dcf0743efc9bd1a23d",
+      "status": "P5: original $type-first parameter names without CommandParameter suffix; typed differences and unknown future metadata preservation."
     }
   ],
   "rule_references": [

@@ -117,3 +117,9 @@ V2非空优先，V1保方向，V0纵向；未知选择不回退首组，损坏�
 原FolderConfigCollectionValidator在4065/4209执行两条独立版本分支；History.Folders字典经原Restore(Dictionary)只归一排序，不套用独立文件递归升级。默认来自最终选项配置，候选不切换Config.Current。来源版本保留；QuickAccess内嵌Format独立校验，不能被外层升级掩盖。盘符/UNC/虚拟父级及路径映射、普通保存和五文件恢复用合成样本对照，见[契约](p5-folder-compatibility.md)。
 
 ScrollPage编辑时清除执行参数中的旧IsNScroll/PageMoveMargin，兼容材料和未知字段保留，重载不覆盖新参数。完整原差分converter仍待迁入；不把本批修复视为全部兼容通过。
+
+## P5 第五批：原差分保存
+
+原 DiffJsonConverter 的公开读写属性/Equals/IDefaultable 迁入；已迁 Config 分支的写出副本只保留非默认字段，原未知材料不删除。四模板沿各自构造默认，九数字 Index1–9 沿实例默认，命令默认随输入方案/方向，触摸和通知默认保留原构造关系。原 owner 参数、空串解绑和 $type 首字段/去后缀恢复。
+
+完整 Mac 布局继续显式保留关闭 null 与动态字典，这是原差分格式的明确适配。旧滚动 setter 转换实际结果后归档，旧自动隐藏别名不能在恢复默认后复活。合成保存/重启/再次导入及失败回滚见[本批验收](../acceptance/p5-difference-settings-runtime.md)；未迁原配置、真实两分支导出、Windows动态和旧效果执行均不列为本批通过。

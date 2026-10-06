@@ -254,12 +254,12 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         // 原差分写出不再包含只读兼容值。直接递归Merge会留下旧setter字段，重启时覆盖新ScrollType/停顿。
         if (value is ScrollPageCommandParameter)
             foreach (var field in new[] { "IsNScroll", "PageMoveMargin" })
-                if (parameter.ContainsKey(field))
+                foreach (var key in parameter.Select(pair => pair.Key).Where(key => key.Equals(field, StringComparison.OrdinalIgnoreCase)).ToArray())
                 {
-                    Object(command, "MacImportedLegacyParameterFields")[field] = parameter[field]?.DeepClone();
-                    parameter.Remove(field);
+                    Object(command, "MacImportedLegacyParameterFields")[key] = parameter[key]?.DeepClone();
+                    parameter.Remove(key);
                 }
-        Merge(parameter, JsonSerializer.SerializeToNode(value, Options)!.AsObject());
+        MergeTyped(parameter, value!);
     }
 
     /// <summary>编辑原 Commands 差分键位；空字符串表示解绑，未知参数保持。</summary>
@@ -498,7 +498,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "PageList", "History", "Bookmark", "System", "Archive", "Playlist", "AutoHide", "Window", "WindowTitle", "MenuBar", "Command", "Mouse", "StartUp" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
-                Merge(Object(config, branch), JsonSerializer.SerializeToNode(value, Options)!.AsObject());
+                MergeTyped(Object(config, branch), value!);
             }
             // 仅覆盖本次编辑的两字段；配置在等待/失败时不暴露给防抖和其他保存。
             Object(config, "History")["LimitSize"] = historyConfig.LimitSize;
@@ -618,7 +618,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
                 preparedHistory["Items"] = CreateLimitedHistoryItems(items, historyConfig ?? Config.Current.History, sort: true);
             var saveHistory = (historyConfig ?? Config.Current.History).IsSaveHistory;
             if (saveHistory) await WriteTemporaryAsync(names[0], preparedHistory, token);
-            await WriteTemporaryAsync(names[1], _setting, token);
+            await WriteTemporaryAsync(names[1], CreateSettingMemento(), token);
             // 在副本上准备书签文件，提交失败不能污染权威内存节点。
             var preparedBookmarks = _bookmarks.DeepClone().AsObject();
             preparedBookmarks["Format"] ??= JsonValue.Create("NeeView.Bookmark/46.3.0");
