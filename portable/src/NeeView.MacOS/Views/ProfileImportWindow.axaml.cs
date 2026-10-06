@@ -49,9 +49,9 @@ public sealed partial class ProfileImportWindow : Window
         try
         {
             if (_model is null || await _model.CreateRequestAsync() is not { } request || _closed) return;
-            var dialog = new Window { Title = "确认导入", Width = 560, Height = 260, WindowStartupLocation = WindowStartupLocation.CenterOwner };
+            var dialog = new Window { Title = "确认导入", Width = 600, Height = 340, WindowStartupLocation = WindowStartupLocation.CenterOwner };
             var panel = new StackPanel { Margin = new(20), Spacing = 12 };
-            panel.Children.Add(new TextBlock { Text = "将先关闭并保存当前阅读窗口、保留五文件备份，再恢复选中项目并重建窗口。\n未映射路径继续保留；附属脚本、主题、播放列表不执行或导入。\n历史保留开关与数量/期限仍按导入后的设置生效。", TextWrapping = Avalonia.Media.TextWrapping.Wrap });
+            panel.Children.Add(new TextBlock { Text = "将先关闭并保存当前阅读窗口、备份原 JSON 与实际覆盖的附属文件，再恢复选中项目并重建窗口。\n选中附属类别覆盖同名文件，其他文件保持；播放列表选中后切换到 Mac 管理的列表目录。\n主题和脚本只保留材料，不应用主题、不执行脚本；未映射路径继续保留。\n历史保留开关与数量/期限仍按导入后的设置生效。", TextWrapping = Avalonia.Media.TextWrapping.Wrap });
             var buttons = new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 12 };
             var apply = new Button { Content = "备份并导入" }; var cancel = new Button { Content = "取消" };
             apply.Click += (_, _) => dialog.Close(true); cancel.Click += (_, _) => dialog.Close(false);

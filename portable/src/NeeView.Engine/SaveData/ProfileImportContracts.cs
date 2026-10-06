@@ -16,13 +16,14 @@ public static class ProfileImportFiles
 /// <summary>只读来源；目录是 Profile 根，备份是原标准 ZIP 包，不从包中执行或解压脚本。</summary>
 public enum ProfileImportSourceKind { Directory, Backup }
 public sealed record ProfileImportSource(string Path, ProfileImportSourceKind Kind);
-public sealed record ProfileImportBundle(IReadOnlyDictionary<string, string> Files, IReadOnlyList<string> ExtraEntries);
+public sealed record ProfileImportBundle(IReadOnlyDictionary<string, string> Files, IReadOnlyList<string> ExtraEntries,
+    IReadOnlyDictionary<string, byte[]>? Assets = null);
 /// <summary>实际文件读取替换点；界面不枚举来源或打开 ZIP。</summary>
 public interface IProfileImportReader
 {
-    /// <summary>读取有限的原 JSON 字节；错误/取消不能修改来源或当前状态。</summary>
+    /// <summary>读取有限的原 JSON 和附属字节；错误/取消不能修改来源或当前状态。</summary>
     /// <param name="source">明确选定的 Profile 或备份。</param><param name="token">等待和读取取消。</param>
-    /// <returns>原文件文本与未处理附属文件清单。</returns>
+    /// <returns>原文件文本、附属数据及未处理条目清单；不持有来源流。</returns>
     Task<ProfileImportBundle> ReadAsync(ProfileImportSource source, CancellationToken token);
 }
 public sealed record ProfilePathMapping(string WindowsPrefix, string MacPrefix);
@@ -43,13 +44,22 @@ public sealed record ProfileImportCommand(string Name, string Shortcut, bool Exp
 public sealed class ProfileImportPreview
 {
     private readonly IReadOnlyDictionary<string, JsonObject> _documents;
+    private readonly IReadOnlyDictionary<string, byte[]> _assets;
     internal ProfileImportPreview(IReadOnlyDictionary<string, JsonObject> documents, IReadOnlyList<ProfileImportFileSummary> files,
-        IReadOnlyList<ProfileImportPath> paths, IReadOnlyList<ProfileImportCommand> commands, IReadOnlyList<string> notices)
-        => (_documents, Files, Paths, Commands, Notices) = (documents, files, paths, commands, notices);
+        IReadOnlyList<ProfileImportPath> paths, IReadOnlyList<ProfileImportCommand> commands, IReadOnlyList<string> notices,
+        IReadOnlyDictionary<string, byte[]>? assets = null, IReadOnlyList<ProfileImportAssetSummary>? assetSummaries = null)
+    {
+        (_documents, Files, Paths, Commands, Notices) = (documents, files, paths, commands, notices);
+        _assets = assets ?? new Dictionary<string, byte[]>(); Assets = assetSummaries ?? [];
+    }
     public IReadOnlyList<ProfileImportFileSummary> Files { get; }
     public IReadOnlyList<ProfileImportPath> Paths { get; }
     public IReadOnlyList<ProfileImportCommand> Commands { get; }
     public IReadOnlyList<string> Notices { get; }
+    public IReadOnlyList<ProfileImportAssetSummary> Assets { get; }
+    /// <summary>复制附属材料，不允许界面或调用方修改预览候选。</summary>
+    /// <param name="path">预览中的规范逻辑路径。</param><returns>独立字节副本；缺失返回 null。</returns>
+    public byte[]? GetAsset(string path) => _assets.TryGetValue(path, out var bytes) ? bytes.ToArray() : null;
     public int UnmappedCount => Paths.Count(p => p.Status == ProfilePathStatus.Unmapped);
     /// <summary>确认选项并复制候选；未知/尚未支持的版本在写入前拒绝。</summary>
     /// <param name="selection">实际恢复项目，未选择的项目不改写。</param>

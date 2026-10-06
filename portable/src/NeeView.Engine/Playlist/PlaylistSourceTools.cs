@@ -12,6 +12,8 @@ public static class PlaylistSourceTools
     /// <summary>接受原两种格式；未知格式/新版本明确拒绝，不保存成当前版本破坏源。</summary>
     public static PlaylistSource Deserialize(byte[] bytes)
     {
+        // 原LoadFromFile经ReadAllText接收UTF-8 BOM；二进制后端在唯一解析入口保留同一语义。
+        if (bytes.AsSpan().StartsWith(new byte[] { 0xEF, 0xBB, 0xBF })) bytes = bytes[3..];
         using var document = JsonDocument.Parse(bytes, new() { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip });
         var root = document.RootElement;
         var format = root.GetProperty("Format").GetString();

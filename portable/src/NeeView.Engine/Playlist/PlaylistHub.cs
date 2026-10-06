@@ -54,7 +54,8 @@ public sealed partial class PlaylistHub(PlaylistConfig config)
     /// <summary>保留原 Default 首项、实际文件自然排序和外部选择追加，不凭空增加 Pagemark 文件。</summary>
     private IReadOnlyList<string> GetFiles(string selected)
     {
-        var files = Directory.Exists(Config.PlaylistFolder) ? Directory.EnumerateFiles(Config.PlaylistFolder, "*.nvpls").Where(path => path != Config.DefaultPlaylist).OrderBy(path => path, NaturalSort.Comparer).ToList() : [];
+        // Windows 的原通配符忽略扩展名大小写；Mac显式复用格式识别，不能漏掉导入的.NVPLS。
+        var files = Directory.Exists(Config.PlaylistFolder) ? Directory.EnumerateFiles(Config.PlaylistFolder).Where(PlaylistSourceTools.IsPlaylist).Where(path => path != Config.DefaultPlaylist).OrderBy(path => path, NaturalSort.Comparer).ToList() : [];
         files.Insert(0, Config.DefaultPlaylist);
         if (!files.Contains(selected)) files.Add(selected); return files;
     }

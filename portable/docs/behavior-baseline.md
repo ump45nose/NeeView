@@ -129,3 +129,9 @@ ScrollPage编辑时清除执行参数中的旧IsNScroll/PageMoveMargin，兼容�
 原Alpha.5（≤46.0.4209）按单效果/本地缓存→首层→默认预设→全局缓存顺序迁入；Level raw端点、五位舍入、Bloom仅上限、13旧属性/15枚举及现代$type短名称保持。原10层限制属于运行新建，不裁剪导入数据。完整原材料归档，未来类型/未核对色彩不伪造默认效果。
 
 早期Mac保留标记可继续升级，现代层及未来升级材料不能被旧标记降级。来源效果三分支整体替换/恢复缺省，避免当前缓存递归复活；预览/事务/普通差分保存仍走唯一JSON链。见[契约](p5-effect-compatibility.md)及[验收](../acceptance/p5-effect-compatibility-runtime.md)。本批只迁数据，原效果编辑/执行命令仍占位，真实导出和Windows画面对照未验。
+
+## P5 第七批：原附属材料导入
+
+固定基线Exporter保存Playlists/*.nvpls、Themes/*.json和Scripts/*.nvjs的一级文件；原Importer三类默认关闭、覆盖同名。本批兼容两种ZIP分隔符，列表复用原v1/v2唯一解析并仅映射已知Path；版本、相对内部定位、未知数据保持。
+
+Mac落点使用当前Profile管理目录，列表目录配置与实际覆盖文件共用原提交/持久备份/重建恢复；该适配在选择/确认报告中说明。主题/脚本仅保留原字节、不装载或执行，不把材料保存称为运行能力迁移。见[契约](p5-profile-assets.md)及[静默验收](../acceptance/p5-profile-assets-runtime.md)。

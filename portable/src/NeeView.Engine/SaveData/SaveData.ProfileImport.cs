@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 namespace NeeView;
 
-/// <summary>导入结果包含持久备份，失败重建时仍能恢复导入前五文件及缺失状态。</summary>
+/// <summary>导入结果包含持久备份，失败重建时恢复五文件和实际覆盖附属项的原字节/缺失状态。</summary>
 public sealed record ProfileImportResult(string BackupDirectory, IReadOnlyList<string> AppliedFiles);
 
 public sealed partial class SaveData
@@ -29,10 +29,15 @@ public sealed partial class SaveData
             {
                 RecoverInterruptedSave();
                 var documents = await PrepareImportAsync(request, token); ValidateImportDocuments(documents);
-                var names = request.Selection.Files.Where(name => request.GetEffectiveDocument(name) is not null).ToArray();
-                var backup = await CreateImportBackupAsync(token);
-                await WriteImportDocumentsAsync(names.ToDictionary(name => name, name => documents[name]), token);
-                return new ProfileImportResult(backup, names);
+                var names = request.Selection.Files.Where(name => request.GetEffectiveDocument(name) is not null).ToList();
+                var assets = request.GetAssets();
+                // 列表导入显式切换到Mac管理目录；目录配置与文件参加同一事务和备份。
+                if (assets.Keys.Any(name => ProfileImportAssets.Kind(name) == ProfileImportAssetKind.Playlists) && !names.Contains("UserSetting.json")) names.Add("UserSetting.json");
+                var values = names.ToDictionary(name => name, name => documents[name] is null ? null : JsonSerializer.SerializeToUtf8Bytes(documents[name], Options));
+                foreach (var pair in assets) values.Add(pair.Key, pair.Value);
+                var backup = await CreateImportBackupAsync(assets.Keys, token);
+                await WriteImportBytesAsync(values, token);
+                return new ProfileImportResult(backup, values.Keys.ToArray());
             }, token);
         }
         finally { _gate.Release(); }
@@ -48,14 +53,24 @@ public sealed partial class SaveData
             {
                 var root = System.IO.Path.GetFullPath(System.IO.Path.Combine(DirectoryPath, "ImportBackups")) + System.IO.Path.DirectorySeparatorChar;
                 var full = System.IO.Path.GetFullPath(backupDirectory);
-                if (!full.StartsWith(root, StringComparison.Ordinal)) throw new InvalidDataException("备份不属于当前 Profile。");
-                var manifest = JsonNode.Parse(await File.ReadAllTextAsync(System.IO.Path.Combine(full, "manifest.json"), token))!.AsObject();
+                if (!full.StartsWith(root, StringComparison.Ordinal) || System.IO.Path.GetDirectoryName(full) != root.TrimEnd(System.IO.Path.DirectorySeparatorChar))
+                    throw new InvalidDataException("备份不属于当前 Profile 的直接备份目录。");
+                ProfileImportAssets.RejectLink(root.TrimEnd(System.IO.Path.DirectorySeparatorChar));
+                ProfileImportAssets.RejectLink(full);
+                ProfileImportAssets.RejectLink(System.IO.Path.Combine(full, "manifest.json"));
+                JsonObject manifest;
+                try { manifest = JsonNode.Parse(await File.ReadAllTextAsync(System.IO.Path.Combine(full, "manifest.json"), token)) as JsonObject ?? throw new InvalidDataException("备份清单必须是对象。"); }
+                catch (JsonException ex) { throw new InvalidDataException("备份清单损坏。", ex); }
                 var values = new Dictionary<string, byte[]?>();
-                foreach (var name in ProfileImportFiles.Names)
+                if (manifest.Count > ProfileImportFiles.MaxEntries) throw new InvalidDataException("备份清单数量超限。");
+                if (manifest.Select(p => ProfileImportAssets.CollisionKey(p.Key)).Distinct().Count() != manifest.Count) throw new InvalidDataException("备份清单文件名冲突。");
+                foreach (var name in ProfileImportFiles.Names) if (!manifest.ContainsKey(name)) throw new InvalidDataException("备份清单缺失：" + name);
+                foreach (var name in manifest.Select(p => p.Key))
                 {
-                    if (!manifest.ContainsKey(name)) throw new InvalidDataException("备份清单缺失：" + name);
+                    var source = ProfileImportAssets.ResolveTarget(full, name);
+                    _ = ProfileImportAssets.ResolveTarget(DirectoryPath, name);
                     if (manifest[name] is null) { values[name] = null; continue; }
-                    var bytes = await File.ReadAllBytesAsync(System.IO.Path.Combine(full, name), token);
+                    var bytes = await File.ReadAllBytesAsync(source, token);
                     if (Convert.ToHexString(SHA256.HashData(bytes)) != manifest[name]!.GetValue<string>()) throw new InvalidDataException("备份校验失败：" + name);
                     values[name] = bytes;
                 }
@@ -71,7 +86,7 @@ public sealed partial class SaveData
     {
         var documents = new Dictionary<string, JsonObject?>();
         foreach (var name in ProfileImportFiles.Names)
-            documents[name] = File.Exists(System.IO.Path.Combine(DirectoryPath, name)) ? await ReadAsync(name, token) : null;
+            documents[name] = File.Exists(ProfileImportAssets.ResolveTarget(DirectoryPath, name)) ? await ReadAsync(name, token) : null;
         foreach (var name in request.Selection.Files)
         {
             if (request.GetEffectiveDocument(name) is not { } imported) continue;
@@ -99,6 +114,22 @@ public sealed partial class SaveData
         }
         if (request.Selection.Folders && documents["Foldres.json"] is { } folders && request.GetEffectiveDocument("Foldres.json") is not null)
             LegacyFolderConfigUpgrade.NormalizeOrders(folders, ReadProfileConfig(documents["UserSetting.json"] ?? new()));
+        var playlists = request.AssetNames.Where(name => ProfileImportAssets.Kind(name) == ProfileImportAssetKind.Playlists).ToArray();
+        if (playlists.Length > 0)
+        {
+            documents["UserSetting.json"] ??= new JsonObject();
+            var config = Object(Object(documents["UserSetting.json"]!, "Config"), "Playlist");
+            // 不跟随旧自定义目录写入；原默认目录契约由当前Profile提供，未知设置继续保留。
+            config["PlaylistFolder"] = null;
+            var current = config["CurrentPlaylist"]?.GetValue<string>();
+            if (current is not null)
+            {
+                var fileName = current.Replace('\\', '/').Split('/')[^1];
+                var imported = playlists.FirstOrDefault(name => ProfileImportAssets.CollisionKey(name) == ProfileImportAssets.CollisionKey("Playlists/" + fileName));
+                if (imported is not null) config["CurrentPlaylist"] = imported.Split('/')[1];
+            }
+        }
+        foreach (var name in request.AssetNames) _ = ProfileImportAssets.ResolveTarget(DirectoryPath, name);
         return documents;
     }
     /// <summary>检查已迁字段、集合和已知命令参数；未迁未知字段继续保留。</summary>
@@ -150,34 +181,42 @@ public sealed partial class SaveData
             }
     }
     /// <summary>在权威文件改写前保存原字节和缺失清单，不替代短期事务副本。</summary>
+    /// <param name="assets">实际覆盖的附属项；未选中材料不备份或触碰。</param>
     /// <param name="token">备份准备取消。</param><returns>当前 Profile 下带哈希清单的备份目录。</returns>
-    private async Task<string> CreateImportBackupAsync(CancellationToken token)
+    private async Task<string> CreateImportBackupAsync(IEnumerable<string> assets, CancellationToken token)
     {
+        ProfileImportAssets.RejectLink(DirectoryPath);
+        ProfileImportAssets.RejectLink(System.IO.Path.Combine(DirectoryPath, "ImportBackups"));
         var path = System.IO.Path.Combine(DirectoryPath, "ImportBackups", DateTime.UtcNow.ToString("yyyyMMddTHHmmssfff") + "-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(path); var manifest = new JsonObject();
-        foreach (var name in ProfileImportFiles.Names)
+        foreach (var name in ProfileImportFiles.Names.Concat(assets).Distinct())
         {
-            var source = System.IO.Path.Combine(DirectoryPath, name);
+            var source = ProfileImportAssets.ResolveTarget(DirectoryPath, name);
             if (!File.Exists(source)) { manifest[name] = null; continue; }
             var bytes = await File.ReadAllBytesAsync(source, token);
-            await WriteDurableBytesAsync(System.IO.Path.Combine(path, name), bytes, token);
+            var target = ProfileImportAssets.ResolveTarget(path, name);
+            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target)!);
+            await WriteDurableBytesAsync(target, bytes, token);
             manifest[name] = Convert.ToHexString(SHA256.HashData(bytes));
         }
         await WriteDurableBytesAsync(System.IO.Path.Combine(path, "manifest.json"), JsonSerializer.SerializeToUtf8Bytes(manifest, Options), token);
         return path;
     }
-    /// <summary>将选定 JSON 序列化到后台事务；未包含的文件不触碰。</summary>
-    /// <param name="docs">实际提交文件。</param><param name="token">提交点之前取消。</param>
-    private Task WriteImportDocumentsAsync(IReadOnlyDictionary<string, JsonObject?> docs, CancellationToken token) =>
-        WriteImportBytesAsync(docs.ToDictionary(p => p.Key, p => p.Value is null ? null : JsonSerializer.SerializeToUtf8Bytes(p.Value, Options)), token);
-    /// <summary>共用原五文件提交与中断恢复原语，null 明确表示恢复原缺失状态。</summary>
-    /// <param name="values">固定 Profile 文件及目标字节。</param><param name="token">提交标记前取消。</param>
+    /// <summary>共用原提交与中断恢复原语，null 明确表示恢复原缺失状态。</summary>
+    /// <param name="values">受限 Profile 文件及目标字节。</param><param name="token">提交标记前取消。</param>
     private async Task WriteImportBytesAsync(IReadOnlyDictionary<string, byte[]?> values, CancellationToken token)
     {
         var names = values.Keys.ToArray(); var marker = System.IO.Path.Combine(DirectoryPath, ".save-pending.json");
+        // 目标验证失败时不能进入清理：未经验证的来源名绝不用于删除暂存文件。
+        var targets = values.Keys.ToDictionary(name => name, name => ProfileImportAssets.ResolveTarget(DirectoryPath, name));
+        ProfileImportAssets.RejectLink(marker); ProfileImportAssets.RejectLink(marker + ".tmp");
         try
         {
-            foreach (var pair in values) if (pair.Value is { } bytes) await WriteDurableBytesAsync(System.IO.Path.Combine(DirectoryPath, pair.Key) + ".tmp", bytes, token);
+            foreach (var pair in values) if (pair.Value is { } bytes)
+            {
+                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(targets[pair.Key])!);
+                await WriteDurableBytesAsync(targets[pair.Key] + ".tmp", bytes, token);
+            }
             await CommitTemporaryFilesAsync(names, values.Where(p => p.Value is null).Select(p => p.Key).ToHashSet(), token);
         }
         catch { RecoverInterruptedSave(); throw; }
@@ -185,7 +224,8 @@ public sealed partial class SaveData
         {
             foreach (var name in names.Append(".save-pending.json"))
             {
-                var path = System.IO.Path.Combine(DirectoryPath, name);
+                var path = name == ".save-pending.json" ? marker : ProfileImportAssets.ResolveTarget(DirectoryPath, name);
+                ProfileImportAssets.RejectLink(path + ".tmp"); ProfileImportAssets.RejectLink(path + ".save-backup");
                 if (File.Exists(path + ".tmp")) File.Delete(path + ".tmp");
                 if (!File.Exists(marker) && File.Exists(path + ".save-backup")) File.Delete(path + ".save-backup");
             }

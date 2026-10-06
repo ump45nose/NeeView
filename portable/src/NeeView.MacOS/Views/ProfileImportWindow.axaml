@@ -42,7 +42,10 @@
         <CheckBox Content="目录参数" IsChecked="{Binding ImportFolders}" Margin="0,0,16,0" />
         <CheckBox Content="快速访问" IsChecked="{Binding ImportQuickAccess}" Margin="0,0,16,0" />
         <CheckBox Content="历史 / 阅读进度" IsChecked="{Binding ImportHistory}" Margin="0,0,16,0" />
-        <CheckBox Content="书签" IsChecked="{Binding ImportBookmarks}" />
+        <CheckBox Content="书签" IsChecked="{Binding ImportBookmarks}" Margin="0,0,16,0" />
+        <CheckBox Content="播放列表" IsChecked="{Binding ImportPlaylists}" Margin="0,0,16,0" />
+        <CheckBox Content="主题材料" IsChecked="{Binding ImportThemes}" Margin="0,0,16,0" />
+        <CheckBox Content="脚本材料（不执行）" IsChecked="{Binding ImportScripts}" />
       </WrapPanel>
     </StackPanel>
     <TabControl Grid.Row="5">
@@ -55,6 +58,18 @@
             <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="4" /></DataTemplate></ListBox.ItemTemplate>
           </ListBox>
         </Grid>
+      </TabItem>
+      <TabItem Header="附属文件">
+        <ListBox ItemsSource="{Binding Preview.Assets}" x:Name="ImportAssetList">
+          <ListBox.ItemTemplate><DataTemplate>
+            <StackPanel Margin="4" Spacing="3">
+              <TextBlock Text="{Binding Path}" FontWeight="SemiBold" />
+              <StackPanel Orientation="Horizontal" Spacing="6"><TextBlock Text="{Binding Bytes}" /><TextBlock Text="bytes" /></StackPanel>
+              <TextBlock Text="{Binding Capability}" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding Error}" TextWrapping="Wrap" Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}" />
+            </StackPanel>
+          </DataTemplate></ListBox.ItemTemplate>
+        </ListBox>
       </TabItem>
       <TabItem Header="历史 / 书签 / 路径">
         <ListBox ItemsSource="{Binding Preview.Paths}" x:Name="ImportPathList">

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace NeeView;
 
 /// <summary>原五文件的只读预览；保留原树和差分，实际应用通过独立候选接入 SaveData 事务。</summary>
-public sealed class ProfileImportService(IProfileImportReader reader, IReadOnlyList<CommandDefinition> definitions, IReadOnlySet<string> available)
+public sealed partial class ProfileImportService(IProfileImportReader reader, IReadOnlyList<CommandDefinition> definitions, IReadOnlySet<string> available)
 {
     private readonly SemaphoreSlim _gate = new(1);
     /// <summary>有界读取后后台解析；同一服务串行，取消/旧请求不接触当前配置。</summary>
@@ -77,7 +77,8 @@ public sealed class ProfileImportService(IProfileImportReader reader, IReadOnlyL
                     Map(start, "LastFolderPath", "Config.StartUp");
                     foreach (var field in new[] { "DestinationFolderCollection", "DestinationFodlerCollection" })
                         Walk(Array(Object(config, "System"), field), "Config.System." + field, "Path");
-                    Map(Object(config, "Playlist"), "PlaylistFolderRaw", "Config.Playlist");
+                    Map(Object(config, "Playlist"), "PlaylistFolder", "Config.Playlist");
+                    Map(Object(config, "Playlist"), "CurrentPlaylist", "Config.Playlist");
                     Map(Object(Object(config, "Book"), "ExportImageParameter"), "ExportFolder", "Config.Book.ExportImageParameter");
                     if (raw["MacImportedLegacyEffectUpgrade"]?.ToString() == "Layers/1")
                         notices.Add("旧 ImageEffect 已按原规则转换为效果层、参数缓存和默认预设，原材料保留；效果实际执行尚未接入。");
@@ -165,8 +166,9 @@ public sealed class ProfileImportService(IProfileImportReader reader, IReadOnlyL
             notices.Add("检测到 History.Folders（原 FoldersLegacy），按原字典转换恢复；默认排序在最终配置确定后归一，不套用独立文件递归升级。");
         if (docs.GetValueOrDefault("Bookmark.json")?["QuickAccess"] is not null && !docs.ContainsKey("QuicAccess.json"))
             notices.Add("检测到 Bookmark.QuickAccess（原 QuickAccessLegacy），保留内嵌Format并单独校验，未知/未来版本不能实际应用。");
+        var assets = PreviewAssets(bundle, mapper, paths, notices, token);
         foreach (var extra in bundle.ExtraEntries) notices.Add("附属项未导入：" + extra + "（脚本不执行）");
-        return new(docs, summaries.AsReadOnly(), paths.AsReadOnly(), commands.AsReadOnly(), notices.AsReadOnly());
+        return new(docs, summaries.AsReadOnly(), paths.AsReadOnly(), commands.AsReadOnly(), notices.AsReadOnly(), assets.Bytes, assets.Summaries);
 
         // 仅报告现有配置投影外字段，不建立第二套设置 schema，也不把字段存在当作功能通过。
         void ReportSettings(JsonObject? node, Type type, string field, int depth)

@@ -745,13 +745,13 @@
       "source": "NeeView/Playlist/PlaylistHub.cs",
       "target": "src/NeeView.Engine/Playlist/PlaylistHub.cs",
       "sha256": "66d22fb6172366cba7343ab716d41a1d29047231708c3b998671c4f1b7e8a7e4",
-      "status": "原文件选择/Default首项/自然排序/循环关系；监视、文件管理待迁"
+      "status": "原文件选择/Default首项/自然排序/循环关系；监视、文件管理待迁 P5第七批：目录枚举保留Windows扩展名大小写语义，导入.NVPLS不会从原Hub列表漏掉。"
     },
     {
       "source": "NeeView/Playlist/PlaylistSourceTools.cs",
       "target": "src/NeeView.Engine/Playlist/PlaylistSourceTools.cs",
       "sha256": "17c4c51f9a14db8d0b8ee7cae6d9614b7a526f581fd9271b6c8fb12fa46c7cb9",
-      "status": "P4第七批共用原v1/v2解析与临时列表格式；原Hub与来源同入口，保留重复及顺序；路径映射/完整修复待P5"
+      "status": "P4第七批与P5第七批共用原v1/v2解析；列表导入仅映射已知Items路径，版本/未知数据保留；完整修复后续迁入。 Unique binary parser preserves original ReadAllText UTF-8 BOM behavior; imported bytes remain intact."
     },
     {
       "source": "NeeView/Playlist/PlaylistSourceValidator.cs",
@@ -1873,13 +1873,13 @@
       "source": "NeeView/SaveData/Exporter.cs",
       "target": "src/NeeView.Backends/Content/ProfileImportReader.cs",
       "sha256": "e20bdec6ce1e3233965df1a2e6a90b2ccde1824791bb5e8819fa8a13b31592cb",
-      "status": "P5 原五文件/标准ZIP形状适配；只读预览不导出或解压脚本"
+      "status": "P5第七批：原五文件与三个一级附属目录只读快照；两种ZIP分隔符、原扩展名范围；有限字节，不落盘解压、不执行脚本。"
     },
     {
       "source": "NeeView/SaveData/Importer.cs",
       "target": "src/NeeView.Engine/SaveData/SaveData.ProfileImport.cs",
       "sha256": "5097c3763a92995343526387beb702432061b7d660658cc880adde3c3501e876",
-      "status": "P5第二批：原默认选择、独立文件优先/旧内嵌后备、来源差分恢复；复用五JSON备份/提交/失败恢复和唯一窗口重建。附属脚本/主题/播放列表本批不导入，完整旧设置validator待迁入。"
+      "status": "P5第二/七批：原默认选择/覆盖、独立文件优先及后备、差分恢复。附属文件参加唯一Profile事务/原字节哈希备份/失败重建恢复；Mac列表使用Profile管理目录，主题脚本仅材料不执行。"
     },
     {
       "source": "NeeView/SaveData/UserSettingTools.cs",
@@ -2150,6 +2150,36 @@
       "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
       "sha256": "3e7d3c7ae1a7d9296272a0fa9f1522b99937c2ebc32cdb46ce98f81a57ae2a51",
       "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/SaveData/SaveDataProfile.cs",
+      "target": "src/NeeView.Engine/SaveData/ProfileImportAssets.cs",
+      "sha256": "6727692ad5246b9171f71a7bdcf81d508e459737d9faee72c39794724b8bb22f",
+      "status": "P5第七批：原三个目录和一级允许文件范围；Mac规范路径/链接/别名边界适配，不建立新存储服务 原Default/Pagemark大小写别名还原固定逻辑名，其它文件名保持。"
+    },
+    {
+      "source": "NeeView/SaveData/Importer.cs",
+      "target": "src/NeeView.Engine/SaveData/ProfileImportRequest.cs",
+      "sha256": "5097c3763a92995343526387beb702432061b7d660658cc880adde3c3501e876",
+      "status": "P5第七批：原设置默认开、附属三类默认关闭；确认时复制实际选中字节，损坏列表只阻止该类"
+    },
+    {
+      "source": "NeeView/Playlist/PlaylistSourceTools.cs",
+      "target": "src/NeeView.Engine/SaveData/ProfileImportService.Assets.cs",
+      "sha256": "17c4c51f9a14db8d0b8ee7cae6d9614b7a526f581fd9271b6c8fb12fa46c7cb9",
+      "status": "P5第七批：复用原列表唯一格式解析器生成路径预览，不另建列表内核；未知数据及内部相对定位保留"
+    },
+    {
+      "source": "NeeView/Styles/ThemeManager.cs",
+      "target": "src/NeeView.Backends/Content/ProfileImportReader.cs",
+      "sha256": "7fc00b3031d6f1c43ccdf12d15f1befdaaec1b11c865548c90b753535c972816",
+      "status": "P5第七批：仅复用CollectCustomThemes的一级*.json材料范围；实际主题装载/应用没有迁入"
+    },
+    {
+      "source": "NeeView/Script/ScriptCommandSourceMap.cs",
+      "target": "src/NeeView.Backends/Content/ProfileImportReader.cs",
+      "sha256": "32225b08b5ee923474d6fdfd51010296e8b954190bb8255539b9bd8a9264d333",
+      "status": "P5第七批：仅复用CollectScripts的一级*.nvjs材料范围；不登记脚本命令、watcher或触发事件执行"
     }
   ],
   "rule_references": [

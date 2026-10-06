@@ -644,17 +644,19 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         }
     }
     /// <summary>统一文件提交原语，普通保存、导入和备份恢复共用同一 marker 格式。</summary>
-    /// <param name="names">已准备临时文件的固定 Profile 名称。</param>
+    /// <param name="names">已准备临时文件的受限 Profile 名称。</param>
     /// <param name="deleted">事务明确删除的文件；缺省文件不会误当作删除。</param>
     /// <param name="token">提交标记前可取消，标记之后完成或回滚。</param>
     private async Task CommitTemporaryFilesAsync(IReadOnlyList<string> names, IReadOnlySet<string> deleted, CancellationToken token)
     {
         var marker = System.IO.Path.Combine(DirectoryPath, ".save-pending.json");
         var previous = new JsonObject();
+        var targets = names.ToDictionary(name => name, name => ProfileImportAssets.ResolveTarget(DirectoryPath, name));
+        ProfileImportAssets.RejectLink(marker); ProfileImportAssets.RejectLink(marker + ".tmp");
         foreach (var name in names)
         {
             token.ThrowIfCancellationRequested();
-            var path = System.IO.Path.Combine(DirectoryPath, name);
+            var path = targets[name];
             previous[name] = File.Exists(path);
             if (File.Exists(path)) File.Copy(path, path + ".save-backup", true);
         }
@@ -663,7 +665,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         File.Move(marker + ".tmp", marker, true);
         foreach (var name in names)
         {
-            var path = System.IO.Path.Combine(DirectoryPath, name);
+            var path = targets[name];
             if (deleted.Contains(name)) File.Delete(path);
             else File.Move(path + ".tmp", path, true);
         }
@@ -690,12 +692,17 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
     private void RecoverInterruptedSave()
     {
         var marker = System.IO.Path.Combine(DirectoryPath, ".save-pending.json");
+        ProfileImportAssets.RejectLink(marker);
         if (!File.Exists(marker)) return;
         var previous = JsonNode.Parse(File.ReadAllText(marker))!.AsObject();
-        foreach (var name in new[] { "History.json", "UserSetting.json", "Bookmark.json", FolderConfigCollection.FileName, QuickAccessCollection.FileName }.Where(previous.ContainsKey))
+        if (previous.Count > ProfileImportFiles.MaxEntries) throw new InvalidDataException("恢复清单数量超限。");
+        if (previous.Select(p => ProfileImportAssets.CollisionKey(p.Key)).Distinct().Count() != previous.Count) throw new InvalidDataException("恢复清单文件名冲突。");
+        // 验证完整清单后才恢复；兼容原双/三/四/五文件 marker，没有第二恢复协议。
+        var targets = previous.ToDictionary(pair => pair.Key, pair => (Path: ProfileImportAssets.ResolveTarget(DirectoryPath, pair.Key), Exists: pair.Value!.GetValue<bool>()));
+        foreach (var pair in targets)
         {
-            var path = System.IO.Path.Combine(DirectoryPath, name);
-            if (previous[name]!.GetValue<bool>()) File.Copy(path + ".save-backup", path, true);
+            var path = pair.Value.Path;
+            if (pair.Value.Exists) File.Copy(path + ".save-backup", path, true);
             else if (File.Exists(path)) File.Delete(path);
         }
         File.Delete(marker);
@@ -703,7 +710,10 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
     /// <summary>写入同目录临时 JSON 并刷新到磁盘；不替换权威文件。</summary>
     private async Task WriteTemporaryAsync(string name, JsonObject value, CancellationToken token)
     {
-        var temp = System.IO.Path.Combine(DirectoryPath, name) + ".tmp";
+        // 两个内部marker由既有保存/重命名调用方给出，不能作为附属导入/恢复清单目标。
+        var path = name is ".save-pending.json" or ".book-rename-pending.json" ? System.IO.Path.Combine(DirectoryPath, name) : ProfileImportAssets.ResolveTarget(DirectoryPath, name);
+        ProfileImportAssets.RejectLink(DirectoryPath); ProfileImportAssets.RejectLink(path + ".tmp");
+        var temp = path + ".tmp";
         await using var stream = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
         await JsonSerializer.SerializeAsync(stream, value, Options, token);
         await stream.FlushAsync(token); stream.Flush(true);

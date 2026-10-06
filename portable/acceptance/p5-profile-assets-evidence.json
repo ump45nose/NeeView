@@ -1,0 +1,229 @@
+{
+  "utc": "2026-10-06T07:42:10.351689+00:00",
+  "scope": "Synthetic isolated Profile assets, original playlist parser and Hub, common transaction/rebuild recovery, formal Headless view; not actual user exports or Windows/device acceptance",
+  "new_asset_tests": [
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.InvalidPlaylistDoesNotBlockSelectingOnlyScripts(text: \"{broken\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0179885"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.PlaylistMappingUsesExistingFormatParserAndPreservesUnknownData(format: \"NeeViewPlaylist.1\", v1: True)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0024691"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.UnsafeZipNamesAreRejectedWithoutExtraction(name: \"/Themes/x.json\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0040263"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.PlaylistMappingUsesExistingFormatParserAndPreservesUnknownData(format: \"NeeView.Playlist/2.0.0\", v1: False)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0010232"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.PartialAssetCommitRollsBackEarlierOverwrite",
+      "outcome": "Passed",
+      "duration": "00:00:00.0243975"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.SerializedPlaylistFolderAndAbsoluteSelectionAreMappedButShortNameIsPreserved",
+      "outcome": "Passed",
+      "duration": "00:00:00.0023715"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.UnsafeZipNamesAreRejectedWithoutExtraction(name: \"C:/Themes/x.json\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0005159"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.PlaylistMappingUsesExistingFormatParserAndPreservesUnknownData(format: \"NeeView.Playlist/45.0.3981\", v1: False)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0184606"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.DefaultSkipsAllAssetsAndThemeOnlyKeepsUnselectedBytes",
+      "outcome": "Passed",
+      "duration": "00:00:00.0239766"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.InvalidPlaylistDoesNotBlockSelectingOnlyScripts(text: \"{\\\"Format\\\":\\\"NeeView.Playlist/2.0.1\\\",\\\"Items\\\":[\"···)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0183706"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.WindowsDefaultAndPagemarkAliasesRestoreFixedNamesAndUppercaseListsRemainVisible",
+      "outcome": "Passed",
+      "duration": "00:00:00.0439389"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.BomPlaylistRemainsByteExactAndLoadsThroughExistingHub",
+      "outcome": "Passed",
+      "duration": "00:00:00.0292934"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.UnsafeZipNamesAreRejectedWithoutExtraction(name: \"Scripts/./OnStartup.nvjs\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0006676"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.PreviewAndConfirmedRequestOwnIndependentBytes",
+      "outcome": "Passed",
+      "duration": "00:00:00.0230110"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.ImportedListsJoinExistingHubAndRestoreCustomDirectoryAndExactBytes",
+      "outcome": "Passed",
+      "duration": "00:00:00.0410404"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.ZipAliasesCannotOverwriteOneAnother(first: \"Themes/A.json\", second: \"themes/a.JSON\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0017713"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.InvalidBackupCannotWriteAnyTarget(damage: \"path\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0232441"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.DirectoryAndZipKeepOriginalBytesAndSkipUnsupportedNestedMaterials(separator: '/')",
+      "outcome": "Passed",
+      "duration": "00:00:00.0048601"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.InvalidPlaylistDoesNotBlockSelectingOnlyScripts(text: \"{}\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0147504"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.PlaylistMappingUsesExistingFormatParserAndPreservesUnknownData(format: \"NeeView.Playlist/2.0.1\", v1: False)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0006926"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.SourceAndTargetLinksNeverReadOrWriteOutsideProfile",
+      "outcome": "Passed",
+      "duration": "00:00:00.0043281"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.FormalViewSeparatesMaterialsFromRuntimeCapabilities",
+      "outcome": "Passed",
+      "duration": "00:00:00.4551744"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.InvalidBackupCannotWriteAnyTarget(damage: \"syntax\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0236984"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.UnsafeZipNamesAreRejectedWithoutExtraction(name: \"Themes/../x.json\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0008884"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.InvalidBackupCannotWriteAnyTarget(damage: \"hash\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0238076"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.RestoreReturnsOriginalBytesAndDeletesOnlyPreviouslyMissingSelectedFiles",
+      "outcome": "Passed",
+      "duration": "00:00:00.0395337"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.DirectoryAndZipKeepOriginalBytesAndSkipUnsupportedNestedMaterials(separator: '\\\\')",
+      "outcome": "Passed",
+      "duration": "00:00:00.0028942"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.ZipSymlinkAndOversizedAssetAreRejected",
+      "outcome": "Passed",
+      "duration": "00:00:00.0059031"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.FailedRebuildRestoresBothJsonAndAssetsBeforeReopening",
+      "outcome": "Passed",
+      "duration": "00:00:00.0587564"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.StartupRecoversDynamicMarkerAndKeepsFailedRollbackMaterialsForRetry",
+      "outcome": "Passed",
+      "duration": "00:00:00.0045227"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.CancellationBeforeCommitDoesNotCreateImportBackupOrModifyFiles",
+      "outcome": "Passed",
+      "duration": "00:00:00.0021492"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.InvalidPlaylistDoesNotBlockSelectingOnlyScripts(text: \"{\\\"Format\\\":\\\"NeeView.Playlist/3.0.0\\\",\\\"Items\\\":[\"···)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0175836"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.InvalidMarkerIsRejectedBeforeAnyRecoveryMutation",
+      "outcome": "Passed",
+      "duration": "00:00:00.0012793"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ProfileImportAssetTests.ZipAliasesCannotOverwriteOneAnother(first: \"Themes/café.json\", second: \"Themes/café.json\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0008013"
+    }
+  ],
+  "new_asset_test_count": 34,
+  "full_tests": {
+    "total": "1148",
+    "executed": "1146",
+    "passed": "1146",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "targeted_before_case_fix": 350,
+  "final_asset_playlist_regression": 71,
+  "boundaries": {
+    "production_projects": [
+      "NeeView.Backends",
+      "NeeView.Engine",
+      "NeeView.MacOS"
+    ],
+    "source_files": 72,
+    "partial_adapters": 291,
+    "upstream_source_files": 26
+  },
+  "foreground_app_activated": false,
+  "user_images_modified": false,
+  "formal_app": "构建及本地签名校验通过；运行见独立真机记录，Developer ID/公证/安装未执行",
+  "skipped": [
+    "NeeView.Engine.Tests.BrowseResourceTests.MountedResourceSubfoldersRenderAndScrollWithBoundedDisplay",
+    "NeeView.Engine.Tests.PageThumbnailResourceTests.ResourceSamplesShowThumbnailsScrollAndCloseWithBoundedResources"
+  ],
+  "repairs": [
+    "Preserve original book-rename internal temporary marker while rejecting it as imported asset/recovery target",
+    "Missing playlist format only blocks playlist selection, not importing scripts alone",
+    "Serialized playlist directory/absolute selection mappings, uppercase list enumeration, Default/Pagemark aliases",
+    "Unique playlist parser accepts original UTF-8 BOM while keeping imported bytes intact"
+  ],
+  "artifacts": "/Users/yuwk/.codex/artifacts/neeview/p5-profile-assets-20261006",
+  "limitations": [
+    "Theme loading/applying not migrated",
+    "Scripts not registered or executed on import/rebuild",
+    "Actual branch exports, system picker and Windows dynamic comparison not verified",
+    "Developer ID/notarization/install not performed; P5 not complete"
+  ],
+  "import_sources_modified": false,
+  "windows_baseline_modified": false
+}

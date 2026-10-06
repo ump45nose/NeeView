@@ -26,13 +26,17 @@ public sealed class ProfileImportViewModel : ObservableObject, IDisposable
     public ProfileImportPreview? Preview { get => _preview; private set { if (SetProperty(ref _preview, value)) { OnPropertyChanged(nameof(Summary)); OnPropertyChanged(nameof(CanApply)); } } }
     public bool IsBusy { get => _busy; private set { if (SetProperty(ref _busy, value)) { OnPropertyChanged(nameof(CanPreview)); OnPropertyChanged(nameof(CanApply)); } } }
     public bool CanPreview => !_disposed && _source is not null && !IsBusy;
-    private bool _settings = true, _folders = true, _quickAccess = true, _history, _bookmarks;
+    private bool _settings = true, _folders = true, _quickAccess = true, _history, _bookmarks, _playlists, _themes, _scripts;
     public bool ImportSettings { get => _settings; set { if (SetProperty(ref _settings, value)) SelectionChanged(); } }
     public bool ImportFolders { get => _folders; set { if (SetProperty(ref _folders, value)) SelectionChanged(); } }
     public bool ImportQuickAccess { get => _quickAccess; set { if (SetProperty(ref _quickAccess, value)) SelectionChanged(); } }
     public bool ImportHistory { get => _history; set { if (SetProperty(ref _history, value)) SelectionChanged(); } }
     public bool ImportBookmarks { get => _bookmarks; set { if (SetProperty(ref _bookmarks, value)) SelectionChanged(); } }
-    public bool CanApply => !_disposed && !IsBusy && Preview is not null && (ImportSettings || ImportFolders || ImportQuickAccess || ImportHistory || ImportBookmarks);
+    public bool ImportPlaylists { get => _playlists; set { if (SetProperty(ref _playlists, value)) SelectionChanged(); } }
+    public bool ImportThemes { get => _themes; set { if (SetProperty(ref _themes, value)) SelectionChanged(); } }
+    public bool ImportScripts { get => _scripts; set { if (SetProperty(ref _scripts, value)) SelectionChanged(); } }
+    public bool CanApply => !_disposed && !IsBusy && Preview is not null && (ImportSettings || ImportFolders || ImportQuickAccess || ImportHistory || ImportBookmarks || ImportPlaylists || ImportThemes || ImportScripts);
+    private ProfileImportSelection Selection => new(ImportSettings, ImportFolders, ImportQuickAccess, ImportHistory, ImportBookmarks, ImportPlaylists, ImportThemes, ImportScripts);
     /// <summary>只呈现来源选择/确认错误，不创建系统窗口或接触文件。</summary>
     public void ReportError(string message) { if (!_disposed) Error = message; }
     private void SelectionChanged() { Error = null; OnPropertyChanged(nameof(CanApply)); }
@@ -41,18 +45,18 @@ public sealed class ProfileImportViewModel : ObservableObject, IDisposable
     {
         if (!CanApply) return null;
         var preview = Preview!; var generation = _generation;
-        var selection = new ProfileImportSelection(ImportSettings, ImportFolders, ImportQuickAccess, ImportHistory, ImportBookmarks);
+        var selection = Selection;
         IsBusy = true;
         try
         {
             var request = await Task.Run(() => preview.CreateRequest(selection));
-            return !_disposed && generation == _generation && selection == new ProfileImportSelection(ImportSettings, ImportFolders, ImportQuickAccess, ImportHistory, ImportBookmarks) ? request : null;
+            return !_disposed && generation == _generation && selection == Selection ? request : null;
         }
         catch (Exception ex) { if (!_disposed && generation == _generation) Error = ex.Message; return null; }
         finally { if (!_disposed && generation == _generation) IsBusy = false; }
     }
     public string? Error { get => _error; private set => SetProperty(ref _error, value); }
-    public string Summary => Preview is { } p ? $"{p.Paths.Count} 条路径，{p.UnmappedCount} 条未映射，{p.Commands.Count} 个命令 · 应用前预览" : "未生成预览；不会写入当前数据。";
+    public string Summary => Preview is { } p ? $"{p.Paths.Count} 条路径，{p.UnmappedCount} 条未映射，{p.Commands.Count} 个命令，{p.Assets.Count} 个附属文件 · 应用前预览" : "未生成预览；不会写入当前数据。";
     /// <summary>使用 Engine 预览契约，编辑行为与窗口结构、主题分开。</summary>
     public ProfileImportViewModel(ProfileImportService service) { _service = service; Mappings.CollectionChanged += MappingsChanged; }
     /// <summary>来源切换立即使旧候选失效，再读取明确选定来源。</summary>
