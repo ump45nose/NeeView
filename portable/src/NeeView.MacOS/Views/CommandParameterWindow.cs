@@ -26,6 +26,14 @@ public sealed class CommandParameterWindow : Window
                 scope.Register(field.Name, check);
                 check.IsCheckedChanged += (_, _) => field.SetValue(draft.Value, check.IsChecked == true); fields.Children.Add(check);
             }
+            else if (field.PropertyType == typeof(string))
+            {
+                fields.Children.Add(new TextBlock { Text = label });
+                var text = new TextBox { Name = field.Name, Text = (string?)field.GetValue(draft.Value) };
+                scope.Register(field.Name, text);
+                text.TextChanged += (_, _) => field.SetValue(draft.Value, text.Text ?? "");
+                fields.Children.Add(text);
+            }
             else if (field.PropertyType.IsEnum)
             {
                 fields.Children.Add(new TextBlock { Text = label }); var choices = Enum.GetValues(field.PropertyType).Cast<object>().ToArray();

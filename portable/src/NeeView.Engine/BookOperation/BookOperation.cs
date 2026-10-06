@@ -67,13 +67,15 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>共享原加载链；历史重放可指定条目并保留访问顺序，返回是否实际提交新书。</summary>
     /// <param name="startupMemento">原 FirstLoader 的显式启动快照，优先于历史和字段恢复策略。</param>
     /// <param name="pageSearchKeyword">同书文件结果重载保留原临时搜索；普通切书仍使用默认空查询。</param>
-    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, Playlist? expectedPlaylist = null, int? terminalDirection = null, string? pageSearchKeyword = null, IReadOnlyList<string>? openPaths = null)
+    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, Playlist? expectedPlaylist = null, int? terminalDirection = null, string? pageSearchKeyword = null, IReadOnlyList<string>? openPaths = null, long? expectedGeneration = null)
     {
         ObjectDisposedException.ThrowIf(_disposed || _closing, this);
+        // 设置重收集不能抢占在导航锁释放后发起的新打开；原普通打开仍按新代次优先。
+        if (expectedGeneration is { } expected && Interlocked.CompareExchange(ref _generation, expected + 1, expected) != expected) return false;
         CancelCopyPreparation();
         CancelFileCopyPreparation();
         CancelBookTransferPreparation();
-        var generation = Interlocked.Increment(ref _generation);
+        var generation = expectedGeneration is { } previous ? previous + 1 : Interlocked.Increment(ref _generation);
         _opening?.Cancel();
         var opening = CancellationTokenSource.CreateLinkedTokenSource(token); _opening = opening;
         IsLoading = true; Error = null; Notify();

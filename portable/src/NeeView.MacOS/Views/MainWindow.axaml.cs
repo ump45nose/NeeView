@@ -39,7 +39,7 @@ public sealed partial class MainWindow : Window
     private SliderTextBox PageNumber => this.FindControl<SliderTextBox>("PageNumberView")!;
     private static readonly HashSet<string> HostCommands = new(StringComparer.Ordinal)
     {
-        "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen", "MoveToFolderAs", "CopyToFolderAs",
+        "SaveSetting", "ReloadSetting", "ExportBackup", "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen", "MoveToFolderAs", "CopyToFolderAs",
         "ViewScaleUp", "ViewScaleDown", "ViewScrollUp", "ViewScrollDown", "ViewScrollLeft", "ViewScrollRight", "OpenContextMenu", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
         "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ToggleBookLock", "Unload", "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff",
         "ToggleViewFlipVertical", "ViewFlipVerticalOn", "ViewFlipVerticalOff", "ViewReset", "ViewScaleStretch", "ViewPresetScroll", "ViewScrollNTypeUp", "ViewScrollNTypeDown",
@@ -184,6 +184,7 @@ public sealed partial class MainWindow : Window
     /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
     public bool IsCommandAvailable(string name) => name switch
     {
+        "SaveSetting" or "ReloadSetting" or "ExportBackup" => !_profileBusy && _model?.Operation.CanManageProfile == true,
         "ToggleMediaPlay" or "PrevMediaPosition" or "NextMediaPosition" => _model?.Operation.MediaExists() == true,
         var command when PagedTransformCommands.Contains(command) && _model?.Operation.IsFrameReading != true => false,
         "Unload" => _model?.Operation.CanUnload == true,
@@ -358,6 +359,8 @@ public sealed partial class MainWindow : Window
         {
             switch (name)
             {
+                case "SaveSetting": case "ReloadSetting": case "ExportBackup":
+                    await RunProfileActionAsync(name); break;
                 case "ToggleSlideShow":
                     _model.Operation.ToggleSlideShow(fromMenu);
                     BeginSlideShowAutoScroll();
@@ -925,6 +928,7 @@ public sealed partial class MainWindow : Window
         {
             foreach (var dialog in OwnedWindows.ToArray()) dialog.Close();
             _model?.Operation.CancelBookTransferPreparation();
+            _profileCancellation?.Cancel(); await _profileAction;
             await _destinationAction;
             await this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.PrepareCloseAsync();
             await _listStyleTask;

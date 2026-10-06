@@ -27,7 +27,7 @@ public sealed class CommandParameterEdit(string owner, object value)
     /// <summary>原字段在Mac编辑页的文案，业务计算继续读取原属性名。</summary>
     public static string Label(string property) => property switch
     {
-        "Delta" => "媒体步进秒数（0 使用默认值）", "MultiPagePolicy" => "当前页组范围", "Scale" => "缩放步幅（0–1）", "IsSnapDefaultScale" => "跨越默认比例时吸附到 100%", "Angle" => "旋转角度（度）", "IsStretch" => "旋转后适配窗口",
+        "FileName" => "备份文件名（空白时选择 .nvzip）", "Delta" => "媒体步进秒数（0 使用默认值）", "MultiPagePolicy" => "当前页组范围", "Scale" => "缩放步幅（0–1）", "IsSnapDefaultScale" => "跨越默认比例时吸附到 100%", "Angle" => "旋转角度（度）", "IsStretch" => "旋转后适配窗口",
         "Scroll" => "滚动步幅（视口比例）", "AllowCrossScroll" => "到边界后滚动另一轴", "Horizontal" => "水平对齐", "Vertical" => "垂直对齐", "IsSnap" => "强制对齐小于视口的图像",
         "ScrollType" => "滚动路径", "LineBreakStopTime" => "换行停顿（秒）", "EndMargin" => "终端容差（DIP）", "LineBreakStopMode" => "停顿位置", "PagesAsOne" => "全景页面作为整体（P3）",
         "IsReverse" => "允许随滑条方向反转", "IsLoop" => "循环切换", "IsToggle" => "再次选择此模式时切回原始大小", "Size" => "步进页数", "ToggleMode" => "快捷键开关动作", "IsIncludeTerminal" => "包含书籍首尾",

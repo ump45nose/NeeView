@@ -12,6 +12,7 @@ public static class CommandParameterTypes
         "ViewScaleUp" or "ViewBaseScaleUp" => typeof(ViewScaleCommandParameter),
         "CopyToFolderAs" => typeof(CopyToFolderAsCommandParameter),
         "CopyFile" => typeof(CopyFileCommandParameter),
+        "ExportBackup" => typeof(ExportBackupCommandParameter),
         var name when name == "MoveToFolderAs" || name.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal) => typeof(MoveToFolderAsCommandParameter),
         "ViewRotateLeft" => typeof(ViewRotateCommandParameter),
         "ViewScrollUp" => typeof(ViewScrollCommandParameter),

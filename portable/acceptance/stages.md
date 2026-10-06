@@ -482,3 +482,7 @@ GIF/WebP与官方ImageIO APNG沿原工厂/页框/JSON接入，原播放状态、
 ## P5 第十九批：ARM64开发分发
 
 12脚本回归通过，实际Release发布、21实际NuGet依赖/3 SDK运行时包原文许可、18 Mach-O ARM64/签名、ZIP完整性及随机目录重定位通过。未启动产品或写用户数据，Developer ID/公证/Gatekeeper/干净安装未验；[契约](../docs/p5-distribution.md)与[记录](p5-distribution-runtime.md)。P5未完成。
+
+## P5 第二十批：原Profile三命令
+
+22新增/23相关专项、1380全量通过/2资源跳过、14原生通过；正式Library/ARM64.app及本地签名通过。原导出/保存/仅设置原地恢复保持，递归+排序/失败重试/新打开和关闭等待已回归；实际保存sheet、真实导出/设备/Windows/正式分发另验，P5未完成。见[契约](../docs/p5-profile-commands.md)和[记录](p5-profile-commands-runtime.md)。

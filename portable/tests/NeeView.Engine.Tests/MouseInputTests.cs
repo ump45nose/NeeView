@@ -217,7 +217,8 @@ public sealed class MouseInputTests
             var menu = window.Viewer.ContextMenu!; Assert.Equal(8, menu.Items.Count);
             Assert.Contains(menu.Items.OfType<MenuItem>().SelectMany(i => i.Items.OfType<MenuItem>()), i => i.Tag is string name && name == "Unload" && i.IsEnabled);
             Assert.Contains(menu.Items.OfType<MenuItem>().SelectMany(i => i.Items.OfType<MenuItem>()), i => i.Tag is string name && name == "ToggleSlideShow" && i.IsEnabled);
-            Assert.Contains(menu.Items.OfType<MenuItem>().SelectMany(i => i.Items.OfType<MenuItem>()), i => i.Tag is string name && name == "ExportBackup" && !i.IsEnabled);
+            Assert.Contains(menu.Items.OfType<MenuItem>().SelectMany(i => i.Items.OfType<MenuItem>()), i => i.Tag is string name && name == "ExportBackup" && i.IsEnabled);
+            Assert.Contains(menu.Items.OfType<MenuItem>().SelectMany(i => i.Items.OfType<MenuItem>()), i => i.Tag is string name && name == "OpenConsole" && !i.IsEnabled);
             menu.Close(); Pump(window); Assert.Null(window.Viewer.ContextMenu);
         }
         finally { window.Viewer.ContextMenu?.Close(); await window.PrepareShutdownAsync(); window.Close(); }

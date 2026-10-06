@@ -8,7 +8,7 @@ namespace NeeView.MacOS.ViewModels;
 public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTable commands, SaveData saveData)
     : ObservableObject
 {
-    public LayoutPanelManager Layout { get; } = new(Config.Current.Panels.Layout);
+    public LayoutPanelManager Layout { get; private set; } = new(Config.Current.Panels.Layout);
     public bool IsPanelDragging { get; private set; }
     public BookOperation Operation { get; } = operation;
     public CommandTable Commands { get; } = commands;
@@ -240,6 +240,14 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public void SetPanelDragging(bool value) { IsPanelDragging = value; RefreshPanels(); }
     /// <summary>布局变化只保存原布局节点并刷新表现，不触发阅读解码。</summary>
     private void Layout_Changed(object? sender, EventArgs e) { Config.Current.Panels.Layout = Layout.CreateMemento(); RefreshPanels(); }
+    /// <summary>原设置重载恢复布局数据；唯一面板内容仍由表现宿主复用，不重开阅读上下文。</summary>
+    public void RestorePanelLayout()
+    {
+        Layout.Changed -= Layout_Changed;
+        Layout = new(Config.Current.Panels.Layout);
+        Layout.Changed += Layout_Changed;
+        OnPropertyChanged(nameof(Layout)); RefreshPanels();
+    }
     /// <summary>只通知侧栏绑定，不发布阅读刷新或重新申请图像。</summary>
     public void RefreshPanels()
     {

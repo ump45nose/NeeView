@@ -236,10 +236,10 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | HelpMainMenu | 显示主菜单帮助 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/HelpMainMenuCommand.cs |
 | HelpSearchOption | 搜索选项帮助 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/HelpSearchOptionCommand.cs |
 | OpenContextMenu | 打开上下文菜单 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/OpenContextMenuCommand.cs |
-| ExportBackup | 导出设置 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ExportBackupCommand.cs |
+| ExportBackup | 导出设置 |  |  | 已接入 | P5 原Profile串流备份/FileName及保存对话框；不执行脚本 | NeeView/Command/Commands/ExportBackupCommand.cs |
 | ImportBackup | 导入设置 |  |  | 已接入 | P5选择/预览、确认、备份及失败恢复；受支持版本与项目限制 | NeeView/Command/Commands/ImportBackupCommand.cs |
-| ReloadSetting | 重新载入设置 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ReloadSettingCommand.cs |
-| SaveSetting | 保存设置 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SaveSettingCommand.cs |
+| ReloadSetting | 重新载入设置 |  |  | 已接入 | P5 仅UserSetting原地恢复；来源规则变化重收集 | NeeView/Command/Commands/ReloadSettingCommand.cs |
+| SaveSetting | 保存设置 |  |  | 已接入 | P5 原SaveAll(false)/列表flush/立即阅读保存 | NeeView/Command/Commands/SaveSettingCommand.cs |
 | TouchEmulate | 模拟触控 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/TouchEmulateCommand.cs |
 | FocusPrevApp | 切换到上一个 NeeView | Ctrl+Shift+Tab |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/FocusPrevAppCommand.cs |
 | FocusNextApp | 切换到下一个 NeeView | Ctrl+Tab |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/FocusNextAppCommand.cs |
@@ -253,3 +253,5 @@ P4收尾不新增命令：原235实例、167执行入口/68占位保持。Delete
 P5 第十七批接通原三个媒体命令，当前171执行入口/64占位；235原实例保持，数量不代表功能覆盖率。视频及高级自动播放继续待迁。
 
 P5第十八批接通原ToggleSlideShow；当前172执行入口/63占位，235原实例保持。原计时/等待/输入及菜单/键位语义见[p5-slideshow.md](p5-slideshow.md)，数量不代表覆盖率。
+
+P5第二十批：SaveSetting/ReloadSetting/ExportBackup进入唯一Profile及可等待宿主。当前175入口/60占位，数量不代表功能覆盖率，见[契约](p5-profile-commands.md)。

@@ -2350,7 +2350,7 @@
     "Text": "导出设置",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ExportBackupCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P5 原Profile串流备份/FileName及保存对话框；不执行脚本",
     "MenuText": "导出设置...",
     "MouseGesture": "",
     "TouchGesture": "",
@@ -2372,7 +2372,7 @@
     "Text": "重新载入设置",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ReloadSettingCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P5 仅UserSetting原地恢复；来源规则变化重收集",
     "MouseGesture": "",
     "TouchGesture": "",
     "IsShowMessage": false
@@ -2382,7 +2382,7 @@
     "Text": "保存设置",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SaveSettingCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P5 原SaveAll(false)/列表flush/立即阅读保存",
     "MouseGesture": "",
     "TouchGesture": "",
     "IsShowMessage": true

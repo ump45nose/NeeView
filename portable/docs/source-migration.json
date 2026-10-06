@@ -2474,6 +2474,48 @@
       "target": "src/NeeView.MacOS/Views/ReaderView.SlideShow.cs",
       "sha256": "d3ecb95fc78100ae57db968c1ffc437f61afab8c148abdaafa42a954d9d54fa7",
       "status": "P5第十八批：原AutoScroll方向终端/底部/100ms门槛，沿现有DragArea及线性Pan"
+    },
+    {
+      "source": "NeeView/SaveData/Exporter.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.ProfileExport.cs",
+      "sha256": "e20bdec6ce1e3233965df1a2e6a90b2ccde1824791bb5e8819fa8a13b31592cb",
+      "status": "原五根/一级列表主题脚本材料；有界串流ZIP和同目录提交，系统路径适配"
+    },
+    {
+      "source": "NeeView/SaveData/ExportDataPresenter.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.Profile.cs",
+      "sha256": "7b355482f05548c4e43437b13b23f741ac33b17783088b7d84fefade33cc5438",
+      "status": "原导出前Flush/SaveAll及Documents默认选择；表现只采集路径与取消"
+    },
+    {
+      "source": "NeeView/SaveData/UserSettingTools.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.ReloadSetting.cs",
+      "sha256": "5239375f0ee9151c5253a93d22a77f26a03856fde433cf74c97e225977c32a86",
+      "status": "原UserSetting只读重载/配置原地合并/命令默认恢复；候选验证和预算"
+    },
+    {
+      "source": "NeeView/Command/Commands/SaveSettingCommand.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Profile.cs",
+      "sha256": "c9032d6c83f90635e569fac2361fc65f188f28102d635d56bd898e1e76897ddb",
+      "status": "原NowLoading门控及SaveAll(false)进入唯一JSON"
+    },
+    {
+      "source": "NeeView/Command/Commands/ReloadSettingCommand.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Profile.cs",
+      "sha256": "38910cce9c93df2155bbe5a49461f1bbf43328670283f9fd0c3ce23e1df25f0a",
+      "status": "原只设置恢复；普通书籍不重开，来源DirtyBook规则变化才重收集"
+    },
+    {
+      "source": "NeeView/Command/Commands/ExportBackupCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.Profile.cs",
+      "sha256": "a35275b542a52e1c6c50eef82210c05850868367c73c06873d92bc837df78b78",
+      "status": "原FileName/保存对话框/可等待Flush及导出入口"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/ExportBackupCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/ExportBackupCommandParameter.cs",
+      "sha256": "bd27d883fe575d84d8ddcaeab09e14fda1c34ece570411ff443fe56581112c4b",
+      "status": "原FileName空字符串默认，参数草稿沿唯一命令差分"
     }
   ],
   "rule_references": [

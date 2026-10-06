@@ -150,3 +150,5 @@ P5 第十三批：原PDF归档/页目录/三种尺寸及原JSON配置接入唯�
 P5 图像动画：原AnimatedMediaPlayer帧编号归一位置、Image.IsMediaRepeat、三格式默认、Media.PageSeconds及命令链已迁入。固定源码对照/合成实际解码/正式Headless与APNG原生分别验证，Windows动态播放及长期大型动画未验，见[p5-animated-images.md](p5-animated-images.md)。
 
 P5第十八批：SlideShow/SlideShowInput/SlideShowConfig、PageFrameContext、PageFrameBox.AutoScroll、MainView.SimpleProgressBar及FirstLoader原启动选项迁入；命令名NextPage保持，计时补偿和Played进度分别对照，40msEOS调度与损坏配置容错明确记录，见[契约](p5-slideshow.md)。
+
+原Exporter仅一级三材料与五根；原Reload只UserSetting/ObjectMerge，缺失Config不重置运行设置、命令恢复默认；BookSource.DirtyBook的来源变化重收集保留。普通书籍引用不变，递归+排序、新导航及来源失败分别回归，见[设置命令契约](p5-profile-commands.md)。

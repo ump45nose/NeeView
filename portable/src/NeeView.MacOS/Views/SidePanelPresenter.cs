@@ -126,6 +126,13 @@ public sealed class SidePanelPresenter : IDisposable
         foreach (var floating in _windows.Values) Snap(floating);
     }
 
+    /// <summary>设置重载强制恢复权重和浮动位置；复用唯一内容控件及已有窗口。</summary>
+    public void RestoreLayout()
+    {
+        _signature = ""; Refresh();
+        foreach (var (key, floating) in _windows)
+            floating.RestorePlacement(_model.Layout.Panels[key].WindowPlacement, _window);
+    }
     /// <summary>原标题浮动取当前容器屏幕位置加32像素，图标浮动沿用保存位置。</summary>
     public void OpenWindow(string key, bool fromContainer = false)
     {
