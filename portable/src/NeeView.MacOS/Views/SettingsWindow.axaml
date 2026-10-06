@@ -29,7 +29,7 @@
         </ComboBox>
         <TextBlock Text="自定义主题目录" />
         <TextBox x:Name="ThemeFolder" Text="{Binding Folder, Mode=TwoWay}" />
-        <StackPanel Orientation="Horizontal" Spacing="12"><Button Content="选择目录…" Click="ChooseThemeFolder_Click" /><Button x:Name="RefreshThemes" Content="刷新主题列表" Click="RefreshThemes_Click" /></StackPanel>
+        <WrapPanel><Button Content="选择目录…" Click="ChooseThemeFolder_Click" Margin="0,0,12,8" /><Button x:Name="RefreshThemes" Content="刷新主题列表" Click="RefreshThemes_Click" Margin="0,0,12,8" /><Button x:Name="OpenThemeFolder" Content="打开自定义主题文件夹" Click="OpenThemeFolder_Click" Margin="0,0,0,8" /></WrapPanel>
         <TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
         <TextBlock Text="布局保持不变；保存后应用配色，取消保留当前主题。" TextWrapping="Wrap" />
       </StackPanel>

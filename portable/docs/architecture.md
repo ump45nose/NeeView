@@ -1,5 +1,7 @@
 # NeeView Mac 源码迁移架构
 
+P5 第十批补齐原 OpenCustomThemeFolder：Engine 在已有单槽中准备目录，仅首次创建目录时按原字节生成Sample；表现模型转交当前目录草稿，系统打开沿同一IPlatformService。已有目录不补样例、不覆盖材料，失败/取消不提交配置，关闭取消未完成打开。见[目录动作契约](p5-theme-folder.md)。
+
 P5 第九批迁入原 FontsConfig 与 FontParameters 字号公式。AppKit 只提供消息/菜单字体度量，Mac FontPresenter 独立发布原字体资源；字体表单保存成功后才应用，失败沿原配置分支回滚。常规/菜单/树/面板分别引用角色，阅读及唯一JSON链保持；ClearType保留禁用，原38非零字号门槛保持。见[字体契约](p5-fonts.md)。
 
 P5 第八批接入原 ThemeConfig/ThemeSource/ThemeColor/ThemeProfile 与预设 JSON、BasedOn、失败回退和实际颜色应用。Engine 只输出颜色值，Mac 的 ThemePresenter 管应用资源/系统色值，主题表单独立；保存成功后才应用，启动/导入重建沿唯一链路。原窗口区域和书籍/图片工厂保持。见[主题契约](p5-theme.md)。

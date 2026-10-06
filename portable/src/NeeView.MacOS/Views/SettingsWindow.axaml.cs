@@ -31,9 +31,11 @@ public sealed partial class SettingsWindow : Window
     /// <summary>独立加载布局，不依赖具体存储或解码后端。</summary>
     public SettingsWindow() { AvaloniaXamlLoader.Load(this); _initialized = true; }
     /// <summary>传入业务表现模型，编辑副本直到用户保存。</summary>
-    public SettingsWindow(ReaderWorkspaceViewModel model, Func<string, bool>? available = null) : this()
+    public SettingsWindow(ReaderWorkspaceViewModel model, Func<string, bool>? available = null, IPlatformService? platform = null) : this()
     {
         _model = model;
+        _themePlatform = platform;
+        this.FindControl<Button>("OpenThemeFolder")!.IsEnabled = platform is not null;
         _inputs = model.Commands.Definitions.Select(d => new ShortcutEdit(d, model.SaveData.GetShortcut(d.Name, d.Shortcut), available?.Invoke(d.Name) ?? model.Commands.IsAvailable(d.Name), model.SaveData.GetMouseGesture(d.Name, d.MouseGesture).ToString())).ToArray();
         this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm(); FillAutoHide(); FillView(); FillNavigation(); FillFiles(); FillTheme(); FillFonts();
         this.FindControl<CheckBox>("GestureEnabled")!.IsChecked = Config.Current.Mouse.IsGestureEnabled;

@@ -7,6 +7,16 @@ namespace NeeView.MacOS.Views;
 public sealed partial class SettingsWindow
 {
     private ThemeSettingsViewModel? _themeSettings;
+    private IPlatformService? _themePlatform;
+    /// <summary>按钮只转交明确的目录动作；文件准备在Engine、系统打开在平台契约。</summary>
+    private async void OpenThemeFolder_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_themeSettings is null || _themePlatform is null || _saving || _themeSettings.IsOpeningFolder) return;
+        var button = this.FindControl<Button>("OpenThemeFolder")!;
+        button.IsEnabled = false;
+        try { await _themeSettings.OpenFolderAsync(_themePlatform); }
+        finally { if (IsVisible) button.IsEnabled = true; }
+    }
     /// <summary>表单初始化只读取当前配置，后台请求由独立表现模型取消。</summary>
     private void FillTheme()
     {

@@ -1,11 +1,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 namespace NeeView.MacOS.ViewModels;
 
-/// <summary>主题设置草稿；仅转交 Engine 扫描，不读文件或创建显示资源。</summary>
+/// <summary>主题设置草稿；扫描和显式目录准备转交Engine，不读文件或创建显示资源。</summary>
 public sealed class ThemeSettingsViewModel : ObservableObject, IDisposable
 {
     private readonly ThemeManager _manager = new();
     private CancellationTokenSource? _scan;
+    private CancellationTokenSource? _folderAction;
+    private bool _isOpeningFolder;
     private bool _disposed;
     private string _folder, _message = "";
     private ThemeChoice _selected;
@@ -21,6 +23,31 @@ public sealed class ThemeSettingsViewModel : ObservableObject, IDisposable
     public ThemeChoice Selected { get => _selected; set { if (value is not null) SetProperty(ref _selected, value); } }
     public IReadOnlyList<ThemeChoice> Items { get => _items; private set => SetProperty(ref _items, value); }
     public string Message { get => _message; private set => SetProperty(ref _message, value); }
+    public bool IsOpeningFolder { get => _isOpeningFolder; private set => SetProperty(ref _isOpeningFolder, value); }
+    /// <summary>显式创建/打开当前目录草稿；配置和主题选择保持，关闭取消未提交的系统打开。</summary>
+    /// <param name="platform">宿主提供的同一平台契约，不创建具体后端。</param>
+    public async Task OpenFolderAsync(IPlatformService platform)
+    {
+        if (_disposed || IsOpeningFolder) return;
+        var folder = Folder; var source = _folderAction = new CancellationTokenSource();
+        _scan?.Cancel();
+        IsOpeningFolder = true;
+        try
+        {
+            var path = await _manager.PrepareCustomThemeFolderAsync(folder, source.Token);
+            source.Token.ThrowIfCancellationRequested();
+            await platform.OpenFolderAsync(path, source.Token);
+            if (!_disposed && Folder == folder) await RefreshAsync();
+        }
+        catch (OperationCanceledException) when (source.IsCancellationRequested) { }
+        catch (Exception ex) { if (!_disposed && Folder == folder) Message = ex.Message; }
+        finally
+        {
+            if (_folderAction == source) _folderAction = null;
+            source.Dispose();
+            if (!_disposed) IsOpeningFolder = false;
+        }
+    }
     /// <summary>只发布最新目录扫描；清空 ItemsSource 导致的临时 null 不改变原选择。</summary>
     public async Task RefreshAsync()
     {
@@ -48,6 +75,6 @@ public sealed class ThemeSettingsViewModel : ObservableObject, IDisposable
         _ => Path.GetFileNameWithoutExtension(source.FileName)!
     });
     /// <summary>关闭表单取消扫描，晚到结果不更新已关闭窗口。</summary>
-    public void Dispose() { _disposed = true; _scan?.Cancel(); _scan?.Dispose(); _scan = null; }
+    public void Dispose() { _disposed = true; _scan?.Cancel(); _scan?.Dispose(); _scan = null; _folderAction?.Cancel(); }
 }
 public sealed record ThemeChoice(ThemeSource Source, string Label);

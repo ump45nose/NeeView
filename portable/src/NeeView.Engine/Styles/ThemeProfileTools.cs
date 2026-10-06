@@ -13,6 +13,16 @@ public static class ThemeProfileTools
             ?? throw new FileNotFoundException("No such theme: " + name);
         return Load(stream, name);
     }
+    /// <summary>原模板按内嵌字节写出；仅允许新文件，不能覆盖同时出现的用户主题。</summary>
+    /// <param name="name">原内嵌主题材料名。</param><param name="path">调用方新建目录中的样例路径。</param>
+    public static void SaveFromContent(string name, string path)
+    {
+        using var source = typeof(ThemeProfileTools).Assembly.GetManifestResourceStream("NeeView.Styles.Themes." + name)
+            ?? throw new FileNotFoundException("No such theme: " + name);
+        using var output = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+        source.CopyTo(output);
+        output.Flush(true);
+    }
     /// <summary>后台读取自定义原 JSON；4 MiB 上限避免设置材料形成无界内存。</summary>
     public static ThemeProfile LoadFromFile(string path)
     {

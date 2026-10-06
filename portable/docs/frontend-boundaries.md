@@ -1,5 +1,7 @@
 # 前端独立调整边界
 
+P5 第十批：主题目录按钮保留在现有设置页，ThemeSettingsViewModel只转交当前目录草稿和平台契约。Engine负责原首次目录/样例规则，Backends负责Finder目录内容打开和真实错误；视图不创建文件或具体后端。关闭拒绝晚到结果，见[目录动作契约](p5-theme-folder.md)。
+
 P5 第九批：字体结构在SettingsWindow.axaml，百分比/字体族选择草稿在FontSettingsViewModel。Engine只保留FontsConfig及原FontParameters纯尺寸计算；启动层注入AppKit度量，FontPresenter发布资源。主题和字体互不重置，视图的角色/间距/模板可独立调整。事务成功后才更新资源，失败/取消保持外观，见[字体契约](p5-fonts.md)。
 
 P5 导入布局/五类选项在 ProfileImportWindow.axaml，编辑草稿、后台候选复制与代次在 ProfileImportViewModel；视图仅确认并关闭返回 Engine 请求。MainWindow 不解析或写 JSON，MacApp 负责唯一旧窗口关闭与正式窗口重建。Engine 负责原默认键位、映射/兼容、候选校验和五文件备份/提交/恢复；后端读取仅在启动层注入。第三批旧版本/布局转换也全部在 Engine，预览展示转换后的命令，界面没有解析旧格式。原 ImportBackup 接入同一界面，主题与报告布局可以独立调整，见[兼容契约](p5-legacy-compatibility.md)。

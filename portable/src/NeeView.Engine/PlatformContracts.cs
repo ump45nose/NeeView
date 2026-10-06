@@ -106,6 +106,8 @@ public interface IPlatformService
     Task<byte[]?> ReadFileIconAsync(string path, CancellationToken token = default) => Task.FromResult<byte[]?>(null);
     /// <summary>在 Finder 中定位真实文件。</summary>
     Task RevealAsync(string path, CancellationToken token = default);
+    /// <summary>打开目录内容；与在父目录中定位对象分开，失败必须传播。</summary>
+    Task OpenFolderAsync(string path, CancellationToken token = default) => throw new NotSupportedException("当前平台尚未提供打开目录能力。");
     /// <summary>移入系统废纸篓，不以永久删除回退。</summary>
     Task TrashAsync(string path, CancellationToken token = default);
 }

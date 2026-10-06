@@ -455,7 +455,7 @@
       "source": "NeeView/Styles/ThemeProfileTools.cs",
       "target": "src/NeeView.Engine/Styles/ThemeProfileTools.cs",
       "sha256": "6794d36daacc3dcfb22a1960b79716c190ea830efd049e3dec6038a2754ba05c",
-      "status": "P5第八批：原主题标识/角色/颜色覆盖算法迁入；WPF颜色改纯ARGB，Format保留原字符串；默认角色循环链和加载限额有明确回归"
+      "status": "P5第八批：原主题标识/角色/颜色覆盖算法迁入；WPF颜色改纯ARGB，Format保留原字符串；默认角色循环链和加载限额有明确回归；P5第十批原SaveFromContent按内嵌字节独占写出样例，不覆盖用户文件"
     },
     {
       "source": "NeeView/Styles/ThemeSource.cs",
@@ -2263,7 +2263,7 @@
       "source": "NeeView/Styles/ThemeManager.cs",
       "target": "src/NeeView.Engine/Styles/ThemeManager.cs",
       "sha256": "7fc00b3031d6f1c43ccdf12d15f1befdaaec1b11c865548c90b753535c972816",
-      "status": "P5第八批：原六预设/一级自定义/BasedOn/覆盖/回退，移除WPF及Windows系统类型；平台值快照和单槽后台适配"
+      "status": "P5第八批：原六预设/一级自定义/BasedOn/覆盖/回退，移除WPF及Windows系统类型；平台值快照和单槽后台适配；P5第十批原OpenCustomThemeFolder文件准备迁入，首次建目录生成Sample，系统打开经平台契约"
     },
     {
       "source": "NeeView/System/FontParameters.cs",
@@ -2513,7 +2513,7 @@
       "source": "NeeView/Setting/SettingPageWindow.cs",
       "target": "src/NeeView.MacOS/Views/SettingsWindow.Theme.cs",
       "sha256": "68ee309563718794434506278de8e2372c4fc916cf9d05226e542c003ad0572f",
-      "status": "P5第八批：原主题及目录设置入口转换，布局/独立草稿/真实提交分开；Finder模板生成未迁入"
+      "status": "P5第八/十批：原主题及目录设置入口转换，独立草稿/真实提交分开；显式打开目录转交Engine准备和同一平台契约，关闭取消/晚到隔离"
     },
     {
       "source": "NeeView/Styles/Fonts.xaml",

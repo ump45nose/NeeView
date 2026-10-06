@@ -317,7 +317,7 @@ public sealed partial class MainWindow : Window
     private async Task ShowOptionsAsync(bool history = false)
     {
         if (_model is null || _preparing || _closedPrepared) return;
-        var settings = new SettingsWindow(_model, IsCommandImplemented);
+        var settings = new SettingsWindow(_model, IsCommandImplemented, _platform);
         var pageFormat = Config.Current.PageList.Format; var recursiveSearch = Config.Current.Bookshelf.IsSearchIncludeSubdirectories;
         if (history) settings.SelectHistoryPage();
         await settings.ShowDialog(this);

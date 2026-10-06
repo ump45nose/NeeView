@@ -1,0 +1,197 @@
+{
+  "utc": "2026-10-06T08:53:36.557137+00:00",
+  "scope": "P5 original theme folder action; isolated files and silent formal Headless; Finder mocked",
+  "base_commit": "f6597359d81b92a8f422fc666dd5ad149d0cf333",
+  "windows_source_baseline": "c5c398d89",
+  "folder_tests": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0
+  },
+  "full_tests": {
+    "total": "1225",
+    "executed": "1223",
+    "passed": "1223",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "boundaries": {
+    "production_projects": [
+      "NeeView.Backends",
+      "NeeView.Engine",
+      "NeeView.MacOS"
+    ],
+    "source_files": 84,
+    "partial_adapters": 295,
+    "upstream_source_files": 26
+  },
+  "folder_test_results": [
+    {
+      "name": "NeeView.Engine.Tests.ThemeFolderTests.CancelledPreparationAndExclusiveWriteLeaveUserFilesUntouched",
+      "outcome": "Passed",
+      "duration": "00:00:00.0208612"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeFolderTests.ClosingDraftCancelsPendingOpenAndSuppressesLatePublication",
+      "outcome": "Passed",
+      "duration": "00:00:00.0269040"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeFolderTests.ExistingDirectoryDoesNotGenerateOrReplaceSample(hasSample: False)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0211146"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeFolderTests.InvalidTargetIsReportedWithoutChangingExistingMaterial(issue: \"file\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0195662"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeFolderTests.FormalFolderActionFailureRetryAndCancelKeepOriginalConfigAndBook",
+      "outcome": "Passed",
+      "duration": "00:00:00.2540105"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeFolderTests.NewDirectoryGetsOriginalTemplateAndLoadsAsCustomTheme",
+      "outcome": "Passed",
+      "duration": "00:00:00.0383277"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeFolderTests.InvalidTargetIsReportedWithoutChangingExistingMaterial(issue: \"empty\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0195060"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeFolderTests.InvalidTargetIsReportedWithoutChangingExistingMaterial(issue: \"whitespace\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0202375"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeFolderTests.InvalidTargetIsReportedWithoutChangingExistingMaterial(issue: \"invalid\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0221247"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeFolderTests.ExistingDirectoryDoesNotGenerateOrReplaceSample(hasSample: True)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0215821"
+    }
+  ],
+  "build_steps": [
+    {
+      "name": "Engine 构建",
+      "exit_code": 0
+    },
+    {
+      "name": "原算法与正式视图测试",
+      "exit_code": 0
+    },
+    {
+      "name": "正式入口源码编译（Library检查）",
+      "exit_code": 0
+    },
+    {
+      "name": "正式 Mac 应用构建",
+      "exit_code": 0
+    },
+    {
+      "name": "正式 .app 本地签名校验",
+      "exit_code": 0
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "p5-theme-folder-form.png",
+      "sha256": "fe316b9c481148ff65660ca33c541c61d2e63a390883f2e9e9fb7d5e63104efb"
+    }
+  ],
+  "foreground_app_activated": false,
+  "user_images_modified": false,
+  "import_sources_modified": false,
+  "windows_baseline_modified": false,
+  "skipped": [
+    "NeeView.Engine.Tests.BrowseResourceTests.MountedResourceSubfoldersRenderAndScrollWithBoundedDisplay",
+    "NeeView.Engine.Tests.PageThumbnailResourceTests.ResourceSamplesShowThumbnailsScrollAndCloseWithBoundedResources"
+  ],
+  "artifacts": "/Users/yuwk/.codex/artifacts/neeview/p5-theme-folder-20261006/final-full",
+  "archived_generated_files": [
+    "p5-theme-folder-archive-cover-layout.png",
+    "p5-theme-folder-archive-settings-layout.png",
+    "p5-theme-folder-banner-layout.png",
+    "p5-theme-folder-book-cards-layout.png",
+    "p5-theme-folder-book-confirm.png",
+    "p5-theme-folder-book-overwrite.png",
+    "p5-theme-folder-bookmark-layout.png",
+    "p5-theme-folder-bookmark-navigation-layout.png",
+    "p5-theme-folder-bookmark-search-layout.png",
+    "p5-theme-folder-bookshelf-bookmarks-layout.png",
+    "p5-theme-folder-cache.json",
+    "p5-theme-folder-commands.json",
+    "p5-theme-folder-confirm.png",
+    "p5-theme-folder-conflict.png",
+    "p5-theme-folder-content-layout.png",
+    "p5-theme-folder-copy-parameter.png",
+    "p5-theme-folder-destination-layout.png",
+    "p5-theme-folder-directory-overwrite.png",
+    "p5-theme-folder-directory-tree-layout.png",
+    "p5-theme-folder-docking-layout.png",
+    "p5-theme-folder-fade-layout.png",
+    "p5-theme-folder-fixed-dataset-layout.png",
+    "p5-theme-folder-floating-layout.png",
+    "p5-theme-folder-hidden-layout.png",
+    "p5-theme-folder-history-layout.png",
+    "p5-theme-folder-history-search-layout.png",
+    "p5-theme-folder-history-settings-layout.png",
+    "p5-theme-folder-index-layout.json",
+    "p5-theme-folder-input-settings-layout.png",
+    "p5-theme-folder-layout.png",
+    "p5-theme-folder-masonry-layout.png",
+    "p5-theme-folder-name.png",
+    "p5-theme-folder-number-layout.png",
+    "p5-theme-folder-overlay-layout.png",
+    "p5-theme-folder-page-end-layout.png",
+    "p5-theme-folder-page-search-layout.png",
+    "p5-theme-folder-page-thumbnails-layout.png",
+    "p5-theme-folder-panorama-layout.png",
+    "p5-theme-folder-parameter-layout.png",
+    "p5-theme-folder-playlist-layout.png",
+    "p5-theme-folder-quickaccess-layout.png",
+    "p5-theme-folder-reading-layout.png",
+    "p5-theme-folder-render.json",
+    "p5-theme-folder-scroll-layout.png",
+    "p5-theme-folder-settings.png",
+    "p5-theme-folder-transform-layout.png",
+    "p5-theme-folder-viewer.json",
+    "p5-theme-folder-virtual-grid-layout.png",
+    "p5-theme-folder-window-layout.png"
+  ],
+  "verified_behavior": [
+    "First creation writes exact original embedded Sample bytes; theme listing and loading recognize it",
+    "Existing empty directory does not acquire Sample; user Sample remains unchanged",
+    "Empty, whitespace, invalid and occupied-file targets fail precisely",
+    "Cancelled preparation performs no writes; CreateNew protects existing file",
+    "Formal settings command/button injects the same platform contract; failure and retry",
+    "Draft path/source and current Book/Page stay unchanged; cancel retains explicitly created Sample",
+    "Duplicate folder action ignored; close cancels pending request and suppresses late publication"
+  ],
+  "independent_review": "Read-only review found no confirmed defect; native Finder behavior remains device acceptance",
+  "limitations": [
+    "NSWorkspace actual Finder directory-content opening not device-verified; Headless uses contract double",
+    "Sample write failure can leave newly created directory, matching original no-rollback behavior",
+    "Complete settings search, effects/media and scripts still to migrate",
+    "Real user exports, Developer ID, notarization, licensing manifest and clean install not performed",
+    "Prior skipped P3/P4 checks and existing AX/NAS issues remain recorded"
+  ]
+}

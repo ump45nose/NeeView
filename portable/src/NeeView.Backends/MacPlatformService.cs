@@ -47,6 +47,18 @@ public sealed class MacPlatformService : IPlatformService
         NSApplication.SharedApplication.InvokeOnMainThread(() => { using var url = NSUrl.FromFilename(path); NSWorkspace.SharedWorkspace.ActivateFileViewer([url]); });
         return Task.CompletedTask;
     }
+    /// <summary>原打开主题目录的系统替换点；Finder显示目录内容，检查NSWorkspace真实返回值。</summary>
+    /// <param name="path">Engine已准备的绝对目录。</param><param name="token">进入系统打开前取消；提交后不伪装为取消。</param>
+    public Task OpenFolderAsync(string path, CancellationToken token = default)
+    {
+        NSApplication.SharedApplication.InvokeOnMainThread(() =>
+        {
+            token.ThrowIfCancellationRequested();
+            using var url = NSUrl.FromFilename(path);
+            if (!NSWorkspace.SharedWorkspace.OpenUrl(url)) throw new IOException("Finder 无法打开自定义主题目录。");
+        });
+        return Task.CompletedTask;
+    }
     /// <summary>系统废纸篓操作，失败传播 NSError，禁止永久删除回退。</summary>
     /// <param name="path">真实文件、目录或链接本身；不解析末段链接，父链接仍拒绝。</param>
     /// <param name="token">排队与进入系统调用前取消；提交后等待真实结果。</param>

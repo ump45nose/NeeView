@@ -138,3 +138,5 @@ ScrollPage编辑时清除执行参数中的旧IsNScroll/PageMoveMargin，兼容�
 Mac落点使用当前Profile管理目录，列表目录配置与实际覆盖文件共用原提交/持久备份/重建恢复；该适配在选择/确认报告中说明。主题/脚本仅保留原字节、不装载或执行，不把材料保存称为运行能力迁移。见[契约](p5-profile-assets.md)及[静默验收](../acceptance/p5-profile-assets-runtime.md)。
 
 P5 第八批：原Styles/Theme*.cs、Config/ThemeConfig、Libraries/Themes与SettingPageWindow的六预设/自定义、颜色引用/透明度/默认角色、三类BasedOn、Dark回退和特殊按钮资源已迁入。必要改造为纯ARGB、独立Mac默认目录、后台读取/代次、规范路径与递归限额、默认角色循环保护、Fluent亮暗变体；原窗口结构和书籍链保持。只用合成主题与Headless对照原材料，没有新增真实Windows动态一致性结论。见[主题契约](p5-theme.md)。
+
+P5 第十批：原 ThemeManager.OpenCustomThemeFolder / ThemeProfileTools.SaveFromContent / SettingPageWindow 的目录动作已迁入。首次创建目录才生成原字节 Sample，既有目录不补样例/不覆盖；平台打开目录内容，配置草稿独立。10项专项通过，正式设置失败重试/取消及关闭覆盖；Finder真机未验，见[契约](p5-theme-folder.md)。

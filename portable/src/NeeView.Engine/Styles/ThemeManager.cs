@@ -12,10 +12,35 @@ public sealed record ThemeLoadResult(ThemeProfile Profile, ThemeType EffectiveTy
     }
 }
 
-/// <summary>只读主题服务；单槽后台加载和递归深度上限，显示资源由 Mac 表现层管理。</summary>
+/// <summary>原主题服务；加载/扫描只读，显式目录动作才生成样例，显示资源由 Mac 表现层管理。</summary>
 public sealed class ThemeManager
 {
     private readonly SemaphoreSlim _gate = new(1);
+    /// <summary>原打开目录动作的文件准备；仅目录首次创建时写出 Sample.json，已有目录保持。</summary>
+    /// <param name="folder">用户明确操作的目录草稿，不修改当前配置。</param>
+    /// <param name="token">排队及开始文件变更前可取消；已开始的短文件写入等待真实完成。</param>
+    /// <returns>供平台打开的规范绝对目录；不调用文件管理器。</returns>
+    public async Task<string> PrepareCustomThemeFolderAsync(string folder, CancellationToken token = default)
+    {
+        if (string.IsNullOrWhiteSpace(folder)) throw new InvalidOperationException("尚未设置自定义主题目录。");
+        await _gate.WaitAsync(token).ConfigureAwait(false);
+        try
+        {
+            return await Task.Run(() =>
+            {
+                token.ThrowIfCancellationRequested();
+                var directory = new DirectoryInfo(Path.GetFullPath(folder));
+                if (!directory.Exists)
+                {
+                    // 原语义只在首次创建目录时生成；已有目录不补样例、不覆盖用户材料。
+                    directory.Create();
+                    ThemeProfileTools.SaveFromContent("CustomThemeTemplate.json", Path.Combine(directory.FullName, "Sample.json"));
+                }
+                return directory.FullName;
+            }, CancellationToken.None).ConfigureAwait(false);
+        }
+        finally { _gate.Release(); }
+    }
     /// <summary>原六预设及一级 JSON 自定义项；扫描错误只返回预设并报告，不创建目录。</summary>
     /// <param name="folder">本次配置的自定义目录。</param><param name="token">表单关闭/新扫描取消。</param>
     public async Task<(IReadOnlyList<ThemeSource> Items, string? Error)> CollectThemesAsync(string folder, CancellationToken token = default)
