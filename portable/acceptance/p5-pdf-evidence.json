@@ -1,0 +1,34 @@
+{
+  "baseline": "c5c398d89",
+  "targeted": {
+    "passed": 57,
+    "failed": 0
+  },
+  "new_engine_tests": 18,
+  "full": {
+    "passed": 1280,
+    "failed": 0,
+    "skipped": 2,
+    "total": 1282
+  },
+  "native": {
+    "passed": 6,
+    "failed": 0
+  },
+  "review": {
+    "resources": "Export stream lazy-initialization/dispose race fixed; concurrent regressions passed.",
+    "rules": "No confirmed defect; original sizing/JSON/outline rules checked."
+  },
+  "screenshots": {
+    "p5-pdf-viewer.png": "cb5d22f35be127cb1314b1281976b986c4f02f18d69e939048e94e0bea6b3527",
+    "p5-pdf-settings.png": "02b003b21ce339e483eeaba7c82942d2b65af0435549a9f6171744c0e4448501",
+    "p5-pdf-native.png": "a00f5befc8a3833494dd725509763e77212c3371f2d1fd0f6f66e05e0f992750"
+  },
+  "artifacts": "/Users/yuwk/.codex/artifacts/neeview/p5-pdf-20261006/final-full",
+  "limitations": [
+    "Password UI and SupportFileTypes not executable",
+    "Output allocation budget does not bound all native PDF memory",
+    "No device or fixed Windows dynamic equivalence claim",
+    "No Developer ID or notarization"
+  ]
+}

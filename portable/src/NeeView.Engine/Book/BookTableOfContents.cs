@@ -29,10 +29,24 @@ public static class BookTableOfContents
     public static string DirectoryName(string path) => path.LastIndexOf('/') is var index && index >= 0 ? path[..index] : "";
     /// <summary>原来源页临时FileName排序，不以搜索结果或当前反序构造目录树。</summary>
     /// <param name="source">未过滤来源页快照。</param><param name="token">后台排序和建树取消。</param><returns>引用原Page的目录根。</returns>
-    public static ContentsPageNode Create(IReadOnlyList<Page> source, CancellationToken token)
+    public static ContentsPageNode Create(IReadOnlyList<Page> source, CancellationToken token, Archive? archive = null)
     {
         var pages = BookPageSort.Sort(source, PageSortMode.FileName, 0, token).Pages;
         var root = new ContentsPageNode { IsRoot = true, IsExpanded = true, Name = "目录", Page = pages.FirstOrDefault() };
+        if (archive?.Contents is { Count: > 0 } contents)
+        {
+            var targets = source.ToDictionary(p => p.ArchiveEntry.SystemPath, StringComparer.Ordinal);
+            AddContents(root, contents); return root;
+            void AddContents(ContentsPageNode parent, IReadOnlyList<ContentsArchiveEntryNode> nodes)
+            {
+                foreach (var node in nodes)
+                {
+                    token.ThrowIfCancellationRequested();
+                    var child = new ContentsPageNode { Name = node.Name, Page = node.ArchiveEntry is { } entry ? targets.GetValueOrDefault(entry.SystemPath) : null };
+                    parent.Children.Add(child); AddContents(child, node.Children);
+                }
+            }
+        }
         foreach (var group in pages.GroupBy(p => DirectoryName(p.EntryName))) { token.ThrowIfCancellationRequested(); root.Add(group.First(), group.Key); }
         return root;
     }

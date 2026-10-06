@@ -1,5 +1,7 @@
 # NeeView Mac 源码迁移架构
 
+P5 第十三批：原PDF归档/页目录/三种尺寸及原JSON配置接入唯一阅读链；CoreGraphics/PDFKit官方绑定替换PDFium。正文直接输出像素，提取才惰性PNG，请求级流初始化/读/关闭串行。密码与扩展名配置尚未执行，见[PDF契约](p5-pdf.md)。
+
 P5 第十二批接入原嵌套归档 Source/Parent、条目入口和三收集模式。后端随机临时代理分离逻辑/物理路径，完整父链与借用父源分别释放；所有活动代理共享2GiB预算、最多16层。历史存在检测和封面沿同一工厂，嵌套包保持只读，前端/JSON不增加状态。见[嵌套契约](p5-nested.md)。
 
 P5 第十一批接入原设置结构化搜索。Engine复用原Searcher和SettingItemRecord文本关系；Mac从现有九页表单建立索引，全部235命令及参数文案沿同一草稿。结果直接编辑原控件，导航/清空/关闭归还原父级与DataContext；窗口历史不写JSON。未迁设置页面仍按清单推进，见[搜索契约](p5-settings-search.md)。

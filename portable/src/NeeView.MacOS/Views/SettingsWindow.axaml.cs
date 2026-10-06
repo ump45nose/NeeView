@@ -37,7 +37,7 @@ public sealed partial class SettingsWindow : Window
         _themePlatform = platform;
         this.FindControl<Button>("OpenThemeFolder")!.IsEnabled = platform is not null;
         _inputs = model.Commands.Definitions.Select(d => new ShortcutEdit(d, model.SaveData.GetShortcut(d.Name, d.Shortcut), available?.Invoke(d.Name) ?? model.Commands.IsAvailable(d.Name), model.SaveData.GetMouseGesture(d.Name, d.MouseGesture).ToString())).ToArray();
-        this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm(); FillAutoHide(); FillView(); FillNavigation(); FillFiles(); FillTheme(); FillFonts();
+        this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm(); FillAutoHide(); FillView(); FillNavigation(); FillFiles(); FillTheme(); FillFonts(); FillPdf();
         this.FindControl<CheckBox>("GestureEnabled")!.IsChecked = Config.Current.Mouse.IsGestureEnabled;
         FillNumber("GestureDistance", Config.Current.Mouse.GestureMinimumDistance, 5, 200);
         this.FindControl<ComboBox>("InputScheme")!.SelectedIndex = (int)Config.Current.Command.PresetInputScheme;
@@ -286,6 +286,7 @@ public sealed partial class SettingsWindow : Window
                 Config.Current.Mouse.GestureMinimumDistance = (double)(this.FindControl<NumericUpDown>("GestureDistance")!.Value ?? 30);
                 ApplyFilm(); ApplyAutoHide(); ApplyView(); _historySettings!.ApplyPolicy(Config.Current.History); ApplyNavigation(); ApplyFiles(); _themeSettings!.Apply(Config.Current.Theme);
                 _fontSettings!.Apply(Config.Current.Fonts);
+                _pdfSettings!.Apply(Config.Current.Archive.Pdf, Config.Current.Performance);
                 foreach (var parameter in _parameters.Values) parameter.Apply(_model.SaveData);
                 Config.Current.Bookshelf.FolderSortOrder = (FolderSortOrder)Math.Max(0, this.FindControl<ComboBox>("BookshelfGroup")!.SelectedIndex);
                 Config.Current.Book.IsPrioritizeBookMove = this.FindControl<CheckBox>("PrioritizeBookMove")!.IsChecked == true;

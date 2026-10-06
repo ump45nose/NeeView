@@ -7,9 +7,22 @@
           <Grid ColumnDefinitions="*,Auto,Auto"><TextBox x:Name="SettingsSearchBox" Text="{Binding Keyword, Mode=TwoWay}" PlaceholderText="搜索设置" KeyDown="SettingsSearch_KeyDown" TextChanged="SettingsSearch_TextChanged" ToolTip.Tip="原结构化搜索：空格 AND，/or，/not，/word，/re。Enter 确认并加入本窗口历史。" /><Button x:Name="SettingsSearchHistory" Grid.Column="1" Content="⌄" Click="SettingsSearch_History" /><Button x:Name="SettingsSearchClear" Grid.Column="2" Content="×" Click="SettingsSearch_Clear" /></Grid>
           <TextBlock x:Name="SettingsSearchError" Text="{Binding Error}" TextWrapping="Wrap" />
         </StackPanel>
-        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="主题 / 配色" /><ListBoxItem Content="字体" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
+        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="主题 / 配色" /><ListBoxItem Content="字体" /><ListBoxItem Content="归档 / PDF" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
       </Grid>
     </Border>
+    <ScrollViewer x:Name="ArchiveSettings" Grid.Column="1" IsVisible="False">
+      <StackPanel Margin="24" Spacing="12">
+        <TextBlock Classes="settings-section" Text="PDF" FontSize="{DynamicResource SystemFontSizeHuge}" />
+        <CheckBox x:Name="PdfEnabled" Content="启用 PDF 读取" IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
+        <TextBlock Text="默认渲染尺寸（像素）" />
+        <Grid ColumnDefinitions="*,Auto,*"><NumericUpDown x:Name="PdfWidth" AutomationProperties.Name="PDF 渲染宽度" Value="{Binding RenderWidth, Mode=TwoWay}" Minimum="256" Maximum="{Binding RenderWidthMaximum}" Increment="128" /><TextBlock Grid.Column="1" Text=" × " VerticalAlignment="Center" /><NumericUpDown x:Name="PdfHeight" Grid.Column="2" AutomationProperties.Name="PDF 渲染高度" Value="{Binding RenderHeight, Mode=TwoWay}" Minimum="256" Maximum="{Binding RenderHeightMaximum}" Increment="128" /></Grid>
+        <TextBlock Text="保持页面比例；普通显示按原规则选择渲染规格，提取/复制使用默认流。" TextWrapping="Wrap" />
+        <TextBlock Classes="settings-section" Text="源图像尺寸" FontSize="{DynamicResource SystemFontSizeLarge}" />
+        <CheckBox x:Name="PdfLimitSource" Content="限制源尺寸（当前用于 PDF 页面）" IsChecked="{Binding IsLimitSourceSize, Mode=TwoWay}" />
+        <Grid ColumnDefinitions="*,Auto,*"><NumericUpDown x:Name="PdfMaximumWidth" AutomationProperties.Name="最大源宽度" Value="{Binding MaximumWidth, Mode=TwoWay}" Minimum="1024" Maximum="{Binding MaximumWidthMaximum}" Increment="256" /><TextBlock Grid.Column="1" Text=" × " VerticalAlignment="Center" /><NumericUpDown x:Name="PdfMaximumHeight" Grid.Column="2" AutomationProperties.Name="最大源高度" Value="{Binding MaximumHeight, Mode=TwoWay}" Minimum="1024" Maximum="{Binding MaximumHeightMaximum}" Increment="256" /></Grid>
+        <TextBlock Text="保存后用于后续尺寸探测及渲染；已打开页面不会因修改表单重新扫描。密码/分卷读取尚未迁入。" TextWrapping="Wrap" />
+      </StackPanel>
+    </ScrollViewer>
     <ScrollViewer x:Name="FontSettings" Grid.Column="1" IsVisible="False">
       <StackPanel Margin="24" Spacing="12">
         <TextBlock Classes="settings-section" Text="字体" FontSize="{DynamicResource SystemFontSizeHuge}" />

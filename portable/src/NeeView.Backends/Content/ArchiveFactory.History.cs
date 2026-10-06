@@ -32,7 +32,7 @@ public sealed partial class ArchiveFactory
                 { candidate = System.IO.Path.GetDirectoryName(candidate); continue; }
                 if (candidate == path) return true;
                 if ((attributes & FileAttributes.Directory) != 0) return false;
-                if (!ArchiveFormats.IsCompressedArchive(candidate)) return false;
+                if (!ArchiveFormats.IsPageArchive(candidate)) return false;
                 return null; // 逻辑内部定位交给同一工厂，不能将能力/读取失败当作缺失。
 
             }

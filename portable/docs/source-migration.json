@@ -2306,6 +2306,60 @@
       "target": "src/NeeView.Backends/Content/ArchiveFactory.Nested.cs",
       "sha256": "01ae8c774e5c7512ca56b2d6075902fc57061aafe528360387bf01a1c973179b",
       "status": "P5原逐层定位关系；重复名称按ID，内部上级路径在规范化前拒绝"
+    },
+    {
+      "source": "NeeView/Archiver/PdfArchive.cs",
+      "target": "src/NeeView.Engine/Archiver/PdfArchive.cs",
+      "sha256": "084234ed29f2f2488e5e9089fb49b9e64c63e82e2e137bb2370fdd06cab3db87",
+      "status": "P5第十三批：原PDF来源/尺寸抽象，移除WPF/PDFium依赖"
+    },
+    {
+      "source": "NeeView/Archiver/PdfPdfiumArchive.cs",
+      "target": "src/NeeView.Backends/Content/PdfArchiveSource.cs",
+      "sha256": "5aadaf8972e8aa4c7ac3ce969ca158ceaf4a6ec59a69a98381901fca6cfca020",
+      "status": "P5第十三批：原页ID/命名/日期/目录/默认流；官方CoreGraphics/PDFKit替换，按需像素与惰性PNG，关闭串行协调"
+    },
+    {
+      "source": "NeeView/Archiver/PdfArchiveProfile.cs",
+      "target": "src/NeeView.Engine/Config/PdfArchiveConfig.cs",
+      "sha256": "ef4bfce8251a89d3185afb33cc59da2d14bde3e10a16076f330d0ffc7c22c886",
+      "status": "P5第十三批：原显示/默认导出/正文三尺寸规则保持，平台及资源预算分离"
+    },
+    {
+      "source": "NeeView/Config/PdfArchiveConfig.cs",
+      "target": "src/NeeView.Engine/Config/PdfArchiveConfig.cs",
+      "sha256": "7da29eb3656263f404a25dbbb99563f0d875096b694e829d812189296bb51c3f",
+      "status": "P5第十三批：原开关及1920x1080/每轴256配置；SupportFileTypes保留但未接入执行"
+    },
+    {
+      "source": "NeeView/Config/PerformanceConfig.cs",
+      "target": "src/NeeView.Engine/Config/PdfArchiveConfig.cs",
+      "sha256": "d669f86d92d3cee21b3f307b1e37558ec7c8a7d7d4fc29579c7be91be26dfa93",
+      "status": "P5第十三批：原MaximumSize/IsLimitSourceSize已使用字段；其他原字段继续保留JSON"
+    },
+    {
+      "source": "NeeView/Page/PdfPageContent.cs",
+      "target": "src/NeeView.Engine/Config/PdfArchiveConfig.cs",
+      "sha256": "803832ccbef64e1a287c9279ab5fb4b6a7bdf79b2c755d0dc1f97f082738360b",
+      "status": "P5第十三批：原源尺寸限制开关与默认不限制关系"
+    },
+    {
+      "source": "NeeView/PictureSource/PdfPictureSource.cs",
+      "target": "src/NeeView.Backends/Content/PdfArchiveSource.cs",
+      "sha256": "f50e15431c62277745f87e9b8a7d2165ac6e0b60636d8f0abe26619922854975",
+      "status": "P5第十三批：原正文按需尺寸及缩略规格，直接进入唯一BitmapFactory像素链"
+    },
+    {
+      "source": "NeeView/Picture/SizeExtensions.cs",
+      "target": "src/NeeView.Engine/Config/PdfArchiveConfig.cs",
+      "sha256": "5af5fe0ee604225ee464e5a871aebd7e706a52e31ed6cc7eb877645ccbe9d6d8",
+      "status": "P5第十三批：原等比适配/Contains判断顺序保留，仅替换WPF尺寸"
+    },
+    {
+      "source": "NeeView/NeeView/Text/Json/JsonSizeConverter.cs",
+      "target": "src/NeeView.Engine/Config/JsonSizeConverter.cs",
+      "sha256": "d2503dbd30d9deec470aa2d05933dc8d6cdc04a20054f38a53fc43d947ae0d64",
+      "status": "P5第十三批：原Width,Height字符串写出，兼容早期Mac对象尺寸，类型级适配差分序列化"
     }
   ],
   "rule_references": [

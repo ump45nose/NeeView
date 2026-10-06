@@ -42,7 +42,7 @@ public sealed partial class MainWindow
         try
         {
             var source = book?.Pages.SourcePages ?? [];
-            var root = await Task.Run(() => BookTableOfContents.Create(source, request.Token), request.Token);
+            var root = await Task.Run(() => BookTableOfContents.Create(source, request.Token, book?.Source), request.Token);
             if (request.IsCancellationRequested || _preparing || _closedPrepared || !ReferenceEquals(book, _model.Operation.Book)) return;
             _contentsRoot = root; this.FindControl<TreeView>("ContentsTree")!.ItemsSource = new[] { root }; published = true;
         }

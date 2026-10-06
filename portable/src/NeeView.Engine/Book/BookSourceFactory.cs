@@ -105,7 +105,7 @@ public sealed class ArchiveEntryCollection(Archive root, IArchiveFactory archive
             var name = prefix + entry.EntryName.TrimEnd('/'); result.Add(new(entry, name));
             // 包内目录已由当前来源一次返回；只为真正的压缩文件新增子来源，不能重复展开目录。
             if (Mode != ArchiveEntryCollectionMode.IncludeSubArchives || !entry.IsBook() || entry.IsShortcut
-                || !archive.IsDirectory && !archive.IsPlaylist && (entry.IsDirectory || !ArchiveFormats.IsCompressedArchive(entry.EntryName))) continue;
+                || !archive.IsDirectory && !archive.IsPlaylist && (entry.IsDirectory || !ArchiveFormats.IsPageArchive(entry.EntryName))) continue;
             try
             {
                 var child = await archives.OpenAsync(entry, token); _owned.Add(child);

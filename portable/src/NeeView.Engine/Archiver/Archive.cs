@@ -21,6 +21,8 @@ public abstract class Archive(string path, ArchiveEntry? source = null) : IAsync
     public virtual bool IsDirectory => false;
     /// <summary>原PlaylistArchive来源资格；登记顺序可用，目录递归采用普通书籍策略。</summary>
     public virtual bool IsPlaylist => false;
+    /// <summary>原PDF目录；普通来源继续使用条目路径目录，空表示没有文档目录。</summary>
+    public virtual IReadOnlyList<ContentsArchiveEntryNode>? Contents => null;
     public bool IsDisposed { get; protected set; }
     /// <summary>建立条目索引，后台执行且支持取消。</summary>
     public abstract Task<IReadOnlyList<ArchiveEntry>> GetEntriesAsync(CancellationToken token);
@@ -57,6 +59,7 @@ public class ArchiveEntry(Archive archive)
     public string EntryName => Archive.IsDirectory || Archive.IsPlaylist ? RawEntryName : RawEntryName.Replace('\\', '/');
     public string Extension => System.IO.Path.GetExtension(EntryName);
     public long Length { get; init; }
+    public DateTime CreationTime { get; init; }
     public DateTime LastWriteTime { get; init; }
     public bool IsDirectory { get; init; }
     public bool IsShortcut { get; init; }

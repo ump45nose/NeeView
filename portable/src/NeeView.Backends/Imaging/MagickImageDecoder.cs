@@ -19,13 +19,15 @@ public sealed class MagickImageDecoder : IImageDecoder
     public Task<ImageInfo> ProbeAsync(Stream stream, CancellationToken token) => Task.Run(() =>
     {
         token.ThrowIfCancellationRequested();
+        if (stream is PdfPageStream pdf) return pdf.Probe();
         using var image = new MagickImage(); image.Ping(stream);
         token.ThrowIfCancellationRequested();
         var swapped = image.Orientation is OrientationType.LeftTop or OrientationType.RightTop or OrientationType.RightBottom or OrientationType.LeftBottom;
         return new ImageInfo(new((int)(swapped ? image.Height : image.Width), (int)(swapped ? image.Width : image.Height)), image.Format.ToString());
     }, token);
     /// <summary>输入解码规格，返回 BGRA 8 位预乘像素；原生完成后再次检查取消。</summary>
-    public Task<DecodedImageLease> DecodeAsync(Stream stream, DecodeRequest request, CancellationToken token) => Task.Run(() =>
+    public Task<DecodedImageLease> DecodeAsync(Stream stream, DecodeRequest request, CancellationToken token) => stream is PdfPageStream pdf
+        ? pdf.DecodeAsync(request, token) : Task.Run(() =>
     {
         token.ThrowIfCancellationRequested();
         using var image = new MagickImage();

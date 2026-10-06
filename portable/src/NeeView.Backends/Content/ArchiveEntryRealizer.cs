@@ -48,7 +48,8 @@ public sealed class ArchiveEntryRealizer(string? temporaryRoot = null) : IArchiv
                             if (length > remainingBytes) throw new InvalidDataException("归档实体化批次超过临时预算。");
                             await output.WriteAsync(buffer.AsMemory(0, read), token).ConfigureAwait(false);
                         }
-                        if (entry.Length >= 0 && length != entry.Length) throw new InvalidDataException("归档实体化文件长度与索引不符。");
+                        // 原PDF页Length=0是生成图像的逻辑元数据，不能与PNG流长度比较；仍逐字节执行批次预算。
+                        if (entry.Archive is not PdfArchive && entry.Length >= 0 && length != entry.Length) throw new InvalidDataException("归档实体化文件长度与索引不符。");
                         await output.FlushAsync(token).ConfigureAwait(false);
                     }
                     token.ThrowIfCancellationRequested();

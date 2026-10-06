@@ -1,6 +1,7 @@
 namespace NeeView;
 
 /// <summary>替代实际使用的 WPF 尺寸值，不包含控件或属性系统。</summary>
+[System.Text.Json.Serialization.JsonConverter(typeof(JsonSizeConverter))]
 public readonly record struct Size(double Width, double Height);
 /// <summary>布局比例或偏移值。</summary>
 public record struct Vector(double X, double Y)

@@ -1,5 +1,7 @@
 # 前端独立调整边界
 
+P5 第十三批：原PDF归档/页目录/三种尺寸及原JSON配置接入唯一阅读链；CoreGraphics/PDFKit官方绑定替换PDFium。正文直接输出像素，提取才惰性PNG，请求级流初始化/读/关闭串行。密码与扩展名配置尚未执行，见[PDF契约](p5-pdf.md)。
+
 P5 第十二批：嵌套解析/临时代理/父链生命周期全部位于Engine来源关系及Backends。ReaderView、页面列表和封面仍消费原Page与唯一BitmapFactory，不解压、不识别物理临时路径；布局/主题可独立修改，见[嵌套契约](p5-nested.md)。
 
 P5 第十一批：SettingsSearchPresenter从现有布局控件/明确分区标识取得可搜索文案，CommandParameterEdit提供既有参数字段；Engine只匹配纯文本/目标键。结果直接展示同一草稿控件和命令行模板，没有第二字段配置表。重挂时固定继承DataContext，返回时恢复父级/顺序/继承，样式不参与匹配，见[搜索契约](p5-settings-search.md)。

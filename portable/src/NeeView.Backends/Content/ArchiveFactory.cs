@@ -4,7 +4,7 @@ using NeeView;
 namespace NeeView.Backends;
 
 /// <summary>原 Archive 工厂的 Mac 实现，目录、ZIP、RAR 与 7z 共用原来源关系。</summary>
-public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias = null) : IArchiveFactory
+public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias = null, IPdfRenderer? pdfRenderer = null) : IArchiveFactory
 {
     /// <summary>应用独占的解压临时根；启动装配将此目录交给历史保存排除，非系统临时根。</summary>
     public static string TemporaryDirectory => System.IO.Path.Combine(System.IO.Path.GetTempPath(), "NeeView.Mac");
@@ -82,8 +82,8 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
             while (!string.IsNullOrEmpty(parent))
             {
                 token.ThrowIfCancellationRequested();
-                if (File.Exists(parent) && ArchiveFormats.IsCompressedArchive(parent))
-                    return new ArchiveOpenTarget(new CompressedArchive(parent), System.IO.Path.GetRelativePath(parent, path));
+                if (File.Exists(parent) && ArchiveFormats.IsPageArchive(parent))
+                    return new ArchiveOpenTarget(CreatePageArchive(parent, token), System.IO.Path.GetRelativePath(parent, path));
                 if (Directory.Exists(parent)) break;
                 parent = System.IO.Path.GetDirectoryName(parent);
             }
@@ -102,14 +102,22 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
             if (System.Text.RegularExpressions.Regex.IsMatch(path, @"(?:\.part\d+\.rar|\.r\d{2}|\.\d{3})$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
                 throw new NotSupportedException("分卷归档尚未迁移，请使用完整的单文件归档。");
             if (PlaylistSourceTools.IsPlaylist(path)) archive = new PlaylistArchive(path, this) { IsRootShortcut = new FileInfo(path).LinkTarget is not null };
-            else if (ArchiveFormats.IsCompressedArchive(path)) archive = new CompressedArchive(path) { IsRootShortcut = new FileInfo(path).LinkTarget is not null };
-            else throw new NotSupportedException("支持目录、图片、ZIP/CBZ、RAR/CBR、7z 和播放列表；其他来源尚未迁移。");
+            else if (ArchiveFormats.IsPageArchive(path)) archive = CreatePageArchive(path, token);
+            else throw new NotSupportedException("支持目录、图片、ZIP/CBZ、RAR/CBR、7z、PDF 和播放列表；其他来源尚未迁移。");
         }
         return new ArchiveOpenTarget(archive, null);
     }, token);
     /// <summary>超时/取消后SourceIo可释放晚到的根来源，不能把来源藏在不可释放的元组中。</summary>
     private sealed record ArchiveOpenTarget(Archive Archive, string? Relative) : IAsyncDisposable
     { public ValueTask DisposeAsync() => Archive.DisposeAsync(); }
+    /// <summary>原归档工厂分派PDF与压缩；不让PDF进入压缩/图片delegate。</summary>
+    private Archive CreatePageArchive(string path, CancellationToken token, string? logicalPath = null, ArchiveEntry? source = null, IAsyncDisposable? lifetime = null)
+    {
+        if (!ArchiveFormats.IsPdfArchive(logicalPath ?? path)) return new CompressedArchive(path, logicalPath, source, lifetime) { IsRootShortcut = source is null && new FileInfo(path).LinkTarget is not null };
+        if (!Config.Current.Archive.Pdf.IsEnabled) throw new NotSupportedException("PDF读取已在归档设置中关闭。");
+        if (pdfRenderer is null) throw new NotSupportedException("当前宿主未装配系统PDF后端。");
+        return new PdfArchiveSource(path, pdfRenderer, token, logicalPath, source, lifetime) { IsRootShortcut = source is null && new FileInfo(path).LinkTarget is not null };
+    }
 
 }
 
@@ -432,6 +440,7 @@ internal sealed class RequestedArchive : Archive
     private readonly Archive _source;
     public RequestedArchive(Archive source, string entry) : base(source.Path) { _source = source; RequestedEntryName = entry; }
     public override ArchiveEntry? Source => _source.Source;
+    public override IReadOnlyList<ContentsArchiveEntryNode>? Contents => _source.Contents;
     public override string RootArchivePath => _source.RootArchivePath;
     /// <summary>显式页面定位不改变当前书籍；复制仍引用原来源根条目。</summary>
     public override ArchiveEntry CreateBookEntry() => _source.CreateBookEntry();

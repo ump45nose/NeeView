@@ -98,6 +98,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             config.Bookmark = ReadBranch<BookmarkConfig>(raw, "Bookmark");
             config.System = ReadBranch<SystemConfig>(raw, "System");
             config.Archive = ReadBranch<ArchiveConfig>(raw, "Archive");
+            config.Performance = ReadBranch<PerformanceConfig>(raw, "Performance");
             config.Playlist = ReadBranch<PlaylistConfig>(raw, "Playlist");
             config.Window = ReadBranch<WindowConfig>(raw, "Window");
             config.WindowTitle = ReadBranch<WindowTitleConfig>(raw, "WindowTitle");
@@ -501,7 +502,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         try
         {
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "PageList", "History", "Bookmark", "System", "Archive", "Playlist", "AutoHide", "Window", "WindowTitle", "MenuBar", "Command", "Mouse", "StartUp", "Theme", "Fonts" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "PageList", "History", "Bookmark", "System", "Archive", "Performance", "Playlist", "AutoHide", "Window", "WindowTitle", "MenuBar", "Command", "Mouse", "StartUp", "Theme", "Fonts" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 MergeTyped(Object(config, branch), value!);

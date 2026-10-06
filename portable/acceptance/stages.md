@@ -456,3 +456,7 @@ P5第一批最终37项专项、877项全量通过，2项需显式图片目录的
 ## P5 第十一批：原设置结构化搜索
 
 当前九页表单、全部235命令及参数文案沿原Searcher接入同一草稿结果编辑，设置窗口历史不写JSON。16新增/1239全量通过、2资源跳过；正式Library/default ARM64应用和strict/deep本地签名通过。首次Library代码Binding裁剪检查失败已记录，改为现有XAML绑定后重新全量通过。Headless不替代Windows/设备或真实导出，完整原设置页及P5其他模块继续待迁，见[契约](../docs/p5-settings-search.md)和[静默验收](p5-settings-search-runtime.md)。
+
+## P5 第十三批：原PDF阅读链
+
+原PDF归档/目录/三尺寸/配置接入，官方CoreGraphics/PDFKit替换WindowsPDFium；57相关专项、1280全量通过/2资源跳过、6实际原生后台测试通过。正式Library/默认ARM64应用及strict/deep本地签名通过。导出流并发缺陷已修复并回归，原生像素和Headless分别留证；密码/扩展名配置、Windows/设备和正式分发待迁/待验。见[契约](../docs/p5-pdf.md)与[验收](p5-pdf-runtime.md)，P5整体未完成。

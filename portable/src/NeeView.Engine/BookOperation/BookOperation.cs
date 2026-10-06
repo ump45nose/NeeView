@@ -628,7 +628,11 @@ public static class ArchiveFormats
 {
     private static readonly HashSet<string> Extensions = new(StringComparer.OrdinalIgnoreCase) { ".zip", ".cbz", ".rar", ".cbr", ".7z" };
     /// <summary>按扩展名识别归档候选，损坏或加密归档仍由加载入口明确报错。</summary>
-    public static bool IsArchive(string path) => IsCompressedArchive(path) || PlaylistSourceTools.IsPlaylist(path);
+    public static bool IsArchive(string path) => IsPageArchive(path) || PlaylistSourceTools.IsPlaylist(path);
+    /// <summary>PDF单独交给系统页面后端，不传入SharpCompress或ImageMagick的PDF delegate。</summary>
+    public static bool IsPdfArchive(string path) => string.Equals(System.IO.Path.GetExtension(path), ".pdf", StringComparison.OrdinalIgnoreCase);
+    /// <summary>原可递归的页面来源资格，压缩与PDF各走自身后端。</summary>
+    public static bool IsPageArchive(string path) => IsCompressedArchive(path) || IsPdfArchive(path);
     /// <summary>压缩后端资格与.nvpls明确分离，不能把列表JSON交给SharpCompress。</summary>
     public static bool IsCompressedArchive(string path) => Extensions.Contains(System.IO.Path.GetExtension(path));
 }
