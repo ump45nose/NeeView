@@ -336,17 +336,19 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     public void Render(DrawingContext context)
     {
         if (Layout is null || _pages.Length == 0) { Text(context, _layoutError ?? (IsLayoutPending ? "正在计算布局…" : "这个来源没有可浏览的页面"), new(24, 24)); return; }
+        bool effected = ImageEffectRenderer.DrawScene(context, new Avalonia.Rect(owner.Bounds.Size), RecordScene);
         using var clip = context.PushClip(new Avalonia.Rect(owner.Bounds.Size));
         foreach (int index in Layout.Query(_offset, _offset + owner.Bounds.Height))
         {
             var item = Layout.Items[index]; var page = _pages[index];
             var target = new Avalonia.Rect(item.X - _offsetX, item.Y - _offset, item.Width, item.Height);
-            if (page.PageType.IsFolder()) ArchivePageRenderer.Draw(owner, context, page, target, _images.GetValueOrDefault(page)?.Bitmap, _errors.GetValueOrDefault(page) ?? (_pending.ContainsKey(page) ? "正在加载…" : ""));
+            if (effected) { /* 已合成整视口；选择框及滚动UI保留在效果外层。 */ }
+            else if (page.PageType.IsFolder()) ArchivePageRenderer.Draw(owner, context, page, target, _images.GetValueOrDefault(page)?.Bitmap, _errors.GetValueOrDefault(page) ?? (_pending.ContainsKey(page) ? "正在加载…" : ""));
             else if (_images.TryGetValue(page, out var image))
             {
                 var trim = Config.Current.ImageTrim; var size = image.Bitmap.PixelSize;
                 var source = trim.IsEnabled ? new Avalonia.Rect(size.Width*trim.Left,size.Height*trim.Top,size.Width*(1-trim.Left-trim.Right),size.Height*(1-trim.Top-trim.Bottom)) : new Avalonia.Rect(size.ToSize(1));
-                ReaderImageRenderer.Draw(owner,context,image.Bitmap,source,target,Matrix.Identity,retain:image.Retain);
+                ReaderImageRenderer.Draw(owner,context,image.Bitmap,source,target,Matrix.Identity,retain:image.Retain,pixels:image.Lease.Image);
                 ImageGridRenderer.Draw(context,target,ImageGridTarget.Image);
             }
             else { context.FillRectangle(Brush("Gallery.Placeholder", Brushes.DimGray), target); Text(context, _errors.ContainsKey(page) ? "读取失败" : "正在加载…", target.TopLeft + new Avalonia.Vector(8, 8)); }
@@ -358,6 +360,34 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
             context.FillRectangle(Brush("Gallery.Scrollbar", Brushes.Gray), new Avalonia.Rect(owner.Bounds.Width - 8, _offset / MaximumOffset * (owner.Bounds.Height - thumb), 5, thumb), 2);
         }
         Text(context, $"{(_mode == BrowseLayoutMode.Masonry ? "瀑布流" : "连续阅读")} · {Layout.ColumnCount}列 · {_pages.Length}项", new(12, 10));
+    }
+    /// <summary>扩展浏览模式沿相同整视口效果；可见查询、像素与预算仍使用现有表现和工厂。</summary>
+    private void RecordScene(SkiaSharp.SKCanvas canvas)
+    {
+        if (Layout is null) return;
+        foreach (int index in Layout.Query(_offset, _offset + owner.Bounds.Height))
+        {
+            var item = Layout.Items[index]; var page = _pages[index];
+            var target = new Avalonia.Rect(item.X - _offsetX, item.Y - _offset, item.Width, item.Height);
+            var image = _images.GetValueOrDefault(page);
+            if (page.PageType.IsFolder()) ReaderEffectScene.Card(owner, canvas, page, target, image?.Lease.Image, image is null ? null : image.Retain,
+                _errors.GetValueOrDefault(page) ?? (_pending.ContainsKey(page) ? "正在加载…" : ""), Matrix.Identity);
+            else if (image is not null)
+            {
+                var trim = Config.Current.ImageTrim; var size = image.Bitmap.PixelSize;
+                var source = trim.IsEnabled ? new Avalonia.Rect(size.Width * trim.Left, size.Height * trim.Top, size.Width * (1 - trim.Left - trim.Right), size.Height * (1 - trim.Top - trim.Bottom)) : new Avalonia.Rect(size.ToSize(1));
+                ReaderEffectScene.PageBackground(canvas, target);
+                ReaderEffectScene.Image(canvas, image.Lease.Image, source, target, image.Retain, ReaderImageRenderer.Interpolation(owner, source, target, Matrix.Identity));
+                ReaderEffectScene.Grid(canvas, target);
+            }
+            else
+            {
+                var brush = Brush("Gallery.Placeholder", Brushes.DimGray) as ISolidColorBrush;
+                var color = brush?.Color ?? Colors.DimGray;
+                ReaderEffectScene.Fill(canvas, target, new(color.R, color.G, color.B, color.A));
+                ReaderEffectScene.Text(canvas, _errors.ContainsKey(page) ? "读取失败" : "正在加载…", target.TopLeft + new Avalonia.Vector(8, 8));
+            }
+        }
     }
     private IBrush Brush(string name, IBrush fallback) => owner.TryFindResource(name, out var value) && value is IBrush brush ? brush : fallback;
     private void Text(DrawingContext context, string text, Point point) => context.DrawText(new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("sans-serif"), 12, CanvasBackgroundPresenter.Foreground(ContentColor)), point);

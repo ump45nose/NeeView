@@ -3181,7 +3181,13 @@
       "source": "NeeView/Expression.Blend.NETFramework/Microsoft.Expression.Effects.dll",
       "target": "src/NeeView.MacOS/Views/ImageEffectRenderer.cs",
       "sha256": "34843cfea24b713b1b5fd9a93c61d7c6d3fa320dbb84df60d9d48c5560c79452",
-      "status": "P5第三十一批：固定DLL只作Bloom/Monochrome/ColorTone行为核验；CTAB/ps_2_0及原managed打包绑定手工落实SkSL，不复制或分发DLL/字节码、不引入D3D运行兼容层。原生动态对照另验。"
+      "status": "P5第三十二批：14类原参数/JSON保持，四自有与九Expression按固定算法迁入；Blur按WPF官方核迁入；整视口/逆层序与View导出共享。Windows动态/GPU另验，resize待迁。"
+    },
+    {
+      "source": "NeeView/PageFrames/EffectPanel.cs",
+      "target": "src/NeeView.MacOS/Views/ImageEffectSceneRenderer.cs",
+      "sha256": "047969ad0489edee144b65e11fe3a71019558aa978c8034a37e312299cec99b7",
+      "status": "P5第三十二批：保留原整阅读视口包装与逆层序；借用已有像素记录绘图、有界设备像素表面替换WPF。"
     }
   ],
   "rule_references": [
@@ -3756,6 +3762,27 @@
     {
       "target": "src/NeeView.Backends/MacFileAliases.cs",
       "status": "Foundation Finder alias解析替换Windows快捷方式，不弹窗/挂载；符号链接文件动作操作链接本身，Windows COM不模拟"
+    }
+  ],
+  "external_algorithm_references": [
+    {
+      "name": "dotnet/wpf BlurEffect Gaussian weights",
+      "repository_commit": "e89a851c5792c8777a7115cc7a797fd0c045fdd4",
+      "url": "https://github.com/dotnet/wpf/tree/e89a851c5792c8777a7115cc7a797fd0c045fdd4",
+      "source_files": [
+        {
+          "path": "src/Microsoft.DotNet.Wpf/src/WpfGfx/core/resources/BlurEffect.cpp",
+          "sha256": "37f5fbb1482329f0a71ab2a4cc5a7edb269d8c1dd7732e88d8a1273d94a3d4d9"
+        },
+        {
+          "path": "src/Microsoft.DotNet.Wpf/src/WpfGfx/core/resources/BlurEffect.h",
+          "sha256": "64df3636a362347cc56748ef65a4514bc27884244e50d7ac8ed92994ccd21f37"
+        }
+      ],
+      "target": "src/NeeView.MacOS/Views/ImageBlurKernel.cs",
+      "license": "licenses/upstream/dotnet-wpf/LICENSE.TXT",
+      "license_sha256": "ae48df11a335dc1a615f4f938b69cba73bcf4485c4f97af49b38efb0f216353b",
+      "status": "P5第三十二批：官方离散核/缩放半径的C#和Skia适配；WPF本身不进入Mac构建/分发。"
     }
   ]
 }

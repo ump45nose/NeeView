@@ -19,8 +19,10 @@ public sealed class ImageEffectIntegrationTests
 {
     private static CancellationToken Token => TestContext.Current.CancellationToken;
     public static bool HasMountedSample => File.Exists(Environment.GetEnvironmentVariable("NEEVIEW_IMAGE_EFFECT_SAMPLE"));
-    [AvaloniaFact(SkipUnless=nameof(HasMountedSample),Skip="需显式提供只读实图样本")]
-    public async Task MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource()
+    [AvaloniaTheory(SkipUnless=nameof(HasMountedSample),Skip="需显式提供只读实图样本")]
+    [InlineData(EffectType.Hsv)] [InlineData(EffectType.Sharpen)] [InlineData(EffectType.Embossed)] [InlineData(EffectType.Pixelate)]
+    [InlineData(EffectType.Magnify)] [InlineData(EffectType.Ripple)] [InlineData(EffectType.Swirl)] [InlineData(EffectType.Blur)]
+    public async Task MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(EffectType type)
     {
         using var f=new Fixture();var sample=Environment.GetEnvironmentVariable("NEEVIEW_IMAGE_EFFECT_SAMPLE")!;
         var source=await File.ReadAllBytesAsync(sample,Token);var stamp=File.GetLastWriteTimeUtc(sample);
@@ -31,12 +33,22 @@ public sealed class ImageEffectIntegrationTests
             await window.OpenAsync(sample);await op.ApplySettingAsync(s=>{s.PageMode=PageMode.SinglePage;s.IsSupportedDividePage=false;});
             await op.EditImageOptionsAsync(c=>{c.ImageCustomSize.IsEnabled=true;c.ImageCustomSize.Size=new(600,900);c.ImageTrim.IsEnabled=true;c.ImageTrim.Left=.1;c.ImageTrim.Right=.1;c.ImageTrim.Top=.2;c.ImageTrim.Bottom=.1;});
             using var before=new MemoryStream();await window.Viewer.ExportViewAsync(op.Frame!,new ExportImageParameter{Mode=ExportImageMode.View,IsOriginalSize=true},before,Token);
-            await op.EditImageOptionsAsync(c=>{c.ImageEffect.IsEnabled=true;c.ImageEffect.Layers[0].Effect=new HsvEffectUnit{Hue=120,Saturation=.2};});
+            await op.EditImageOptionsAsync(c=>{c.ImageEffect.IsEnabled=true;c.ImageEffect.Layers[0].ChangeType(type,c.ImageEffect,c.ImageEffectCache);if(type==EffectType.Hsv)c.ImageEffect.Layers[0].Effect=new HsvEffectUnit{Hue=120,Saturation=.2};
+                // 原Auto在CPU为nearest；默认Sharpen偏移可小于半个像素。实图使用可观察参数，产品默认保持。
+                if(type==EffectType.Sharpen)c.ImageEffect.Layers[0].Effect=new SharpenEffectUnit{Height=10};});
             using var after=new MemoryStream();await window.Viewer.ExportViewAsync(op.Frame!,new ExportImageParameter{Mode=ExportImageMode.View,IsOriginalSize=true},after,Token);
             using var plain=new MagickImage(before.ToArray());using var effected=new MagickImage(after.ToArray());
             Assert.Equal((uint)480,effected.Width);Assert.Equal((uint)630,effected.Height);
             Assert.False(plain.ToByteArray(MagickFormat.Rgba).SequenceEqual(effected.ToByteArray(MagickFormat.Rgba)));
             Assert.Equal(source,await File.ReadAllBytesAsync(sample,Token));Assert.Equal(stamp,File.GetLastWriteTimeUtc(sample));
+            if (Environment.GetEnvironmentVariable("NEEVIEW_IMAGE_EFFECT_EVIDENCE_DIR") is { Length: > 0 } evidence)
+            {
+                Directory.CreateDirectory(evidence);
+                await File.WriteAllTextAsync(Path.Combine(evidence, type + "-resource.json"), JsonSerializer.Serialize(new
+                { effect = type.ToString(), source_sha256 = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(source)),
+                    width = effected.Width, height = effected.Height, source_unchanged = true, pixels_changed = true,
+                    scope = "显式只读单样本/正式View导出；非Windows动态/GPU" }, new JsonSerializerOptions { WriteIndented = true }) + "\n", Token);
+            }
             if(Environment.GetEnvironmentVariable("NEEVIEW_ACCEPTANCE_PHASE")=="p5-image-effects")
                 await File.WriteAllTextAsync(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../../acceptance/p5-image-effects-resource.json")),
                     JsonSerializer.Serialize(new{scope="挂载图片单样本；独立临时Profile/输出，不激活正式应用，不代表Windows动态",width=effected.Width,height=effected.Height,
@@ -118,11 +130,11 @@ public sealed class ImageEffectIntegrationTests
     [AvaloniaFact]
     public void PendingEffectNeverRendersOriginalAsSuccessfulEffect()
     {
-        Config.SetCurrent(new(){ImageEffect=new(){IsEnabled=true,Layers=new(){new(){Effect=new RippleEffectUnit()}}}});
+        Config.SetCurrent(new(){ImageEffect=new(){IsEnabled=true,Layers=new(){new(){Effect=new UnknownEffectUnit{TypeName="Future"}}}}});
         using var image=new MagickImage(MagickColors.Red,4,4);using var stream=new MemoryStream();image.Write(stream,MagickFormat.Png);stream.Position=0;using var source=new Bitmap(stream);
         var result=new ImageEffectRenderResult();int released=0;using var target=new RenderTargetBitmap(new PixelSize(4,4));
         using(var context=target.CreateDrawingContext())ImageEffectRenderer.Draw(context,source,new(0,0,4,4),new(0,0,4,4),()=>new Release(()=>released++),true,result);
-        Assert.Contains("Ripple",result.Error);Assert.Equal(1,released);Assert.Throws<InvalidOperationException>(result.ThrowIfFailed);
+        Assert.Contains("Future",result.Error);Assert.Equal(1,released);Assert.Throws<InvalidOperationException>(result.ThrowIfFailed);
     }
     private sealed class Probe(Bitmap source,Action acquired,Action released):Control
     {
@@ -177,7 +189,8 @@ public sealed class ImageEffectIntegrationTests
         await Wait(()=>factory.GetDiagnostics().Leases==0);Assert.Equal(0,factory.ByteCount);
     }
     [AvaloniaTheory] [InlineData(EffectType.Bloom)] [InlineData(EffectType.Monochrome)] [InlineData(EffectType.ColorTone)]
-    public async Task MigratedColorEffectsUseRealViewExportAndLeaveSourceCopyAndPositionIntact(EffectType type)
+    [InlineData(EffectType.Blur)] [InlineData(EffectType.Embossed)] [InlineData(EffectType.Sharpen)] [InlineData(EffectType.Pixelate)] [InlineData(EffectType.Magnify)] [InlineData(EffectType.Ripple)] [InlineData(EffectType.Swirl)]
+    public async Task MigratedEffectsUseRealViewExportAndLeaveSourceCopyAndPositionIntact(EffectType type)
     {
         using var f=new Fixture();var path=Path.Combine(f.Images,"001.png");
         using(var image=new MagickImage(MagickColors.Red,100,200))image.Write(path);
@@ -202,7 +215,8 @@ public sealed class ImageEffectIntegrationTests
         finally{await window.PrepareShutdownAsync();window.Close();}
         await Wait(()=>factory.GetDiagnostics().Leases==0);Assert.Equal(0,factory.ByteCount);
     }
-    [AvaloniaFact] public async Task BrowseGeometryKeepsAnchorWithoutRepeatingLayoutAndSceneResourcesClose()
+    [AvaloniaTheory] [InlineData(EffectType.Hsv)] [InlineData(EffectType.Swirl)] [InlineData(EffectType.Blur)]
+    public async Task BrowseGeometryKeepsAnchorWithoutRepeatingLayoutAndSceneResourcesClose(EffectType type)
     {
         using var f=new Fixture();for(int i=6;i<=100;i++)File.Copy(Path.Combine(f.Images,"001.png"),Path.Combine(f.Images,$"{i:000}.png"));
         var state=new SaveData(f.State);await state.LoadAsync(Token);var decoder=new MagickImageDecoder();var factory=new BitmapFactory(decoder);var op=new BookOperation(new ArchiveFactory(),decoder,state);var window=Window(op,state,factory);
@@ -210,7 +224,7 @@ public sealed class ImageEffectIntegrationTests
         {
             await window.OpenAsync(f.Images);await op.SetBrowseModeAsync(BrowseLayoutMode.Masonry);await window.Viewer.RefreshAsync();await Wait(()=>window.Viewer.DisplayCount>0&&window.Viewer.BrowsePendingCount==0);
             window.Viewer.Pan(new(0,-1500));await Wait(()=>op.Position.Index>0&&window.Viewer.BrowsePendingCount==0);var page=op.Book!.CurrentPage;
-            await op.EditImageOptionsAsync(c=>{c.ImageCustomSize.IsEnabled=true;c.ImageCustomSize.Size=new(200,300);c.ImageTrim.IsEnabled=true;c.ImageTrim.Top=.2;c.ImageEffect.IsEnabled=true;c.ImageEffect.Layers[0].Effect=new HsvEffectUnit{Hue=120};});
+            await op.EditImageOptionsAsync(c=>{c.ImageCustomSize.IsEnabled=true;c.ImageCustomSize.Size=new(200,300);c.ImageTrim.IsEnabled=true;c.ImageTrim.Top=.2;c.ImageEffect.IsEnabled=true;c.ImageEffect.Layers[0].ChangeType(type,c.ImageEffect,c.ImageEffectCache);});
             await window.Viewer.RefreshAsync();await Wait(()=>window.Viewer.BrowsePendingCount==0);Assert.Same(page,op.Book.CurrentPage);Assert.Contains(page!.Index,window.Viewer.BrowseLayout!.Query(window.Viewer.BrowseOffset,window.Viewer.BrowseOffset+window.Viewer.Bounds.Height));
             var layout=window.Viewer.BrowseLayout;await Task.Delay(180,Token);await window.Viewer.RefreshAsync();Assert.Same(layout,window.Viewer.BrowseLayout);
             using(var frame=window.CaptureRenderedFrame()){Assert.NotNull(frame);}

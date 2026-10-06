@@ -100,6 +100,34 @@ def add_upstream_licenses(record, root, licenses, upstream):
     record["license_material_state"] = "included"
 
 
+def source_algorithm_records(root, licenses):
+    """记录纯源码算法及其固定提交/许可原文，不联网解析来源。"""
+    migration = json.loads((root / "docs/source-migration.json").read_text())
+    records = []
+    for reference in migration.get("external_algorithm_references", []):
+        relative = Path(reference["license"])
+        source = (root / relative).resolve()
+        if not source.is_relative_to((root / "licenses").resolve()) or not source.is_file():
+            raise RuntimeError("源码算法许可文件缺失：" + reference["name"])
+        actual_sha256 = sha256(source)
+        if actual_sha256 != reference["license_sha256"]:
+            raise RuntimeError("源码算法许可原文指纹不一致：" + reference["name"])
+        destination = licenses / relative.relative_to("licenses")
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+        records.append({
+            "name": reference["name"],
+            "repository_commit": reference["repository_commit"],
+            "repository": reference["url"],
+            "source_files": reference["source_files"],
+            "target": reference["target"],
+            "license": reference["license"],
+            "license_files": [{"source": reference["license"], "file": destination.relative_to(licenses.parent).as_posix(), "sha256": actual_sha256}],
+            "license_material_state": "included",
+        })
+    return records
+
+
 def dependency_manifest(root, project, resources, framework_references):
     """将ARM64已解析runtime/native资产与实际.app交叉核对，包含SDK运行时许可。"""
     assets = json.loads((root / "src" / project / "obj/project.assets.json").read_text())
@@ -140,6 +168,8 @@ def dependency_manifest(root, project, resources, framework_references):
         record = package_record(reference["RuntimePackName"], reference["RuntimePackVersion"], package, licenses)
         if (record["name"], record["version"]) not in {(item["name"], item["version"]) for item in runtime_records}: runtime_records.append(record)
     if not runtime_records: raise RuntimeError("发布缺少SDK运行时许可来源")
+    migration_path = root / "docs/source-migration.json"
+    source_records = source_algorithm_records(root, licenses) if migration_path.is_file() else []
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
     status = subprocess.check_output(["git", "status", "--porcelain"], cwd=root, text=True).splitlines()
     version = plistlib.loads((resources.parent / "Info.plist").read_bytes())["CFBundleShortVersionString"]
@@ -147,6 +177,7 @@ def dependency_manifest(root, project, resources, framework_references):
                 "dependency_source": "ARM64 project.assets.json runtime/native matched to published bundle; resolved SDK runtime packs",
                 "native_hash_scope": "bundle before signing; signed archive hashes recorded separately",
                 "dependencies": sorted(records, key=lambda item: item["name"].lower()), "runtime_packs": runtime_records,
+                "source_algorithm_references": source_records,
                 "native_files": [{"path": path.relative_to(resources.parent).as_posix(), "unsigned_sha256": sha256(path)} for path in native_binaries(resources.parent)]}
     (resources / "dependencies.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
     shutil.copy2(root.parent / "LICENSE.md", resources / "LICENSE.md")

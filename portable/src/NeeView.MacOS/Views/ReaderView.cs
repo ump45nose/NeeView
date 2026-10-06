@@ -21,6 +21,7 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
     {
         private int _references = 1;
         public Bitmap Bitmap { get; } = bitmap;
+        public DecodedImageLease Pixels => lease.Image;
         public ThemeRgba Color => lease.Image.Color;
         /// <summary>同一图片及解码规格/来源版本可复用显示缓冲；Folder封面仍按原选择重新请求。</summary>
         public bool CanReuse(Page page, DecodeRequest candidate) => page.IsImage && request == candidate
@@ -303,13 +304,22 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
         if (IsBrowsing && _browse is not null) { _browse.Render(context); ImageGridRenderer.Draw(context, new Avalonia.Rect(Bounds.Size), ImageGridTarget.Screen); return; }
         if (_frame is null)
         { DrawText(context, _operation?.Book is null ? "NeeView\n打开图片、目录或 ZIP / CBZ" : "这个来源没有可阅读的图片", new(30,30), CanvasBackgroundPresenter.Foreground(CurrentContentColor)); return; }
-        using var clip=context.PushClip(new Avalonia.Rect(Bounds.Size));
         var motion=_motion.GetPageState();
-        if (IsPanorama) DrawPanorama(context);
-        if (_outgoing is { } old)
-            DrawFrame(context,old.Targets,old.Matrix * Matrix.CreateTranslation(motion.Outgoing),old.Images,old.Errors,_awaitingTransition ? 1 : motion.OutgoingOpacity);
-        if (!IsPanorama && !_awaitingTransition)
-            DrawFrame(context,_transform.GetTargets(),GetRenderedMatrix(),_images,_pageErrors,motion.IncomingOpacity);
+        if (!ImageEffectRenderer.DrawScene(context, new Avalonia.Rect(Bounds.Size), canvas =>
+        {
+            if (IsPanorama) RecordPanorama(canvas);
+            if (_outgoing is { } previous) RecordFrame(canvas, previous.Targets, previous.Matrix * Matrix.CreateTranslation(motion.Outgoing), previous.Images, previous.Errors, _awaitingTransition ? 1 : motion.OutgoingOpacity);
+            if (!IsPanorama && !_awaitingTransition) RecordFrame(canvas, _transform.GetTargets(), GetRenderedMatrix(), _images, _pageErrors, motion.IncomingOpacity);
+        }))
+        {
+            // 与原ScrollViewer一样只裁剪效果输入；外层Blur按自己的扩展边界输出。
+            using var clip=context.PushClip(new Avalonia.Rect(Bounds.Size));
+            if (IsPanorama) DrawPanorama(context);
+            if (_outgoing is { } old)
+                DrawFrame(context,old.Targets,old.Matrix * Matrix.CreateTranslation(motion.Outgoing),old.Images,old.Errors,_awaitingTransition ? 1 : motion.OutgoingOpacity);
+            if (!IsPanorama && !_awaitingTransition)
+                DrawFrame(context,_transform.GetTargets(),GetRenderedMatrix(),_images,_pageErrors,motion.IncomingOpacity);
+        }
         ImageGridRenderer.Draw(context, new Avalonia.Rect(Bounds.Size), ImageGridTarget.Screen);
         if (_sequenceHint.Length>0) { context.FillRectangle(new SolidColorBrush(Color.FromArgb(210,24,24,24)),new Avalonia.Rect(12,12,220,58)); DrawText(context,_sequenceHint,new(24,20)); }
         if (_loadError is not null) DrawText(context,_loadError,new(12,12));
@@ -330,7 +340,7 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
             {
                 if (ReferenceEquals(images, _images)) image = GetMediaDisplay(source.Page, image);
                 var crop=source.ViewSizeCalculator.GetViewBox(); var pixels=image.Bitmap.PixelSize;
-                ReaderImageRenderer.Draw(this,context,image.Bitmap,new Avalonia.Rect(crop.X*pixels.Width,crop.Y*pixels.Height,crop.Width*pixels.Width,crop.Height*pixels.Height),target,matrix,interpolation, image.Retain, immediate, result);
+                ReaderImageRenderer.Draw(this,context,image.Bitmap,new Avalonia.Rect(crop.X*pixels.Width,crop.Y*pixels.Height,crop.Width*pixels.Width,crop.Height*pixels.Height),target,matrix,interpolation, image.Retain, immediate, result, image.Pixels);
                 if (errors.GetValueOrDefault(source.Page) is { Length: > 0 } error)
                 {
                     // 静态首帧可用时仍明确显示动画失败，不能悄悄把不支持当作播放成功。

@@ -1,0 +1,36 @@
+{
+  "source_algorithm_references": [
+    {
+      "name": "dotnet/wpf BlurEffect Gaussian weights",
+      "repository_commit": "e89a851c5792c8777a7115cc7a797fd0c045fdd4",
+      "repository": "https://github.com/dotnet/wpf/tree/e89a851c5792c8777a7115cc7a797fd0c045fdd4",
+      "source_files": [
+        {
+          "path": "src/Microsoft.DotNet.Wpf/src/WpfGfx/core/resources/BlurEffect.cpp",
+          "sha256": "37f5fbb1482329f0a71ab2a4cc5a7edb269d8c1dd7732e88d8a1273d94a3d4d9"
+        },
+        {
+          "path": "src/Microsoft.DotNet.Wpf/src/WpfGfx/core/resources/BlurEffect.h",
+          "sha256": "64df3636a362347cc56748ef65a4514bc27884244e50d7ac8ed92994ccd21f37"
+        }
+      ],
+      "target": "src/NeeView.MacOS/Views/ImageBlurKernel.cs",
+      "license": "licenses/upstream/dotnet-wpf/LICENSE.TXT",
+      "license_files": [
+        {
+          "source": "licenses/upstream/dotnet-wpf/LICENSE.TXT",
+          "file": "licenses/upstream/dotnet-wpf/LICENSE.TXT",
+          "sha256": "ae48df11a335dc1a615f4f938b69cba73bcf4485c4f97af49b38efb0f216353b"
+        }
+      ],
+      "license_material_state": "included"
+    }
+  ],
+  "native_file_count": 18,
+  "signing": "ad-hoc development",
+  "zip_relocation_and_signature": "passed",
+  "notarized": false,
+  "archive_sha256": "743e43693d8419d63c2f8f00dc6353a0f9b55b80b2cb65658f70ef3c0dd30666",
+  "gatekeeper": "not executed",
+  "interactive_installation": "not executed"
+}

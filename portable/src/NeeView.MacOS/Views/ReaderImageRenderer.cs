@@ -29,15 +29,20 @@ internal static class ReaderImageRenderer
         {
             if (_pageChecker?.Color != color)
             {
-                double max = Math.Max(color.R, Math.Max(color.G, color.B));
-                double v = max / 255; double next = Math.Clamp(v + (v < .1 ? .1 : -.1), 0, 1);
-                byte Channel(byte component) => (byte)Math.Clamp((int)(max == 0 ? next * 255 : component * next / v), 0, 255);
-                var alt = Color.FromArgb(color.A, Channel(color.R), Channel(color.G), Channel(color.B));
+                var alt = CanvasBackgroundPresenter.ToColor(PageCheckerAlternate(color));
                 _pageChecker = (color, CanvasBackgroundPresenter.Checker(CanvasBackgroundPresenter.ToColor(color), alt, 16));
             }
             brush = _pageChecker.Value.Brush;
         }
         context.FillRectangle(brush, target.Deflate(1));
+    }
+    /// <summary>普通绘制与整视口效果共享原HSV明暗公式，主题修改不会产生第二套背景规则。</summary>
+    internal static ThemeRgba PageCheckerAlternate(ThemeRgba color)
+    {
+        double maximum = Math.Max(color.R, Math.Max(color.G, color.B)), value = maximum / 255;
+        double next = Math.Clamp(value + (value < .1 ? .1 : -.1), 0, 1);
+        byte Channel(byte component) => (byte)Math.Clamp((int)(maximum == 0 ? next * 255 : component * next / value), 0, 255);
+        return new(color.A, Channel(color.R), Channel(color.G), Channel(color.B));
     }
     /// <summary>实际设备像素双轴判定；插值只作用于图像，不改变其他文字/卡片。</summary>
     public static BitmapInterpolationMode Interpolation(Control owner, Avalonia.Rect source, Avalonia.Rect target, Matrix matrix)
@@ -48,11 +53,12 @@ internal static class ReaderImageRenderer
         return Config.Current.ImageDotKeep.IsImageDotKeep(size, new(source.Width, source.Height)) ? BitmapInterpolationMode.None : BitmapInterpolationMode.HighQuality;
     }
     /// <summary>绘图调用共享实际矩阵和裁剪源；显示资源仍由各查看器的租约拥有。</summary>
-    public static void Draw(Control owner, DrawingContext context, Bitmap bitmap, Avalonia.Rect source, Avalonia.Rect target, Matrix matrix, BitmapInterpolationMode? interpolation = null, Func<IDisposable>? retain = null, bool immediate = false, ImageEffectRenderResult? result = null)
+    public static void Draw(Control owner, DrawingContext context, Bitmap bitmap, Avalonia.Rect source, Avalonia.Rect target, Matrix matrix, BitmapInterpolationMode? interpolation = null, Func<IDisposable>? retain = null, bool immediate = false, ImageEffectRenderResult? result = null, DecodedImageLease? pixels = null)
     {
         PageBackground(context, target);
-        using var options = context.PushRenderOptions(new RenderOptions { BitmapInterpolationMode = interpolation ?? Interpolation(owner, source, target, matrix) });
-        if (!ImageEffectRenderer.Draw(context, bitmap, source, target, retain, immediate, result)) context.DrawImage(bitmap, source, target);
+        var sampling=interpolation ?? Interpolation(owner, source, target, matrix);
+        using var options = context.PushRenderOptions(new RenderOptions { BitmapInterpolationMode = sampling });
+        if (!ImageEffectRenderer.Draw(context, bitmap, source, target, retain, immediate, result, pixels, sampling)) context.DrawImage(bitmap, source, target);
         if (retain is not null && ImageEffectRenderer.Unsupported(Config.Current.ImageEffect) is { } pending)
         {
             using var clip = context.PushClip(target);

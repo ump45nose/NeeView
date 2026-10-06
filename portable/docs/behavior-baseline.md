@@ -160,3 +160,5 @@ P5第二十二批：原六种画布背景、五自定义刷、透明页底色/HS
 ## P5第二十八批：原图像效果/几何/预设
 
 原参数短$type/默认差分、Level raw端点、外到内层集合的逆执行、10层及默认预设保护、六分支/缓存及字段保留进入唯一JSON。原自定义尺寸九比例、裁剪对边联动及DPI→custom→trim→split顺序保持；UI尺寸为16–4096，不截断旧合法导入数值。原图像网格按整个页框，导出不包含网格。四类自有shader已在真实Skia及唯一View导出执行；十类WPF/第三方参数保留，未称全部执行。资源及原版动态边界见[p5-image-effects.md](p5-image-effects.md)。
+
+P5第三十二批：原PageFrameBox/EffectPanel整ScrollViewer作用域与原ViewImageExporter合成画布接入，十四类效果全部有实际后端。六空间参数/公式按固定Expression指令核验；Blur按官方WPF离散核与修正权重，Auto采样保留CPU nearest/GPU bilinear。双页接缝、页背景、模糊外扩/累计中心、半页/旋转及只读实图View导出/源Copy/关闭资源归零已自动验证；固定Windows动态与实际GPU另验，见[契约](p5-spatial-effects.md)。

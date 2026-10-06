@@ -1,5 +1,7 @@
 # P5 第三十一批：Bloom、Monochrome、ColorTone实际颜色后端
 
+第三十二批已补齐其余七类并将颜色层也接入原整视口合成；当前作用范围和资源契约见[空间效果](p5-spatial-effects.md)，以下为第三十一批历史交付。
+
 ## 职责与依赖
 
 原EffectUnit/层/预设/JSON保持；仅替换Microsoft.Expression颜色执行后端，进入唯一ImageEffectRenderer/Skia颜色滤镜链。固定DLL只用于只读核验，不进入Mac发布包；没有D3D兼容层、新语言、依赖或图像资源体系。XAML和参数表单未变。

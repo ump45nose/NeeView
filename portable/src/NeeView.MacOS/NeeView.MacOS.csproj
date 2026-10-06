@@ -24,6 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <!-- 迁入纯源码依赖也随正式 .app 保存原版权/许可通知。 -->
+    <BundleResource Include="../../licenses/upstream/dotnet-wpf/LICENSE.TXT" LogicalName="Licenses/dotnet-wpf.LICENSE.txt" />
     <BundleResource Include="../NeeView.Engine/Search/Upstream/LICENSE.md" LogicalName="Licenses/NeeLaboratory.IO.Search.LICENSE.txt" />
     <BundleResource Include="../NeeView.Engine/Search/Upstream/THIRDPARTY_LICENSES.md" LogicalName="Licenses/NeeLaboratory.IO.Search.THIRDPARTY.txt" />
   </ItemGroup>

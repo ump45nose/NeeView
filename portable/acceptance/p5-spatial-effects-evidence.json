@@ -1,0 +1,84 @@
+{
+  "baseline": "c5c398d89",
+  "effect_scope": "original composed reader viewport",
+  "effects": "14 implemented; resize and viewer Loupe pending",
+  "sample_scope": "eight effects on one explicitly selected read-only mounted sample; not Windows dynamic/GPU",
+  "read_only_sample_results": [
+    {
+      "effect": "Blur",
+      "source_sha256": "FCC295403BAB147389C5D534B2F703898A54C8F4D14C71EE73765066D14C4832",
+      "width": 480,
+      "height": 630,
+      "source_unchanged": true,
+      "pixels_changed": true,
+      "scope": "显式只读单样本/正式View导出；非Windows动态/GPU"
+    },
+    {
+      "effect": "Embossed",
+      "source_sha256": "FCC295403BAB147389C5D534B2F703898A54C8F4D14C71EE73765066D14C4832",
+      "width": 480,
+      "height": 630,
+      "source_unchanged": true,
+      "pixels_changed": true,
+      "scope": "显式只读单样本/正式View导出；非Windows动态/GPU"
+    },
+    {
+      "effect": "Hsv",
+      "source_sha256": "FCC295403BAB147389C5D534B2F703898A54C8F4D14C71EE73765066D14C4832",
+      "width": 480,
+      "height": 630,
+      "source_unchanged": true,
+      "pixels_changed": true,
+      "scope": "显式只读单样本/正式View导出；非Windows动态/GPU"
+    },
+    {
+      "effect": "Magnify",
+      "source_sha256": "FCC295403BAB147389C5D534B2F703898A54C8F4D14C71EE73765066D14C4832",
+      "width": 480,
+      "height": 630,
+      "source_unchanged": true,
+      "pixels_changed": true,
+      "scope": "显式只读单样本/正式View导出；非Windows动态/GPU"
+    },
+    {
+      "effect": "Pixelate",
+      "source_sha256": "FCC295403BAB147389C5D534B2F703898A54C8F4D14C71EE73765066D14C4832",
+      "width": 480,
+      "height": 630,
+      "source_unchanged": true,
+      "pixels_changed": true,
+      "scope": "显式只读单样本/正式View导出；非Windows动态/GPU"
+    },
+    {
+      "effect": "Ripple",
+      "source_sha256": "FCC295403BAB147389C5D534B2F703898A54C8F4D14C71EE73765066D14C4832",
+      "width": 480,
+      "height": 630,
+      "source_unchanged": true,
+      "pixels_changed": true,
+      "scope": "显式只读单样本/正式View导出；非Windows动态/GPU"
+    },
+    {
+      "effect": "Sharpen",
+      "source_sha256": "FCC295403BAB147389C5D534B2F703898A54C8F4D14C71EE73765066D14C4832",
+      "width": 480,
+      "height": 630,
+      "source_unchanged": true,
+      "pixels_changed": true,
+      "scope": "显式只读单样本/正式View导出；非Windows动态/GPU"
+    },
+    {
+      "effect": "Swirl",
+      "source_sha256": "FCC295403BAB147389C5D534B2F703898A54C8F4D14C71EE73765066D14C4832",
+      "width": 480,
+      "height": 630,
+      "source_unchanged": true,
+      "pixels_changed": true,
+      "scope": "显式只读单样本/正式View导出；非Windows动态/GPU"
+    }
+  ],
+  "explicit_source_target_work_surface_bytes": 134217728,
+  "native_memory_limit_verified": false,
+  "source_algorithm_license": "dotnet/wpf MIT fixed source reference",
+  "foreground_app_activated": false
+}

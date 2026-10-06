@@ -196,6 +196,34 @@ class PackageTests(unittest.TestCase):
             result = package.dependency_manifest(root, "NeeView.MacOS", resources, [{"RuntimePackName": "Runtime", "RuntimePackVersion": "1", "RuntimePackPath": str(runtime)}])
         self.assertEqual([], result["dependencies"])
 
+    def test_source_algorithm_reference_is_recorded_with_verified_license(self):
+        root = self.root / "portable"
+        license_path = root / "licenses/upstream/dotnet-wpf/LICENSE.TXT"
+        license_path.parent.mkdir(parents=True)
+        license_path.write_text("fixed WPF terms")
+        (root / "docs").mkdir()
+        (root / "docs/source-migration.json").write_text(json.dumps({"external_algorithm_references": [{
+            "name": "dotnet/wpf BlurEffect Gaussian weights", "repository_commit": "fixed", "url": "https://github.com/dotnet/wpf/tree/fixed",
+            "source_files": [{"path": "src/BlurEffect.cpp", "sha256": "source"}], "target": "src/ImageBlurKernel.cs",
+            "license": "licenses/upstream/dotnet-wpf/LICENSE.TXT", "license_sha256": package.sha256(license_path)
+        }]}))
+        records = package.source_algorithm_records(root, self.root / "Resources/licenses")
+        self.assertEqual("fixed", records[0]["repository_commit"])
+        self.assertEqual("included", records[0]["license_material_state"])
+        self.assertEqual(package.sha256(license_path), records[0]["license_files"][0]["sha256"])
+
+    def test_source_algorithm_reference_rejects_license_hash_mismatch(self):
+        root = self.root / "portable"
+        license_path = root / "licenses/upstream/dotnet-wpf/LICENSE.TXT"
+        license_path.parent.mkdir(parents=True); license_path.write_text("tampered terms")
+        (root / "docs").mkdir()
+        (root / "docs/source-migration.json").write_text(json.dumps({"external_algorithm_references": [{
+            "name": "Blur", "repository_commit": "fixed", "url": "https://example.test/fixed", "source_files": [],
+            "target": "src/ImageBlurKernel.cs", "license": "licenses/upstream/dotnet-wpf/LICENSE.TXT", "license_sha256": "wrong"
+        }]}))
+        with self.assertRaisesRegex(RuntimeError, "源码算法许可原文指纹不一致"):
+            package.source_algorithm_records(root, self.root / "Resources/licenses")
+
 
 if __name__ == "__main__":
     unittest.main()

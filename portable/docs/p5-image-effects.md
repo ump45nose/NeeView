@@ -1,5 +1,7 @@
 # P5第二十八批：原图像效果、预设与阅读几何
 
+当前实现已由第三十一/三十二批补齐十四类后端并改为原整视口作用域；以下是第二十八批交付边界，当前资源/采样/范围以[空间效果契约](p5-spatial-effects.md)为准。resize与查看器Loupe仍待迁。
+
 ## 职责、原出处与依赖
 
 固定基线c5c398d89的EffectUnit/EffectLayer/EffectUnitCache、六分支EffectProfile/Collection、ImageCustomSize/ImageTrim/ImageGrid、PageCustomSize/PageViewSizeCalculator及原六区域侧栏。迁移指纹见source-migration.json。

@@ -20,11 +20,11 @@ internal sealed class ImageEffectRenderResult
     public void ThrowIfFailed() { if (Error is { } message) throw new InvalidOperationException("图像效果未完成：" + message); }
 }
 
-internal static class ImageEffectRenderer
+internal static partial class ImageEffectRenderer
 {
     private static readonly ConditionalWeakTable<ImageEffectConfig, SnapshotCache> Snapshots = new();
     public static bool IsSupported(EffectUnit? unit) => unit is null or LevelEffectUnit or HsvEffectUnit or ColorSelectEffectUnit or ColorizeEffectUnit
-        or BloomEffectUnit or MonochromeEffectUnit or ColorToneEffectUnit;
+        or BloomEffectUnit or MonochromeEffectUnit or ColorToneEffectUnit or BlurEffectUnit || unit is not null && ImageSpatialEffectRenderer.IsSpatial(unit);
     public static string? Unsupported(ImageEffectConfig config) => !config.IsEnabled ? null : string.Join("、", config.Layers
         .Where(x => x.IsEnabled && !IsSupported(x.Effect)).Select(x => x.Effect is UnknownEffectUnit u ? u.TypeName ?? "未知" : x.EffectType.ToString())) is { Length: > 0 } names ? names : null;
     public static void EnsureExportSupported()
@@ -39,12 +39,12 @@ internal static class ImageEffectRenderer
     internal static string? SurfaceError(double width, double height) => !double.IsFinite(width) || !double.IsFinite(height) || width < 0 || height < 0
         ? "Invalid surface size" : Math.Ceiling(width) * Math.Ceiling(height) * 4 > 128L * 1024 * 1024 ? "Surface budget exceeded (128 MiB)" : null;
     /// <summary>捕获纯参数和显示资源租约；scene-graph 延迟绘制/释放不会访问已经关闭的图片。</summary>
-    public static bool Draw(DrawingContext context, Bitmap bitmap, Avalonia.Rect source, Avalonia.Rect target, Func<IDisposable>? retain, bool immediate = false, ImageEffectRenderResult? result = null)
+    public static bool Draw(DrawingContext context, Bitmap bitmap, Avalonia.Rect source, Avalonia.Rect target, Func<IDisposable>? retain, bool immediate = false, ImageEffectRenderResult? result = null, DecodedImageLease? pixels = null, BitmapInterpolationMode interpolation = BitmapInterpolationMode.HighQuality)
     {
         var config = Config.Current.ImageEffect;
         if (!config.IsEnabled || retain is null || !config.Layers.Any(x => x.IsEnabled && x.Effect is not null)) return false;
         var snapshot = Snapshot(config);
-        var operation = new DrawOperation(bitmap, source, target, snapshot, retain(), result);
+        var operation = new DrawOperation(bitmap, source, target, snapshot, retain(), result, pixels, retain, interpolation);
         var submitted = false;
         try { context.Custom(operation); submitted = true; }
         // 提交失败时 scene-graph 没有接管所有权；离屏成功提交也由调用方立即释放。
@@ -83,13 +83,17 @@ internal static class ImageEffectRenderer
             {
                 var effects = _source.Layers.Reverse().Where(x => x.IsEnabled && x.Effect is not null).Select(x => x.Effect!.Clone()).ToArray();
                 // 每份参数快照只预检一次，坏参数/编译失败在正式导出之前报告。
-                foreach (var effect in effects.Where(IsSupported)) { using var filter = CreateFilter(effect); }
+                foreach (var effect in effects.Where(IsSupported))
+                    if (effect is BlurEffectUnit blur) ImageBlurKernel.DeviceRadius(blur.Radius, 1);
+                    else if (ImageSpatialEffectRenderer.IsSpatial(effect)) ImageSpatialEffectRenderer.Validate(effect);
+                    else { using var filter = CreateFilter(effect); }
                 return _snapshot = new(effects, null);
             }
             catch (Exception ex) { return _snapshot = new([], ex.Message); }
         }
     }
-    private sealed class DrawOperation(Bitmap bitmap, Avalonia.Rect source, Avalonia.Rect target, EffectSnapshot snapshot, IDisposable resource, ImageEffectRenderResult? result) : ICustomDrawOperation
+    private sealed class DrawOperation(Bitmap bitmap, Avalonia.Rect source, Avalonia.Rect target, EffectSnapshot snapshot, IDisposable resource, ImageEffectRenderResult? result,
+        DecodedImageLease? pixels, Func<IDisposable> retain, BitmapInterpolationMode interpolation) : ICustomDrawOperation
     {
         public Avalonia.Rect Bounds => target;
         public bool HitTest(Avalonia.Point point) => false;
@@ -131,6 +135,17 @@ internal static class ImageEffectRenderer
                 error = SurfaceError(width, height);
             }
             if (error is not null) { Failure(context, error); return; }
+            if (snapshot.Effects.Any(x => ImageSpatialEffectRenderer.IsSpatial(x) || x is BlurEffectUnit))
+            {
+                if (pixels is null) { Failure(context, "Decoded pixel lease required"); return; }
+                using var lease = feature.Lease();
+                using var recorder = new SKPictureRecorder();
+                var recording = recorder.BeginRecording(ReaderEffectScene.Rect(target));
+                ReaderEffectScene.Image(recording, pixels, source, target, retain, interpolation);
+                using var picture = recorder.EndRecording();
+                RenderScene(lease, picture, target, snapshot.Effects);
+                return;
+            }
             var filters = new List<SKColorFilter>(); SKColorFilter? combined = null;
             try
             {

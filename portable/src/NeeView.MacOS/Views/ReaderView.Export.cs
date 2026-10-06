@@ -63,8 +63,11 @@ public sealed partial class ReaderView
         using (var context = bitmap.CreateDrawingContext())
         {
             if (options.HasBackground) _background?.Render(context, CurrentContentColor, new Avalonia.Size(pixels.Width, pixels.Height));
-            DrawFrame(context, targets, matrix * Matrix.CreateTranslation(-outputRect.X, -outputRect.Y), _images, [], 1,
-                options.IsDotKeep ? BitmapInterpolationMode.None : options.IsOriginalSize ? BitmapInterpolationMode.HighQuality : null, immediate: true, result: result);
+            var transform = matrix * Matrix.CreateTranslation(-outputRect.X, -outputRect.Y);
+            var sampling = options.IsDotKeep ? BitmapInterpolationMode.None : options.IsOriginalSize ? BitmapInterpolationMode.HighQuality : (BitmapInterpolationMode?)null;
+            if (!ImageEffectRenderer.DrawScene(context, new Avalonia.Rect(0, 0, pixels.Width, pixels.Height),
+                canvas => RecordFrame(canvas, targets, transform, _images, [], 1, sampling, true), true, result))
+                DrawFrame(context, targets, transform, _images, [], 1, sampling, immediate: true, result: result);
         }
         // Custom的异常由框架捕获；显式结果保证失败不编码成无效果导出文件。
         result.ThrowIfFailed();

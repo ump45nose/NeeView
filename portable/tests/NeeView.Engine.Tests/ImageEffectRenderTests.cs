@@ -93,8 +93,8 @@ public sealed class ImageEffectRenderTests
     }
     [AvaloniaFact] public void UnsupportedEffectsAreReportedAndBlockViewExport()
     {
-        Config.SetCurrent(new(){ImageEffect=new(){IsEnabled=true,Layers=new(){new(){Effect=new RippleEffectUnit()}}}});
-        Assert.Equal("Ripple",ImageEffectRenderer.Unsupported(Config.Current.ImageEffect)); Assert.Throws<NotSupportedException>(ImageEffectRenderer.EnsureExportSupported);
+        Config.SetCurrent(new(){ImageEffect=new(){IsEnabled=true,Layers=new(){new(){Effect=new UnknownEffectUnit{TypeName="Future"}}}}});
+        Assert.Equal("Future",ImageEffectRenderer.Unsupported(Config.Current.ImageEffect)); Assert.Throws<NotSupportedException>(ImageEffectRenderer.EnsureExportSupported);
         Config.Current.ImageEffect.Layers[0].IsEnabled=false; Assert.Null(ImageEffectRenderer.Unsupported(Config.Current.ImageEffect)); ImageEffectRenderer.EnsureExportSupported();
     }
 }
