@@ -1,5 +1,7 @@
 # NeeView Mac 源码迁移架构
 
+P5 第十一批接入原设置结构化搜索。Engine复用原Searcher和SettingItemRecord文本关系；Mac从现有九页表单建立索引，全部235命令及参数文案沿同一草稿。结果直接编辑原控件，导航/清空/关闭归还原父级与DataContext；窗口历史不写JSON。未迁设置页面仍按清单推进，见[搜索契约](p5-settings-search.md)。
+
 P5 第十批补齐原 OpenCustomThemeFolder：Engine 在已有单槽中准备目录，仅首次创建目录时按原字节生成Sample；表现模型转交当前目录草稿，系统打开沿同一IPlatformService。已有目录不补样例、不覆盖材料，失败/取消不提交配置，关闭取消未完成打开。见[目录动作契约](p5-theme-folder.md)。
 
 P5 第九批迁入原 FontsConfig 与 FontParameters 字号公式。AppKit 只提供消息/菜单字体度量，Mac FontPresenter 独立发布原字体资源；字体表单保存成功后才应用，失败沿原配置分支回滚。常规/菜单/树/面板分别引用角色，阅读及唯一JSON链保持；ClearType保留禁用，原38非零字号门槛保持。见[字体契约](p5-fonts.md)。

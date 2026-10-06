@@ -52,6 +52,7 @@ public sealed partial class SettingsWindow : Window
         this.FindControl<CheckBox>("OpenLastBookmarkFolder")!.IsChecked = Config.Current.StartUp.IsOpenLastBookmarkFolder;
         _historySettings = new(Config.Current.History);
         this.FindControl<ScrollViewer>("HistorySettings")!.DataContext = _historySettings;
+        InitializeSettingsSearch();
     }
     /// <summary>历史面板的设置入口定位同一设置窗口，不复制第二套表单。</summary>
     public void SelectHistoryPage() => this.FindControl<ListBox>("SettingsNavigation")!.SelectedIndex = 4;
@@ -61,14 +62,12 @@ public sealed partial class SettingsWindow : Window
         if (!_initialized) return;
         if (this.FindControl<ScrollViewer>("ReadingSettings") is not { } reading || this.FindControl<Grid>("InputSettings") is not { } input) return;
         var index = (sender as ListBox)?.SelectedIndex ?? 0;
-        reading.IsVisible = index == 0; input.IsVisible = index == 1;
-        this.FindControl<ScrollViewer>("FilmSettings")!.IsVisible = index == 2;
-        this.FindControl<ScrollViewer>("AutoHideSettings")!.IsVisible = index == 3;
-        this.FindControl<ScrollViewer>("HistorySettings")!.IsVisible = index == 4;
-        this.FindControl<ScrollViewer>("NavigationSettings")!.IsVisible = index == 5;
-        this.FindControl<ScrollViewer>("FileSettings")!.IsVisible = index == 6;
-        this.FindControl<ScrollViewer>("ThemeSettings")!.IsVisible = index == 7;
-        this.FindControl<ScrollViewer>("FontSettings")!.IsVisible = index == 8;
+        if (_settingsSearch is not null && _showingSearch)
+        {
+            _settingsSearch.Keyword = ""; _showingSearch = false; _settingsSearchPresenter!.Restore();
+            _ = _settingsSearch.SearchAsync(false);
+        }
+        SetSettingsPageVisibility(index);
     }
     /// <summary>按名称及命令标识过滤编辑副本，未展示的键位也保留。</summary>
     private void InputSearch_Changed(object? sender, TextChangedEventArgs e)

@@ -3,13 +3,16 @@
   <Grid RowDefinitions="*,Auto" ColumnDefinitions="190,*">
     <Border Grid.Column="0" Classes="panel">
       <Grid RowDefinitions="Auto,*">
-        <TextBox PlaceholderText="搜索设置" Margin="8" IsEnabled="False" ToolTip.Tip="完整设置搜索在 P2–P5 迁移" />
+        <StackPanel x:Name="SettingsSearchInput" Margin="8" Spacing="4">
+          <Grid ColumnDefinitions="*,Auto,Auto"><TextBox x:Name="SettingsSearchBox" Text="{Binding Keyword, Mode=TwoWay}" PlaceholderText="搜索设置" KeyDown="SettingsSearch_KeyDown" TextChanged="SettingsSearch_TextChanged" ToolTip.Tip="原结构化搜索：空格 AND，/or，/not，/word，/re。Enter 确认并加入本窗口历史。" /><Button x:Name="SettingsSearchHistory" Grid.Column="1" Content="⌄" Click="SettingsSearch_History" /><Button x:Name="SettingsSearchClear" Grid.Column="2" Content="×" Click="SettingsSearch_Clear" /></Grid>
+          <TextBlock x:Name="SettingsSearchError" Text="{Binding Error}" TextWrapping="Wrap" />
+        </StackPanel>
         <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="主题 / 配色" /><ListBoxItem Content="字体" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
       </Grid>
     </Border>
     <ScrollViewer x:Name="FontSettings" Grid.Column="1" IsVisible="False">
       <StackPanel Margin="24" Spacing="12">
-        <TextBlock Text="字体" FontSize="{DynamicResource SystemFontSizeHuge}" />
+        <TextBlock Classes="settings-section" Text="字体" FontSize="{DynamicResource SystemFontSizeHuge}" />
         <TextBlock Text="字体名" />
         <ComboBox x:Name="FontChoice" ItemsSource="{Binding FontNames}" SelectedItem="{Binding FontName, Mode=TwoWay}" />
         <TextBlock Text="常规字号（%）" /><NumericUpDown x:Name="FontPercent" Value="{Binding FontPercent, Mode=TwoWay}" Minimum="{Binding FontMinimum}" Maximum="{Binding FontMaximum}" Increment="5" FormatString="0.#####" />
@@ -22,38 +25,38 @@
     </ScrollViewer>
     <ScrollViewer x:Name="ThemeSettings" Grid.Column="1" IsVisible="False">
       <StackPanel Margin="24" Spacing="14">
-        <TextBlock Text="主题 / 配色" FontSize="20" />
+        <TextBlock Classes="settings-section" Text="主题 / 配色" FontSize="20" />
         <TextBlock Text="主题" />
         <ComboBox x:Name="ThemeChoice" ItemsSource="{Binding Items}" SelectedItem="{Binding Selected, Mode=TwoWay}">
           <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>
         </ComboBox>
         <TextBlock Text="自定义主题目录" />
         <TextBox x:Name="ThemeFolder" Text="{Binding Folder, Mode=TwoWay}" />
-        <WrapPanel><Button Content="选择目录…" Click="ChooseThemeFolder_Click" Margin="0,0,12,8" /><Button x:Name="RefreshThemes" Content="刷新主题列表" Click="RefreshThemes_Click" Margin="0,0,12,8" /><Button x:Name="OpenThemeFolder" Content="打开自定义主题文件夹" Click="OpenThemeFolder_Click" Margin="0,0,0,8" /></WrapPanel>
+        <WrapPanel><Button x:Name="ChooseThemeFolder" Content="选择目录…" Click="ChooseThemeFolder_Click" Margin="0,0,12,8" /><Button x:Name="RefreshThemes" Content="刷新主题列表" Click="RefreshThemes_Click" Margin="0,0,12,8" /><Button x:Name="OpenThemeFolder" Content="打开自定义主题文件夹" Click="OpenThemeFolder_Click" Margin="0,0,0,8" /></WrapPanel>
         <TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
         <TextBlock Text="布局保持不变；保存后应用配色，取消保留当前主题。" TextWrapping="Wrap" />
       </StackPanel>
     </ScrollViewer>
     <ScrollViewer x:Name="NavigationSettings" Grid.Column="1" IsVisible="False">
       <StackPanel Margin="24" Spacing="12">
-        <TextBlock Text="页面列表 / 书架" FontSize="20" />
+        <TextBlock Classes="settings-section" Text="页面列表 / 书架" FontSize="20" />
         <TextBlock Text="页面名称" /><ComboBox x:Name="PageNameFormat"><ComboBoxItem Content="智能名称" /><ComboBoxItem Content="仅文件名" /><ComboBoxItem Content="完整条目名" /><ComboBoxItem Content="页码" /></ComboBox>
         <TextBlock Text="页面列表样式" /><ComboBox x:Name="PageListStyle"><ComboBoxItem Content="普通列表" /><ComboBoxItem Content="详细内容" /><ComboBoxItem Content="横幅" /><ComboBoxItem Content="缩略图" /></ComboBox>
         <CheckBox x:Name="PageShowBookTitle" Content="显示书名" /><CheckBox x:Name="PageGroupBy" Content="按目录分组" /><CheckBox x:Name="PageShowSearch" Content="显示页面搜索框" /><CheckBox x:Name="PageShowCount" Content="显示项目数" /><CheckBox x:Name="PageFocusMain" Content="确认页面后焦点回正文" />
-        <CheckBox x:Name="PageTreeVisible" Content="显示页面目录组树" /><ComboBox x:Name="PageTreeLayout"><ComboBoxItem Content="上方" /><ComboBoxItem Content="左侧" /></ComboBox>
+        <CheckBox x:Name="PageTreeVisible" Content="显示页面目录组树" /><ComboBox x:Name="PageTreeLayout" AutomationProperties.Name="页面目录组树位置"><ComboBoxItem Content="上方" /><ComboBoxItem Content="左侧" /></ComboBox>
         <TextBlock Text="页面树宽 / 高 (DIP)" /><NumericUpDown x:Name="PageTreeWidth" Minimum="48" Maximum="2048" /><NumericUpDown x:Name="PageTreeHeight" Minimum="40" Maximum="2048" />
-        <TextBlock Text="普通书架" FontSize="16" Margin="0,8,0,0" />
+        <TextBlock Classes="settings-section" Text="普通书架" FontSize="16" Margin="0,8,0,0" />
         <CheckBox x:Name="FolderShowSearch" Content="显示书架搜索框" /><CheckBox x:Name="FolderSearchRecursive" Content="搜索包含子目录" />
-        <CheckBox x:Name="FolderTreeVisible" Content="显示普通目录树" /><ComboBox x:Name="FolderTreeLayout"><ComboBoxItem Content="上方" /><ComboBoxItem Content="左侧" /></ComboBox>
+        <CheckBox x:Name="FolderTreeVisible" Content="显示普通目录树" /><ComboBox x:Name="FolderTreeLayout" AutomationProperties.Name="普通目录树位置"><ComboBoxItem Content="上方" /><ComboBoxItem Content="左侧" /></ComboBox>
         <TextBlock Text="书架树宽 / 高 (DIP)" /><NumericUpDown x:Name="FolderTreeWidth" Minimum="48" Maximum="2048" /><NumericUpDown x:Name="FolderTreeHeight" Minimum="40" Maximum="2048" />
         <CheckBox x:Name="FolderTreeSync" Content="同步按钮同时同步目录树" /><CheckBox x:Name="FolderTreeAutoSync" Content="自动同步目录树" />
-        <TextBlock Text="搜索（全局）" FontSize="16" Margin="0,8,0,0" /><CheckBox x:Name="IncrementalSearch" Content="逐次搜索（500ms合并输入）" /><CheckBox x:Name="KeepSearchHistory" Content="保存搜索表达式历史" />
+        <TextBlock Classes="settings-section" Text="搜索（全局）" FontSize="16" Margin="0,8,0,0" /><CheckBox x:Name="IncrementalSearch" Content="逐次搜索（500ms合并输入）" /><CheckBox x:Name="KeepSearchHistory" Content="保存搜索表达式历史" />
       </StackPanel>
     </ScrollViewer>
     <ScrollViewer x:Name="ReadingSettings" Grid.Column="1">
       <StackPanel Margin="24" Spacing="14">
-        <TextBlock Text="书籍 / 阅读" FontSize="20" />
-        <ComboBox x:Name="Scope" SelectedIndex="0" SelectionChanged="Scope_Changed"><ComboBoxItem Content="当前书籍" /><ComboBoxItem Content="默认阅读设置" /></ComboBox>
+        <TextBlock Classes="settings-section" Text="书籍 / 阅读" FontSize="20" />
+        <ComboBox x:Name="Scope" AutomationProperties.Name="阅读设置作用域：当前书籍 / 默认阅读设置" SelectedIndex="0" SelectionChanged="Scope_Changed"><ComboBoxItem Content="当前书籍" /><ComboBoxItem Content="默认阅读设置" /></ComboBox>
         <TextBlock Text="页面模式" /><ComboBox x:Name="Mode" SelectedIndex="0"><ComboBoxItem Content="单页" /><ComboBoxItem Content="双页" /></ComboBox>
         <TextBlock Text="阅读方向" /><ComboBox x:Name="Order" SelectedIndex="0"><ComboBoxItem Content="从右向左" /><ComboBoxItem Content="从左向右" /></ComboBox>
         <CheckBox x:Name="Divide" Content="单页模式分割横向页面" /><CheckBox x:Name="Wide" Content="双页模式宽图独占一页" />
@@ -71,12 +74,12 @@
         <TextBlock Text="悬停滚动灵敏度 / 时长" /><NumericUpDown x:Name="HoverSensitivity" Minimum="1" Maximum="10" Increment="0.1" /><NumericUpDown x:Name="HoverDuration" Minimum="0" Maximum="1" Increment="0.1" />
         <CheckBox x:Name="MouseWheelScroll" Content="无修饰滚轮连续滚动（优先于滚轮命令）" />
         <TextBlock Text="连续滚轮灵敏度 / 时长" /><NumericUpDown x:Name="WheelSensitivity" Minimum="0" Maximum="2" Increment="0.1" /><NumericUpDown x:Name="WheelDuration" Minimum="0" Maximum="1" Increment="0.1" />
-        <TextBlock Text="书架（全局）" FontSize="16" Margin="0,8,0,0" />
+        <TextBlock Classes="settings-section" Text="书架（全局）" FontSize="16" Margin="0,8,0,0" />
         <TextBlock Text="文件夹与归档排序" /><ComboBox x:Name="BookshelfGroup"><ComboBoxItem Content="混排" /><ComboBoxItem Content="文件夹在前" /><ComboBoxItem Content="文件夹在后" /></ComboBox>
         <CheckBox x:Name="PrioritizeBookMove" Content="允许前后书命令取代正在加载的书籍" />
         <CheckBox x:Name="OpenLastFolder" Content="启动时恢复上次书架位置" />
         <CheckBox x:Name="OpenLastBookmarkFolder" Content="启动时恢复独立书签列表位置" />
-        <TextBlock Text="查看器（全局）" FontSize="16" Margin="0,8,0,0" />
+        <TextBlock Classes="settings-section" Text="查看器（全局）" FontSize="16" Margin="0,8,0,0" />
         <CheckBox x:Name="BaseScaleEnabled" Content="启用书籍基准缩放" />
         <TextBlock Text="缩放中心" /><ComboBox x:Name="ScaleCenter" />
         <TextBlock Text="旋转中心" /><ComboBox x:Name="RotateCenter" />
@@ -93,10 +96,10 @@
       </StackPanel>
     </ScrollViewer>
     <Grid x:Name="InputSettings" Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto,*" Margin="16" IsVisible="False">
-      <TextBlock Text="命令 / 键鼠" FontSize="20" Margin="0,0,0,12" />
+      <TextBlock Classes="settings-section" Text="命令 / 键鼠" FontSize="20" Margin="0,0,0,12" />
       <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
-        <ComboBox x:Name="InputScheme"><ComboBoxItem Content="A · 标准" /><ComboBoxItem Content="B · 滚轮翻页" /><ComboBoxItem Content="C · 点击翻页" /></ComboBox>
-        <ComboBox x:Name="InputReadOrder"><ComboBoxItem Content="从右向左" /><ComboBoxItem Content="从左向右" /></ComboBox>
+        <ComboBox x:Name="InputScheme" AutomationProperties.Name="默认键位方案"><ComboBoxItem Content="A · 标准" /><ComboBoxItem Content="B · 滚轮翻页" /><ComboBoxItem Content="C · 点击翻页" /></ComboBox>
+        <ComboBox x:Name="InputReadOrder" AutomationProperties.Name="默认键位阅读方向"><ComboBoxItem Content="从右向左" /><ComboBoxItem Content="从左向右" /></ComboBox>
         <Button x:Name="InputDefaults" Content="应用默认键位" Click="InputDefaults_Click" ToolTip.Tip="替换键位编辑副本；保存后生效。命令参数保留。" />
       </StackPanel>
       <StackPanel Grid.Row="2" Margin="0,0,0,8">
@@ -110,7 +113,7 @@
     </Grid>
     <ScrollViewer x:Name="FilmSettings" Grid.Column="1" IsVisible="False">
       <StackPanel Margin="24" Spacing="14">
-        <TextBlock Text="胶片条 / 滑条" FontSize="20" />
+        <TextBlock Classes="settings-section" Text="胶片条 / 滑条" FontSize="20" />
         <CheckBox x:Name="FilmEnabled" Content="显示胶片条" /><CheckBox x:Name="FilmHide" Content="自动隐藏胶片条" />
         <TextBlock Text="缩略图宽度（DIP，最低 32）" /><NumericUpDown x:Name="FilmWidth" Minimum="32" Increment="8" FormatString="0.#####" />
         <CheckBox x:Name="FilmNumber" Content="显示页码" /><CheckBox x:Name="FilmCenter" Content="所选图片居中（首尾保留空白）" /><CheckBox x:Name="FilmDetail" Content="悬停显示页面详情" />
@@ -129,15 +132,15 @@
     </ScrollViewer>
     <ScrollViewer x:Name="AutoHideSettings" Grid.Column="1" IsVisible="False">
       <StackPanel Margin="24" Spacing="14">
-        <TextBlock Text="窗口 / 自动隐藏" FontSize="20" />
-        <TextBlock Text="启用自动隐藏模式" FontSize="16" />
+        <TextBlock Classes="settings-section" Text="窗口 / 自动隐藏" FontSize="20" />
+        <TextBlock Classes="settings-section" Text="启用自动隐藏模式" FontSize="16" />
         <CheckBox x:Name="AutoNormal" Content="普通窗口" /><CheckBox x:Name="AutoMaximized" Content="最大化窗口" /><CheckBox x:Name="AutoFullScreen" Content="全屏窗口" />
-        <TextBlock Text="菜单 / 侧栏" FontSize="16" />
+        <TextBlock Classes="settings-section" Text="菜单 / 侧栏" FontSize="16" />
         <CheckBox x:Name="AddressEnabled" Content="显示地址栏" /><CheckBox x:Name="SideBarEnabled" Content="显示侧栏图标" />
         <CheckBox x:Name="MenuHide" Content="自动隐藏菜单和地址栏" /><CheckBox x:Name="MenuModeHide" Content="自动隐藏模式下隐藏菜单和地址栏" />
         <CheckBox x:Name="LeftHide" Content="自动隐藏左侧栏" /><CheckBox x:Name="RightHide" Content="自动隐藏右侧栏" />
         <CheckBox x:Name="LeftModeHide" Content="自动隐藏模式下隐藏左侧栏" /><CheckBox x:Name="RightModeHide" Content="自动隐藏模式下隐藏右侧栏" />
-        <TextBlock Text="延迟与边缘触发" FontSize="16" />
+        <TextBlock Classes="settings-section" Text="延迟与边缘触发" FontSize="16" />
         <TextBlock Text="隐藏延迟（秒）" /><NumericUpDown x:Name="HideDelay" Minimum="0" Maximum="60" Increment="0.1" FormatString="0.#####" />
         <TextBlock Text="显示延迟（秒）" /><NumericUpDown x:Name="ShowDelay" Minimum="0" Maximum="60" Increment="0.1" FormatString="0.#####" />
         <CheckBox x:Name="KeyDelay" Content="按键延长所属区域的隐藏延迟" />
@@ -151,10 +154,10 @@
     <ScrollViewer x:Name="HistorySettings" Grid.Column="1" IsVisible="False">
       <!-- 原历史设置区域；候选与草稿由独立表现模型持有，限制算法在Engine。 -->
       <StackPanel Margin="24" Spacing="14">
-        <TextBlock Text="历史记录" FontSize="20" />
+        <TextBlock Classes="settings-section" Text="历史记录" FontSize="20" />
         <CheckBox x:Name="SaveHistory" Content="保存历史记录文件" IsChecked="{Binding IsSaveHistory, Mode=TwoWay}" />
         <TextBlock Text="关闭后删除历史文件；本次运行仍可导航，最后打开书籍和书签独立保存。" TextWrapping="Wrap" />
-        <TextBlock Text="保存限制" FontSize="16" />
+        <TextBlock Classes="settings-section" Text="保存限制" FontSize="16" />
         <TextBlock Text="设置保存在文件中的历史记录上限。应用程序运行期间的历史记录不受限制。" TextWrapping="Wrap" />
         <TextBlock Text="数量限制" />
         <ComboBox x:Name="HistoryLimitSize" ItemsSource="{Binding SizeChoices}" SelectedItem="{Binding SelectedSize, Mode=TwoWay}">
@@ -165,7 +168,7 @@
           <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>
         </ComboBox>
         <TextBlock Text="数量为 0 时不保存访问条目。书签、搜索历史与最后阅读位置独立保留；下次启动按限制载入。" TextWrapping="Wrap" />
-        <TextBlock Text="登记与清理" FontSize="16" Margin="0,8,0,0" />
+        <TextBlock Classes="settings-section" Text="登记与清理" FontSize="16" Margin="0,8,0,0" />
         <TextBlock Text="新书主页面切换次数（0 表示立即登记；已登记书籍一次切换即可更新）" TextWrapping="Wrap" />
         <NumericUpDown x:Name="HistoryEntryPageCount" Minimum="-2147483648" Maximum="2147483647" Increment="1" FormatString="0" Value="{Binding HistoryEntryPageCount, Mode=TwoWay}" />
         <CheckBox x:Name="ForceUpdateHistory" Content="从历史打开也更新访问日期" IsChecked="{Binding IsForceUpdateHistory, Mode=TwoWay}" />
@@ -177,7 +180,7 @@
     </ScrollViewer>
     <ScrollViewer x:Name="FileSettings" Grid.Column="1" IsVisible="False">
       <StackPanel Margin="16" Spacing="12">
-        <TextBlock Text="文件操作" FontSize="18" />
+        <TextBlock Classes="settings-section" Text="文件操作" FontSize="18" />
         <CheckBox x:Name="FileWriteAccess" Content="允许修改文件" />
         <CheckBox x:Name="RemoveConfirmed" Content="删除文件前确认" />
         <CheckBox x:Name="ZipWriteAccess" Content="允许删除 ZIP/CBZ 内部条目（永久删除，始终确认）" />
@@ -196,6 +199,9 @@
         <TextBlock Text="复制文件不需要开启修改权限；页组范围可在输入设置的 CopyFile 参数中调整。" TextWrapping="Wrap" />
         <TextBlock Text="剪切暂保留禁用入口，移动可使用分类或移至文件夹。" TextWrapping="Wrap" Opacity="0.5" />
       </StackPanel>
+    </ScrollViewer>
+    <ScrollViewer x:Name="SettingsSearchPage" Grid.Column="1" IsVisible="False">
+      <StackPanel Margin="24" Spacing="8"><TextBlock x:Name="SettingsSearchSummary" FontSize="20" /><StackPanel x:Name="SettingsSearchResults" Spacing="4" /></StackPanel>
     </ScrollViewer>
     <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="16" Spacing="8">
       <TextBlock x:Name="Message" TextWrapping="Wrap" MaxWidth="560" VerticalAlignment="Center" /><Button x:Name="CancelSettings" Content="取消" Click="Cancel_Click" /><Button x:Name="SaveSettings" Content="保存" Click="Save_Click" />

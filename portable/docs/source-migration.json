@@ -2276,6 +2276,24 @@
       "target": "src/NeeView.Backends/MacFontEnvironment.cs",
       "sha256": "113492170dff2e622dafafc9e68cc92f0b58895cb2219181ba3ea16ba8dcba8c",
       "status": "P5第九批：只替换MessageFontSize/MenuFontSize来源；AppKit默认字体点大小作为DIP，启动调用后释放包装"
+    },
+    {
+      "source": "NeeView/Setting/SettingWindowModel.cs",
+      "target": "src/NeeView.Engine/Setting/SettingsSearchIndex.cs",
+      "sha256": "047cc04590aa385ad14e69af9b646b881bab7e4661e9d8c325cf7f8f2eed76b6",
+      "status": "原SettingItemRecord的Page/Section/Item文本与默认Searcher迁入纯数据适配；先解析再搜索，错误不降级为全匹配"
+    },
+    {
+      "source": "NeeView/Setting/SettingItem.cs",
+      "target": "src/NeeView.MacOS/Views/SettingsSearchPresenter.cs",
+      "sha256": "25a4750764e36e7912c317cbed94c335cfd8e6f88e836bde0287db1708bae953",
+      "status": "原SearchResultItem直接编辑草稿与命令参数文本迁入独立表现；复用现有控件和行模板，不建立第二配置表"
+    },
+    {
+      "source": "NeeView/SearchBox/SearchBoxModel.cs",
+      "target": "src/NeeView.MacOS/Views/SettingsWindow.Search.cs",
+      "sha256": "109910eabd7cbf0e2d42621256587f0b9cb6aacad2b52e8f6a8d192f78ef8986",
+      "status": "复用现有原Trim/Analyze/500ms/确认输入适配，原设置搜索历史仅本窗口；全部命令保留占位，关闭取消"
     }
   ],
   "rule_references": [

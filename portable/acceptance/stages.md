@@ -452,3 +452,7 @@ P5第一批最终37项专项、877项全量通过，2项需显式图片目录的
 34新增回归、350扩展专项及71最后列表/附属专项分别通过（有重叠）；最终1146全量通过、0失败、2资源跳过。初次全量发现内部重命名marker误拒绝，失败/等待运行归档，修正后重命名及全量通过；大写列表扩展名/原固定名兼容接入。正式Library/default ARM64应用构建与strict/deep本地签名通过，Headless截图检查完成，没有激活真实应用或操作用户图片/Windows/NAS。
 
 见[契约](../docs/p5-profile-assets.md)与[静默验收](p5-profile-assets-runtime.md)。用户真实导出、实际主题/脚本/效果及高级格式、正式分发未验/待迁，P5整体未完成。按用户AGENTS规则自动提交并推送；旧阶段证据与用户.DS_Store保持。
+
+## P5 第十一批：原设置结构化搜索
+
+当前九页表单、全部235命令及参数文案沿原Searcher接入同一草稿结果编辑，设置窗口历史不写JSON。16新增/1239全量通过、2资源跳过；正式Library/default ARM64应用和strict/deep本地签名通过。首次Library代码Binding裁剪检查失败已记录，改为现有XAML绑定后重新全量通过。Headless不替代Windows/设备或真实导出，完整原设置页及P5其他模块继续待迁，见[契约](../docs/p5-settings-search.md)和[静默验收](p5-settings-search-runtime.md)。

@@ -140,3 +140,5 @@ Mac落点使用当前Profile管理目录，列表目录配置与实际覆盖文�
 P5 第八批：原Styles/Theme*.cs、Config/ThemeConfig、Libraries/Themes与SettingPageWindow的六预设/自定义、颜色引用/透明度/默认角色、三类BasedOn、Dark回退和特殊按钮资源已迁入。必要改造为纯ARGB、独立Mac默认目录、后台读取/代次、规范路径与递归限额、默认角色循环保护、Fluent亮暗变体；原窗口结构和书籍链保持。只用合成主题与Headless对照原材料，没有新增真实Windows动态一致性结论。见[主题契约](p5-theme.md)。
 
 P5 第十批：原 ThemeManager.OpenCustomThemeFolder / ThemeProfileTools.SaveFromContent / SettingPageWindow 的目录动作已迁入。首次创建目录才生成原字节 Sample，既有目录不补样例/不覆盖；平台打开目录内容，配置草稿独立。10项专项通过，正式设置失败重试/取消及关闭覆盖；Finder真机未验，见[契约](p5-theme-folder.md)。
+
+P5 第十一批：原SettingWindowModel的Page/Section/Item搜索文本、默认Searcher语法和可编辑结果接入当前九页表单；全部235命令含未迁能力/参数文案可搜索。原窗口内确认历史不持久化；解析错误保留上次有效结果。控件草稿/父级/DC/取消/保存失败重试、参数共享和500ms取消有正式Headless回归；完整原设置页及Windows动态仍独立待迁/待验。见[契约](p5-settings-search.md)。
