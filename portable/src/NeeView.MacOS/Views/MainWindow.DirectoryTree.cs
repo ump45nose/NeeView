@@ -29,6 +29,11 @@ public sealed partial class MainWindow
         // 普通选择/枚举回报不重建GridLength，保留尚未完成的分隔条拖动。
         bool visible = Config.Current.Bookshelf.IsFolderTreeVisible && _model?.Operation.Bookshelf.IsBookmarkPlace == false;
         if (!_preparing && !_closedPrepared && this.FindControl<FolderTreeView>("BookshelfDirectoryTree")!.IsVisible != visible) RefreshFolderTreeLayout();
+        if (!_preparing && !_closedPrepared)
+        {
+            MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck);
+            RefreshHistoryCommandStates();
+        }
     });
     /// <summary>原Top/Left结构及隐藏状态；分隔尺寸从原Bookshelf配置读取。</summary>
     private void RefreshFolderTreeLayout()

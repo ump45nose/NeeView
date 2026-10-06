@@ -39,19 +39,19 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public string FolderPlace => Operation.Bookshelf.Place ?? "";
     public string FolderMessage => Operation.Bookshelf.Error ?? (Operation.Bookshelf.IsLoading ? "正在读取目录…" : "");
     private bool _refreshingFolders;
+    internal bool IsRefreshingFolders => _refreshingFolders;
     private FolderItem? _selectedFolder;
     public FolderItem? SelectedFolder
     {
         get => _selectedFolder;
         set { if (SetProperty(ref _selectedFolder, value) && !_refreshingFolders) Operation.Bookshelf.Select(value); }
     }
-    private static IReadOnlyList<FolderOrderChoice> NormalOrders { get; } =
-    [new(FolderOrder.FileName, "文件名"), new(FolderOrder.FileNameDescending, "文件名（降序）"),
-     new(FolderOrder.FileType, "类型"), new(FolderOrder.FileTypeDescending, "类型（降序）"),
-     new(FolderOrder.TimeStamp, "时间"), new(FolderOrder.TimeStampDescending, "时间（降序）"),
-     new(FolderOrder.Size, "大小"), new(FolderOrder.SizeDescending, "大小（降序）"), new(FolderOrder.Random, "随机")];
-    public IReadOnlyList<FolderOrderChoice> FolderOrders => Operation.Bookshelf.IsBookmarkPlace
-        ? BookmarkListViewModel.Orders.Select(e => new FolderOrderChoice(e.Mode, e.Label)).ToArray() : NormalOrders;
+    private static IReadOnlyList<FolderOrderChoice> AllOrders { get; } = BookmarkListViewModel.Orders.Select(e => new FolderOrderChoice(e.Mode,
+        e.Mode == FolderOrder.FileName ? "文件名" : e.Mode == FolderOrder.FileNameDescending ? "文件名（降序）" : e.Label)).ToArray();
+    private static IReadOnlyDictionary<FolderOrderClass, IReadOnlyList<FolderOrderChoice>> OrdersByClass { get; } = Enum.GetValues<FolderOrderClass>()
+        .ToDictionary(category => category, category => (IReadOnlyList<FolderOrderChoice>)AllOrders.Where(e => category.GetFolderOrders().Contains(e.Mode)).ToArray());
+    /// <summary>表现层只映射原资格表的标签，搜索、目录和快速访问不共用错误的菜单范围。</summary>
+    public IReadOnlyList<FolderOrderChoice> FolderOrders => OrdersByClass[Operation.Bookshelf.FolderOrderClass];
     public FolderOrderChoice SelectedFolderOrder => FolderOrders.First(e => e.Mode == Operation.Bookshelf.FolderOrder);
     public bool IsBookmarkPlace => Operation.Bookshelf.IsBookmarkPlace;
     public int LastIndex => Math.Max(0, Pages.Count - 1);

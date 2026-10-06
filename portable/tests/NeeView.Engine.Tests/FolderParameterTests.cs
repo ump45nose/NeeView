@@ -77,7 +77,7 @@ public sealed class FolderParameterTests
         Assert.Equal(FolderOrder.FileName, new FolderParameter("/books", reloaded).FolderOrder);
     }
 
-    /// <summary>原命令排序与切换进入当前路径参数；不支持的类别仍保留菜单占位。</summary>
+    /// <summary>原命令排序与切换进入当前路径参数；已登记入口仍按当前来源限制执行。</summary>
     [Fact]
     public async Task OriginalOrderCommandsUsePathAndToggleSupportedOrderMap()
     {
@@ -89,7 +89,8 @@ public sealed class FolderParameterTests
         await commands.ExecuteAsync("SetBookOrderByRandom"); var firstSeed = state.FolderConfigs.GetFolderParameter(fixture.Root).Seed;
         await commands.ExecuteAsync("SetBookOrderByRandom"); Assert.NotEqual(firstSeed, state.FolderConfigs.GetFolderParameter(fixture.Root).Seed);
         await commands.ExecuteAsync("ToggleBookOrder"); Assert.Equal(FolderOrder.FileName, operation.Bookshelf.FolderOrder);
-        Assert.False(commands.IsAvailable("SetBookOrderByEntryTimeA")); Assert.False(commands.IsAvailable("SetBookOrderByPathA"));
+        Assert.True(commands.IsAvailable("SetBookOrderByEntryTimeA")); Assert.True(commands.IsAvailable("SetBookOrderByPathA"));
+        Assert.False(operation.CanChangeFolderOrder(FolderOrder.EntryTime)); Assert.False(operation.CanChangeFolderOrder(FolderOrder.Path));
         Assert.Equal(FolderOrder.FileName, Config.Current.Bookshelf.DefaultFolderOrder);
     }
 

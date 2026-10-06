@@ -193,6 +193,8 @@ public sealed partial class MainWindow : Window
     /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
     public bool IsCommandAvailable(string name) => name switch
     {
+        var command when CommandTable.BookOrderCommands.TryGetValue(command, out var order) => _model?.Operation.CanChangeFolderOrder(order) == true,
+        "ToggleBookOrder" => _model?.Operation is { } sorting && sorting.Bookshelf.FolderOrders.Count > 1 && sorting.CanChangeFolderOrder(sorting.Bookshelf.FolderOrder),
         "ExportImage" => !_preparing && _exportAction.IsCompleted && _model?.Operation.CanExportImage == true
             && (_model.SaveData.GetCommandParameter<ExportImageCommandParameter>(name).Mode != ExportImageMode.Original || _model.Operation.CanExportOriginalImage),
         "ExportImageAs" or "ExportBookAs" => !_preparing && _exportAction.IsCompleted && _model?.Operation.CanExportImage == true,
@@ -629,7 +631,7 @@ public sealed partial class MainWindow : Window
     /// <summary>在已有元数据上应用原排序，绑定回报和程序同步不重复重排。</summary>
     private async void FolderOrder_Changed(object? sender, SelectionChangedEventArgs e)
     {
-        if (_model is null || sender is not ComboBox { SelectedItem: FolderOrderChoice choice } || choice.Mode == _model.Operation.Bookshelf.FolderOrder) return;
+        if (_model is null || _model.IsRefreshingFolders || sender is not ComboBox { SelectedItem: FolderOrderChoice choice } || choice.Mode == _model.Operation.Bookshelf.FolderOrder) return;
         try { await _model.Operation.ChangeFolderOrderAsync(choice.Mode); MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck); }
         catch (Exception ex) { ShowError(ex.Message); }
     }

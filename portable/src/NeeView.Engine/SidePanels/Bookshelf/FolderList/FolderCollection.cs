@@ -23,11 +23,14 @@ public static class FolderCollection
             _ => order
         };
         var byName = Comparer<FolderItem>.Create((x, y) => { token.ThrowIfCancellationRequested(); return NaturalSort.Compare(x.Name, y.Name); });
+        var byPath = Comparer<FolderItem>.Create((x, y) => { token.ThrowIfCancellationRequested(); return NaturalSort.Compare(x.Path, y.Path); });
         var byType = Comparer<FolderItem>.Create((x, y) => CompareFileType(x, y, token));
         var random = new Random(seed);
         var sorted = mode switch
         {
             FolderOrder.FileNameDescending => order.ThenByDescending(e => e, byName),
+            FolderOrder.Path => order.ThenBy(e => e, byPath),
+            FolderOrder.PathDescending => order.ThenByDescending(e => e, byPath),
             FolderOrder.FileType => order.ThenBy(e => e, byType),
             FolderOrder.FileTypeDescending => order.ThenByDescending(e => e, byType),
             FolderOrder.TimeStamp => order.ThenBy(e => e.LastWriteTime).ThenBy(e => e, byName),

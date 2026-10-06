@@ -89,3 +89,5 @@ P5 已开始。P3/P4 的两项真机检查按用户要求 [跳过并记录](../a
 第二十七批：[原图像导出契约](p5-image-export.md)；1516全量/2资源跳过、25本轮原生及正式Library/ARM64/本地签名通过；全量后补四项全景回归，最终44专项通过。200装配入口/35占位不等于覆盖率，系统选择器/外部阅读器及Windows动态另验，P5整体未完成。见[静默验收](../acceptance/p5-image-export-runtime.md)。
 
 第二十八批：[原图像效果契约](p5-image-effects.md)；四类实际shader、自定义尺寸/裁剪/DPI、网格、预设/缓存及原命令接入；十类第三方效果、缩放滤镜和P5其他能力继续推进。全量/正式构建/签名见[本批静默验收](../acceptance/p5-image-effects-runtime.md)。
+
+第二十九批：[书架排序契约](p5-book-order.md)；四个原命令与Full/WithPath/Normal/None资格迁入，静默验证见[验收](../acceptance/p5-book-order-runtime.md)。P5整体继续推进。

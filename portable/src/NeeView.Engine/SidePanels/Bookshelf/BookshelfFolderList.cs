@@ -35,6 +35,10 @@ public sealed partial class BookshelfFolderList(IArchiveFactory archives, Folder
     public IReadOnlyList<FolderItem> Items { get; private set; } = [];
     public FolderItem? SelectedItem { get; private set; }
     public FolderOrder FolderOrder { get; private set; } = FolderOrder.FileName;
+    /// <summary>原 Full/WithPath/Normal/None 资格只从已提交来源计算，搜索不改变书籍。</summary>
+    public FolderOrderClass FolderOrderClass => IsBookmarkPlace ? FolderOrderClass.Full : IsQuickAccessPlace || Place is null
+        ? FolderOrderClass.None : SearchKeyword.Length > 0 ? FolderOrderClass.WithPath : FolderOrderClass.Normal;
+    public IReadOnlyList<FolderOrder> FolderOrders => FolderOrderClass.GetFolderOrders();
     public bool IsLoading { get; private set; }
     public string? Error { get; private set; }
     public event EventHandler? Changed;
@@ -105,7 +109,7 @@ public sealed partial class BookshelfFolderList(IArchiveFactory archives, Folder
                 var collection = GetQuickAccess();
                 var folder = collection.FindNode(place) ?? throw new IOException("快速访问位置已不存在。");
                 if (folder.Children is null) throw new IOException("请选择快速访问文件夹。");
-                SearchKeyword = ""; StopSearchWatch(); _quickPlace = folder;
+                SearchKeyword = ""; FolderOrder = FolderOrder.FileName; StopSearchWatch(); _quickPlace = folder;
                 Place = place; Items = folder.Children.Select(node => new FolderItem(node.DisplayName, node.IsFolder ? collection.GetPath(node) : node.Path ?? "", node.IsFolder) { QuickAccess = node }).ToArray();
                 SelectedItem = Items.FirstOrDefault(item => item.Path == selectedPath); IsLoading = false; Error = null; committed = true; Changed?.Invoke(this, EventArgs.Empty); return true;
             }
@@ -131,7 +135,7 @@ public sealed partial class BookshelfFolderList(IArchiveFactory archives, Folder
             pending.Token.ThrowIfCancellationRequested();
             if (_disposed || revision != _revision) return false;
             var parameter = new FolderParameter(place, _folderConfigs);
-            var mode = GetNormalOrder(parameter.FolderOrder);
+            var mode = GetNormalOrder(parameter.FolderOrder, query.Length > 0);
             var items = FolderCollection.Sort(entries, mode, Config.Current.Bookshelf.FolderSortOrder, parameter.Seed, pending.Token);
             _entries = entries; _parameter = parameter; Place = place; Items = items; FolderOrder = mode; SearchKeyword = query;
             SelectedItem = selectedPath is null ? null : FindSelection(selectedPath); return true;
@@ -146,8 +150,8 @@ public sealed partial class BookshelfFolderList(IArchiveFactory archives, Folder
         }
     }
 
-    /// <summary>原普通列表不提供路径/注册时间排序，保留原字段而使用文件名回退。</summary>
-    private static FolderOrder GetNormalOrder(FolderOrder mode) => !Enum.IsDefined(mode) || mode.IsEntryCategory() || mode.IsPathCategory() ? FolderOrder.FileName : mode;
+    /// <summary>普通搜索允许原路径排序，单目录/归档不允许；原参数保持，仅显示文件名回退。</summary>
+    private static FolderOrder GetNormalOrder(FolderOrder mode, bool search) => !Enum.IsDefined(mode) || mode.IsEntryCategory() || (!search && mode.IsPathCategory()) ? FolderOrder.FileName : mode;
     /// <summary>原归档递归模式同步到根书项，先精确定位，再匹配带目录边界的真实祖先。</summary>
     private FolderItem? FindSelection(string path) => Items.FirstOrDefault(e => e.Path == path)
         ?? Items.FirstOrDefault(e => path.StartsWith(e.Path.TrimEnd('/') + "/", StringComparison.Ordinal));
@@ -157,11 +161,11 @@ public sealed partial class BookshelfFolderList(IArchiveFactory archives, Folder
     /// <param name="reshuffle">用户重新选择随机时生成新种子；应用其他全局设置时保留随机次序。</param>
     public void ChangeOrder(FolderOrder mode, bool reshuffle = true)
     {
-        if (_disposed || IsLoading) return;
+        if (_disposed || IsLoading || !FolderOrders.Contains(mode)) return;
         if (IsQuickAccessPlace) return;
         if (IsBookmarkPlace) { BookmarkList.ChangeOrder(mode); PublishBookmarks(); return; }
         if (_disposed || IsLoading || _parameter is null) return;
-        mode = GetNormalOrder(mode);
+        mode = GetNormalOrder(mode, SearchKeyword.Length > 0);
         if (mode != FolderOrder.Random || reshuffle || _parameter.FolderOrder != mode) _parameter.FolderOrder = mode;
         FolderOrder = mode; Reorder();
     }
@@ -171,7 +175,7 @@ public sealed partial class BookshelfFolderList(IArchiveFactory archives, Folder
         if (_disposed || IsLoading || Place is null) return;
         if (IsQuickAccessPlace) return;
         if (IsBookmarkPlace) { BookmarkList.Refresh(); PublishBookmarks(); return; }
-        _parameter = new(Place, _folderConfigs); FolderOrder = GetNormalOrder(_parameter.FolderOrder); Reorder();
+        _parameter = new(Place, _folderConfigs); FolderOrder = GetNormalOrder(_parameter.FolderOrder, SearchKeyword.Length > 0); Reorder();
     }
     /// <summary>应用全局目录分组时保持随机种子及未支持的原默认排序字段，只调整已提交集合。</summary>
     public void Reorder()

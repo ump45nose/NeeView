@@ -11,13 +11,15 @@ public sealed class CommandTable
 {
     private readonly Dictionary<string, Func<Task>> _actions = [];
     public IReadOnlyList<CommandDefinition> Definitions { get; }
-    /// <summary>原普通书架排序命令；执行与菜单勾选共用，其他来源能力后续扩展。</summary>
+    /// <summary>原书架排序命令；执行、来源资格与菜单勾选共用。</summary>
     public static IReadOnlyDictionary<string, FolderOrder> BookOrderCommands { get; } = new Dictionary<string, FolderOrder>
     {
         ["SetBookOrderByFileNameA"] = FolderOrder.FileName, ["SetBookOrderByFileNameD"] = FolderOrder.FileNameDescending,
+        ["SetBookOrderByPathA"] = FolderOrder.Path, ["SetBookOrderByPathD"] = FolderOrder.PathDescending,
         ["SetBookOrderByFileTypeA"] = FolderOrder.FileType, ["SetBookOrderByFileTypeD"] = FolderOrder.FileTypeDescending,
         ["SetBookOrderByTimeStampA"] = FolderOrder.TimeStamp, ["SetBookOrderByTimeStampD"] = FolderOrder.TimeStampDescending,
         ["SetBookOrderBySizeA"] = FolderOrder.Size, ["SetBookOrderBySizeD"] = FolderOrder.SizeDescending,
+        ["SetBookOrderByEntryTimeA"] = FolderOrder.EntryTime, ["SetBookOrderByEntryTimeD"] = FolderOrder.EntryTimeDescending,
         ["SetBookOrderByRandom"] = FolderOrder.Random
     };
     /// <summary>装配原阅读命令及已迁移设置命令；没有实现的命令不可执行。</summary>

@@ -18,19 +18,32 @@ public sealed partial class BookOperation
             ? BookshelfFolderMemento.Create(path, Bookshelf.SelectedItem?.Path, saveData.FolderConfigs) : null;
     }
     /// <summary>原普通目录排序能力及切换顺序：枚举顺序排除路径/登记时间类别。</summary>
-    public static IReadOnlyList<FolderOrder> NormalFolderOrders { get; } = Enum.GetValues<FolderOrder>()
-        .Where(e => !e.IsEntryCategory() && !e.IsPathCategory()).ToArray();
+    public static IReadOnlyList<FolderOrder> NormalFolderOrders => FolderOrderClass.Normal.GetFolderOrders();
+
+    /// <summary>当前可执行资格独立于命令登记；快速访问按原树序，不写排序参数。</summary>
+    /// <param name="order">原排序枚举。</param><returns>当前来源可执行且没有在途导航。</returns>
+    public bool CanChangeFolderOrder(FolderOrder order) => !_disposed && !_closing && !Bookshelf.IsLoading
+        && Bookshelf.Place is not null && !Bookshelf.IsQuickAccessPlace && Bookshelf.FolderOrders.Contains(order);
 
     /// <summary>修改当前目录原参数并可靠保存；失败恢复排序/种子/选择，不能污染全局默认。</summary>
     /// <param name="order">当前来源支持的排序。</param>
     public async Task ChangeFolderOrderAsync(FolderOrder order)
     {
-        if (_disposed || _closing || Bookshelf.IsLoading || Bookshelf.Place is null || !(Bookshelf.IsBookmarkPlace ? Enum.IsDefined(order) : NormalFolderOrders.Contains(order))) return;
+        if (!CanChangeFolderOrder(order)) return;
+        var place = Bookshelf.Place; var search = Bookshelf.SearchKeyword;
         await _historyGate.WaitAsync();
         try
         {
-            if (_disposed || _closing || Bookshelf.IsLoading || Bookshelf.Place is null) return;
-            try { await saveData.EditFolderParametersAsync(() => Bookshelf.ChangeOrder(order)); }
+            // 等锁期间用户可能已换来源；旧动作不能写入新目录或将搜索排序用于普通列表。
+            if (!CanChangeFolderOrder(order) || Bookshelf.Place != place || Bookshelf.SearchKeyword != search) return;
+            try
+            {
+                await saveData.EditFolderParametersAsync(() =>
+                {
+                    // 状态保存也有独立串行槽；排队期间再次换目录时拒绝旧动作。
+                    if (CanChangeFolderOrder(order) && Bookshelf.Place == place && Bookshelf.SearchKeyword == search) Bookshelf.ChangeOrder(order);
+                });
+            }
             catch { Bookshelf.ReloadParameter(); throw; }
             await Bookshelf.RefreshBookmarkMetadataAsync();
         }
@@ -38,7 +51,7 @@ public sealed partial class BookOperation
     }
     /// <summary>沿原普通排序能力表循环，不选择当前来源不支持的类别。</summary>
     public Task ToggleFolderOrderAsync()
-    { var orders = Bookshelf.IsBookmarkPlace ? Enum.GetValues<FolderOrder>() : NormalFolderOrders.ToArray(); return ChangeFolderOrderAsync(orders[(Array.IndexOf(orders, Bookshelf.FolderOrder) + 1) % orders.Length]); }
+    { var orders = Bookshelf.FolderOrders.ToArray(); return ChangeFolderOrderAsync(orders[(Array.IndexOf(orders, Bookshelf.FolderOrder) + 1) % orders.Length]); }
 
     /// <summary>原随机书籍命令从当前书架排除当前书籍；不改变排序或随机种子，打开失败保留选择。</summary>
     public async Task RandomBookAsync()

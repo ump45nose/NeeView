@@ -162,14 +162,14 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | ToggleBookOrder | 切换书籍顺序 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/ToggleBookOrderCommand.cs |
 | SetBookOrderByFileNameA | 书名升序 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/SetBookOrderByFileNameACommand.cs |
 | SetBookOrderByFileNameD | 书名降序 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/SetBookOrderByFileNameDCommand.cs |
-| SetBookOrderByPathA | 书籍路径升序 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderByPathACommand.cs |
-| SetBookOrderByPathD | 书籍路径降序 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderByPathDCommand.cs |
+| SetBookOrderByPathA | 书籍路径升序 |  |  | 已接入 | P5第二十九批原来源资格/排序/目录参数；见p5-book-order.md | NeeView/Command/Commands/SetBookOrderByPathACommand.cs |
+| SetBookOrderByPathD | 书籍路径降序 |  |  | 已接入 | P5第二十九批原来源资格/排序/目录参数；见p5-book-order.md | NeeView/Command/Commands/SetBookOrderByPathDCommand.cs |
 | SetBookOrderByFileTypeA | 书籍文件类型升序 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/SetBookOrderByFileTypeACommand.cs |
 | SetBookOrderByFileTypeD | 书籍文件类型降序 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/SetBookOrderByFileTypeDCommand.cs |
 | SetBookOrderByTimeStampA | 书籍日期升序 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/SetBookOrderByTimeStampACommand.cs |
 | SetBookOrderByTimeStampD | 书籍日期降序 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/SetBookOrderByTimeStampDCommand.cs |
-| SetBookOrderByEntryTimeA | 书籍登记时间升序 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderByEntryTimeACommand.cs |
-| SetBookOrderByEntryTimeD | 书籍登记时间降序 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SetBookOrderByEntryTimeDCommand.cs |
+| SetBookOrderByEntryTimeA | 书籍登记时间升序 |  |  | 已接入 | P5第二十九批原来源资格/排序/目录参数；见p5-book-order.md | NeeView/Command/Commands/SetBookOrderByEntryTimeACommand.cs |
+| SetBookOrderByEntryTimeD | 书籍登记时间降序 |  |  | 已接入 | P5第二十九批原来源资格/排序/目录参数；见p5-book-order.md | NeeView/Command/Commands/SetBookOrderByEntryTimeDCommand.cs |
 | SetBookOrderBySizeA | 书籍大小升序 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/SetBookOrderBySizeACommand.cs |
 | SetBookOrderBySizeD | 书籍大小降序 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/SetBookOrderBySizeDCommand.cs |
 | SetBookOrderByRandom | 书籍随机排序 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/SetBookOrderByRandomCommand.cs |

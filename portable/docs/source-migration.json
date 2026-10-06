@@ -871,7 +871,7 @@
       "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderCollection.cs",
       "target": "src/NeeView.Engine/SidePanels/Bookshelf/FolderList/FolderCollection.cs",
       "sha256": "149c018a78d5c12e9203dd646ae1df2e8ed1472b4b225233e208dd650f14e3f3",
-      "status": "原普通排序：目录分组、自然文件名/类型/时间/大小及稳定随机种子；不含监视器与系统项"
+      "status": "P5第二十九批：原Full/WithPath/Normal/None资格、书签注册索引及搜索完整路径排序；四命令共用原目录参数和保存回滚。见p5-book-order.md"
     },
     {
       "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderList.cs",
@@ -1219,7 +1219,7 @@
       "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderCollection.cs",
       "target": "src/NeeView.Engine/SidePanels/Bookmark/BookmarkFolderList.cs",
       "sha256": "149c018a78d5c12e9203dd646ae1df2e8ed1472b4b225233e208dd650f14e3f3",
-      "status": "书签目录进入/返回/同步、普通条目索引与无磁盘探测排序子集；搜索、元数据、书架互联待迁"
+      "status": "P5第二十九批：原Full/WithPath/Normal/None资格、书签注册索引及搜索完整路径排序；四命令共用原目录参数和保存回滚。见p5-book-order.md"
     },
     {
       "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderItem.cs",
@@ -1343,9 +1343,9 @@
     },
     {
       "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderOrderClass.cs",
-      "target": "src/NeeView.Engine/BookOperation/BookOperation.Bookshelf.cs",
+      "target": "src/NeeView.Engine/SidePanels/Bookshelf/FolderList/FolderOrderClass.cs",
       "sha256": "542d3c9d14cd34aceb4fb3d880d5b3937b4bba597e8b256c70fe5159d4243eb6",
-      "status": "Original Normal supported order map and enum sequence"
+      "status": "P5第二十九批：原Full/WithPath/Normal/None资格、书签注册索引及搜索完整路径排序；四命令共用原目录参数和保存回滚。见p5-book-order.md"
     },
     {
       "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderList.cs",
@@ -3086,6 +3086,30 @@
       "target": "src/NeeView.MacOS/ViewModels/ImageEffectPanelViewModel.cs",
       "sha256": "2374f51602a6ef88f6d0fd41edf3ec2edeb6c57cc0dff7ae34f9eabc33521681",
       "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/Command/Commands/SetBookOrderByPathACommand.cs",
+      "target": "src/NeeView.Engine/Command/CommandTable.cs",
+      "sha256": "4a49d10a9f495ab1727c7e61dc57fb695431e4ebe30690a3d906e568e4a8b84f",
+      "status": "P5第二十九批：原Full/WithPath/Normal/None资格、书签注册索引及搜索完整路径排序；四命令共用原目录参数和保存回滚。见p5-book-order.md"
+    },
+    {
+      "source": "NeeView/Command/Commands/SetBookOrderByPathDCommand.cs",
+      "target": "src/NeeView.Engine/Command/CommandTable.cs",
+      "sha256": "5b8715710c304a0c28060ccc298e1b6b1bb1a138924c521fcd7beba9ee70055a",
+      "status": "P5第二十九批：原Full/WithPath/Normal/None资格、书签注册索引及搜索完整路径排序；四命令共用原目录参数和保存回滚。见p5-book-order.md"
+    },
+    {
+      "source": "NeeView/Command/Commands/SetBookOrderByEntryTimeACommand.cs",
+      "target": "src/NeeView.Engine/Command/CommandTable.cs",
+      "sha256": "33ba2c9dfbbae85ab625340f8369a2ccf60aac6ac9898538a9d31a14e4cc194f",
+      "status": "P5第二十九批：原Full/WithPath/Normal/None资格、书签注册索引及搜索完整路径排序；四命令共用原目录参数和保存回滚。见p5-book-order.md"
+    },
+    {
+      "source": "NeeView/Command/Commands/SetBookOrderByEntryTimeDCommand.cs",
+      "target": "src/NeeView.Engine/Command/CommandTable.cs",
+      "sha256": "02ca7f4764f2126b8ef127d0c1dbed666689a3d8244802bea1e93cb245bb8b2d",
+      "status": "P5第二十九批：原Full/WithPath/Normal/None资格、书签注册索引及搜索完整路径排序；四命令共用原目录参数和保存回滚。见p5-book-order.md"
     }
   ],
   "rule_references": [
