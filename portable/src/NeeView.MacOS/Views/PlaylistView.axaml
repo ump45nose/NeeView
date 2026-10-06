@@ -17,7 +17,7 @@
       <Button x:Name="PlaylistRestore" Content="恢复" IsEnabled="{Binding CanRestore}" Click="Restore_Click" />
       <Button Content="↑" Tag="-1" Click="Move_Click" ToolTip.Tip="上移登记项" /><Button Content="↓" Tag="1" Click="Move_Click" ToolTip.Tip="下移登记项" />
     </StackPanel>
-    <ListBox x:Name="PlaylistItems" SelectionMode="Multiple" SelectionChanged="Item_Changed" DoubleTapped="Item_DoubleTapped">
+    <ListBox x:Name="PlaylistItems" Classes="original-list" SelectionMode="Multiple" SelectionChanged="Item_Changed" DoubleTapped="Item_DoubleTapped">
       <ListBox.ItemTemplate><DataTemplate>
         <StackPanel Spacing="3" Margin="2">
           <TextBlock Text="{Binding GroupHeader}" IsVisible="{Binding HasGroupHeader}" FontWeight="Bold" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,2" />

@@ -17,10 +17,16 @@
       <SolidColorBrush x:Key="Gallery.Selection" Color="#5CACEB" />
       <SolidColorBrush x:Key="Gallery.Scrollbar" Color="#888" />
       <SolidColorBrush x:Key="Gallery.Text" Color="#DDD" />
+      <!-- 原Fonts.xaml/FontParameters资源角色；启动后由实际平台字体值替换。 -->
+      <FontFamily x:Key="DefaultFontFamily">Default</FontFamily><FontFamily x:Key="ArrowFontFamily">Default</FontFamily>
+      <x:Double x:Key="SystemFontSize">12</x:Double><x:Double x:Key="SystemFontSizeNormal">15</x:Double>
+      <x:Double x:Key="SystemFontSizeLarge">18</x:Double><x:Double x:Key="SystemFontSizeHuge">24</x:Double>
+      <x:Double x:Key="DefaultFontSize">15</x:Double><x:Double x:Key="MenuFontSize">12</x:Double>
+      <x:Double x:Key="FolderTreeFontSize">12</x:Double><x:Double x:Key="PanelFontSize">15</x:Double><x:Double x:Key="FontIconSize">30</x:Double>
     </ResourceDictionary>
   </Styles.Resources>
   <!-- 保留原区域颜色和 41/36 DIP 图标栏尺寸；视觉调整集中在本文件。 -->
-  <Style Selector="Window"><Setter Property="Background" Value="{DynamicResource Window.Background}" /><Setter Property="Foreground" Value="{DynamicResource Window.Foreground}" /><Setter Property="FontSize" Value="13" /></Style>
+  <Style Selector="Window"><Setter Property="Background" Value="{DynamicResource Window.Background}" /><Setter Property="Foreground" Value="{DynamicResource Window.Foreground}" /><Setter Property="FontSize" Value="{DynamicResource DefaultFontSize}" /><Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" /></Style>
   <!-- 原角色颜色；保持Fluent模板和原区域尺寸，主题切换只替换资源。 -->
   <Style Selector="Button"><Setter Property="Background" Value="{DynamicResource Button.Background}" /><Setter Property="Foreground" Value="{DynamicResource Button.Foreground}" /><Setter Property="BorderBrush" Value="{DynamicResource Button.Border}" /></Style>
   <Style Selector="Button:pointerover"><Setter Property="Background" Value="{DynamicResource Button.MouseOver.Background}" /><Setter Property="BorderBrush" Value="{DynamicResource Button.MouseOver.Border}" /></Style>
@@ -28,16 +34,17 @@
   <Style Selector="TextBox"><Setter Property="Background" Value="{DynamicResource TextBox.Background}" /><Setter Property="Foreground" Value="{DynamicResource TextBox.Foreground}" /><Setter Property="BorderBrush" Value="{DynamicResource TextBox.Border}" /></Style>
   <Style Selector="TextBox:pointerover"><Setter Property="Background" Value="{DynamicResource TextBox.MouseOver.Background}" /></Style>
   <Style Selector="ComboBox"><Setter Property="Background" Value="{DynamicResource Button.Background}" /><Setter Property="Foreground" Value="{DynamicResource Button.Foreground}" /><Setter Property="BorderBrush" Value="{DynamicResource Button.Border}" /></Style>
-  <Style Selector="ContextMenu"><Setter Property="Background" Value="{DynamicResource Menu.Background}" /><Setter Property="Foreground" Value="{DynamicResource Menu.Foreground}" /><Setter Property="BorderBrush" Value="{DynamicResource Menu.Border}" /></Style>
-  <Style Selector="MenuItem"><Setter Property="Foreground" Value="{DynamicResource Menu.Foreground}" /></Style>
-  <Style Selector="TreeView"><Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{DynamicResource Panel.Foreground}" /></Style>
+  <Style Selector="ContextMenu"><Setter Property="Background" Value="{DynamicResource Menu.Background}" /><Setter Property="Foreground" Value="{DynamicResource Menu.Foreground}" /><Setter Property="BorderBrush" Value="{DynamicResource Menu.Border}" /><Setter Property="FontSize" Value="{DynamicResource MenuFontSize}" /><Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" /></Style>
+  <Style Selector="MenuItem"><Setter Property="Foreground" Value="{DynamicResource Menu.Foreground}" /><Setter Property="FontSize" Value="{DynamicResource MenuFontSize}" /><Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" /></Style>
+  <Style Selector="TreeView"><Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{DynamicResource Panel.Foreground}" /><Setter Property="FontSize" Value="{DynamicResource FolderTreeFontSize}" /></Style>
+  <Style Selector="TreeViewItem"><Setter Property="FontSize" Value="{DynamicResource FolderTreeFontSize}" /></Style>
   <Style Selector="Slider"><Setter Property="Background" Value="{DynamicResource Slider.Background}" /><Setter Property="Foreground" Value="{DynamicResource Slider.Thumb}" /></Style>
   <Style Selector="Border.panel"><Setter Property="Background" Value="{DynamicResource Panel.Background}" /><Setter Property="BorderBrush" Value="{DynamicResource Panel.Separator}" /><Setter Property="BorderThickness" Value="0,0,1,0" /></Style>
   <Style Selector="Border.rail"><Setter Property="Background" Value="{DynamicResource SideBar.Background}" /><Setter Property="Width" Value="41" /></Style>
   <Style Selector="Button.panel-icon"><Setter Property="Width" Value="36" /><Setter Property="Height" Value="36" /><Setter Property="Margin" Value="2" /><Setter Property="Padding" Value="7" /><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="CornerRadius" Value="2" /></Style>
   <Style Selector="PathIcon"><Setter Property="Foreground" Value="{DynamicResource SideBar.Foreground}" /></Style>
-  <Style Selector="Menu"><Setter Property="Background" Value="{DynamicResource MenuBar.Background}" /><Setter Property="FontSize" Value="13" /></Style>
-  <Style Selector="TextBox.address"><Setter Property="Background" Value="{DynamicResource MenuBar.Address.Background}" /><Setter Property="BorderThickness" Value="0" /><Setter Property="MinHeight" Value="28" /><Setter Property="FontSize" Value="12" /><Setter Property="Padding" Value="8,4" /></Style>
+  <Style Selector="Menu"><Setter Property="Background" Value="{DynamicResource MenuBar.Background}" /><Setter Property="FontSize" Value="{DynamicResource MenuFontSize}" /><Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" /></Style>
+  <Style Selector="TextBox.address"><Setter Property="Background" Value="{DynamicResource MenuBar.Address.Background}" /><Setter Property="BorderThickness" Value="0" /><Setter Property="MinHeight" Value="28" /><Setter Property="FontSize" Value="{DynamicResource MenuFontSize}" /><Setter Property="Padding" Value="8,4" /></Style>
   <Style Selector="TextBox.slider-number"><Setter Property="MinHeight" Value="0" /><Setter Property="Padding" Value="3,0" /><Setter Property="VerticalContentAlignment" Value="Center" /><Setter Property="TextAlignment" Value="Center" /></Style>
   <Style Selector="Border.slider-number-frame:pointerover"><Setter Property="BorderBrush" Value="{DynamicResource Control.Accent}" /></Style>
   <Style Selector="TextBlock.panel-title"><Setter Property="Margin" Value="10,8" /><Setter Property="Foreground" Value="{DynamicResource Panel.Header}" /></Style>
@@ -45,7 +52,7 @@
   <Style Selector="ListBoxItem:pointerover"><Setter Property="Background" Value="{DynamicResource Item.MouseOver.Background}" /></Style>
   <Style Selector="ListBoxItem:selected"><Setter Property="Background" Value="{DynamicResource Item.Selected.Background}" /></Style>
   <Style Selector="ListBoxItem"><Setter Property="Padding" Value="8,5" /><Setter Property="MinHeight" Value="28" /></Style>
-  <Style Selector="ListBox.original-list ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch" /></Style>
+  <Style Selector="ListBox.original-list ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="FontSize" Value="{DynamicResource PanelFontSize}" /></Style>
   <Style Selector="GridSplitter"><Setter Property="Background" Value="{DynamicResource Panel.Splitter}" /></Style>
   <Style Selector="Border.panel-drop-preview"><Setter Property="Background" Value="#605CACEB" /><Setter Property="BorderBrush" Value="#FF5CACEB" /><Setter Property="BorderThickness" Value="2" /></Style>
 </Styles>

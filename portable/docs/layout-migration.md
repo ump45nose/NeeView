@@ -4,6 +4,7 @@
 
 | 原区域 | Mac 入口 | 当前状态 |
 |---|---|---|
+| SettingPageFonts / Fonts.xaml | SettingsWindow.Fonts / FontPresenter / 原动态字体资源 | P5第九批字体族与四比例、主/浮/设置/菜单/树/面板资源接入；窗口区域及侧栏比例保持，ClearType禁用保留，系统字体真机另验 |
 | DockMenuSocket / 地址栏 | MainWindow.axaml 顶部 Menu/AddressBar | 完整原八组默认菜单、地址打开及原覆盖隐藏；未迁移能力禁用占位，动态菜单配置待后续 |
 | SidePanelFrameView 左右栏 | SidePanelFrame 七列、左右rail | 原左3/右6入口、41 DIP栏/36 DIP图标，分隔拖动、显隐、原资格/延迟/焦点及覆盖自动隐藏 |
 | MainViewSocket | ReaderView | 原页框绘制、缩放/平移、当前帧和邻图预取 |

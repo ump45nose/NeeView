@@ -498,6 +498,12 @@
       "target": "src/NeeView.Engine/Styles/Themes/HighContrastTheme.json",
       "sha256": "114efc5d7ed388ee9c420730ea5423b843c912984c798fa7d1be0a80cdea453c",
       "status": "P5第八批：原JSON材料原字节内嵌，预设进入唯一主题加载；CustomTemplate保持材料待设置生成入口"
+    },
+    {
+      "source": "NeeView/Config/FontsConfig.cs",
+      "target": "src/NeeView.Engine/Config/FontsConfig.cs",
+      "sha256": "6745d8b84c7b60159e5d9b50bb96f674cc91e27757cca89e237d376feeb10f8e",
+      "status": "P5第九批：原六字段/默认/非正回退/五位舍入，系统默认字体为启动注入值；唯一JSON差分与事务"
     }
   ],
   "partial_adapters": [
@@ -2258,6 +2264,18 @@
       "target": "src/NeeView.Engine/Styles/ThemeManager.cs",
       "sha256": "7fc00b3031d6f1c43ccdf12d15f1befdaaec1b11c865548c90b753535c972816",
       "status": "P5第八批：原六预设/一级自定义/BasedOn/覆盖/回退，移除WPF及Windows系统类型；平台值快照和单槽后台适配"
+    },
+    {
+      "source": "NeeView/System/FontParameters.cs",
+      "target": "src/NeeView.Engine/System/FontParameters.cs",
+      "sha256": "94c4b27c0275da040f844fb05f8d0ed3902328d1a26e73e315b762d56c98b00a",
+      "status": "P5第九批：保留原消息/菜单/树/面板/系统标题/图标公式，移出WPF资源及全局订阅；纯值快照"
+    },
+    {
+      "source": "NeeView/System/SystemVisualParameters.cs",
+      "target": "src/NeeView.Backends/MacFontEnvironment.cs",
+      "sha256": "113492170dff2e622dafafc9e68cc92f0b58895cb2219181ba3ea16ba8dcba8c",
+      "status": "P5第九批：只替换MessageFontSize/MenuFontSize来源；AppKit默认字体点大小作为DIP，启动调用后释放包装"
     }
   ],
   "rule_references": [
@@ -2496,6 +2514,24 @@
       "target": "src/NeeView.MacOS/Views/SettingsWindow.Theme.cs",
       "sha256": "68ee309563718794434506278de8e2372c4fc916cf9d05226e542c003ad0572f",
       "status": "P5第八批：原主题及目录设置入口转换，布局/独立草稿/真实提交分开；Finder模板生成未迁入"
+    },
+    {
+      "source": "NeeView/Styles/Fonts.xaml",
+      "target": "src/NeeView.MacOS/Styles/NeeViewTheme.axaml",
+      "sha256": "e2179288cbee0ed8ab412e653c8e267f646fac27a5d7d7711aac15115c2a621e",
+      "status": "P5第九批：原字体资源键转换Avalonia动态资源，Calibri专用箭头映射由系统字形回退替换"
+    },
+    {
+      "source": "NeeView/Setting/SettingPageWindow.cs",
+      "target": "src/NeeView.MacOS/Views/SettingsWindow.Fonts.cs",
+      "sha256": "68ee309563718794434506278de8e2372c4fc916cf9d05226e542c003ad0572f",
+      "status": "P5第九批：原字体六设置独立草稿/百分比表单，ClearType为保留禁用项；成功保存才应用"
+    },
+    {
+      "source": "NeeView/System/FontParameters.cs",
+      "target": "src/NeeView.MacOS/Views/FontPresenter.cs",
+      "sha256": "94c4b27c0275da040f844fb05f8d0ed3902328d1a26e73e315b762d56c98b00a",
+      "status": "P5第九批：原字体资源发布转换Avalonia；独立于主题/阅读，缺失字体显示默认且保留配置"
     }
   ],
   "backend_reuse": [

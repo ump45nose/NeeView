@@ -1,0 +1,254 @@
+{
+  "utc": "2026-10-06T08:43:30.425964+00:00",
+  "scope": "P5 original font config, resource roles, formal settings and unique JSON; silent Headless",
+  "base_commit": "98591ef65b1e82aeaf4b5534ae541e06131b39e9",
+  "windows_source_baseline": "c5c398d89",
+  "font_tests": {
+    "total": "17",
+    "executed": "17",
+    "passed": "17",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "full_tests": {
+    "total": "1215",
+    "executed": "1213",
+    "passed": "1213",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "boundaries": {
+    "production_projects": [
+      "NeeView.Backends",
+      "NeeView.Engine",
+      "NeeView.MacOS"
+    ],
+    "source_files": 84,
+    "partial_adapters": 295,
+    "upstream_source_files": 26
+  },
+  "font_test_results": [
+    {
+      "name": "NeeView.Engine.Tests.FontsTests.CalculateUsesMessageAndMenuBaselinesAndCapsOnlySystemSizes",
+      "outcome": "Passed",
+      "duration": "00:00:00.0031877"
+    },
+    {
+      "name": "NeeView.Engine.Tests.FontsTests.CalculateRejectsInvalidPlatformMetrics(message: NaN, menu: 10)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0001722"
+    },
+    {
+      "name": "NeeView.Engine.Tests.FontsTests.FailedSaveRollsBackFontsInPlaceAndRetryPersists",
+      "outcome": "Passed",
+      "duration": "00:00:00.4409317"
+    },
+    {
+      "name": "NeeView.Engine.Tests.FontsTests.CalculateRejectsInvalidPlatformMetrics(message: 10, menu: ∞)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000181"
+    },
+    {
+      "name": "NeeView.Engine.Tests.FontsTests.CalculateRejectsInvalidOrOverflowingScale(value: NaN)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000166"
+    },
+    {
+      "name": "NeeView.Engine.Tests.FontsUiTests.FormalFontFormKeepsImportedValuesOnUnrelatedSave",
+      "outcome": "Passed",
+      "duration": "00:00:00.2672605"
+    },
+    {
+      "name": "NeeView.Engine.Tests.FontsTests.Legacy38FontUpgradeBlocksNonZeroSizeButMigratesNameAndZeroSize",
+      "outcome": "Passed",
+      "duration": "00:00:00.0083629"
+    },
+    {
+      "name": "NeeView.Engine.Tests.FontsUiTests.FontRolesUpdateOpenControlsAndKeepCurrentBook",
+      "outcome": "Passed",
+      "duration": "00:00:01.7455545"
+    },
+    {
+      "name": "NeeView.Engine.Tests.FontsTests.DefaultsAndScaleAccessorsKeepOriginalSemantics",
+      "outcome": "Passed",
+      "duration": "00:00:00.0591676"
+    },
+    {
+      "name": "NeeView.Engine.Tests.FontsTests.CalculateRejectsInvalidOrOverflowingScale(value: ∞)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0001276"
+    },
+    {
+      "name": "NeeView.Engine.Tests.FontsUiTests.FormalSettingsCancelFailureAndRetryApplyOnlyCommittedFonts",
+      "outcome": "Passed",
+      "duration": "00:00:01.6904820"
+    },
+    {
+      "name": "NeeView.Engine.Tests.FontsTests.CalculateRejectsInvalidOrOverflowingScale(value: 1.7976931348623157E+308)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000869"
+    },
+    {
+      "name": "NeeView.Engine.Tests.FontsUiTests.DraftPreservesMissingNameAndOriginalOutOfRangeScales",
+      "outcome": "Passed",
+      "duration": "00:00:00.0049645"
+    },
+    {
+      "name": "NeeView.Engine.Tests.FontsTests.CalculateRejectsInvalidPlatformMetrics(message: 10, menu: -1)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000220"
+    },
+    {
+      "name": "NeeView.Engine.Tests.FontsTests.CalculateRejectsInvalidPlatformMetrics(message: 10, menu: NaN)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0012022"
+    },
+    {
+      "name": "NeeView.Engine.Tests.FontsTests.LoadMergesFontsBranchDefaultsAndPreservesUnknownJson",
+      "outcome": "Passed",
+      "duration": "00:00:00.0320875"
+    },
+    {
+      "name": "NeeView.Engine.Tests.FontsTests.CalculateRejectsInvalidPlatformMetrics(message: ∞, menu: 10)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000176"
+    }
+  ],
+  "build_steps": [
+    {
+      "name": "Engine 构建",
+      "exit_code": 0
+    },
+    {
+      "name": "原算法与正式视图测试",
+      "exit_code": 0
+    },
+    {
+      "name": "正式入口源码编译（Library检查）",
+      "exit_code": 0
+    },
+    {
+      "name": "正式 Mac 应用构建",
+      "exit_code": 0
+    },
+    {
+      "name": "正式 .app 本地签名校验",
+      "exit_code": 0
+    }
+  ],
+  "initial_build_failure": "CS8602 on nullable AppKit message/menu fonts; explicit failure added; formal build and signature retried successfully",
+  "screenshots": [
+    {
+      "file": "p5-fonts-main.png",
+      "sha256": "f0ae22dddce328becb3d6a222ab2a975387eeba0df4915f9cda09f52e16aa692"
+    },
+    {
+      "file": "p5-fonts-form.png",
+      "sha256": "e79712f50482ec4918acec0d28986135dd13f56e2b6e18cc4d551eb0a9e63b42"
+    },
+    {
+      "file": "p5-fonts-floating.png",
+      "sha256": "97341c08e33f1efda60d9cd896b2b29fa2537301da435274536ef8c41a467e2e"
+    }
+  ],
+  "foreground_app_activated": false,
+  "user_images_modified": false,
+  "import_sources_modified": false,
+  "windows_baseline_modified": false,
+  "skipped": [
+    "NeeView.Engine.Tests.BrowseResourceTests.MountedResourceSubfoldersRenderAndScrollWithBoundedDisplay",
+    "NeeView.Engine.Tests.PageThumbnailResourceTests.ResourceSamplesShowThumbnailsScrollAndCloseWithBoundedResources"
+  ],
+  "artifacts": "/Users/yuwk/.codex/artifacts/neeview/p5-fonts-20261006/final-full",
+  "archived_generated_files": [
+    "p5-fonts-archive-cover-layout.png",
+    "p5-fonts-archive-settings-layout.png",
+    "p5-fonts-banner-layout.png",
+    "p5-fonts-book-cards-layout.png",
+    "p5-fonts-book-confirm.png",
+    "p5-fonts-book-overwrite.png",
+    "p5-fonts-bookmark-layout.png",
+    "p5-fonts-bookmark-navigation-layout.png",
+    "p5-fonts-bookmark-search-layout.png",
+    "p5-fonts-bookshelf-bookmarks-layout.png",
+    "p5-fonts-cache.json",
+    "p5-fonts-commands.json",
+    "p5-fonts-confirm.png",
+    "p5-fonts-conflict.png",
+    "p5-fonts-content-layout.png",
+    "p5-fonts-copy-parameter.png",
+    "p5-fonts-destination-layout.png",
+    "p5-fonts-directory-overwrite.png",
+    "p5-fonts-directory-tree-layout.png",
+    "p5-fonts-docking-layout.png",
+    "p5-fonts-fade-layout.png",
+    "p5-fonts-fixed-dataset-layout.png",
+    "p5-fonts-floating-layout.png",
+    "p5-fonts-hidden-layout.png",
+    "p5-fonts-history-layout.png",
+    "p5-fonts-history-search-layout.png",
+    "p5-fonts-history-settings-layout.png",
+    "p5-fonts-index-layout.json",
+    "p5-fonts-input-settings-layout.png",
+    "p5-fonts-layout.png",
+    "p5-fonts-masonry-layout.png",
+    "p5-fonts-name.png",
+    "p5-fonts-number-layout.png",
+    "p5-fonts-overlay-layout.png",
+    "p5-fonts-page-end-layout.png",
+    "p5-fonts-page-search-layout.png",
+    "p5-fonts-page-thumbnails-layout.png",
+    "p5-fonts-panorama-layout.png",
+    "p5-fonts-parameter-layout.png",
+    "p5-fonts-playlist-layout.png",
+    "p5-fonts-quickaccess-layout.png",
+    "p5-fonts-reading-layout.png",
+    "p5-fonts-render.json",
+    "p5-fonts-scroll-layout.png",
+    "p5-fonts-settings.png",
+    "p5-fonts-transform-layout.png",
+    "p5-fonts-viewer.json",
+    "p5-fonts-virtual-grid-layout.png",
+    "p5-fonts-window-layout.png"
+  ],
+  "verified_behavior": [
+    "Original six fields, defaults, five-digit rounding and imported out-of-range scales",
+    "Original message/menu formulas, title cap and icon minimum",
+    "Unique JSON differences, unknown fields, failure rollback, retry and load",
+    "Formal settings cancel, failure, retry and committed resource application",
+    "Main/floating/settings/menu/tree/list font role updates",
+    "Missing font fallback preserves name; installed font selection",
+    "Stable Book/Page/Position and no extra decoding for same-spec small image",
+    "Invalid sizes rejected before partial publication; ClearType disabled and preference retained"
+  ],
+  "limitations": [
+    "AppKit font values, system glyph fallback and Retina not device-verified",
+    "Fixed Windows dynamic comparison and user two-branch real exports not performed",
+    "Version 38 nonzero absolute font sizes still require source Windows MessageFontSize",
+    "Full settings search, original Sample directory action, effects/media and scripts remain to migrate",
+    "Developer ID, notarization, dependency distribution manifest and clean install not performed; P5 incomplete",
+    "Previously skipped P3/P4 and existing AX/NAS issues remain recorded"
+  ]
+}

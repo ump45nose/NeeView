@@ -32,6 +32,8 @@ public sealed partial class PanelListItemView : UserControl
         Cover.Height = Math.Clamp(profile.ShapeHeight, 0, 1024);
         if (style == PanelListItemStyle.Thumbnail) { Width = Math.Clamp(profile.ShapeWidth, 24, 1024) + 4; text.HorizontalAlignment = HorizontalAlignment.Stretch; }
         DataContextChanged += (_, _) => { ObserveNode(); RefreshRow(); }; RefreshRow();
+        // 原面板字体变化只补偿两行文本高度，不重新构造封面或请求像素。
+        PropertyChanged += (_, e) => { if (e.Property == FontSizeProperty) UpdateTextHeight(); };
     }
     /// <summary>原节点原地编辑时更新展示，退树解除订阅，回收控件不保留旧节点。</summary>
     private void ObserveNode()
@@ -57,12 +59,15 @@ public sealed partial class PanelListItemView : UserControl
         }
         var model = new ListItemText(name, path, page, header, date, _profile, DisplayStyle, directory);
         this.FindControl<Grid>("ItemRoot")!.DataContext = model;
+        UpdateTextHeight();
         bool thumbnail = !folder && path.Length > 0 && DisplayStyle != PanelListItemStyle.Normal;
         Cover.Source = thumbnail && DataContext is not Page ? path : null;
         Cover.PageSource = thumbnail ? DataContext as Page : null;
         Cover.Placeholder = directory ? "▸" : "▱";
         Cover.IconBrush = color is not null && Color.TryParse(color, out var parsed) ? new SolidColorBrush(parsed) : Brushes.LightGray; Cover.InvalidateVisual();
     }
+    private void UpdateTextHeight()
+    { this.FindControl<TextBlock>("ItemName")!.MaxHeight = _profile.IsTextWrapped ? FontSize * 2.8 : double.PositiveInfinity; }
 }
 /// <summary>文本与布局参数是表现数据，不参与来源定位、历史更新或打开规则。</summary>
 public sealed record ListItemText(string RawName, string Path, string Page, string? GroupHeader, DateTime LastAccessTime, PanelListItemProfile Profile, PanelListItemStyle Style, bool Folder)
@@ -73,6 +78,5 @@ public sealed record ListItemText(string RawName, string Path, string Page, stri
     public bool DateVisible => Style == PanelListItemStyle.Content && LastAccessTime != default;
     public bool TextVisible => Profile.IsTextVisible;
     public TextWrapping Wrapping => Profile.IsTextWrapped ? TextWrapping.Wrap : TextWrapping.NoWrap;
-    public double TextHeight => Profile.IsTextWrapped ? 36 : double.PositiveInfinity;
     public string? Detail => Profile.IsDetailPopupEnabled ? RawName + "\n" + Path + (Page.Length > 0 ? "\n" + Page : "") + (Date.Length > 0 ? "\n" + Date : "") : null;
 }

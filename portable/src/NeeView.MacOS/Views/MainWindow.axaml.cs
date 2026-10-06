@@ -321,6 +321,7 @@ public sealed partial class MainWindow : Window
         var pageFormat = Config.Current.PageList.Format; var recursiveSearch = Config.Current.Bookshelf.IsSearchIncludeSubdirectories;
         if (history) settings.SelectHistoryPage();
         await settings.ShowDialog(this);
+        if (settings.WasSaved && !_preparing && !_closedPrepared) RefreshFonts();
         if (settings.WasSaved && _themePresenter is not null) await _themePresenter.RefreshAsync();
         if (_preparing || _closedPrepared) return;
         _model.RefreshSelection(); _model.RefreshPanels(); await FilmStrip.RefreshAsync(); BuildMenus();
