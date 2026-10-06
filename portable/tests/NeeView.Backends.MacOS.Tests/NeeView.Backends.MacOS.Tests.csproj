@@ -16,6 +16,7 @@
     <ProjectReference Include="../../src/NeeView.Backends/NeeView.Backends.csproj" />
     <PackageReference Include="xunit.v3" />
     <Compile Include="../Fixtures/SyntheticPdf.cs" Link="SyntheticPdf.cs" />
+    <Compile Include="../Fixtures/AnimationFixture.cs" Link="AnimationFixture.cs" />
     <Using Include="Xunit" />
   </ItemGroup>
 </Project>

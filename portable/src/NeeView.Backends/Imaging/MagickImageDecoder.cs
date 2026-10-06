@@ -4,17 +4,26 @@ using NeeView;
 namespace NeeView.Backends;
 
 /// <summary>Q8 解码器：原生资源限额、首帧、EXIF、色彩和预乘 alpha。</summary>
-public sealed class MagickImageDecoder : IImageDecoder
+public sealed class MagickImageDecoder(IAnimatedImageDecoder? pngAnimation = null) : IImageDecoder, IAnimatedImageDecoder
 {
+    private readonly MagickAnimatedImageDecoder _animated = new();
+    /// <summary>原动画来源调用同一图片后端，由工厂共享解码槽和资源计费。</summary>
+    public async Task<IAnimatedImageSource?> OpenAnimationAsync(Stream stream, DecodeRequest request, long workingBudget, CancellationToken token)
+    {
+        if (pngAnimation is not null && await pngAnimation.OpenAnimationAsync(stream, request, workingBudget, token).ConfigureAwait(false) is { } png) return png;
+        return await _animated.OpenAnimationAsync(stream, request, workingBudget, token).ConfigureAwait(false);
+    }
     private const long WorkingBudget = 256L * 1024 * 1024;
     /// <summary>设置原生解码工作限额；不将缓存预算误当作进程内存上限。</summary>
-    public MagickImageDecoder()
+    private static void ConfigureLimits()
     {
         ResourceLimits.Memory = 256 * 1024 * 1024;
         ResourceLimits.MaxMemoryRequest = 256 * 1024 * 1024;
         ResourceLimits.Disk = 512 * 1024 * 1024;
         ResourceLimits.Thread = 1;
     }
+    // 保持原静态/动画共享的原生工作限制，进程只设置一次。
+    static MagickImageDecoder() => ConfigureLimits();
     /// <summary>输入可读流，只探测尺寸和方向，不分配完整像素。</summary>
     public Task<ImageInfo> ProbeAsync(Stream stream, CancellationToken token) => Task.Run(() =>
     {

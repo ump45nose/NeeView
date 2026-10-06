@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="NeeView.MacOS.Views.MediaControlView" x:CompileBindings="False" IsVisible="{Binding Exists}">
+  <!-- 原底部媒体条：播放、音量/时间、循环及位置。动图无音轨，音量保留禁用入口。 -->
+  <Border Background="{DynamicResource BottomBar.Background}" BorderBrush="{DynamicResource BottomBar.Border}" BorderThickness="0,1,0,0" Padding="8,3">
+    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto,*,Auto">
+      <Button x:Name="MediaPlay" Content="{Binding PlayText}" Click="Play_Click" ToolTip.Tip="播放 / 暂停" MinWidth="36" />
+      <Button Grid.Column="1" Content="音量" IsEnabled="False" ToolTip.Tip="图片动画没有音轨" Margin="4,0" />
+      <TextBlock Grid.Column="2" Text="{Binding DisplayTime}" VerticalAlignment="Center" Margin="10,0" PointerPressed="Time_Pressed" />
+      <Button x:Name="MediaRepeat" Grid.Column="3" Content="{Binding RepeatText}" Click="Repeat_Click" />
+      <Slider x:Name="MediaPosition" Grid.Row="1" Grid.ColumnSpan="4" Minimum="0" Maximum="1" Value="{Binding Position, Mode=OneWay}" ValueChanged="Position_Changed" SmallChange="0.01" />
+    </Grid>
+  </Border>
+</UserControl>

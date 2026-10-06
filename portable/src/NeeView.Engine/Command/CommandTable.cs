@@ -25,6 +25,9 @@ public sealed class CommandTable
     {
         using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("NeeView.Command.command-manifest.json")!;
         Definitions = JsonSerializer.Deserialize<List<CommandDefinition>>(stream)!;
+        _actions["ToggleMediaPlay"] = () => { operation.ToggleMediaPlay(); return Task.CompletedTask; };
+        _actions["PrevMediaPosition"] = () => { operation.MoveMediaPositionCommand("PrevMediaPosition", -1); return Task.CompletedTask; };
+        _actions["NextMediaPosition"] = () => { operation.MoveMediaPositionCommand("NextMediaPosition", 1); return Task.CompletedTask; };
         for (int i = 1; i <= 9; i++) { var name = "MoveToDestinationFolder" + i; _actions[name] = () => operation.ClassifyCommandAsync(name); }
         _actions["UndoDestinationMove"] = () => operation.ReplayDestinationMoveAsync(true);
         _actions["RedoDestinationMove"] = () => operation.ReplayDestinationMoveAsync(false);

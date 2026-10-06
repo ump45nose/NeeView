@@ -1,7 +1,7 @@
 namespace NeeView;
 
 /// <summary>原图像工厂的后端适配与字节缓存，显示资源由租约统一计入预算。</summary>
-public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
+public sealed partial class BitmapFactory(IImageDecoder decoder) : IDisposable
 {
     private sealed class Entry(DecodedImageLease image, bool thumbnail)
     {
@@ -34,7 +34,7 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
     private long _coverRevision;
     public long Budget { get; set; } = 512L * 1024 * 1024;
     public long ThumbnailBudget { get; set; } = 64L * 1024 * 1024;
-    public long ByteCount { get { lock (_sync) return _cache.Values.Concat(_retired).Sum(e => e.Image.ByteCount + e.DisplayBytes); } }
+    public long ByteCount { get { lock (_sync) return _animationBytes + _cache.Values.Concat(_retired).Sum(e => e.Image.ByteCount + e.DisplayBytes); } }
 
     /// <summary>在同一缓存锁下汇总实际像素、显示租约及需求；只读观测不触发回收或解码。</summary>
     /// <returns>不包含内容路径或缓存键的资源快照；显示中的退役条目仍计费。</returns>
@@ -51,8 +51,8 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
                 else main += entry.Image.ByteCount + entry.DisplayBytes;
                 leases += entry.References; waiting += entry.WaitingConsumers;
             }
-            return new(_cache.Count, _retired.Count, _pending.Count, pixels, display, main, thumbnails,
-                leases, waiting, 2 - _decodeSlots.CurrentCount, 1 - _backgroundSlot.CurrentCount, Budget, ThumbnailBudget, _disposed);
+            return new(_cache.Count, _retired.Count, _pending.Count, pixels, display, main + _animationBytes, thumbnails,
+                leases, waiting, 2 - _decodeSlots.CurrentCount, 1 - _backgroundSlot.CurrentCount, Budget, ThumbnailBudget, _disposed, _animationBytes);
         }
     }
 
@@ -215,7 +215,7 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
     /// <summary>只回收没有显示租约的旧像素，当前显示资源不会提前释放。</summary>
     private void Trim()
     {
-        var main = _cache.Values.Concat(_retired).Where(e => !e.IsThumbnail).Sum(e => e.Image.ByteCount + e.DisplayBytes);
+        var main = _animationBytes + _cache.Values.Concat(_retired).Where(e => !e.IsThumbnail).Sum(e => e.Image.ByteCount + e.DisplayBytes);
         var thumbnails = _cache.Values.Concat(_retired).Where(e => e.IsThumbnail).Sum(e => e.Image.ByteCount + e.DisplayBytes);
         // 未超预算时无需分配/排序完整LRU；保留原回收顺序和租约保护。
         if (main <= Budget && thumbnails <= ThumbnailBudget) return;
@@ -230,19 +230,22 @@ public sealed class BitmapFactory(IImageDecoder decoder) : IDisposable
     /// <summary>取消队列并释放未被显示持有的资源；晚到解码自行清理。</summary>
     public void Dispose()
     {
+        AnimatedBitmapLease[] sources;
         lock (_sync)
         {
             if (_disposed) return; _disposed = true; _lifetime.Cancel();
+            sources = _animationSources.ToArray();
             foreach (var entry in _cache.Values) { entry.Cached = false; if (entry.References == 0 && entry.WaitingConsumers == 0) entry.Image.Dispose(); else _retired.Add(entry); }
             _cache.Clear();
         }
+        foreach (var source in sources) source.Dispose();
     }
 }
 
 /// <summary>缓存的无内容标识诊断数据；RSS/原生工作内存由进程采样单独记录。</summary>
 public sealed record BitmapCacheDiagnostics(int CachedEntries, int RetiredEntries, int PendingRequests,
     long PixelBytes, long DisplayBytes, long MainBytes, long ThumbnailBytes, int Leases, int WaitingConsumers,
-    int DecodeSlotsInUse, int BackgroundSlotsInUse, long Budget, long ThumbnailBudget, bool IsDisposed);
+    int DecodeSlotsInUse, int BackgroundSlotsInUse, long Budget, long ThumbnailBudget, bool IsDisposed, long AnimationBytes = 0);
 
 /// <summary>共享像素租约，Avalonia Bitmap 必须先释放再归还租约。</summary>
 public sealed class BitmapLease(DecodedImageLease image, Action<long> addDisplay, Action<long> release) : IDisposable

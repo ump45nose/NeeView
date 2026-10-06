@@ -18,6 +18,7 @@ public sealed class Config
     public BookmarkConfig Bookmark { get; set; } = new();
     public SystemConfig System { get; set; } = new();
     public ArchiveConfig Archive { get; set; } = new();
+    public ImageConfig Image { get; set; } = new();
     public PerformanceConfig Performance { get; set; } = new();
     public PlaylistConfig Playlist { get; set; } = new();
     public AutoHideConfig AutoHide { get; set; } = new();
@@ -41,6 +42,7 @@ public sealed class ArchiveConfig
 {
     public ZipArchiveConfig Zip { get; set; } = new();
     public PdfArchiveConfig Pdf { get; set; } = new();
+    public MediaArchiveConfig Media { get; set; } = new();
 }
 /// <summary>沿原ZIP独立写权限，默认关闭；不能以普通文件权限隐式授权不可逆修改。</summary>
 public sealed class ZipArchiveConfig

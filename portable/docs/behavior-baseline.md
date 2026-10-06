@@ -146,3 +146,5 @@ P5 第十一批：原SettingWindowModel的Page/Section/Item搜索文本、默认
 P5 第十二批：原Archive/ArchiveManager/ArchiveEntryUtility/ArchiveEntryCollection三模式与真实Source/Parent接入。重复名称条目ID不重猜，原父书/内部历史开关/条目恢复保持；临时代理/深度/共享预算为Mac资源适配。嵌套包只读，损坏不误清历史，内部上级路径拒绝。见[契约](p5-nested.md)及[验收](../acceptance/p5-nested-runtime.md)。
 
 P5 第十三批：原PDF归档/页目录/三种尺寸及原JSON配置接入唯一阅读链；CoreGraphics/PDFKit官方绑定替换PDFium。正文直接输出像素，提取才惰性PNG，请求级流初始化/读/关闭串行。密码交互尚未执行，扩展名配置已接入，见[PDF契约](p5-pdf.md)。
+
+P5 图像动画：原AnimatedMediaPlayer帧编号归一位置、Image.IsMediaRepeat、三格式默认、Media.PageSeconds及命令链已迁入。固定源码对照/合成实际解码/正式Headless与APNG原生分别验证，Windows动态播放及长期大型动画未验，见[p5-animated-images.md](p5-animated-images.md)。

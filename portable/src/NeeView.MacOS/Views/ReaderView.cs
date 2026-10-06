@@ -152,6 +152,7 @@ public sealed partial class ReaderView : Control, IDisposable
         if (_disposed) return;
         if (IsBrowsing)
         {
+            ClearAnimations();
             ++_revision; _request?.Cancel(); StopMotion();
             foreach (var image in _images.Values) image.Dispose(); _images.Clear(); _pageErrors.Clear();
             _operation.SetViewport(new CoreSize(Bounds.Width, Bounds.Height), TopLevel.GetTopLevel(this)?.RenderScaling ?? 1);
@@ -172,6 +173,7 @@ public sealed partial class ReaderView : Control, IDisposable
             }
             catch (OperationCanceledException) { if (ReferenceEquals(_request, request)) _request = null; request.Dispose(); return; }
         }
+        ReconcileAnimations(sources);
         foreach (var page in _images.Keys.Except(sources).ToArray()) { _images[page].Dispose(); _images.Remove(page); }
         foreach (var page in _pageErrors.Keys.Except(sources).ToArray()) _pageErrors.Remove(page);
         InvalidateVisual();
@@ -180,7 +182,8 @@ public sealed partial class ReaderView : Control, IDisposable
             foreach (var page in sources)
             {
                 var specification=GetRequest(page);
-                if (_images.TryGetValue(page,out var displayed) && displayed.CanReuse(page,specification)) continue;
+                if (_images.TryGetValue(page,out var displayed) && displayed.CanReuse(page,specification))
+                { await EnsureAnimationAsync(page, specification, revision, request.Token); continue; }
                 BitmapLease lease;
                 try { lease = await _factory.GetAsync(page, specification, request.Token); }
                 catch (EmptyArchivePageException) { if (revision == _revision) _pageErrors[page] = ""; continue; }
@@ -200,8 +203,10 @@ public sealed partial class ReaderView : Control, IDisposable
                 if (_images.Remove(page, out var old)) old.Dispose();
                 BitmapCreationCount++;
                 _pageErrors.Remove(page); _images[page] = new(bitmap, lease, specification, page.ArchiveEntry.Length, page.ArchiveEntry.LastWriteTime); InvalidateVisual();
+                await EnsureAnimationAsync(page, specification, revision, request.Token);
             }
             if (_disposed || revision != _revision || request.IsCancellationRequested) return;
+            SelectCurrentMedia();
             InvalidateVisual();
             if (_awaitingTransition)
             {
@@ -235,7 +240,7 @@ public sealed partial class ReaderView : Control, IDisposable
             {
                 var pages = _transform.GetTargets().Where(t => !t.Source.IsDummy).Select(t => t.Source.Page).Distinct().ToHashSet();
                 _outgoing = new(_transform.GetTargets().ToArray(), _transform.GetMatrix(), GetContentRect(),
-                    _images.Where(p => pages.Contains(p.Key)).ToDictionary(p => p.Key, p => p.Value.Retain()), new(_pageErrors));
+                    _images.Where(p => pages.Contains(p.Key)).ToDictionary(p => p.Key, p => GetMediaDisplay(p.Key, p.Value).Retain()), new(_pageErrors));
             }
         }
         _frame = nextFrame;
@@ -301,8 +306,16 @@ public sealed partial class ReaderView : Control, IDisposable
             else if(source.Page.PageType.IsFolder()) ArchivePageRenderer.Draw(this,context,source.Page,target,images.GetValueOrDefault(source.Page)?.Bitmap,errors.GetValueOrDefault(source.Page)??"正在加载…");
             else if(images.TryGetValue(source.Page,out var image))
             {
+                if (ReferenceEquals(images, _images)) image = GetMediaDisplay(source.Page, image);
                 var crop=source.ViewSizeCalculator.GetViewBox(); var pixels=image.Bitmap.PixelSize;
                 context.DrawImage(image.Bitmap,new Avalonia.Rect(crop.X*pixels.Width,crop.Y*pixels.Height,crop.Width*pixels.Width,crop.Height*pixels.Height),target);
+                if (errors.GetValueOrDefault(source.Page) is { Length: > 0 } error)
+                {
+                    // 静态首帧可用时仍明确显示动画失败，不能悄悄把不支持当作播放成功。
+                    using var clip = context.PushClip(target);
+                    context.FillRectangle(new SolidColorBrush(Color.Parse("#D9202020")),new Avalonia.Rect(target.TopLeft,new Avalonia.Size(target.Width,36)));
+                    DrawText(context,"动画未播放："+error,target.TopLeft+new Avalonia.Vector(8,8));
+                }
             }
             else { context.FillRectangle(new SolidColorBrush(Color.Parse("#202020")),target); DrawText(context,source.Page.Content.Error??errors.GetValueOrDefault(source.Page)??"正在加载…",target.TopLeft+new Avalonia.Vector(12,12)); }
         }
@@ -651,6 +664,7 @@ public sealed partial class ReaderView : Control, IDisposable
     public void Dispose()
     {
         if (_disposed) return; CancelMouseSequence(); StopMotion(); _disposed = true; ++_revision; _request?.Cancel(); _request = null;
+        ClearAnimations();
         foreach (var item in _images.Values) item.Dispose(); _images.Clear(); _pageErrors.Clear();
         _browse?.Dispose(); _panorama = null; _panoramaRecenter = null;
         _transform.Dispose();

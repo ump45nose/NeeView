@@ -23,7 +23,17 @@
         <TextBlock Classes="settings-section" Text="源图像尺寸" FontSize="{DynamicResource SystemFontSizeLarge}" />
         <CheckBox x:Name="PdfLimitSource" Content="限制源尺寸（当前用于 PDF 页面）" IsChecked="{Binding IsLimitSourceSize, Mode=TwoWay}" />
         <Grid ColumnDefinitions="*,Auto,*"><NumericUpDown x:Name="PdfMaximumWidth" AutomationProperties.Name="最大源宽度" Value="{Binding MaximumWidth, Mode=TwoWay}" Minimum="1024" Maximum="{Binding MaximumWidthMaximum}" Increment="256" /><TextBlock Grid.Column="1" Text=" × " VerticalAlignment="Center" /><NumericUpDown x:Name="PdfMaximumHeight" Grid.Column="2" AutomationProperties.Name="最大源高度" Value="{Binding MaximumHeight, Mode=TwoWay}" Minimum="1024" Maximum="{Binding MaximumHeightMaximum}" Increment="256" /></Grid>
-        <TextBlock Text="保存后用于后续尺寸探测及渲染；已打开页面不会因修改表单重新扫描。密码/分卷读取尚未迁入。" TextWrapping="Wrap" />
+        <TextBlock Text="保存后用于后续尺寸探测及渲染；已打开页面不会因修改表单重新扫描。密码读取已接入，分卷尚未迁入。" TextWrapping="Wrap" />
+        <StackPanel x:Name="AnimationSettings" Spacing="10">
+          <TextBlock Classes="settings-section" Text="图像动画" FontSize="{DynamicResource SystemFontSizeLarge}" />
+          <CheckBox x:Name="AnimatedGifEnabled" Content="播放 GIF 动画" IsChecked="{Binding Gif, Mode=TwoWay}" />
+          <CheckBox x:Name="AnimatedPngEnabled" Content="播放 PNG / APNG 动画" IsChecked="{Binding Png, Mode=TwoWay}" />
+          <CheckBox x:Name="AnimatedWebpEnabled" Content="播放 WebP 动画" IsChecked="{Binding Webp, Mode=TwoWay}" />
+          <CheckBox x:Name="ImageMediaRepeat" Content="循环播放图像动画" IsChecked="{Binding Repeat, Mode=TwoWay}" />
+          <TextBlock Text="媒体快进 / 倒带步长（秒）" />
+          <NumericUpDown x:Name="MediaPageSeconds" Value="{Binding PageSeconds, Mode=TwoWay}" Minimum="{Binding SecondsMinimum}" Maximum="{Binding SecondsMaximum}" Increment="1" FormatString="0.#####" />
+          <TextBlock Text="长动画会消耗较多内存。关闭相应格式后读取首帧；缩略图、连续阅读和瀑布流使用首帧，分页中播放。" TextWrapping="Wrap" />
+        </StackPanel>
       </StackPanel>
     </ScrollViewer>
     <ScrollViewer x:Name="FontSettings" Grid.Column="1" IsVisible="False">

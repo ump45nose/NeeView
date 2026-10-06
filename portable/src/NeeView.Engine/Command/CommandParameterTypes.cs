@@ -24,6 +24,7 @@ public static class CommandParameterTypes
         "SetStretchModeUniform" => typeof(StretchModeCommandParameter),
         "ToggleViewFlipHorizontal" or "ToggleViewFlipVertical" or "TogglePlaylistItem" or "ToggleBookLock" => typeof(ToggleCommandParameter),
         "PrevPlaylistItemInBook" => typeof(MovePlaylistItemInBookCommandParameter),
+        "PrevMediaPosition" or "NextMediaPosition" => typeof(MoveMediaPositionCommandParameter),
         "PrevPage" or "PrevOnePage" or "FirstPage" or "PrevFolderPage" => typeof(ReversibleCommandParameter),
         _ => null
     };

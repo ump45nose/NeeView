@@ -470,3 +470,7 @@ P5第十四批：原PDF SupportFileTypes与集合字符串JSON接入唯一来源
 ## P5 第十六批：ZIP/RAR/7z密码
 
 原索引/抽取重试关系沿现有口令契约接入；51相关专项、1318全量通过/2资源跳过、10实际原生后台通过，正式ARM64构建/本地签名通过。已修复加密RAR索引/Volume顺序；真实图片Headless检查通过，加密ZIP保持只读。见[契约](../docs/p5-compressed-password.md)及[验收](p5-compressed-password-runtime.md)。效果/媒体/脚本、完整原设置、真实导出和正式分发继续推进，P5整体未完成。
+
+## P5 第十七批：原动图与媒体条
+
+GIF/WebP与官方ImageIO APNG沿原工厂/页框/JSON接入，原播放状态、前后独立参数、循环及底部媒体条保持。22新增、1340全量通过/2资源跳过、14官方原生后台通过，正式ARM64构建/本地签名通过；首帧取消/晚到资源、默认差分/失败重试与正式Headless像素分别回归。见[契约](../docs/p5-animated-images.md)与[验收](p5-animated-images-runtime.md)。幻灯/视频/效果/脚本、完整设置/真实导出/设备/正式分发仍继续，P5未完成。

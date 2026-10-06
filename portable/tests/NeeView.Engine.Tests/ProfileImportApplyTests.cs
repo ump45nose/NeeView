@@ -337,7 +337,7 @@ public sealed class ProfileImportApplyTests
             Assert.True(Walk(rebuilt.FindControl<Menu>("MenuBar")!).Single(m => m.Tag as string == "ImportBackup").IsEnabled);
             var implementation = typeof(MainWindow).GetMethod("IsCommandImplemented", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
             var items = new CommandTable(rebuiltOperation!).Definitions.Select(d => new { d.Name, d.Source, implemented = (bool)implementation.Invoke(rebuilt, [d.Name])! }).ToArray();
-            Assert.Equal(235, items.Length); Assert.Equal(168, items.Count(i => i.implemented));
+            Assert.Equal(235, items.Length); Assert.Equal(171, items.Count(i => i.implemented));
             if (System.Environment.GetEnvironmentVariable("NEEVIEW_P5_APPLY_COMMAND_ARTIFACT") is { } report)
                 await File.WriteAllTextAsync(report, JsonSerializer.Serialize(new { scope = "正式窗口已装配读取器与导入回调；执行入口数不代表覆盖率", total = items.Length, implemented = items.Count(i => i.implemented), items }, new JsonSerializerOptions { WriteIndented = true }), Token);
             await window.ExecuteAsync("NextPage"); // 已关闭入口不再访问或保存旧实例。

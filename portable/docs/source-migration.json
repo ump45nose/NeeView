@@ -2396,6 +2396,54 @@
       "target": "src/NeeView.Backends/Content/ArchiveFactory.cs",
       "sha256": "a59d8bd9c2b72920732b9035d601d411681fe409d21d6652584fd0b00e3a5d79",
       "status": "P5第十六批：保留原索引/抽取口令重试关系；SharpCompress替换Windows SevenZip，来源私有候选/顺序重开/真实抽取验证，密码输入在后台槽外等待，RAR4/7z校验按格式区分，ZIP加密只读"
+    },
+    {
+      "source": "NeeView/PageSelect/MediaControl/AnimatedMediaPlayer.cs",
+      "target": "src/NeeView.Engine/Bitmap/AnimatedMediaPlayer.cs",
+      "sha256": "40fbfe76bd8ddc71c0cefef9f1b577caad36d2be711145d75e327a616b7ffc9e",
+      "status": "P5图像动画子集：保留原位置/播放/循环/配置，资源和时钟替换；范围见p5-animated-images.md"
+    },
+    {
+      "source": "NeeView/PageSelect/MediaControl/MediaPlayerOperator.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Media.cs",
+      "sha256": "d2f190e3c77785d0030346607b92f75fba22eb14f239d567153d51c0ff3b61db",
+      "status": "P5图像动画子集：保留原位置/播放/循环/配置，资源和时钟替换；范围见p5-animated-images.md"
+    },
+    {
+      "source": "NeeView/Page/AnimatedPageContent.cs",
+      "target": "src/NeeView.Engine/Bitmap/BitmapFactory.Animated.cs",
+      "sha256": "30f786032e3a47535a3f172a47b903cb5b80a585bbf4a3982a86b61be91da08c",
+      "status": "P5图像动画子集：保留原位置/播放/循环/配置，资源和时钟替换；范围见p5-animated-images.md"
+    },
+    {
+      "source": "NeeView/Picture/PictureProfile.cs",
+      "target": "src/NeeView.Engine/Bitmap/AnimatedImageContracts.cs",
+      "sha256": "4c35f8b46336a1088c8b35bdc9c585a74b085f283340a75ce5070e43b387f54d",
+      "status": "P5图像动画子集：保留原位置/播放/循环/配置，资源和时钟替换；范围见p5-animated-images.md"
+    },
+    {
+      "source": "NeeView/Config/ImageConfig.cs",
+      "target": "src/NeeView.Engine/Config/ImageConfig.cs",
+      "sha256": "18137579618be5fbb5e90c92791a6c04fe22481a4ff82ab44943e79db3d5802b",
+      "status": "P5图像动画子集：保留原位置/播放/循环/配置，资源和时钟替换；范围见p5-animated-images.md"
+    },
+    {
+      "source": "NeeView/Config/ImageStandardConfig.cs",
+      "target": "src/NeeView.Engine/Config/ImageConfig.cs",
+      "sha256": "35874532519b1e933c451ae7d92a0cb160f8daeb66001b08fb0612f55132a325",
+      "status": "P5图像动画子集：保留原位置/播放/循环/配置，资源和时钟替换；范围见p5-animated-images.md"
+    },
+    {
+      "source": "NeeView/Config/MediaArchiveConfig.cs",
+      "target": "src/NeeView.Engine/Config/ImageConfig.cs",
+      "sha256": "d669494d69b3ffd0e64ca1ee9479c8fbc82f9f08047e33ac563b891fae0d47fe",
+      "status": "P5图像动画子集：保留原位置/播放/循环/配置，资源和时钟替换；范围见p5-animated-images.md"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/MoveMediaPageCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/MoveMediaPositionCommandParameter.cs",
+      "sha256": "efb7aff923edbbf2b20167d3e356c7b3b254134e371f8813858fa2114cc4a61f",
+      "status": "原独立Delta、非负五位精度与零值全局回退；前后命令分别保存，沿原参数编辑/差分JSON"
     }
   ],
   "rule_references": [
@@ -2658,6 +2706,18 @@
       "target": "src/NeeView.MacOS/Views/PasswordDialog.axaml",
       "sha256": "885c3fefa0b38d1cccf74eadf57eb3874292af225b7efa24dfc07e51879e6ff5",
       "status": "转换原拥有窗口/非空确认/Enter/Escape/取消；只收集文本，不读取来源或保存"
+    },
+    {
+      "source": "NeeView/PageSelect/MediaControl/MediaControlView.xaml",
+      "target": "src/NeeView.MacOS/Views/MediaControlView.axaml",
+      "sha256": "14afd66a5d29af31638748806801f9b3e8fabd47afa4e5f597351fb00277c102",
+      "status": "原底部媒体位置/播放/循环/时间表现转换，动图无音轨禁用"
+    },
+    {
+      "source": "NeeView/PageSelect/MediaControl/MediaControlViewModel.cs",
+      "target": "src/NeeView.MacOS/ViewModels/MediaControlViewModel.cs",
+      "sha256": "2a945e371f78003ccc13e4470b5caebd95466225a10e101a3248621d00f27bf9",
+      "status": "原底部媒体位置/播放/循环/时间表现转换，动图无音轨禁用"
     }
   ],
   "backend_reuse": [

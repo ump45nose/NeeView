@@ -133,7 +133,7 @@ public sealed class ListTemplateTests
             await window.OpenAsync(fixture.Images); await operation.SaveAsync(); await state.RegisterBookmarkAsync(operation.Book!, token: TestContext.Current.CancellationToken);
             model.ShowPanel("HistoryPanel"); Dispatcher.UIThread.RunJobs(); await SettleAsync(window); var book = operation.Book;
             var list = window.FindControl<ListBox>("HistoryList")!; var selected = list.SelectedItem;
-            Assert.Contains(list.GetVisualDescendants().OfType<ListCoverImage>(), cover => cover.HasImage); SaveImage(window, "content");
+            await WaitForCoverAsync(window, list); SaveImage(window, "content");
             await window.SetListStyleAsync(true, PanelListItemStyle.Banner); await SettleAsync(window); Assert.Same(book, operation.Book); Assert.Same(selected, list.SelectedItem);
             Assert.All(list.GetVisualDescendants().OfType<PanelListItemView>(), view => Assert.Equal(PanelListItemStyle.Banner, view.DisplayStyle)); SaveImage(window, "banner");
             var bookmark = window.FindControl<BookmarkListView>("BookmarkPanelList")!; await bookmark.SetListStyleAsync(PanelListItemStyle.Thumbnail); await window.SetListStyleAsync(false, PanelListItemStyle.Normal);
@@ -143,7 +143,7 @@ public sealed class ListTemplateTests
             await window.SetListStyleAsync(true, PanelListItemStyle.Thumbnail); Assert.Equal(PanelListItemStyle.Banner, Config.Current.History.PanelListItemStyle); Assert.Same(selected, list.SelectedItem); Assert.Same(book, operation.Book);
             await bookmark.SetListStyleAsync(PanelListItemStyle.Normal); Assert.Equal(PanelListItemStyle.Thumbnail, Config.Current.Bookmark.PanelListItemStyle);
             Directory.Delete(file); await window.SetListStyleAsync(true, PanelListItemStyle.Content); await SettleAsync(window);
-            Assert.Contains(list.GetVisualDescendants().OfType<ListCoverImage>(), cover => cover.HasImage);
+            await WaitForCoverAsync(window, list);
         }
         finally { await window.PrepareShutdownAsync(); window.Close(); }
     }
@@ -164,6 +164,21 @@ public sealed class ListTemplateTests
         Dispatcher.UIThread.RunJobs(); window.UpdateLayout();
         await Task.WhenAll(window.GetVisualDescendants().OfType<ListCoverImage>().Select(cover => cover.Loading)).WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs(); window.UpdateLayout();
+    }
+    /// <summary>模板切换后有效视口可能在下一帧才发布；等待当前封面，失败仍回报真实后端错误。</summary>
+    private static async Task WaitForCoverAsync(Window window, ListBox list)
+    {
+        var deadline = System.Diagnostics.Stopwatch.StartNew();
+        while (deadline.Elapsed < TimeSpan.FromSeconds(10))
+        {
+            Dispatcher.UIThread.RunJobs(); window.UpdateLayout();
+            var covers = list.GetVisualDescendants().OfType<ListCoverImage>().ToArray();
+            if (covers.Any(cover => cover.HasImage)) return;
+            if (covers.Any(cover => cover.Error is not null)) break;
+            await Task.Delay(20, TestContext.Current.CancellationToken);
+        }
+        Assert.Fail("当前列表封面未完成：" + string.Join("; ", list.GetVisualDescendants().OfType<ListCoverImage>()
+            .Select(cover => $"bounds={cover.Bounds}, visible={cover.IsVisible}, task={cover.Loading.Status}, error={cover.Error}")));
     }
     private static void SaveImage(Window window, string suffix)
     {

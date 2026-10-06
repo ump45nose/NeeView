@@ -157,6 +157,9 @@ public sealed partial class MainWindow : Window
         model.Operation.MarkersChanged += Model_MarkersChanged;
         model.HistoryRefreshed += History_Refreshed;
         Viewer.Attach(model.Operation, images); model.Refreshed += Model_Refreshed;
+        var mediaControl = this.FindControl<MediaControlView>("DockMediaControlSocket")!;
+        mediaControl.Attach(model.Operation, Viewer.RefreshMediaAsync); mediaControl.Failed += (_, message) => ShowError(message);
+        Viewer.MediaChanged += (_, _) => { mediaControl.UpdatePlayer(); if (!_preparing && !_closedPrepared) { MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!,GetCommandCheck);RefreshHistoryCommandStates(); } };
         model.PanelsRefreshed += Model_PanelsRefreshed;
         _leftWidth = model.LeftWidth; _rightWidth = model.RightWidth; UpdatePanelColumns(); model.Attach();
         FilmStrip.Attach(model.Operation, images); NavigatorView.Attach(model.Operation, images);
@@ -180,6 +183,7 @@ public sealed partial class MainWindow : Window
     /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
     public bool IsCommandAvailable(string name) => name switch
     {
+        "ToggleMediaPlay" or "PrevMediaPosition" or "NextMediaPosition" => _model?.Operation.MediaExists() == true,
         var command when PagedTransformCommands.Contains(command) && _model?.Operation.IsFrameReading != true => false,
         "Unload" => _model?.Operation.CanUnload == true,
         "MoveToFolderAs" or "CopyToFolderAs" or "MoveBookToFolderAs" or "CopyBookToFolderAs" => IsDestinationCommandAvailable(name),
@@ -222,6 +226,7 @@ public sealed partial class MainWindow : Window
     /// <summary>原菜单绑定的勾选表现；只读取引擎配置，不在菜单中维护第二套状态。</summary>
     private bool? GetCommandCheck(string name) => name switch
     {
+        "ToggleMediaPlay" => _model?.Operation.IsMediaPlaying(),
         "ToggleBookLock" => _model?.Operation.IsBookLocked,
         "ToggleIsPanorama" => Config.Current.Book.IsPanorama,
         "SetPageOrientationHorizontal" => Config.Current.Book.Orientation == PageFrameOrientation.Horizontal,
@@ -323,6 +328,7 @@ public sealed partial class MainWindow : Window
         if (history) settings.SelectHistoryPage();
         await settings.ShowDialog(this);
         if (settings.WasSaved && !_preparing && !_closedPrepared) RefreshFonts();
+        if (settings.WasSaved && !_preparing && !_closedPrepared) await Viewer.RefreshAsync();
         if (settings.WasSaved && _themePresenter is not null) await _themePresenter.RefreshAsync();
         if (_preparing || _closedPrepared) return;
         _model.RefreshSelection(); _model.RefreshPanels(); await FilmStrip.RefreshAsync(); BuildMenus();
@@ -342,6 +348,8 @@ public sealed partial class MainWindow : Window
         {
             switch (name)
             {
+                case "ToggleMediaPlay": case "PrevMediaPosition": case "NextMediaPosition":
+                    await _model.Commands.ExecuteAsync(name); await Viewer.RefreshMediaAsync(); break;
                 case "ImportBackup":
                 case "PreviewProfileImport": await ShowProfileImportAsync(); break;
                 case "LoadAs":
@@ -911,6 +919,7 @@ public sealed partial class MainWindow : Window
             _historyCleanupCancellation?.Cancel();
             if (_historyCleanupTask is not null) await _historyCleanupTask;
             await this.FindControl<PlaylistView>("PlaylistPanelView")!.PrepareCloseAsync();
+            await this.FindControl<MediaControlView>("DockMediaControlSocket")!.PrepareCloseAsync();
             await this.FindControl<BookmarkListView>("BookmarkPanelList")!.PrepareCloseAsync();
             if (_model is not null) await _model.HistorySearch.PrepareCloseAsync();
             if (_model is not null) { await _model.PageSearch.PrepareCloseAsync(); await _model.FolderSearch.PrepareCloseAsync(); }
@@ -937,13 +946,14 @@ public sealed partial class MainWindow : Window
                 _model.Refreshed -= PageNavigation_Refreshed;
             }
             this.FindControl<PlaylistView>("PlaylistPanelView")!.Dispose();
+            this.FindControl<MediaControlView>("DockMediaControlSocket")!.Dispose();
             this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.Dispose();
             this.FindControl<BookmarkListView>("BookmarkPanelList")!.Dispose();
             _autoHide?.Dispose(); _sidePanels?.Dispose(); _platformInput?.Dispose(); FilmStrip.Dispose(); NavigatorView.Dispose(); Viewer.Dispose(); _images?.Dispose(); _closedPrepared = true;
         }
         finally
         {
-            if (!_closedPrepared) { _sidePanels?.CancelClose(); this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.CancelClose(); this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); this.FindControl<BookmarkListView>("BookmarkPanelList")!.CancelClose(); _model?.HistorySearch.CancelClose(); _model?.PageSearch.CancelClose(); _model?.FolderSearch.CancelClose(); }
+            if (!_closedPrepared) { this.FindControl<MediaControlView>("DockMediaControlSocket")!.CancelClose(); _sidePanels?.CancelClose(); this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.CancelClose(); this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); this.FindControl<BookmarkListView>("BookmarkPanelList")!.CancelClose(); _model?.HistorySearch.CancelClose(); _model?.PageSearch.CancelClose(); _model?.FolderSearch.CancelClose(); }
             _preparing = false; _shutdown = null;
         }
     }

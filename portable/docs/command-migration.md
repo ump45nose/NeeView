@@ -156,9 +156,9 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | NextBookHistory | 前进到下一本书籍 | Alt+Right |  | 已接入 | P2 原导航历史接入；具体范围见验收表 | NeeView/Command/Commands/NextBookHistoryCommand.cs |
 | MoveToParentBook | 打开父文件夹 | Alt+Up |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/MoveToParentBookCommand.cs |
 | MoveToChildBook | 打开本书 | Alt+Down |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/MoveToChildBookCommand.cs |
-| ToggleMediaPlay | 视频播放/停止 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleMediaPlayCommand.cs |
-| PrevMediaPosition | 视频倒带 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/PrevMediaPositionCommand.cs |
-| NextMediaPosition | 视频快进 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/NextMediaPositionCommand.cs |
+| ToggleMediaPlay | 视频播放/停止 |  |  | 已接入 | P5当前图像动画，原播放/秒数步长；视频仍待迁 | NeeView/Command/Commands/ToggleMediaPlayCommand.cs |
+| PrevMediaPosition | 视频倒带 |  |  | 已接入 | P5当前图像动画，原播放/秒数步长；视频仍待迁 | NeeView/Command/Commands/PrevMediaPositionCommand.cs |
+| NextMediaPosition | 视频快进 |  |  | 已接入 | P5当前图像动画，原播放/秒数步长；视频仍待迁 | NeeView/Command/Commands/NextMediaPositionCommand.cs |
 | ToggleBookOrder | 切换书籍顺序 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/ToggleBookOrderCommand.cs |
 | SetBookOrderByFileNameA | 书名升序 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/SetBookOrderByFileNameACommand.cs |
 | SetBookOrderByFileNameD | 书名降序 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/SetBookOrderByFileNameDCommand.cs |
@@ -249,3 +249,5 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 P4第一批原九数字、MoveToFolderAs及Undo/Redo接入，数字默认输入1–9并保留可配置Index。第一批仅Once普通目录主图；第二批已迁入原多页策略及普通目录CopyToFolderAs，归档实体化复制待后续。DeleteFile/RenameBook已分别接入，CopyFile/CopyBook/Paste由第五批接入；CutFile/CutBook按用户决定保持禁用占位。菜单能力受原写权限/当前来源/有效目标/忙碌约束；详见[p4-destination-folders.md](p4-destination-folders.md)。
 
 P4收尾不新增命令：原235实例、167执行入口/68占位保持。DeleteFile主菜单仍单主页，页面列表Delete为显式多选，普通实体/列表登记/ZIP分别处理；ZIP独立写权限且永久删除始终确认。Paste支持标准图片/HTML/URL及原失败回退；Mac链接自身操作接入。Cut继续按用户决定禁用。详见[p4-completion.md](p4-completion.md)。
+
+P5 第十七批接通原三个媒体命令，当前171执行入口/64占位；235原实例保持，数量不代表功能覆盖率。视频及高级自动播放继续待迁。

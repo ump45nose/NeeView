@@ -115,7 +115,7 @@ public sealed partial class MacApp : Avalonia.Application
             if (_fileOperations is null) { _fileOperations = new FileOperationBackend(Path.Combine(directory, "FileRecovery")); recovery = await _fileOperations.RecoverAsync(); }
             recovery = recovery.Concat(await state.RecoverBookRenameAsync(_fileOperations)).ToArray();
             if (_shuttingDown) return;
-            var decoder = new MagickImageDecoder(); operation = new BookOperation(new Backends.ArchiveFactory(MacFileAliases.Resolve, new MacPdfRenderer()), decoder, state);
+            var decoder = new MagickImageDecoder(new MacAnimatedPngDecoder()); operation = new BookOperation(new Backends.ArchiveFactory(MacFileAliases.Resolve, new MacPdfRenderer()), decoder, state);
             _destinationMoves ??= new(_fileOperations);
             images = new BitmapFactory(decoder); operation.AttachFileOperations(_destinationMoves, _fileOperations, images);
             operation.AttachFileClipboard(new MacFileClipboard());

@@ -130,11 +130,14 @@
       <StackPanel>
         <!-- 保持原底部插槽，可见窗口缩略图由共享工厂加载。 -->
         <local:ThumbnailView x:Name="DockFilmStripSocket" Height="{Binding FilmStripHeight}" IsVisible="{Binding FilmStripVisible}" />
+        <Grid x:Name="SliderArea">
         <Grid x:Name="DockPageSliderSocket" ColumnDefinitions="Auto,*,Auto" Margin="10,0" Height="{Binding SliderThickness}" Opacity="{Binding SliderOpacity}" IsVisible="{Binding SliderVisible}">
           <Slider x:Name="PageSliderView" Grid.Column="1" MinHeight="0" Minimum="0" Maximum="{Binding LastIndex}" Value="{Binding PageIndex, Mode=OneWay}" IsDirectionReversed="{Binding SliderReversed}" SmallChange="1" IsSnapToTickEnabled="True" TickFrequency="1" ValueChanged="Slider_ValueChanged" />
           <local:PageMarkersView x:Name="PageMarkers" Grid.Column="1" Margin="6,0" IsHitTestVisible="False" Indices="{Binding MarkerIndices}" Maximum="{Binding LastIndex}" IsReversed="{Binding SliderReversed}" IsVisible="{Binding SliderMarksVisible}" />
           <!-- 页号编辑/焦点反馈独立于窗口、主题及原正文定位规则。 -->
           <local:SliderTextBox x:Name="PageNumberView" Grid.Column="{Binding SliderNumberColumn}" IsVisible="{Binding SliderNumberVisible}" Margin="8,0" Value="{Binding PageIndex, Mode=OneWay}" Maximum="{Binding LastIndex}" SourceKey="{Binding SliderSource}" />
+        </Grid>
+        <local:MediaControlView x:Name="DockMediaControlSocket" VerticalAlignment="Bottom" />
         </Grid>
         <TextBlock x:Name="StatusField" Text="{Binding Status}" TextTrimming="CharacterEllipsis" FontSize="11" Margin="10,0,10,5" />
       </StackPanel>
