@@ -49,6 +49,10 @@ public interface IArchiveFactory
     }
     /// <summary>打开目录、ZIP、RAR 或 7z。调用方负责释放返回来源。</summary>
     Task<Archive> OpenAsync(string path, CancellationToken token);
+    /// <summary>原CreateArchiveAsync(entry)；保留父归档/重复条目ID，返回来源借用父来源且由调用方释放。</summary>
+    /// <param name="entry">仍由父书拥有的真实来源条目。</param><param name="token">读取取消。</param>
+    /// <returns>独立子来源；默认实现保持既有后端路径入口。</returns>
+    Task<Archive> OpenAsync(ArchiveEntry entry, CancellationToken token) => OpenAsync(entry.TargetArchiveEntry.SystemPath, token);
     /// <summary>可靠检查真实或归档内部定位；仅确定缺失返回false，权限/断线/不支持传播。</summary>
     Task<bool> ExistsAsync(string path, CancellationToken token) => throw new NotSupportedException("来源存在检查尚未实现。");
     /// <summary>列出直接子目录，用于 P1 基础导航。</summary>

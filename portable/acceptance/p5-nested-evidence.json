@@ -1,0 +1,116 @@
+{
+  "baseline": "c5c398d89",
+  "start_commit": "d2e0323ff",
+  "new_tests": [
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.OriginalCollectionModesOnlyFlattenNestedArchiveWhenRequested(mode: IncludeSubArchives, count: 6)",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.NestedNamesAndDuplicateIdsUseOriginalSourceEntryInsteadOfPathReopen",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.FormalViewerLoadsNestedContentAndShutdownReturnsResources",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.ArchiveParentSegmentsCannotResolveToOutsideBookOrCreateExtractedNames",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.OriginalCollectionModesOnlyFlattenNestedArchiveWhenRequested(mode: IncludeSubDirectories, count: 2)",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.NestedRarAndSevenZipKeepPhysicalReaderAndBorrowedParent(fixture: \"Rar.rar\")",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.NestedRarAndSevenZipKeepPhysicalReaderAndBorrowedParent(fixture: \"7Zip.LZMA.7z\")",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.OriginalInnerHistorySwitchAppliesToRealParentAndLeavesLogicalDirectoriesEnabled",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.NestedDepthBudgetAndPartialWriteAreBoundedAndRetryable",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.OriginalCollectionModesOnlyFlattenNestedArchiveWhenRequested(mode: CurrentDirectory, count: 2)",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.NestedRarAndSevenZipKeepPhysicalReaderAndBorrowedParent(fixture: \"Rar5.solid.rar\")",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.RestoreAfterCloseKeepsNestedBookAndOriginalPageName",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.NestedZipIsReadOnlyEvenWhenRootZipDeletionIsEnabled",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.NestedRarAndSevenZipKeepPhysicalReaderAndBorrowedParent(fixture: \"Rar.solid.rar\")",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.ParentBookFollowsOriginalArchiveCollectionMode(mode: CurrentDirectory)",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.ParentBookFollowsOriginalArchiveCollectionMode(mode: IncludeSubDirectories)",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.DeepExplicitImageAndHistoryUseLogicalPathAndReleaseWholeOwnedChain(mode: IncludeSubArchives)",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.DeepExplicitImageAndHistoryUseLogicalPathAndReleaseWholeOwnedChain(mode: CurrentDirectory)",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.CancelledBackgroundWaitKeepsInputUntilActualWorkAndReleasesLateOutput",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.DeepExplicitImageAndHistoryUseLogicalPathAndReleaseWholeOwnedChain(mode: IncludeSubDirectories)",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.BadNestedArchiveAndMissingTargetDoNotLeakTemporaryMaterialOrReplaceCurrentBook",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.ParentBookFollowsOriginalArchiveCollectionMode(mode: IncludeSubArchives)",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NeeView.Engine.Tests.NestedArchiveTests.NestedRarAndSevenZipKeepPhysicalReaderAndBorrowedParent(fixture: \"7Zip.solid.7z\")",
+      "outcome": "Passed"
+    }
+  ],
+  "related_targeted_passed": 53,
+  "full": {
+    "passed": 1262,
+    "failed": 0,
+    "resource_skipped": 2,
+    "total": 1264
+  },
+  "independent_review": "p5_nested_review: 无确认缺陷；父链/借用、逻辑/物理路径、存在错误传播及只读能力",
+  "native_formats": [
+    "ZIP",
+    "RAR",
+    "solid RAR",
+    "solid RAR5",
+    "7z",
+    "solid 7z"
+  ],
+  "scope": "隔离夹具及正式Headless；未激活应用/修改用户Profile或图片，非Windows/设备动态验收",
+  "archive": "/Users/yuwk/.codex/artifacts/neeview/p5-nested-20261006/final-full"
+}

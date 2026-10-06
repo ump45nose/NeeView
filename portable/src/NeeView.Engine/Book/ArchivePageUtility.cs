@@ -84,7 +84,7 @@ public static class ArchivePageUtility
             }
             else
             {
-                var archive = await archives.OpenAsync(entry.SystemPath, token); cover.Own(archive);
+                var archive = await archives.OpenAsync(entry, token); cover.Own(archive);
                 entries = await archive.GetEntriesAsync(token);
             }
             return await SelectEntriesAsync(entries, archives, depth, match, cover, token);

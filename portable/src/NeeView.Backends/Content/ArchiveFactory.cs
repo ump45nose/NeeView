@@ -52,11 +52,20 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
     /// <summary>后台列出当前目录直接子目录，不随同目录翻页重复调用。</summary>
     public Task<IReadOnlyList<FolderItem>> ListFoldersAsync(string path, CancellationToken token) => SourceIo.RunAsync<IReadOnlyList<FolderItem>>(() =>
         new DirectoryInfo(path).EnumerateDirectories().Where(e => !e.Name.StartsWith('.')).Select(e => { token.ThrowIfCancellationRequested(); return new FolderItem(e.Name, e.FullName); }).OrderBy(e => e.Name, NaturalSort.Comparer).ToList(), token);
-    /// <summary>图片转所在目录；不支持的归档返回明确提示。</summary>
-    public Task<Archive> OpenAsync(string path, CancellationToken token) => SourceIo.RunAsync<Archive>(() =>
+    /// <summary>打开真实来源或逐层解析归档逻辑定位；调用方拥有完整返回链。</summary>
+    /// <param name="path">用户/历史逻辑路径，不能是应用解压材料。</param><param name="token">解析及抽取取消。</param>
+    /// <returns>唯一Archive来源，临时文件不进入Path。</returns>
+    public async Task<Archive> OpenAsync(string path, CancellationToken token)
     {
-        token.ThrowIfCancellationRequested(); path = System.IO.Path.GetFullPath(path);
-        // Finder打开别名的系统含义是打开其目标。原生解析只由启动装配注入，不模拟Windows.lnk。
+        var target = await OpenRootAsync(path, token).ConfigureAwait(false);
+        if (target.Relative is null) return target.Archive;
+        try { return await ResolveInnerAsync(target.Archive, target.Relative, token).ConfigureAwait(false); }
+        catch { await target.Archive.DisposeAsync(); throw; }
+    }
+    /// <summary>仅在有界后台槽检查真实路径、别名及根归档；不在持槽期间等待子来源读取。</summary>
+    private Task<ArchiveOpenTarget> OpenRootAsync(string path, CancellationToken token) => SourceIo.RunAsync(() =>
+    {
+        token.ThrowIfCancellationRequested(); RejectInnerParentTraversal(path); path = System.IO.Path.GetFullPath(path);
         if (resolveAlias is not null)
         {
             var seen = new HashSet<string>(StringComparer.Ordinal);
@@ -67,7 +76,6 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
                 path = System.IO.Path.GetFullPath(target);
             }
         }
-        // 原归档内逻辑路径：只在完整路径不存在时回溯真实归档，尊重名称含 .cbz 的普通目录。
         if (!File.Exists(path) && !Directory.Exists(path))
         {
             var parent = System.IO.Path.GetDirectoryName(path);
@@ -75,41 +83,34 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
             {
                 token.ThrowIfCancellationRequested();
                 if (File.Exists(parent) && ArchiveFormats.IsCompressedArchive(parent))
-                {
-                    var relative = System.IO.Path.GetRelativePath(parent, path);
-                    var compressed = new CompressedArchive(parent);
-                    try
-                    {
-                        if (compressed.ContainsDirectory(relative)) return new ArchiveDirectory(compressed, path, relative);
-                        if (!compressed.ContainsFile(relative)) throw new FileNotFoundException("归档内部指定页面或目录不存在：" + relative);
-                        if (ArchiveFormats.IsArchive(relative)) throw new NotSupportedException("嵌套归档尚未迁移。");
-                        if (Config.Current.System.ArchiveRecursiveMode == ArchiveEntryCollectionMode.CurrentDirectory && relative.Contains('/'))
-                        {
-                            var slash = relative.LastIndexOf('/');
-                            return new ArchiveDirectory(compressed, System.IO.Path.GetDirectoryName(path)!, relative[..slash]) { RequestedEntryName = relative[(slash + 1)..] };
-                        }
-                        return new RequestedArchive(compressed, relative);
-                    }
-                    catch { compressed.DisposeAsync().AsTask().GetAwaiter().GetResult(); throw; }
-                }
+                    return new ArchiveOpenTarget(new CompressedArchive(parent), System.IO.Path.GetRelativePath(parent, path));
                 if (Directory.Exists(parent)) break;
                 parent = System.IO.Path.GetDirectoryName(parent);
             }
         }
+        Archive archive;
         if (ImageFormats.IsImage(path))
         {
             if (!File.Exists(path)) throw new FileNotFoundException("图片不存在。", path);
             var directory = System.IO.Path.GetDirectoryName(path)!;
-            return new FolderArchive(directory) { RequestedEntryName = System.IO.Path.GetFileName(path), IsRootShortcut = new DirectoryInfo(directory).LinkTarget is not null };
+            archive = new FolderArchive(directory) { RequestedEntryName = System.IO.Path.GetFileName(path), IsRootShortcut = new DirectoryInfo(directory).LinkTarget is not null };
         }
-        if (Directory.Exists(path)) return new FolderArchive(path) { IsRootShortcut = new DirectoryInfo(path).LinkTarget is not null };
-        if (!File.Exists(path)) throw new FileNotFoundException("来源不存在。", path);
-        if (System.Text.RegularExpressions.Regex.IsMatch(path, @"(?:\.part\d+\.rar|\.r\d{2}|\.\d{3})$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
-            throw new NotSupportedException("分卷归档尚未迁移，请使用完整的单文件归档。");
-        if (PlaylistSourceTools.IsPlaylist(path)) return new PlaylistArchive(path, this) { IsRootShortcut = new FileInfo(path).LinkTarget is not null };
-        if (ArchiveFormats.IsCompressedArchive(path)) return new CompressedArchive(path) { IsRootShortcut = new FileInfo(path).LinkTarget is not null };
-        throw new NotSupportedException("支持目录、图片、ZIP/CBZ、RAR/CBR、7z 和播放列表；其他来源尚未迁移。");
+        else if (Directory.Exists(path)) archive = new FolderArchive(path) { IsRootShortcut = new DirectoryInfo(path).LinkTarget is not null };
+        else
+        {
+            if (!File.Exists(path)) throw new FileNotFoundException("来源不存在。", path);
+            if (System.Text.RegularExpressions.Regex.IsMatch(path, @"(?:\.part\d+\.rar|\.r\d{2}|\.\d{3})$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                throw new NotSupportedException("分卷归档尚未迁移，请使用完整的单文件归档。");
+            if (PlaylistSourceTools.IsPlaylist(path)) archive = new PlaylistArchive(path, this) { IsRootShortcut = new FileInfo(path).LinkTarget is not null };
+            else if (ArchiveFormats.IsCompressedArchive(path)) archive = new CompressedArchive(path) { IsRootShortcut = new FileInfo(path).LinkTarget is not null };
+            else throw new NotSupportedException("支持目录、图片、ZIP/CBZ、RAR/CBR、7z 和播放列表；其他来源尚未迁移。");
+        }
+        return new ArchiveOpenTarget(archive, null);
     }, token);
+    /// <summary>超时/取消后SourceIo可释放晚到的根来源，不能把来源藏在不可释放的元组中。</summary>
+    private sealed record ArchiveOpenTarget(Archive Archive, string? Relative) : IAsyncDisposable
+    { public ValueTask DisposeAsync() => Archive.DisposeAsync(); }
+
 }
 
 /// <summary>有界文件系统任务；超时后继续观察不可中断调用并释放晚到资源。</summary>
@@ -157,16 +158,19 @@ public static class SourceIo
     private static async Task DisposeCancellationAsync<T>(Task<T> work, CancellationTokenSource cancellation)
     { try { await work; } catch { } finally { cancellation.Dispose(); } }
     /// <summary>后台运行同步系统调用；十五秒等待超时不会释放仍在使用的槽。</summary>
-    public static async Task<T> RunAsync<T>(Func<T> action, CancellationToken token)
+    /// <param name="action">后台工作，返回可释放资源时晚到由SourceIo清理。</param><param name="token">调用方取消。</param>
+    /// <param name="requestResource">转交给工作持有的请求流；排队失败或真实工作完成后关闭。</param>
+    /// <returns>按时完成的工作结果，所有权转交调用方。</returns>
+    public static async Task<T> RunAsync<T>(Func<T> action, CancellationToken token, IDisposable? requestResource = null)
     {
-        if (!await Slots.WaitAsync(TimeSpan.FromSeconds(15), token)) throw new TimeoutException("来源暂不可访问：I/O 队列等待超时。");
-        var work = Task.Run(() => { try { return action(); } finally { Slots.Release(); } });
+        bool acquired;
+        try { acquired = await Slots.WaitAsync(TimeSpan.FromSeconds(15), token); }
+        catch { requestResource?.Dispose(); throw; }
+        if (!acquired) { requestResource?.Dispose(); throw new TimeoutException("来源暂不可访问：I/O 队列等待超时。"); }
+        // 请求流随实际工作关闭；等待超时不能提前关闭仍被晚到工作使用的流。
+        var work = Task.Run(() => { try { return action(); } finally { try { requestResource?.Dispose(); } finally { Slots.Release(); } } });
         try { return await work.WaitAsync(TimeSpan.FromSeconds(15), token); }
-        catch
-        {
-            _ = ObserveLateAsync(work);
-            throw;
-        }
+        catch { _ = ObserveLateAsync(work); throw; }
     }
     /// <summary>清理超时或取消后返回的来源/流，观察任务异常。</summary>
     private static async Task ObserveLateAsync<T>(Task<T> work)
@@ -274,6 +278,8 @@ public sealed partial class FolderArchive(string path) : Archive(path)
 public sealed partial class CompressedArchive : Archive
 {
     private IArchive _archive;
+    private readonly string _physicalPath;
+    private readonly IAsyncDisposable? _nestedLifetime;
     private readonly SemaphoreSlim _gate = new(1);
     private List<IArchiveEntry> _entries;
     private readonly Dictionary<int, (string Path, long Length, long Used)> _solidFiles = [];
@@ -293,8 +299,9 @@ public sealed partial class CompressedArchive : Archive
     /// <summary>精确内部文件定位；不存在或嵌套来源不能退回根归档冒充打开成功。</summary>
     public bool ContainsFile(string relative) => _entries.Where((_, i) => !_deletedIds.Contains(i)).Any(e => !e.IsDirectory && e.Key?.Replace('\\', '/') == relative);
     /// <summary>打开只读普通或固实归档，不按归档路径创建本地文件。</summary>
-    public CompressedArchive(string path) : base(path)
+    public CompressedArchive(string path, string? logicalPath = null, ArchiveEntry? source = null, IAsyncDisposable? lifetime = null) : base(logicalPath ?? path, source)
     {
+        _physicalPath = path; _nestedLifetime = lifetime;
         _archive = SharpCompress.Archives.ArchiveFactory.OpenArchive(path, new ReaderOptions());
         try
         {
@@ -342,7 +349,7 @@ public sealed partial class CompressedArchive : Archive
             }
             // 固实包必须从块前部顺序恢复解码状态；不能直接调用随机条目流。
             // Reader 释放会关闭底层 SourceStream，固实抽取需独立来源，不能破坏登记索引的归档。
-            using var extraction = RequiresSequential ? SharpCompress.Archives.ArchiveFactory.OpenArchive(Path, new ReaderOptions()) : null;
+            using var extraction = RequiresSequential ? SharpCompress.Archives.ArchiveFactory.OpenArchive(_physicalPath, new ReaderOptions()) : null;
             using var reader = extraction?.ExtractAllEntries();
             if (reader is not null)
             {
@@ -415,7 +422,7 @@ public sealed partial class CompressedArchive : Archive
             if (_cacheDirectory is not null && Directory.Exists(_cacheDirectory)) Directory.Delete(_cacheDirectory, true);
             _solidFiles.Clear();
         }
-        finally { _gate.Release(); }
+        finally { try { if (_nestedLifetime is not null) await _nestedLifetime.DisposeAsync(); } finally { _gate.Release(); } }
     }
 }
 
@@ -424,6 +431,7 @@ internal sealed class RequestedArchive : Archive
 {
     private readonly Archive _source;
     public RequestedArchive(Archive source, string entry) : base(source.Path) { _source = source; RequestedEntryName = entry; }
+    public override ArchiveEntry? Source => _source.Source;
     public override string RootArchivePath => _source.RootArchivePath;
     /// <summary>显式页面定位不改变当前书籍；复制仍引用原来源根条目。</summary>
     public override ArchiveEntry CreateBookEntry() => _source.CreateBookEntry();
@@ -433,9 +441,10 @@ internal sealed class RequestedArchive : Archive
 }
 
 /// <summary>原包内目录逻辑来源；只过滤原条目，不解压为文件夹，拥有底层归档。</summary>
-internal sealed class ArchiveDirectory(Archive source, string path, string directory) : Archive(path)
+internal sealed class ArchiveDirectory(Archive source, string path, string directory, bool ownsSource = true) : Archive(path)
 {
     private Dictionary<int, ArchiveEntry> _entries = [];
+    public override ArchiveEntry? Source => source.Source;
     public override string RootArchivePath => source.RootArchivePath;
     /// <summary>保留包内目录的原条目归属，复制策略不能误取当前图片或把逻辑地址当作实体目录。</summary>
     public override ArchiveEntry CreateBookEntry() => new(source) { RawEntryName = directory.TrimEnd('/'), IsDirectory = true };
@@ -470,5 +479,5 @@ internal sealed class ArchiveDirectory(Archive source, string path, string direc
         return new(removed, result.Error);
     }
     /// <summary>关闭等到底层读取完成，不提前释放固实流。</summary>
-    public override async ValueTask DisposeAsync() { await source.DisposeAsync(); IsDisposed = true; _entries.Clear(); }
+    public override async ValueTask DisposeAsync() { if (ownsSource) await source.DisposeAsync(); IsDisposed = true; _entries.Clear(); }
 }

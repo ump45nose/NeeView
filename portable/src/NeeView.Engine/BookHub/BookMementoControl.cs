@@ -18,7 +18,8 @@ public sealed class BookMementoControl(Book book)
     /// <summary>沿原判断顺序：已登记可持续更新，已有书只需一次实际主页面变化。</summary>
     public bool CanHistory(HistoryConfig config) => !IsHistoryRemoved && book.Pages.Count > 0
         && (!IsPageChangeCountEnabled || _historyEntry || _pageChangeCount >= (book.IsNew ? config.HistoryEntryPageCount : 1))
-        // 嵌套归档在P5；包内逻辑目录属于普通归档，不能误用路径差异当作嵌套。
+        && (config.IsInnerArchiveHistoryEnabled || book.Source.Parent is null)
+        // 包内逻辑目录不新增压缩层，不能误用路径差异当作嵌套。
         && (config.IsUncHistoryEnabled || !book.Path.StartsWith(@"\\", StringComparison.Ordinal));
     /// <summary>仅JSON事务成功后记为已登记，失败仍可重试。</summary>
     internal void CommitHistoryEntry() => _historyEntry = true;

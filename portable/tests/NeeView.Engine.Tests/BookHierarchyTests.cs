@@ -138,15 +138,17 @@ public sealed class BookHierarchyTests
         Config.Current.System.BookPageCollectMode = BookPageCollectMode.ImageAndBook;
         await operation.MoveToParentBookAsync(); Assert.Null(operation.Error); Assert.Equal("bad.cbz", operation.Book!.CurrentPage!.EntryName);
     }
-    /// <summary>真正包内归档明确留待后续，不能回根包并把同页重显示冒充成功打开。</summary>
+    /// <summary>P5真实包内归档进入子书并可返回父包，不能回根包冒充子书打开。</summary>
     [Fact]
-    public async Task NestedArchiveIsExplicitlyUnsupportedAndKeepsBook()
+    public async Task NestedArchiveOpensChildAndRestoresParentEntry()
     {
         using var fixture = new Fixture(); var zip = Path.Combine(fixture.Root, "nested.cbz");
         using (var archive = ZipFile.Open(zip, ZipArchiveMode.Create)) archive.CreateEntryFromFile(fixture.Zip, "inside.cbz");
         var state = new SaveData(fixture.State); await state.LoadAsync(TestContext.Current.CancellationToken); await using var operation = fixture.Operation(state);
-        await operation.OpenAsync(zip, TestContext.Current.CancellationToken); var old = operation.Book; await operation.MoveToChildBookAsync();
-        Assert.Same(old, operation.Book); Assert.Contains("嵌套归档", operation.Error!);
+        Config.Current.System.ArchiveRecursiveMode = ArchiveEntryCollectionMode.CurrentDirectory;
+        await operation.OpenAsync(zip, TestContext.Current.CancellationToken); await operation.MoveToChildBookAsync();
+        Assert.Null(operation.Error); Assert.Equal(Path.Combine(zip, "inside.cbz"), operation.Book!.Path); Assert.Equal(5, operation.Book.Pages.Count);
+        await operation.MoveToParentBookAsync(); Assert.Null(operation.Error); Assert.Equal(zip, operation.Book!.Path); Assert.Equal("inside.cbz", operation.Book.CurrentPage!.EntryName);
     }
     /// <summary>封面首图优先/regex/原有限子书深度与显式目标，读取后关闭请求级来源。</summary>
     [Fact]

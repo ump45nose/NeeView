@@ -104,7 +104,7 @@ public sealed class HistoryPolicyTests
         Assert.Equal(0, await cleanup); Assert.Single(state.HistoryEntries);
     }
     [Fact]
-    public async Task ExistsChecksArchiveDirectoriesAndPreservesOfflineOrUnsupportedPaths()
+    public async Task ExistsChecksArchiveDirectoriesAndPreservesOfflineOrCorruptPaths()
     {
         using var f = new Fixture(); var token = TestContext.Current.CancellationToken; var factory = new ArchiveFactory();
         Assert.True(await factory.ExistsAsync(f.Images, token)); Assert.True(await factory.ExistsAsync(Path.Combine(f.Zip, "001.png"), token));
@@ -114,7 +114,8 @@ public sealed class HistoryPolicyTests
         var nested = Path.Combine(f.Root, "nested.cbz"); using (var zip = System.IO.Compression.ZipFile.Open(nested, System.IO.Compression.ZipArchiveMode.Create))
         { zip.CreateEntry("chapter/001.png"); zip.CreateEntry("inner.cbz"); }
         Assert.True(await factory.ExistsAsync(Path.Combine(nested, "chapter"), token));
-        await Assert.ThrowsAsync<NotSupportedException>(() => factory.ExistsAsync(Path.Combine(nested, "inner.cbz", "001.png"), token));
+        var corrupt = await Assert.ThrowsAnyAsync<Exception>(() => factory.ExistsAsync(Path.Combine(nested, "inner.cbz", "001.png"), token));
+        Assert.IsNotType<FileNotFoundException>(corrupt); // 已支持嵌套；损坏读取不能误报为缺失并清理历史。
     }
     [Fact]
     public async Task ClearInPlaceUsesCurrentTargetsIncludingAliasesWithoutPrefixDeletion()

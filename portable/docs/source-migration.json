@@ -535,7 +535,7 @@
       "source": "NeeView/Archiver/Archive.cs",
       "target": "src/NeeView.Engine/Archiver/Archive.cs",
       "sha256": "ba65b2fb43f8ad7cdc61650ce534935d50d7336c10ea772b7d077ea1c48417f1",
-      "status": "P4收尾：原CanDelete/DeleteAsync来源能力，回报真实成功项；保留根链接对象信息"
+      "status": "P5嵌套：保留Source/Parent/RootArchivePath与原源条目，逻辑包装不增加层数；P4删除/根链接能力保持"
     },
     {
       "source": "NeeView/Menu/MenuTree.cs",
@@ -1111,7 +1111,7 @@
       "source": "NeeView/Archiver/ArchiveEntryCollection.cs",
       "target": "src/NeeView.Engine/Book/BookSourceFactory.cs",
       "sha256": "6b3906245a09390e5ad1ffeb893e5f7e7676e81937a649fab0aeb7536957ee76",
-      "status": "原递归来源所属关系/shortcut/失败子书/展平；P3元数据循环后台执行，来源按集合反向关闭；P3直接目录分批索引沿原Page/导航锁提交，代次隔离及末端保护，递归展平/归档保持完整过滤"
+      "status": "P5原三收集模式与真实嵌套来源展开；条目入口保留重复ID，来源反向释放；P3直接目录渐进索引保持"
     },
     {
       "source": "NeeView/Archiver/ArchiveEntryCollectionMode.cs",
@@ -1129,7 +1129,7 @@
       "source": "NeeView/BookHub/BookAddress.cs",
       "target": "src/NeeView.Engine/Book/BookAddress.cs",
       "sha256": "87d5270001b8eddff6729866b0bc149e6f8e6effe6f83e970678dc59575dfaeb",
-      "status": "原已支持普通/归档父级与相对定位；嵌套归档虚拟Scheme未迁"
+      "status": "P5原三收集模式的嵌套父书与最外层目录定位；沿真实父链，不新增持久Scheme"
     },
     {
       "source": "NeeView/BookHub/BookHub.cs",
@@ -1393,7 +1393,7 @@
       "source": "NeeView/BookHub/BookMementoControl.cs",
       "target": "src/NeeView.Engine/BookHub/BookMementoControl.cs",
       "sha256": "767441b5125d01b795bdaa14962afd3e5b39c01669ff2a1b1a349d9eba6ccfc2",
-      "status": "原主Page计数、登记阈值、删除/重新登记和计数绕过；JSON事务由SaveData执行，嵌套P5"
+      "status": "P5原内部历史开关按真实Parent判断；原主Page计数/阈值/计数绕过与SaveData事务保持"
     },
     {
       "source": "NeeView/BookHistory/BookHistoryCollection.cs",
@@ -1405,7 +1405,7 @@
       "source": "NeeView/Archiver/ArchiveEntryUtility.cs",
       "target": "src/NeeView.Backends/Content/ArchiveFactory.History.cs",
       "sha256": "01ae8c774e5c7512ca56b2d6075902fc57061aafe528360387bf01a1c973179b",
-      "status": "原来源存在检查的Mac替换，归档逻辑定位/挂载根/权限与未支持能力"
+      "status": "P5原嵌套内部存在检测沿同一工厂只读解析；仅缺失转换false，能力/损坏/权限失败不误清历史"
     },
     {
       "source": "NeeView/SidePanels/Bookshelf/FolderList/FolderList.cs",
@@ -2294,6 +2294,18 @@
       "target": "src/NeeView.MacOS/Views/SettingsWindow.Search.cs",
       "sha256": "109910eabd7cbf0e2d42621256587f0b9cb6aacad2b52e8f6a8d192f78ef8986",
       "status": "复用现有原Trim/Analyze/500ms/确认输入适配，原设置搜索历史仅本窗口；全部命令保留占位，关闭取消"
+    },
+    {
+      "source": "NeeView/Archiver/ArchiveManager.cs",
+      "target": "src/NeeView.Backends/Content/ArchiveFactory.Nested.cs",
+      "sha256": "1ac6fed20689c27110182e3b801a357330c67e8faffe4c255eae227c71947572",
+      "status": "P5原源条目入口及逐层解析；逻辑/物理路径分离，父链拥有/借用、16层和共享2GiB临时预算适配"
+    },
+    {
+      "source": "NeeView/Archiver/ArchiveEntryUtility.cs",
+      "target": "src/NeeView.Backends/Content/ArchiveFactory.Nested.cs",
+      "sha256": "01ae8c774e5c7512ca56b2d6075902fc57061aafe528360387bf01a1c973179b",
+      "status": "P5原逐层定位关系；重复名称按ID，内部上级路径在规范化前拒绝"
     }
   ],
   "rule_references": [

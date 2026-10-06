@@ -1,5 +1,7 @@
 # 前端独立调整边界
 
+P5 第十二批：嵌套解析/临时代理/父链生命周期全部位于Engine来源关系及Backends。ReaderView、页面列表和封面仍消费原Page与唯一BitmapFactory，不解压、不识别物理临时路径；布局/主题可独立修改，见[嵌套契约](p5-nested.md)。
+
 P5 第十一批：SettingsSearchPresenter从现有布局控件/明确分区标识取得可搜索文案，CommandParameterEdit提供既有参数字段；Engine只匹配纯文本/目标键。结果直接展示同一草稿控件和命令行模板，没有第二字段配置表。重挂时固定继承DataContext，返回时恢复父级/顺序/继承，样式不参与匹配，见[搜索契约](p5-settings-search.md)。
 
 P5 第十批：主题目录按钮保留在现有设置页，ThemeSettingsViewModel只转交当前目录草稿和平台契约。Engine负责原首次目录/样例规则，Backends负责Finder目录内容打开和真实错误；视图不创建文件或具体后端。关闭拒绝晚到结果，见[目录动作契约](p5-theme-folder.md)。

@@ -142,3 +142,5 @@ P5 第八批：原Styles/Theme*.cs、Config/ThemeConfig、Libraries/Themes与Set
 P5 第十批：原 ThemeManager.OpenCustomThemeFolder / ThemeProfileTools.SaveFromContent / SettingPageWindow 的目录动作已迁入。首次创建目录才生成原字节 Sample，既有目录不补样例/不覆盖；平台打开目录内容，配置草稿独立。10项专项通过，正式设置失败重试/取消及关闭覆盖；Finder真机未验，见[契约](p5-theme-folder.md)。
 
 P5 第十一批：原SettingWindowModel的Page/Section/Item搜索文本、默认Searcher语法和可编辑结果接入当前九页表单；全部235命令含未迁能力/参数文案可搜索。原窗口内确认历史不持久化；解析错误保留上次有效结果。控件草稿/父级/DC/取消/保存失败重试、参数共享和500ms取消有正式Headless回归；完整原设置页及Windows动态仍独立待迁/待验。见[契约](p5-settings-search.md)。
+
+P5 第十二批：原Archive/ArchiveManager/ArchiveEntryUtility/ArchiveEntryCollection三模式与真实Source/Parent接入。重复名称条目ID不重猜，原父书/内部历史开关/条目恢复保持；临时代理/深度/共享预算为Mac资源适配。嵌套包只读，损坏不误清历史，内部上级路径拒绝。见[契约](p5-nested.md)及[验收](../acceptance/p5-nested-runtime.md)。

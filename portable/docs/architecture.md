@@ -1,5 +1,7 @@
 # NeeView Mac 源码迁移架构
 
+P5 第十二批接入原嵌套归档 Source/Parent、条目入口和三收集模式。后端随机临时代理分离逻辑/物理路径，完整父链与借用父源分别释放；所有活动代理共享2GiB预算、最多16层。历史存在检测和封面沿同一工厂，嵌套包保持只读，前端/JSON不增加状态。见[嵌套契约](p5-nested.md)。
+
 P5 第十一批接入原设置结构化搜索。Engine复用原Searcher和SettingItemRecord文本关系；Mac从现有九页表单建立索引，全部235命令及参数文案沿同一草稿。结果直接编辑原控件，导航/清空/关闭归还原父级与DataContext；窗口历史不写JSON。未迁设置页面仍按清单推进，见[搜索契约](p5-settings-search.md)。
 
 P5 第十批补齐原 OpenCustomThemeFolder：Engine 在已有单槽中准备目录，仅首次创建目录时按原字节生成Sample；表现模型转交当前目录草稿，系统打开沿同一IPlatformService。已有目录不补样例、不覆盖材料，失败/取消不提交配置，关闭取消未完成打开。见[目录动作契约](p5-theme-folder.md)。

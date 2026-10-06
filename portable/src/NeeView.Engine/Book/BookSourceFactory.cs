@@ -3,7 +3,7 @@ namespace NeeView;
 
 /// <summary>原页面收集模式及数值；高级媒体仍由后续后端接入。</summary>
 public enum BookPageCollectMode { Image, ImageAndBook, All }
-/// <summary>原归档收集范围；嵌套压缩执行仍在P5，目录递归和包内目录使用同一集合。</summary>
+/// <summary>原归档收集范围；目录、包内目录与嵌套压缩共用同一集合。</summary>
 public enum ArchiveEntryCollectionMode { CurrentDirectory, IncludeSubDirectories, IncludeSubArchives }
 
 /// <summary>按原模式过滤页面，保留有内容目录展平及空目录页面的判断。</summary>
@@ -103,11 +103,12 @@ public sealed class ArchiveEntryCollection(Archive root, IArchiveFactory archive
         {
             token.ThrowIfCancellationRequested();
             var name = prefix + entry.EntryName.TrimEnd('/'); result.Add(new(entry, name));
-            // 真正的嵌套归档需要专门后端，P5接入；包内目录已经由当前归档一次返回。
-            if (Mode != ArchiveEntryCollectionMode.IncludeSubArchives || !(archive.IsDirectory || archive.IsPlaylist) || !entry.IsBook() || entry.IsShortcut) continue;
+            // 包内目录已由当前来源一次返回；只为真正的压缩文件新增子来源，不能重复展开目录。
+            if (Mode != ArchiveEntryCollectionMode.IncludeSubArchives || !entry.IsBook() || entry.IsShortcut
+                || !archive.IsDirectory && !archive.IsPlaylist && (entry.IsDirectory || !ArchiveFormats.IsCompressedArchive(entry.EntryName))) continue;
             try
             {
-                var child = await archives.OpenAsync(entry.SystemPath, token); _owned.Add(child);
+                var child = await archives.OpenAsync(entry, token); _owned.Add(child);
                 await CollectAsync(child, name + "/", result, token);
             }
             catch (OperationCanceledException) { throw; }

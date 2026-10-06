@@ -2,13 +2,18 @@
 namespace NeeView;
 
 /// <summary>原 Archive 的 P1 读取边界，来源保留条目所属关系并负责释放。</summary>
-public abstract class Archive(string path) : IAsyncDisposable
+public abstract class Archive(string path, ArchiveEntry? source = null) : IAsyncDisposable
 {
     public string Path { get; } = path;
-    public virtual string RootArchivePath => Path;
+    /// <summary>原Source/Parent关系；逻辑定位始终指向父归档条目，临时文件只属于后端。</summary>
+    public virtual ArchiveEntry? Source => source;
+    public Archive? Parent => Source?.Archive;
+    public virtual string RootArchivePath => Parent?.RootArchivePath ?? Path;
+    /// <summary>嵌套层数用于有界展开；逻辑目录包装不新增压缩层。</summary>
+    public int NestingDepth => Parent is null ? 0 : Parent.NestingDepth + 1;
     /// <summary>对应原ArchiveEntryUtility.CreateAsync(Book.Path)的当前书籍条目；不是当前阅读页面。</summary>
     /// <returns>普通根目录、归档或播放列表返回其实体地址，内部目录由来源保留原归属关系。</returns>
-    public virtual ArchiveEntry CreateBookEntry() => new(this) { FilePath = Path, IsDirectory = IsDirectory, IsShortcut = IsRootShortcut };
+    public virtual ArchiveEntry CreateBookEntry() => Source ?? new(this) { FilePath = Path, IsDirectory = IsDirectory, IsShortcut = IsRootShortcut };
     /// <summary>根来源是否由链接打开；文件动作仍针对链接本身。</summary>
     public bool IsRootShortcut { get; init; }
     /// <summary>来源解析的显式图片条目，普通历史恢复不能覆盖该定位。</summary>
