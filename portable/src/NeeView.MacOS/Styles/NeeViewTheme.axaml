@@ -21,6 +21,17 @@
   </Styles.Resources>
   <!-- 保留原区域颜色和 41/36 DIP 图标栏尺寸；视觉调整集中在本文件。 -->
   <Style Selector="Window"><Setter Property="Background" Value="{DynamicResource Window.Background}" /><Setter Property="Foreground" Value="{DynamicResource Window.Foreground}" /><Setter Property="FontSize" Value="13" /></Style>
+  <!-- 原角色颜色；保持Fluent模板和原区域尺寸，主题切换只替换资源。 -->
+  <Style Selector="Button"><Setter Property="Background" Value="{DynamicResource Button.Background}" /><Setter Property="Foreground" Value="{DynamicResource Button.Foreground}" /><Setter Property="BorderBrush" Value="{DynamicResource Button.Border}" /></Style>
+  <Style Selector="Button:pointerover"><Setter Property="Background" Value="{DynamicResource Button.MouseOver.Background}" /><Setter Property="BorderBrush" Value="{DynamicResource Button.MouseOver.Border}" /></Style>
+  <Style Selector="Button:pressed"><Setter Property="Background" Value="{DynamicResource Button.Pressed.Background}" /><Setter Property="BorderBrush" Value="{DynamicResource Button.Pressed.Border}" /></Style>
+  <Style Selector="TextBox"><Setter Property="Background" Value="{DynamicResource TextBox.Background}" /><Setter Property="Foreground" Value="{DynamicResource TextBox.Foreground}" /><Setter Property="BorderBrush" Value="{DynamicResource TextBox.Border}" /></Style>
+  <Style Selector="TextBox:pointerover"><Setter Property="Background" Value="{DynamicResource TextBox.MouseOver.Background}" /></Style>
+  <Style Selector="ComboBox"><Setter Property="Background" Value="{DynamicResource Button.Background}" /><Setter Property="Foreground" Value="{DynamicResource Button.Foreground}" /><Setter Property="BorderBrush" Value="{DynamicResource Button.Border}" /></Style>
+  <Style Selector="ContextMenu"><Setter Property="Background" Value="{DynamicResource Menu.Background}" /><Setter Property="Foreground" Value="{DynamicResource Menu.Foreground}" /><Setter Property="BorderBrush" Value="{DynamicResource Menu.Border}" /></Style>
+  <Style Selector="MenuItem"><Setter Property="Foreground" Value="{DynamicResource Menu.Foreground}" /></Style>
+  <Style Selector="TreeView"><Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{DynamicResource Panel.Foreground}" /></Style>
+  <Style Selector="Slider"><Setter Property="Background" Value="{DynamicResource Slider.Background}" /><Setter Property="Foreground" Value="{DynamicResource Slider.Thumb}" /></Style>
   <Style Selector="Border.panel"><Setter Property="Background" Value="{DynamicResource Panel.Background}" /><Setter Property="BorderBrush" Value="{DynamicResource Panel.Separator}" /><Setter Property="BorderThickness" Value="0,0,1,0" /></Style>
   <Style Selector="Border.rail"><Setter Property="Background" Value="{DynamicResource SideBar.Background}" /><Setter Property="Width" Value="41" /></Style>
   <Style Selector="Button.panel-icon"><Setter Property="Width" Value="36" /><Setter Property="Height" Value="36" /><Setter Property="Margin" Value="2" /><Setter Property="Padding" Value="7" /><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="CornerRadius" Value="2" /></Style>
@@ -30,7 +41,9 @@
   <Style Selector="TextBox.slider-number"><Setter Property="MinHeight" Value="0" /><Setter Property="Padding" Value="3,0" /><Setter Property="VerticalContentAlignment" Value="Center" /><Setter Property="TextAlignment" Value="Center" /></Style>
   <Style Selector="Border.slider-number-frame:pointerover"><Setter Property="BorderBrush" Value="{DynamicResource Control.Accent}" /></Style>
   <Style Selector="TextBlock.panel-title"><Setter Property="Margin" Value="10,8" /><Setter Property="Foreground" Value="{DynamicResource Panel.Header}" /></Style>
-  <Style Selector="ListBox"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /></Style>
+  <Style Selector="ListBox"><Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{DynamicResource Panel.Foreground}" /><Setter Property="BorderThickness" Value="0" /></Style>
+  <Style Selector="ListBoxItem:pointerover"><Setter Property="Background" Value="{DynamicResource Item.MouseOver.Background}" /></Style>
+  <Style Selector="ListBoxItem:selected"><Setter Property="Background" Value="{DynamicResource Item.Selected.Background}" /></Style>
   <Style Selector="ListBoxItem"><Setter Property="Padding" Value="8,5" /><Setter Property="MinHeight" Value="28" /></Style>
   <Style Selector="ListBox.original-list ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch" /></Style>
   <Style Selector="GridSplitter"><Setter Property="Background" Value="{DynamicResource Panel.Splitter}" /></Style>

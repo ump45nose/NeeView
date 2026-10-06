@@ -61,6 +61,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         _activeHistoryPath = null; _activeHistoryBook = null;
         if (!BookmarkRoot.IsFolder) throw new JsonException("Bookmark.Nodes 必须是根文件夹。");
         var config = ReadProfileConfig(_setting);
+        config.Theme.DefaultFolder = System.IO.Path.Combine(DirectoryPath, "Themes");
         config.Playlist.DefaultFolder = System.IO.Path.Combine(DirectoryPath, "Playlists");
         Playlists = new(config.Playlist);
         Config.SetCurrent(config);
@@ -104,6 +105,10 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             config.Command = ReadBranch<CommandConfig>(raw, "Command");
             config.Mouse = ReadBranch<MouseConfig>(raw, "Mouse");
             config.StartUp = ReadBranch<StartUpConfig>(raw, "StartUp");
+            var theme = raw["Theme"]?.DeepClone().AsObject() ?? new JsonObject();
+            // 明确的现代值优先，旧PanelColor仅作读取后备，避免顺序依赖。
+            if (theme.ContainsKey("ThemeType")) theme.Remove("PanelColor");
+            config.Theme = theme.Deserialize<ThemeConfig>(ReadOptions) ?? new();
             // 原旧拼写与初期 Mac 字段只作读取别名；原新字段明确存在时优先。
             var auto = raw["AutoHide"]?.DeepClone().AsObject() ?? new JsonObject();
             if (auto["AutoHideHitTestMargin"] is { } margin)
@@ -495,7 +500,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         try
         {
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "PageList", "History", "Bookmark", "System", "Archive", "Playlist", "AutoHide", "Window", "WindowTitle", "MenuBar", "Command", "Mouse", "StartUp" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "PageList", "History", "Bookmark", "System", "Archive", "Playlist", "AutoHide", "Window", "WindowTitle", "MenuBar", "Command", "Mouse", "StartUp", "Theme" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 MergeTyped(Object(config, branch), value!);

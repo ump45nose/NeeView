@@ -9,5 +9,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Command/command-manifest.json" />
     <EmbeddedResource Include="Menu/default-menu.json" />
+    <EmbeddedResource Include="Styles/Themes/*.json" />
   </ItemGroup>
 </Project>

@@ -129,6 +129,15 @@ public sealed partial class SaveData
                 if (imported is not null) config["CurrentPlaylist"] = imported.Split('/')[1];
             }
         }
+        // 原附属主题只读材料；只有设置也被选中且选择引用同包文件，才绑定实际Mac落点。
+        if (request.Selection.Settings && request.GetEffectiveDocument("UserSetting.json") is not null &&
+            documents["UserSetting.json"]?["Config"]?["Theme"] is JsonObject theme && theme["ThemeType"] is { } themeValue &&
+            ThemeSource.Parse(themeValue.GetValue<string>()) is { Type: ThemeType.Custom } source)
+        {
+            var imported = request.AssetNames.FirstOrDefault(name => ProfileImportAssets.Kind(name) == ProfileImportAssetKind.Themes &&
+                name.Split('/')[1].Equals(source.FileName, StringComparison.OrdinalIgnoreCase));
+            if (imported is not null) { theme["CustomThemeFolder"] = null; theme["ThemeType"] = new ThemeSource(ThemeType.Custom, imported.Split('/')[1]).ToString(); }
+        }
         foreach (var name in request.AssetNames) _ = ProfileImportAssets.ResolveTarget(DirectoryPath, name);
         return documents;
     }

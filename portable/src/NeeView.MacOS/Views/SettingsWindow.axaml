@@ -4,9 +4,23 @@
     <Border Grid.Column="0" Classes="panel">
       <Grid RowDefinitions="Auto,*">
         <TextBox PlaceholderText="搜索设置" Margin="8" IsEnabled="False" ToolTip.Tip="完整设置搜索在 P2–P5 迁移" />
-        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
+        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="主题 / 配色" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
       </Grid>
     </Border>
+    <ScrollViewer x:Name="ThemeSettings" Grid.Column="1" IsVisible="False">
+      <StackPanel Margin="24" Spacing="14">
+        <TextBlock Text="主题 / 配色" FontSize="20" />
+        <TextBlock Text="主题" />
+        <ComboBox x:Name="ThemeChoice" ItemsSource="{Binding Items}" SelectedItem="{Binding Selected, Mode=TwoWay}">
+          <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBlock Text="自定义主题目录" />
+        <TextBox x:Name="ThemeFolder" Text="{Binding Folder, Mode=TwoWay}" />
+        <StackPanel Orientation="Horizontal" Spacing="12"><Button Content="选择目录…" Click="ChooseThemeFolder_Click" /><Button x:Name="RefreshThemes" Content="刷新主题列表" Click="RefreshThemes_Click" /></StackPanel>
+        <TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
+        <TextBlock Text="布局保持不变；保存后应用配色，取消保留当前主题。" TextWrapping="Wrap" />
+      </StackPanel>
+    </ScrollViewer>
     <ScrollViewer x:Name="NavigationSettings" Grid.Column="1" IsVisible="False">
       <StackPanel Margin="24" Spacing="12">
         <TextBlock Text="页面列表 / 书架" FontSize="20" />

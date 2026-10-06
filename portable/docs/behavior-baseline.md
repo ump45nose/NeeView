@@ -135,3 +135,5 @@ ScrollPage编辑时清除执行参数中的旧IsNScroll/PageMoveMargin，兼容�
 固定基线Exporter保存Playlists/*.nvpls、Themes/*.json和Scripts/*.nvjs的一级文件；原Importer三类默认关闭、覆盖同名。本批兼容两种ZIP分隔符，列表复用原v1/v2唯一解析并仅映射已知Path；版本、相对内部定位、未知数据保持。
 
 Mac落点使用当前Profile管理目录，列表目录配置与实际覆盖文件共用原提交/持久备份/重建恢复；该适配在选择/确认报告中说明。主题/脚本仅保留原字节、不装载或执行，不把材料保存称为运行能力迁移。见[契约](p5-profile-assets.md)及[静默验收](../acceptance/p5-profile-assets-runtime.md)。
+
+P5 第八批：原Styles/Theme*.cs、Config/ThemeConfig、Libraries/Themes与SettingPageWindow的六预设/自定义、颜色引用/透明度/默认角色、三类BasedOn、Dark回退和特殊按钮资源已迁入。必要改造为纯ARGB、独立Mac默认目录、后台读取/代次、规范路径与递归限额、默认角色循环保护、Fluent亮暗变体；原窗口结构和书籍链保持。只用合成主题与Headless对照原材料，没有新增真实Windows动态一致性结论。见[主题契约](p5-theme.md)。

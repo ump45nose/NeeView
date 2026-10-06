@@ -432,6 +432,72 @@
       "target": "src/NeeView.Engine/Config/DiffJsonConverter.cs",
       "sha256": "8af38463d3505d6bbcce4a6124350a00cb4ae7e5a0a1269be6185d3cc1b82c11",
       "status": "P5: retain writable-property metadata, Equals/IDefaultable and original read/write; exclude JsonExtensionData and expose parent-specific defaults for the raw JSON write copy."
+    },
+    {
+      "source": "NeeView/Styles/ThemeType.cs",
+      "target": "src/NeeView.Engine/Styles/ThemeType.cs",
+      "sha256": "02e50bb4e6543f0f506af868d479ff1566e251d7e1027d494128d309bba99529",
+      "status": "P5第八批：原主题标识/角色/颜色覆盖算法迁入；WPF颜色改纯ARGB，Format保留原字符串；默认角色循环链和加载限额有明确回归"
+    },
+    {
+      "source": "NeeView/Styles/ThemeColor.cs",
+      "target": "src/NeeView.Engine/Styles/ThemeColor.cs",
+      "sha256": "179f2c4157cdf593c5f58a9e509fa9ee70979879d7cc2675efa2e0a09d66de31",
+      "status": "P5第八批：原主题标识/角色/颜色覆盖算法迁入；WPF颜色改纯ARGB，Format保留原字符串；默认角色循环链和加载限额有明确回归"
+    },
+    {
+      "source": "NeeView/Styles/ThemeProfile.cs",
+      "target": "src/NeeView.Engine/Styles/ThemeProfile.cs",
+      "sha256": "8bf5201c0a31029765c3416741f85ec6cca8839b18f3bf43854a6b4ff6fa3b36",
+      "status": "P5第八批：原主题标识/角色/颜色覆盖算法迁入；WPF颜色改纯ARGB，Format保留原字符串；默认角色循环链和加载限额有明确回归"
+    },
+    {
+      "source": "NeeView/Styles/ThemeProfileTools.cs",
+      "target": "src/NeeView.Engine/Styles/ThemeProfileTools.cs",
+      "sha256": "6794d36daacc3dcfb22a1960b79716c190ea830efd049e3dec6038a2754ba05c",
+      "status": "P5第八批：原主题标识/角色/颜色覆盖算法迁入；WPF颜色改纯ARGB，Format保留原字符串；默认角色循环链和加载限额有明确回归"
+    },
+    {
+      "source": "NeeView/Styles/ThemeSource.cs",
+      "target": "src/NeeView.Engine/Styles/ThemeSource.cs",
+      "sha256": "898f84119788a3a911de4e592a67adbdec6fb8ed296212a61de246dc747893b4",
+      "status": "P5第八批：原主题标识/角色/颜色覆盖算法迁入；WPF颜色改纯ARGB，Format保留原字符串；默认角色循环链和加载限额有明确回归"
+    },
+    {
+      "source": "NeeView/Libraries/Themes/LightMonochromeTheme.json",
+      "target": "src/NeeView.Engine/Styles/Themes/LightMonochromeTheme.json",
+      "sha256": "c24db9d6434b5bb1a369530dc62b88ac192d8f46889553f1306d2d28bf44f58e",
+      "status": "P5第八批：原JSON材料原字节内嵌，预设进入唯一主题加载；CustomTemplate保持材料待设置生成入口"
+    },
+    {
+      "source": "NeeView/Libraries/Themes/LightTheme.json",
+      "target": "src/NeeView.Engine/Styles/Themes/LightTheme.json",
+      "sha256": "5953b62367b6ca662c4e1723abf5adf51b9427a266d170ab03ab06316fc83750",
+      "status": "P5第八批：原JSON材料原字节内嵌，预设进入唯一主题加载；CustomTemplate保持材料待设置生成入口"
+    },
+    {
+      "source": "NeeView/Libraries/Themes/DarkTheme.json",
+      "target": "src/NeeView.Engine/Styles/Themes/DarkTheme.json",
+      "sha256": "03aa9b27e0b5ec00ce93a17a09320e93e7e2ff0452be67847dd8387d0407fd76",
+      "status": "P5第八批：原JSON材料原字节内嵌，预设进入唯一主题加载；CustomTemplate保持材料待设置生成入口"
+    },
+    {
+      "source": "NeeView/Libraries/Themes/CustomThemeTemplate.json",
+      "target": "src/NeeView.Engine/Styles/Themes/CustomThemeTemplate.json",
+      "sha256": "ba876dd917b02a5cde5ff9e238d95f5663ebd60052240ce1831a6ac152373206",
+      "status": "P5第八批：原JSON材料原字节内嵌，预设进入唯一主题加载；CustomTemplate保持材料待设置生成入口"
+    },
+    {
+      "source": "NeeView/Libraries/Themes/DarkMonochromeTheme.json",
+      "target": "src/NeeView.Engine/Styles/Themes/DarkMonochromeTheme.json",
+      "sha256": "90af1e13d8eac31cf85d93c54d04a23d86a21ac75427ef3208df073038cbccae",
+      "status": "P5第八批：原JSON材料原字节内嵌，预设进入唯一主题加载；CustomTemplate保持材料待设置生成入口"
+    },
+    {
+      "source": "NeeView/Libraries/Themes/HighContrastTheme.json",
+      "target": "src/NeeView.Engine/Styles/Themes/HighContrastTheme.json",
+      "sha256": "114efc5d7ed388ee9c420730ea5423b843c912984c798fa7d1be0a80cdea453c",
+      "status": "P5第八批：原JSON材料原字节内嵌，预设进入唯一主题加载；CustomTemplate保持材料待设置生成入口"
     }
   ],
   "partial_adapters": [
@@ -2180,6 +2246,18 @@
       "target": "src/NeeView.Backends/Content/ProfileImportReader.cs",
       "sha256": "32225b08b5ee923474d6fdfd51010296e8b954190bb8255539b9bd8a9264d333",
       "status": "P5第七批：仅复用CollectScripts的一级*.nvjs材料范围；不登记脚本命令、watcher或触发事件执行"
+    },
+    {
+      "source": "NeeView/Config/ThemeConfig.cs",
+      "target": "src/NeeView.Engine/Config/ThemeConfig.cs",
+      "sha256": "3640b6c193437eb226f0f95ef89681728a8b0b4c5b77d2b5bbaf4b35e44cbc26",
+      "status": "P5第八批：原默认/标识/目录/旧PanelColor保留，Mac独立Profile默认目录由SaveData注入；进入唯一差分/事务"
+    },
+    {
+      "source": "NeeView/Styles/ThemeManager.cs",
+      "target": "src/NeeView.Engine/Styles/ThemeManager.cs",
+      "sha256": "7fc00b3031d6f1c43ccdf12d15f1befdaaec1b11c865548c90b753535c972816",
+      "status": "P5第八批：原六预设/一级自定义/BasedOn/覆盖/回退，移除WPF及Windows系统类型；平台值快照和单槽后台适配"
     }
   ],
   "rule_references": [
@@ -2406,6 +2484,18 @@
       "target": "src/NeeView.MacOS/Views/DestinationFolderDialog.cs",
       "sha256": "9b08834e199adcc7f6d93e9df76bba5b9c79d0161a6701a5221a826ff93fa3c6",
       "status": "原克隆编辑/增删顺序语义，转换Avalonia异步目录选取"
+    },
+    {
+      "source": "NeeView/Styles/ThemeManager.cs",
+      "target": "src/NeeView.MacOS/Views/ThemePresenter.cs",
+      "sha256": "7fc00b3031d6f1c43ccdf12d15f1befdaaec1b11c865548c90b753535c972816",
+      "status": "P5第八批：原RefreshThemeColor转换应用级Avalonia资源与Fluent变体，系统订阅/关闭取消，不触碰书籍/像素缓存"
+    },
+    {
+      "source": "NeeView/Setting/SettingPageWindow.cs",
+      "target": "src/NeeView.MacOS/Views/SettingsWindow.Theme.cs",
+      "sha256": "68ee309563718794434506278de8e2372c4fc916cf9d05226e542c003ad0572f",
+      "status": "P5第八批：原主题及目录设置入口转换，布局/独立草稿/真实提交分开；Finder模板生成未迁入"
     }
   ],
   "backend_reuse": [

@@ -1,0 +1,409 @@
+{
+  "date": "2026-10-06",
+  "base_commit": "56ab2cb0e32c5e6bf1226a038cb70525ca12c8bb",
+  "windows_source_baseline": "c5c398d89",
+  "theme_tests": {
+    "total": "50",
+    "executed": "50",
+    "passed": "50",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "full_tests": {
+    "total": "1198",
+    "executed": "1196",
+    "passed": "1196",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "boundaries": {
+    "production_projects": [
+      "NeeView.Backends",
+      "NeeView.Engine",
+      "NeeView.MacOS"
+    ],
+    "source_files": 83,
+    "partial_adapters": 293,
+    "upstream_source_files": 26
+  },
+  "theme_test_results": [
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.BadMaterialsFallbackAndLeaveSelection(issue: \"bad-color\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0028179"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.BadMaterialsFallbackAndLeaveSelection(issue: \"color-cycle\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0374096"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.BadMaterialsFallbackAndLeaveSelection(issue: \"deep\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0329221"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.BadMaterialsFallbackAndLeaveSelection(issue: \"default-cycle\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0008668"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.BadMaterialsFallbackAndLeaveSelection(issue: \"json\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0017787"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.BadMaterialsFallbackAndLeaveSelection(issue: \"large\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0007577"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.BadMaterialsFallbackAndLeaveSelection(issue: \"missing\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0012567"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.BadMaterialsFallbackAndLeaveSelection(issue: \"null-colors\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0007974"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.BadMaterialsFallbackAndLeaveSelection(issue: \"parent-cycle\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0008777"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.ColorTokensKeepOriginalRepresentation(token: \"#123456\", expected: \"#FF123456\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000088"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.ColorTokensKeepOriginalRepresentation(token: \"#81234567\", expected: \"#81234567\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000201"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.ColorTokensKeepOriginalRepresentation(token: \"#8abc\", expected: \"#88AABBCC\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0020956"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.ColorTokensKeepOriginalRepresentation(token: \"#abc\", expected: \"#FFAABBCC\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000150"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.ColorTokensKeepOriginalRepresentation(token: \"Orange\", expected: \"#FFFFA500\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000098"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.ColorTokensKeepOriginalRepresentation(token: \"Transparent\", expected: \"#00FFFFFF\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002098"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.ColorTokensKeepOriginalRepresentation(token: \"sc#0,1,0.5\", expected: \"#FF00FFBC\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0010500"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.ColorTokensKeepOriginalRepresentation(token: \"sc#0.5,0,1,0.5\", expected: \"#8000FFBC\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000123"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.ConfigAliasesAndDefaultDifferenceUseAuthoritativeJson(modern: False)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0282070"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.ConfigAliasesAndDefaultDifferenceUseAuthoritativeJson(modern: True)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0283698"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.CustomFolderMappingUsesExistingLongestPrefixMapper",
+      "outcome": "Passed",
+      "duration": "00:00:00.0027873"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.CustomInheritanceUsesOriginalLookupAndBom(mode: \"absolute\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0008411"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.CustomInheritanceUsesOriginalLookupAndBom(mode: \"embedded\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0010621"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.CustomInheritanceUsesOriginalLookupAndBom(mode: \"relative\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0014030"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.InvalidSourceIsRejected(source: \"999\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0003918"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.InvalidSourceIsRejected(source: \"Custom.\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000171"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.InvalidSourceIsRejected(source: \"Dark.some.json\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000949"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.InvalidSourceIsRejected(source: \"FutureTheme\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000790"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.LinksOpacityAndRoleDefaultsKeepOriginalSemantics",
+      "outcome": "Passed",
+      "duration": "00:00:00.0006286"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.PresetsUseOriginalMaterialsAndCompleteKeys(type: Dark, background: \"#FF000000\", dark: True)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0038424"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.PresetsUseOriginalMaterialsAndCompleteKeys(type: DarkMonochrome, background: \"#FF000000\", dark: True)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0006421"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.PresetsUseOriginalMaterialsAndCompleteKeys(type: HighContrast, background: \"#FF000000\", dark: True)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0018773"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.PresetsUseOriginalMaterialsAndCompleteKeys(type: Light, background: \"#FFFFFFFF\", dark: False)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002181"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.PresetsUseOriginalMaterialsAndCompleteKeys(type: LightMonochrome, background: \"#FFFFFFFF\", dark: False)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002275"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.ScanAndCancellationAreReadOnly",
+      "outcome": "Passed",
+      "duration": "00:00:00.0066244"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.SourceWireFormatsAndDefaultEquality(input: \"\", output: \"Dark\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000149"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.SourceWireFormatsAndDefaultEquality(input: \"Custom\", output: \"Dark\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0035354"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.SourceWireFormatsAndDefaultEquality(input: \"Custom.mine.v2.json\", output: \"Custom.mine.v2.json\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000445"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.SourceWireFormatsAndDefaultEquality(input: \"System\", output: \"System\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0001683"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.SourceWireFormatsAndDefaultEquality(input: null, output: \"Dark\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000465"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.SystemUsesPlatformSnapshot(dark: False, high: False, expected: Light)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002760"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.SystemUsesPlatformSnapshot(dark: False, high: True, expected: HighContrast)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0023893"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.SystemUsesPlatformSnapshot(dark: True, high: False, expected: Dark)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0034492"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.ThemeImportRespectsSelectionAndActualNames(settings: False)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0569985"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.ThemeImportRespectsSelectionAndActualNames(settings: True)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0469940"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeTests.ThemeSaveFailureRestoresSameConfigAndCanRetry",
+      "outcome": "Passed",
+      "duration": "00:00:00.4138904"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeUiTests.DraftRejectsOldScansAndKeepsMissingCustomSelection",
+      "outcome": "Passed",
+      "duration": "00:00:00.0211996"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeUiTests.PresenterRejectsOldLoadsAndDisposedResults",
+      "outcome": "Passed",
+      "duration": "00:00:00.0021946"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeUiTests.RuntimePaletteFlowsToExistingWindowsWithoutReloadingBook",
+      "outcome": "Passed",
+      "duration": "00:00:02.7075614"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeUiTests.SettingsThemeCancelFailureRetryUsesOnlyExistingTransaction",
+      "outcome": "Passed",
+      "duration": "00:00:01.0416536"
+    },
+    {
+      "name": "NeeView.Engine.Tests.ThemeUiTests.TransparentButtonSpecialResourcesKeepOriginalRule",
+      "outcome": "Passed",
+      "duration": "00:00:00.0009346"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Engine 构建",
+      "exit_code": 0
+    },
+    {
+      "name": "原算法与正式视图测试",
+      "exit_code": 0
+    },
+    {
+      "name": "正式入口源码编译（Library检查）",
+      "exit_code": 0
+    },
+    {
+      "name": "正式 Mac 应用构建",
+      "exit_code": 0
+    },
+    {
+      "name": "正式 .app 本地签名校验",
+      "exit_code": 0
+    }
+  ],
+  "formal_app": "构建及本地签名校验通过；运行见独立真机记录，Developer ID/公证/安装未执行",
+  "screenshots": [
+    "p5-theme-custom-main.png",
+    "p5-theme-light-floating.png",
+    "p5-theme-light-main.png",
+    "p5-theme-light-settings.png"
+  ],
+  "foreground_app_activated": false,
+  "user_images_modified": false,
+  "import_sources_modified": false,
+  "windows_baseline_modified": false,
+  "skipped": [
+    "NeeView.Engine.Tests.PageThumbnailResourceTests.ResourceSamplesShowThumbnailsScrollAndCloseWithBoundedResources",
+    "NeeView.Engine.Tests.BrowseResourceTests.MountedResourceSubfoldersRenderAndScrollWithBoundedDisplay"
+  ],
+  "artifacts": "/Users/yuwk/.codex/artifacts/neeview/p5-theme-20261006/final-full",
+  "archived_generated_files": [
+    "p5-theme-archive-cover-layout.png",
+    "p5-theme-archive-settings-layout.png",
+    "p5-theme-banner-layout.png",
+    "p5-theme-book-cards-layout.png",
+    "p5-theme-book-confirm.png",
+    "p5-theme-book-overwrite.png",
+    "p5-theme-bookmark-layout.png",
+    "p5-theme-bookmark-navigation-layout.png",
+    "p5-theme-bookmark-search-layout.png",
+    "p5-theme-bookshelf-bookmarks-layout.png",
+    "p5-theme-cache.json",
+    "p5-theme-commands.json",
+    "p5-theme-confirm.png",
+    "p5-theme-conflict.png",
+    "p5-theme-content-layout.png",
+    "p5-theme-copy-parameter.png",
+    "p5-theme-destination-layout.png",
+    "p5-theme-directory-overwrite.png",
+    "p5-theme-directory-tree-layout.png",
+    "p5-theme-docking-layout.png",
+    "p5-theme-fade-layout.png",
+    "p5-theme-fixed-dataset-layout.png",
+    "p5-theme-floating-layout.png",
+    "p5-theme-hidden-layout.png",
+    "p5-theme-history-layout.png",
+    "p5-theme-history-search-layout.png",
+    "p5-theme-history-settings-layout.png",
+    "p5-theme-index-layout.json",
+    "p5-theme-input-settings-layout.png",
+    "p5-theme-layout.png",
+    "p5-theme-masonry-layout.png",
+    "p5-theme-name.png",
+    "p5-theme-number-layout.png",
+    "p5-theme-overlay-layout.png",
+    "p5-theme-page-end-layout.png",
+    "p5-theme-page-search-layout.png",
+    "p5-theme-page-thumbnails-layout.png",
+    "p5-theme-panorama-layout.png",
+    "p5-theme-parameter-layout.png",
+    "p5-theme-playlist-layout.png",
+    "p5-theme-quickaccess-layout.png",
+    "p5-theme-reading-layout.png",
+    "p5-theme-render.json",
+    "p5-theme-scroll-layout.png",
+    "p5-theme-settings.png",
+    "p5-theme-transform-layout.png",
+    "p5-theme-viewer.json",
+    "p5-theme-virtual-grid-layout.png",
+    "p5-theme-window-layout.png"
+  ],
+  "verified_behavior": [
+    "Original presets, color roles, BasedOn, opacity and Dark fallback",
+    "Unique JSON defaults, differences, unknown keys, save failure and retry",
+    "Selected settings and matching imported theme bind to the same Profile directory",
+    "Formal settings command and save button; cancel, failure, retry and success",
+    "Main, floating, settings, menus and dropdown resources update",
+    "Stable Book/Page/Position and no additional image decoding after theme switch",
+    "Late results rejected and platform listener removed on close"
+  ],
+  "limitations": [
+    "System theme events, platform contrast/accent and system picker not device-verified",
+    "Fixed Windows dynamic comparison and actual two-branch user exports not performed",
+    "Original open-theme-folder/sample action and documentation link remain unconnected",
+    "Full settings/fonts, effects/media and script execution remain to migrate",
+    "Developer ID, notarization and clean install not performed; P5 remains incomplete",
+    "Previously skipped P3/P4 checks and existing AX/NAS issues remain recorded"
+  ]
+}

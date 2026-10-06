@@ -124,6 +124,9 @@ public sealed partial class MacApp : Avalonia.Application
             model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state);
             var platform = new MacPlatformService();
             candidate = new MainWindow(); _window = candidate; candidate.Bind(model, images, platform);
+            var theme = new ThemePresenter(this, Config.Current.Theme); candidate.AttachTheme(theme);
+            await theme.RefreshAsync();
+            if (_shuttingDown) { await candidate.PrepareShutdownAsync(); candidate.Close(); return; }
             _window.AttachProfileImport(new ProfileImportReader(), request => ApplyProfileImportAsync(state, request));
             _window.AttachPlatformInput(new MacTrackpadInput());
             var boundWindow = _window;

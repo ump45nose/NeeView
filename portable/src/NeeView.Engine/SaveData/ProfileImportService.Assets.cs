@@ -6,7 +6,7 @@ namespace NeeView;
 
 public sealed partial class ProfileImportService
 {
-    /// <summary>附属数据只读候选；列表复用唯一格式解析器，主题/脚本不装载、不执行。</summary>
+    /// <summary>附属数据只读候选；列表复用唯一格式解析器，预览不装载主题、不执行脚本。</summary>
     /// <param name="bundle">受限读取结果。</param><param name="mapper">显式物理路径映射。</param>
     /// <param name="paths">共享路径报告。</param><param name="notices">共享能力报告。</param><param name="token">候选生成取消。</param>
     /// <returns>私有字节快照及逐文件能力状态；坏列表仅阻止选择该类别。</returns>
@@ -26,7 +26,7 @@ public sealed partial class ProfileImportService
             var capability = kind switch
             {
                 ProfileImportAssetKind.Playlists => "原列表格式；选中后覆盖同名，进入现有播放列表链路",
-                ProfileImportAssetKind.Themes => "原 JSON 材料保留；主题应用尚未迁入",
+                ProfileImportAssetKind.Themes => "原 JSON 主题；导入后按配置选择加载，失败回退 Dark",
                 _ => "原 .nvjs 材料保留；不注册命令、不执行事件脚本"
             };
             if (kind == ProfileImportAssetKind.Playlists)
@@ -60,8 +60,10 @@ public sealed partial class ProfileImportService
         }
         if (summaries.Any(s => ProfileImportAssets.Kind(s.Path) == ProfileImportAssetKind.Playlists))
             notices.Add("播放列表导入到当前 Mac Profile/Playlists；选中后切换到该目录，保留未覆盖列表。路径映射只处理 Items 的完整 Path，归档内部相对值与未知字段保持。");
-        if (summaries.Any(s => ProfileImportAssets.Kind(s.Path) is ProfileImportAssetKind.Themes or ProfileImportAssetKind.Scripts))
-            notices.Add("主题和脚本仅保存到当前 Mac Profile/Themes、Scripts；导入及窗口重建不装载主题、不执行 OnStartup/OnBookLoaded 等脚本。实际能力继续占位。");
+        if (summaries.Any(s => ProfileImportAssets.Kind(s.Path) == ProfileImportAssetKind.Themes))
+            notices.Add("主题保存到 Mac Profile/Themes；同时导入设置并引用同包主题时使用该目录，重建后加载当前选择，失败回退 Dark。预览不装载主题；只选主题材料不更改目录配置。");
+        if (summaries.Any(s => ProfileImportAssets.Kind(s.Path) == ProfileImportAssetKind.Scripts))
+            notices.Add("脚本仅保存到当前 Mac Profile/Scripts；不执行 OnStartup/OnBookLoaded 等脚本，实际能力继续占位。");
         return (bytes, summaries.AsReadOnly());
     }
 }

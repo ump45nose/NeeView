@@ -1,0 +1,120 @@
+{
+  "Format": "NeeView.Theme/1.0.0",
+  "FormatManual": "https://neelabo.github.io/NeeView/theme.html",
+  "Colors": {
+    "Window.Background": "#FF000000",
+    "Window.Foreground": "#FFE0E0E0",
+    "Window.Border": "#00808080",
+    "Window.ActiveTitle": "Window.Foreground",
+    "Window.InactiveTitle": "Window.Foreground/0.50",
+
+    "Window.Dialog.Border": "#FF404040",
+
+    "Control.Background": "#FFA0A0A0",
+    "Control.Foreground": "",
+    "Control.Border": "#FFA0A0A0",
+    "Control.GrayText": "#FF909090",
+    "Control.Accent": "Window.Foreground",
+    "Control.AccentText": "#FF404040",
+    "Control.Danger": "#FFE81123",
+    "Control.DangerText": "#FFFFFFFF",
+    "Control.Focus": "Control.Accent",
+    "Control.MouseOver.Background": "#FF404040",
+
+    "Item.Separator": "#22888888",
+    "Item.MouseOver.Background": "#FFFFFFFF/0.15",
+    "Item.MouseOver.Border": "",
+    "Item.Selected.Background": "#FFFFFFFF/0.25",
+    "Item.Selected.Border": "",
+    "Item.Inactive.Background": "#00000000",
+    "Item.Inactive.Border": "#FF606060",
+
+    "Button.Background": "#FF404040",
+    "Button.Foreground": "Window.Foreground",
+    "Button.Border": "",
+    "Button.MouseOver.Background": "#44FFFFFF",
+    "Button.MouseOver.Border": "",
+    "Button.Checked.Background": "#44FFFFFF",
+    "Button.Checked.Border": "Control.Accent",
+    "Button.Pressed.Background": "#88FFFFFF",
+    "Button.Pressed.Border": "",
+
+    "IconButton.Background": "#00000000",
+    "IconButton.Foreground": "Control.Accent",
+    "IconButton.Border": "",
+    "IconButton.MouseOver.Background": "#20FFFFFF",
+    "IconButton.MouseOver.Border": "",
+    "IconButton.Checked.Background": "Control.Accent/0.20",
+    "IconButton.Checked.Border": "",
+    "IconButton.Pressed.Background": "#30FFFFFF",
+    "IconButton.Pressed.Border": "",
+
+    "ScrollBar.Background": "#FF404040",
+    "ScrollBar.Foreground": "#FF808080",
+    "ScrollBar.Border": "",
+    "ScrollBar.MouseOver": "#FFA0A0A0",
+    "ScrollBar.Pressed": "#FFC0C0C0",
+
+    "Slider.Background": "#FF505050",
+    "Slider.Foreground": "",
+    "Slider.Border": "",
+    "Slider.Thumb": "Control.Accent",
+    "Slider.Thumb.MouseOver": "Slider.Thumb/0.5",
+    "Slider.Track": "",
+
+    "TextBox.Background": "#FF202020",
+    "TextBox.Foreground": "",
+    "TextBox.Border": "Control.Border",
+    "TextBox.MouseOver.Background": "#FF404040",
+
+    "Menu.Background": "#FF222222",
+    "Menu.Foreground": "",
+    "Menu.Border": "#FF404040",
+    "Menu.Separator": "#FF808080",
+
+    "SideBar.Background": "#FF303030",
+    "SideBar.Foreground": "",
+    "SideBar.Border": "",
+
+    "Panel.Background": "#FF202020",
+    "Panel.Foreground": "",
+    "Panel.Border": "",
+    "Panel.Header": "#FF808080",
+    "Panel.Note": "Control.GrayText",
+    "Panel.Separator": "#FF404040",
+    "Panel.Splitter": "SideBar.Background",
+
+    "MenuBar.Background": "#FF383838",
+    "MenuBar.Foreground": "",
+    "MenuBar.Border": "",
+    "MenuBar.Address.Background": "#FF282828",
+    "MenuBar.Address.Border": "",
+
+    "BottomBar.Background": "MenuBar.Background",
+    "BottomBar.Foreground": "MenuBar.Foreground",
+    "BottomBar.Border": "",
+    "BottomBar.Slider.Background": "Slider.Background",
+    "BottomBar.Slider.Foreground": "Slider.Foreground",
+    "BottomBar.Slider.Border": "Slider.Border",
+    "BottomBar.Slider.Thumb": "Control.Accent",
+    "BottomBar.Slider.Thumb.MouseOver": "BottomBar.Slider.Thumb/0.5",
+    "BottomBar.Slider.Track": "Control.Accent",
+
+    "Toast.Background": "Menu.Background",
+    "Toast.Foreground": "Menu.Foreground",
+    "Toast.Border": "Menu.Border",
+
+    "Notification.Background": "#88000000",
+    "Notification.Foreground": "#FFFFFFFF",
+
+    "Thumbnail.Background": "#FF404040",
+    "Thumbnail.Foreground": "#FF808080",
+
+    "SelectedMark.Foreground": "Control.Accent",
+    "CheckIcon.Foreground": "Window.Foreground",
+    "BookmarkIcon.Foreground": "#FFFFA07A",
+    "PlaylistItemIcon.Foreground": "#FFFFA07A",
+
+    "Tag.Background": "#FFA0A0A0"
+  }
+}

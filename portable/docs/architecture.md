@@ -1,5 +1,8 @@
 # NeeView Mac 源码迁移架构
 
+P5 第八批接入原 ThemeConfig/ThemeSource/ThemeColor/ThemeProfile 与预设 JSON、BasedOn、失败回退和实际颜色应用。Engine 只输出颜色值，Mac 的 ThemePresenter 管应用资源/系统色值，主题表单独立；保存成功后才应用，启动/导入重建沿唯一链路。原窗口区域和书籍/图片工厂保持。见[主题契约](p5-theme.md)。
+
+
 P5 第七批将原三个一级附属目录接入预览、独立选择和唯一Profile提交/备份/恢复，列表复用现有格式与Hub；Mac管理目录落点在确认中说明。主题/脚本只保留原材料，不装载或执行。动态恢复清单受限，旧五文件备份兼容。契约见[附属文件导入](p5-profile-assets.md)。
 
 P5 第六批接入原 Alpha.5 的旧单效果→首层/参数缓存/默认预设纯数据升级，早期Mac保留标记可继续迁移，现代层/未来类型不被旧标记覆盖。预览/应用/差分保存仍走唯一JSON链，原材料归档；实际效果执行及编辑尚未接入。契约见[效果兼容](p5-effect-compatibility.md)。

@@ -1,0 +1,121 @@
+{
+  "Format": "NeeView.Theme/1.0.0",
+  "FormatManual": "https://neelabo.github.io/NeeView/theme.html",
+  "Colors": {
+    "Window.Background": "#FFFFFFFF",
+    "Window.Foreground": "#FF404040",
+    "Window.Border": "#00808080",
+    "Window.ActiveTitle": "Window.Foreground",
+    "Window.InactiveTitle": "Window.ActiveTitle/0.5",
+
+    "Window.Dialog.Border": "Window.Border",
+
+    "Control.Background": "#FFC0C0C0",
+    "Control.Foreground": "",
+    "Control.Border": "#FFC0C0C0",
+    "Control.GrayText": "#FFA0A0A0",
+    "Control.Accent": "Window.Foreground",
+    "Control.AccentText": "#FFE0E0E0",
+    "Control.Danger": "#FFE81123",
+    "Control.DangerText": "#FFFFFFFF",
+    "Control.Focus": "Control.Accent",
+    "Control.MouseOver.Background": "#FFE8E8E8",
+
+    "Item.Separator": "#22888888",
+    "Item.MouseOver.Background": "#11000000",
+    "Item.MouseOver.Border": "",
+    "Item.Selected.Background": "#18000000",
+    "Item.Selected.Border": "",
+    "Item.Inactive.Background": "#00000000",
+    "Item.Inactive.Border": "#FFAAAAAA",
+
+    "Button.Background": "#FFD0D0D0",
+    "Button.Foreground": "Window.Foreground",
+    "Button.Border": "",
+    "Button.MouseOver.Background": "#44FFFFFF",
+    "Button.MouseOver.Border": "",
+    "Button.Checked.Background": "#44FFFFFF",
+    "Button.Checked.Border": "Control.Accent",
+    "Button.Pressed.Background": "#88FFFFFF",
+    "Button.Pressed.Border": "",
+
+    "IconButton.Background": "#00000000",
+    "IconButton.Foreground": "Control.Accent",
+    "IconButton.Border": "",
+    "IconButton.MouseOver.Background": "#11000000",
+    "IconButton.MouseOver.Border": "",
+    "IconButton.Checked.Background": "Control.Accent/0.20",
+    "IconButton.Checked.Border": "",
+    "IconButton.Pressed.Background": "#22000000",
+    "IconButton.Pressed.Border": "",
+
+    "ScrollBar.Background": "#FFE0E0E0",
+    "ScrollBar.Foreground": "#FF808080",
+    "ScrollBar.Border": "",
+    "ScrollBar.MouseOver": "#FF606060",
+    "ScrollBar.Pressed": "#FF404040",
+
+    "Slider.Background": "#FFC0C0C0",
+    "Slider.Foreground": "",
+    "Slider.Border": "",
+    "Slider.Thumb": "Control.Accent",
+    "Slider.Thumb.MouseOver": "Slider.Thumb/0.5",
+    "Slider.Track": "",
+
+    "TextBox.Background": "#FFF8F8F8",
+    "TextBox.Foreground": "",
+    "TextBox.Border": "Control.Border",
+    "TextBox.MouseOver.Background": "#FFF8F8F8",
+
+    "Menu.Background": "",
+    "Menu.Foreground": "",
+    "Menu.Border": "#FFA0A0A0",
+    "Menu.Separator": "#FF808080",
+
+    "SideBar.Background": "#FFE0E0E0",
+    "SideBar.Foreground": "",
+    "SideBar.Border": "",
+
+    "Panel.Background": "#FFF8F8F8",
+    "Panel.Foreground": "",
+    "Panel.Border": "",
+    "Panel.Header": "#FF808080",
+    "Panel.Note": "Control.GrayText",
+    "Panel.Separator": "#FFC0C0C0",
+    "Panel.Splitter": "SideBar.Background",
+
+    "MenuBar.Background": "#FFD8D8D8",
+    "MenuBar.Foreground": "",
+    "MenuBar.Border": "",
+    "MenuBar.Address.Background": "#FFE8E8E8",
+    "MenuBar.Address.Border": "",
+
+    "BottomBar.Background": "MenuBar.Background",
+    "BottomBar.Foreground": "MenuBar.Foreground",
+    "BottomBar.Border": "",
+
+    "BottomBar.Slider.Background": "Slider.Background",
+    "BottomBar.Slider.Foreground": "Slider.Foreground",
+    "BottomBar.Slider.Border": "Slider.Border",
+    "BottomBar.Slider.Thumb": "Control.Accent",
+    "BottomBar.Slider.Thumb.MouseOver": "BottomBar.Slider.Thumb/0.5",
+    "BottomBar.Slider.Track": "Control.Accent",
+
+    "Toast.Background": "Menu.Background",
+    "Toast.Foreground": "Menu.Foreground",
+    "Toast.Border": "Menu.Border",
+
+    "Notification.Background": "#88000000",
+    "Notification.Foreground": "#FFFFFFFF",
+
+    "Thumbnail.Background": "#FFA0A0A0",
+    "Thumbnail.Foreground": "#FFC0C0C0",
+
+    "SelectedMark.Foreground": "Control.Accent",
+    "CheckIcon.Foreground": "Window.Foreground",
+    "BookmarkIcon.Foreground": "#FFFFA07A",
+    "PlaylistItemIcon.Foreground": "#FFFFA07A",
+
+    "Tag.Background": "#FFA0A0A0"
+  }
+}

@@ -57,3 +57,5 @@ P2第二十一批：历史/书架/书签原四模板入口启用，Content左封
 P3第二批在原FolderPanel内部转换普通目录树Top/Left分隔布局，既有书架书签树及左右停靠关系保持。PageListPanel增加原四模板更多入口，使用原Page及共享64 MiB缩略预算。主题和资源所有权独立，详见[p3-navigation.md](p3-navigation.md)。
 
 P3收尾在原PageListPanel标题下转换书名/搜索区、目录组树和正文列表分隔，计数在底部；目录树可Top/Left，不改变主窗口或两侧面板关系。书架搜索仍在原FolderPanel内部，设置左导航新增页面列表/书架页，原历史页索引保持。展示模板/颜色/尺寸独立于原SourcePages过滤、排序与保存。合成截图见../acceptance/p3-completion-page-search-layout.png；静默实际控件测试不当作Mac焦点/弹出层或Windows动态验收。
+
+P5 第八批新增原设置主题/目录页面，仍沿左导航、右内容和底部保存/取消；预设JSON决定颜色，Fluent模板和布局区域保持。主/浮/设置与菜单/下拉使用同一应用资源，详见[p5-theme.md](p5-theme.md)。

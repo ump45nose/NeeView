@@ -77,6 +77,7 @@ public sealed partial class ProfileImportService(IProfileImportReader reader, IR
                     Map(start, "LastFolderPath", "Config.StartUp");
                     foreach (var field in new[] { "DestinationFolderCollection", "DestinationFodlerCollection" })
                         Walk(Array(Object(config, "System"), field), "Config.System." + field, "Path");
+                    Map(Object(config, "Theme"), "CustomThemeFolder", "Config.Theme");
                     Map(Object(config, "Playlist"), "PlaylistFolder", "Config.Playlist");
                     Map(Object(config, "Playlist"), "CurrentPlaylist", "Config.Playlist");
                     Map(Object(Object(config, "Book"), "ExportImageParameter"), "ExportFolder", "Config.Book.ExportImageParameter");

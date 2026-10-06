@@ -93,7 +93,7 @@ public sealed class ProfileImportAssetTests
         var result = await state.ApplyProfileImportAsync(preview.CreateRequest(Assets(themes: true)), Token);
         Assert.Equal(new[] { "Themes/x.json" }, result.AppliedFiles);
         Assert.Equal("untouched", File.ReadAllText(Path.Combine(f.Root, "Scripts/x.nvjs"))); Assert.Equal(setting, f.Get("UserSetting.json"));
-        Assert.Contains(preview.Assets, a => a.Capability.Contains("主题应用尚未迁入")); Assert.Contains(preview.Assets, a => a.Capability.Contains("不执行事件脚本"));
+        Assert.Contains(preview.Assets, a => a.Capability.Contains("导入后按配置选择加载")); Assert.Contains(preview.Assets, a => a.Capability.Contains("不执行事件脚本"));
         Assert.Throws<InvalidDataException>(() => preview.CreateRequest(Assets()));
     }
 

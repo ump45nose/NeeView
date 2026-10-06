@@ -13,6 +13,8 @@ public sealed partial class SettingsWindow : Window
     private IReadOnlyList<ShortcutEdit> _inputs = [];
     private bool _initialized;
     private bool _saving;
+    /// <summary>只有原五文件事务成功才允许宿主应用外观草稿。</summary>
+    public bool WasSaved { get; private set; }
     private HistorySettingsViewModel? _historySettings;
     private bool _resetInputDefaults;
     private readonly Dictionary<string, CommandParameterEdit> _parameters = [];
@@ -33,7 +35,7 @@ public sealed partial class SettingsWindow : Window
     {
         _model = model;
         _inputs = model.Commands.Definitions.Select(d => new ShortcutEdit(d, model.SaveData.GetShortcut(d.Name, d.Shortcut), available?.Invoke(d.Name) ?? model.Commands.IsAvailable(d.Name), model.SaveData.GetMouseGesture(d.Name, d.MouseGesture).ToString())).ToArray();
-        this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm(); FillAutoHide(); FillView(); FillNavigation(); FillFiles();
+        this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm(); FillAutoHide(); FillView(); FillNavigation(); FillFiles(); FillTheme();
         this.FindControl<CheckBox>("GestureEnabled")!.IsChecked = Config.Current.Mouse.IsGestureEnabled;
         FillNumber("GestureDistance", Config.Current.Mouse.GestureMinimumDistance, 5, 200);
         this.FindControl<ComboBox>("InputScheme")!.SelectedIndex = (int)Config.Current.Command.PresetInputScheme;
@@ -63,6 +65,7 @@ public sealed partial class SettingsWindow : Window
         this.FindControl<ScrollViewer>("HistorySettings")!.IsVisible = index == 4;
         this.FindControl<ScrollViewer>("NavigationSettings")!.IsVisible = index == 5;
         this.FindControl<ScrollViewer>("FileSettings")!.IsVisible = index == 6;
+        this.FindControl<ScrollViewer>("ThemeSettings")!.IsVisible = index == 7;
     }
     /// <summary>按名称及命令标识过滤编辑副本，未展示的键位也保留。</summary>
     private void InputSearch_Changed(object? sender, TextChangedEventArgs e)
@@ -279,14 +282,14 @@ public sealed partial class SettingsWindow : Window
                     _model.SaveData.SetMouseGestureDifference(input.Name, input.MouseGesture.Trim(), input.Definition.MouseGesture);
                 Config.Current.Mouse.IsGestureEnabled = this.FindControl<CheckBox>("GestureEnabled")!.IsChecked == true;
                 Config.Current.Mouse.GestureMinimumDistance = (double)(this.FindControl<NumericUpDown>("GestureDistance")!.Value ?? 30);
-                ApplyFilm(); ApplyAutoHide(); ApplyView(); _historySettings!.ApplyPolicy(Config.Current.History); ApplyNavigation(); ApplyFiles();
+                ApplyFilm(); ApplyAutoHide(); ApplyView(); _historySettings!.ApplyPolicy(Config.Current.History); ApplyNavigation(); ApplyFiles(); _themeSettings!.Apply(Config.Current.Theme);
                 foreach (var parameter in _parameters.Values) parameter.Apply(_model.SaveData);
                 Config.Current.Bookshelf.FolderSortOrder = (FolderSortOrder)Math.Max(0, this.FindControl<ComboBox>("BookshelfGroup")!.SelectedIndex);
                 Config.Current.Book.IsPrioritizeBookMove = this.FindControl<CheckBox>("PrioritizeBookMove")!.IsChecked == true;
                 Config.Current.StartUp.IsOpenLastFolder = this.FindControl<CheckBox>("OpenLastFolder")!.IsChecked == true;
                 Config.Current.StartUp.IsOpenLastBookmarkFolder = this.FindControl<CheckBox>("OpenLastBookmarkFolder")!.IsChecked == true;
             }, _historySettings!.GetLimits());
-            _saving = false; Close();
+            WasSaved = true; _saving = false; Close();
         }
         catch (Exception ex)
         {

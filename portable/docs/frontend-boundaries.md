@@ -113,3 +113,5 @@ P4第十一批逻辑书复制没有新增视图业务：既有菜单依赖CanCop
 P4收尾：ContentDropSnapshot只借用拖放数据并复制有限字节，Bitmap所有权仍归发送者；下载/编码探测/临时材料由后端接收器处理。页面列表Delete只转交原Page显式选区，类型分组、ZIP权限/强制确认及真实成功项协调归Engine/来源。SettingsWindow.Files只编辑原ZIP权限草稿；样式、布局和对话框文案独立，见[p4-completion.md](p4-completion.md)。
 
 设备修复：页面列表Delete在窗口Tunnel的焦点作用域先分派，避免全局DeleteFile抢先处理；控件不实现删除规则。Retina吸附在最终显示矩阵完成，绘制/命中/诊断共用；原PageFrame和逻辑Pan不变。Finder引用URL只在后端解析，界面没有Foundation依赖。无障碍查询的存活回调数组增长另记为设备失败，不因主题、控件或输入简化掩盖，见[设备验收](../acceptance/p34-device-runtime.md)。
+
+P5 第八批：主题结构在SettingsWindow.axaml，选择/目录/扫描草稿在ThemeSettingsViewModel；Engine读取原JSON和颜色引用/继承/回退，ThemePresenter只发布应用颜色/Fluent变体。启动与导入重建绑定同一Config，设置保存成功才刷新主题；取消或失败保留已显示资源。主/浮/设置/弹出层共用资源；不打开书籍、重排页面或请求像素，详见[p5-theme.md](p5-theme.md)。

@@ -1,0 +1,120 @@
+{
+  "Format": "NeeView.Theme/1.0.0",
+  "FormatManual": "https://neelabo.github.io/NeeView/theme.html",
+  "Colors": {
+    "Window.Background": "#FF000000",
+    "Window.Foreground": "#FFFFFFFF",
+    "Window.Border": "Control.Border",
+    "Window.ActiveTitle": "Window.Foreground",
+    "Window.InactiveTitle": "Window.Foreground",
+
+    "Window.Dialog.Border": "Window.Border",
+
+    "Control.Background": "#FF000000",
+    "Control.Foreground": "",
+    "Control.Border": "#FF80D0FF",
+    "Control.GrayText": "#FF00FF00",
+    "Control.Accent": "#FFFFA500",
+    "Control.AccentText": "#FF000000",
+    "Control.Danger": "#FFE81123",
+    "Control.DangerText": "#FFFFFFFF",
+    "Control.Focus": "Control.Accent",
+    "Control.MouseOver.Background": "Control.Background",
+
+    "Item.Separator": "#00FFFFFF",
+    "Item.MouseOver.Background": "#00000000",
+    "Item.MouseOver.Border": "Control.Accent",
+    "Item.Selected.Background": "#00000000",
+    "Item.Selected.Border": "Control.Accent",
+    "Item.Inactive.Background": "#00000000",
+    "Item.Inactive.Border": "Control.Foreground",
+
+    "Button.Background": "#00000000",
+    "Button.Foreground": "Control.Foreground",
+    "Button.Border": "Control.Foreground",
+    "Button.MouseOver.Background": "#00000000",
+    "Button.MouseOver.Border": "Control.Accent",
+    "Button.Checked.Background": "#00000000",
+    "Button.Checked.Border": "Control.Accent",
+    "Button.Pressed.Background": "#00000000",
+    "Button.Pressed.Border": "Control.Accent",
+
+    "IconButton.Background": "#00000000",
+    "IconButton.Foreground": "Control.Accent",
+    "IconButton.Border": "",
+    "IconButton.MouseOver.Background": "#00000000",
+    "IconButton.MouseOver.Border": "Control.Accent",
+    "IconButton.Checked.Background": "#00000000",
+    "IconButton.Checked.Border": "Control.Accent",
+    "IconButton.Pressed.Background": "#00000000",
+    "IconButton.Pressed.Border": "Control.Foreground",
+
+    "ScrollBar.Background": "#FF000000",
+    "ScrollBar.Foreground": "#FFFFFFFF",
+    "ScrollBar.Border": "#FFFFFFFF",
+    "ScrollBar.MouseOver": "#FFFFFFFF",
+    "ScrollBar.Pressed": "#FFFFFFFF",
+
+    "Slider.Background": "Window.Foreground",
+    "Slider.Foreground": "",
+    "Slider.Border": "",
+    "Slider.Thumb": "Control.Accent",
+    "Slider.Thumb.MouseOver": "Slider.Thumb",
+    "Slider.Track": "",
+
+    "TextBox.Background": "Window.Background",
+    "TextBox.Foreground": "Window.Foreground",
+    "TextBox.Border": "Control.Border",
+    "TextBox.MouseOver.Background": "Window.Background",
+
+    "Menu.Background": "",
+    "Menu.Foreground": "",
+    "Menu.Border": "Window.Border",
+    "Menu.Separator": "Menu.Foreground",
+
+    "SideBar.Background": "",
+    "SideBar.Foreground": "",
+    "SideBar.Border": "Control.Border",
+
+    "Panel.Background": "",
+    "Panel.Foreground": "",
+    "Panel.Border": "Control.Border",
+    "Panel.Header": "Control.Foreground",
+    "Panel.Note": "Control.GrayText",
+    "Panel.Separator": "Control.Border",
+    "Panel.Splitter": "Control.Border",
+
+    "MenuBar.Background": "",
+    "MenuBar.Foreground": "",
+    "MenuBar.Border": "Control.Border",
+    "MenuBar.Address.Background": "",
+    "MenuBar.Address.Border": "Control.Border",
+
+    "BottomBar.Background": "",
+    "BottomBar.Foreground": "MenuBar.Foreground",
+    "BottomBar.Border": "Control.Border",
+    "BottomBar.Slider.Background": "Slider.Background",
+    "BottomBar.Slider.Foreground": "Slider.Foreground",
+    "BottomBar.Slider.Border": "Slider.Border",
+    "BottomBar.Slider.Thumb": "Slider.Thumb",
+    "BottomBar.Slider.Thumb.MouseOver": "BottomBar.Slider.Thumb",
+    "BottomBar.Slider.Track": "BottomBar.Slider.Thumb",
+
+    "Toast.Background": "",
+    "Toast.Foreground": "",
+    "Toast.Border": "Control.Border",
+
+    "Notification.Background": "#FF000000",
+    "Notification.Foreground": "#FFFFFFFF",
+
+    "Thumbnail.Background": "#FF404040",
+    "Thumbnail.Foreground": "#FF808080",
+
+    "SelectedMark.Foreground": "#FFFFA500",
+    "CheckIcon.Foreground": "#FF90EE90",
+    "BookmarkIcon.Foreground": "#FFFFA500",
+    "PlaylistItemIcon.Foreground": "#FFFFA500",
+
+    "Tag.Background": "#FF00FF00"
+  }
+}
