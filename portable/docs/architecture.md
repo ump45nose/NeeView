@@ -1,5 +1,8 @@
 # NeeView Mac 源码迁移架构
 
+P5 第十六批：ZIP AES/PKWARE、RAR4/5 与 7z 固实加密接入原 ArchiveKey 打开链。来源私有口令、真实抽取验证、逻辑路径缓存、取消及失败父链释放保持；加密 ZIP 只读，普通 ZIP 删除不变。见[压缩密码契约](p5-compressed-password.md)。
+
+
 P5 第十五批：原ArchiveKey/进程AES缓存及纯输入弹窗接入唯一打开链；根/明确嵌套PDF通过系统后端解锁，后台无交互、失败父链释放、切书/关闭取消，见[密码契约](p5-pdf-password.md)。压缩密码仍待迁。
 
 P5 第十三批：原PDF归档/页目录/三种尺寸及原JSON配置接入唯一阅读链；CoreGraphics/PDFKit官方绑定替换PDFium。正文直接输出像素，提取才惰性PNG，请求级流初始化/读/关闭串行。PDF密码交互由P5第十五批接入，压缩密码仍待迁，扩展名配置已接入，见[PDF契约](p5-pdf.md)。

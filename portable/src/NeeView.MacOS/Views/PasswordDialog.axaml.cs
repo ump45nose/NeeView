@@ -13,6 +13,7 @@ public sealed partial class PasswordDialog : Window
         AvaloniaXamlLoader.Load(this);
         this.FindControl<TextBlock>("SourceName")!.Text = "请输入密码：" + System.IO.Path.GetFileName(request.ArchivePath);
         this.FindControl<TextBlock>("IncorrectPassword")!.IsVisible = request.IsRetry;
+        if (request.MayBeDamaged) this.FindControl<TextBlock>("IncorrectPassword")!.Text = "密码不正确，或加密内容已损坏。请重试或取消。";
         var input = this.FindControl<TextBox>("PasswordInput")!;
         input.TextChanged += (_, _) => this.FindControl<Button>("AcceptPassword")!.IsEnabled = !string.IsNullOrEmpty(input.Text);
         input.KeyDown += (_, e) => { if (e.Key == Key.Enter) { e.Handled = true; Accept(this, new()); } else if (e.Key == Key.Escape) { e.Handled = true; Close(null); } };

@@ -56,6 +56,7 @@ public sealed partial class CompressedArchive
 {
     private readonly HashSet<int> _deletedIds = [];
     public override bool CanDelete(IReadOnlyList<ArchiveEntry> entries) => !IsDisposed && Source is null && Config.Current.Archive.Zip.IsFileWriteAccessEnabled && _archive.Type == SharpCompress.Common.ArchiveType.Zip
+        && !_entries.Any(e => e.IsEncrypted)
         && entries.Count > 0 && entries.All(e => ReferenceEquals(e.Archive, this) && (e.Id >= 0 && e.Id < _entries.Count && !_deletedIds.Contains(e.Id)
             || e.Id < 0 && e.IsDirectory && ContainsDirectory(e.EntryName)));
     /// <summary>ZIP根来源按原条目ID删除并展开目录子项。暂存完整副本后原子替换；RAR/7z保持只读。</summary>

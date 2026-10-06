@@ -2,11 +2,12 @@
 namespace NeeView;
 
 /// <summary>原归档口令交互数据；只携带逻辑来源和重试状态，不携带口令。</summary>
-public sealed record ArchiveKeyRequest(string ArchivePath, bool IsRetry);
+public sealed record ArchiveKeyRequest(string ArchivePath, bool IsRetry, bool MayBeDamaged = false);
 /// <summary>后端确实遇到锁定文档时回报；损坏与其他错误不能被当作口令失败。</summary>
-public sealed class ArchiveKeyRequiredException(string archivePath = "") : NotSupportedException("来源需要密码或密码不正确。")
+public sealed class ArchiveKeyRequiredException(string archivePath = "", bool mayBeDamaged = false) : NotSupportedException(mayBeDamaged ? "密码不正确，或加密内容已损坏。" : "来源需要密码或密码不正确。")
 {
     public string ArchivePath { get; } = archivePath;
+    public bool MayBeDamaged { get; } = mayBeDamaged;
 }
 
 /// <summary>保留原None/Completed/Canceled状态；每次打开拥有自己的重试对象。</summary>
@@ -25,10 +26,10 @@ public sealed class ArchiveKey(string fileName)
     /// <summary>在后台槽之外等待界面；输入取消或迟到时不改变候选及缓存。</summary>
     /// <param name="request">独立表现端口令输入。</param><param name="token">切书/关闭取消。</param>
     /// <returns>是否获得非空候选，false保持旧书且结束本次打开。</returns>
-    public async Task<bool> UpdateArchiveKeyByUserAsync(Func<ArchiveKeyRequest, CancellationToken, Task<string?>> request, CancellationToken token)
+    public async Task<bool> UpdateArchiveKeyByUserAsync(Func<ArchiveKeyRequest, CancellationToken, Task<string?>> request, CancellationToken token, bool mayBeDamaged = false)
     {
         token.ThrowIfCancellationRequested(); if (State == ArchiveKeyState.Canceled) return false;
-        var value = await request(new(fileName, State == ArchiveKeyState.Completed), token).ConfigureAwait(false);
+        var value = await request(new(fileName, State == ArchiveKeyState.Completed, mayBeDamaged), token).ConfigureAwait(false);
         token.ThrowIfCancellationRequested();
         if (string.IsNullOrEmpty(value)) { SetState(ArchiveKeyState.Canceled); return false; }
         SetKey(value); return true;

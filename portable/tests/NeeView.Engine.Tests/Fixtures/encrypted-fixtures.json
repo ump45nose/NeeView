@@ -1,0 +1,46 @@
+{
+  "license": "SharpCompress MIT，见SharpCompress-LICENSE.txt；合成夹具按仓库MIT",
+  "passwords": "上游公开夹具：RAR/ZIP AES=test，7z=testpassword；合成ZIP=synthetic-test-only。均为测试常量，不含用户口令。",
+  "files": [
+    {
+      "name": "Rar.encrypted_filesAndHeader.rar",
+      "sha256": "3944a0cf36758d042c238dacae56a4fa494b6f790c4f0dd719d9a47b7c845202",
+      "source": "https://github.com/adamhathcock/sharpcompress/blob/0.50.3/tests/TestArchives/Archives/Rar.encrypted_filesAndHeader.rar"
+    },
+    {
+      "name": "Zip.deflate.WinzipAES.zip",
+      "sha256": "deb1d7c7e0f0a6bc78c41ee9fe3f9bf501695f7d01091987a4ce22a9963be32b",
+      "source": "https://github.com/adamhathcock/sharpcompress/blob/0.50.3/tests/TestArchives/Archives/Zip.deflate.WinzipAES.zip"
+    },
+    {
+      "name": "Rar5.encrypted_filesAndHeader.rar",
+      "sha256": "63fc4b5576f7482311e950155607e171696588881bdd277c8c099efd2f98b6e2",
+      "source": "https://github.com/adamhathcock/sharpcompress/blob/0.50.3/tests/TestArchives/Archives/Rar5.encrypted_filesAndHeader.rar"
+    },
+    {
+      "name": "Rar.encrypted_filesOnly.rar",
+      "sha256": "52c0d575e01750ae643c65866b5e06e67773a0aed5edea6b2b04e7de14a784a2",
+      "source": "https://github.com/adamhathcock/sharpcompress/blob/0.50.3/tests/TestArchives/Archives/Rar.encrypted_filesOnly.rar"
+    },
+    {
+      "name": "Zip.pkware.synthetic.zip",
+      "sha256": "34c6b0bc6a29d472d97a2bc10991ece20db8a3f6b802f8529b203bee0c018e23",
+      "source": "NeeView合成16x16红色PNG，macOS zip生成PKWARE归档"
+    },
+    {
+      "name": "Rar5.encrypted_filesOnly.rar",
+      "sha256": "e5fb06af812633b246430f029a051cc462d00180a0df455a798644deccdc7d07",
+      "source": "https://github.com/adamhathcock/sharpcompress/blob/0.50.3/tests/TestArchives/Archives/Rar5.encrypted_filesOnly.rar"
+    },
+    {
+      "name": "7Zip.LZMA.Aes.7z",
+      "sha256": "517331153899be02ec41e03b9095e435701c2af66ae40db21081f0d77440b97a",
+      "source": "https://github.com/adamhathcock/sharpcompress/blob/0.50.3/tests/TestArchives/Archives/7Zip.LZMA.Aes.7z"
+    },
+    {
+      "name": "7Zip.LZMA2.Aes.7z",
+      "sha256": "fa05b223e2bf44e404b6d3886db1b9fd661c0d6ad2856eee5d9c007a579ea8b4",
+      "source": "https://github.com/adamhathcock/sharpcompress/blob/0.50.3/tests/TestArchives/Archives/7Zip.LZMA2.Aes.7z"
+    }
+  ]
+}

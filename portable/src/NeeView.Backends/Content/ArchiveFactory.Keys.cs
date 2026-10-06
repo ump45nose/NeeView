@@ -33,7 +33,7 @@ public sealed partial class ArchiveFactory
             {
                 if (requestKey is null) throw;
                 var key = keys.Get(error.ArchivePath);
-                if (!await key.UpdateArchiveKeyByUserAsync(requestKey, token).ConfigureAwait(false))
+                if (!await key.UpdateArchiveKeyByUserAsync(requestKey, token, error.MayBeDamaged).ConfigureAwait(false))
                     throw new OperationCanceledException("已取消密码输入。", token);
             }
         }

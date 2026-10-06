@@ -2390,6 +2390,12 @@
       "target": "src/NeeView.Engine/Archiver/ArchiveKeyCache.cs",
       "sha256": "1097c1ebbecb4c7519c0fd66e0b4b4a904c0bc2a55c22cfed20d8ba7381af38e",
       "status": "保留原进程内AES缓存；移除明文诊断，补充锁/资源释放/临时字节擦除，不持久化"
+    },
+    {
+      "source": "NeeView/Archiver/SevenZipAccessor.cs",
+      "target": "src/NeeView.Backends/Content/ArchiveFactory.cs",
+      "sha256": "a59d8bd9c2b72920732b9035d601d411681fe409d21d6652584fd0b00e3a5d79",
+      "status": "P5第十六批：保留原索引/抽取口令重试关系；SharpCompress替换Windows SevenZip，来源私有候选/顺序重开/真实抽取验证，密码输入在后台槽外等待，RAR4/7z校验按格式区分，ZIP加密只读"
     }
   ],
   "rule_references": [
