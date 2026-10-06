@@ -54,6 +54,8 @@ public sealed class CommandTable
         _actions["SetPageOrientationVertical"] = () => operation.SetOrientationAsync(PageFrameOrientation.Vertical);
         _actions["PrevOnePage"] = () => operation.MoveAsync(-1, true);
         _actions["FirstPage"] = () => operation.JumpAsync(0);
+        _actions["JumpRandomPage"] = operation.JumpRandomPageAsync;
+        _actions["ToggleSortMode"] = operation.ToggleSortModeAsync;
         _actions["LastPage"] = () => operation.JumpAsync((operation.Book?.Pages.Count ?? 1) - 1, true);
         _actions["PrevHistoryPage"] = () => operation.NavigateHistoryAsync(-1);
         _actions["NextHistoryPage"] = () => operation.NavigateHistoryAsync(1);

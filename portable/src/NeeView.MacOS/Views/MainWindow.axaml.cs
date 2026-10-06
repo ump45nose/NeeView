@@ -39,7 +39,7 @@ public sealed partial class MainWindow : Window
     private SliderTextBox PageNumber => this.FindControl<SliderTextBox>("PageNumberView")!;
     private static readonly HashSet<string> HostCommands = new(StringComparer.Ordinal)
     {
-        "SaveSetting", "ReloadSetting", "ExportBackup", "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen", "MoveToFolderAs", "CopyToFolderAs",
+        "ToggleVisibleAddressBar", "ToggleVisiblePageSlider", "ToggleWindowMinimize", "ToggleWindowMaximize", "OpenSettingFilesFolder", "SaveSetting", "ReloadSetting", "ExportBackup", "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen", "MoveToFolderAs", "CopyToFolderAs",
         "ViewScaleUp", "ViewScaleDown", "ViewScrollUp", "ViewScrollDown", "ViewScrollLeft", "ViewScrollRight", "OpenContextMenu", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
         "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ToggleBookLock", "Unload", "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff",
         "ToggleViewFlipVertical", "ViewFlipVerticalOn", "ViewFlipVerticalOff", "ViewReset", "ViewScaleStretch", "ViewPresetScroll", "ViewScrollNTypeUp", "ViewScrollNTypeDown",
@@ -119,6 +119,11 @@ public sealed partial class MainWindow : Window
         history.AddHandler(PointerReleasedEvent, History_Released, RoutingStrategies.Bubble, handledEventsToo: true);
         this.FindControl<TextBox>("HistorySearchBox")!.AddHandler(KeyDownEvent, HistorySearch_KeyDown, RoutingStrategies.Tunnel);
         Closing += Window_Closing;
+        PropertyChanged += (_, change) =>
+        {
+            if (change.Property == WindowStateProperty && WindowState == WindowState.Minimized && change.OldValue is WindowState previous)
+                _minimizeResumeState = previous;
+        };
         Opened += async (_, _) => await RunStartupHistoryCleanupAsync();
     }
     /// <summary>由唯一启动层传入已经装配的契约，不在控件中创建解码或存储实现。</summary>
@@ -185,6 +190,7 @@ public sealed partial class MainWindow : Window
     public bool IsCommandAvailable(string name) => name switch
     {
         "SaveSetting" or "ReloadSetting" or "ExportBackup" => !_profileBusy && _model?.Operation.CanManageProfile == true,
+        "OpenSettingFilesFolder" => _platform is not null && _settingFolderAction.IsCompleted,
         "ToggleMediaPlay" or "PrevMediaPosition" or "NextMediaPosition" => _model?.Operation.MediaExists() == true,
         var command when PagedTransformCommands.Contains(command) && _model?.Operation.IsFrameReading != true => false,
         "Unload" => _model?.Operation.CanUnload == true,
@@ -256,6 +262,8 @@ public sealed partial class MainWindow : Window
         "ToggleVisibleBookmarkList" => _model?.ShowBookmarks,
         "ToggleVisibleNavigator" => _model?.ShowNavigator,
         "ToggleVisibleFilmStrip" => Config.Current.FilmStrip.IsEnabled,
+        "ToggleVisibleAddressBar" => Config.Current.MenuBar.IsAddressBarEnabled,
+        "ToggleVisiblePageSlider" => Config.Current.Slider.IsEnabled,
         "ToggleHideFilmStrip" => Config.Current.FilmStrip.IsHideFilmStrip,
         "ToggleHideMenu" => Config.Current.MenuBar.IsHideMenu,
         "ToggleHidePanel" => Config.Current.Panels.IsHideLeftPanel || Config.Current.Panels.IsHideRightPanel,
@@ -359,6 +367,13 @@ public sealed partial class MainWindow : Window
         {
             switch (name)
             {
+                case "ToggleVisibleAddressBar": case "ToggleVisiblePageSlider":
+                    SetChromeVisible(name, fromMenu); break;
+                case "ToggleWindowMinimize":
+                    WindowState = WindowState == WindowState.Minimized ? _minimizeResumeState : WindowState.Minimized; break;
+                case "ToggleWindowMaximize":
+                    WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized; break;
+                case "OpenSettingFilesFolder": await OpenSettingFolderAsync(); break;
                 case "SaveSetting": case "ReloadSetting": case "ExportBackup":
                     await RunProfileActionAsync(name); break;
                 case "ToggleSlideShow":
@@ -929,6 +944,7 @@ public sealed partial class MainWindow : Window
             foreach (var dialog in OwnedWindows.ToArray()) dialog.Close();
             _model?.Operation.CancelBookTransferPreparation();
             _profileCancellation?.Cancel(); await _profileAction;
+            _settingFolderCancellation?.Cancel(); await _settingFolderAction;
             await _destinationAction;
             await this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.PrepareCloseAsync();
             await _listStyleTask;

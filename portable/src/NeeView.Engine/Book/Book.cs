@@ -8,6 +8,7 @@ public sealed class Book(Archive source, List<Page> pages, BookSettingConfig set
     private BookMementoControl? _mementoControl;
     public BookMementoControl MementoControl => _mementoControl ??= new(this);
     public Archive Source { get; } = source;
+    public PageSortModeClass PageSortModeClass => Source.IsPlaylist ? PageSortModeClass.WithEntry : PageSortModeClass.Normal;
     public BookAddress BookAddress { get; } = BookAddress.Create(source);
     public ArchiveEntryCollection? Entries { get; init; }
     public string Path => Source.Path;

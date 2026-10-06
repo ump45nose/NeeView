@@ -15,6 +15,8 @@ internal sealed class AutoHideVisibility
     public bool Visible { get; private set; } = true;
     private bool? _pending;
     private double _deadline;
+    /// <summary>原VisibleOnce立即改变实际显示，再沿既有焦点/悬停和延迟规则收起。</summary>
+    public void SetVisibleOnce(bool value) { Visible = value; _pending = null; }
     /// <summary>立即锁定优先；重复请求只缩短截止时间，键盘延长隐藏才使用 force。</summary>
     /// <param name="now">单调时钟，秒。</param>
     /// <param name="enabled">该区域当前是否具备原自动隐藏资格。</param>
@@ -112,6 +114,15 @@ public sealed class AutoHidePresenter : IDisposable
 
     /// <summary>按原 EnterVisibleLocked 保留连续 ShowHiddenPanels 的切换记忆。</summary>
     public void ShowHiddenPanels() { _locked = !_lockedOld; _lockedOld = _locked; Update(); }
+    /// <summary>原Menu/StatusVisibleAtOnce只影响对应区域，不锁定侧栏或创建持久状态。</summary>
+    /// <param name="addressBar">true是顶部菜单/地址区，false是底部状态/滑条区。</param><param name="visible">原Toggle参数求得的当次实际状态。</param>
+    public void SetChromeVisibleOnce(bool addressBar, bool visible)
+    {
+        if (_disposed) return;
+        int index = addressBar ? 0 : 3;
+        if (!_enabled[index]) return;
+        _states[index].SetVisibleOnce(visible); Update();
+    }
     /// <summary>按原 LeaveVisibleLocked 在后续键盘/指针/滚轮动作解除一次显示锁。</summary>
     public void LeaveVisibleLocked()
     {

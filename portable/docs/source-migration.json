@@ -53,7 +53,7 @@
       "source": "NeeView/Book/PageSortMode.cs",
       "target": "src/NeeView.Engine/Book/PageSortMode.cs",
       "sha256": "70ae48f4a62b3fdad3cadf3fbcdfdebbd2deb60aa9c076fb3826948b193fed13",
-      "status": "原业务或值算法迁入；移除WPF/文案/注解，保留当前使用的业务字段和算法"
+      "status": "原枚举/类别资格/循环/验证迁入；文案字典换成无UI的枚举判定，未知排序按原行为回退"
     },
     {
       "source": "NeeView/Book/IBookSetting.cs",
@@ -2516,6 +2516,48 @@
       "target": "src/NeeView.Engine/Command/ExportBackupCommandParameter.cs",
       "sha256": "bd27d883fe575d84d8ddcaeab09e14fda1c34ece570411ff443fe56581112c4b",
       "status": "原FileName空字符串默认，参数草稿沿唯一命令差分"
+    },
+    {
+      "source": "NeeView/Command/Commands/JumpRandomPageCommand.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Controls.cs",
+      "sha256": "5c2e377e9bc5753310a797e5845989b0155ca00e17def85e336dae60ba2dc077",
+      "status": "P5第二十一批：原命令语义迁入；WPF窗口/Binding由Mac表现适配，单一阅读/JSON链"
+    },
+    {
+      "source": "NeeView/Command/Commands/ToggleSortModeCommand.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Controls.cs",
+      "sha256": "2c869e95ff1831b6d592de61af34666bbec7fe08637a21966e8e5f0f9fe81e09",
+      "status": "P5第二十一批：原命令语义迁入；WPF窗口/Binding由Mac表现适配，单一阅读/JSON链"
+    },
+    {
+      "source": "NeeView/Command/Commands/ToggleVisibleAddressBarCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.ChromeCommands.cs",
+      "sha256": "2065369888eaaa215e6c0539094f9028ea05890ae4b8269a19447eeed9ed71c8",
+      "status": "P5第二十一批：原命令语义迁入；WPF窗口/Binding由Mac表现适配，单一阅读/JSON链"
+    },
+    {
+      "source": "NeeView/Command/Commands/ToggleVisiblePageSliderCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.ChromeCommands.cs",
+      "sha256": "a171835f4068b28dceed9d9bc851a5e844a89d8f0e1a6d6708a3b7090f2373dc",
+      "status": "P5第二十一批：原命令语义迁入；WPF窗口/Binding由Mac表现适配，单一阅读/JSON链"
+    },
+    {
+      "source": "NeeView/Command/Commands/ToggleWindowMinimizeCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.ChromeCommands.cs",
+      "sha256": "8365e54885f533490ede9f59ed34b7cf6209caf794aac95cef4019251246baac",
+      "status": "P5第二十一批：原命令语义迁入；WPF窗口/Binding由Mac表现适配，单一阅读/JSON链"
+    },
+    {
+      "source": "NeeView/Command/Commands/ToggleWindowMaximizeCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.ChromeCommands.cs",
+      "sha256": "0bc37c2fbf039bf66c29c02974b02970f910942bf0c4c5b2d58053aa36e6a631",
+      "status": "P5第二十一批：原命令语义迁入；WPF窗口/Binding由Mac表现适配，单一阅读/JSON链"
+    },
+    {
+      "source": "NeeView/Command/Commands/OpenSettingFilesFolderCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.ChromeCommands.cs",
+      "sha256": "1c1343a8690797b73d9e82a5c5fda8fe1586b8cb9d1bff0376203ab3b43cd2e7",
+      "status": "P5第二十一批：原命令语义迁入；WPF窗口/Binding由Mac表现适配，单一阅读/JSON链"
     }
   ],
   "rule_references": [

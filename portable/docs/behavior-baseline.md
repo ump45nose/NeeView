@@ -152,3 +152,5 @@ P5 图像动画：原AnimatedMediaPlayer帧编号归一位置、Image.IsMediaRep
 P5第十八批：SlideShow/SlideShowInput/SlideShowConfig、PageFrameContext、PageFrameBox.AutoScroll、MainView.SimpleProgressBar及FirstLoader原启动选项迁入；命令名NextPage保持，计时补偿和Played进度分别对照，40msEOS调度与损坏配置容错明确记录，见[契约](p5-slideshow.md)。
 
 原Exporter仅一级三材料与五根；原Reload只UserSetting/ObjectMerge，缺失Config不重置运行设置、命令恢复默认；BookSource.DirtyBook的来源变化重收集保留。普通书籍引用不变，递归+排序、新导航及来源失败分别回归，见[设置命令契约](p5-profile-commands.md)。
+
+P5第二十一批：原随机跳页/来源资格排序、地址栏/滑条菜单与快捷键语义、窗口状态与独立设置目录进入唯一命令链。正文与Chrome通知分离；关闭取消/等待系统目录动作。见[契约](p5-original-commands.md)。

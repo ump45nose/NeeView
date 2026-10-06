@@ -260,6 +260,13 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public void HoverFilmStrip(bool value) { _filmShown = value; OnPropertyChanged(nameof(FilmStripVisible)); }
     /// <summary>窗口状态只改变原自动隐藏资格，不重建正文或更改书籍设置。</summary>
     public void SetAutoHideMode(bool value) => AutoHideMode = value;
+    /// <summary>地址栏/滑条配置变化只通知表现，不刷新正文、排序或写JSON。</summary>
+    public void RefreshChromeSettings()
+    {
+        OnPropertyChanged(nameof(AddressBarVisible)); OnPropertyChanged(nameof(SliderVisible));
+        OnPropertyChanged(nameof(CanHideMenu)); OnPropertyChanged(nameof(CanHideSlider)); OnPropertyChanged(nameof(CanHideFilmStrip));
+        ChromeRefreshed?.Invoke(this, EventArgs.Empty);
+    }
     /// <summary>显示端发布五个区域的最终状态；不重建侧栏控件，保留输入焦点和拖动捕获。</summary>
     public void SetChromeVisibility(bool menu, bool left, bool right, bool slider, bool film)
     {

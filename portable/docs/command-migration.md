@@ -70,13 +70,13 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | SetBackgroundCheckDark | 黑色方格背景 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundCheckDarkCommand.cs |
 | SetBackgroundCustom | 自定义背景 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundCustomCommand.cs |
 | ToggleTopmost | 启用/禁用总是置顶显示 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/ToggleTopmostCommand.cs |
-| ToggleVisibleAddressBar | 显示/隐藏地址栏 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleVisibleAddressBarCommand.cs |
+| ToggleVisibleAddressBar | 显示/隐藏地址栏 |  |  | 已接入 | P5 原窗口/导航语义；见p5-original-commands | NeeView/Command/Commands/ToggleVisibleAddressBarCommand.cs |
 | ToggleHideMenu | 启用/禁用自动隐藏菜单 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/ToggleHideMenuCommand.cs |
 | ToggleVisibleSideBar | 显示/隐藏侧边栏 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/ToggleVisibleSideBarCommand.cs |
 | ToggleHidePanel | 启用/禁用自动隐藏面板 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/ToggleHidePanelCommand.cs |
 | ToggleHideLeftPanel | 切换自动隐藏左面板 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/ToggleHideLeftPanelCommand.cs |
 | ToggleHideRightPanel | 切换自动隐藏右面板 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/ToggleHideRightPanelCommand.cs |
-| ToggleVisiblePageSlider | 显示/隐藏滚动条 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleVisiblePageSliderCommand.cs |
+| ToggleVisiblePageSlider | 显示/隐藏滚动条 |  |  | 已接入 | P5 原窗口/导航语义；见p5-original-commands | NeeView/Command/Commands/ToggleVisiblePageSliderCommand.cs |
 | ToggleHidePageSlider | 启用/禁用自动隐藏滚动条 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/ToggleHidePageSliderCommand.cs |
 | ToggleVisibleBookshelf | 显示/隐藏书架 | B |  | 已接入 | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleBookshelfCommand.cs |
 | ToggleVisiblePageList | 显示/隐藏页面列表面板 | P |  | 已接入 | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisiblePageListCommand.cs |
@@ -101,8 +101,8 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | SetFullScreen | 全屏 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/SetFullScreenCommand.cs |
 | CancelFullScreen | 退出全屏 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/CancelFullScreenCommand.cs |
 | ToggleFullDesktop | 切换全桌面 | Shift+F11 |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleFullDesktopCommand.cs |
-| ToggleWindowMinimize | 最小化窗口 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleWindowMinimizeCommand.cs |
-| ToggleWindowMaximize | 最大化窗口 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleWindowMaximizeCommand.cs |
+| ToggleWindowMinimize | 最小化窗口 |  |  | 已接入 | P5 原窗口/导航语义；见p5-original-commands | NeeView/Command/Commands/ToggleWindowMinimizeCommand.cs |
+| ToggleWindowMaximize | 最大化窗口 |  |  | 已接入 | P5 原窗口/导航语义；见p5-original-commands | NeeView/Command/Commands/ToggleWindowMaximizeCommand.cs |
 | ShowHiddenPanels | 临时显示面板 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/ShowHiddenPanelsCommand.cs |
 | ToggleSlideShow | 幻灯片播放/停止 | F5 |  | 已接入 | P5原定时/输入/EOS/页尾及Toggle参数 | NeeView/Command/Commands/ToggleSlideShowCommand.cs |
 | ViewScrollNTypeUp | N 字形滚动↑ |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/ViewScrollNTypeUpCommand.cs |
@@ -137,7 +137,7 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | PrevScrollPage | 滚动 + 上一页 | WheelUp |  | 已接入 | P2/P3原分页及全景NScroll、边界翻页与参数接入；真机动态待验 | NeeView/Command/Commands/PrevScrollPageCommand.cs |
 | NextScrollPage | 滚动 + 下一页 | WheelDown |  | 已接入 | P2/P3原分页及全景NScroll、边界翻页与参数接入；真机动态待验 | NeeView/Command/Commands/NextScrollPageCommand.cs |
 | JumpPage | 转到指定页面 |  |  | 已接入 | P2 原定位/共享步长宿主接入；具体范围见验收表 | NeeView/Command/Commands/JumpPageCommand.cs |
-| JumpRandomPage | 转到随机页面 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/JumpRandomPageCommand.cs |
+| JumpRandomPage | 转到随机页面 |  |  | 已接入 | P5 原窗口/导航语义；见p5-original-commands | NeeView/Command/Commands/JumpRandomPageCommand.cs |
 | PrevSizePage | 后退指定页数 |  |  | 已接入 | P2 原定位/共享步长宿主接入；具体范围见验收表 | NeeView/Command/Commands/PrevSizePageCommand.cs |
 | NextSizePage | 前进指定页数 |  |  | 已接入 | P2 原定位/共享步长宿主接入；具体范围见验收表 | NeeView/Command/Commands/NextSizePageCommand.cs |
 | PrevFolderPage | 上一个文件夹 |  |  | 已接入 | P2 普通书架/文件夹页导航接入；巡回及子书边界见验收表 | NeeView/Command/Commands/PrevFolderPageCommand.cs |
@@ -189,7 +189,7 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | ToggleIsSupportedSingleFirstPage | 首页单独显示 |  |  | 已接入 | P1 Engine | NeeView/Command/Commands/ToggleIsSupportedSingleFirstPageCommand.cs |
 | ToggleIsSupportedSingleLastPage | 尾页单独显示 |  |  | 已接入 | P1 Engine | NeeView/Command/Commands/ToggleIsSupportedSingleLastPageCommand.cs |
 | ToggleIsRecursiveFolder | 载入子文件夹 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/ToggleIsRecursiveFolderCommand.cs |
-| ToggleSortMode | 切换页面顺序 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleSortModeCommand.cs |
+| ToggleSortMode | 切换页面顺序 |  |  | 已接入 | P5 原窗口/导航语义；见p5-original-commands | NeeView/Command/Commands/ToggleSortModeCommand.cs |
 | SetSortModeFileName | 文件名升序 |  |  | 已接入 | P1 Engine | NeeView/Command/Commands/SetSortModeFileNameCommand.cs |
 | SetSortModeFileNameDescending | 文件名降序 |  |  | 已接入 | P1 Engine | NeeView/Command/Commands/SetSortModeFileNameDescendingCommand.cs |
 | SetSortModeTimeStamp | 文件日期升序 |  |  | 已接入 | P1 Engine | NeeView/Command/Commands/SetSortModeTimeStampCommand.cs |
@@ -226,7 +226,7 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | ToggleAutoScroll | 切换自动滚动 | MiddleClick |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleAutoScrollCommand.cs |
 | CancelScript | 中止脚本 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/CancelScriptCommand.cs |
 | OpenOptionsWindow | 打开设置窗口 |  |  | 已接入 | P1 宿主适配 | NeeView/Command/Commands/OpenOptionsWindowCommand.cs |
-| OpenSettingFilesFolder | 打开配置文件位置 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenSettingFilesFolderCommand.cs |
+| OpenSettingFilesFolder | 打开配置文件位置 |  |  | 已接入 | P5 原窗口/导航语义；见p5-original-commands | NeeView/Command/Commands/OpenSettingFilesFolderCommand.cs |
 | OpenScriptsFolder | 打开脚本文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenScriptsFolderCommand.cs |
 | OpenVersionWindow | 显示版本信息 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenVersionWindowCommand.cs |
 | CloseApplication | 退出应用程序 |  |  | 已接入 | P1 宿主适配 | NeeView/Command/Commands/CloseApplicationCommand.cs |
@@ -255,3 +255,5 @@ P5 第十七批接通原三个媒体命令，当前171执行入口/64占位；23
 P5第十八批接通原ToggleSlideShow；当前172执行入口/63占位，235原实例保持。原计时/等待/输入及菜单/键位语义见[p5-slideshow.md](p5-slideshow.md)，数量不代表覆盖率。
 
 P5第二十批：SaveSetting/ReloadSetting/ExportBackup进入唯一Profile及可等待宿主。当前175入口/60占位，数量不代表功能覆盖率，见[契约](p5-profile-commands.md)。
+
+P5第二十一批接通7个原窗口/导航命令；当前182入口/53占位，数量不代表功能覆盖率。见[p5-original-commands.md](p5-original-commands.md)。

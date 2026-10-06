@@ -137,3 +137,5 @@ P4收尾：ContentDropSnapshot只借用拖放数据并复制有限字节，Bitma
 P5 第八批：主题结构在SettingsWindow.axaml，选择/目录/扫描草稿在ThemeSettingsViewModel；Engine读取原JSON和颜色引用/继承/回退，ThemePresenter只发布应用颜色/Fluent变体。启动与导入重建绑定同一Config，设置保存成功才刷新主题；取消或失败保留已显示资源。主/浮/设置/弹出层共用资源；不打开书籍、重排页面或请求像素，详见[p5-theme.md](p5-theme.md)。
 
 P5第二十批：原备份/保存/重载命令进入唯一Profile；仅UserSetting原地恢复，来源DirtyBook变化才重收集，前端布局/主题/字体独立恢复。动态预算、旧备份保持、晚到选择器/新打开边界见[契约](p5-profile-commands.md)。
+
+P5第二十一批：原随机跳页/来源资格排序、地址栏/滑条菜单与快捷键语义、窗口状态与独立设置目录进入唯一命令链。正文与Chrome通知分离；关闭取消/等待系统目录动作。见[契约](p5-original-commands.md)。

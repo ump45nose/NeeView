@@ -248,7 +248,7 @@ public sealed class RenameBookTests
             Assert.Equal(Path.Combine(f.Root, "改名.cbz"), op.Book!.Path);
             var implemented = typeof(MainWindow).GetMethod("IsCommandImplemented", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
             var items = new CommandTable(op).Definitions.Select(d => new { d.Name, d.Text, d.Shortcut, d.MouseGesture, d.Source, d.Stage, implemented = (bool)implemented.Invoke(window, [d.Name])! }).ToArray();
-            Assert.Equal(235, items.Length); Assert.Equal(174, items.Count(i => i.implemented));
+            Assert.Equal(235, items.Length); Assert.Equal(181, items.Count(i => i.implemented));
             await File.WriteAllTextAsync(Output("commands.json"), JsonSerializer.Serialize(new { scope = "执行入口登记，不等于完整原功能覆盖率", total = items.Length, implemented = items.Count(i => i.implemented), items }, new JsonSerializerOptions { WriteIndented = true }), TestContext.Current.CancellationToken);
             action = window.ExecuteAsync("RenameBook"); await WaitAsync(() => window.OwnedWindows.Count == 1); await window.PrepareShutdownAsync(); await action; Assert.True(File.Exists(Path.Combine(f.Root, "改名.cbz")));
         }

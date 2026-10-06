@@ -34,6 +34,22 @@ public sealed partial class BookOperation
     /// <returns>原设置和页框更新完成的任务。</returns>
     public Task TogglePageModeAsync(int direction) => ApplySettingAsync(setting =>
         setting.PageMode = setting.PageMode.GetToggle(direction, saveData.GetCommandParameter<TogglePageModeCommandParameter>("TogglePageMode").IsLoop));
+    /// <summary>原随机页允许选中当前页，使用完整当前过滤结果，沿既有定位/历史/页框链。</summary>
+    /// <returns>定位完成任务；空书或切书时不产生页面。</returns>
+    public async Task JumpRandomPageAsync()
+    {
+        Book? book; int index;
+        await _gate.WaitAsync();
+        try
+        {
+            if (_disposed || _closing || IsLoading || Book is null || Book.Pages.Count == 0) return;
+            book = Book; index = Random.Shared.Next(book.Pages.Count);
+        }
+        finally { _gate.Release(); }
+        await JumpAsync(index, expectedBook: book);
+    }
+    /// <summary>原ToggleSortMode按当前来源的PageSortModeClass跳过不支持模式。</summary>
+    public Task ToggleSortModeAsync() => ApplySettingAsync(setting => setting.SortMode = Book!.PageSortModeClass.GetTogglePageSortMode(setting.SortMode));
     private async Task ApplyGlobalReadingAsync(Action change)
     {
         await _gate.WaitAsync();

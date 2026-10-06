@@ -11,8 +11,8 @@ public static class BookSourceFactory
 {
     /// <summary>原ValidatePageSortMode：列表允许Entry类别，普通书籍保持文件名回退。</summary>
     /// <param name="mode">阅读配置中的原排序。</param><param name="source">真实书籍来源。</param><returns>原来源支持的有效排序。</returns>
-    public static PageSortMode ValidatePageSortMode(PageSortMode mode, Archive source) => !source.IsPlaylist && mode.IsEntryCategory()
-        ? mode.IsDescending() ? PageSortMode.FileNameDescending : PageSortMode.FileName : mode;
+    public static PageSortMode ValidatePageSortMode(PageSortMode mode, Archive source) =>
+        (source.IsPlaylist ? PageSortModeClass.WithEntry : PageSortModeClass.Normal).ValidatePageSortMode(mode);
     /// <summary>直接目录分批构造原Page；递归展平和归档继续完整过滤，避免过早发布会消失的目录项。</summary>
     /// <param name="collection">唯一来源所有者。</param><param name="mode">原过滤模式。</param>
     /// <param name="archives">原来源工厂。</param><param name="token">逐条取消。</param>

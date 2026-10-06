@@ -486,3 +486,5 @@ GIF/WebP与官方ImageIO APNG沿原工厂/页框/JSON接入，原播放状态、
 ## P5 第二十批：原Profile三命令
 
 22新增/23相关专项、1380全量通过/2资源跳过、14原生通过；正式Library/ARM64.app及本地签名通过。原导出/保存/仅设置原地恢复保持，递归+排序/失败重试/新打开和关闭等待已回归；实际保存sheet、真实导出/设备/Windows/正式分发另验，P5未完成。见[契约](../docs/p5-profile-commands.md)和[记录](p5-profile-commands-runtime.md)。
+
+第二十一批：[原窗口/导航契约](../docs/p5-original-commands.md)；11新增/23相关专项、1391全量通过/2资源跳过、14原生通过，正式ARM64构建/本地签名通过。原生窗口/Finder及P5其他能力继续推进，P5未完成。
