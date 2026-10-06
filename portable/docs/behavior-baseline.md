@@ -110,3 +110,10 @@ Finder file reference URL经Foundation转换为真实路径，保留原整批校
 原 UserSettingValidator 的可移植分支、TitleStringValidator 原替换顺序、真实参数 Type/Value/$type 和三代布局回退进入唯一导入链。38的非零旧字体尺寸因来源 Windows MessageFontSize 缺失阻止实际应用；旧效果层/预设转换与执行明确保留待迁，不能以未知字段保存宣称通过。固定基线两个旧移动限制 setter为空，Mac保留实际原行为；不从旧布尔字段重建规则。
 
 V2非空优先，V1保方向，V0纵向；未知选择不回退首组，损坏当前布局不由旧布局覆盖。JSON合并显式写SelectedItem:null清除旧选择，是与原差分null省略的明确格式区别。预览/事务/普通保存合成往返见[本批验收](../acceptance/p5-legacy-compatibility-runtime.md)；真实导出和Windows对照待验。
+
+
+## P5 第四批：旧目录与快速访问
+
+原FolderConfigCollectionValidator在4065/4209执行两条独立版本分支；History.Folders字典经原Restore(Dictionary)只归一排序，不套用独立文件递归升级。默认来自最终选项配置，候选不切换Config.Current。来源版本保留；QuickAccess内嵌Format独立校验，不能被外层升级掩盖。盘符/UNC/虚拟父级及路径映射、普通保存和五文件恢复用合成样本对照，见[契约](p5-folder-compatibility.md)。
+
+ScrollPage编辑时清除执行参数中的旧IsNScroll/PageMoveMargin，兼容材料和未知字段保留，重载不覆盖新参数。完整原差分converter仍待迁入；不把本批修复视为全部兼容通过。

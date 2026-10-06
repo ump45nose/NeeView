@@ -1900,16 +1900,16 @@
       "status": "P5：44至46.3原<=46Alpha1旧Books合入非文件夹、文件夹直接子项EntryTime最大值；根树及顺序保持。"
     },
     {
-      "source": "NeeView/FolderConfig/FolderConfigCollectionValidator.cs",
+      "source": "NeeView/FolderConfig/FolderConfigCollection.cs",
       "target": "src/NeeView.Engine/SaveData/ProfileImportRequest.cs",
-      "sha256": "5cbf41472825140f62b0cff658fb14bbb9bffef7354e8b65a3b6417c2a55cb0f",
-      "status": "P5：独立Foldres优先、History旧Folders字典后备转原Place/Parameter；独立46.1–46.3可应用，较早独立文件仅预览。"
+      "sha256": "3878eb830250c3a8ae0893089a001e8f7c7c66d63c5faae886778cf96cdca378",
+      "status": "P5第四批：原Restore(Dictionary)后备转换，保留来源版本，只归一排序、不套独立文件递归validator；独立文件优先。"
     },
     {
       "source": "NeeView/SidePanels/Bookshelf/QuickAccessCollectionValidator.cs",
       "target": "src/NeeView.Engine/SaveData/ProfileImportRequest.cs",
       "sha256": "424c8f29d3b8723a9a894b9670b5b1a31ee19af01add1f3257a527decfcf3c0b",
-      "status": "P5：独立QuicAccess优先、Bookmark旧QuickAccess后备；原格式验证及未知字段保留。"
+      "status": "P5第四批：原树格式44–46.3；独立文件优先，内嵌Format单独核对、不以外层46.3覆盖未来/未知格式。"
     },
     {
       "source": "NeeView/Book/UncPathTools.cs",
@@ -1958,6 +1958,36 @@
       "target": "src/NeeView.Engine/SaveData/LegacyUserSettingUpgrade.cs",
       "sha256": "e38dc2b2e978cd15ec83345c38ad1beaa1404dbb9a8797c9575993568e87c3c6",
       "status": "P5命令Name:Number语法与编号保留；新名碰撞优先且旧材料保留"
+    },
+    {
+      "source": "NeeView/FolderConfig/FolderConfigCollectionValidator.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyFolderConfigUpgrade.cs",
+      "sha256": "5cbf41472825140f62b0cff658fb14bbb9bffef7354e8b65a3b6417c2a55cb0f",
+      "status": "P5第四批：原4065/4209版本边界和逐项递归转换；JSON节点保持未知字段，索引保留FirstOrDefault及原列表修改语义。"
+    },
+    {
+      "source": "NeeView/FolderConfig/FolderConfigCollection.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyFolderConfigUpgrade.cs",
+      "sha256": "3878eb830250c3a8ae0893089a001e8f7c7c66d63c5faae886778cf96cdca378",
+      "status": "P5第四批：FolderConfigUnit.Validate与Restore(Dictionary)；默认排序按最终候选Config归一，不修改Config.Current。"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/QueryPath.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyFolderConfigUpgrade.cs",
+      "sha256": "d3740ec8a4c8dc9220b7282ddd2753c807db7c8db966c637cbee7434f0b0a872",
+      "status": "P5第四批：GetParent/SimplePath路径子集，盘符/UNC/虚拟/search保持原规则，Mac路径使用本地父级，不引入Windows文件系统依赖。"
+    },
+    {
+      "source": "NeeView/SidePanels/Bookshelf/QuickAccessCollectionValidator.cs",
+      "target": "src/NeeView.Engine/SaveData/ProfileImportCompatibility.cs",
+      "sha256": "424c8f29d3b8723a9a894b9670b5b1a31ee19af01add1f3257a527decfcf3c0b",
+      "status": "P5第四批：原QuickAccess无版本转换分支；44–46.3原树格式及Format校验，来源版本保留。"
+    },
+    {
+      "source": "NeeView/Config/DiffJsonConverter.cs",
+      "target": "src/NeeView.Engine/SaveData/SaveData.cs",
+      "sha256": "8af38463d3505d6bbcce4a6124350a00cb4ae7e5a0a1269be6185d3cc1b82c11",
+      "status": "P5第四批：原兼容setter默认省略规则用于ScrollPage差分编辑；完整converter尚未迁入，旧材料移至非执行字段，未知参数保持。"
     }
   ],
   "rule_references": [

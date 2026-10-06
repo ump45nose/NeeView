@@ -31,14 +31,17 @@ public sealed class ProfileImportRequest
         {
             var reason = ProfileImportCompatibility.BlockReason("History.json", history);
             if (reason is not null) throw new InvalidDataException(reason);
-            return new() { ["Format"] = "NeeView.Folders/46.3.0", ["Folders"] = new JsonArray(folders.Select(pair => (JsonNode)new JsonObject
-                { ["Place"] = pair.Key, ["Parameter"] = pair.Value?.DeepClone() }).ToArray()) };
+            return LegacyFolderConfigUpgrade.FromHistory(history);
         }
         if (name == "QuicAccess.json" && _documents.GetValueOrDefault("Bookmark.json") is { } bookmark && bookmark["QuickAccess"] is JsonObject quick)
         {
             var reason = ProfileImportCompatibility.BlockReason("Bookmark.json", bookmark);
             if (reason is not null) throw new InvalidDataException(reason);
-            var result = quick.DeepClone().AsObject(); result["Format"] = "NeeView.QuickAccess/46.3.0"; return result;
+            var result = quick.DeepClone().AsObject();
+            // 原memento构造器仅对缺失Format提供默认；明确的未知/未来/null格式不能被覆盖。
+            if (!result.ContainsKey("Format")) result["Format"] = "NeeView.QuickAccess/" +
+                (bookmark["MacImportedSourceFormat"] ?? bookmark["Format"])!.GetValue<string>().Split('/')[1];
+            return result;
         }
         return null;
     }

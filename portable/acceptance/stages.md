@@ -435,3 +435,12 @@ P5第一批最终37项专项、877项全量通过，2项需显式图片目录的
 已核对的UserSettingValidator版本分支、标题占位符、真实参数Type/Value/$type及V0/V1/V2回退进入同一候选链，预览和应用一致；未知选择保持关闭，普通保存保留原未知布局/浮窗材料。967全量通过、2资源测试跳过，其中150导入/布局专项含63新增；Engine、正式Library、默认ARM64.app及strict/deep本地签名通过，源码71/255/26。没有新增执行入口，235命令168入口/67占位保持。
 
 设置38–46.3有明确旧字体门槛；旧效果层/预设与执行、旧目录validator、完整差分与高级功能继续待迁。合成Profile写入临时目录，未激活真实应用、操作用户数据或Windows。用户真实导出与正式分发仍待验，P5整体未完成；详见[契约](../docs/p5-legacy-compatibility.md)和[静默验收](p5-legacy-compatibility-runtime.md)。校验后自动提交并推送，历史证据与用户.DS_Store保留。
+
+## P5 第四批：旧目录、快速访问与差分参数
+
+原独立目录4065/4209升级和旧History字典转换保持各自语义，默认排序使用最终选项配置；QuickAccess内嵌Format独立核对，来源版本不丢失。绝对缩略目标映射、相对/未知材料保持；ScrollPage旧setter退役后保存重载不覆盖新参数。
+
+1004全量通过、2资源跳过，164导入专项含37新增，含原布局用例共187相关回归；Engine/正式Library/默认ARM64.app和strict/deep本地ad-hoc签名通过。
+三项目边界71/260/26通过，原235命令168入口/67占位未改变。详见[契约](../docs/p5-folder-compatibility.md)和[静默验收](p5-folder-compatibility-runtime.md)。
+
+全部隔离合成Profile，未激活桌面应用或操作用户图片/Windows/NAS；真实导出与正式分发未验。完整原差分写出、旧效果、附属文件及高级能力仍待迁，P5未完成。按用户AGENTS要求校验后自动提交并推送，历史证据与用户.DS_Store保留。

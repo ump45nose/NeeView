@@ -1,5 +1,7 @@
 # P5 第三批：原旧设置与三代侧栏布局
 
+本文件保留第三批交付范围；旧目录与快速访问的最新范围及差分编辑修复见[第四批契约](p5-folder-compatibility.md)。
+
 ## 职责、依赖与出处
 
 Engine 在既有 Profile 导入链路上适配固定 `c5c398d89` 的 `UserSettingValidator`、`TitleStringValidator`、参数 converter 和 `LayoutDockPanelContent.Restore`。不建立第二套配置模型，原 Windows 文件保持只读；逐文件 SHA256 见 [源码清单](source-migration.json)。视图、后端和生产项目数量不变。

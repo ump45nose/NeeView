@@ -52,7 +52,7 @@ public sealed class ProfileLegacyUpgradeTests
         var migrated = Upgrade("38.0.0", ",\"Config\":{\"Panels\":{\"FontName\":\"Meiryo\",\"FontSize\":0},\"System\":{\"Language\":\"English\"}}");
         Assert.Equal("Meiryo", migrated["Config"]!["Fonts"]!["FontName"]!.GetValue<string>());
         Assert.Equal("en", migrated["Config"]!["System"]!["Language"]!.GetValue<string>());
-        Assert.NotNull(ProfileImportCompatibility.BlockReason("Foldres.json", JsonNode.Parse("""{"Format":"NeeView.Folders/46.0.4209"}""")!.AsObject()));
+        Assert.NotNull(ProfileImportCompatibility.BlockReason("Foldres.json", JsonNode.Parse("""{"Format":"NeeView.Folders/45.0.4000"}""")!.AsObject()));
     }
 
     [Theory]

@@ -90,6 +90,8 @@ public sealed partial class SaveData
             }
             else documents[name] = imported;
         }
+        if (request.Selection.Folders && documents["Foldres.json"] is { } folders && request.GetEffectiveDocument("Foldres.json") is not null)
+            LegacyFolderConfigUpgrade.NormalizeOrders(folders, ReadProfileConfig(documents["UserSetting.json"] ?? new()));
         return documents;
     }
     /// <summary>检查已迁字段、集合和已知命令参数；未迁未知字段继续保留。</summary>

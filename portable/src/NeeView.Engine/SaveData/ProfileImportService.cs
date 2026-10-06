@@ -101,6 +101,10 @@ public sealed class ProfileImportService(IProfileImportReader reader, IReadOnlyL
                 token.ThrowIfCancellationRequested();
                 if (++nodeCount > ProfileImportFiles.MaxRecords) throw new InvalidDataException("导入记录数量超限。");
                 Map(node, pathKey, field); Walk(Array(node, "Children"), field + ".Children", pathKey);
+                // 原目录缩略目标可以是绝对文件或相对书内页；仅绝对Windows目标由映射器转换。
+                if (name == "Foldres.json" && Object(node, "Thumbs") is { } thumbs)
+                    foreach (var key in thumbs.Where(p => p.Value is JsonValue value && value.TryGetValue<string>(out _)).Select(p => p.Key).ToArray())
+                    { token.ThrowIfCancellationRequested(); Map(thumbs, key, field + ".Thumbs"); }
             }
             void Map(JsonObject? node, string key, string field)
             {
@@ -154,9 +158,9 @@ public sealed class ProfileImportService(IProfileImportReader reader, IReadOnlyL
             }
         if (paths.Any(p => p.Status == ProfilePathStatus.Unmapped)) notices.Add($"{paths.Count(p => p.Status == ProfilePathStatus.Unmapped)} 条 Windows 路径未映射，保留原值，可补充映射后重新预览。");
         if (docs.GetValueOrDefault("History.json")?["Folders"] is not null && !docs.ContainsKey("Foldres.json"))
-            notices.Add("检测到 History.Folders（原 FoldersLegacy），后续应用需沿原导入顺序恢复旧目录参数。");
+            notices.Add("检测到 History.Folders（原 FoldersLegacy），按原字典转换恢复；默认排序在最终配置确定后归一，不套用独立文件递归升级。");
         if (docs.GetValueOrDefault("Bookmark.json")?["QuickAccess"] is not null && !docs.ContainsKey("QuicAccess.json"))
-            notices.Add("检测到 Bookmark.QuickAccess（原 QuickAccessLegacy），后续应用需恢复旧快速访问。");
+            notices.Add("检测到 Bookmark.QuickAccess（原 QuickAccessLegacy），保留内嵌Format并单独校验，未知/未来版本不能实际应用。");
         foreach (var extra in bundle.ExtraEntries) notices.Add("附属项未导入：" + extra + "（脚本不执行）");
         return new(docs, summaries.AsReadOnly(), paths.AsReadOnly(), commands.AsReadOnly(), notices.AsReadOnly());
 

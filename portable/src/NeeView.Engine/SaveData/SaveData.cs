@@ -247,7 +247,20 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
     }
 
     /// <summary>更新已支持参数并保留原节点的未知字段；原差分快捷键不会被覆盖。</summary>
-    public void SetCommandParameter<T>(string name, T value) => Merge(Object(Object(Object(_setting, "Commands"), DefaultInputScheme.GetParameterOwner(name)), "Parameter"), JsonSerializer.SerializeToNode(value, Options)!.AsObject());
+    public void SetCommandParameter<T>(string name, T value)
+    {
+        var command = Object(Object(_setting, "Commands"), DefaultInputScheme.GetParameterOwner(name));
+        var parameter = Object(command, "Parameter");
+        // 原差分写出不再包含只读兼容值。直接递归Merge会留下旧setter字段，重启时覆盖新ScrollType/停顿。
+        if (value is ScrollPageCommandParameter)
+            foreach (var field in new[] { "IsNScroll", "PageMoveMargin" })
+                if (parameter.ContainsKey(field))
+                {
+                    Object(command, "MacImportedLegacyParameterFields")[field] = parameter[field]?.DeepClone();
+                    parameter.Remove(field);
+                }
+        Merge(parameter, JsonSerializer.SerializeToNode(value, Options)!.AsObject());
+    }
 
     /// <summary>编辑原 Commands 差分键位；空字符串表示解绑，未知参数保持。</summary>
     public void SetShortcut(string name, string value) => Object(Object(_setting, "Commands"), name)["ShortCutKey"] = value;

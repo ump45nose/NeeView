@@ -1,0 +1,30 @@
+{
+  "scope": "\u9694\u79BB\u5408\u6210Profile\uFF0C\u539F46.0.4209\u76EE\u5F55validator\u3001\u6620\u5C04\u3001\u4E94\u6587\u4EF6\u4E8B\u52A1\u3001\u666E\u901A\u4FDD\u5B58/\u91CD\u8F7D",
+  "source_format": "NeeView.Folders/46.0.4209",
+  "applied": {
+    "Format": "NeeView.Folders/46.3.0",
+    "Folders": [
+      {
+        "Place": "/mapped/books",
+        "Parameter": {
+          "IsFolderRecursive": true,
+          "Future": 7
+        }
+      },
+      {
+        "Place": "/mapped/books/mid/leaf",
+        "Parameter": {
+          "Future": 7
+        }
+      }
+    ],
+    "Future": 42,
+    "MacImportedSourceFormat": "NeeView.Folders/46.0.4209"
+  },
+  "inherited_recursive": true,
+  "exclusions": [
+    "\u771F\u5B9E\u7528\u6237\u5BFC\u51FA",
+    "\u771F\u673A/Windows\u52A8\u6001",
+    "\u7B7E\u540D\u516C\u8BC1\u4E0E\u5B89\u88C5"
+  ]
+}

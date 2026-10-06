@@ -17,11 +17,9 @@ internal static class ProfileImportCompatibility
         string expected = name switch { "UserSetting.json" => "NeeView", "History.json" => "NeeView.History", "Bookmark.json" => "NeeView.Bookmark", "Foldres.json" => "NeeView.Folders", _ => "NeeView.QuickAccess" };
         if (parts.Length != 2 || !(parts[0] == expected || parts[0] == "NeeView" || name == "UserSetting.json" && parts[0] == "NeeView.UserSetting") || !Version.TryParse(parts[1], out var version))
             return name + " 版本缺失或格式类型不匹配，只允许预览。";
-        bool ancillary = name is "Foldres.json" or "QuicAccess.json";
-        int minimum = name == "UserSetting.json" ? 38 : ancillary ? 46 : 44;
-        // 目录旧递归继承 validator 尚未迁入；不能随设置扩大独立 Foldres 的范围。
-        if (version.Major < minimum || version.Major > 46 || version.Major == 46 && version.Minor > 3 || version.Build > ProfileImportFiles.BaselineBuild || version.Revision > 0 ||
-            ancillary && version.Major == 46 && version.Minor == 0)
+        int minimum = name == "UserSetting.json" ? 38 : name == "Foldres.json" ? 46 : 44;
+        // 独立 Folders 仅核对过46数组格式；QuickAccess沿原树格式及无版本分支的validator。
+        if (version.Major < minimum || version.Major > 46 || version.Major == 46 && version.Minor > 3 || version.Build > ProfileImportFiles.BaselineBuild || version.Revision > 0)
             return $"{name} 版本 {parts[1]} 的旧版本升级或未来兼容尚未完成，只允许预览。";
         // <39 的原字体缩放依赖来源 Windows MessageFontSize，不能猜测为当前 Mac 字体。
         if (name == "UserSetting.json" && version < new Version(39, 0, 0) && raw["Config"]?["Panels"] is JsonObject panels &&
@@ -35,7 +33,11 @@ internal static class ProfileImportCompatibility
         if (BlockReason(name, raw) is { } reason) throw new InvalidDataException(reason);
         var version = Version.Parse(raw["Format"]!.GetValue<string>().Split('/')[1]);
         if (name == "UserSetting.json") { LegacyUserSettingUpgrade.Upgrade(raw, version); return raw; }
+        if (name == "Foldres.json") { LegacyFolderConfigUpgrade.Upgrade(raw, version); return raw; }
+        if (name == "QuicAccess.json")
+        { raw["MacImportedSourceFormat"] ??= raw["Format"]!.DeepClone(); raw["Format"] = "NeeView.QuickAccess/46.3.0"; return raw; }
         if (name is not ("History.json" or "Bookmark.json")) return raw;
+        raw["MacImportedSourceFormat"] ??= raw["Format"]!.DeepClone();
         var roots = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var targets = name == "History.json" ? (raw["Items"] as JsonArray)?.OfType<JsonObject>() ?? [] : Walk(raw["Nodes"] as JsonObject);
         foreach (var item in targets.Concat((raw["Books"] as JsonArray)?.OfType<JsonObject>() ?? []))
