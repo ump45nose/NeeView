@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-06",
+  "starting_commit": "43c5b9b4b",
+  "baseline": "c5c398d89",
+  "focused_passed": 11,
+  "new_tests": 11,
+  "tests": {
+    "total": "1438",
+    "executed": "1436",
+    "passed": "1436",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "original_commands": 235,
+  "execution_entries": 192,
+  "placeholders": 43,
+  "frontmost_app_activated": false,
+  "user_data_modified": false,
+  "p5_complete": false,
+  "native_backend_tests": "not repeated: no backend changes; prior14 retained separately",
+  "deferred": [
+    "Windows/device comparison",
+    "remaining effects/media/script/settings",
+    "real exports",
+    "Developer ID/notarization/clean install"
+  ]
+}

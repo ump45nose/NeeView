@@ -1963,7 +1963,7 @@
     "Text": "重置页面设置",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetDefaultPageSettingCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P5 原默认十二字段复制/递归重收集及全局文件权限；见p5-default-settings",
     "MouseGesture": "",
     "TouchGesture": "",
     "IsShowMessage": true
@@ -2286,7 +2286,7 @@
     "Text": "启用/禁用文件操作",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/TogglePermitFileCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P5 原默认十二字段复制/递归重收集及全局文件权限；见p5-default-settings",
     "MenuText": "允许文件操作(P)",
     "MouseGesture": "",
     "TouchGesture": "",

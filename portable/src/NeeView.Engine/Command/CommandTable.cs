@@ -25,6 +25,8 @@ public sealed class CommandTable
     {
         using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("NeeView.Command.command-manifest.json")!;
         Definitions = JsonSerializer.Deserialize<List<CommandDefinition>>(stream)!;
+        _actions["SetDefaultPageSetting"] = operation.SetDefaultPageSettingAsync;
+        _actions["TogglePermitFile"] = () => operation.ToggleFileWriteAccessAsync();
         _actions["ToggleBackground"] = () => operation.SetBackgroundAsync();
         _actions["ToggleNearestNeighbor"] = () => operation.ToggleNearestNeighborAsync();
         foreach (var type in Enum.GetValues<BackgroundType>())

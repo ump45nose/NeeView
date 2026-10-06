@@ -522,6 +522,12 @@
       "target": "src/NeeView.Engine/Archiver/FileTypeCollection.cs",
       "sha256": "2e678fe1f719a3fc46e686f05f04b7f38c8df4cef7b2b31f7775697f65c1de65",
       "status": "P5：原分号/引号解析、集合排序/去重/克隆和FileTypeCollection字符串JSON迁入，仅移除未使用合并注解"
+    },
+    {
+      "source": "NeeView/BookSetting/BookSettingConfigExtensions.cs",
+      "target": "src/NeeView.Engine/BookSetting/BookSettingConfigExtensions.cs",
+      "sha256": "dde4bc43fddf4da468aaa3d42df80916126f60dcc6222fb6ac649fd61be45615",
+      "status": "P5 原十二字段/实际变化历史请求、递归DirtyBook及Toggle菜单参数；可等待保存与失败恢复"
     }
   ],
   "partial_adapters": [
@@ -2648,6 +2654,24 @@
       "target": "src/NeeView.Engine/BookOperation/BookOperation.ImagePresentation.cs",
       "sha256": "7df394f631df83edfe98936839ecf1bf4a2666b39ce949603b0d9fd7417b2fa6",
       "status": "P5原背景/首像素/双轴nearest适配；去WPF，保留JSON/枚举/底刷前景刷/菜单参数与设备像素规则；见p5-background"
+    },
+    {
+      "source": "NeeView/Command/Commands/SetDefaultPageSettingCommand.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.DefaultSettings.cs",
+      "sha256": "535d0f43175e2cf30ca1c5e62f6a0dda6310d03b688e996de2e961ba50a759fa",
+      "status": "P5 原十二字段/实际变化历史请求、递归DirtyBook及Toggle菜单参数；可等待保存与失败恢复"
+    },
+    {
+      "source": "NeeView/Command/Commands/TogglePermitFileCommand.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.DefaultSettings.cs",
+      "sha256": "3f0da8f44c0fc567ab8f05fe6bba5162ef70e9cbf5010b1c7b694fb1df2cb464",
+      "status": "P5 原十二字段/实际变化历史请求、递归DirtyBook及Toggle菜单参数；可等待保存与失败恢复"
+    },
+    {
+      "source": "NeeView/MainView/PageFrameBoxContext.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.DefaultSettings.cs",
+      "sha256": "a4f368332b9bbd16ab38b005129676a083d38636abfd941b28e6fd6931807db5",
+      "status": "P5 原十二字段/实际变化历史请求、递归DirtyBook及Toggle菜单参数；可等待保存与失败恢复"
     }
   ],
   "rule_references": [

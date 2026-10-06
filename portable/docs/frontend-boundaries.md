@@ -141,3 +141,5 @@ P5第二十批：原备份/保存/重载命令进入唯一Profile；仅UserSetti
 P5第二十一批：原随机跳页/来源资格排序、地址栏/滑条菜单与快捷键语义、窗口状态与独立设置目录进入唯一命令链。正文与Chrome通知分离；关闭取消/等待系统目录动作。见[契约](p5-original-commands.md)。
 
 P5第二十二批：原六种画布背景、五自定义刷、透明页底色/HSV棋盘及双轴nearest进入唯一Config/BitmapFactory；背景变化仅重绘。源首像素RGB与预乘显示分离，显示租约/UI发布和独立草稿沿原边界，见[契约](p5-background.md)。
+
+P5第二十三批：默认设置复制/递归重收集与全局写权限全部在原BookOperation/SaveData；菜单只传入原上下文并查询资格，不修改阅读或文件规则。失败恢复完整历史资格，新打开优先；见[契约](p5-default-settings.md)。

@@ -1,6 +1,6 @@
 # 完整命令迁移表
 
-固定基线235个原命令实例全部保留。当前为 **190个执行入口接入、45个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
+固定基线235个原命令实例全部保留。当前为 **192个执行入口接入、43个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
 
 原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。实际键位/手势按原A/B/C、阅读方向和用户差分计算。
 
@@ -199,7 +199,7 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | SetSortModeEntry | 文件登记时间升序 |  |  | 已接入 | P4 原Playlist来源登记顺序排序；普通来源禁用 | NeeView/Command/Commands/SetSortModeEntryCommand.cs |
 | SetSortModeEntryDescending | 文件登记时间降序 |  |  | 已接入 | P4 原Playlist来源登记顺序排序；普通来源禁用 | NeeView/Command/Commands/SetSortModeEntryDescendingCommand.cs |
 | SetSortModeRandom | 随机 |  |  | 已接入 | P1 Engine | NeeView/Command/Commands/SetSortModeRandomCommand.cs |
-| SetDefaultPageSetting | 重置页面设置 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SetDefaultPageSettingCommand.cs |
+| SetDefaultPageSetting | 重置页面设置 |  |  | 已接入 | P5 原默认复制/重收集与文件权限；见p5-default-settings | NeeView/Command/Commands/SetDefaultPageSettingCommand.cs |
 | ToggleBookmark | 添加/删除书签 | Ctrl+D |  | 已接入 | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleBookmarkCommand.cs |
 | RegisterBookmark | 注册书签 |  |  | 已接入 | P2 第五批宿主适配；登记字段/动作接入，原Popup/标签/树选择器待迁 | NeeView/Command/Commands/RegisterBookmarkCommand.cs |
 | NextPlaylist | 下一播放列表 |  |  | 已接入 | P2 第八批原播放列表/标记子集；格式、编辑和导航接入，高级来源/模板/修复待迁 | NeeView/Command/Commands/NextPlaylistCommand.cs |
@@ -230,7 +230,7 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | OpenScriptsFolder | 打开脚本文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenScriptsFolderCommand.cs |
 | OpenVersionWindow | 显示版本信息 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenVersionWindowCommand.cs |
 | CloseApplication | 退出应用程序 |  |  | 已接入 | P1 宿主适配 | NeeView/Command/Commands/CloseApplicationCommand.cs |
-| TogglePermitFile | 启用/禁用文件操作 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/TogglePermitFileCommand.cs |
+| TogglePermitFile | 启用/禁用文件操作 |  |  | 已接入 | P5 原默认复制/重收集与文件权限；见p5-default-settings | NeeView/Command/Commands/TogglePermitFileCommand.cs |
 | HelpCommandList | 显示命令帮助 |  |  | 已接入 | P1 宿主适配 | NeeView/Command/Commands/HelpCommandListCommand.cs |
 | HelpScript | 显示脚本帮助 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/HelpScriptCommand.cs |
 | HelpMainMenu | 显示主菜单帮助 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/HelpMainMenuCommand.cs |
@@ -259,3 +259,5 @@ P5第二十批：SaveSetting/ReloadSetting/ExportBackup进入唯一Profile及可
 P5第二十一批接通7个原窗口/导航命令；当前182入口/53占位，数量不代表功能覆盖率。见[p5-original-commands.md](p5-original-commands.md)。
 
 P5第二十二批接通8个原背景/像素保持命令；当前190入口/45占位，数量不代表功能覆盖率。见[p5-background.md](p5-background.md)。
+
+P5第二十三批：原十二字段默认复制、实际变化历史订阅、递归DirtyBook重收集及全局文件权限接入；新打开优先，失败恢复设置/位置/历史资格，权限不刷新正文。见[契约](p5-default-settings.md)。

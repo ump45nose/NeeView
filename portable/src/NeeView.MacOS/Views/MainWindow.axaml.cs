@@ -189,6 +189,7 @@ public sealed partial class MainWindow : Window
     /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
     public bool IsCommandAvailable(string name) => name switch
     {
+        "SetDefaultPageSetting" => _model?.Operation.IsLoading == false,
         "SaveSetting" or "ReloadSetting" or "ExportBackup" => !_profileBusy && _model?.Operation.CanManageProfile == true,
         "OpenSettingFilesFolder" => _platform is not null && _settingFolderAction.IsCompleted,
         "ToggleNearestNeighbor" => _model?.Operation.IsLoading == false,
@@ -264,6 +265,7 @@ public sealed partial class MainWindow : Window
         "ToggleVisibleNavigator" => _model?.ShowNavigator,
         "ToggleVisibleFilmStrip" => Config.Current.FilmStrip.IsEnabled,
         "ToggleNearestNeighbor" => Config.Current.ImageDotKeep.IsEnabled,
+        "TogglePermitFile" => Config.Current.System.IsFileWriteAccessEnabled,
         var backgroundCommand when backgroundCommand.StartsWith("SetBackground", StringComparison.Ordinal) => backgroundCommand == "SetBackground" + Config.Current.Background.BackgroundType,
         "ToggleVisibleAddressBar" => Config.Current.MenuBar.IsAddressBarEnabled,
         "ToggleVisiblePageSlider" => Config.Current.Slider.IsEnabled,
@@ -370,6 +372,7 @@ public sealed partial class MainWindow : Window
         {
             switch (name)
             {
+                case "TogglePermitFile": await _model.Operation.ToggleFileWriteAccessAsync(fromMenu); break;
                 case "ToggleNearestNeighbor": await _model.Operation.ToggleNearestNeighborAsync(fromMenu); break;
                 case "ToggleVisibleAddressBar": case "ToggleVisiblePageSlider":
                     SetChromeVisible(name, fromMenu); break;

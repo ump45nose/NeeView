@@ -8,6 +8,11 @@ public sealed class BookMementoControl(Book book)
     private bool _historyEntry;
     public bool IsHistoryRemoved { get; private set; }
     public bool IsPageChangeCountEnabled { get; set; } = true;
+    /// <summary>设置事务失败时恢复计数与移除抑制，不把回滚页框当作真实阅读。</summary>
+    internal readonly record struct State(int PageChanges, bool HistoryEntry, bool HistoryRemoved, bool CountEnabled);
+    internal State CaptureState() => new(_pageChangeCount, _historyEntry, IsHistoryRemoved, IsPageChangeCountEnabled);
+    internal void RestoreState(State state)
+    { _pageChangeCount = state.PageChanges; _historyEntry = state.HistoryEntry; IsHistoryRemoved = state.HistoryRemoved; IsPageChangeCountEnabled = state.CountEnabled; }
     /// <summary>仅主Page对象变化计数；半页、尺寸与同页刷新不计数。</summary>
     public void OnTopPageChanged() { if (_pageChangeCount < int.MaxValue) _pageChangeCount++; IsHistoryRemoved = false; }
     /// <summary>原删除回报重置本次访问；下一次真实换页可重新登记。</summary>
