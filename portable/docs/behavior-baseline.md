@@ -154,3 +154,5 @@ P5第十八批：SlideShow/SlideShowInput/SlideShowConfig、PageFrameContext、P
 原Exporter仅一级三材料与五根；原Reload只UserSetting/ObjectMerge，缺失Config不重置运行设置、命令恢复默认；BookSource.DirtyBook的来源变化重收集保留。普通书籍引用不变，递归+排序、新导航及来源失败分别回归，见[设置命令契约](p5-profile-commands.md)。
 
 P5第二十一批：原随机跳页/来源资格排序、地址栏/滑条菜单与快捷键语义、窗口状态与独立设置目录进入唯一命令链。正文与Chrome通知分离；关闭取消/等待系统目录动作。见[契约](p5-original-commands.md)。
+
+P5第二十二批：原六种画布背景、五自定义刷、透明页底色/HSV棋盘及双轴nearest进入唯一Config/BitmapFactory；背景变化仅重绘。源首像素RGB与预乘显示分离，显示租约/UI发布和独立草稿沿原边界，见[契约](p5-background.md)。

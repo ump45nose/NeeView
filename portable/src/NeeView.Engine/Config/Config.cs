@@ -18,6 +18,8 @@ public sealed class Config
     public BookmarkConfig Bookmark { get; set; } = new();
     public SystemConfig System { get; set; } = new();
     public ArchiveConfig Archive { get; set; } = new();
+    public BackgroundConfig Background { get; set; } = new();
+    public ImageDotKeepConfig ImageDotKeep { get; set; } = new();
     public ImageConfig Image { get; set; } = new();
     public SlideShowConfig SlideShow { get; set; } = new();
     public PerformanceConfig Performance { get; set; } = new();

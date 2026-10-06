@@ -39,7 +39,7 @@ public sealed partial class MainWindow : Window
     private SliderTextBox PageNumber => this.FindControl<SliderTextBox>("PageNumberView")!;
     private static readonly HashSet<string> HostCommands = new(StringComparer.Ordinal)
     {
-        "ToggleVisibleAddressBar", "ToggleVisiblePageSlider", "ToggleWindowMinimize", "ToggleWindowMaximize", "OpenSettingFilesFolder", "SaveSetting", "ReloadSetting", "ExportBackup", "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen", "MoveToFolderAs", "CopyToFolderAs",
+        "ToggleNearestNeighbor", "ToggleVisibleAddressBar", "ToggleVisiblePageSlider", "ToggleWindowMinimize", "ToggleWindowMaximize", "OpenSettingFilesFolder", "SaveSetting", "ReloadSetting", "ExportBackup", "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen", "MoveToFolderAs", "CopyToFolderAs",
         "ViewScaleUp", "ViewScaleDown", "ViewScrollUp", "ViewScrollDown", "ViewScrollLeft", "ViewScrollRight", "OpenContextMenu", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
         "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ToggleBookLock", "Unload", "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff",
         "ToggleViewFlipVertical", "ViewFlipVerticalOn", "ViewFlipVerticalOff", "ViewReset", "ViewScaleStretch", "ViewPresetScroll", "ViewScrollNTypeUp", "ViewScrollNTypeDown",
@@ -191,6 +191,7 @@ public sealed partial class MainWindow : Window
     {
         "SaveSetting" or "ReloadSetting" or "ExportBackup" => !_profileBusy && _model?.Operation.CanManageProfile == true,
         "OpenSettingFilesFolder" => _platform is not null && _settingFolderAction.IsCompleted,
+        "ToggleNearestNeighbor" => _model?.Operation.IsLoading == false,
         "ToggleMediaPlay" or "PrevMediaPosition" or "NextMediaPosition" => _model?.Operation.MediaExists() == true,
         var command when PagedTransformCommands.Contains(command) && _model?.Operation.IsFrameReading != true => false,
         "Unload" => _model?.Operation.CanUnload == true,
@@ -262,6 +263,8 @@ public sealed partial class MainWindow : Window
         "ToggleVisibleBookmarkList" => _model?.ShowBookmarks,
         "ToggleVisibleNavigator" => _model?.ShowNavigator,
         "ToggleVisibleFilmStrip" => Config.Current.FilmStrip.IsEnabled,
+        "ToggleNearestNeighbor" => Config.Current.ImageDotKeep.IsEnabled,
+        var backgroundCommand when backgroundCommand.StartsWith("SetBackground", StringComparison.Ordinal) => backgroundCommand == "SetBackground" + Config.Current.Background.BackgroundType,
         "ToggleVisibleAddressBar" => Config.Current.MenuBar.IsAddressBarEnabled,
         "ToggleVisiblePageSlider" => Config.Current.Slider.IsEnabled,
         "ToggleHideFilmStrip" => Config.Current.FilmStrip.IsHideFilmStrip,
@@ -367,6 +370,7 @@ public sealed partial class MainWindow : Window
         {
             switch (name)
             {
+                case "ToggleNearestNeighbor": await _model.Operation.ToggleNearestNeighborAsync(fromMenu); break;
                 case "ToggleVisibleAddressBar": case "ToggleVisiblePageSlider":
                     SetChromeVisible(name, fromMenu); break;
                 case "ToggleWindowMinimize":

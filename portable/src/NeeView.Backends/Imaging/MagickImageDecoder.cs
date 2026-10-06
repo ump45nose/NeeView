@@ -43,6 +43,8 @@ public sealed class MagickImageDecoder(IAnimatedImageDecoder? pngAnimation = nul
         if (!stream.CanSeek) throw new InvalidDataException("解码流必须可定位。");
         image.Ping(stream); var width = image.Width; var height = image.Height; var format = image.Format;
         var estimate = checked((long)width * height * 8);
+        var oriented = image.Orientation is OrientationType.LeftTop or OrientationType.RightTop or OrientationType.RightBottom or OrientationType.LeftBottom;
+        var sourceSize = new Size(oriented ? height : width, oriented ? width : height);
         // JPEG 采样最多缩小 8 倍，每边缩小后仍须符合工作预算。
         var sampledEstimate = checked(((long)width + 7) / 8 * (((long)height + 7) / 8) * 8);
         if (width == 0 || height == 0 || (format == MagickFormat.Jpeg && sampledEstimate > WorkingBudget))
@@ -66,6 +68,13 @@ public sealed class MagickImageDecoder(IAnimatedImageDecoder? pngAnimation = nul
         // 有 ICC 时转换，未声明的图像按 sRGB 解释。
         if (image.GetColorProfile() is not null) image.TransformColorSpace(ColorProfiles.SRGB);
         else image.ColorSpace = ColorSpace.sRGB;
+        ThemeRgba sourceColor;
+        using (var sourcePixels = image.GetPixels())
+        {
+            var first = sourcePixels.GetPixel(0, 0).ToColor()!;
+            // 原GetOneColor保留首像素RGB并强制不透明；显示像素稍后单独预乘。
+            sourceColor = new(255, first.R, first.G, first.B);
+        }
         var ratio = Math.Min(1, Math.Min((double)Math.Max(1, request.TargetWidth) / image.Width,
             (double)Math.Max(1, request.TargetHeight) / image.Height));
         if (ratio < 1) image.Resize((uint)Math.Max(1, image.Width * ratio), (uint)Math.Max(1, image.Height * ratio));
@@ -82,6 +91,6 @@ public sealed class MagickImageDecoder(IAnimatedImageDecoder? pngAnimation = nul
             pixels[offset + 2] = (byte)((pixels[offset + 2] * alpha + 127) / 255);
         }
         token.ThrowIfCancellationRequested();
-        return new DecodedImageLease(new((int)image.Width, (int)image.Height), pixels);
+        return new DecodedImageLease(new((int)image.Width, (int)image.Height), pixels, sourceColor, sourceSize);
     }, token);
 }

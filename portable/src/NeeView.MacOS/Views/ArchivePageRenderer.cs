@@ -24,7 +24,7 @@ public static class ArchivePageRenderer
         return new(area.Center.X - size.Width * scale / 2, area.Center.Y - size.Height * scale / 2, size.Width * scale, size.Height * scale);
     }
     /// <summary>绘制原叠页封面与文件名/类型/大小，空书有正常卡片而非永久加载。</summary>
-    public static void Draw(Control owner, DrawingContext context, Page page, Avalonia.Rect card, Bitmap? cover, string status)
+    public static void Draw(Control owner, DrawingContext context, Page page, Avalonia.Rect card, Bitmap? cover, string status, Matrix? matrix = null)
     {
         var background = Brush(owner, "ArchivePage.Background", Brushes.WhiteSmoke);
         var foreground = Brush(owner, "ArchivePage.Foreground", Brushes.Black);
@@ -34,7 +34,7 @@ public static class ArchivePageRenderer
         var image = Fit(area.Deflate(Math.Min(8, Math.Min(area.Width, area.Height) / 4)), cover?.Size ?? new Avalonia.Size(256, 320));
         context.FillRectangle(border, image.Translate(new Avalonia.Vector(6, 6)));
         context.FillRectangle(background, image); context.DrawRectangle(null, new Pen(border, 2), image);
-        if (cover is not null) context.DrawImage(cover, image.Deflate(Math.Min(2, Math.Min(image.Width, image.Height) / 4)));
+        if (cover is not null) ReaderImageRenderer.Draw(owner, context, cover, new Avalonia.Rect(cover.PixelSize.ToSize(1)), image.Deflate(Math.Min(2, Math.Min(image.Width, image.Height) / 4)), matrix ?? Matrix.Identity);
         else
         {
             // 原fic_folder轮廓；空封面与加载状态共享卡片，不制造解码资源。

@@ -2,6 +2,7 @@ using System.Globalization;
 namespace NeeView;
 
 /// <summary>替换实际使用的 WPF Color 值；只有 ARGB 数据，没有显示资源或原生句柄。</summary>
+[System.Text.Json.Serialization.JsonConverter(typeof(BackgroundColorConverter))]
 public readonly record struct ThemeRgba(byte A, byte R, byte G, byte B)
 {
     /// <summary>按原 Color.FromArgb 次序构造主题颜色。</summary>

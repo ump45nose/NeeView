@@ -2558,6 +2558,96 @@
       "target": "src/NeeView.MacOS/Views/MainWindow.ChromeCommands.cs",
       "sha256": "1c1343a8690797b73d9e82a5c5fda8fe1586b8cb9d1bff0376203ab3b43cd2e7",
       "status": "P5第二十一批：原命令语义迁入；WPF窗口/Binding由Mac表现适配，单一阅读/JSON链"
+    },
+    {
+      "source": "NeeView/Config/BackgroundConfig.cs",
+      "target": "src/NeeView.Engine/Config/BackgroundConfig.cs",
+      "sha256": "28bbedbc71ccc20d8196110d0bffacc4183af7414851a7e90384c97fed483546",
+      "status": "P5原背景/首像素/双轴nearest适配；去WPF，保留JSON/枚举/底刷前景刷/菜单参数与设备像素规则；见p5-background"
+    },
+    {
+      "source": "NeeView/Config/ImageDotKeepConfig.cs",
+      "target": "src/NeeView.Engine/Config/ImageDotKeepConfig.cs",
+      "sha256": "38b323ac7d120a6160bf9f36d881db6279f1715fb3d0a291014380d5593e6eb8",
+      "status": "P5原背景/首像素/双轴nearest适配；去WPF，保留JSON/枚举/底刷前景刷/菜单参数与设备像素规则；见p5-background"
+    },
+    {
+      "source": "NeeView/ContentCanvas/BackgroundType.cs",
+      "target": "src/NeeView.Engine/Config/BackgroundConfig.cs",
+      "sha256": "e862dee3e4bcc5c1b2d7a702f2345e55846076d141bdb45977e74377658dc4d0",
+      "status": "P5原背景/首像素/双轴nearest适配；去WPF，保留JSON/枚举/底刷前景刷/菜单参数与设备像素规则；见p5-background"
+    },
+    {
+      "source": "NeeView/ContentCanvas/BrushSource.cs",
+      "target": "src/NeeView.Engine/Config/BackgroundConfig.cs",
+      "sha256": "bfdc0272b9f18940a0bc5c2c3cf6b203f75c8398dd8332ac82904416810127c7",
+      "status": "P5原背景/首像素/双轴nearest适配；去WPF，保留JSON/枚举/底刷前景刷/菜单参数与设备像素规则；见p5-background"
+    },
+    {
+      "source": "NeeView/ContentCanvas/CanvasBackgroundSource.cs",
+      "target": "src/NeeView.MacOS/Views/CanvasBackgroundPresenter.cs",
+      "sha256": "8efbb8b92680022484015c0332386caf0ea504b25a4bd1f1d20345dd84868744",
+      "status": "P5原背景/首像素/双轴nearest适配；去WPF，保留JSON/枚举/底刷前景刷/菜单参数与设备像素规则；见p5-background"
+    },
+    {
+      "source": "NeeView/ContentCanvas/PageBackgroundBrushSource.cs",
+      "target": "src/NeeView.MacOS/Views/ReaderImageRenderer.cs",
+      "sha256": "85b30378f08570313992d07e44e83507493f6cf17dff1606f2c48a35f96649e9",
+      "status": "P5原背景/首像素/双轴nearest适配；去WPF，保留JSON/枚举/底刷前景刷/菜单参数与设备像素规则；见p5-background"
+    },
+    {
+      "source": "NeeView/Bitmap/BitmapSourceExtension.cs",
+      "target": "src/NeeView.Backends/Imaging/MagickImageDecoder.cs",
+      "sha256": "4d086e8fd6631a0d2ad98359c4774b7a0d522e88e12a707ca9ee4961a364d0c0",
+      "status": "P5原背景/首像素/双轴nearest适配；去WPF，保留JSON/枚举/底刷前景刷/菜单参数与设备像素规则；见p5-background"
+    },
+    {
+      "source": "NeeView/Command/Commands/SetBackgroundAutoCommand.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.ImagePresentation.cs",
+      "sha256": "a4c802e1984f918309294784272529b74a1bb309dea654a22174848f14d34ecd",
+      "status": "P5原背景/首像素/双轴nearest适配；去WPF，保留JSON/枚举/底刷前景刷/菜单参数与设备像素规则；见p5-background"
+    },
+    {
+      "source": "NeeView/Command/Commands/SetBackgroundBlackCommand.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.ImagePresentation.cs",
+      "sha256": "df2cdf4107487e5124ba7acf9c76200fb558da654735c136916d1519615c8597",
+      "status": "P5原背景/首像素/双轴nearest适配；去WPF，保留JSON/枚举/底刷前景刷/菜单参数与设备像素规则；见p5-background"
+    },
+    {
+      "source": "NeeView/Command/Commands/SetBackgroundCheckCommand.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.ImagePresentation.cs",
+      "sha256": "3d223c7f9a2773686727e98235f591f6f646d868c24ec06af23c24265d057ab6",
+      "status": "P5原背景/首像素/双轴nearest适配；去WPF，保留JSON/枚举/底刷前景刷/菜单参数与设备像素规则；见p5-background"
+    },
+    {
+      "source": "NeeView/Command/Commands/SetBackgroundCheckDarkCommand.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.ImagePresentation.cs",
+      "sha256": "771ea6d5c8d919207755db6190fcaa2b2ebec251d33e17bd53c43a9a415a053d",
+      "status": "P5原背景/首像素/双轴nearest适配；去WPF，保留JSON/枚举/底刷前景刷/菜单参数与设备像素规则；见p5-background"
+    },
+    {
+      "source": "NeeView/Command/Commands/SetBackgroundCustomCommand.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.ImagePresentation.cs",
+      "sha256": "cac3913166d1da7b602e189a1eeb112699ec7f092338e4458c089ea415d8c5a3",
+      "status": "P5原背景/首像素/双轴nearest适配；去WPF，保留JSON/枚举/底刷前景刷/菜单参数与设备像素规则；见p5-background"
+    },
+    {
+      "source": "NeeView/Command/Commands/SetBackgroundWhiteCommand.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.ImagePresentation.cs",
+      "sha256": "38912671b25ba5b57bc5c8aa8f2e8fda9e9a77025ebf9b3d3242a3278b89722a",
+      "status": "P5原背景/首像素/双轴nearest适配；去WPF，保留JSON/枚举/底刷前景刷/菜单参数与设备像素规则；见p5-background"
+    },
+    {
+      "source": "NeeView/Command/Commands/ToggleBackgroundCommand.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.ImagePresentation.cs",
+      "sha256": "661b3ee6f824fcff58e8ba66a0ea9cb5d323006af4a5c4d2634d39fc9c6bb999",
+      "status": "P5原背景/首像素/双轴nearest适配；去WPF，保留JSON/枚举/底刷前景刷/菜单参数与设备像素规则；见p5-background"
+    },
+    {
+      "source": "NeeView/Command/Commands/ToggleNearestNeighborCommand.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.ImagePresentation.cs",
+      "sha256": "7df394f631df83edfe98936839ecf1bf4a2666b39ce949603b0d9fd7417b2fa6",
+      "status": "P5原背景/首像素/双轴nearest适配；去WPF，保留JSON/枚举/底刷前景刷/菜单参数与设备像素规则；见p5-background"
     }
   ],
   "rule_references": [

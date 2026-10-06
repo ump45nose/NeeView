@@ -23,7 +23,7 @@ public static class CommandParameterTypes
         "ToggleStretchMode" => typeof(ToggleStretchModeCommandParameter),
         "TogglePageMode" => typeof(TogglePageModeCommandParameter),
         "SetStretchModeUniform" => typeof(StretchModeCommandParameter),
-        "ToggleVisibleAddressBar" or "ToggleVisiblePageSlider" or "ToggleViewFlipHorizontal" or "ToggleViewFlipVertical" or "TogglePlaylistItem" or "ToggleBookLock" or "ToggleSlideShow" => typeof(ToggleCommandParameter),
+        "ToggleNearestNeighbor" or "ToggleVisibleAddressBar" or "ToggleVisiblePageSlider" or "ToggleViewFlipHorizontal" or "ToggleViewFlipVertical" or "TogglePlaylistItem" or "ToggleBookLock" or "ToggleSlideShow" => typeof(ToggleCommandParameter),
         "PrevPlaylistItemInBook" => typeof(MovePlaylistItemInBookCommandParameter),
         "PrevMediaPosition" or "NextMediaPosition" => typeof(MoveMediaPositionCommandParameter),
         "PrevPage" or "PrevOnePage" or "FirstPage" or "PrevFolderPage" => typeof(ReversibleCommandParameter),

@@ -19,6 +19,8 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     { public void Dispose() { Bitmap.Dispose(); Lease.Dispose(); } }
     private sealed record Demand(CancellationTokenSource Cancellation, bool Background);
     private readonly Dictionary<Page, Display> _images = [];
+    public ThemeRgba ContentColor => operation.Book?.CurrentPage is { } page && _images.TryGetValue(page, out var image)
+        ? image.Lease.Image.Color : ThemeRgba.Parse("Black");
     private readonly Dictionary<Page, Demand> _pending = [];
     private readonly Dictionary<Page, string> _errors = [];
     private readonly DispatcherTimer _relayout = new() { Interval = TimeSpan.FromMilliseconds(80) };
@@ -256,6 +258,8 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     {
         var rect = Layout!.Items[index]; double scale = TopLevel.GetTopLevel(owner)?.RenderScaling ?? 1;
         var size = _pages[index].Content.PageDataSource.Size;
+        if (Config.Current.ImageDotKeep.IsImageDotKeep(new(rect.Width * scale, rect.Height * scale), size))
+            return new((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height), _mode == BrowseLayoutMode.Masonry);
         int width = Math.Clamp((int)Math.Ceiling(Math.Min(size.Width, rect.Width * scale) / 64) * 64, 64, 2048);
         int height = Math.Clamp((int)Math.Ceiling(Math.Min(size.Height, width / Math.Max(1, size.Width) * size.Height) / 64) * 64, 64, _mode == BrowseLayoutMode.Masonry ? 2048 : 32768);
         return new(width, height, _mode == BrowseLayoutMode.Masonry);
@@ -304,7 +308,6 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     /// <param name="context">由唯一ReaderView提供的当前帧绘制上下文。</param>
     public void Render(DrawingContext context)
     {
-        context.FillRectangle(Brush("Gallery.Background", Brushes.Black), new Avalonia.Rect(owner.Bounds.Size));
         if (Layout is null || _pages.Length == 0) { Text(context, _layoutError ?? (IsLayoutPending ? "正在计算布局…" : "这个来源没有可浏览的页面"), new(24, 24)); return; }
         using var clip = context.PushClip(new Avalonia.Rect(owner.Bounds.Size));
         foreach (int index in Layout.Query(_offset, _offset + owner.Bounds.Height))
@@ -312,7 +315,7 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
             var item = Layout.Items[index]; var page = _pages[index];
             var target = new Avalonia.Rect(item.X - _offsetX, item.Y - _offset, item.Width, item.Height);
             if (page.PageType.IsFolder()) ArchivePageRenderer.Draw(owner, context, page, target, _images.GetValueOrDefault(page)?.Bitmap, _errors.GetValueOrDefault(page) ?? (_pending.ContainsKey(page) ? "正在加载…" : ""));
-            else if (_images.TryGetValue(page, out var image)) context.DrawImage(image.Bitmap, new Avalonia.Rect(image.Bitmap.Size), target);
+            else if (_images.TryGetValue(page, out var image)) ReaderImageRenderer.Draw(owner, context, image.Bitmap, new Avalonia.Rect(image.Bitmap.PixelSize.ToSize(1)), target, Matrix.Identity);
             else { context.FillRectangle(Brush("Gallery.Placeholder", Brushes.DimGray), target); Text(context, _errors.ContainsKey(page) ? "读取失败" : "正在加载…", target.TopLeft + new Avalonia.Vector(8, 8)); }
             if (ReferenceEquals(page, _selection)) context.DrawRectangle(new Pen(Brush("Gallery.Selection", Brushes.DodgerBlue), 3), target.Deflate(1.5));
         }
@@ -324,7 +327,7 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
         Text(context, $"{(_mode == BrowseLayoutMode.Masonry ? "瀑布流" : "连续阅读")} · {Layout.ColumnCount}列 · {_pages.Length}项", new(12, 10));
     }
     private IBrush Brush(string name, IBrush fallback) => owner.TryFindResource(name, out var value) && value is IBrush brush ? brush : fallback;
-    private void Text(DrawingContext context, string text, Point point) => context.DrawText(new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("sans-serif"), 12, Brush("Gallery.Text", Brushes.LightGray)), point);
+    private void Text(DrawingContext context, string text, Point point) => context.DrawText(new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("sans-serif"), 12, CanvasBackgroundPresenter.Foreground(ContentColor)), point);
 
     /// <summary>滚动立即更新需求，延迟回报阅读锚点；不把滚动锚点当作显式操作选择。</summary>
     /// <param name="delta">纵向DIP增量，正值向下。</param>

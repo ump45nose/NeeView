@@ -21,6 +21,7 @@ public sealed partial class ReaderView : Control, IDisposable
     {
         private int _references = 1;
         public Bitmap Bitmap { get; } = bitmap;
+        public ThemeRgba Color => lease.Image.Color;
         /// <summary>同一图片及解码规格/来源版本可复用显示缓冲；Folder封面仍按原选择重新请求。</summary>
         public bool CanReuse(Page page, DecodeRequest candidate) => page.IsImage && request == candidate
             && length == page.ArchiveEntry.Length && version == page.ArchiveEntry.LastWriteTime;
@@ -45,6 +46,9 @@ public sealed partial class ReaderView : Control, IDisposable
     private BookOperation? _operation;
     private CoreBitmapFactory? _factory;
     private ReaderBrowsePresenter? _browse;
+    private CanvasBackgroundPresenter? _background;
+    private (bool Enabled, double Threshold) _dotKeep;
+    internal Task BackgroundPending => _background?.Pending ?? Task.CompletedTask;
     private bool IsBrowsing => _operation is not null && !_operation.IsFrameReading;
     internal BrowseLayout? BrowseLayout => _browse?.Layout;
     internal bool BrowseLayoutPending => _browse?.IsLayoutPending ?? false;
@@ -140,7 +144,12 @@ public sealed partial class ReaderView : Control, IDisposable
     /// <summary>只装配业务和像素边界；没有解码器或文件系统依赖。</summary>
     public void Attach(BookOperation operation, CoreBitmapFactory factory)
     {
+        if (_operation is not null) _operation.ImagePresentationChanged -= ImagePresentationChanged;
+        _background?.Dispose();
         _operation = operation; _factory = factory; Focusable = true;
+        _background = new(this, operation, factory);
+        _operation.ImagePresentationChanged += ImagePresentationChanged;
+        _dotKeep = (Config.Current.ImageDotKeep.IsEnabled, Config.Current.ImageDotKeep.Threshold);
         _browse?.Dispose();
         _browse = new(this, operation, factory, () => DisplayCompleted?.Invoke(this, EventArgs.Empty));
     }
@@ -148,6 +157,8 @@ public sealed partial class ReaderView : Control, IDisposable
     public async Task RefreshAsync()
     {
         if (_disposed || _operation is null || _factory is null) return;
+        _dotKeep = (Config.Current.ImageDotKeep.IsEnabled, Config.Current.ImageDotKeep.Threshold);
+        _background?.Refresh();
         if (_browse is not null) await _browse.RefreshAsync();
         if (_disposed) return;
         if (IsBrowsing)
@@ -269,6 +280,8 @@ public sealed partial class ReaderView : Control, IDisposable
         var size = page.Content.PageDataSource.Size;
         var frameScale = _panorama?.Frames.FirstOrDefault(f => f.Frame.Contains(page))?.Frame.Scale ?? _frame?.Scale ?? 1;
         var scale = frameScale * _transform.BaseScale * _zoom * (TopLevel.GetTopLevel(this)?.RenderScaling ?? 1);
+        if (Config.Current.ImageDotKeep.IsImageDotKeep(new(size.Width * scale, size.Height * scale), size))
+            return new((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height));
         return new(Math.Max(128, (int)Math.Ceiling(Math.Min(size.Width, size.Width * scale) / 128) * 128), Math.Max(128, (int)Math.Ceiling(Math.Min(size.Height, size.Height * scale) / 128) * 128));
     }
     /// <summary>邻页预取只有一个背景槽，取消或损坏不影响当前图。</summary>
@@ -280,10 +293,12 @@ public sealed partial class ReaderView : Control, IDisposable
     /// <summary>绘制原页框的方向、空白页、缩放与归一化裁剪区域。</summary>
     public override void Render(DrawingContext context)
     {
-        if (IsBrowsing && _browse is not null) { base.Render(context); _browse.Render(context); return; }
-        base.Render(context); context.FillRectangle(Brushes.Black, new Avalonia.Rect(Bounds.Size));
+        base.Render(context);
+        _background?.Render(context, CurrentContentColor);
+        if (_background is null) context.FillRectangle(Brushes.Black, new Avalonia.Rect(Bounds.Size));
+        if (IsBrowsing && _browse is not null) { _browse.Render(context); return; }
         if (_frame is null)
-        { DrawText(context, _operation?.Book is null ? "NeeView\n打开图片、目录或 ZIP / CBZ" : "这个来源没有可阅读的图片", new(30,30)); return; }
+        { DrawText(context, _operation?.Book is null ? "NeeView\n打开图片、目录或 ZIP / CBZ" : "这个来源没有可阅读的图片", new(30,30), CanvasBackgroundPresenter.Foreground(CurrentContentColor)); return; }
         using var clip=context.PushClip(new Avalonia.Rect(Bounds.Size));
         var motion=_motion.GetPageState();
         if (IsPanorama) DrawPanorama(context);
@@ -303,12 +318,12 @@ public sealed partial class ReaderView : Control, IDisposable
         foreach(var(source,target) in targets)
         {
             if(source.IsDummy) context.FillRectangle(Brushes.White,target);
-            else if(source.Page.PageType.IsFolder()) ArchivePageRenderer.Draw(this,context,source.Page,target,images.GetValueOrDefault(source.Page)?.Bitmap,errors.GetValueOrDefault(source.Page)??"正在加载…");
+            else if(source.Page.PageType.IsFolder()) ArchivePageRenderer.Draw(this,context,source.Page,target,images.GetValueOrDefault(source.Page)?.Bitmap,errors.GetValueOrDefault(source.Page)??"正在加载…", matrix);
             else if(images.TryGetValue(source.Page,out var image))
             {
                 if (ReferenceEquals(images, _images)) image = GetMediaDisplay(source.Page, image);
                 var crop=source.ViewSizeCalculator.GetViewBox(); var pixels=image.Bitmap.PixelSize;
-                context.DrawImage(image.Bitmap,new Avalonia.Rect(crop.X*pixels.Width,crop.Y*pixels.Height,crop.Width*pixels.Width,crop.Height*pixels.Height),target);
+                ReaderImageRenderer.Draw(this,context,image.Bitmap,new Avalonia.Rect(crop.X*pixels.Width,crop.Y*pixels.Height,crop.Width*pixels.Width,crop.Height*pixels.Height),target,matrix);
                 if (errors.GetValueOrDefault(source.Page) is { Length: > 0 } error)
                 {
                     // 静态首帧可用时仍明确显示动画失败，不能悄悄把不支持当作播放成功。
@@ -340,7 +355,7 @@ public sealed partial class ReaderView : Control, IDisposable
     { _motion.BeginPan(from,_pan,duration,linear); if(_motion.IsActive) _motionTimer.Start(); InvalidateVisual(); }
     private TimeSpan ScrollDuration => _operation?.Context?.ScrollDuration ?? TimeSpan.Zero;
     /// <summary>错误和空书籍保持可操作，文本不改变来源索引。</summary>
-    private static void DrawText(DrawingContext context, string text, Point position) => context.DrawText(new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("sans-serif"), 13, Brushes.LightGray), position);
+    private static void DrawText(DrawingContext context, string text, Point position, IBrush? foreground = null) => context.DrawText(new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("sans-serif"), 13, foreground ?? Brushes.LightGray), position);
     /// <summary>围绕指针位置缩放，像素需求随缩放更新。</summary>
     public async Task ZoomAsync(double factor, Point? pointer = null)
     {
@@ -667,6 +682,8 @@ public sealed partial class ReaderView : Control, IDisposable
         ClearAnimations();
         foreach (var item in _images.Values) item.Dispose(); _images.Clear(); _pageErrors.Clear();
         _browse?.Dispose(); _panorama = null; _panoramaRecenter = null;
+        if (_operation is not null) _operation.ImagePresentationChanged -= ImagePresentationChanged;
+        _background?.Dispose(); _background = null;
         _transform.Dispose();
     }
 }

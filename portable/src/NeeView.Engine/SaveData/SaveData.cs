@@ -98,6 +98,8 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             config.Bookmark = ReadBranch<BookmarkConfig>(raw, "Bookmark");
             config.System = ReadBranch<SystemConfig>(raw, "System");
             config.Archive = ReadBranch<ArchiveConfig>(raw, "Archive");
+            config.Background = ReadBranch<BackgroundConfig>(raw, "Background");
+            config.ImageDotKeep = ReadBranch<ImageDotKeepConfig>(raw, "ImageDotKeep");
             config.Image = ReadBranch<ImageConfig>(raw, "Image");
             config.SlideShow = ReadSlideShowBranch(raw);
             config.Performance = ReadBranch<PerformanceConfig>(raw, "Performance");
@@ -504,7 +506,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         try
         {
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "PageList", "History", "Bookmark", "System", "Archive", "Image", "SlideShow", "Performance", "Playlist", "AutoHide", "Window", "WindowTitle", "MenuBar", "Command", "Mouse", "StartUp", "Theme", "Fonts" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "PageList", "History", "Bookmark", "System", "Archive", "Background", "ImageDotKeep", "Image", "SlideShow", "Performance", "Playlist", "AutoHide", "Window", "WindowTitle", "MenuBar", "Command", "Mouse", "StartUp", "Theme", "Fonts" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 MergeTyped(Object(config, branch), value!);

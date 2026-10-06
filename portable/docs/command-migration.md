@@ -1,10 +1,10 @@
 # 完整命令迁移表
 
-固定基线235个原命令实例全部保留。P5第二批为 **168个执行入口接入、67个能力占位**（原 ImportBackup 接入同一确认导入入口）；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
+固定基线235个原命令实例全部保留。当前为 **190个执行入口接入、45个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
 
 原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。实际键位/手势按原A/B/C、阅读方向和用户差分计算。
 
-对照[P4运行导出](../acceptance/p4-completion-commands.json)及[P5导入证据](../acceptance/p5-profile-apply-evidence.json)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider与ToggleHidePageSlider语义独立，前者仍占位；ToggleVisibleAddressBar入口仍占位。参数拥有者映射不等于执行能力；P4分类/P5高级能力继续逐项迁移。
+对照[P4运行导出](../acceptance/p4-completion-commands.json)及[P5导入证据](../acceptance/p5-profile-apply-evidence.json)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider与ToggleHidePageSlider语义独立，前者及ToggleVisibleAddressBar已于第二十一批接入。参数拥有者映射不等于执行能力；P4分类/P5高级能力继续逐项迁移。
 
 P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Value参数、默认键位冲突和参数退役规则。预览显示升级后的清单，实际应用使用同一候选。没有新增执行入口，Cut仍按用户要求占位，见[兼容契约](p5-legacy-compatibility.md)。
 
@@ -61,14 +61,14 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | SetStretchModeUniformToHorizontal | 适应窗口宽度 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/SetStretchModeUniformToHorizontalCommand.cs |
 | ToggleStretchAllowScaleUp | 允许放大 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/ToggleStretchAllowScaleUpCommand.cs |
 | ToggleStretchAllowScaleDown | 允许缩小 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/ToggleStretchAllowScaleDownCommand.cs |
-| ToggleNearestNeighbor | 启用/禁用逐点放大 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleNearestNeighborCommand.cs |
-| ToggleBackground | 切换背景 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleBackgroundCommand.cs |
-| SetBackgroundBlack | 黑色背景 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundBlackCommand.cs |
-| SetBackgroundWhite | 白色背景 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundWhiteCommand.cs |
-| SetBackgroundAuto | 背景适应图像颜色 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundAutoCommand.cs |
-| SetBackgroundCheck | 白色方格背景 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundCheckCommand.cs |
-| SetBackgroundCheckDark | 黑色方格背景 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundCheckDarkCommand.cs |
-| SetBackgroundCustom | 自定义背景 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SetBackgroundCustomCommand.cs |
+| ToggleNearestNeighbor | 启用/禁用逐点放大 |  |  | 已接入 | P5 原画布/透明页背景与双轴像素保持；见p5-background | NeeView/Command/Commands/ToggleNearestNeighborCommand.cs |
+| ToggleBackground | 切换背景 |  |  | 已接入 | P5 原画布/透明页背景与双轴像素保持；见p5-background | NeeView/Command/Commands/ToggleBackgroundCommand.cs |
+| SetBackgroundBlack | 黑色背景 |  |  | 已接入 | P5 原画布/透明页背景与双轴像素保持；见p5-background | NeeView/Command/Commands/SetBackgroundBlackCommand.cs |
+| SetBackgroundWhite | 白色背景 |  |  | 已接入 | P5 原画布/透明页背景与双轴像素保持；见p5-background | NeeView/Command/Commands/SetBackgroundWhiteCommand.cs |
+| SetBackgroundAuto | 背景适应图像颜色 |  |  | 已接入 | P5 原画布/透明页背景与双轴像素保持；见p5-background | NeeView/Command/Commands/SetBackgroundAutoCommand.cs |
+| SetBackgroundCheck | 白色方格背景 |  |  | 已接入 | P5 原画布/透明页背景与双轴像素保持；见p5-background | NeeView/Command/Commands/SetBackgroundCheckCommand.cs |
+| SetBackgroundCheckDark | 黑色方格背景 |  |  | 已接入 | P5 原画布/透明页背景与双轴像素保持；见p5-background | NeeView/Command/Commands/SetBackgroundCheckDarkCommand.cs |
+| SetBackgroundCustom | 自定义背景 |  |  | 已接入 | P5 原画布/透明页背景与双轴像素保持；见p5-background | NeeView/Command/Commands/SetBackgroundCustomCommand.cs |
 | ToggleTopmost | 启用/禁用总是置顶显示 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/ToggleTopmostCommand.cs |
 | ToggleVisibleAddressBar | 显示/隐藏地址栏 |  |  | 已接入 | P5 原窗口/导航语义；见p5-original-commands | NeeView/Command/Commands/ToggleVisibleAddressBarCommand.cs |
 | ToggleHideMenu | 启用/禁用自动隐藏菜单 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/ToggleHideMenuCommand.cs |
@@ -257,3 +257,5 @@ P5第十八批接通原ToggleSlideShow；当前172执行入口/63占位，235原
 P5第二十批：SaveSetting/ReloadSetting/ExportBackup进入唯一Profile及可等待宿主。当前175入口/60占位，数量不代表功能覆盖率，见[契约](p5-profile-commands.md)。
 
 P5第二十一批接通7个原窗口/导航命令；当前182入口/53占位，数量不代表功能覆盖率。见[p5-original-commands.md](p5-original-commands.md)。
+
+P5第二十二批接通8个原背景/像素保持命令；当前190入口/45占位，数量不代表功能覆盖率。见[p5-background.md](p5-background.md)。

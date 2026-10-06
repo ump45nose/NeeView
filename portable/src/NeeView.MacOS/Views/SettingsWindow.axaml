@@ -7,9 +7,25 @@
           <Grid ColumnDefinitions="*,Auto,Auto"><TextBox x:Name="SettingsSearchBox" Text="{Binding Keyword, Mode=TwoWay}" PlaceholderText="搜索设置" KeyDown="SettingsSearch_KeyDown" TextChanged="SettingsSearch_TextChanged" ToolTip.Tip="原结构化搜索：空格 AND，/or，/not，/word，/re。Enter 确认并加入本窗口历史。" /><Button x:Name="SettingsSearchHistory" Grid.Column="1" Content="⌄" Click="SettingsSearch_History" /><Button x:Name="SettingsSearchClear" Grid.Column="2" Content="×" Click="SettingsSearch_Clear" /></Grid>
           <TextBlock x:Name="SettingsSearchError" Text="{Binding Error}" TextWrapping="Wrap" />
         </StackPanel>
-        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="主题 / 配色" /><ListBoxItem Content="字体" /><ListBoxItem Content="归档 / PDF" /><ListBoxItem Content="幻灯播放" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
+        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="主题 / 配色" /><ListBoxItem Content="字体" /><ListBoxItem Content="归档 / PDF" /><ListBoxItem Content="幻灯播放" /><ListBoxItem Content="背景 / 像素保持" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
       </Grid>
     </Border>
+    <ScrollViewer x:Name="BackgroundSettings" Grid.Column="1" IsVisible="False">
+      <StackPanel Margin="24" Spacing="12">
+        <TextBlock Classes="settings-section" Text="背景 / 像素保持" FontSize="{DynamicResource SystemFontSizeHuge}" />
+        <TextBlock Text="画布背景" />
+        <ComboBox x:Name="BackgroundTypeChoice" ItemsSource="{Binding Backgrounds}" SelectedValueBinding="{Binding Value}" SelectedValue="{Binding Background, Mode=TwoWay}"><ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate></ComboBox>
+        <TextBlock Text="自定义刷" />
+        <ComboBox x:Name="BackgroundBrushChoice" ItemsSource="{Binding Brushes}" SelectedValueBinding="{Binding Value}" SelectedValue="{Binding Brush, Mode=TwoWay}"><ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate></ComboBox>
+        <TextBlock Text="自定义底色（#AARRGGBB 或颜色名）" /><TextBox x:Name="CustomBackgroundColor" Text="{Binding Color, Mode=TwoWay}" />
+        <TextBlock Text="自定义背景图片路径" /><TextBox x:Name="CustomBackgroundImage" Text="{Binding Image, Mode=TwoWay}" />
+        <TextBlock Text="透明图片页底色（#AARRGGBB；Alpha 为 00 时无底色）" TextWrapping="Wrap" /><TextBox x:Name="PageBackgroundColor" Text="{Binding PageColor, Mode=TwoWay}" />
+        <CheckBox x:Name="PageBackgroundChecker" Content="透明页底色使用棋盘格" IsChecked="{Binding Checker, Mode=TwoWay}" />
+        <CheckBox x:Name="ImageDotKeepEnabled" Content="启用像素保持（nearest）" IsChecked="{Binding Nearest, Mode=TwoWay}" />
+        <TextBlock Text="像素保持阈值（相对源像素尺寸）" /><NumericUpDown x:Name="ImageDotKeepThreshold" Value="{Binding Threshold, Mode=TwoWay}" Minimum="{Binding ThresholdMinimum}" Maximum="{Binding ThresholdMaximum}" Increment="0.1" FormatString="0.#####" />
+        <TextBlock Text="保存后应用，取消保持当前画面。画布棋盘与图片平铺使用设备像素周期；透明页背景随图片缩放。" TextWrapping="Wrap" />
+      </StackPanel>
+    </ScrollViewer>
     <ScrollViewer x:Name="SlideShowSettings" Grid.Column="1" IsVisible="False">
       <StackPanel Margin="24" Spacing="12">
         <TextBlock Classes="settings-section" Text="幻灯播放" FontSize="{DynamicResource SystemFontSizeHuge}" />

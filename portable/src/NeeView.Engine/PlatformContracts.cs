@@ -97,9 +97,13 @@ public sealed record ImageInfo(Size Size, string Format);
 /// <summary>解码目标尺寸，以设备像素计。</summary>
 public sealed record DecodeRequest(int TargetWidth, int TargetHeight, bool IsThumbnail = false);
 /// <summary>单个像素缓冲的所有者；显示端不能保留已释放缓冲。</summary>
-public sealed class DecodedImageLease(Size size, byte[] pixels) : IDisposable
+public sealed class DecodedImageLease(Size size, byte[] pixels, ThemeRgba? sourceColor = null, Size? sourceSize = null) : IDisposable
 {
     public Size Size { get; } = size;
+    /// <summary>原GetOneColor首像素（忽略Alpha），在解码缩小前取得；其他后端默认使用输出首像素。</summary>
+    public ThemeRgba Color => sourceColor ?? (Pixels.Length >= 4 ? new(255, Pixels[2], Pixels[1], Pixels[0]) : ThemeRgba.Parse("Black"));
+    /// <summary>方向校正后的原始大小，用于设备像素平铺，不因安全降采样改变周期。</summary>
+    public Size SourceSize { get; } = sourceSize ?? size;
     public byte[] Pixels { get; private set; } = pixels;
     public int Stride => checked((int)Size.Width * 4);
     public long ByteCount => Pixels.LongLength;

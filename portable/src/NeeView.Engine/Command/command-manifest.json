@@ -541,7 +541,7 @@
     "Text": "启用/禁用逐点放大",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleNearestNeighborCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P5 原画布/透明页背景与双轴像素保持；见p5-background",
     "MenuText": "逐点放大",
     "MouseGesture": "",
     "TouchGesture": "",
@@ -552,7 +552,7 @@
     "Text": "切换背景",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/ToggleBackgroundCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P5 原画布/透明页背景与双轴像素保持；见p5-background",
     "MouseGesture": "",
     "TouchGesture": "",
     "IsShowMessage": true
@@ -562,7 +562,7 @@
     "Text": "黑色背景",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundBlackCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P5 原画布/透明页背景与双轴像素保持；见p5-background",
     "MouseGesture": "",
     "TouchGesture": "",
     "IsShowMessage": true
@@ -572,7 +572,7 @@
     "Text": "白色背景",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundWhiteCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P5 原画布/透明页背景与双轴像素保持；见p5-background",
     "MouseGesture": "",
     "TouchGesture": "",
     "IsShowMessage": true
@@ -582,7 +582,7 @@
     "Text": "背景适应图像颜色",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundAutoCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P5 原画布/透明页背景与双轴像素保持；见p5-background",
     "MouseGesture": "",
     "TouchGesture": "",
     "IsShowMessage": true
@@ -592,7 +592,7 @@
     "Text": "白色方格背景",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundCheckCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P5 原画布/透明页背景与双轴像素保持；见p5-background",
     "MouseGesture": "",
     "TouchGesture": "",
     "IsShowMessage": true
@@ -602,7 +602,7 @@
     "Text": "黑色方格背景",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundCheckDarkCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P5 原画布/透明页背景与双轴像素保持；见p5-background",
     "MouseGesture": "",
     "TouchGesture": "",
     "IsShowMessage": true
@@ -612,7 +612,7 @@
     "Text": "自定义背景",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/SetBackgroundCustomCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P5 原画布/透明页背景与双轴像素保持；见p5-background",
     "MouseGesture": "",
     "TouchGesture": "",
     "IsShowMessage": true
