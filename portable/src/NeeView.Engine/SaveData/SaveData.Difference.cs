@@ -49,6 +49,13 @@ public sealed partial class SaveData
                         autoHide.Remove(field);
                     }
             TrimKnownObject(raw, config, new Config());
+            if (raw["SlideShow"] is JsonObject slideShow)
+                foreach (var field in new[] { "IsSlideShowByLoop", "IsCancelSlideByMouseMove" })
+                    if (slideShow.ContainsKey(field))
+                    {
+                        Object(Object(result, "MacImportedLegacyConfigFields"), "SlideShow")[field] = slideShow[field]?.DeepClone();
+                        slideShow.Remove(field);
+                    }
         }
         if (result["Commands"] is JsonObject commands)
         {

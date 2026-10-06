@@ -48,10 +48,15 @@ public sealed partial class BookOperation
         {
             if (!IsCurrent()) return;
             book.MementoControl.RequestSaveBookMemento(true); ScheduleSave();
-            var action = Config.Current.Book.PageEndAction;
+            var action = _slideShow?.IsPlaying == true ? Config.Current.SlideShow.PageEndAction : Config.Current.Book.PageEndAction;
             var notify = action != PageEndAction.Dialog;
             if (action == PageEndAction.Dialog)
-                action = PageEndDialogAsync is { } dialog ? await dialog(direction, CancellationToken.None) : PageEndAction.None;
+            {
+                var playing = _slideShow?.IsPlaying == true;
+                if (playing) _slideShow!.Suspend();
+                try { action = PageEndDialogAsync is { } dialog ? await dialog(direction, CancellationToken.None) : PageEndAction.None; }
+                finally { if (playing && _slideShow?.IsPlaying == true) _slideShow.Resume(); }
+            }
             if (!IsCurrent()) return;
             switch (action)
             {
@@ -62,7 +67,7 @@ public sealed partial class BookOperation
                 case PageEndAction.NextBook:
                     await MoveBookAsync(direction, true, book, generation, position); break;
                 case PageEndAction.SeamlessLoop: break; // 循环由原PageFrameFactory完成。
-                default: if (notify) { Error = direction < 0 ? "已到首页。" : "已到末页。"; Notify(); } break;
+                default: _slideShow?.Stop(); if (notify) { Error = direction < 0 ? "已到首页。" : "已到末页。"; Notify(); } break;
             }
         }
         finally { Interlocked.Exchange(ref _pageTerminating, 0); }

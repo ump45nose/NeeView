@@ -2,6 +2,7 @@
 namespace NeeView;
 public sealed class StartUpConfig
 {
+    public bool IsAutoPlaySlideShow { get; set; }
     public bool IsOpenLastFolder { get; set; }
     public bool IsOpenLastBookmarkFolder { get; set; }
     public BookshelfFolderMemento? LastFolder { get; set; }

@@ -547,7 +547,7 @@
       "source": "NeeView/PageFrames/PageFrameContext.cs",
       "target": "src/NeeView.Engine/PageFrames/PageFrameContext.cs",
       "sha256": "82c53650f100db295fa932237a20ef9c1c252d9fe292b02d3c371ffed96b2d2e",
-      "status": "P1只读设置和分割/尺寸适配；高级裁剪/播放待迁入"
+      "status": "P5第十八批：原幻灯页尾/翻页效果/自动滚动覆盖接入，损坏时长SafeDuration；媒体书及高级裁剪仍待迁"
     },
     {
       "source": "NeeView/Archiver/Archive.cs",
@@ -1387,7 +1387,7 @@
       "source": "NeeView/Config/StartUpConfig.cs",
       "target": "src/NeeView.Engine/Config/StartUpConfig.cs",
       "sha256": "3b63ec096acbbc1aec243ba52859c6ac38fdcd15f2addfc96833f0a0b1684a46",
-      "status": "第十九批：原bookmark scheme/共享节点独立位置、每目录参数、元数据排序及启动列表快照；平台I/O异步化"
+      "status": "P5第十八批：原启动幻灯开关接入已有启动/列表恢复字段；唯一FirstLoader关系适配"
     },
     {
       "source": "NeeView/SidePanels/Bookshelf/FolderList/BookmarkFolderCollection.cs",
@@ -2444,6 +2444,36 @@
       "target": "src/NeeView.Engine/Command/MoveMediaPositionCommandParameter.cs",
       "sha256": "efb7aff923edbbf2b20167d3e356c7b3b254134e371f8813858fa2114cc4a61f",
       "status": "原独立Delta、非负五位精度与零值全局回退；前后命令分别保存，沿原参数编辑/差分JSON"
+    },
+    {
+      "source": "NeeView/Config/SlideShowConfig.cs",
+      "target": "src/NeeView.Engine/Config/SlideShowConfig.cs",
+      "sha256": "e0ae39e625ef8c1f553e70748341b23f9835da697610aa04233d51c0edfecc02",
+      "status": "P5第十八批：原十字段/默认/五位精度；旧setter按原语义读取后退役，损坏非有限数值容错"
+    },
+    {
+      "source": "NeeView/SlideShow/SlideShow.cs",
+      "target": "src/NeeView.Engine/SlideShow/SlideShow.cs",
+      "sha256": "d12f6f9f2a796e823a958e6c29b1f2f375b937065530039728d548e8116d2163",
+      "status": "P5第十八批：原播放/定时补偿/等待EOS/命令回退；单调时钟、单个可等待回报替换Timer/AppDispatcher"
+    },
+    {
+      "source": "NeeView/SlideShow/SlideShowInput.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.SlideShow.cs",
+      "sha256": "5e7f515db5c47cbcf4521543b785eaff439d9ba4abc58be6d654e6195f6681f7",
+      "status": "P5第十八批：原输入重置层级及取消滚动；Avalonia隧道输入/40ms调度适配"
+    },
+    {
+      "source": "NeeView/Command/Commands/ToggleSlideShowCommand.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.SlideShow.cs",
+      "sha256": "4fca705005ecc377a4f3dd4da499b2d8c4bf2bd8932f401bbc6e2277176fc414",
+      "status": "P5第十八批：保留菜单忽略固定参数和键位Toggle/On/Off"
+    },
+    {
+      "source": "NeeView/PageFrames/PageFrameBox.cs",
+      "target": "src/NeeView.MacOS/Views/ReaderView.SlideShow.cs",
+      "sha256": "d3ecb95fc78100ae57db968c1ffc437f61afab8c148abdaafa42a954d9d54fa7",
+      "status": "P5第十八批：原AutoScroll方向终端/底部/100ms门槛，沿现有DragArea及线性Pan"
     }
   ],
   "rule_references": [
@@ -2718,6 +2748,18 @@
       "target": "src/NeeView.MacOS/ViewModels/MediaControlViewModel.cs",
       "sha256": "2a945e371f78003ccc13e4470b5caebd95466225a10e101a3248621d00f27bf9",
       "status": "原底部媒体位置/播放/循环/时间表现转换，动图无音轨禁用"
+    },
+    {
+      "source": "NeeView/MainView/MainView.xaml",
+      "target": "src/NeeView.MacOS/Views/MainWindow.axaml",
+      "sha256": "32907cac4b5fb50ff436d1f575b6081d69b83e6fcf781dae33347910ebb0586d",
+      "status": "P5第十八批：原顶部4 DIP幻灯计时条，不改正文区域"
+    },
+    {
+      "source": "NeeView/Controls/SimpleProgressBar.cs",
+      "target": "src/NeeView.MacOS/Views/SimpleProgressBar.cs",
+      "sha256": "e8050b7437e9e84ce15392cd4f77ea81b6bf1f0b70ef91df4e5b898813676b49",
+      "status": "P5第十八批：原宽度乘Value；Avalonia直接绘制替换WPF模板和动画"
     }
   ],
   "backend_reuse": [

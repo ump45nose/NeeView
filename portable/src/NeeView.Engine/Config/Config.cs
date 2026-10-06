@@ -19,6 +19,7 @@ public sealed class Config
     public SystemConfig System { get; set; } = new();
     public ArchiveConfig Archive { get; set; } = new();
     public ImageConfig Image { get; set; } = new();
+    public SlideShowConfig SlideShow { get; set; } = new();
     public PerformanceConfig Performance { get; set; } = new();
     public PlaylistConfig Playlist { get; set; } = new();
     public AutoHideConfig AutoHide { get; set; } = new();

@@ -1,5 +1,8 @@
 # 前端独立调整边界
 
+P5 第十八批：原幻灯周期/输入重置/首周期EOS等待、页尾覆盖、自动滚动和启动选项进入唯一BookOperation与JSON；顶部原4 DIP计时条和设置草稿独立。关闭失败恢复播放及滚动；调度适配与剩余媒体边界见[幻灯契约](p5-slideshow.md)。
+
+
 P5 第十七批：GIF/WebP与官方ImageIO APNG完整合成帧、原播放状态/三命令/底部媒体条和JSON设置接入唯一阅读工厂；取消首帧不缓存成功、原生来源/像素/显示统一计费。界面结构和草稿独立，详见[动图契约](p5-animated-images.md)。
 
 P5 第十六批：ZIP AES/PKWARE、RAR4/5 与 7z 固实加密接入原 ArchiveKey 打开链。来源私有口令、真实抽取验证、逻辑路径缓存、取消及失败父链释放保持；加密 ZIP 只读，普通 ZIP 删除不变。见[压缩密码契约](p5-compressed-password.md)。

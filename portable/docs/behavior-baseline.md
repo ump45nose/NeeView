@@ -148,3 +148,5 @@ P5 第十二批：原Archive/ArchiveManager/ArchiveEntryUtility/ArchiveEntryColl
 P5 第十三批：原PDF归档/页目录/三种尺寸及原JSON配置接入唯一阅读链；CoreGraphics/PDFKit官方绑定替换PDFium。正文直接输出像素，提取才惰性PNG，请求级流初始化/读/关闭串行。密码交互尚未执行，扩展名配置已接入，见[PDF契约](p5-pdf.md)。
 
 P5 图像动画：原AnimatedMediaPlayer帧编号归一位置、Image.IsMediaRepeat、三格式默认、Media.PageSeconds及命令链已迁入。固定源码对照/合成实际解码/正式Headless与APNG原生分别验证，Windows动态播放及长期大型动画未验，见[p5-animated-images.md](p5-animated-images.md)。
+
+P5第十八批：SlideShow/SlideShowInput/SlideShowConfig、PageFrameContext、PageFrameBox.AutoScroll、MainView.SimpleProgressBar及FirstLoader原启动选项迁入；命令名NextPage保持，计时补偿和Played进度分别对照，40msEOS调度与损坏配置容错明确记录，见[契约](p5-slideshow.md)。

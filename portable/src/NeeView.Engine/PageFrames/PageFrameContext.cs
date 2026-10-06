@@ -1,8 +1,8 @@
 // Copyright (c) NeeLaboratory. 原源码关系与业务规则沿用仓库 MIT；P1子集适配见 docs/source-migration.json。
 namespace NeeView.PageFrames;
 
-/// <summary>原 PageFrameContext 的基础阅读/尺寸部分，排除控件、幻灯片和效果订阅。</summary>
-public sealed class PageFrameContext(BookSettingConfig setting, Config config) : IContentSizeCalculatorProfile
+/// <summary>原 PageFrameContext 阅读/尺寸与幻灯覆盖，排除控件和效果订阅。</summary>
+public sealed class PageFrameContext(BookSettingConfig setting, Config config, SlideShow? slideShow = null) : IContentSizeCalculatorProfile
 {
     public PageMode PageMode => setting.PageMode;
     public int FramePageSize => PageMode == PageMode.WidePage ? 2 : 1;
@@ -11,13 +11,16 @@ public sealed class PageFrameContext(BookSettingConfig setting, Config config) :
     public bool IsSupportedWidePage => setting.IsSupportedWidePage && FramePageSize == 2;
     public bool IsSupportedSingleFirstPage => setting.IsSupportedSingleFirstPage && FramePageSize == 2;
     public bool IsSupportedSingleLastPage => setting.IsSupportedSingleLastPage && FramePageSize == 2;
-    public bool IsLoopPage => config.Book.PageEndAction == PageEndAction.SeamlessLoop;
+    public PageEndAction PageEndAction => slideShow?.IsPlaying == true ? config.SlideShow.PageEndAction : config.Book.PageEndAction;
+    public bool IsLoopPage => PageEndAction == PageEndAction.SeamlessLoop;
     public PageFrameOrientation FrameOrientation => config.Book.Orientation;
     public bool IsPanorama => config.Book.IsPanorama && config.Book.MacPanoramaLayout == BrowseLayoutMode.Panorama;
     public double FrameMargin => IsPanorama && double.IsFinite(config.Book.FrameSpace) ? config.Book.FrameSpace : 1;
     public TimeSpan ScrollDuration => SafeDuration(config.View.ScrollDuration);
-    public TimeSpan PageChangeDuration => SafeDuration(config.View.PageMoveDuration);
-    public PageMoveType PageChangeType => PageChangeDuration == TimeSpan.Zero ? PageMoveType.Scroll : config.View.PageMoveType;
+    public bool IsAutoScroll => slideShow?.IsPlayingAutoScroll == true;
+    public TimeSpan AutoScrollDuration => IsAutoScroll ? SafeDuration(slideShow!.Interval / 1000) : TimeSpan.Zero;
+    public TimeSpan PageChangeDuration => IsPanorama ? ScrollDuration : SafeDuration(slideShow?.IsPlaying == true ? config.SlideShow.PageMoveDuration : config.View.PageMoveDuration);
+    public PageMoveType PageChangeType => PageChangeDuration == TimeSpan.Zero || IsPanorama ? PageMoveType.Scroll : slideShow?.IsPlaying == true ? config.SlideShow.PageMoveType : config.View.PageMoveType;
     /// <summary>非有限/负损坏配置无动画；合法原数值不截断为编辑范围。</summary>
     public static TimeSpan SafeDuration(double seconds) => double.IsFinite(seconds) && seconds > 0 && seconds < TimeSpan.MaxValue.TotalSeconds ? TimeSpan.FromSeconds(seconds) : TimeSpan.Zero;
     public bool IsStaticWidePage => config.Book.IsStaticWidePage && FramePageSize == 2;

@@ -1005,7 +1005,7 @@
     "Text": "幻灯片播放/停止",
     "Shortcut": "F5",
     "Source": "NeeView/Command/Commands/ToggleSlideShowCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P5原定时/输入/EOS/页尾及Toggle参数",
     "MenuText": "幻灯片",
     "MouseGesture": "",
     "TouchGesture": "",

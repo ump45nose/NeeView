@@ -17,6 +17,7 @@
     </Border>
     <Grid x:Name="SidePanelFrame" Grid.Row="1" ColumnDefinitions="41,240,4,*,4,240,41">
       <local:ReaderView x:Name="MainViewSocket" Grid.Column="3" />
+      <local:SimpleProgressBar x:Name="SlideShowTimer" Grid.Column="3" Height="4" VerticalAlignment="Top" Foreground="{DynamicResource Control.Accent}" IsVisible="False" IsHitTestVisible="False" />
       <Border x:Name="LeftRail" Grid.Column="0" Classes="rail" IsVisible="{Binding SideBarVisible}"><StackPanel x:Name="LeftRailItems" /></Border>
       <Border x:Name="LeftPanel" Grid.Column="1" Classes="panel" IsVisible="{Binding LeftVisible}"><Grid x:Name="LeftDockHost" /></Border>
       <GridSplitter Grid.Column="2" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" IsVisible="{Binding LeftVisible}" />

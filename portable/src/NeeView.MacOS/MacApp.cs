@@ -90,6 +90,7 @@ public sealed partial class MacApp : Avalonia.Application
         if (_window is null || _shuttingDown) return;
         if (InitialPaths.Length > 0) await _window.OpenFilesAsync(InitialPaths);
         else if (!_explicitOpen) await _window.RestoreLastAsync();
+        if (!_shuttingDown && Config.Current.StartUp.IsAutoPlaySlideShow) _window?.StartSlideShow();
     }
     /// <summary>重用进行中的初始化，单窗口入口不增加第二个 Host。</summary>
     public Task OpenWindowAsync(bool restore = true)

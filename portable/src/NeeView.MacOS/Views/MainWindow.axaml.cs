@@ -157,6 +157,7 @@ public sealed partial class MainWindow : Window
         model.Operation.MarkersChanged += Model_MarkersChanged;
         model.HistoryRefreshed += History_Refreshed;
         Viewer.Attach(model.Operation, images); model.Refreshed += Model_Refreshed;
+        InitializeSlideShow();
         var mediaControl = this.FindControl<MediaControlView>("DockMediaControlSocket")!;
         mediaControl.Attach(model.Operation, Viewer.RefreshMediaAsync); mediaControl.Failed += (_, message) => ShowError(message);
         Viewer.MediaChanged += (_, _) => { mediaControl.UpdatePlayer(); if (!_preparing && !_closedPrepared) { MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!,GetCommandCheck);RefreshHistoryCommandStates(); } };
@@ -226,6 +227,7 @@ public sealed partial class MainWindow : Window
     /// <summary>原菜单绑定的勾选表现；只读取引擎配置，不在菜单中维护第二套状态。</summary>
     private bool? GetCommandCheck(string name) => name switch
     {
+        "ToggleSlideShow" => _model?.Operation.SlideShow.IsPlaying,
         "ToggleMediaPlay" => _model?.Operation.IsMediaPlaying(),
         "ToggleBookLock" => _model?.Operation.IsBookLocked,
         "ToggleIsPanorama" => Config.Current.Book.IsPanorama,
@@ -303,6 +305,8 @@ public sealed partial class MainWindow : Window
         int start = _model.LeftAutoHide ? 0 : 3;
         int end = _model.RightAutoHide ? 7 : 4;
         Grid.SetColumn(Viewer, start); Grid.SetColumnSpan(Viewer, end - start);
+        var slideTimer = this.FindControl<SimpleProgressBar>("SlideShowTimer")!;
+        Grid.SetColumn(slideTimer, start); Grid.SetColumnSpan(slideTimer, end - start);
     }
     /// <summary>打开请求统一进入 BookOperation，窗口不枚举内容。</summary>
     public async Task OpenAsync(string path)
@@ -329,6 +333,12 @@ public sealed partial class MainWindow : Window
         await settings.ShowDialog(this);
         if (settings.WasSaved && !_preparing && !_closedPrepared) RefreshFonts();
         if (settings.WasSaved && !_preparing && !_closedPrepared) await Viewer.RefreshAsync();
+        if (settings.WasSaved && !_preparing && !_closedPrepared && _model.Operation.SlideShow.IsPlaying)
+        {
+            _model.Operation.SlideShow.ResetTimer();
+            if (_model.Operation.SlideShow.IsPlayingAutoScroll) BeginSlideShowAutoScroll();
+            else Viewer.CancelSlideShowScroll();
+        }
         if (settings.WasSaved && _themePresenter is not null) await _themePresenter.RefreshAsync();
         if (_preparing || _closedPrepared) return;
         _model.RefreshSelection(); _model.RefreshPanels(); await FilmStrip.RefreshAsync(); BuildMenus();
@@ -348,6 +358,10 @@ public sealed partial class MainWindow : Window
         {
             switch (name)
             {
+                case "ToggleSlideShow":
+                    _model.Operation.ToggleSlideShow(fromMenu);
+                    BeginSlideShowAutoScroll();
+                    break;
                 case "ToggleMediaPlay": case "PrevMediaPosition": case "NextMediaPosition":
                     await _model.Commands.ExecuteAsync(name); await Viewer.RefreshMediaAsync(); break;
                 case "ImportBackup":
@@ -716,6 +730,7 @@ public sealed partial class MainWindow : Window
     /// <summary>系统 Command 键先处理；编辑控件隔离其余原快捷键。</summary>
     private async void Key_Down(object? sender, KeyEventArgs e)
     {
+        NotifySlideShowInput(SlideShowTimerResetGesture.InputAction, false);
         // 原 PreviewKeyDown 先 LeaveVisibleLocked，避免委托注册顺序让新锁被同一按键清除。
         _autoHide?.HandleKey(e.Source as Control);
         if (e.Handled || _model is null) return;
@@ -901,6 +916,7 @@ public sealed partial class MainWindow : Window
     {
         await Task.Yield();
         _preparing = true;
+        StopSlideShowForClose();
         _model?.Operation.CancelClipboardPreparation();
         _model?.Operation.CancelFileCopyPreparation();
         _sidePanels?.PrepareClose();
@@ -954,7 +970,7 @@ public sealed partial class MainWindow : Window
         finally
         {
             if (!_closedPrepared) { this.FindControl<MediaControlView>("DockMediaControlSocket")!.CancelClose(); _sidePanels?.CancelClose(); this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.CancelClose(); this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); this.FindControl<BookmarkListView>("BookmarkPanelList")!.CancelClose(); _model?.HistorySearch.CancelClose(); _model?.PageSearch.CancelClose(); _model?.FolderSearch.CancelClose(); }
-            _preparing = false; _shutdown = null;
+            _preparing = false; CompleteSlideShowClose(_closedPrepared); _shutdown = null;
         }
     }
 }

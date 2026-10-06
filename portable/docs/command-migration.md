@@ -104,7 +104,7 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | ToggleWindowMinimize | 最小化窗口 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleWindowMinimizeCommand.cs |
 | ToggleWindowMaximize | 最大化窗口 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleWindowMaximizeCommand.cs |
 | ShowHiddenPanels | 临时显示面板 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/ShowHiddenPanelsCommand.cs |
-| ToggleSlideShow | 幻灯片播放/停止 | F5 |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleSlideShowCommand.cs |
+| ToggleSlideShow | 幻灯片播放/停止 | F5 |  | 已接入 | P5原定时/输入/EOS/页尾及Toggle参数 | NeeView/Command/Commands/ToggleSlideShowCommand.cs |
 | ViewScrollNTypeUp | N 字形滚动↑ |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/ViewScrollNTypeUpCommand.cs |
 | ViewScrollNTypeDown | N 字形滚动↓ |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/ViewScrollNTypeDownCommand.cs |
 | ViewScrollUp | 滚动↑ |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/ViewScrollUpCommand.cs |
@@ -251,3 +251,5 @@ P4第一批原九数字、MoveToFolderAs及Undo/Redo接入，数字默认输入1
 P4收尾不新增命令：原235实例、167执行入口/68占位保持。DeleteFile主菜单仍单主页，页面列表Delete为显式多选，普通实体/列表登记/ZIP分别处理；ZIP独立写权限且永久删除始终确认。Paste支持标准图片/HTML/URL及原失败回退；Mac链接自身操作接入。Cut继续按用户决定禁用。详见[p4-completion.md](p4-completion.md)。
 
 P5 第十七批接通原三个媒体命令，当前171执行入口/64占位；235原实例保持，数量不代表功能覆盖率。视频及高级自动播放继续待迁。
+
+P5第十八批接通原ToggleSlideShow；当前172执行入口/63占位，235原实例保持。原计时/等待/输入及菜单/键位语义见[p5-slideshow.md](p5-slideshow.md)，数量不代表覆盖率。

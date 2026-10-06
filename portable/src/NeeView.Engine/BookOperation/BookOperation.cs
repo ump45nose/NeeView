@@ -144,7 +144,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                     opening.Token.ThrowIfCancellationRequested();
                     if (_disposed || _closing || generation != _generation || IsBookLocked && Book is { } commitLocked && commitLocked.Path != book.Path || expectedPlaylist is not null && !ReferenceEquals(expectedPlaylist, _playlistHub?.Current)) return false;
                     Book = book; _fileSelection = null; source = null; collection = null; _keepHistoryOrder = keepHistoryOrder;
-                    Config.Current.BookSetting = setting; Context = new(setting, Config.Current);
+                    Config.Current.BookSetting = setting; Context = new(setting, Config.Current, SlideShow);
                     // 原 BookMemento 没有 Part；普通打开/启动从首半页开始，反向页尾进入末半页。
                     Position = new(index, terminalDirection < 0 ? 1 : 0);
                     RebuildFrame(terminalDirection < 0 ? -1 : 1); return true;
@@ -209,11 +209,12 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>保留 PageFrameBox 的帧步进与单页步进算法，I/O 前后检查书籍代次。</summary>
     public async Task MoveAsync(int direction, bool onePage = false)
     {
+        var requestedGeneration = Volatile.Read(ref _generation);
         Book? terminatedBook = null; long terminatedGeneration = 0; PagePosition terminatedPosition = default;
         await _gate.WaitAsync();
         try
         {
-            if (_disposed || _closing || Book is null || Frame is null || IsLoading) return;
+            if (_disposed || _closing || Book is null || Frame is null || IsLoading || requestedGeneration != _generation) return;
             var generation = _generation;
             var range = Frame.FrameRange;
             // 原 MoveToNextPage 在双页时从当前方向的 Top + 1 页开始；单页仍按帧移动。
@@ -574,6 +575,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     {
         // 关闭请求当场使准备失效；先 Yield 会给原生晚到结果留下继续提交的间隙。
         _closing = true; Interlocked.Increment(ref _generation);
+        _slideShow?.Stop();
         _bookDeleteClosing.Cancel(); _bookTransferClosing.Cancel();
         CancelClipboardPreparation();
         CancelFileCopyPreparation();
@@ -603,7 +605,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             if (Book is not null) await Book.DisposeAsync();
             _bookshelf?.Dispose(); _destinationFolders?.Dispose(); HistoryList.Dispose();
             if (_playlistHub is not null) _playlistHub.Changed -= Playlist_Changed;
-            Book = null; Frame = null; _disposed = true;
+            Book = null; Frame = null; _disposed = true; _slideShow?.Dispose();
         }
         finally
         {

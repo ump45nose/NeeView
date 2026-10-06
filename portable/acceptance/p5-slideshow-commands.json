@@ -1,0 +1,2122 @@
+{
+  "scope": "\u5F53\u524D\u6267\u884C\u5165\u53E3\u767B\u8BB0\uFF0C\u4E0D\u7B49\u4E8E\u5B8C\u6574\u539F\u529F\u80FD\u8986\u76D6\uFF1B\u672A\u8FC1\u80FD\u529B\u4FDD\u7559\u539F\u547D\u4EE4/\u83DC\u5355\u5360\u4F4D",
+  "total": 235,
+  "implemented": 171,
+  "items": [
+    {
+      "Name": "LoadAs",
+      "Text": "\u6253\u5F00\u6587\u4EF6",
+      "Shortcut": "Ctrl\u002BO",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/LoadAsCommand.cs",
+      "Stage": "P1 \u5BBF\u4E3B\u9002\u914D",
+      "implemented": true
+    },
+    {
+      "Name": "LoadRecentBook",
+      "Text": "\u6700\u8FD1\u4F7F\u7528\u7684\u4E66\u7C4D",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/LoadRecentBookCommand.cs",
+      "Stage": "P2 \u5BBF\u4E3B\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "ReLoad",
+      "Text": "\u91CD\u65B0\u8F7D\u5165",
+      "Shortcut": "",
+      "MouseGesture": "UD",
+      "Source": "NeeView/Command/Commands/ReLoadCommand.cs",
+      "Stage": "P1 \u5BBF\u4E3B\u9002\u914D",
+      "implemented": true
+    },
+    {
+      "Name": "Unload",
+      "Text": "\u5173\u95ED",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/UnloadCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "OpenExplorer",
+      "Text": "\u5728\u8D44\u6E90\u7BA1\u7406\u5668\u4E2D\u6253\u5F00",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/OpenExplorerCommand.cs",
+      "Stage": "P1 \u5BBF\u4E3B\u9002\u914D",
+      "implemented": true
+    },
+    {
+      "Name": "OpenExternalApp",
+      "Text": "\u5728\u5916\u90E8\u5E94\u7528\u4E2D\u6253\u5F00 (\u7B80\u5355)",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/OpenExternalAppCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "OpenExternalAppAs",
+      "Text": "\u5728\u5916\u90E8\u5E94\u7528\u4E2D\u6253\u5F00",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/OpenExternalAppAsCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "CutFile",
+      "Text": "\u526A\u5207\u6587\u4EF6",
+      "Shortcut": "Ctrl\u002BX",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/CutFileCommand.cs",
+      "Stage": "\u7528\u6237\u9009\u62E9\u6682\u4FDD\u7559\u7981\u7528\uFF1B\u79FB\u52A8\u4F7F\u7528\u5206\u7C7B/\u79FB\u81F3\u6587\u4EF6\u5939",
+      "implemented": false
+    },
+    {
+      "Name": "CopyFile",
+      "Text": "\u590D\u5236\u6587\u4EF6",
+      "Shortcut": "Ctrl\u002BC",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/CopyFileCommand.cs",
+      "Stage": "P4 \u539F\u9875\u7EC4/\u666E\u901A\u5B9E\u4F53\u53CA\u5F52\u6863\u56DB\u7B56\u7565\u526A\u8D34\u677F\u590D\u5236\uFF1B\u76EE\u5F55\u63D0\u53D6/\u94FE\u63A5\u5F85\u8FC1",
+      "implemented": true
+    },
+    {
+      "Name": "CopyImage",
+      "Text": "\u590D\u5236\u56FE\u50CF",
+      "Shortcut": "Ctrl\u002BShift\u002BC",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/CopyImageCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "Paste",
+      "Text": "\u7C98\u8D34",
+      "Shortcut": "Ctrl\u002BV",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/PasteCommand.cs",
+      "Stage": "P4 QueryPath\u4F18\u5148/\u5355\u6765\u6E90\u53CA\u591A\u9879\u4E34\u65F6\u5217\u8868\u52A0\u8F7D\uFF1B\u4F4D\u56FE\u7B49\u5176\u4ED6\u5185\u5BB9\u5F85\u8FC1",
+      "implemented": true
+    },
+    {
+      "Name": "CopyToFolderAs",
+      "Text": "\u590D\u5236\u5230\u6587\u4EF6\u5939",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/CopyToFolderAsCommand.cs",
+      "Stage": "P4 \u539F\u9875\u7EC4\u56FA\u5B9A\u590D\u5236/\u5F52\u6863LimitedRealization\uFF1B\u6574\u76EE\u5F55\u590D\u5236\u5F85\u540E\u7EED",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToFolderAs",
+      "Text": "\u79FB\u52A8\u5230\u6587\u4EF6\u5939",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "Stage": "P4 \u666E\u901A\u76EE\u5F55\u5206\u7C7B/\u539F\u591A\u9875\u7B56\u7565",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder1",
+      "Text": "\u79FB\u52A8\u5230\u6587\u4EF6\u5939 1",
+      "Shortcut": "1",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "Stage": "P4 \u666E\u901A\u76EE\u5F55\u5206\u7C7B/\u539F\u591A\u9875\u7B56\u7565",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder2",
+      "Text": "\u79FB\u52A8\u5230\u6587\u4EF6\u5939 2",
+      "Shortcut": "2",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "Stage": "P4 \u666E\u901A\u76EE\u5F55\u5206\u7C7B/\u539F\u591A\u9875\u7B56\u7565",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder3",
+      "Text": "\u79FB\u52A8\u5230\u6587\u4EF6\u5939 3",
+      "Shortcut": "3",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "Stage": "P4 \u666E\u901A\u76EE\u5F55\u5206\u7C7B/\u539F\u591A\u9875\u7B56\u7565",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder4",
+      "Text": "\u79FB\u52A8\u5230\u6587\u4EF6\u5939 4",
+      "Shortcut": "4",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "Stage": "P4 \u666E\u901A\u76EE\u5F55\u5206\u7C7B/\u539F\u591A\u9875\u7B56\u7565",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder5",
+      "Text": "\u79FB\u52A8\u5230\u6587\u4EF6\u5939 5",
+      "Shortcut": "5",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "Stage": "P4 \u666E\u901A\u76EE\u5F55\u5206\u7C7B/\u539F\u591A\u9875\u7B56\u7565",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder6",
+      "Text": "\u79FB\u52A8\u5230\u6587\u4EF6\u5939 6",
+      "Shortcut": "6",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "Stage": "P4 \u666E\u901A\u76EE\u5F55\u5206\u7C7B/\u539F\u591A\u9875\u7B56\u7565",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder7",
+      "Text": "\u79FB\u52A8\u5230\u6587\u4EF6\u5939 7",
+      "Shortcut": "7",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "Stage": "P4 \u666E\u901A\u76EE\u5F55\u5206\u7C7B/\u539F\u591A\u9875\u7B56\u7565",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder8",
+      "Text": "\u79FB\u52A8\u5230\u6587\u4EF6\u5939 8",
+      "Shortcut": "8",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "Stage": "P4 \u666E\u901A\u76EE\u5F55\u5206\u7C7B/\u539F\u591A\u9875\u7B56\u7565",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToDestinationFolder9",
+      "Text": "\u79FB\u52A8\u5230\u6587\u4EF6\u5939 9",
+      "Shortcut": "9",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/MoveToFolderAsCommand.cs",
+      "Stage": "P4 \u666E\u901A\u76EE\u5F55\u5206\u7C7B/\u539F\u591A\u9875\u7B56\u7565",
+      "implemented": true
+    },
+    {
+      "Name": "UndoDestinationMove",
+      "Text": "\u64A4\u9500\u76EE\u6807\u6587\u4EF6\u5939\u79FB\u52A8",
+      "Shortcut": "Ctrl\u002BZ",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/UndoDestinationMoveCommand.cs",
+      "Stage": "P4 \u5206\u7C7B\u9996\u6279",
+      "implemented": true
+    },
+    {
+      "Name": "RedoDestinationMove",
+      "Text": "\u91CD\u505A\u76EE\u6807\u6587\u4EF6\u5939\u79FB\u52A8",
+      "Shortcut": "Ctrl\u002BY",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/RedoDestinationMoveCommand.cs",
+      "Stage": "P4 \u5206\u7C7B\u9996\u6279",
+      "implemented": true
+    },
+    {
+      "Name": "ExportImageAs",
+      "Text": "\u53E6\u5B58\u4E3A",
+      "Shortcut": "Ctrl\u002BS",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ExportImageAsCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ExportImage",
+      "Text": "\u4FDD\u5B58\u4E3A\u6587\u4EF6",
+      "Shortcut": "Shift\u002BCtrl\u002BS",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ExportImageCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ExportBookAs",
+      "Text": "\u5BFC\u51FA\u4E66\u7C4D",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ExportBookAsCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "Print",
+      "Text": "\u6253\u5370",
+      "Shortcut": "Ctrl\u002BP",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/PrintCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "DeleteFile",
+      "Text": "\u5220\u9664\u6587\u4EF6",
+      "Shortcut": "Delete",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/DeleteFileCommand.cs",
+      "Stage": "P4 \u666E\u901A\u76EE\u5F55\u5F53\u524D\u56FE\u7247/\u7CFB\u7EDF\u5E9F\u7EB8\u7BD3\uFF1B\u5F52\u6863/\u5217\u8868\u591A\u9009\u5F85\u540E\u7EED",
+      "implemented": true
+    },
+    {
+      "Name": "OpenBookExplorer",
+      "Text": "\u5728\u8D44\u6E90\u7BA1\u7406\u5668\u4E2D\u6253\u5F00\u4E66\u7C4D",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/OpenBookExplorerCommand.cs",
+      "Stage": "P2 \u5BBF\u4E3B\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "OpenBookExternalAppAs",
+      "Text": "\u7528\u5916\u90E8\u5E94\u7528\u6253\u5F00\u4E66\u7C4D",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/OpenBookExternalAppAsCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "CutBook",
+      "Text": "\u526A\u5207\u4E66\u7C4D",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/CutBookCommand.cs",
+      "Stage": "\u7528\u6237\u9009\u62E9\u6682\u4FDD\u7559\u7981\u7528\uFF1B\u79FB\u52A8\u4F7F\u7528\u65E2\u6709\u6587\u4EF6\u64CD\u4F5C",
+      "implemented": false
+    },
+    {
+      "Name": "CopyBook",
+      "Text": "\u590D\u5236\u4E66\u7C4D",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/CopyBookCommand.cs",
+      "Stage": "P4 \u5B9E\u4F53\u76EE\u5F55\u6216\u6839\u5F52\u6863\u590D\u5236\u5230\u7CFB\u7EDF\u526A\u8D34\u677F",
+      "implemented": true
+    },
+    {
+      "Name": "CopyBookToFolderAs",
+      "Text": "\u590D\u5236\u4E66\u7C4D\u5230\u6587\u4EF6\u5939",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/CopyBookToFolderAsCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": true
+    },
+    {
+      "Name": "MoveBookToFolderAs",
+      "Text": "\u79FB\u52A8\u4E66\u7C4D\u5230\u6587\u4EF6\u5939",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/MoveBookToFolderAsCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": true
+    },
+    {
+      "Name": "DeleteBook",
+      "Text": "\u5220\u9664\u4E66\u7C4D",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/DeleteBookCommand.cs",
+      "Stage": "P4 \u771F\u5B9E\u6839\u76EE\u5F55/\u6587\u4EF6\u6574\u4E66\u5E9F\u7EB8\u7BD3\u4E0E\u539F\u4E0B\u4E00\u4E66\uFF1B\u903B\u8F91/\u4E34\u65F6/\u94FE\u63A5\u62D2\u7EDD",
+      "implemented": true
+    },
+    {
+      "Name": "RenameBook",
+      "Text": "\u91CD\u547D\u540D\u4E66\u7C4D",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/RenameBookCommand.cs",
+      "Stage": "P4 \u5F53\u524D\u76EE\u5F55/\u5F52\u6863\u4E66\u7C4D\u91CD\u547D\u540D\u4E0E\u660E\u786E\u8DEF\u5F84\u8054\u52A8\u5DF2\u63A5\u5165\uFF1B\u8BBE\u5907/Windows\u5F85\u9A8C",
+      "implemented": true
+    },
+    {
+      "Name": "SelectArchiver",
+      "Text": "\u9009\u62E9\u5F52\u6863\u7A0B\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SelectArchiverCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ClearHistory",
+      "Text": "\u6E05\u7406\u5386\u53F2\u8BB0\u5F55",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ClearHistoryCommand.cs",
+      "Stage": "P2 \u539F\u5386\u53F2\u96C6\u5408\u6E05\u7A7A",
+      "implemented": true
+    },
+    {
+      "Name": "ClearHistoryInPlace",
+      "Text": "\u5220\u9664\u5F53\u524D\u4F4D\u7F6E\u7684\u5386\u53F2\u8BB0\u5F55",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ClearHistoryInPlaceCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "RemoveUnlinkedHistory",
+      "Text": "\u5220\u9664\u65E0\u6548\u7684\u5386\u53F2\u8BB0\u5F55",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/RemoveUnlinkedHistoryCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleStretchMode",
+      "Text": "\u5207\u6362\u62C9\u4F38",
+      "Shortcut": "LeftButton\u002BWheelDown",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleStretchModeCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleStretchModeReverse",
+      "Text": "\u5207\u6362\u62C9\u4F38 (\u53CD\u5411)",
+      "Shortcut": "LeftButton\u002BWheelUp",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleStretchModeReverseCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "SetStretchModeNone",
+      "Text": "\u539F\u59CB\u5927\u5C0F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetStretchModeNoneCommand.cs",
+      "Stage": "P1 \u5BBF\u4E3B\u9002\u914D",
+      "implemented": true
+    },
+    {
+      "Name": "SetStretchModeUniform",
+      "Text": "\u9002\u5E94\u7A97\u53E3",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetStretchModeUniformCommand.cs",
+      "Stage": "P1 \u5BBF\u4E3B\u9002\u914D",
+      "implemented": true
+    },
+    {
+      "Name": "SetStretchModeUniformToFill",
+      "Text": "\u94FA\u6EE1\u6574\u4E2A\u7A97\u53E3",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetStretchModeUniformToFillCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "SetStretchModeUniformToSize",
+      "Text": "\u9002\u5E94\u7A97\u53E3\u533A\u57DF",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetStretchModeUniformToSizeCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "SetStretchModeUniformToVertical",
+      "Text": "\u9002\u5E94\u7A97\u53E3\u9AD8\u5EA6",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetStretchModeUniformToVerticalCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "SetStretchModeUniformToHorizontal",
+      "Text": "\u9002\u5E94\u7A97\u53E3\u5BBD\u5EA6",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetStretchModeUniformToHorizontalCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleStretchAllowScaleUp",
+      "Text": "\u5141\u8BB8\u653E\u5927",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleStretchAllowScaleUpCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleStretchAllowScaleDown",
+      "Text": "\u5141\u8BB8\u7F29\u5C0F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleStretchAllowScaleDownCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleNearestNeighbor",
+      "Text": "\u542F\u7528/\u7981\u7528\u9010\u70B9\u653E\u5927",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleNearestNeighborCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleBackground",
+      "Text": "\u5207\u6362\u80CC\u666F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleBackgroundCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "SetBackgroundBlack",
+      "Text": "\u9ED1\u8272\u80CC\u666F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBackgroundBlackCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "SetBackgroundWhite",
+      "Text": "\u767D\u8272\u80CC\u666F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBackgroundWhiteCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "SetBackgroundAuto",
+      "Text": "\u80CC\u666F\u9002\u5E94\u56FE\u50CF\u989C\u8272",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBackgroundAutoCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "SetBackgroundCheck",
+      "Text": "\u767D\u8272\u65B9\u683C\u80CC\u666F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBackgroundCheckCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "SetBackgroundCheckDark",
+      "Text": "\u9ED1\u8272\u65B9\u683C\u80CC\u666F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBackgroundCheckDarkCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "SetBackgroundCustom",
+      "Text": "\u81EA\u5B9A\u4E49\u80CC\u666F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBackgroundCustomCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleTopmost",
+      "Text": "\u542F\u7528/\u7981\u7528\u603B\u662F\u7F6E\u9876\u663E\u793A",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleTopmostCommand.cs",
+      "Stage": "P2 Mac \u539F\u7A97\u53E3\u663E\u793A\u63A7\u5236\uFF1B\u89C1 p2-autohide.md",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleAddressBar",
+      "Text": "\u663E\u793A/\u9690\u85CF\u5730\u5740\u680F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleVisibleAddressBarCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleHideMenu",
+      "Text": "\u542F\u7528/\u7981\u7528\u81EA\u52A8\u9690\u85CF\u83DC\u5355",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleHideMenuCommand.cs",
+      "Stage": "P2 Mac \u539F\u7A97\u53E3\u663E\u793A\u63A7\u5236\uFF1B\u89C1 p2-autohide.md",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleSideBar",
+      "Text": "\u663E\u793A/\u9690\u85CF\u4FA7\u8FB9\u680F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleVisibleSideBarCommand.cs",
+      "Stage": "P2 Mac \u539F\u7A97\u53E3\u663E\u793A\u63A7\u5236\uFF1B\u89C1 p2-autohide.md",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleHidePanel",
+      "Text": "\u542F\u7528/\u7981\u7528\u81EA\u52A8\u9690\u85CF\u9762\u677F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleHidePanelCommand.cs",
+      "Stage": "P2 Mac \u539F\u7A97\u53E3\u663E\u793A\u63A7\u5236\uFF1B\u89C1 p2-autohide.md",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleHideLeftPanel",
+      "Text": "\u5207\u6362\u81EA\u52A8\u9690\u85CF\u5DE6\u9762\u677F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleHideLeftPanelCommand.cs",
+      "Stage": "P2 Mac \u539F\u7A97\u53E3\u663E\u793A\u63A7\u5236\uFF1B\u89C1 p2-autohide.md",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleHideRightPanel",
+      "Text": "\u5207\u6362\u81EA\u52A8\u9690\u85CF\u53F3\u9762\u677F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleHideRightPanelCommand.cs",
+      "Stage": "P2 Mac \u539F\u7A97\u53E3\u663E\u793A\u63A7\u5236\uFF1B\u89C1 p2-autohide.md",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisiblePageSlider",
+      "Text": "\u663E\u793A/\u9690\u85CF\u6EDA\u52A8\u6761",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleVisiblePageSliderCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleHidePageSlider",
+      "Text": "\u542F\u7528/\u7981\u7528\u81EA\u52A8\u9690\u85CF\u6EDA\u52A8\u6761",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleHidePageSliderCommand.cs",
+      "Stage": "P2 Mac \u539F\u7A97\u53E3\u663E\u793A\u63A7\u5236\uFF1B\u89C1 p2-autohide.md",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleBookshelf",
+      "Text": "\u663E\u793A/\u9690\u85CF\u4E66\u67B6",
+      "Shortcut": "B",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleVisibleBookshelfCommand.cs",
+      "Stage": "P2 \u5BBF\u4E3B\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisiblePageList",
+      "Text": "\u663E\u793A/\u9690\u85CF\u9875\u9762\u5217\u8868\u9762\u677F",
+      "Shortcut": "P",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleVisiblePageListCommand.cs",
+      "Stage": "P2 \u5BBF\u4E3B\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleBookmarkList",
+      "Text": "\u663E\u793A/\u9690\u85CF\u4E66\u7B7E\u9762\u677F",
+      "Shortcut": "D",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleVisibleBookmarkListCommand.cs",
+      "Stage": "P2 \u5BBF\u4E3B\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisiblePlaylist",
+      "Text": "\u663E\u793A/\u9690\u85CF\u64AD\u653E\u5217\u8868\u9762\u677F",
+      "Shortcut": "M",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleVisiblePlaylistCommand.cs",
+      "Stage": "P2 \u7B2C\u516B\u6279\u539F\u64AD\u653E\u5217\u8868/\u6807\u8BB0\u5B50\u96C6\uFF1B\u683C\u5F0F\u3001\u7F16\u8F91\u548C\u5BFC\u822A\u63A5\u5165\uFF0C\u9AD8\u7EA7\u6765\u6E90/\u6A21\u677F/\u4FEE\u590D\u5F85\u8FC1",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleHistoryList",
+      "Text": "\u663E\u793A/\u9690\u85CF\u5386\u53F2\u8BB0\u5F55\u9762\u677F",
+      "Shortcut": "H",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleVisibleHistoryListCommand.cs",
+      "Stage": "P2 \u5BBF\u4E3B\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleFileInfo",
+      "Text": "\u663E\u793A/\u9690\u85CF\u4FE1\u606F\u9762\u677F",
+      "Shortcut": "I",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleVisibleFileInfoCommand.cs",
+      "Stage": "P2 \u5BBF\u4E3B\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleNavigator",
+      "Text": "\u663E\u793A/\u9690\u85CF\u5BFC\u822A\u9762\u677F",
+      "Shortcut": "N",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleVisibleNavigatorCommand.cs",
+      "Stage": "P2 \u5BBF\u4E3B\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleEffectInfo",
+      "Text": "\u663E\u793A/\u9690\u85CF\u6548\u679C\u9762\u677F",
+      "Shortcut": "E",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleVisibleEffectInfoCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleVisibleFoldersTree",
+      "Text": "\u663E\u793A/\u9690\u85CF\u76EE\u5F55\u6811",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleVisibleFoldersTreeCommand.cs",
+      "Stage": "P3\u666E\u901A/QuickAccess\u76EE\u5F55\u6811\u5BBF\u4E3B\u663E\u9690\uFF1B\u5B8C\u6574\u811A\u672C\u53C2\u6570\u5F85P5",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleContentsTree",
+      "Text": "\u663E\u793A/\u9690\u85CF\u5185\u5BB9\u9762\u677F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleVisibleContentsTreeCommand.cs",
+      "Stage": "P3\u5168\u6E90\u76EE\u5F55\u7EC4\u6811\u5BBF\u4E3B\u663E\u9690\uFF1B\u5B8C\u6574\u811A\u672C\u53C2\u6570\u5F85P5",
+      "implemented": true
+    },
+    {
+      "Name": "FocusFolderSearchBox",
+      "Text": "\u805A\u7126\u5230\u4E66\u67B6\u641C\u7D22\u6846",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/FocusFolderSearchBoxCommand.cs",
+      "Stage": "P3\u666E\u901A\u4E66\u67B6\u641C\u7D22\u6846\u663E\u793A\u4E0E\u7126\u70B9\uFF1B\u865A\u62DF\u4F4D\u7F6E\u80FD\u529B\u8FB9\u754C\u89C1\u5951\u7EA6",
+      "implemented": true
+    },
+    {
+      "Name": "FocusBookmarkSearchBox",
+      "Text": "\u805A\u7126\u5230\u4E66\u7B7E\u641C\u7D22\u6846",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/FocusBookmarkSearchBoxCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "FocusPageListSearchBox",
+      "Text": "\u805A\u7126\u5230\u9875\u9762\u5217\u8868\u641C\u7D22\u6846",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/FocusPageListSearchBoxCommand.cs",
+      "Stage": "P3\u539F\u9875\u9762\u641C\u7D22\u6846\u663E\u793A\u4E0E\u7126\u70B9\uFF0C\u8F93\u5165\u548C\u6B63\u6587\u4F5C\u7528\u57DF\u9694\u79BB",
+      "implemented": true
+    },
+    {
+      "Name": "FocusHistorySearchBox",
+      "Text": "\u805A\u7126\u5230\u5386\u53F2\u8BB0\u5F55\u641C\u7D22\u6846",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/FocusHistorySearchBoxCommand.cs",
+      "Stage": "P2 \u539F\u5386\u53F2\u9762\u677F\u7126\u70B9",
+      "implemented": true
+    },
+    {
+      "Name": "FocusBookmarkList",
+      "Text": "\u663E\u793A\u4E66\u7B7E",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/FocusBookmarkListCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "FocusMainView",
+      "Text": "\u805A\u7126\u5230\u4E3B\u89C6\u56FE",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/FocusMainViewCommand.cs",
+      "Stage": "P3\u539F\u4E3B\u67E5\u770B\u5668\u7126\u70B9\u5BBF\u4E3B\u63A5\u5165",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleVisibleFilmStrip",
+      "Text": "\u663E\u793A/\u9690\u85CF\u5E7B\u706F\u6761",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleVisibleFilmStripCommand.cs",
+      "Stage": "P2 \u5BBF\u4E3B\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleHideFilmStrip",
+      "Text": "\u542F\u7528/\u7981\u7528\u81EA\u52A8\u9690\u85CF\u5E7B\u706F\u6761",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleHideFilmStripCommand.cs",
+      "Stage": "P2 \u5BBF\u4E3B\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleMainViewFloating",
+      "Text": "\u5207\u6362\u4E3B\u89C6\u56FE\u7A97\u53E3",
+      "Shortcut": "F12",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleMainViewFloatingCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleFullScreen",
+      "Text": "\u5207\u6362\u5168\u5C4F\u72B6\u6001",
+      "Shortcut": "F11",
+      "MouseGesture": "U",
+      "Source": "NeeView/Command/Commands/ToggleFullScreenCommand.cs",
+      "Stage": "P2 Mac \u539F\u7A97\u53E3\u663E\u793A\u63A7\u5236\uFF1B\u89C1 p2-autohide.md",
+      "implemented": true
+    },
+    {
+      "Name": "SetFullScreen",
+      "Text": "\u5168\u5C4F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetFullScreenCommand.cs",
+      "Stage": "P2 Mac \u539F\u7A97\u53E3\u663E\u793A\u63A7\u5236\uFF1B\u89C1 p2-autohide.md",
+      "implemented": true
+    },
+    {
+      "Name": "CancelFullScreen",
+      "Text": "\u9000\u51FA\u5168\u5C4F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/CancelFullScreenCommand.cs",
+      "Stage": "P2 Mac \u539F\u7A97\u53E3\u663E\u793A\u63A7\u5236\uFF1B\u89C1 p2-autohide.md",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleFullDesktop",
+      "Text": "\u5207\u6362\u5168\u684C\u9762",
+      "Shortcut": "Shift\u002BF11",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleFullDesktopCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleWindowMinimize",
+      "Text": "\u6700\u5C0F\u5316\u7A97\u53E3",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleWindowMinimizeCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleWindowMaximize",
+      "Text": "\u6700\u5927\u5316\u7A97\u53E3",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleWindowMaximizeCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ShowHiddenPanels",
+      "Text": "\u4E34\u65F6\u663E\u793A\u9762\u677F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ShowHiddenPanelsCommand.cs",
+      "Stage": "P2 Mac \u539F\u7A97\u53E3\u663E\u793A\u63A7\u5236\uFF1B\u89C1 p2-autohide.md",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleSlideShow",
+      "Text": "\u5E7B\u706F\u7247\u64AD\u653E/\u505C\u6B62",
+      "Shortcut": "F5",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleSlideShowCommand.cs",
+      "Stage": "P5\u539F\u5B9A\u65F6/\u8F93\u5165/EOS/\u9875\u5C3E\u53CAToggle\u53C2\u6570",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScrollNTypeUp",
+      "Text": "N \u5B57\u5F62\u6EDA\u52A8\u2191",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewScrollNTypeUpCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScrollNTypeDown",
+      "Text": "N \u5B57\u5F62\u6EDA\u52A8\u2193",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewScrollNTypeDownCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScrollUp",
+      "Text": "\u6EDA\u52A8\u2191",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewScrollUpCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScrollDown",
+      "Text": "\u6EDA\u52A8\u2193",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewScrollDownCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScrollLeft",
+      "Text": "\u6EDA\u52A8\u2190",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewScrollLeftCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScrollRight",
+      "Text": "\u6EDA\u52A8\u2192",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewScrollRightCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ViewPresetScroll",
+      "Text": "\u9884\u8BBE\u6EDA\u52A8",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewPresetScrollCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScaleUp",
+      "Text": "\u653E\u5927",
+      "Shortcut": "RightButton\u002BWheelUp",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewScaleUpCommand.cs",
+      "Stage": "P1 \u5BBF\u4E3B\u9002\u914D",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScaleDown",
+      "Text": "\u7F29\u5C0F",
+      "Shortcut": "RightButton\u002BWheelDown",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewScaleDownCommand.cs",
+      "Stage": "P1 \u5BBF\u4E3B\u9002\u914D",
+      "implemented": true
+    },
+    {
+      "Name": "ViewScaleStretch",
+      "Text": "\u62C9\u4F38",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewScaleStretchCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ViewBaseScaleUp",
+      "Text": "\u653E\u5927\u57FA\u51C6\u6BD4\u4F8B",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewBaseScaleUpCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ViewBaseScaleDown",
+      "Text": "\u7F29\u5C0F\u57FA\u51C6\u6BD4\u4F8B",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewBaseScaleDownCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ViewRotateLeft",
+      "Text": "\u5DE6\u65CB",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewRotateLeftCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ViewRotateRight",
+      "Text": "\u53F3\u65CB",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewRotateRightCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsAutoRotateLeft",
+      "Text": "\u542F\u7528/\u7981\u7528\u81EA\u52A8\u5DE6\u65CB\u8F6C",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleIsAutoRotateLeftCommand.cs",
+      "Stage": "P2 Engine \u63A5\u5165\uFF1BWindows\u52A8\u6001\u5BF9\u7167\u5F85\u9A8C",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsAutoRotateRight",
+      "Text": "\u542F\u7528/\u7981\u7528\u81EA\u52A8\u53F3\u65CB\u8F6C",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleIsAutoRotateRightCommand.cs",
+      "Stage": "P2 Engine \u63A5\u5165\uFF1BWindows\u52A8\u6001\u5BF9\u7167\u5F85\u9A8C",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsAutoRotateForcedLeft",
+      "Text": "\u542F\u7528/\u7981\u7528\u5F3A\u5236\u5DE6\u65CB\u8F6C",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleIsAutoRotateForcedLeftCommand.cs",
+      "Stage": "P2 Engine \u63A5\u5165\uFF1BWindows\u52A8\u6001\u5BF9\u7167\u5F85\u9A8C",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsAutoRotateForcedRight",
+      "Text": "\u542F\u7528/\u7981\u7528\u5F3A\u5236\u53F3\u65CB\u8F6C",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleIsAutoRotateForcedRightCommand.cs",
+      "Stage": "P2 Engine \u63A5\u5165\uFF1BWindows\u52A8\u6001\u5BF9\u7167\u5F85\u9A8C",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleViewFlipHorizontal",
+      "Text": "\u5DE6\u53F3\u7FFB\u8F6C",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleViewFlipHorizontalCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ViewFlipHorizontalOn",
+      "Text": "\u5141\u8BB8\u5DE6\u53F3\u7FFB\u8F6C",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewFlipHorizontalOnCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ViewFlipHorizontalOff",
+      "Text": "\u53D6\u6D88\u5DE6\u53F3\u7FFB\u8F6C",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewFlipHorizontalOffCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleViewFlipVertical",
+      "Text": "\u4E0A\u4E0B\u7FFB\u8F6C",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleViewFlipVerticalCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ViewFlipVerticalOn",
+      "Text": "\u5141\u8BB8\u4E0A\u4E0B\u7FFB\u8F6C",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewFlipVerticalOnCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ViewFlipVerticalOff",
+      "Text": "\u53D6\u6D88\u4E0A\u4E0B\u7FFB\u8F6C",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewFlipVerticalOffCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ViewReset",
+      "Text": "\u91CD\u7F6E\u89C6\u56FE",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ViewResetCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "PrevPage",
+      "Text": "\u540E\u9000",
+      "Shortcut": "Right,RightClick",
+      "MouseGesture": "R",
+      "Source": "NeeView/Command/Commands/PrevPageCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "NextPage",
+      "Text": "\u524D\u8FDB",
+      "Shortcut": "Left,LeftClick",
+      "MouseGesture": "L",
+      "Source": "NeeView/Command/Commands/NextPageCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "PrevOnePage",
+      "Text": "\u540E\u9000\u4E00\u9875",
+      "Shortcut": "",
+      "MouseGesture": "LR",
+      "Source": "NeeView/Command/Commands/PrevOnePageCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "NextOnePage",
+      "Text": "\u524D\u8FDB\u4E00\u9875",
+      "Shortcut": "",
+      "MouseGesture": "RL",
+      "Source": "NeeView/Command/Commands/NextOnePageCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "PrevScrollPage",
+      "Text": "\u6EDA\u52A8 \u002B \u4E0A\u4E00\u9875",
+      "Shortcut": "WheelUp",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/PrevScrollPageCommand.cs",
+      "Stage": "P2/P3\u539F\u5206\u9875\u53CA\u5168\u666FNScroll\u3001\u8FB9\u754C\u7FFB\u9875\u4E0E\u53C2\u6570\u63A5\u5165\uFF1B\u771F\u673A\u52A8\u6001\u5F85\u9A8C",
+      "implemented": true
+    },
+    {
+      "Name": "NextScrollPage",
+      "Text": "\u6EDA\u52A8 \u002B \u4E0B\u4E00\u9875",
+      "Shortcut": "WheelDown",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/NextScrollPageCommand.cs",
+      "Stage": "P2/P3\u539F\u5206\u9875\u53CA\u5168\u666FNScroll\u3001\u8FB9\u754C\u7FFB\u9875\u4E0E\u53C2\u6570\u63A5\u5165\uFF1B\u771F\u673A\u52A8\u6001\u5F85\u9A8C",
+      "implemented": true
+    },
+    {
+      "Name": "JumpPage",
+      "Text": "\u8F6C\u5230\u6307\u5B9A\u9875\u9762",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/JumpPageCommand.cs",
+      "Stage": "P2 \u539F\u5B9A\u4F4D/\u5171\u4EAB\u6B65\u957F\u5BBF\u4E3B\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "JumpRandomPage",
+      "Text": "\u8F6C\u5230\u968F\u673A\u9875\u9762",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/JumpRandomPageCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "PrevSizePage",
+      "Text": "\u540E\u9000\u6307\u5B9A\u9875\u6570",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/PrevSizePageCommand.cs",
+      "Stage": "P2 \u539F\u5B9A\u4F4D/\u5171\u4EAB\u6B65\u957F\u5BBF\u4E3B\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "NextSizePage",
+      "Text": "\u524D\u8FDB\u6307\u5B9A\u9875\u6570",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/NextSizePageCommand.cs",
+      "Stage": "P2 \u539F\u5B9A\u4F4D/\u5171\u4EAB\u6B65\u957F\u5BBF\u4E3B\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "PrevFolderPage",
+      "Text": "\u4E0A\u4E00\u4E2A\u6587\u4EF6\u5939",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/PrevFolderPageCommand.cs",
+      "Stage": "P2 \u666E\u901A\u4E66\u67B6/\u6587\u4EF6\u5939\u9875\u5BFC\u822A\u63A5\u5165\uFF1B\u5DE1\u56DE\u53CA\u5B50\u4E66\u8FB9\u754C\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "NextFolderPage",
+      "Text": "\u4E0B\u4E00\u4E2A\u6587\u4EF6\u5939",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/NextFolderPageCommand.cs",
+      "Stage": "P2 \u666E\u901A\u4E66\u67B6/\u6587\u4EF6\u5939\u9875\u5BFC\u822A\u63A5\u5165\uFF1B\u5DE1\u56DE\u53CA\u5B50\u4E66\u8FB9\u754C\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "FirstPage",
+      "Text": "\u8F6C\u5230\u9996\u9875",
+      "Shortcut": "Ctrl\u002BRight",
+      "MouseGesture": "UR",
+      "Source": "NeeView/Command/Commands/FirstPageCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "LastPage",
+      "Text": "\u8F6C\u5230\u5C3E\u9875",
+      "Shortcut": "Ctrl\u002BLeft",
+      "MouseGesture": "UL",
+      "Source": "NeeView/Command/Commands/LastPageCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "PrevHistoryPage",
+      "Text": "\u540E\u9000\u5230\u4E0A\u4E00\u9875",
+      "Shortcut": "Back",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/PrevHistoryPageCommand.cs",
+      "Stage": "P2 \u539F\u5BFC\u822A\u5386\u53F2\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "NextHistoryPage",
+      "Text": "\u524D\u8FDB\u5230\u4E0B\u4E00\u9875",
+      "Shortcut": "Shift\u002BBack",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/NextHistoryPageCommand.cs",
+      "Stage": "P2 \u539F\u5BFC\u822A\u5386\u53F2\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleBookLock",
+      "Text": "\u4E66\u7C4D\u9501\u5B9A\u72B6\u6001",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleBookLockCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "PrevBook",
+      "Text": "\u4E0A\u4E00\u672C\u4E66\u7C4D",
+      "Shortcut": "Up",
+      "MouseGesture": "LU",
+      "Source": "NeeView/Command/Commands/PrevBookCommand.cs",
+      "Stage": "P2 \u666E\u901A\u4E66\u67B6/\u6587\u4EF6\u5939\u9875\u5BFC\u822A\u63A5\u5165\uFF1B\u5DE1\u56DE\u53CA\u5B50\u4E66\u8FB9\u754C\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "NextBook",
+      "Text": "\u4E0B\u4E00\u672C\u4E66\u7C4D",
+      "Shortcut": "Down",
+      "MouseGesture": "LD",
+      "Source": "NeeView/Command/Commands/NextBookCommand.cs",
+      "Stage": "P2 \u666E\u901A\u4E66\u67B6/\u6587\u4EF6\u5939\u9875\u5BFC\u822A\u63A5\u5165\uFF1B\u5DE1\u56DE\u53CA\u5B50\u4E66\u8FB9\u754C\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "RandomBook",
+      "Text": "\u968F\u673A\u6392\u5E8F\u4E66\u7C4D",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/RandomBookCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "PrevHistory",
+      "Text": "\u540E\u9000\u5230\u4E0A\u4E00\u6761\u5386\u53F2\u8BB0\u5F55",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/PrevHistoryCommand.cs",
+      "Stage": "P2 \u539F\u8FC7\u6EE4\u540E\u5386\u53F2\u5217\u8868\u5BFC\u822A",
+      "implemented": true
+    },
+    {
+      "Name": "NextHistory",
+      "Text": "\u524D\u8FDB\u5230\u4E0B\u4E00\u6761\u5386\u53F2\u8BB0\u5F55",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/NextHistoryCommand.cs",
+      "Stage": "P2 \u539F\u8FC7\u6EE4\u540E\u5386\u53F2\u5217\u8868\u5BFC\u822A",
+      "implemented": true
+    },
+    {
+      "Name": "PrevBookHistory",
+      "Text": "\u540E\u9000\u5230\u4E0A\u4E00\u672C\u4E66\u7C4D",
+      "Shortcut": "Alt\u002BLeft",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/PrevBookHistoryCommand.cs",
+      "Stage": "P2 \u539F\u5BFC\u822A\u5386\u53F2\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "NextBookHistory",
+      "Text": "\u524D\u8FDB\u5230\u4E0B\u4E00\u672C\u4E66\u7C4D",
+      "Shortcut": "Alt\u002BRight",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/NextBookHistoryCommand.cs",
+      "Stage": "P2 \u539F\u5BFC\u822A\u5386\u53F2\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToParentBook",
+      "Text": "\u6253\u5F00\u7236\u6587\u4EF6\u5939",
+      "Shortcut": "Alt\u002BUp",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/MoveToParentBookCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "MoveToChildBook",
+      "Text": "\u6253\u5F00\u672C\u4E66",
+      "Shortcut": "Alt\u002BDown",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/MoveToChildBookCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleMediaPlay",
+      "Text": "\u89C6\u9891\u64AD\u653E/\u505C\u6B62",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleMediaPlayCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": true
+    },
+    {
+      "Name": "PrevMediaPosition",
+      "Text": "\u89C6\u9891\u5012\u5E26",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/PrevMediaPositionCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": true
+    },
+    {
+      "Name": "NextMediaPosition",
+      "Text": "\u89C6\u9891\u5FEB\u8FDB",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/NextMediaPositionCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleBookOrder",
+      "Text": "\u5207\u6362\u4E66\u7C4D\u987A\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleBookOrderCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderByFileNameA",
+      "Text": "\u4E66\u540D\u5347\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBookOrderByFileNameACommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderByFileNameD",
+      "Text": "\u4E66\u540D\u964D\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBookOrderByFileNameDCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderByPathA",
+      "Text": "\u4E66\u7C4D\u8DEF\u5F84\u5347\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBookOrderByPathACommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "SetBookOrderByPathD",
+      "Text": "\u4E66\u7C4D\u8DEF\u5F84\u964D\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBookOrderByPathDCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "SetBookOrderByFileTypeA",
+      "Text": "\u4E66\u7C4D\u6587\u4EF6\u7C7B\u578B\u5347\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBookOrderByFileTypeACommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderByFileTypeD",
+      "Text": "\u4E66\u7C4D\u6587\u4EF6\u7C7B\u578B\u964D\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBookOrderByFileTypeDCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderByTimeStampA",
+      "Text": "\u4E66\u7C4D\u65E5\u671F\u5347\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBookOrderByTimeStampACommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderByTimeStampD",
+      "Text": "\u4E66\u7C4D\u65E5\u671F\u964D\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBookOrderByTimeStampDCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderByEntryTimeA",
+      "Text": "\u4E66\u7C4D\u767B\u8BB0\u65F6\u95F4\u5347\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBookOrderByEntryTimeACommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "SetBookOrderByEntryTimeD",
+      "Text": "\u4E66\u7C4D\u767B\u8BB0\u65F6\u95F4\u964D\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBookOrderByEntryTimeDCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "SetBookOrderBySizeA",
+      "Text": "\u4E66\u7C4D\u5927\u5C0F\u5347\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBookOrderBySizeACommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderBySizeD",
+      "Text": "\u4E66\u7C4D\u5927\u5C0F\u964D\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBookOrderBySizeDCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookOrderByRandom",
+      "Text": "\u4E66\u7C4D\u968F\u673A\u6392\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBookOrderByRandomCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "TogglePageMode",
+      "Text": "\u5207\u6362\u9875\u9762\u6A21\u5F0F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/TogglePageModeCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "TogglePageModeReverse",
+      "Text": "\u5207\u6362\u9875\u9762\u6A21\u5F0F (\u53CD\u5411)",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/TogglePageModeReverseCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "SetPageModeOne",
+      "Text": "\u5355\u9875\u663E\u793A",
+      "Shortcut": "Ctrl\u002B1",
+      "MouseGesture": "RU",
+      "Source": "NeeView/Command/Commands/SetPageModeOneCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "SetPageModeTwo",
+      "Text": "\u53CC\u9875\u663E\u793A",
+      "Shortcut": "Ctrl\u002B2",
+      "MouseGesture": "RD",
+      "Source": "NeeView/Command/Commands/SetPageModeTwoCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsPanorama",
+      "Text": "\u5168\u666F\u6A21\u5F0F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleIsPanoramaCommand.cs",
+      "Stage": "P3\u539F\u5E27\u7EA7\u5168\u666F\u3001PagesAsOne/NScroll\u4E0EMac\u8FDE\u7EED/\u7011\u5E03\u63A5\u5165\uFF1B\u8BBE\u5907/Windows\u52A8\u6001\u72EC\u7ACB\u9A8C\u6536",
+      "implemented": true
+    },
+    {
+      "Name": "TogglePageOrientation",
+      "Text": "\u5207\u6362\u9875\u9762\u65B9\u5411",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/TogglePageOrientationCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "SetPageOrientationHorizontal",
+      "Text": "\u6C34\u5E73\u9875\u9762\u5E03\u5C40",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetPageOrientationHorizontalCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "SetPageOrientationVertical",
+      "Text": "\u5782\u76F4\u9875\u9762\u5E03\u5C40",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetPageOrientationVerticalCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleBookReadOrder",
+      "Text": "\u5207\u6362\u53F3\u5F00/\u5DE6\u5F00",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleBookReadOrderCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookReadOrderRight",
+      "Text": "\u53F3\u5F00 (\u4ECE\u53F3\u5411\u5DE6)",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBookReadOrderRightCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "SetBookReadOrderLeft",
+      "Text": "\u5DE6\u5F00 (\u4ECE\u5DE6\u5411\u53F3\uFF09",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetBookReadOrderLeftCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsSupportedDividePage",
+      "Text": "\u5206\u5272\u6A2A\u5411\u9875\u9762",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleIsSupportedDividePageCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsSupportedWidePage",
+      "Text": "\u6A2A\u5411\u9875\u9762\u89C6\u4E3A\u53CC\u9875",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleIsSupportedWidePageCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsSupportedSingleFirstPage",
+      "Text": "\u9996\u9875\u5355\u72EC\u663E\u793A",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleIsSupportedSingleFirstPageCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsSupportedSingleLastPage",
+      "Text": "\u5C3E\u9875\u5355\u72EC\u663E\u793A",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleIsSupportedSingleLastPageCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleIsRecursiveFolder",
+      "Text": "\u8F7D\u5165\u5B50\u6587\u4EF6\u5939",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleIsRecursiveFolderCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleSortMode",
+      "Text": "\u5207\u6362\u9875\u9762\u987A\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleSortModeCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "SetSortModeFileName",
+      "Text": "\u6587\u4EF6\u540D\u5347\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetSortModeFileNameCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "SetSortModeFileNameDescending",
+      "Text": "\u6587\u4EF6\u540D\u964D\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetSortModeFileNameDescendingCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "SetSortModeTimeStamp",
+      "Text": "\u6587\u4EF6\u65E5\u671F\u5347\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetSortModeTimeStampCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "SetSortModeTimeStampDescending",
+      "Text": "\u6587\u4EF6\u65E5\u671F\u964D\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetSortModeTimeStampDescendingCommand.cs",
+      "Stage": "P2 Engine \u63A5\u5165\uFF1BWindows\u52A8\u6001\u5BF9\u7167\u5F85\u9A8C",
+      "implemented": true
+    },
+    {
+      "Name": "SetSortModeSize",
+      "Text": "\u6587\u4EF6\u5927\u5C0F\u5347\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetSortModeSizeCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "SetSortModeSizeDescending",
+      "Text": "\u6587\u4EF6\u5927\u5C0F\u964D\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetSortModeSizeDescendingCommand.cs",
+      "Stage": "P2 Engine \u63A5\u5165\uFF1BWindows\u52A8\u6001\u5BF9\u7167\u5F85\u9A8C",
+      "implemented": true
+    },
+    {
+      "Name": "SetSortModeEntry",
+      "Text": "\u6587\u4EF6\u767B\u8BB0\u65F6\u95F4\u5347\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetSortModeEntryCommand.cs",
+      "Stage": "P4 \u539FPlaylist\u6765\u6E90\u767B\u8BB0\u987A\u5E8F\u6392\u5E8F\uFF1B\u666E\u901A\u6765\u6E90\u7981\u7528",
+      "implemented": true
+    },
+    {
+      "Name": "SetSortModeEntryDescending",
+      "Text": "\u6587\u4EF6\u767B\u8BB0\u65F6\u95F4\u964D\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetSortModeEntryDescendingCommand.cs",
+      "Stage": "P4 \u539FPlaylist\u6765\u6E90\u767B\u8BB0\u987A\u5E8F\u6392\u5E8F\uFF1B\u666E\u901A\u6765\u6E90\u7981\u7528",
+      "implemented": true
+    },
+    {
+      "Name": "SetSortModeRandom",
+      "Text": "\u968F\u673A",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetSortModeRandomCommand.cs",
+      "Stage": "P1 Engine",
+      "implemented": true
+    },
+    {
+      "Name": "SetDefaultPageSetting",
+      "Text": "\u91CD\u7F6E\u9875\u9762\u8BBE\u7F6E",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetDefaultPageSettingCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleBookmark",
+      "Text": "\u6DFB\u52A0/\u5220\u9664\u4E66\u7B7E",
+      "Shortcut": "Ctrl\u002BD",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleBookmarkCommand.cs",
+      "Stage": "P2 \u5BBF\u4E3B\u63A5\u5165\uFF1B\u5177\u4F53\u8303\u56F4\u89C1\u9A8C\u6536\u8868",
+      "implemented": true
+    },
+    {
+      "Name": "RegisterBookmark",
+      "Text": "\u6CE8\u518C\u4E66\u7B7E",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/RegisterBookmarkCommand.cs",
+      "Stage": "P2 \u7B2C\u4E94\u6279\u5BBF\u4E3B\u9002\u914D\uFF1B\u767B\u8BB0\u5B57\u6BB5/\u52A8\u4F5C\u63A5\u5165\uFF0C\u539FPopup/\u6807\u7B7E/\u6811\u9009\u62E9\u5668\u5F85\u8FC1",
+      "implemented": true
+    },
+    {
+      "Name": "NextPlaylist",
+      "Text": "\u4E0B\u4E00\u64AD\u653E\u5217\u8868",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/NextPlaylistCommand.cs",
+      "Stage": "P2 \u7B2C\u516B\u6279\u539F\u64AD\u653E\u5217\u8868/\u6807\u8BB0\u5B50\u96C6\uFF1B\u683C\u5F0F\u3001\u7F16\u8F91\u548C\u5BFC\u822A\u63A5\u5165\uFF0C\u9AD8\u7EA7\u6765\u6E90/\u6A21\u677F/\u4FEE\u590D\u5F85\u8FC1",
+      "implemented": true
+    },
+    {
+      "Name": "PrevPlaylist",
+      "Text": "\u4E0A\u4E00\u4E2A\u64AD\u653E\u5217\u8868",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/PrevPlaylistCommand.cs",
+      "Stage": "P2 \u7B2C\u516B\u6279\u539F\u64AD\u653E\u5217\u8868/\u6807\u8BB0\u5B50\u96C6\uFF1B\u683C\u5F0F\u3001\u7F16\u8F91\u548C\u5BFC\u822A\u63A5\u5165\uFF0C\u9AD8\u7EA7\u6765\u6E90/\u6A21\u677F/\u4FEE\u590D\u5F85\u8FC1",
+      "implemented": true
+    },
+    {
+      "Name": "TogglePlaylistItem",
+      "Text": "\u6DFB\u52A0/\u5220\u9664\u64AD\u653E\u5217\u8868\u9879\u76EE",
+      "Shortcut": "Ctrl\u002BM",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/TogglePlaylistItemCommand.cs",
+      "Stage": "P2 \u7B2C\u516B\u6279\u539F\u64AD\u653E\u5217\u8868/\u6807\u8BB0\u5B50\u96C6\uFF1B\u683C\u5F0F\u3001\u7F16\u8F91\u548C\u5BFC\u822A\u63A5\u5165\uFF0C\u9AD8\u7EA7\u6765\u6E90/\u6A21\u677F/\u4FEE\u590D\u5F85\u8FC1",
+      "implemented": true
+    },
+    {
+      "Name": "PrevPlaylistItem",
+      "Text": "\u4E0A\u4E00\u4E2A\u64AD\u653E\u5217\u8868\u9879\u76EE",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/PrevPlaylistItemCommand.cs",
+      "Stage": "P2 \u7B2C\u516B\u6279\u539F\u64AD\u653E\u5217\u8868/\u6807\u8BB0\u5B50\u96C6\uFF1B\u683C\u5F0F\u3001\u7F16\u8F91\u548C\u5BFC\u822A\u63A5\u5165\uFF0C\u9AD8\u7EA7\u6765\u6E90/\u6A21\u677F/\u4FEE\u590D\u5F85\u8FC1",
+      "implemented": true
+    },
+    {
+      "Name": "NextPlaylistItem",
+      "Text": "\u4E0B\u4E00\u4E2A\u64AD\u653E\u5217\u8868\u9879\u76EE",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/NextPlaylistItemCommand.cs",
+      "Stage": "P2 \u7B2C\u516B\u6279\u539F\u64AD\u653E\u5217\u8868/\u6807\u8BB0\u5B50\u96C6\uFF1B\u683C\u5F0F\u3001\u7F16\u8F91\u548C\u5BFC\u822A\u63A5\u5165\uFF0C\u9AD8\u7EA7\u6765\u6E90/\u6A21\u677F/\u4FEE\u590D\u5F85\u8FC1",
+      "implemented": true
+    },
+    {
+      "Name": "PrevPlaylistItemInBook",
+      "Text": "\u4E66\u7C4D\u4E2D\u7684\u4E0A\u4E00\u4E2A\u64AD\u653E\u5217\u8868\u9879\u76EE",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/PrevPlaylistItemInBookCommand.cs",
+      "Stage": "P2 \u7B2C\u516B\u6279\u539F\u64AD\u653E\u5217\u8868/\u6807\u8BB0\u5B50\u96C6\uFF1B\u683C\u5F0F\u3001\u7F16\u8F91\u548C\u5BFC\u822A\u63A5\u5165\uFF0C\u9AD8\u7EA7\u6765\u6E90/\u6A21\u677F/\u4FEE\u590D\u5F85\u8FC1",
+      "implemented": true
+    },
+    {
+      "Name": "NextPlaylistItemInBook",
+      "Text": "\u4E66\u7C4D\u4E2D\u7684\u4E0B\u4E00\u4E2A\u64AD\u653E\u5217\u8868\u9879\u76EE",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/NextPlaylistItemInBookCommand.cs",
+      "Stage": "P2 \u7B2C\u516B\u6279\u539F\u64AD\u653E\u5217\u8868/\u6807\u8BB0\u5B50\u96C6\uFF1B\u683C\u5F0F\u3001\u7F16\u8F91\u548C\u5BFC\u822A\u63A5\u5165\uFF0C\u9AD8\u7EA7\u6765\u6E90/\u6A21\u677F/\u4FEE\u590D\u5F85\u8FC1",
+      "implemented": true
+    },
+    {
+      "Name": "SetEffectProfile",
+      "Text": "\u8BBE\u7F6E\u6548\u679C\u914D\u7F6E",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SetEffectProfileCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "NextEffectProfile",
+      "Text": "\u4E0B\u4E00\u4E2A\u6548\u679C\u914D\u7F6E",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/CommandTable.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "PrevEffectProfile",
+      "Text": "\u524D\u4E00\u4E2A\u6548\u679C\u914D\u7F6E",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/CommandTable.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleCustomSize",
+      "Text": "\u542F\u7528/\u7981\u7528\u81EA\u5B9A\u4E49\u5927\u5C0F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleCustomSizeCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleTrim",
+      "Text": "\u5207\u6362\u88C1\u526A",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleTrimCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleResizeFilter",
+      "Text": "\u542F\u7528/\u7981\u7528\u8C03\u6574\u5927\u5C0F\u6EE4\u955C",
+      "Shortcut": "Ctrl\u002BR",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleResizeFilterCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleGrid",
+      "Text": "\u542F\u7528/\u7981\u7528\u7F51\u683C",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleGridCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleEffect",
+      "Text": "\u542F\u7528/\u7981\u7528\u6548\u679C",
+      "Shortcut": "Ctrl\u002BE",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleEffectCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleIsLoupe",
+      "Text": "\u542F\u7528/\u7981\u7528\u653E\u5927\u955C",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleIsLoupeCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "LoupeOn",
+      "Text": "\u542F\u7528\u653E\u5927\u955C",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/LoupeOnCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "LoupeOff",
+      "Text": "\u9000\u51FA\u653E\u5927\u955C",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/LoupeOffCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "LoupeScaleUp",
+      "Text": "\u63D0\u9AD8\u653E\u5927\u955C\u500D\u7387",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/LoupeScaleUpCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "LoupeScaleDown",
+      "Text": "\u964D\u4F4E\u653E\u5927\u955C\u500D\u7387",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/LoupeScaleDownCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ToggleHoverScroll",
+      "Text": "\u542F\u7528/\u7981\u7528\u60AC\u6D6E\u6EDA\u52A8",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleHoverScrollCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ToggleAutoScroll",
+      "Text": "\u5207\u6362\u81EA\u52A8\u6EDA\u52A8",
+      "Shortcut": "MiddleClick",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ToggleAutoScrollCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "CancelScript",
+      "Text": "\u4E2D\u6B62\u811A\u672C",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/CancelScriptCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "OpenOptionsWindow",
+      "Text": "\u6253\u5F00\u8BBE\u7F6E\u7A97\u53E3",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/OpenOptionsWindowCommand.cs",
+      "Stage": "P1 \u5BBF\u4E3B\u9002\u914D",
+      "implemented": true
+    },
+    {
+      "Name": "OpenSettingFilesFolder",
+      "Text": "\u6253\u5F00\u914D\u7F6E\u6587\u4EF6\u4F4D\u7F6E",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/OpenSettingFilesFolderCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "OpenScriptsFolder",
+      "Text": "\u6253\u5F00\u811A\u672C\u6587\u4EF6\u5939",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/OpenScriptsFolderCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "OpenVersionWindow",
+      "Text": "\u663E\u793A\u7248\u672C\u4FE1\u606F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/OpenVersionWindowCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "CloseApplication",
+      "Text": "\u9000\u51FA\u5E94\u7528\u7A0B\u5E8F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/CloseApplicationCommand.cs",
+      "Stage": "P1 \u5BBF\u4E3B\u9002\u914D",
+      "implemented": true
+    },
+    {
+      "Name": "TogglePermitFile",
+      "Text": "\u542F\u7528/\u7981\u7528\u6587\u4EF6\u64CD\u4F5C",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/TogglePermitFileCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "HelpCommandList",
+      "Text": "\u663E\u793A\u547D\u4EE4\u5E2E\u52A9",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/HelpCommandListCommand.cs",
+      "Stage": "P1 \u5BBF\u4E3B\u9002\u914D",
+      "implemented": true
+    },
+    {
+      "Name": "HelpScript",
+      "Text": "\u663E\u793A\u811A\u672C\u5E2E\u52A9",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/HelpScriptCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "HelpMainMenu",
+      "Text": "\u663E\u793A\u4E3B\u83DC\u5355\u5E2E\u52A9",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/HelpMainMenuCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "HelpSearchOption",
+      "Text": "\u641C\u7D22\u9009\u9879\u5E2E\u52A9",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/HelpSearchOptionCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "OpenContextMenu",
+      "Text": "\u6253\u5F00\u4E0A\u4E0B\u6587\u83DC\u5355",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/OpenContextMenuCommand.cs",
+      "Stage": "P2 \u6267\u884C\u5165\u53E3\u5DF2\u63A5\u5165\uFF1B\u53C2\u6570/\u884C\u4E3A\u8303\u56F4\u89C1\u6A21\u5757\u9A8C\u6536\u8BB0\u5F55",
+      "implemented": true
+    },
+    {
+      "Name": "ExportBackup",
+      "Text": "\u5BFC\u51FA\u8BBE\u7F6E",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ExportBackupCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ImportBackup",
+      "Text": "\u5BFC\u5165\u8BBE\u7F6E",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ImportBackupCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "ReloadSetting",
+      "Text": "\u91CD\u65B0\u8F7D\u5165\u8BBE\u7F6E",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/ReloadSettingCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "SaveSetting",
+      "Text": "\u4FDD\u5B58\u8BBE\u7F6E",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/SaveSettingCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "TouchEmulate",
+      "Text": "\u6A21\u62DF\u89E6\u63A7",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/TouchEmulateCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "FocusPrevApp",
+      "Text": "\u5207\u6362\u5230\u4E0A\u4E00\u4E2A NeeView",
+      "Shortcut": "Ctrl\u002BShift\u002BTab",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/FocusPrevAppCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "FocusNextApp",
+      "Text": "\u5207\u6362\u5230\u4E0B\u4E00\u4E2A NeeView",
+      "Shortcut": "Ctrl\u002BTab",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/FocusNextAppCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "StretchWindow",
+      "Text": "\u8C03\u6574\u7A97\u53E3\u5927\u5C0F",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/StretchWindowCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    },
+    {
+      "Name": "OpenConsole",
+      "Text": "\u6253\u5F00\u811A\u672C\u63A7\u5236\u53F0",
+      "Shortcut": "",
+      "MouseGesture": "",
+      "Source": "NeeView/Command/Commands/OpenConsoleCommand.cs",
+      "Stage": "\u5F85 P2\u2013P5",
+      "implemented": false
+    }
+  ]
+}

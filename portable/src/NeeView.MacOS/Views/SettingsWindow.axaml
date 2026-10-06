@@ -7,9 +7,25 @@
           <Grid ColumnDefinitions="*,Auto,Auto"><TextBox x:Name="SettingsSearchBox" Text="{Binding Keyword, Mode=TwoWay}" PlaceholderText="搜索设置" KeyDown="SettingsSearch_KeyDown" TextChanged="SettingsSearch_TextChanged" ToolTip.Tip="原结构化搜索：空格 AND，/or，/not，/word，/re。Enter 确认并加入本窗口历史。" /><Button x:Name="SettingsSearchHistory" Grid.Column="1" Content="⌄" Click="SettingsSearch_History" /><Button x:Name="SettingsSearchClear" Grid.Column="2" Content="×" Click="SettingsSearch_Clear" /></Grid>
           <TextBlock x:Name="SettingsSearchError" Text="{Binding Error}" TextWrapping="Wrap" />
         </StackPanel>
-        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="主题 / 配色" /><ListBoxItem Content="字体" /><ListBoxItem Content="归档 / PDF" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
+        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="主题 / 配色" /><ListBoxItem Content="字体" /><ListBoxItem Content="归档 / PDF" /><ListBoxItem Content="幻灯播放" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
       </Grid>
     </Border>
+    <ScrollViewer x:Name="SlideShowSettings" Grid.Column="1" IsVisible="False">
+      <StackPanel Margin="24" Spacing="12">
+        <TextBlock Classes="settings-section" Text="幻灯播放" FontSize="{DynamicResource SystemFontSizeHuge}" />
+        <TextBlock Text="页面显示间隔（秒）" /><NumericUpDown x:Name="SlideShowInterval" Value="{Binding Interval, Mode=TwoWay}" Minimum="0.1" Maximum="{Binding IntervalMaximum}" Increment="0.1" FormatString="0.#####" />
+        <TextBlock Text="翻页命令" /><ComboBox x:Name="SlideShowCommand" ItemsSource="{Binding Commands}" SelectedItem="{Binding Command, Mode=TwoWay}"><ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate></ComboBox>
+        <TextBlock Text="重置计时的操作" /><ComboBox x:Name="SlideShowReset" ItemsSource="{Binding ResetGestures}" SelectedValueBinding="{Binding Value}" SelectedValue="{Binding Reset, Mode=TwoWay}"><ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate></ComboBox>
+        <CheckBox x:Name="SlideShowTimerVisible" Content="显示计时进度" IsChecked="{Binding Timer, Mode=TwoWay}" />
+        <CheckBox x:Name="SlideShowPrioritizeTime" Content="优先按时间翻页" IsChecked="{Binding Priority, Mode=TwoWay}" />
+        <CheckBox x:Name="SlideShowWaitAnimation" Content="翻页前等待动画完整播放一次" IsChecked="{Binding WaitAnimation, Mode=TwoWay}" />
+        <CheckBox x:Name="SlideShowAutoScroll" Content="自动滚动到页面底部" IsChecked="{Binding AutoScroll, Mode=TwoWay}" />
+        <TextBlock Text="书尾动作" /><ComboBox x:Name="SlideShowPageEnd" ItemsSource="{Binding EndActions}" SelectedValueBinding="{Binding Value}" SelectedValue="{Binding EndAction, Mode=TwoWay}"><ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate></ComboBox>
+        <TextBlock Text="翻页效果" /><ComboBox x:Name="SlideShowPageMove" ItemsSource="{Binding MoveTypes}" SelectedValueBinding="{Binding Value}" SelectedValue="{Binding Move, Mode=TwoWay}"><ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate></ComboBox>
+        <TextBlock Text="翻页动画时长（秒）" /><NumericUpDown x:Name="SlideShowPageDuration" Value="{Binding Duration, Mode=TwoWay}" Minimum="0" Maximum="{Binding DurationMaximum}" Increment="0.1" FormatString="0.#####" />
+        <CheckBox x:Name="SlideShowAutoStart" Content="应用启动时自动播放幻灯片" IsChecked="{Binding AutoStart, Mode=TwoWay}" />
+      </StackPanel>
+    </ScrollViewer>
     <ScrollViewer x:Name="ArchiveSettings" Grid.Column="1" IsVisible="False">
       <StackPanel Margin="24" Spacing="12">
         <TextBlock Classes="settings-section" Text="PDF" FontSize="{DynamicResource SystemFontSizeHuge}" />
