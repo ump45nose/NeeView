@@ -7,7 +7,7 @@ namespace NeeView.MacOS.Views;
 
 public sealed partial class SettingsWindow
 {
-    private static readonly string[] SearchPageNames = ["ReadingSettings", "InputSettings", "FilmSettings", "AutoHideSettings", "HistorySettings", "NavigationSettings", "FileSettings", "ThemeSettings", "FontSettings", "ArchiveSettings", "SlideShowSettings", "BackgroundSettings"];
+    private static readonly string[] SearchPageNames = ["ReadingSettings", "InputSettings", "FilmSettings", "AutoHideSettings", "HistorySettings", "NavigationSettings", "FileSettings", "ThemeSettings", "FontSettings", "ArchiveSettings", "SlideShowSettings", "BackgroundSettings", "LoupeSettings"];
     private SettingsSearchPresenter? _settingsSearchPresenter;
     private NavigationSearchViewModel? _settingsSearch;
     private bool _showingSearch;

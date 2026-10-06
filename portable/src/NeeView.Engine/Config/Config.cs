@@ -36,6 +36,7 @@ public sealed class Config
     public WindowTitleConfig WindowTitle { get; set; } = new();
     public MenuBarConfig MenuBar { get; set; } = new();
     public MouseConfig Mouse { get; set; } = new();
+    public LoupeConfig Loupe { get; set; } = new();
     public CommandConfig Command { get; set; } = new();
     public ThemeConfig Theme { get; set; } = new();
     public FontsConfig Fonts { get; set; } = new();

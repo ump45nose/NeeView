@@ -25,7 +25,8 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
         public Display Retain() { Interlocked.Increment(ref _references); return this; }
         public void Dispose() { if (Interlocked.Decrement(ref _references) != 0) return; Bitmap.Dispose(); Lease.Dispose(); }
     }
-    private sealed record Demand(CancellationTokenSource Cancellation, bool Background);
+    private sealed record Demand(CancellationTokenSource Cancellation, bool Background)
+    { public DecodeRequest? Request { get; set; } }
     private readonly Dictionary<Page, Display> _images = [];
     public ThemeRgba ContentColor => operation.Book?.CurrentPage is { } page && _images.TryGetValue(page, out var image)
         ? image.Lease.Image.Color : ThemeRgba.Parse("Black");
@@ -76,6 +77,14 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     /// <summary>后台编码期间保留现有显示租约，离开可见区也不能提前释放。</summary>
     internal (Bitmap Bitmap, IDisposable Retained) RetainCopyImage(Page page)
     { if (!ReferenceEquals(page, CopyImagePage)) throw new InvalidOperationException("选中图片已改变。"); var image = _images[page].Retain(); return (image.Bitmap, image); }
+    /// <summary>Loupe 的原图基准仅采用当前页面几何，不重新布局或改滚动锚点。</summary>
+    internal double GetOriginalScale()
+    {
+        var index = FindPageIndex(operation.Book?.CurrentPage);
+        if (Layout is null || index < 0) return 1;
+        var size = _pages[index].Content.PageDataSource.Size;
+        return Layout.Items[index].Width / Math.Max(1, size.Width) * (TopLevel.GetTopLevel(owner)?.RenderScaling ?? 1);
+    }
     public int PendingCount => _pending.Count + (IsLayoutPending ? 1 : 0);
     public bool HasPressedPointer => _pressed is not null;
 
@@ -250,8 +259,9 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     private void UpdateDemand()
     {
         if (!Active || _disposed || Layout is null || _book is null || owner.Bounds.Width <= 0 || owner.Bounds.Height <= 0) return;
-        double margin = owner.Bounds.Height * .35;
-        var indices = Layout.Query(_offset - margin, _offset + owner.Bounds.Height + margin)
+        var visible = owner.LoupeVisibleRect;
+        double margin = visible.Height * .35;
+        var indices = Layout.Query(_offset + visible.Y - margin, _offset + visible.Bottom + margin)
             .OrderBy(i => Layout.Items[i].Bottom <= _offset || Layout.Items[i].Y >= _offset + owner.Bounds.Height)
             .ThenBy(i => Math.Abs(Layout.Items[i].Y + Layout.Items[i].Height / 2 - _offset - owner.Bounds.Height / 2)).Take(128).ToArray();
         var desired = indices.Select(i => _pages[i]).ToHashSet();
@@ -263,8 +273,13 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
             var page = _pages[index]; var specification = GetRequest(index);
             TrackSize(index, page);
             if (_images.TryGetValue(page, out var image) && image.Width == specification.TargetWidth && image.Height == specification.TargetHeight) continue;
-            if (_pending.ContainsKey(page) || _errors.ContainsKey(page)) continue;
-            var rect = Layout.Items[index]; var demand = new Demand(new(), rect.Bottom <= _offset || rect.Y >= _offset + owner.Bounds.Height); _pending.Add(page, demand);
+            if (_pending.TryGetValue(page, out var pending))
+            {
+                if (pending.Request == specification) continue;
+                pending.Cancellation.Cancel(); _pending.Remove(page);
+            }
+            if (_errors.ContainsKey(page)) continue;
+            var rect = Layout.Items[index]; var demand = new Demand(new(), rect.Bottom <= _offset || rect.Y >= _offset + owner.Bounds.Height) { Request = specification }; _pending.Add(page, demand);
             _ = LoadAsync(_book, page, demand);
         }
     }
@@ -282,7 +297,7 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     /// <returns>按64像素取整、有上限的尺寸请求，不改变页面原始尺寸。</returns>
     private DecodeRequest GetRequest(int index)
     {
-        var rect = Layout!.Items[index]; double scale = TopLevel.GetTopLevel(owner)?.RenderScaling ?? 1;
+        var rect = Layout!.Items[index]; double scale = (TopLevel.GetTopLevel(owner)?.RenderScaling ?? 1) * owner.LoupeFixedScale;
         var size = _pages[index].Content.PageDataSource.Size;
         if (Config.Current.ImageDotKeep.IsImageDotKeep(new(rect.Width * scale, rect.Height * scale), size))
             return new((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height), _mode == BrowseLayoutMode.Masonry);
@@ -305,7 +320,7 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
             if (_disposed || !Active || !ReferenceEquals(_book, book)) return;
             int index = page.Index; if (index < 0 || index >= _pages.Length || !ReferenceEquals(_pages[index], page)) return;
             TrackSize(index, page);
-            var request = GetRequest(index);
+            var request = GetRequest(index); demand.Request = request;
             var lease = await factory.GetAsync(page, request, token, demand.Background);
             if (_disposed || !Active || token.IsCancellationRequested || !ReferenceEquals(_book, book)) { lease.Dispose(); return; }
             Bitmap? bitmap = null; var pixels = lease.Image; var handle = GCHandle.Alloc(pixels.Pixels, GCHandleType.Pinned);
@@ -338,7 +353,9 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
         if (Layout is null || _pages.Length == 0) { Text(context, _layoutError ?? (IsLayoutPending ? "正在计算布局…" : "这个来源没有可浏览的页面"), new(24, 24)); return; }
         bool effected = ImageEffectRenderer.DrawScene(context, new Avalonia.Rect(owner.Bounds.Size), RecordScene);
         using var clip = context.PushClip(new Avalonia.Rect(owner.Bounds.Size));
-        foreach (int index in Layout.Query(_offset, _offset + owner.Bounds.Height))
+        using (context.PushTransform(owner.LoupeMatrix))
+        {
+        foreach (int index in Layout.Query(_offset + owner.LoupeVisibleRect.Y, _offset + owner.LoupeVisibleRect.Bottom))
         {
             var item = Layout.Items[index]; var page = _pages[index];
             var target = new Avalonia.Rect(item.X - _offsetX, item.Y - _offset, item.Width, item.Height);
@@ -348,11 +365,12 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
             {
                 var trim = Config.Current.ImageTrim; var size = image.Bitmap.PixelSize;
                 var source = trim.IsEnabled ? new Avalonia.Rect(size.Width*trim.Left,size.Height*trim.Top,size.Width*(1-trim.Left-trim.Right),size.Height*(1-trim.Top-trim.Bottom)) : new Avalonia.Rect(size.ToSize(1));
-                ReaderImageRenderer.Draw(owner,context,image.Bitmap,source,target,Matrix.Identity,retain:image.Retain,pixels:image.Lease.Image);
+                ReaderImageRenderer.Draw(owner,context,image.Bitmap,source,target,owner.LoupeMatrix,retain:image.Retain,pixels:image.Lease.Image);
                 ImageGridRenderer.Draw(context,target,ImageGridTarget.Image);
             }
             else { context.FillRectangle(Brush("Gallery.Placeholder", Brushes.DimGray), target); Text(context, _errors.ContainsKey(page) ? "读取失败" : "正在加载…", target.TopLeft + new Avalonia.Vector(8, 8)); }
             if (ReferenceEquals(page, _selection)) context.DrawRectangle(new Pen(Brush("Gallery.Selection", Brushes.DodgerBlue), 3), target.Deflate(1.5));
+        }
         }
         if (MaximumOffset > 0)
         {
@@ -365,7 +383,9 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     private void RecordScene(SkiaSharp.SKCanvas canvas)
     {
         if (Layout is null) return;
-        foreach (int index in Layout.Query(_offset, _offset + owner.Bounds.Height))
+        using var saved = new SkiaSharp.SKAutoCanvasRestore(canvas, true);
+        canvas.Concat(ReaderEffectScene.Matrix(owner.LoupeMatrix));
+        foreach (int index in Layout.Query(_offset + owner.LoupeVisibleRect.Y, _offset + owner.LoupeVisibleRect.Bottom))
         {
             var item = Layout.Items[index]; var page = _pages[index];
             var target = new Avalonia.Rect(item.X - _offsetX, item.Y - _offset, item.Width, item.Height);
@@ -377,7 +397,7 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
                 var trim = Config.Current.ImageTrim; var size = image.Bitmap.PixelSize;
                 var source = trim.IsEnabled ? new Avalonia.Rect(size.Width * trim.Left, size.Height * trim.Top, size.Width * (1 - trim.Left - trim.Right), size.Height * (1 - trim.Top - trim.Bottom)) : new Avalonia.Rect(size.ToSize(1));
                 ReaderEffectScene.PageBackground(canvas, target);
-                ReaderEffectScene.Image(canvas, image.Lease.Image, source, target, image.Retain, ReaderImageRenderer.Interpolation(owner, source, target, Matrix.Identity));
+                ReaderEffectScene.Image(canvas, image.Lease.Image, source, target, image.Retain, ReaderImageRenderer.Interpolation(owner, source, target, owner.LoupeMatrix));
                 ReaderEffectScene.Grid(canvas, target);
             }
             else

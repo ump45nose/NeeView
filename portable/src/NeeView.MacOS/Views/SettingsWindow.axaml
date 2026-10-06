@@ -7,9 +7,26 @@
           <Grid ColumnDefinitions="*,Auto,Auto"><TextBox x:Name="SettingsSearchBox" Text="{Binding Keyword, Mode=TwoWay}" PlaceholderText="搜索设置" KeyDown="SettingsSearch_KeyDown" TextChanged="SettingsSearch_TextChanged" ToolTip.Tip="原结构化搜索：空格 AND，/or，/not，/word，/re。Enter 确认并加入本窗口历史。" /><Button x:Name="SettingsSearchHistory" Grid.Column="1" Content="⌄" Click="SettingsSearch_History" /><Button x:Name="SettingsSearchClear" Grid.Column="2" Content="×" Click="SettingsSearch_Clear" /></Grid>
           <TextBlock x:Name="SettingsSearchError" Text="{Binding Error}" TextWrapping="Wrap" />
         </StackPanel>
-        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="主题 / 配色" /><ListBoxItem Content="字体" /><ListBoxItem Content="归档 / PDF" /><ListBoxItem Content="幻灯播放" /><ListBoxItem Content="背景 / 像素保持" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
+        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="主题 / 配色" /><ListBoxItem Content="字体" /><ListBoxItem Content="归档 / PDF" /><ListBoxItem Content="幻灯播放" /><ListBoxItem Content="背景 / 像素保持" /><ListBoxItem Content="放大镜" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
       </Grid>
     </Border>
+    <ScrollViewer x:Name="LoupeSettings" Grid.Column="1" IsVisible="False">
+      <StackPanel Margin="24" Spacing="12">
+        <TextBlock Classes="settings-section" Text="放大镜" FontSize="{DynamicResource SystemFontSizeHuge}" />
+        <TextBlock Text="初始倍率" /><NumericUpDown x:Name="LoupeDefaultScale" Value="{Binding DefaultScale, Mode=TwoWay}" Minimum="{Binding DefaultScaleMinimum}" Maximum="{Binding DefaultScaleMaximum}" Increment="0.1" FormatString="0.#####" />
+        <TextBlock Text="最小倍率" /><NumericUpDown x:Name="LoupeMinimumScale" Value="{Binding MinimumScale, Mode=TwoWay}" Minimum="{Binding MinimumScaleMinimum}" Maximum="{Binding MinimumScaleMaximum}" Increment="0.1" FormatString="0.#####" />
+        <TextBlock Text="最大倍率" /><NumericUpDown x:Name="LoupeMaximumScale" Value="{Binding MaximumScale, Mode=TwoWay}" Minimum="{Binding MaximumScaleMinimum}" Maximum="{Binding MaximumScaleMaximum}" Increment="0.1" FormatString="0.#####" />
+        <TextBlock Text="倍率步长" /><NumericUpDown x:Name="LoupeScaleStep" Value="{Binding ScaleStep, Mode=TwoWay}" Minimum="{Binding ScaleStepMinimum}" Maximum="{Binding ScaleStepMaximum}" Increment="0.1" FormatString="0.#####" />
+        <TextBlock Text="鼠标移动速度" /><NumericUpDown x:Name="LoupeSpeed" Value="{Binding Speed, Mode=TwoWay}" Minimum="{Binding SpeedMinimum}" Maximum="{Binding SpeedMaximum}" Increment="0.1" FormatString="0.#####" />
+        <CheckBox x:Name="LoupeIsLoupeCenter" Content="以鼠标位置为放大镜中心" IsChecked="{Binding IsLoupeCenter, Mode=TwoWay}" />
+        <CheckBox x:Name="LoupeIsResetByRestart" Content="每次开启时重置倍率" IsChecked="{Binding IsResetByRestart, Mode=TwoWay}" />
+        <CheckBox x:Name="LoupeIsResetByPageChanged" Content="翻页时退出放大镜（全景除外）" IsChecked="{Binding IsResetByPageChanged, Mode=TwoWay}" />
+        <CheckBox x:Name="LoupeIsVisibleLoupeInfo" Content="显示放大镜倍率" IsChecked="{Binding IsVisibleLoupeInfo, Mode=TwoWay}" />
+        <CheckBox x:Name="LoupeIsWheelScalingEnabled" Content="垂直滚轮调整放大镜倍率" IsChecked="{Binding IsWheelScalingEnabled, Mode=TwoWay}" />
+        <CheckBox x:Name="LoupeIsEscapeKeyEnabled" Content="允许 Escape 退出放大镜" IsChecked="{Binding IsEscapeKeyEnabled, Mode=TwoWay}" />
+        <CheckBox x:Name="LoupeIsBaseOnOriginal" Content="以原始图像大小为倍率基准" IsChecked="{Binding IsBaseOnOriginal, Mode=TwoWay}" />
+      </StackPanel>
+    </ScrollViewer>
     <ScrollViewer x:Name="BackgroundSettings" Grid.Column="1" IsVisible="False">
       <StackPanel Margin="24" Spacing="12">
         <TextBlock Classes="settings-section" Text="背景 / 像素保持" FontSize="{DynamicResource SystemFontSizeHuge}" />

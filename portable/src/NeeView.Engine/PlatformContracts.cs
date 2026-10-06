@@ -27,6 +27,8 @@ public interface IPlatformInput : IDisposable
 {
     /// <summary>安装窗口处理器，返回 true 表示已消费；释放时移除原生监听。</summary>
     void Attach(Func<PlatformGesture, bool> handler);
+    /// <summary>窗口限定的相对指针捕获；释放后通知所有者，不支持的平台返回空。</summary>
+    IDisposable? BeginRelativePointer(nint sourceWindow, Action<double, double> handler, Action? released = null) => null;
 }
 
 /// <summary>内容来源替换点；沿用 Archive/ArchiveEntry 模型。</summary>

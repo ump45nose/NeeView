@@ -1,5 +1,7 @@
 # NeeView Mac 源码迁移架构
 
+P5第三十三批：原Loupe十二字段、五命令、固定开启基点/设备舍入与局部相对捕获进入唯一查看器；普通变换、JSON和窗口布局保持。见[放大镜契约](p5-loupe.md)。
+
 P5第三十二批：六类空间效果与原WPF Blur接入整阅读视口合成，十四类原效果均有实际后端；页框/背景/网格作用域、CPU/GPU Auto采样和原生像素租约保持。缩放滤镜及真正Loupe继续迁移，见[空间效果契约](p5-spatial-effects.md)。
 
 P5第三十一批：Bloom、Monochrome和ColorTone按固定原后端指令/常量关系进入现有Skia颜色链；参数、层序、显示租约和View导出保持，七类空间/模糊效果继续待迁，见[颜色效果契约](p5-color-effects.md)。

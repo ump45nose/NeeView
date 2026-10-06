@@ -44,6 +44,7 @@ public sealed partial class MainWindow : Window
         "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ToggleBookLock", "Unload", "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff",
         "ToggleViewFlipVertical", "ViewFlipVerticalOn", "ViewFlipVerticalOff", "ViewReset", "ViewScaleStretch", "ViewPresetScroll", "ViewScrollNTypeUp", "ViewScrollNTypeDown",
         "ToggleStretchMode", "ToggleStretchModeReverse", "SetStretchModeUniformToFill", "SetStretchModeUniformToSize", "SetStretchModeUniformToVertical", "SetStretchModeUniformToHorizontal", "ToggleStretchAllowScaleUp", "ToggleStretchAllowScaleDown", "ToggleHoverScroll",
+        "ToggleIsLoupe", "LoupeOn", "LoupeOff", "LoupeScaleUp", "LoupeScaleDown",
         "ExportImage", "ExportImageAs", "ExportBookAs", "CopyImage", "OpenExternalApp", "OpenExternalAppAs", "OpenBookExternalAppAs", "OpenVersionWindow", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleEffectInfo", "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
@@ -60,7 +61,8 @@ public sealed partial class MainWindow : Window
     /// <summary>由启动层接入原生事件；只消费主查看器区域，其余控件使用框架输入。</summary>
     public void AttachPlatformInput(IPlatformInput input)
     {
-        _platformInput?.Dispose(); _platformInput = input; input.Attach(HandlePlatformGesture);
+        Viewer.AttachLoupeInput(null, null); _platformInput?.Dispose(); _platformInput = input; input.Attach(HandlePlatformGesture);
+        Viewer.AttachLoupeInput(input, () => TryGetPlatformHandle()?.Handle ?? 0);
     }
     /// <summary>真实精确滚动连续平移，捏合围绕当前指针缩放，不使用增量大小猜设备。</summary>
     public bool HandlePlatformGesture(PlatformGesture gesture)
@@ -75,6 +77,8 @@ public sealed partial class MainWindow : Window
         if (this.InputHitTest(new Point(gesture.X, gesture.Y)) is not Visual hit ||
             (!ReferenceEquals(hit, Viewer) && !hit.GetVisualAncestors().Contains(Viewer))) return false;
         _autoHide?.LeaveVisibleLocked();
+        if (!gesture.IsMagnify && Viewer.TryLoupeWheel(gesture.DeltaX, gesture.DeltaY)) return true;
+        if (Viewer.IsLoupeEnabled && !gesture.IsMagnify) return false;
         if (gesture.IsMagnify) _ = ZoomFromGestureAsync(1 + gesture.Magnification, local);
         else Viewer.Pan(new(gesture.DeltaX, gesture.DeltaY));
         return true;
@@ -93,6 +97,8 @@ public sealed partial class MainWindow : Window
         // Finder复制不触发阅读回报，菜单展开/窗口重新激活时只重查命令能力。
         this.FindControl<Menu>("MenuBar")!.AddHandler(MenuItem.SubmenuOpenedEvent, (_, _) => RefreshHistoryCommandStates());
         Activated += (_, _) => RefreshHistoryCommandStates();
+        Deactivated += (_, _) => Viewer.SetLoupe(false);
+        Viewer.LoupeChanged += (_, _) => { if (!_closedPrepared) { MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck); RefreshHistoryCommandStates(); } };
         AddHandler(DragDrop.DropEvent, Drop);
         DragDrop.SetAllowDrop(this, true);
         Viewer.TryGestureRequested = TryHandleGesture;
@@ -208,6 +214,8 @@ public sealed partial class MainWindow : Window
         "SaveSetting" or "ReloadSetting" or "ExportBackup" => !_profileBusy && _model?.Operation.CanManageProfile == true,
         "OpenSettingFilesFolder" => _platform is not null && _settingFolderAction.IsCompleted,
         "ToggleCustomSize" or "ToggleTrim" or "ToggleGrid" or "ToggleEffect" or "NextEffectProfile" or "PrevEffectProfile" or "SetEffectProfile" or "ToggleNearestNeighbor" => _model?.Operation.IsLoading == false,
+        "LoupeScaleUp" or "LoupeScaleDown" => Viewer.IsLoupeEnabled && !_preparing && !_closedPrepared,
+        "ToggleIsLoupe" or "LoupeOn" or "LoupeOff" => _model?.Operation.Book is not null && _model.Operation.IsLoading == false && !_preparing && !_closedPrepared,
         "ToggleMediaPlay" or "PrevMediaPosition" or "NextMediaPosition" => _model?.Operation.MediaExists() == true,
         var command when PagedTransformCommands.Contains(command) && _model?.Operation.IsFrameReading != true => false,
         "Unload" => _model?.Operation.CanUnload == true,
@@ -258,6 +266,7 @@ public sealed partial class MainWindow : Window
         "ToggleTrim" => Config.Current.ImageTrim.IsEnabled,
         "ToggleGrid" => Config.Current.ImageGrid.IsEnabled,
         "ToggleEffect" => Config.Current.ImageEffect.IsEnabled,
+        "ToggleIsLoupe" => Viewer.IsLoupeEnabled,
         "ToggleSlideShow" => _model?.Operation.SlideShow.IsPlaying,
         "ToggleMediaPlay" => _model?.Operation.IsMediaPlaying(),
         "ToggleBookLock" => _model?.Operation.IsBookLocked,
@@ -403,7 +412,12 @@ public sealed partial class MainWindow : Window
                 case "OpenBookExternalAppAs": await ExecuteExternalApplicationAsync(name, true); break;
                 case "TogglePermitFile": await _model.Operation.ToggleFileWriteAccessAsync(fromMenu); break;
                 case "ToggleCustomSize": case "ToggleTrim": case "ToggleGrid": case "ToggleEffect": await _model.Operation.ToggleImageOptionAsync(name, fromMenu); break;
-            case "ToggleNearestNeighbor": await _model.Operation.ToggleNearestNeighborAsync(fromMenu); break;
+                case "ToggleNearestNeighbor": await _model.Operation.ToggleNearestNeighborAsync(fromMenu); break;
+                case "ToggleIsLoupe": Viewer.SetLoupe(_model.SaveData.GetCommandParameter<ToggleCommandParameter>(name).GetState(Viewer.IsLoupeEnabled, fromMenu)); break;
+                case "LoupeOn": Viewer.SetLoupe(true); break;
+                case "LoupeOff": Viewer.SetLoupe(false); break;
+                case "LoupeScaleUp": Viewer.LoupeZoom(1); break;
+                case "LoupeScaleDown": Viewer.LoupeZoom(-1); break;
                 case "ToggleVisibleAddressBar": case "ToggleVisiblePageSlider":
                     SetChromeVisible(name, fromMenu); break;
                 case "ToggleWindowMinimize":
@@ -803,6 +817,7 @@ public sealed partial class MainWindow : Window
         if (focusedElement is TextBox) return;
         // 弹出菜单拥有方向键，不能让原阅读快捷键抢走菜单导航/选择。
         if (this.FindControl<Menu>("MenuBar")!.IsOpen || focusedElement is MenuItem) return;
+        if (ReferenceEquals(focusedElement, Viewer) && Viewer.TryLoupeEscape(e.Key, e.KeyModifiers)) { e.Handled = true; return; }
         if (focusedElement is ComboBox && e.KeyModifiers == KeyModifiers.None && e.Key is Key.Up or Key.Down or Key.Left or Key.Right or Key.Enter or Key.Space) return;
         // 普通列表拥有方向/定位键；选条目不能触发全局 Up/Down 书籍导航。
         if (focusedElement is Control focused && (focused is ListBox or TreeView || focused.GetVisualAncestors().Any(x => x is ListBox or TreeView)))
@@ -973,6 +988,7 @@ public sealed partial class MainWindow : Window
     {
         await Task.Yield();
         _preparing = true;
+        Viewer.SetLoupe(false);
         StopSlideShowForClose();
         _exportCancellation?.Cancel(); _exportDialog?.Close(null); _model?.Operation.CancelExportPreparation();
         _imageCopyCancellation?.Cancel();

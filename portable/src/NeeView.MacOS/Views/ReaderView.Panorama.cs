@@ -18,19 +18,19 @@ public sealed partial class ReaderView
     {
         if (!IsPanorama || _frame is null || _operation?.Book is not { } book || _operation.Context is not { } context || Bounds.Width <= 0 || Bounds.Height <= 0)
         { _panorama = null; return; }
-        _panorama = new(book.Pages, _frame, context, new(-Bounds.Width / 2 - _pan.X, -Bounds.Height / 2 - _pan.Y, Bounds.Width, Bounds.Height),
+        _panorama = new(book.Pages, _frame, context, new(LoupeVisibleRect.X - Bounds.Width / 2 - _pan.X, LoupeVisibleRect.Y - Bounds.Height / 2 - _pan.Y, LoupeVisibleRect.Width, LoupeVisibleRect.Height),
             _transform.BaseScale * _zoom, _transform.Angle, book.IsIndexing);
     }
     /// <summary>每帧保留自身自动旋转及双页几何，共享当前表现变换；FrameSpace在显示DIP中应用一次。</summary>
     private Matrix PanoramaMatrix(PanoramaFrame placement)
     {
         var center = new Avalonia.Vector(placement.Bounds.X + placement.Bounds.Width / 2, placement.Bounds.Y + placement.Bounds.Height / 2);
-        return Matrix.CreateScale(_transform.BaseScale, _transform.BaseScale)
+        return ApplyLoupe(Matrix.CreateScale(_transform.BaseScale, _transform.BaseScale)
             * Matrix.CreateRotation(placement.Frame.Angle * Math.PI / 180)
             * Matrix.CreateScale(_transform.IsFlipHorizontal ? -_zoom : _zoom, _transform.IsFlipVertical ? -_zoom : _zoom)
             * Matrix.CreateRotation(_transform.Angle * Math.PI / 180)
             * Matrix.CreateTranslation(Bounds.Width / 2 + _pan.X + center.X, Bounds.Height / 2 + _pan.Y + center.Y)
-            * Matrix.CreateTranslation(_motion.GetPanOffset());
+            * Matrix.CreateTranslation(_motion.GetPanOffset()));
     }
     /// <summary>可见和一视口邻区共享原缓存；普通分页仍只申请当前原帧。</summary>
     private Page[] GetDemandSources()

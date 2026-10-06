@@ -5,6 +5,7 @@
 | 能力 | 原出处 | 迁移方式/状态 |
 |---|---|---|
 | 字体名、常规/菜单/树/面板比例 | Config/FontsConfig.cs、System/FontParameters.cs、Styles/Fonts.xaml、SettingPageWindow.cs | P5第九批原六字段/字号公式/资源角色接入唯一JSON与设置事务；Mac度量替换，缺字体保留名称，ClearType禁用，38非零绝对字号继续待来源基准 |
+| 查看器 Loupe | Config/LoupeConfig.cs、MouseInput/LoupeContext/LoupeDragTransformContext/MouseInputLoupe、PageFrames/LoupeTransform | P5第三十三批原12字段/五命令/固定基点/设备舍入及范围关闭-全景例外；AppKit局部相对捕获替换，真机/Windows另验 |
 | 半页位置与有向范围 | Book/PagePosition.cs、PageRange.cs；NeeView.UnitTest/PagePositions.cs | 原源码及原测试迁入 |
 | 双页、宽页、首页/末页单独、分割 | PageFrames/PageFrameFactory.cs | 完整生成算法迁入，纯几何适配；组合测试 |
 | 帧/单页步进 | PageFrames/PageFrameBox.cs:976 起；NextPage/NextOnePageCommand | 原方向和范围算法适配；真实目录/ZIP测试 |

@@ -3188,6 +3188,36 @@
       "target": "src/NeeView.MacOS/Views/ImageEffectSceneRenderer.cs",
       "sha256": "047969ad0489edee144b65e11fe3a71019558aa978c8034a37e312299cec99b7",
       "status": "P5第三十二批：保留原整阅读视口包装与逆层序；借用已有像素记录绘图、有界设备像素表面替换WPF。"
+    },
+    {
+      "source": "NeeView/Config/LoupeConfig.cs",
+      "target": "src/NeeView.Engine/Config/LoupeConfig.cs",
+      "sha256": "d2032195d14721bafb9d7bd97d8107a336bbe930fdc7ad998b2afce694f63bc9",
+      "status": "P5第三十三批；保留原12字段/默认/舍入、独立倍率/开启固定基点/设备像素位移、范围关闭/全景例外；WPF变换与输入替换为Avalonia/AppKit局部相对捕获"
+    },
+    {
+      "source": "NeeView/MouseInput/LoupeContext.cs",
+      "target": "src/NeeView.Engine/MouseInput/LoupeContext.cs",
+      "sha256": "86e232600fc76da8f934366d08509d999a91d9224843ba127d81468a996c76b0",
+      "status": "P5第三十三批；保留原12字段/默认/舍入、独立倍率/开启固定基点/设备像素位移、范围关闭/全景例外；WPF变换与输入替换为Avalonia/AppKit局部相对捕获"
+    },
+    {
+      "source": "NeeView/MouseInput/LoupeDragTransformContext.cs",
+      "target": "src/NeeView.Engine/PageFrames/LoupeTransform.cs",
+      "sha256": "367b8574791b3b6546247b59f48aee39edea1d8628db0c2db37bfcdc21392d62",
+      "status": "P5第三十三批；保留原12字段/默认/舍入、独立倍率/开启固定基点/设备像素位移、范围关闭/全景例外；WPF变换与输入替换为Avalonia/AppKit局部相对捕获"
+    },
+    {
+      "source": "NeeView/PageFrames/LoupeTransformContext.cs",
+      "target": "src/NeeView.Engine/PageFrames/LoupeTransform.cs",
+      "sha256": "7152c09f81f8077aebd243fc039245ac65f9cac75ec833d8e1a51f04a5c780d0",
+      "status": "P5第三十三批；保留原12字段/默认/舍入、独立倍率/开启固定基点/设备像素位移、范围关闭/全景例外；WPF变换与输入替换为Avalonia/AppKit局部相对捕获"
+    },
+    {
+      "source": "NeeView/MouseInput/MouseInputLoupe.cs",
+      "target": "src/NeeView.MacOS/Views/ReaderView.Loupe.cs",
+      "sha256": "1b557cc02077b48c28facf4b445d8f344f880a170e722a2dac83e2ba192f09fe",
+      "status": "P5第三十三批；保留原12字段/默认/舍入、独立倍率/开启固定基点/设备像素位移、范围关闭/全景例外；WPF变换与输入替换为Avalonia/AppKit局部相对捕获"
     }
   ],
   "rule_references": [
