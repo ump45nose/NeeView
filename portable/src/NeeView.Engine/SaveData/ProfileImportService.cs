@@ -88,11 +88,11 @@ public sealed partial class ProfileImportService(IProfileImportReader reader, IR
                         Map(Object(parameter, "Value") ?? parameter, "ExportFolder", "Commands.ExportImage.Parameter");
                     }
                     if (raw["MacImportedLegacyEffectUpgrade"]?.ToString() == "Layers/1")
-                        notices.Add("旧 ImageEffect 已按原规则转换为效果层、参数缓存和默认预设，原材料保留；效果实际执行尚未接入。");
+                        notices.Add("旧 ImageEffect 已按原规则转换为效果层、参数缓存和默认预设，原材料保留；Level/Hsv/ColorSelect/Colorize 已接入；其余效果逐项标记待迁。");
                     else if (raw["MacImportedLegacyEffectFormat"] is not null && config?["ImageEffect"]?["Layers"] is null)
-                        notices.Add("旧 ImageEffect 尚未转换，原参数与缓存完整保留；效果实际执行尚未接入。" + raw["MacImportedLegacyEffectIssue"]?.ToString());
+                        notices.Add("旧 ImageEffect 尚未转换，原参数与缓存完整保留；Level/Hsv/ColorSelect/Colorize 已接入；其余效果逐项标记待迁。" + raw["MacImportedLegacyEffectIssue"]?.ToString());
                     else if (config?["ImageEffect"] is not null || config?["EffectProfiles"] is not null || config?["ImageEffectCache"] is not null)
-                        notices.Add("现代效果层、缓存和预设数据保持，未知类型不改写；效果实际执行尚未接入。");
+                        notices.Add("现代效果层、缓存和预设数据保持，未知类型不改写；Level/Hsv/ColorSelect/Colorize 已接入；其余效果逐项标记待迁。");
                     break;
             }
             summaries.Add(new(name, true, format, paths.Count - before));
@@ -181,16 +181,21 @@ public sealed partial class ProfileImportService(IProfileImportReader reader, IR
         void ReportSettings(JsonObject? node, Type type, string field, int depth)
         {
             if (node is null) return;
+            // 动态材料没有配置属性 schema；JsonObject 的两个 Item 索引器也不是设置字段。
+            if (typeof(JsonNode).IsAssignableFrom(type))
+            {
+                if (node.Count > 0) notices.Add("动态配置材料保留，执行兼容逐项核对：" + field);
+                return;
+            }
             var properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
-                .Where(p => p.GetCustomAttributes(typeof(JsonIgnoreAttribute), true).OfType<JsonIgnoreAttribute>().All(a => a.Condition != JsonIgnoreCondition.Always))
+                .Where(p => p.GetIndexParameters().Length == 0 && p.GetCustomAttributes(typeof(JsonIgnoreAttribute), true).OfType<JsonIgnoreAttribute>().All(a => a.Condition != JsonIgnoreCondition.Always))
                 .ToDictionary(p => p.GetCustomAttributes(typeof(JsonPropertyNameAttribute), true).OfType<JsonPropertyNameAttribute>().FirstOrDefault()?.Name ?? p.Name);
             foreach (var pair in node)
             {
                 token.ThrowIfCancellationRequested(); CheckRecordBudget(); var location = field + "." + pair.Key;
                 if (!properties.TryGetValue(pair.Key, out var property))
                 {
-                    // 效果纯数据有独立明确报告，尚未投影为可执行的 Config 属性。
-                    if (field == "Config" && pair.Key is "ImageEffect" or "ImageEffectCache" or "EffectProfiles") continue;
+
                     // 原启动快照仍由 SaveData 的原 JSON 直接读取，没有独立 Config 属性。
                     if (field == "Config.StartUp" && pair.Key is "LastBookV2" or "LastBook" or "LastFolderPath") continue;
                     notices.Add("配置投影外字段保留，兼容待核对：" + location);

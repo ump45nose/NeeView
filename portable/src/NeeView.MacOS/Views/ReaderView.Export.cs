@@ -18,7 +18,7 @@ public sealed partial class ReaderView
     }
     private async Task ExportViewCoreAsync(PageFrame frame, IExportImageParameter options, Stream stream, CancellationToken token)
     {
-        Dispatcher.UIThread.VerifyAccess(); token.ThrowIfCancellationRequested();
+        Dispatcher.UIThread.VerifyAccess(); token.ThrowIfCancellationRequested(); ImageEffectRenderer.EnsureExportSupported();
         if (IsBrowsing || _disposed) throw new NotSupportedException("视图导出请先切回分页或原帧全景。");
         if (options.IsOriginalSize)
         {
@@ -59,12 +59,15 @@ public sealed partial class ReaderView
         ValidateExportSize(outputRect.Width, outputRect.Height);
         var pixels = new PixelSize((int)Math.Ceiling(outputRect.Width), (int)Math.Ceiling(outputRect.Height));
         using var bitmap = new RenderTargetBitmap(pixels, new(96, 96));
+        var result = new ImageEffectRenderResult();
         using (var context = bitmap.CreateDrawingContext())
         {
             if (options.HasBackground) _background?.Render(context, CurrentContentColor, new Avalonia.Size(pixels.Width, pixels.Height));
             DrawFrame(context, targets, matrix * Matrix.CreateTranslation(-outputRect.X, -outputRect.Y), _images, [], 1,
-                options.IsDotKeep ? BitmapInterpolationMode.None : options.IsOriginalSize ? BitmapInterpolationMode.HighQuality : null);
+                options.IsDotKeep ? BitmapInterpolationMode.None : options.IsOriginalSize ? BitmapInterpolationMode.HighQuality : null, immediate: true, result: result);
         }
+        // Custom的异常由框架捕获；显式结果保证失败不编码成无效果导出文件。
+        result.ThrowIfFailed();
         token.ThrowIfCancellationRequested();
         // 离屏位图独立持有直到编码结束，逐帧释放；非seek ZIP流通过编码器流式写入。
         await Task.Run(() =>

@@ -57,6 +57,7 @@
         <Grid ColumnDefinitions="*,Auto,*"><NumericUpDown x:Name="PdfMaximumWidth" AutomationProperties.Name="最大源宽度" Value="{Binding MaximumWidth, Mode=TwoWay}" Minimum="1024" Maximum="{Binding MaximumWidthMaximum}" Increment="256" /><TextBlock Grid.Column="1" Text=" × " VerticalAlignment="Center" /><NumericUpDown x:Name="PdfMaximumHeight" Grid.Column="2" AutomationProperties.Name="最大源高度" Value="{Binding MaximumHeight, Mode=TwoWay}" Minimum="1024" Maximum="{Binding MaximumHeightMaximum}" Increment="256" /></Grid>
         <TextBlock Text="保存后用于后续尺寸探测及渲染；已打开页面不会因修改表单重新扫描。密码读取已接入，分卷尚未迁入。" TextWrapping="Wrap" />
         <StackPanel x:Name="AnimationSettings" Spacing="10">
+          <CheckBox x:Name="ImageAspectRatioEnabled" Content="将图像的分辨率（DPI）反映到显示尺寸" IsChecked="{Binding AspectRatio, Mode=TwoWay}" />
           <TextBlock Classes="settings-section" Text="图像动画" FontSize="{DynamicResource SystemFontSizeLarge}" />
           <CheckBox x:Name="AnimatedGifEnabled" Content="播放 GIF 动画" IsChecked="{Binding Gif, Mode=TwoWay}" />
           <CheckBox x:Name="AnimatedPngEnabled" Content="播放 PNG / APNG 动画" IsChecked="{Binding Png, Mode=TwoWay}" />

@@ -78,7 +78,7 @@ public sealed partial class BookOperation
             if (!page.IsImage) { page.Content.HasSize = true; return; }
             await using var stream = await page.ArchiveEntry.Archive.OpenEntryAsync(page.ArchiveEntry, token);
             var info = await decoder.ProbeAsync(stream, token); token.ThrowIfCancellationRequested();
-            page.Content.PageDataSource = new(info.Size); page.Content.HasSize = true;
+            page.Content.PageDataSource = new(info.Size) { AspectSize = info.AspectSize }; page.Content.HasSize = true;
         }
         catch (Exception ex) when (ex is not OperationCanceledException) { page.Content.Error = ex.Message; page.Content.HasSize = true; }
         finally { _probeSlots.Release(); }

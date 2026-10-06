@@ -39,13 +39,13 @@ public sealed partial class MainWindow : Window
     private SliderTextBox PageNumber => this.FindControl<SliderTextBox>("PageNumberView")!;
     private static readonly HashSet<string> HostCommands = new(StringComparer.Ordinal)
     {
-        "ToggleNearestNeighbor", "ToggleVisibleAddressBar", "ToggleVisiblePageSlider", "ToggleWindowMinimize", "ToggleWindowMaximize", "OpenSettingFilesFolder", "SaveSetting", "ReloadSetting", "ExportBackup", "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen", "MoveToFolderAs", "CopyToFolderAs",
+        "ToggleCustomSize", "ToggleTrim", "ToggleGrid", "ToggleEffect", "ToggleNearestNeighbor", "ToggleVisibleAddressBar", "ToggleVisiblePageSlider", "ToggleWindowMinimize", "ToggleWindowMaximize", "OpenSettingFilesFolder", "SaveSetting", "ReloadSetting", "ExportBackup", "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen", "MoveToFolderAs", "CopyToFolderAs",
         "ViewScaleUp", "ViewScaleDown", "ViewScrollUp", "ViewScrollDown", "ViewScrollLeft", "ViewScrollRight", "OpenContextMenu", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
         "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ToggleBookLock", "Unload", "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff",
         "ToggleViewFlipVertical", "ViewFlipVerticalOn", "ViewFlipVerticalOff", "ViewReset", "ViewScaleStretch", "ViewPresetScroll", "ViewScrollNTypeUp", "ViewScrollNTypeDown",
         "ToggleStretchMode", "ToggleStretchModeReverse", "SetStretchModeUniformToFill", "SetStretchModeUniformToSize", "SetStretchModeUniformToVertical", "SetStretchModeUniformToHorizontal", "ToggleStretchAllowScaleUp", "ToggleStretchAllowScaleDown", "ToggleHoverScroll",
         "ExportImage", "ExportImageAs", "ExportBookAs", "CopyImage", "OpenExternalApp", "OpenExternalAppAs", "OpenBookExternalAppAs", "OpenVersionWindow", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
-        "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
+        "ToggleVisibleEffectInfo", "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
         "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "ToggleVisibleFoldersTree", "ToggleVisibleContentsTree", "FocusMainView", "FocusFolderSearchBox", "FocusPageListSearchBox", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkList", "FocusBookmarkSearchBox", "ClearHistory", "ClearHistoryInPlace", "RemoveUnlinkedHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
     };
@@ -157,6 +157,8 @@ public sealed partial class MainWindow : Window
         AttachListTemplates();
         AttachDirectoryTree();
         AttachDestinationFolders();
+        var effectPanel = this.FindControl<ImageEffectView>("ImageEffectPanelView")!;
+        effectPanel.AskNameAsync = (title, value) => AskNameAsync(title, value); effectPanel.Failed += (_, message) => ShowError(message); effectPanel.Attach(model.Operation);
         var playlist = this.FindControl<PlaylistView>("PlaylistPanelView")!;
         playlist.Failed += (_, message) => ShowError(message); playlist.Attach(model.Operation);
         model.Operation.MarkersChanged += Model_MarkersChanged;
@@ -202,7 +204,7 @@ public sealed partial class MainWindow : Window
         "OpenVersionWindow" => _platform is not null,
         "SaveSetting" or "ReloadSetting" or "ExportBackup" => !_profileBusy && _model?.Operation.CanManageProfile == true,
         "OpenSettingFilesFolder" => _platform is not null && _settingFolderAction.IsCompleted,
-        "ToggleNearestNeighbor" => _model?.Operation.IsLoading == false,
+        "ToggleCustomSize" or "ToggleTrim" or "ToggleGrid" or "ToggleEffect" or "NextEffectProfile" or "PrevEffectProfile" or "SetEffectProfile" or "ToggleNearestNeighbor" => _model?.Operation.IsLoading == false,
         "ToggleMediaPlay" or "PrevMediaPosition" or "NextMediaPosition" => _model?.Operation.MediaExists() == true,
         var command when PagedTransformCommands.Contains(command) && _model?.Operation.IsFrameReading != true => false,
         "Unload" => _model?.Operation.CanUnload == true,
@@ -249,6 +251,10 @@ public sealed partial class MainWindow : Window
     /// <summary>原菜单绑定的勾选表现；只读取引擎配置，不在菜单中维护第二套状态。</summary>
     private bool? GetCommandCheck(string name) => name switch
     {
+        "ToggleCustomSize" => Config.Current.ImageCustomSize.IsEnabled,
+        "ToggleTrim" => Config.Current.ImageTrim.IsEnabled,
+        "ToggleGrid" => Config.Current.ImageGrid.IsEnabled,
+        "ToggleEffect" => Config.Current.ImageEffect.IsEnabled,
         "ToggleSlideShow" => _model?.Operation.SlideShow.IsPlaying,
         "ToggleMediaPlay" => _model?.Operation.IsMediaPlaying(),
         "ToggleBookLock" => _model?.Operation.IsBookLocked,
@@ -276,6 +282,7 @@ public sealed partial class MainWindow : Window
         "ToggleVisibleFileInfo" => _model?.ShowInformation,
         "ToggleVisibleBookmarkList" => _model?.ShowBookmarks,
         "ToggleVisibleNavigator" => _model?.ShowNavigator,
+        "ToggleVisibleEffectInfo" => _model?.ShowImageEffects,
         "ToggleVisibleFilmStrip" => Config.Current.FilmStrip.IsEnabled,
         "ToggleNearestNeighbor" => Config.Current.ImageDotKeep.IsEnabled,
         "TogglePermitFile" => Config.Current.System.IsFileWriteAccessEnabled,
@@ -392,7 +399,8 @@ public sealed partial class MainWindow : Window
                 case "OpenExternalAppAs": await ExecuteExternalApplicationAsync(name, false); break;
                 case "OpenBookExternalAppAs": await ExecuteExternalApplicationAsync(name, true); break;
                 case "TogglePermitFile": await _model.Operation.ToggleFileWriteAccessAsync(fromMenu); break;
-                case "ToggleNearestNeighbor": await _model.Operation.ToggleNearestNeighborAsync(fromMenu); break;
+                case "ToggleCustomSize": case "ToggleTrim": case "ToggleGrid": case "ToggleEffect": await _model.Operation.ToggleImageOptionAsync(name, fromMenu); break;
+            case "ToggleNearestNeighbor": await _model.Operation.ToggleNearestNeighborAsync(fromMenu); break;
                 case "ToggleVisibleAddressBar": case "ToggleVisiblePageSlider":
                     SetChromeVisible(name, fromMenu); break;
                 case "ToggleWindowMinimize":
@@ -547,6 +555,7 @@ public sealed partial class MainWindow : Window
                 case "ToggleVisibleFileInfo": _model.SelectPanel("FileInformationPanel"); break;
                 case "ToggleVisibleBookmarkList": _model.SelectPanel("BookmarkPanel"); break;
                 case "ToggleVisibleNavigator": _model.SelectPanel("NavigatePanel"); break;
+                case "ToggleVisibleEffectInfo": _model.SelectPanel("ImageEffectPanel"); break;
                 case "ToggleVisiblePlaylist": _model.SelectPanel("PlaylistPanel"); break;
                 case "TogglePlaylistItem": await _model.Operation.TogglePlaylistItemAsync(fromMenu); break;
                 case "PrevPlaylist": case "NextPlaylist": await _model.Commands.ExecuteAsync(name); await _model.Operation.SaveAsync(); break;
@@ -1016,6 +1025,7 @@ public sealed partial class MainWindow : Window
             this.FindControl<MediaControlView>("DockMediaControlSocket")!.Dispose();
             this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.Dispose();
             this.FindControl<BookmarkListView>("BookmarkPanelList")!.Dispose();
+            this.FindControl<ImageEffectView>("ImageEffectPanelView")!.Dispose();
             Viewer.DisplayCompleted -= ImageCopy_ReadingChanged;
             _autoHide?.Dispose(); _sidePanels?.Dispose(); _platformInput?.Dispose(); FilmStrip.Dispose(); NavigatorView.Dispose(); Viewer.Dispose(); _images?.Dispose(); _closedPrepared = true;
         }

@@ -25,6 +25,11 @@ public sealed class CommandTable
     {
         using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("NeeView.Command.command-manifest.json")!;
         Definitions = JsonSerializer.Deserialize<List<CommandDefinition>>(stream)!;
+        _actions["SetEffectProfile"] = () => operation.SetEffectProfileCommandAsync();
+        _actions["NextEffectProfile"] = () => operation.MoveEffectProfileAsync(1);
+        _actions["PrevEffectProfile"] = () => operation.MoveEffectProfileAsync(-1);
+        foreach (var imageCommand in new[] { "ToggleCustomSize", "ToggleTrim", "ToggleGrid", "ToggleEffect" })
+            _actions[imageCommand] = () => operation.ToggleImageOptionAsync(imageCommand);
         _actions["SetDefaultPageSetting"] = operation.SetDefaultPageSettingAsync;
         _actions["TogglePermitFile"] = () => operation.ToggleFileWriteAccessAsync();
         _actions["ToggleBackground"] = () => operation.SetBackgroundAsync();

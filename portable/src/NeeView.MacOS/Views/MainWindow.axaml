@@ -123,7 +123,7 @@
             <local:ThumbnailView x:Name="Navigator" IsNavigator="True" />
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4" Margin="8"><Button Content="−" Tag="ViewScaleDown" Click="Command_Click" /><Button Content="适合" Tag="SetStretchModeUniform" Click="Command_Click" /><Button Content="100%" Tag="SetStretchModeNone" Click="Command_Click" /><Button Content="+" Tag="ViewScaleUp" Click="Command_Click" /></StackPanel>
           </Grid></Border>
-      <Border Tag="ImageEffectPanel"><TextBlock Text="图像效果将在 P5 迁入。" TextWrapping="Wrap" Margin="10" /></Border>
+      <local:ImageEffectView x:Name="ImageEffectPanelView" Tag="ImageEffectPanel" />
       <Border Tag="PlaylistPanel"><local:PlaylistView x:Name="PlaylistPanelView" /></Border>
       <Border Tag="DestinationFolderPanel"><local:DestinationFolderPanelView x:Name="DestinationPanelView" /></Border>
     </Grid>

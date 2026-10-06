@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ x:Class="NeeView.MacOS.Views.ImageEffectView" MinWidth="200" Foreground="{DynamicResource Panel.Foreground}">
+ <DockPanel Margin="4,2">
+  <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+   <ComboBox x:Name="Profiles" />
+   <Button x:Name="More" Grid.Column="1" Content="⋯" Margin="4,0,0,0" />
+  </Grid>
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+   <StackPanel x:Name="Sections" Spacing="10" Margin="2,4" />
+  </ScrollViewer>
+ </DockPanel>
+</UserControl>

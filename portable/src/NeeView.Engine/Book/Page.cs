@@ -45,4 +45,8 @@ public sealed class PageContent(bool isBook = false, IArchiveFactory? archives =
     public string? Error { get; internal set; }
 }
 /// <summary>移除 WPF 图像后保留页面尺寸数据。</summary>
-public sealed record PageDataSource(Size Size);
+public sealed record PageDataSource(Size Size)
+{
+    /// <summary>原 BitmapInfo.GetAspectSize：方向校正后 Pixel×96/DPI，缺省与像素尺寸相同。</summary>
+    public Size AspectSize { get; init; } = Size;
+}

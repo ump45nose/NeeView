@@ -148,7 +148,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                     opening.Token.ThrowIfCancellationRequested();
                     if (_disposed || _closing || generation != _generation || IsBookLocked && Book is { } commitLocked && commitLocked.Path != book.Path || expectedPlaylist is not null && !ReferenceEquals(expectedPlaylist, _playlistHub?.Current)) return false;
                     Book = book; _fileSelection = null; source = null; collection = null; _keepHistoryOrder = keepHistoryOrder;
-                    Config.Current.BookSetting = setting; Context = new(setting, Config.Current, SlideShow);
+                    Config.Current.BookSetting = setting; new EffectProfileCollection(Config.Current).Restore(); Context = new(setting, Config.Current, SlideShow);
                     // 原 BookMemento 没有 Part；普通打开/启动从首半页开始，反向页尾进入末半页。
                     Position = new(index, terminalDirection < 0 ? 1 : 0);
                     RebuildFrame(terminalDirection < 0 ? -1 : 1); return true;
@@ -430,7 +430,8 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         try
         {
             if (_disposed || _closing || Book is null || IsLoading) return;
-            var current = Book.CurrentPage; change(Book.Setting); Book.MementoControl.RequestSaveBookMemento(true); Book.Sort(CancellationToken.None);
+            var current = Book.CurrentPage; var effectId = Book.Setting.EffectProfileId; new EffectProfileCollection(Config.Current).Store(); change(Book.Setting);
+            if (effectId != Book.Setting.EffectProfileId) new EffectProfileCollection(Config.Current).Restore(); Book.MementoControl.RequestSaveBookMemento(true); Book.Sort(CancellationToken.None);
             Position = new(current?.Index ?? 0, Position.Part); RebuildFrame(1); RecordPageHistory(); ScheduleSave(); Notify();
         }
         finally { _gate.Release(); }
@@ -490,6 +491,13 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                 throw;
             }
             Bookshelf.Reorder();
+            bool imageGeometryChanged = snapshot.Image.Standard.IsAspectRatioEnabled != Config.Current.Image.Standard.IsAspectRatioEnabled
+                || System.Text.Json.JsonSerializer.Serialize(snapshot.ImageCustomSize) != System.Text.Json.JsonSerializer.Serialize(Config.Current.ImageCustomSize)
+                || System.Text.Json.JsonSerializer.Serialize(snapshot.ImageTrim) != System.Text.Json.JsonSerializer.Serialize(Config.Current.ImageTrim);
+            if (imageGeometryChanged && Book is not null) RebuildFrame(MoveDirection, false);
+            if (imageGeometryChanged || System.Text.Json.JsonSerializer.Serialize(snapshot.ImageEffect) != System.Text.Json.JsonSerializer.Serialize(Config.Current.ImageEffect)
+                || System.Text.Json.JsonSerializer.Serialize(snapshot.ImageGrid) != System.Text.Json.JsonSerializer.Serialize(Config.Current.ImageGrid)
+                || System.Text.Json.JsonSerializer.Serialize(snapshot.EffectProfiles) != System.Text.Json.JsonSerializer.Serialize(Config.Current.EffectProfiles)) Notify();
             if (reading is not null && Book is { } current && System.Text.Json.JsonSerializer.Serialize(reading) != System.Text.Json.JsonSerializer.Serialize(current.Setting))
             {
                 var page = current.CurrentPage; current.Sort(CancellationToken.None); Position = new(page?.Index ?? 0, Position.Part);
@@ -501,6 +509,10 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>设置回滚只复制已声明的可写字段；不丢失BookSetting绑定/上下文引用。</summary>
     private static void CopySettingFields(object source, object target)
     {
+        if (source is System.Text.Json.Nodes.JsonObject raw && target is System.Text.Json.Nodes.JsonObject targetRaw)
+        { targetRaw.Clear(); foreach (var field in raw) targetRaw[field.Key] = field.Value?.DeepClone(); return; }
+        if (source is EffectUnitCache cache && target is EffectUnitCache targetCache)
+        { targetCache.Clear(); foreach (var unit in cache) targetCache.Add(unit.Clone()); return; }
         foreach (var property in source.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
             .Where(p => p.CanRead && p.CanWrite && !Attribute.IsDefined(p, typeof(System.Text.Json.Serialization.JsonIgnoreAttribute))))
         {
@@ -517,7 +529,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         MoveDirection = direction;
         if (Book is null || Context is null || Book.Pages.Count == 0) { Frame = null; if (synchronizeSelection) PageSelector.Synchronize(Book, 0); return; }
         var page = Book.Pages[Math.Clamp(Position.Index, 0, Book.Pages.Count - 1)];
-        if (!(Context.PageMode == PageMode.SinglePage && Context.IsSupportedDividePage && Maths.AspectRatioTools.IsLandscape(page.Content.PageDataSource.Size))) Position = new(page.Index, direction > 0 ? 0 : 1);
+        if (!(Context.PageMode == PageMode.SinglePage && Context.IsSupportedDividePage && Maths.AspectRatioTools.IsLandscape(new PageSizeCalculator(Context, page.Content.PageDataSource).GetPageSize()))) Position = new(page.Index, direction > 0 ? 0 : 1);
         Frame = new PageFrameFactory(Context, new BookContext(Book.Pages), new ContentSizeCalculator(Context)).CreatePageFrame(Position, direction);
         // 原 BookContext.SelectedRange.CollectPositions 按索引升序；主图片不随视觉左右或反向生成改变。
         var oldPage = Book.CurrentPage;
@@ -543,7 +555,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                 if (!page.IsImage) { page.Content.HasSize = true; continue; }
                 await using var stream = await page.ArchiveEntry.Archive.OpenEntryAsync(page.ArchiveEntry, token);
                 var info = await decoder.ProbeAsync(stream, token);
-                page.Content.PageDataSource = new(info.Size);
+                page.Content.PageDataSource = new(info.Size) { AspectSize = info.AspectSize };
             }
             catch (Exception ex) when (ex is not OperationCanceledException) { page.Content.Error = ex.Message; }
             page.Content.HasSize = true;

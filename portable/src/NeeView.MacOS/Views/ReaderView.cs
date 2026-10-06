@@ -25,9 +25,9 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
         /// <summary>同一图片及解码规格/来源版本可复用显示缓冲；Folder封面仍按原选择重新请求。</summary>
         public bool CanReuse(Page page, DecodeRequest candidate) => page.IsImage && request == candidate
             && length == page.ArchiveEntry.Length && version == page.ArchiveEntry.LastWriteTime;
-        public Display Retain() { ++_references; return this; }
+        public Display Retain() { Interlocked.Increment(ref _references); return this; }
         /// <summary>同一显示资源可被当前帧和短暂退出帧共用，字节预算只登记一次。</summary>
-        public void Dispose() { if (--_references != 0) return; Bitmap.Dispose(); lease.Dispose(); }
+        public void Dispose() { if (Interlocked.Decrement(ref _references) != 0) return; Bitmap.Dispose(); lease.Dispose(); }
     }
     private sealed record FrameVisual((PageFrameElement Source, Avalonia.Rect Target)[] Targets, Matrix Matrix, NeeView.Rect Bounds,
         Dictionary<Page, Display> Images, Dictionary<Page, string> Errors) : IDisposable
@@ -277,13 +277,16 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
     /// <summary>按设备像素请求图像，128 像素分桶减少窗口小幅调整造成的缓存重复。</summary>
     private DecodeRequest GetRequest(Page page)
     {
-        var size = page.Content.PageDataSource.Size;
+        var source = page.Content.PageDataSource; var size = source.Size;
         if (_exportOriginalSize) return new((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height));
         var frameScale = _panorama?.Frames.FirstOrDefault(f => f.Frame.Contains(page))?.Frame.Scale ?? _frame?.Scale ?? 1;
         var scale = frameScale * _transform.BaseScale * _zoom * (TopLevel.GetTopLevel(this)?.RenderScaling ?? 1);
-        if (Config.Current.ImageDotKeep.IsImageDotKeep(new(size.Width * scale, size.Height * scale), size))
+        var adjusted = new PageCustomSize(Config.Current.ImageCustomSize, () => new(Bounds.Width, Bounds.Height))
+            .TransformToCustomSize(Config.Current.Image.Standard.IsAspectRatioEnabled ? source.AspectSize : size);
+        var display = new CoreSize(adjusted.Width * scale, adjusted.Height * scale);
+        if (Config.Current.ImageDotKeep.IsImageDotKeep(display, size))
             return new((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height));
-        return new(Math.Max(128, (int)Math.Ceiling(Math.Min(size.Width, size.Width * scale) / 128) * 128), Math.Max(128, (int)Math.Ceiling(Math.Min(size.Height, size.Height * scale) / 128) * 128));
+        return ReaderImageRenderer.CreateRequest(size, display, 128, 32768);
     }
     /// <summary>邻页预取只有一个背景槽，取消或损坏不影响当前图。</summary>
     private async Task PrefetchAsync(Page page, CancellationToken token)
@@ -297,7 +300,7 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
         base.Render(context);
         _background?.Render(context, CurrentContentColor);
         if (_background is null) context.FillRectangle(Brushes.Black, new Avalonia.Rect(Bounds.Size));
-        if (IsBrowsing && _browse is not null) { _browse.Render(context); return; }
+        if (IsBrowsing && _browse is not null) { _browse.Render(context); ImageGridRenderer.Draw(context, new Avalonia.Rect(Bounds.Size), ImageGridTarget.Screen); return; }
         if (_frame is null)
         { DrawText(context, _operation?.Book is null ? "NeeView\n打开图片、目录或 ZIP / CBZ" : "这个来源没有可阅读的图片", new(30,30), CanvasBackgroundPresenter.Foreground(CurrentContentColor)); return; }
         using var clip=context.PushClip(new Avalonia.Rect(Bounds.Size));
@@ -307,24 +310,27 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
             DrawFrame(context,old.Targets,old.Matrix * Matrix.CreateTranslation(motion.Outgoing),old.Images,old.Errors,_awaitingTransition ? 1 : motion.OutgoingOpacity);
         if (!IsPanorama && !_awaitingTransition)
             DrawFrame(context,_transform.GetTargets(),GetRenderedMatrix(),_images,_pageErrors,motion.IncomingOpacity);
+        ImageGridRenderer.Draw(context, new Avalonia.Rect(Bounds.Size), ImageGridTarget.Screen);
         if (_sequenceHint.Length>0) { context.FillRectangle(new SolidColorBrush(Color.FromArgb(210,24,24,24)),new Avalonia.Rect(12,12,220,58)); DrawText(context,_sequenceHint,new(24,20)); }
         if (_loadError is not null) DrawText(context,_loadError,new(12,12));
     }
     /// <summary>同一绘制函数显示当前/退出帧；快照复用真实Bitmap与租约，不复制像素。</summary>
     private void DrawFrame(DrawingContext context,IEnumerable<(PageFrameElement Source,Avalonia.Rect Target)> targets,Matrix matrix,
-        Dictionary<Page,Display> images,Dictionary<Page,string> errors,double opacity, BitmapInterpolationMode? interpolation = null)
+        Dictionary<Page,Display> images,Dictionary<Page,string> errors,double opacity, BitmapInterpolationMode? interpolation = null, bool immediate = false, ImageEffectRenderResult? result = null)
     {
         if(opacity<=0) return;
         using var alpha=context.PushOpacity(opacity); using var transform=context.PushTransform(matrix);
+        Avalonia.Rect? frameBounds = null;
         foreach(var(source,target) in targets)
         {
+            frameBounds = frameBounds is { } previous ? previous.Union(target) : target;
             if(source.IsDummy) context.FillRectangle(Brushes.White,target);
             else if(source.Page.PageType.IsFolder()) ArchivePageRenderer.Draw(this,context,source.Page,target,images.GetValueOrDefault(source.Page)?.Bitmap,errors.GetValueOrDefault(source.Page)??"正在加载…", matrix);
             else if(images.TryGetValue(source.Page,out var image))
             {
                 if (ReferenceEquals(images, _images)) image = GetMediaDisplay(source.Page, image);
                 var crop=source.ViewSizeCalculator.GetViewBox(); var pixels=image.Bitmap.PixelSize;
-                ReaderImageRenderer.Draw(this,context,image.Bitmap,new Avalonia.Rect(crop.X*pixels.Width,crop.Y*pixels.Height,crop.Width*pixels.Width,crop.Height*pixels.Height),target,matrix,interpolation);
+                ReaderImageRenderer.Draw(this,context,image.Bitmap,new Avalonia.Rect(crop.X*pixels.Width,crop.Y*pixels.Height,crop.Width*pixels.Width,crop.Height*pixels.Height),target,matrix,interpolation, image.Retain, immediate, result);
                 if (errors.GetValueOrDefault(source.Page) is { Length: > 0 } error)
                 {
                     // 静态首帧可用时仍明确显示动画失败，不能悄悄把不支持当作播放成功。
@@ -335,6 +341,8 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
             }
             else { context.FillRectangle(new SolidColorBrush(Color.Parse("#202020")),target); DrawText(context,source.Page.Content.Error??errors.GetValueOrDefault(source.Page)??"正在加载…",target.TopLeft+new Avalonia.Vector(12,12)); }
         }
+        // 原GridLine挂在整个PageFrame的canvas；导出取_contentCanvas，不包含该网格。
+        if (!immediate && frameBounds is { } bounds) ImageGridRenderer.Draw(context, bounds, ImageGridTarget.Image);
     }
     /// <summary>命中与绘制共享插值矩阵，动画期间不按终点点击旧画面。</summary>
     private Matrix GetRenderedMatrix()

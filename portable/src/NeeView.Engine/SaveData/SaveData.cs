@@ -100,6 +100,16 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             config.Archive = ReadBranch<ArchiveConfig>(raw, "Archive");
             config.Background = ReadBranch<BackgroundConfig>(raw, "Background");
             config.ImageDotKeep = ReadBranch<ImageDotKeepConfig>(raw, "ImageDotKeep");
+            var customSize = raw["ImageCustomSize"]?.DeepClone().AsObject() ?? new();
+            if (customSize.ContainsKey("AspectRatio")) customSize.Remove("IsUniformed");
+            config.ImageCustomSize = customSize.Deserialize<ImageCustomSizeConfig>(ReadOptions) ?? new();
+            config.ImageTrim = ReadBranch<ImageTrimConfig>(raw, "ImageTrim");
+            config.ImageResizeFilter = raw["ImageResizeFilter"]?.DeepClone().AsObject() ?? new();
+            config.ImageGrid = ReadBranch<ImageGridConfig>(raw, "ImageGrid");
+            config.ImageEffect = ReadBranch<ImageEffectConfig>(raw, "ImageEffect");
+            config.ImageEffectCache = ReadBranch<EffectUnitCache>(raw, "ImageEffectCache");
+            config.EffectProfiles = ReadBranch<EffectProfileCollectionConfig>(raw, "EffectProfiles");
+            if (raw["EffectProfiles"] is null) new EffectProfileCollection(config).Store();
             config.Image = ReadBranch<ImageConfig>(raw, "Image");
             config.SlideShow = ReadSlideShowBranch(raw);
             config.Performance = ReadBranch<PerformanceConfig>(raw, "Performance");
@@ -505,12 +515,16 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         bool historyEntry = false;
         try
         {
+            new EffectProfileCollection(Config.Current).Store();
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "PageList", "History", "Bookmark", "System", "Archive", "Background", "ImageDotKeep", "Image", "SlideShow", "Performance", "Playlist", "AutoHide", "Window", "WindowTitle", "MenuBar", "Command", "Mouse", "StartUp", "Theme", "Fonts" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "PageList", "History", "Bookmark", "System", "Archive", "Background", "ImageDotKeep", "ImageCustomSize", "ImageTrim", "ImageGrid", "ImageEffect", "EffectProfiles", "Image", "SlideShow", "Performance", "Playlist", "AutoHide", "Window", "WindowTitle", "MenuBar", "Command", "Mouse", "StartUp", "Theme", "Fonts" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 MergeTyped(Object(config, branch), value!);
             }
+            Object(config, "ImageCustomSize").Remove("IsUniformed");
+            config["ImageEffectCache"] = JsonSerializer.SerializeToNode(Config.Current.ImageEffectCache, Options);
+            config["ImageResizeFilter"] = Config.Current.ImageResizeFilter.DeepClone();
             // 仅覆盖本次编辑的两字段；配置在等待/失败时不暴露给防抖和其他保存。
             Object(config, "History")["LimitSize"] = historyConfig.LimitSize;
             Object(config, "History")["LimitSpan"] = JsonSerializer.SerializeToNode(historyConfig.LimitSpan, Options);

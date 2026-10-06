@@ -27,6 +27,7 @@ public sealed class CommandParameterEdit(string owner, object value)
     /// <summary>原字段在Mac编辑页的文案，业务计算继续读取原属性名。</summary>
     public static string Label(string property) => property switch
     {
+        "Id" => "效果预设 ID（0 为默认）",
         "Mode" => "导出模式", "HasBackground" => "包含画布背景", "IsOriginalSize" => "原始页框尺寸", "IsDotKeep" => "保持像素", "ExportFolder" => "输出目录（空白时选择）",
         "FileFormat" => "图像格式", "QualityLevel" => "JPEG质量", "IsShowToast" => "显示完成提示", "OverwriteMode" => "同名冲突策略", "FileNameFormat0" => "原图命名格式", "FileNameFormat1" => "单页命名格式", "FileNameFormat2" => "双页命名格式",
         "FileName" => "备份文件名（空白时选择 .nvzip）", "Delta" => "媒体步进秒数（0 使用默认值）", "MultiPagePolicy" => "当前页组范围", "Scale" => "缩放步幅（0–1）", "IsSnapDefaultScale" => "跨越默认比例时吸附到 100%", "Angle" => "旋转角度（度）", "IsStretch" => "旋转后适配窗口",

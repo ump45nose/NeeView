@@ -588,6 +588,174 @@
       "target": "src/NeeView.Engine/ExportImage/ExportImageTypes.cs",
       "sha256": "95c48e888f5abb296603231f5b53a45706fb988acba04efd79fded17e6849340",
       "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/RippleEffectUnit.cs",
+      "target": "src/NeeView.Engine/Effects/RippleEffectUnit.cs",
+      "sha256": "9aca02085a5ab0949c919ea74cc129d29683db11027d6960fc048c44a3dc0a8f",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/SharpenEffectUnit.cs",
+      "target": "src/NeeView.Engine/Effects/SharpenEffectUnit.cs",
+      "sha256": "69db67593f484ecb1e425813198958e4f0562b889a5c23a8ef82e07d673d4c74",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/PixelateEffectUnit.cs",
+      "target": "src/NeeView.Engine/Effects/PixelateEffectUnit.cs",
+      "sha256": "992d9a835ba648daa6fc31e6438731c90a992c0550facd2bdbde6ba061646743",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/EffectUnit.cs",
+      "target": "src/NeeView.Engine/Effects/EffectUnit.cs",
+      "sha256": "d98c66a1f5e2f43fe5e922f021e0cbfed9736bcb7020a0c09156b5bf32400369",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/HsvEffectUnit.cs",
+      "target": "src/NeeView.Engine/Effects/HsvEffectUnit.cs",
+      "sha256": "c3c3e07df55c4bdc3b43d3a6ac806242793af4556c54b4585c5b9e80d74a2bd3",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/BloomEffectUnit.cs",
+      "target": "src/NeeView.Engine/Effects/BloomEffectUnit.cs",
+      "sha256": "0cdcafd212b3bb8af387707a5a591c1bc04de37303c9209ccd1ed8dec2c4d2f2",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/ColorizeEffectUnit.cs",
+      "target": "src/NeeView.Engine/Effects/ColorizeEffectUnit.cs",
+      "sha256": "562bc1568de2c64168f77e027ced2851155afca099f5fab7f4d11cd9e3226e28",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/MonochromeEffectUnit.cs",
+      "target": "src/NeeView.Engine/Effects/MonochromeEffectUnit.cs",
+      "sha256": "8d2f70cbe64ff31edff9cabb5242809c139bb1a9ada5d7e314c71697b0844ac7",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/MagnifyEffecttUnit.cs",
+      "target": "src/NeeView.Engine/Effects/MagnifyEffectUnit.cs",
+      "sha256": "3e7d3c7ae1a7d9296272a0fa9f1522b99937c2ebc32cdb46ce98f81a57ae2a51",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/LevelEffectUnit.cs",
+      "target": "src/NeeView.Engine/Effects/LevelEffectUnit.cs",
+      "sha256": "9baa631f3c9f0dccbc55048a0a7b4a10d88ebe292b935c5800f69fb9273602a7",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/ColorSelectEffectUnit.cs",
+      "target": "src/NeeView.Engine/Effects/ColorSelectEffectUnit.cs",
+      "sha256": "b2bd45a763e5c4502c0aa0b82045b745cac738cd7d365697da2cfe9008b99ec7",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/BlurEffectUnit.cs",
+      "target": "src/NeeView.Engine/Effects/BlurEffectUnit.cs",
+      "sha256": "97fb8fdd702d293218e9e0dbdface87ccd4cf90ff07bfa77ddc376e3f77835a0",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/EmbossedEffectUnit.cs",
+      "target": "src/NeeView.Engine/Effects/EmbossedEffectUnit.cs",
+      "sha256": "cbaffdc0ef5697d74086f8875acd10ada6ade696c59110fa0aed1cd1fe88699b",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/ColorToneEffectUnit.cs",
+      "target": "src/NeeView.Engine/Effects/ColorToneEffectUnit.cs",
+      "sha256": "331e7fc6ce0b4ae72ab7b9d296d7e9267990b6fb15be81cf8f025b97765c64ab",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/SwirlEffectUnit.cs",
+      "target": "src/NeeView.Engine/Effects/SwirlEffectUnit.cs",
+      "sha256": "0e66dbd875e16b4f03bcab077d6d2cd9e3d11108e6a3b17d1c10529492c25caa",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/EffectType.cs",
+      "target": "src/NeeView.Engine/Effects/EffectType.cs",
+      "sha256": "8b0f0bd1d58e3fc36fd0dd726ef1e5c4519e37035016b0d87fe61a9d4968651d",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/EffectSampleType.cs",
+      "target": "src/NeeView.Engine/Effects/EffectType.cs",
+      "sha256": "661bccacb446deacb13d4a2d26a355dbc1232c40efb01baf0cf21983ab076ef6",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/ColorizeControlPoint.cs",
+      "target": "src/NeeView.Engine/Effects/ColorizeControlPoint.cs",
+      "sha256": "a5c3016db07300b2a2eefde923ebc99431a36e2882ce76f4f37a4917be8e9b60",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/Config/ImageCustomSizeConfig.cs",
+      "target": "src/NeeView.Engine/Config/ImageCustomSizeConfig.cs",
+      "sha256": "fa8138c4a13d100ffcbb142206d453ea879804f39bddd2c48c97e744025dfcfe",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/Config/ImageTrimConfig.cs",
+      "target": "src/NeeView.Engine/Config/ImageTrimConfig.cs",
+      "sha256": "e28149c02c86eac2def7b1874613754ba10e4bc60a44c63b8024d4176f6472bb",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/Config/ImageGridConfig.cs",
+      "target": "src/NeeView.Engine/Config/ImageGridConfig.cs",
+      "sha256": "15c7c33b3dd36c3faf4413b2de7a45f53a2445d760044b2220590762ea5c94dc",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/Config/ImageEffectConfig.cs",
+      "target": "src/NeeView.Engine/Config/ImageEffectConfig.cs",
+      "sha256": "e52f651ebc921fffc11bee09303dc766c0125025d8fb6d13f90eaa8b2c8b9aa1",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/Config/EffectUnitCache.cs",
+      "target": "src/NeeView.Engine/Config/EffectUnitCache.cs",
+      "sha256": "d5d1ad9c436d9f084552e29956c8c29cb5039833850ba6e6150c2743b0ce62a8",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/Config/EffectProfile.cs",
+      "target": "src/NeeView.Engine/Config/EffectProfile.cs",
+      "sha256": "dfee1593321ed4d7f44ef246dd892eaaa1f324f28afd6673f5085243d5c96545",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/Config/EffectProfileCollection.cs",
+      "target": "src/NeeView.Engine/Config/EffectProfileCollection.cs",
+      "sha256": "fad268d6ecfe826d9341ef52d9b5480a706adf07f9bdbe58dfe5b646c32466a0",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/Config/EffectProfileCollectionConfig.cs",
+      "target": "src/NeeView.Engine/Config/EffectProfileCollection.cs",
+      "sha256": "1b61753aa1592bd610818dc45c2a74d72b1f53727a3f6a63ed9714ef0531dc3d",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/PageFrames/PageCustomSize.cs",
+      "target": "src/NeeView.Engine/PageFrames/PageCustomSize.cs",
+      "sha256": "b84b94c5eba3dcab00e9417ec479bb289509f3a6823fa867790b5bcf973a7ce7",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/SetEffectProfileCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/SetEffectProfileCommandParameter.cs",
+      "sha256": "047eab5086833adda00bd74f6fdeae0fe41411d10882597d31c276337abb317c",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
     }
   ],
   "partial_adapters": [
@@ -2497,7 +2665,7 @@
       "source": "NeeView/Config/ImageStandardConfig.cs",
       "target": "src/NeeView.Engine/Config/ImageConfig.cs",
       "sha256": "35874532519b1e933c451ae7d92a0cb160f8daeb66001b08fb0612f55132a325",
-      "status": "P5图像动画子集：保留原位置/播放/循环/配置，资源和时钟替换；范围见p5-animated-images.md"
+      "status": "P5第十七/二十八批：原动画开关及IsAspectRatioEnabled迁入；其余字段仍按唯一JSON保留。"
     },
     {
       "source": "NeeView/Config/MediaArchiveConfig.cs",
@@ -2888,6 +3056,36 @@
       "target": "src/NeeView.Engine/BookOperation/BookOperation.Export.cs",
       "sha256": "38783734d2979464dde60f92658e6d46e366d5709ffc9c7ff16ef328de3246f8",
       "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/EffectLayer.cs",
+      "target": "src/NeeView.Engine/Config/ImageEffectConfig.cs",
+      "sha256": "3eac990974c876f14b7d09194eca6865d07488afaa9aa05d4817522dcc320815",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/EffectLayerCollection.cs",
+      "target": "src/NeeView.Engine/Config/ImageEffectConfig.cs",
+      "sha256": "e1d121512be3d7b3d32bdf7fd87e38d4c5013315786ac73f3483a69e1f57d68d",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/PageFrames/PageViewSizeCalculator.cs",
+      "target": "src/NeeView.Engine/PageFrames/PageFrameContext.cs",
+      "sha256": "a1e024e5fa14856039906dad6e94344395fe230099556e60c80d4f986c723fce",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/Bitmap/BitmapInfo.cs",
+      "target": "src/NeeView.Backends/Imaging/MagickImageDecoder.cs",
+      "sha256": "565edbdf0065f2f269c2da492de8dcc5f6477bcabe4370896edcc33378c4d87b",
+      "status": "P5第二十八批：原GetAspectSize的96DIP/DPI/方向规则迁入Probe，WebP缺省72DPI；WIC替换Magick，格式元数据Windows动态待验。"
+    },
+    {
+      "source": "NeeView/SidePanels/ImageEffect/ImageEffectViewModel.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ImageEffectPanelViewModel.cs",
+      "sha256": "2374f51602a6ef88f6d0fd41edf3ec2edeb6c57cc0dff7ae34f9eabc33521681",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
     }
   ],
   "rule_references": [
@@ -3240,6 +3438,48 @@
       "target": "src/NeeView.MacOS/Views/MainWindow.Export.cs",
       "sha256": "1c1f0a0bf157cc758cfe047883390007c8356c790982710ec63d9669dea3f962",
       "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/Shaders/LevelEffect.fx",
+      "target": "src/NeeView.MacOS/Views/ImageEffectRenderer.cs",
+      "sha256": "307a4532fb75a4cec02881ec09b029f1df886deddc4b0584dc1b854bfdb0d4a9",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/Shaders/HsvEffect.fx",
+      "target": "src/NeeView.MacOS/Views/ImageEffectRenderer.cs",
+      "sha256": "26673492f5c1beb7f94dfa98cd87a8209a8b23995334ee4e7b82211926fe2594",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/Shaders/ColorSelectEffect.fx",
+      "target": "src/NeeView.MacOS/Views/ImageEffectRenderer.cs",
+      "sha256": "5fbc2c5f47daff0ee20f60d061c278895a927f60e7723621ac14de26730d969d",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/Shaders/Colorize.fx",
+      "target": "src/NeeView.MacOS/Views/ImageEffectRenderer.cs",
+      "sha256": "e710a1eadf116a002fbe0f9f586b1277e3daafd02b7d40b808e596b0b2d715d9",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/ColorizeEffectTools.cs",
+      "target": "src/NeeView.MacOS/Views/ImageEffectRenderer.cs",
+      "sha256": "7cd18097d8e1b14676a06a645d6f7a3bc63e7e6c20b98709062ac4db92f725bd",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/ContentCanvas/GridLine.cs",
+      "target": "src/NeeView.MacOS/Views/ImageGridRenderer.cs",
+      "sha256": "8b232df8a96faf0c13ece12d4b03d92942e0afeb22c78b4f1370f59e46c4602c",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/SidePanels/ImageEffect/ImageEffectView.xaml",
+      "target": "src/NeeView.MacOS/Views/ImageEffectView.axaml",
+      "sha256": "854fe4f62d9cc55e8eee4385681555105d6f149690d2d1aa730217cc06548916",
+      "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
     }
   ],
   "backend_reuse": [

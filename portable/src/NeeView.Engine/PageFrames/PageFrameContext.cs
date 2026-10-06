@@ -30,6 +30,9 @@ public sealed class PageFrameContext(BookSettingConfig setting, Config config, S
     public double DividePageRate => Math.Clamp(config.Book.DividePageRate, .01, 1);
     public Size CanvasSize { get; set; } = new(1000, 800);
     public Size ReferenceSize => CanvasSize;
+    public ImageCustomSizeConfig ImageCustomSizeConfig => config.ImageCustomSize;
+    public ImageTrimConfig ImageTrimConfig => config.ImageTrim;
+    public bool IsAspectRatioEnabled => config.Image.Standard.IsAspectRatioEnabled;
     public double DeviceScale { get; set; } = 1;
     public AutoRotateType AutoRotate => setting.AutoRotate;
     public AutoRotatePolicy AutoRotatePolicy => AutoRotatePolicy.FitToViewArea;
@@ -48,26 +51,47 @@ public sealed class BookContext(IReadOnlyList<Page> pages) : BookPageAccessor(pa
     public bool IsMedia => false;
 }
 
-/// <summary>原 PageSizeCalculator 的 P1 入口；高级固定尺寸和裁剪尚未启用。</summary>
+/// <summary>原 PageSizeCalculator 顺序：自定义尺寸、裁剪；分割由下一层处理。</summary>
 public sealed class PageSizeCalculator(PageFrameContext context, PageDataSource source)
 {
-    /// <summary>返回方向校正后的图片尺寸。</summary>
-    public Size GetPageSize() { _ = context; return source.Size; }
+    public Size GetPageSize()
+    {
+        var original = context.IsAspectRatioEnabled ? source.AspectSize : source.Size;
+        var size = new PageCustomSize(context.ImageCustomSizeConfig, () => context.CanvasSize).TransformToCustomSize(original);
+        var trim = context.ImageTrimConfig;
+        // 保留原运算顺序；逐次相减会在整像素边界留下浮点尾差，使导出额外增加一行。
+        return trim.IsEnabled ? new(Math.Max(size.Width - size.Width * (trim.Left + trim.Right), 0),
+            Math.Max(size.Height - size.Height * (trim.Top + trim.Bottom), 0)) : size;
+    }
 }
-
-/// <summary>保留原 PageViewSizeCalculator 的分割尺寸与左右区域算法。</summary>
+/// <summary>原 PageViewSizeCalculator；裁剪后再按阅读方向分割，无 WPF 微小像素偏移。</summary>
 public sealed class PageViewSizeCalculator(PageFrameContext context, PageDataSource source, PageRange range, int direction)
 {
-    /// <summary>按原分割比例计算当前部分的逻辑尺寸。</summary>
-    public Size GetViewSize() => new(source.Size.Width * (range.PartSize == 1 ? context.DividePageRate : 1), source.Size.Height);
-    /// <summary>返回归一化裁剪区域，左右阅读方向决定分割先后。</summary>
+    public Size GetViewSize()
+    {
+        var size = new PageSizeCalculator(context, source).GetPageSize();
+        return new(size.Width * (range.PartSize == 0 ? 0 : range.PartSize == 1 ? context.DividePageRate : 1), size.Height);
+    }
+    public Size GetSourceSize(Size viewSize)
+    {
+        double width = viewSize.Width / (range.PartSize == 1 ? context.DividePageRate : 1), height = viewSize.Height;
+        var trim = context.ImageTrimConfig;
+        if (trim.IsEnabled)
+        {
+            var widthRate = Math.Max(1 - (trim.Left + trim.Right), 0); var heightRate = Math.Max(1 - (trim.Top + trim.Bottom), 0);
+            if (widthRate > 0 && heightRate > 0) return new(width / widthRate, height / heightRate);
+        }
+        return new(width, height);
+    }
     public Rect GetViewBox()
     {
-        if (range.PartSize != 1) return new(0, 0, 1, 1);
-        bool isLeftPart = range.Min.Part == 0;
-        if (direction == -1) isLeftPart = !isLeftPart;
-        double half = context.DividePageRate;
-        return new(isLeftPart ? 0 : 1 - half, 0, half, 1);
+        var trim = context.ImageTrimConfig;
+        var rect = trim.IsEnabled ? new Rect(trim.Left, trim.Top, Math.Max(1 - (trim.Left + trim.Right), 0), Math.Max(1 - (trim.Top + trim.Bottom), 0)) : new(0, 0, 1, 1);
+        if (range.PartSize == 0) return new(rect.X, rect.Y, 0, rect.Height);
+        if (range.PartSize != 1) return rect;
+        bool left = (range.Min.Part == 0) != (direction == -1);
+        double width = rect.Width * context.DividePageRate;
+        return new(left ? rect.X : rect.X + rect.Width - width, rect.Y, width, rect.Height);
     }
 }
 

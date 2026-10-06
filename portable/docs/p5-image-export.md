@@ -30,7 +30,7 @@ Engine 沿唯一 BookOperation/Archive/PageFrame 管理来源、原命名、覆�
 
 原单图流式 OriginalImageExporter 只打开条目而未写目标流，本批实际 CopyToAsync。原整书 Original 吞条目异常可能产生成功但缺页的包，本批传播失败并保留旧 ZIP。这两项属于明确修正，不作为原版无差异声明。
 
-旧 ExportImageAs 参数继续通过既有版本升级迁到 Config.Book；当前 JSON 差分、未知字段、直接命令 JPEG 默认及输出目录路径映射保持。原效果层执行/编辑仍待迁入，View 只包含当前 Mac 实际绘制能力；连续/瀑布需先返回分页或原帧全景。目录、普通 ZIP、PDF 等沿已有来源读取；本批不新增内容来源或解码后端。
+旧 ExportImageAs 参数继续通过既有版本升级迁到 Config.Book；当前 JSON 差分、未知字段、直接命令 JPEG 默认及输出目录路径映射保持。四类效果层执行/编辑由第二十八批接入，View使用同一像素路径；未迁层、坏参数及效果工作预算失败明确拒绝输出；连续/瀑布需先返回分页或原帧全景。目录、普通 ZIP、PDF 等沿已有来源读取；本批不新增内容来源或解码后端。
 
 ## 错误、测试与扩展
 

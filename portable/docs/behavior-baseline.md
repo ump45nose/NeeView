@@ -156,3 +156,7 @@ P5第十八批：SlideShow/SlideShowInput/SlideShowConfig、PageFrameContext、P
 P5第二十一批：原随机跳页/来源资格排序、地址栏/滑条菜单与快捷键语义、窗口状态与独立设置目录进入唯一命令链。正文与Chrome通知分离；关闭取消/等待系统目录动作。见[契约](p5-original-commands.md)。
 
 P5第二十二批：原六种画布背景、五自定义刷、透明页底色/HSV棋盘及双轴nearest进入唯一Config/BitmapFactory；背景变化仅重绘。源首像素RGB与预乘显示分离，显示租约/UI发布和独立草稿沿原边界，见[契约](p5-background.md)。
+
+## P5第二十八批：原图像效果/几何/预设
+
+原参数短$type/默认差分、Level raw端点、外到内层集合的逆执行、10层及默认预设保护、六分支/缓存及字段保留进入唯一JSON。原自定义尺寸九比例、裁剪对边联动及DPI→custom→trim→split顺序保持；UI尺寸为16–4096，不截断旧合法导入数值。原图像网格按整个页框，导出不包含网格。四类自有shader已在真实Skia及唯一View导出执行；十类WPF/第三方参数保留，未称全部执行。资源及原版动态边界见[p5-image-effects.md](p5-image-effects.md)。

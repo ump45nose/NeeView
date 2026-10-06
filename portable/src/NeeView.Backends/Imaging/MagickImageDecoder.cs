@@ -32,7 +32,15 @@ public sealed class MagickImageDecoder(IAnimatedImageDecoder? pngAnimation = nul
         using var image = new MagickImage(); image.Ping(stream);
         token.ThrowIfCancellationRequested();
         var swapped = image.Orientation is OrientationType.LeftTop or OrientationType.RightTop or OrientationType.RightBottom or OrientationType.LeftBottom;
-        return new ImageInfo(new((int)(swapped ? image.Height : image.Width), (int)(swapped ? image.Width : image.Height)), image.Format.ToString());
+        var size = new Size(swapped ? image.Height : image.Width, swapped ? image.Width : image.Height);
+        // WIC 的 96DIP/DPI 规则；WebP 原专用探测器的缺省72DPI保留。
+        var density = image.Density;
+        double multiplier = density.Units == DensityUnit.PixelsPerCentimeter ? 2.54 : 1;
+        double fallback = image.Format == MagickFormat.WebP ? 72 : 96;
+        double Dpi(double value) => density.Units == DensityUnit.Undefined || !double.IsFinite(value) || value <= 0 ? fallback : value * multiplier;
+        double x = Dpi(density.X), y = Dpi(density.Y);
+        if (swapped) (x, y) = (y, x);
+        return new ImageInfo(size, image.Format.ToString()) { AspectSize = new(size.Width * 96 / x, size.Height * 96 / y) };
     }, token);
     /// <summary>输入解码规格，返回 BGRA 8 位预乘像素；原生完成后再次检查取消。</summary>
     public Task<DecodedImageLease> DecodeAsync(Stream stream, DecodeRequest request, CancellationToken token) => stream is PdfPageStream pdf

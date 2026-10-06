@@ -22,8 +22,8 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
         public BitmapLease Lease { get; } = lease;
         public int Width { get; } = width;
         public int Height { get; } = height;
-        public Display Retain() { ++_references; return this; }
-        public void Dispose() { if (--_references != 0) return; Bitmap.Dispose(); Lease.Dispose(); }
+        public Display Retain() { Interlocked.Increment(ref _references); return this; }
+        public void Dispose() { if (Interlocked.Decrement(ref _references) != 0) return; Bitmap.Dispose(); Lease.Dispose(); }
     }
     private sealed record Demand(CancellationTokenSource Cancellation, bool Background);
     private readonly Dictionary<Page, Display> _images = [];
@@ -49,6 +49,11 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     private (Page Page, double X, double Y, Point Pointer)? _zoomAnchor;
     public long LayoutPublications { get; private set; }
     public bool IsLayoutPending => _layoutPending || _relayout.IsEnabled;
+    private (bool, NeeView.Size, CustomSizeAspectRatio, double, bool, bool, double, double, double, double, bool)? _geometryKey;
+    private double _height;
+    private static (bool, NeeView.Size, CustomSizeAspectRatio, double, bool, bool, double, double, double, double, bool) GeometryKey()
+    { var c = Config.Current.ImageCustomSize; var t = Config.Current.ImageTrim; return (c.IsEnabled,c.Size,c.AspectRatio,c.ApplicabilityRate,c.IsAlignLongSide,t.IsEnabled,t.Left,t.Right,t.Top,t.Bottom,Config.Current.Image.Standard.IsAspectRatioEnabled); }
+    private NeeView.Size EffectiveSize(Page page) => page.IsImage && operation.Context is { } context ? new NeeView.PageFrames.PageSizeCalculator(context,page.Content.PageDataSource).GetPageSize() : page.Content.PageDataSource.Size;
     private double _width, _columnWidth, _scale, _offset, _offsetX;
     private BrowseLayoutMode _mode;
     private bool _rightToLeft, _disposed, _initialized;
@@ -95,7 +100,7 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
         }
         bool newBook = !ReferenceEquals(book, _book);
         var anchor = newBook ? (Page: book?.CurrentPage, Fraction: 0d) : CaptureAnchor();
-        bool rebuild = newBook || _order != book?.PageOrderVersion || _mode != operation.BrowseMode
+        bool rebuild = _geometryKey != GeometryKey() || (_height != owner.Bounds.Height && Config.Current.ImageCustomSize.AspectRatio is CustomSizeAspectRatio.View or CustomSizeAspectRatio.HalfView) || newBook || _order != book?.PageOrderVersion || _mode != operation.BrowseMode
             || _width != owner.Bounds.Width || _columnWidth != Config.Current.Book.MacGalleryColumnWidth
             || _scale != Config.Current.Book.MacContinuousScale
             || _rightToLeft != (book?.Setting.BookReadOrder == PageReadOrder.RightToLeft);
@@ -135,13 +140,14 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     /// <param name="anchor">旧几何失效时保存的原Page及页内相对位置。</param>
     /// <param name="full">书籍/顺序/几何设置变化必须全算，尺寸补齐复用旧检查点。</param>
     /// <returns>计算及UI发布完成；过期结果不发布，计算异常保留可用旧布局。</returns>
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "正式Mac项目LinkMode=None；后台布局仅克隆固定原ImageCustomSize/ImageTrim配置，不启用AOT裁剪。")]
     private Task ScheduleLayoutAsync((Page? Page, double Fraction) anchor, bool full)
     {
         if (_disposed || !Active) return Task.CompletedTask;
         _layoutCancellation?.Cancel();
         var cancellation = new CancellationTokenSource(); _layoutCancellation = cancellation;
         var generation = ++_layoutGeneration; _layoutPending = true;
-        _width = owner.Bounds.Width; _columnWidth = Config.Current.Book.MacGalleryColumnWidth;
+        _width = owner.Bounds.Width; _height = owner.Bounds.Height; _geometryKey = GeometryKey(); _columnWidth = Config.Current.Book.MacGalleryColumnWidth;
         _scale = Config.Current.Book.MacContinuousScale;
         _rightToLeft = _book?.Setting.BookReadOrder == PageReadOrder.RightToLeft;
         var pages = _pages; var book = _book; var order = _order;
@@ -151,6 +157,12 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
         // 尺寸补齐可能赶上窗口/列宽全算；不能用旧几何检查点替换新几何请求。
         var basis = full || _layoutShape != shape ? null : Layout;
         var changes = new Dictionary<int, NeeView.Size>(_dirtySizes);
+        // 仅调度时捕获几何副本；后台计算不能跟随用户继续编辑的运行参数。
+        var geometry = new Config { ImageCustomSize = System.Text.Json.JsonSerializer.Deserialize<ImageCustomSizeConfig>(System.Text.Json.JsonSerializer.Serialize(Config.Current.ImageCustomSize))!, ImageTrim = System.Text.Json.JsonSerializer.Deserialize<ImageTrimConfig>(System.Text.Json.JsonSerializer.Serialize(Config.Current.ImageTrim))! };
+        var geometryContext = new NeeView.PageFrames.PageFrameContext(new(),geometry) { CanvasSize = new(_width,_height) };
+        geometry.Image.Standard.IsAspectRatioEnabled = Config.Current.Image.Standard.IsAspectRatioEnabled;
+        NeeView.Size Adjust(int index, NeeView.Size source) => pages[index].IsImage ? new NeeView.PageFrames.PageSizeCalculator(geometryContext,
+            new PageDataSource(source) { AspectSize = pages[index].Content.PageDataSource.AspectSize }).GetPageSize() : source;
         _layoutWork = CalculateAsync(); return _layoutWork;
 
         async Task CalculateAsync()
@@ -163,12 +175,12 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
                 {
                     var clock = Stopwatch.StartNew();
                     BrowseLayout next;
-                    if (basis is not null) next = basis.WithSizes(changes, token);
+                    if (basis is not null) next = basis.WithSizes(changes.ToDictionary(x => x.Key, x => Adjust(x.Key,x.Value)), token);
                     else
                     {
                         // PageDataSource为不可变记录；后台读取引用，不访问控件或扫描来源。
                         var sizes = new NeeView.Size[pages.Length];
-                        for (int i = 0; i < sizes.Length; i++) { if ((i & 255) == 0) token.ThrowIfCancellationRequested(); sizes[i] = pages[i].Content.PageDataSource.Size; }
+                        for (int i = 0; i < sizes.Length; i++) { if ((i & 255) == 0) token.ThrowIfCancellationRequested(); sizes[i] = Adjust(i,pages[i].Content.PageDataSource.Size); }
                         next = new(sizes, width, mode, columnWidth, rtl, scale, token);
                     }
                     return (Layout: next, Milliseconds: clock.Elapsed.TotalMilliseconds);
@@ -261,7 +273,7 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     /// <param name="page">可见原页面，尺寸变化进入80ms合并窗口。</param>
     private void TrackSize(int index, Page page)
     {
-        if (Layout is null || Layout.GetPageSize(index) == page.Content.PageDataSource.Size) return;
+        if (Layout is null || Layout.GetPageSize(index) == EffectiveSize(page)) return;
         _dirtySizes[index] = page.Content.PageDataSource.Size;
         if (!_relayout.IsEnabled) _relayout.Start();
     }
@@ -274,9 +286,10 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
         var size = _pages[index].Content.PageDataSource.Size;
         if (Config.Current.ImageDotKeep.IsImageDotKeep(new(rect.Width * scale, rect.Height * scale), size))
             return new((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height), _mode == BrowseLayoutMode.Masonry);
-        int width = Math.Clamp((int)Math.Ceiling(Math.Min(size.Width, rect.Width * scale) / 64) * 64, 64, 2048);
-        int height = Math.Clamp((int)Math.Ceiling(Math.Min(size.Height, width / Math.Max(1, size.Width) * size.Height) / 64) * 64, 64, _mode == BrowseLayoutMode.Masonry ? 2048 : 32768);
-        return new(width, height, _mode == BrowseLayoutMode.Masonry);
+        var trim = Config.Current.ImageTrim;
+        var display = new NeeView.Size(rect.Width * scale / (trim.IsEnabled ? 1-trim.Left-trim.Right : 1),
+            rect.Height * scale / (trim.IsEnabled ? 1-trim.Top-trim.Bottom : 1));
+        return ReaderImageRenderer.CreateRequest(size, display, 64, _mode == BrowseLayoutMode.Masonry ? 2048 : 32768, _mode == BrowseLayoutMode.Masonry);
     }
     /// <summary>探测、共享解码及显示缓冲依次接入；过期结果只释放资源，不更新新书。</summary>
     /// <param name="book">申请需求时的原书籍，切书后不再提交。</param>
@@ -329,7 +342,13 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
             var item = Layout.Items[index]; var page = _pages[index];
             var target = new Avalonia.Rect(item.X - _offsetX, item.Y - _offset, item.Width, item.Height);
             if (page.PageType.IsFolder()) ArchivePageRenderer.Draw(owner, context, page, target, _images.GetValueOrDefault(page)?.Bitmap, _errors.GetValueOrDefault(page) ?? (_pending.ContainsKey(page) ? "正在加载…" : ""));
-            else if (_images.TryGetValue(page, out var image)) ReaderImageRenderer.Draw(owner, context, image.Bitmap, new Avalonia.Rect(image.Bitmap.PixelSize.ToSize(1)), target, Matrix.Identity);
+            else if (_images.TryGetValue(page, out var image))
+            {
+                var trim = Config.Current.ImageTrim; var size = image.Bitmap.PixelSize;
+                var source = trim.IsEnabled ? new Avalonia.Rect(size.Width*trim.Left,size.Height*trim.Top,size.Width*(1-trim.Left-trim.Right),size.Height*(1-trim.Top-trim.Bottom)) : new Avalonia.Rect(size.ToSize(1));
+                ReaderImageRenderer.Draw(owner,context,image.Bitmap,source,target,Matrix.Identity,retain:image.Retain);
+                ImageGridRenderer.Draw(context,target,ImageGridTarget.Image);
+            }
             else { context.FillRectangle(Brush("Gallery.Placeholder", Brushes.DimGray), target); Text(context, _errors.ContainsKey(page) ? "读取失败" : "正在加载…", target.TopLeft + new Avalonia.Vector(8, 8)); }
             if (ReferenceEquals(page, _selection)) context.DrawRectangle(new Pen(Brush("Gallery.Selection", Brushes.DodgerBlue), 3), target.Deflate(1.5));
         }

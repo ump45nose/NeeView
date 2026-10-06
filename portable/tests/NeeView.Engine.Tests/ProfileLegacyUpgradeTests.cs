@@ -283,7 +283,7 @@ public sealed class ProfileLegacyUpgradeTests
         var preview = await Preview(text); var candidate = preview.GetDocument("UserSetting.json")!;
         Assert.Equal("Ctrl+F", preview.Commands.Single(c => c.Name == "ToggleVisibleFilmStrip").Shortcut);
         Assert.DoesNotContain(preview.Commands, c => c.Name == "ToggleVisibleThumbnailList");
-        Assert.Contains(preview.Notices, n => n.Contains("已按原规则转换") && n.Contains("实际执行尚未接入"));
+        Assert.Contains(preview.Notices, n => n.Contains("已按原规则转换") && n.Contains("Level/Hsv/ColorSelect/Colorize 已接入"));
         Assert.Equal("/Exports", candidate["Config"]!["Book"]!["ExportImageParameter"]!["ExportFolder"]!.GetValue<string>());
         var root = Path.Combine(Path.GetTempPath(), "NeeView-P5-Legacy-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
         try

@@ -98,6 +98,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public bool ShowInformation => IsPanelVisible("FileInformationPanel");
     public bool ShowBookmarks => IsPanelVisible("BookmarkPanel");
     public bool ShowNavigator => IsPanelVisible("NavigatePanel");
+    public bool ShowImageEffects => IsPanelVisible("ImageEffectPanel");
     public bool ShowPlaylist => IsPanelVisible("PlaylistPanel");
     /// <summary>跨栏后按实际组选择与栏显隐计算面板状态。</summary>
     public bool IsPanelVisible(string name) => Layout.Windows.Contains(name) || Layout.Find(name) is { } found && ReferenceEquals(Layout.Docks[found.Side].SelectedItem, found.Group) && (found.Side == "Left" ? LeftVisible : RightVisible);
@@ -251,7 +252,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     /// <summary>只通知侧栏绑定，不发布阅读刷新或重新申请图像。</summary>
     public void RefreshPanels()
     {
-        foreach (var name in new[] { nameof(LeftVisible), nameof(RightVisible), nameof(LeftAutoHide), nameof(RightAutoHide), nameof(ShowPageList), nameof(ShowFolderList), nameof(ShowHistory), nameof(ShowBookmarks), nameof(ShowInformation), nameof(ShowNavigator), nameof(ShowPlaylist), nameof(FilmStripVisible) }) OnPropertyChanged(name);
+        foreach (var name in new[] { nameof(LeftVisible), nameof(RightVisible), nameof(LeftAutoHide), nameof(RightAutoHide), nameof(ShowPageList), nameof(ShowFolderList), nameof(ShowHistory), nameof(ShowBookmarks), nameof(ShowInformation), nameof(ShowNavigator), nameof(ShowImageEffects), nameof(ShowPlaylist), nameof(FilmStripVisible) }) OnPropertyChanged(name);
         PanelsRefreshed?.Invoke(this, EventArgs.Empty);
     }
     /// <summary>旧 Mac 临时显示入口；最终状态由独立显示适配发布，不保存在配置中。</summary>

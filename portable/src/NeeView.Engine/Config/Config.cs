@@ -20,6 +20,13 @@ public sealed class Config
     public ArchiveConfig Archive { get; set; } = new();
     public BackgroundConfig Background { get; set; } = new();
     public ImageDotKeepConfig ImageDotKeep { get; set; } = new();
+    public ImageCustomSizeConfig ImageCustomSize { get; set; } = new();
+    public ImageTrimConfig ImageTrim { get; set; } = new();
+    public System.Text.Json.Nodes.JsonObject ImageResizeFilter { get; set; } = new();
+    public ImageGridConfig ImageGrid { get; set; } = new();
+    public ImageEffectConfig ImageEffect { get; set; } = new();
+    public EffectUnitCache ImageEffectCache { get; set; } = new();
+    public EffectProfileCollectionConfig EffectProfiles { get; set; } = new();
     public ImageConfig Image { get; set; } = new();
     public SlideShowConfig SlideShow { get; set; } = new();
     public PerformanceConfig Performance { get; set; } = new();

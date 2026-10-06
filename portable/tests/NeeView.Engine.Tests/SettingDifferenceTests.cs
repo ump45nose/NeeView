@@ -46,6 +46,22 @@ public sealed class SettingDifferenceTests
         await fixture.Load(); Assert.True(JsonNode.DeepEquals(expected, JsonSerializer.SerializeToNode(Config.Current)));
     }
 
+    [Fact]
+    public async Task DefaultEffectCollectionsWithFutureFieldsAreRetainedAcrossRepeatedSaves()
+    {
+        using var fixture = new Fixture(); fixture.Put("""{"Config":{"ImageEffect":{"Layers":[{"FutureLayer":7}]},"EffectProfiles":{"Profiles":[{"Id":0,"FutureProfile":8}],"FutureCollection":9},"ImageResizeFilter":{"FutureFilter":{"Value":10}},"ImageEffectCache":[{"$type":"FutureEffect","Value":11}]}}""");
+        var state = await fixture.Load();
+        for (var i = 0; i < 2; i++)
+        {
+            await state.SaveAsync(null, Token); state = await fixture.Load(); var raw = fixture.Get()["Config"]!;
+            Assert.Equal(7, raw["ImageEffect"]!["Layers"]![0]!["FutureLayer"]!.GetValue<int>());
+            Assert.Equal(8, raw["EffectProfiles"]!["Profiles"]![0]!["FutureProfile"]!.GetValue<int>());
+            Assert.Equal(9, raw["EffectProfiles"]!["FutureCollection"]!.GetValue<int>());
+            Assert.Equal(10, raw["ImageResizeFilter"]!["FutureFilter"]!["Value"]!.GetValue<int>());
+            Assert.Equal(11, raw["ImageEffectCache"]![0]!["Value"]!.GetValue<int>());
+        }
+    }
+
     [Theory]
     [InlineData("Book", "IsPanorama", true)]
     [InlineData("BookSetting", "IsSupportedWidePage", false)]
@@ -144,11 +160,15 @@ public sealed class SettingDifferenceTests
     }
 
     [Fact]
-    public async Task UnknownCommandUnmigratedParameterAndFutureDiscriminatorAreUnchanged()
+    public async Task UnknownCommandsFutureDiscriminatorsAndMigratedParameterExtensionsArePreserved()
     {
         using var fixture = new Fixture(); const string input = """{"Config":{"FutureBranch":{"Data":[1,2]},"ImageEffect":{"Future":true}},"Commands":{"FutureCommand":{"Parameter":{"Value":0}},"SetEffectProfile":{"Parameter":{"Future":42}},"ViewScaleUp":{"Parameter":{"$type":"FutureScale","Scale":0.2}}}}""";
         fixture.Put(input); var state = await fixture.Load(); await state.SaveAsync(null, Token);
-        Assert.True(JsonNode.DeepEquals(JsonNode.Parse(input)!["Commands"], fixture.Get()["Commands"]));
+        var expected = JsonNode.Parse(input)!["Commands"]!; var saved = fixture.Get()["Commands"]!;
+        foreach (var name in new[] { "FutureCommand", "ViewScaleUp" }) Assert.True(JsonNode.DeepEquals(expected[name], saved[name]));
+        Assert.Equal("SetEffectProfile", saved["SetEffectProfile"]!["Parameter"]!["$type"]!.GetValue<string>());
+        Assert.Equal(42, saved["SetEffectProfile"]!["Parameter"]!["Future"]!.GetValue<int>());
+        Assert.Null(saved["SetEffectProfile"]!["Parameter"]!["Id"]);
         Assert.True(fixture.Get()["Config"]!["ImageEffect"]!["Future"]!.GetValue<bool>());
     }
 

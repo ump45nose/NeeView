@@ -22,7 +22,7 @@ public sealed partial class SaveData
             foreach (var key in target.Select(pair => pair.Key).Where(key => key != property.Name && key.Equals(property.Name, StringComparison.OrdinalIgnoreCase)).ToArray()) target.Remove(key);
             if (property.Value is not null && source[property.Name] is JsonObject child &&
                 property.Type.Assembly == typeof(Config).Assembly && !typeof(IEnumerable).IsAssignableFrom(property.Type) &&
-                property.Type.GetConstructor(Type.EmptyTypes) is not null)
+                property.Type.GetConstructor(Type.EmptyTypes) is not null && property.Type != typeof(System.Text.Json.Nodes.JsonObject))
             {
                 MergeTyped(Object(target, property.Name), property.Value);
                 source.Remove(property.Name);
@@ -96,9 +96,19 @@ public sealed partial class SaveData
             if (value is PanelsConfig && property.Name == "Layout" && property.Value is not null) continue;
             // 原FileTypeCollection等类型由converter写为字符串，不能仅凭CLR class递归为对象。
             var serialized = JsonSerializer.SerializeToNode(property.Value, property.Type, Options);
+            // 原效果集合使用有序值相等，Mac 的可变集合默认 Equals 是引用比较。
+            // 只在这些已迁边界比较完整序列化值，包含扩展字段；未知材料不能被当作默认删掉。
+            if (property.Type == typeof(EffectLayerCollection) || property.Type == typeof(EffectUnitCache) ||
+                property.Type == typeof(System.Collections.ObjectModel.ObservableCollection<EffectProfile>) ||
+                property.Type == typeof(JsonObject))
+            {
+                if (JsonNode.DeepEquals(serialized, JsonSerializer.SerializeToNode(property.Default, property.Type, Options))) raw.Remove(property.Name);
+                else raw[property.Name] = serialized;
+                continue;
+            }
             if (property.Value is not null && serialized is JsonObject objectValue &&
                 property.Type.Assembly == typeof(Config).Assembly && !typeof(IEnumerable).IsAssignableFrom(property.Type) &&
-                property.Type.GetConstructor(Type.EmptyTypes) is not null)
+                property.Type.GetConstructor(Type.EmptyTypes) is not null && property.Type != typeof(System.Text.Json.Nodes.JsonObject))
             {
                 var child = raw[property.Name] as JsonObject ?? objectValue;
                 TrimKnownObject(child, property.Value, property.Default ?? Activator.CreateInstance(property.Type)!);

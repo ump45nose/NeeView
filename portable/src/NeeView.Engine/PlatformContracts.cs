@@ -93,7 +93,11 @@ public interface IImageDecoder
 }
 
 /// <summary>图片尺寸及格式元数据。</summary>
-public sealed record ImageInfo(Size Size, string Format);
+public sealed record ImageInfo(Size Size, string Format)
+{
+    /// <summary>后端探测的 DPI 显示尺寸；无可靠元数据的格式保持像素尺寸。</summary>
+    public Size AspectSize { get; init; } = Size;
+}
 /// <summary>解码目标尺寸，以设备像素计。</summary>
 public sealed record DecodeRequest(int TargetWidth, int TargetHeight, bool IsThumbnail = false);
 /// <summary>单个像素缓冲的所有者；显示端不能保留已释放缓冲。</summary>
