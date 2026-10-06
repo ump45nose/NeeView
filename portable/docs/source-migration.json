@@ -2750,6 +2750,24 @@
       "target": "src/NeeView.MacOS/Views/MainWindow.External.cs",
       "sha256": "ce1347c9dcaafde095ed4f08f35a2da0b89b8c36e575bf79c3b52a520d110972",
       "status": "P5第二十五批：原外部应用字段、页组/整书策略、参数与索引；Mac系统替换、字面参数及资源生命周期适配"
+    },
+    {
+      "source": "NeeView/MainView/ViewCopyImage.cs",
+      "target": "src/NeeView.MacOS/Views/ReaderView.ImageCopy.cs",
+      "sha256": "66cd62f4382103b92d4129021e99387f2f5115fc3919f3e6be37e20642999e97",
+      "status": "保留选中原帧首图像源语义；PNG快照替换BitmapSource，不应用显示变换"
+    },
+    {
+      "source": "NeeView/Command/Commands/CopyImageCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.ImageCopy.cs",
+      "sha256": "e0a824dd8fefd32a2b6c597cc65ab71b63166b9d7729dee36caa16ce64a0c00e",
+      "status": "保留CopyImage命令；可等待宿主/单槽/关闭与切书取消"
+    },
+    {
+      "source": "NeeView/External/ClipboardUtility.cs",
+      "target": "src/NeeView.Backends/MacImageClipboard.cs",
+      "sha256": "55528a9a264389a7730f43ca7cff37b6851f44e302adf1b0417235c88337a654",
+      "status": "位图复制系统替换点：NSPasteboard实际public.png，独立命名剪贴板验收"
     }
   ],
   "rule_references": [

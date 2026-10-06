@@ -44,7 +44,7 @@ public sealed partial class MainWindow : Window
         "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ToggleBookLock", "Unload", "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff",
         "ToggleViewFlipVertical", "ViewFlipVerticalOn", "ViewFlipVerticalOff", "ViewReset", "ViewScaleStretch", "ViewPresetScroll", "ViewScrollNTypeUp", "ViewScrollNTypeDown",
         "ToggleStretchMode", "ToggleStretchModeReverse", "SetStretchModeUniformToFill", "SetStretchModeUniformToSize", "SetStretchModeUniformToVertical", "SetStretchModeUniformToHorizontal", "ToggleStretchAllowScaleUp", "ToggleStretchAllowScaleDown", "ToggleHoverScroll",
-        "OpenExternalApp", "OpenExternalAppAs", "OpenBookExternalAppAs", "OpenVersionWindow", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
+        "CopyImage", "OpenExternalApp", "OpenExternalAppAs", "OpenBookExternalAppAs", "OpenVersionWindow", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
         "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "ToggleVisibleFoldersTree", "ToggleVisibleContentsTree", "FocusMainView", "FocusFolderSearchBox", "FocusPageListSearchBox", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkList", "FocusBookmarkSearchBox", "ClearHistory", "ClearHistoryInPlace", "RemoveUnlinkedHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
@@ -162,6 +162,7 @@ public sealed partial class MainWindow : Window
         model.Operation.MarkersChanged += Model_MarkersChanged;
         model.HistoryRefreshed += History_Refreshed;
         Viewer.Attach(model.Operation, images); model.Refreshed += Model_Refreshed;
+        model.Refreshed += ImageCopy_ReadingChanged; Viewer.DisplayCompleted += ImageCopy_ReadingChanged;
         InitializeSlideShow();
         var mediaControl = this.FindControl<MediaControlView>("DockMediaControlSocket")!;
         mediaControl.Attach(model.Operation, Viewer.RefreshMediaAsync); mediaControl.Failed += (_, message) => ShowError(message);
@@ -189,6 +190,7 @@ public sealed partial class MainWindow : Window
     /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
     public bool IsCommandAvailable(string name) => name switch
     {
+        "CopyImage" => CanCopyImage,
         "SetDefaultPageSetting" => _model?.Operation.IsLoading == false,
         "OpenExternalApp" => _model?.Operation is { } ext && ext.CanOpenExternalApplication(ext.GetExternalApplicationPolicy(name)),
         "OpenExternalAppAs" or "OpenBookExternalAppAs" => _model?.Operation is { } external && external.CanOpenExternalApplication(external.GetExternalApplicationPolicy(name), name == "OpenBookExternalAppAs")
@@ -224,6 +226,9 @@ public sealed partial class MainWindow : Window
     {
         if (_model is null) return;
         var root = MenuTree.CreateDefault();
+        // 原CopyImage仅有命令/键位；Mac在文件复制旁提供可见入口，原菜单节点仍完整保留。
+        var fileMenu = root.Children![0].Children!;
+        fileMenu.Insert(fileMenu.FindIndex(node => node.CommandName == "CopyFile") + 1, new(null, MenuElementType.Command, "CopyImage"));
         root.Children![0].Children!.Insert(1, new("打开目录…", MenuElementType.Command, "OpenFolder"));
         root.Children[0].Children!.Add(new("重新载入", MenuElementType.Command, "ReLoad"));
         root.Children[0].Children!.Add(new("关闭窗口", MenuElementType.Command, "CloseWindow"));
@@ -376,6 +381,7 @@ public sealed partial class MainWindow : Window
         {
             switch (name)
             {
+                case "CopyImage": await CopyImageAsync(); break;
                 case "OpenVersionWindow": await ShowVersionAsync(); break;
                 case "OpenExternalApp": await ExecuteExternalApplicationAsync(name, false); break;
                 case "OpenExternalAppAs": await ExecuteExternalApplicationAsync(name, false); break;
@@ -950,6 +956,7 @@ public sealed partial class MainWindow : Window
         await Task.Yield();
         _preparing = true;
         StopSlideShowForClose();
+        _imageCopyCancellation?.Cancel();
         _externalMenu?.Close(); _model?.Operation.CancelExternalApplicationPreparation();
         _model?.Operation.CancelClipboardPreparation();
         _model?.Operation.CancelFileCopyPreparation();
@@ -957,6 +964,7 @@ public sealed partial class MainWindow : Window
         _pageEndDialog?.Close(PageEndAction.None);
         try
         {
+            await _imageCopyAction;
             foreach (var dialog in OwnedWindows.ToArray()) dialog.Close();
             _model?.Operation.CancelBookTransferPreparation();
             _profileCancellation?.Cancel(); await _profileAction;
@@ -995,12 +1003,13 @@ public sealed partial class MainWindow : Window
                 _model.Operation.MarkersChanged -= Model_MarkersChanged;
                 if (_model.Operation.DestinationMoves is { } moves) { moves.StateChanged -= DestinationMove_Changed; moves.ConfirmOverwriteAsync = null; moves.ConfirmDirectoryOverwriteAsync = null; }
                 _model.Detach(); _model.Refreshed -= Model_Refreshed; _model.PanelsRefreshed -= Model_PanelsRefreshed; _model.ChromeRefreshed -= Model_ChromeRefreshed;
-                _model.Refreshed -= PageNavigation_Refreshed;
+                _model.Refreshed -= PageNavigation_Refreshed; _model.Refreshed -= ImageCopy_ReadingChanged;
             }
             this.FindControl<PlaylistView>("PlaylistPanelView")!.Dispose();
             this.FindControl<MediaControlView>("DockMediaControlSocket")!.Dispose();
             this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.Dispose();
             this.FindControl<BookmarkListView>("BookmarkPanelList")!.Dispose();
+            Viewer.DisplayCompleted -= ImageCopy_ReadingChanged;
             _autoHide?.Dispose(); _sidePanels?.Dispose(); _platformInput?.Dispose(); FilmStrip.Dispose(); NavigatorView.Dispose(); Viewer.Dispose(); _images?.Dispose(); _closedPrepared = true;
         }
         finally

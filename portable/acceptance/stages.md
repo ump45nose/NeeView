@@ -496,3 +496,5 @@ GIF/WebP与官方ImageIO APNG沿原工厂/页框/JSON接入，原播放状态、
 第二十四批：[版本窗口契约](../docs/p5-version-window.md)；6专项/1442全量通过/2资源跳过、18原生通过，正式Library/ARM64及本地签名通过；随包许可位置/哈希已核对，193入口/42占位不等于覆盖率。P5未整体完成，见[静默验收](p5-version-window-runtime.md)。
 
 第二十五批：[原外部应用契约](../docs/p5-external-applications.md)；22专项/1464全量通过/2资源跳过、22原生后台通过，正式Library/ARM64及本地签名通过；接入导入宿主196入口/39占位不等于覆盖率。系统关联/第三方应用、P5其他能力及正式分发继续待迁/待验，见[静默验收](p5-external-applications-runtime.md)。
+
+第二十六批：[原图像复制契约](../docs/p5-image-copy.md)；12专项/1475全量通过/2资源跳过、26原生后台通过，正式Library/ARM64及本地签名通过。真实跨应用粘贴与P5其余能力待验/待迁，见[记录](p5-image-copy-runtime.md)。

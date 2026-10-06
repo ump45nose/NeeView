@@ -1,6 +1,6 @@
 # 完整命令迁移表
 
-固定基线235个原命令实例全部保留。当前为 **196个执行入口接入、39个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
+固定基线235个原命令实例全部保留。当前为 **197个执行入口接入、38个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
 
 原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。实际键位/手势按原A/B/C、阅读方向和用户差分计算。
 
@@ -19,7 +19,7 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | OpenExternalAppAs | 在外部应用中打开 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenExternalAppAsCommand.cs |
 | CutFile | 剪切文件 | Ctrl+X |  | 占位 | 用户选择暂保留禁用；移动使用分类/移至文件夹 | NeeView/Command/Commands/CutFileCommand.cs |
 | CopyFile | 复制文件 | Ctrl+C |  | 已接入 | P4 原页组/普通目录实体及归档四策略剪贴板；内部目录提取为原版TODO并提示，Mac链接复制接入 | NeeView/Command/Commands/CopyFileCommand.cs |
-| CopyImage | 复制图像 | Ctrl+Shift+C |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/CopyImageCommand.cs |
+| CopyImage | 复制图像 | Ctrl+Shift+C |  | 已接入 | P5 原图像源复制/宿主适配 | NeeView/Command/Commands/CopyImageCommand.cs |
 | Paste | 粘贴 | Ctrl+V |  | 已接入 | P4 QueryPath优先/单来源及多项临时列表加载；图片/HTML/HTTP(S)接收接入 | NeeView/Command/Commands/PasteCommand.cs |
 | CopyToFolderAs | 复制到文件夹 |  |  | 已接入 | P4 原页组/目录固定复制及归档LimitedRealization；目录整体覆盖确认，内部目录提取提示原版TODO | NeeView/Command/Commands/CopyToFolderAsCommand.cs |
 | MoveToFolderAs | 移动到文件夹 |  |  | 已接入 | P4 普通目录分类/原多页策略 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |

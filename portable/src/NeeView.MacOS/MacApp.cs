@@ -128,6 +128,7 @@ public sealed partial class MacApp : Avalonia.Application
             var platform = new MacPlatformService();
             operation.AttachExternalApplications(platform, Environment.ProcessPath ?? "");
             candidate = new MainWindow(); _window = candidate; candidate.Bind(model, images, platform);
+            candidate.AttachImageClipboard(new MacImageClipboard());
             candidate.AttachFonts(new FontPresenter(this, Config.Current.Fonts, MacFontEnvironment.Read(Avalonia.Media.FontManager.Current.DefaultFontFamily.Name)));
             var theme = new ThemePresenter(this, Config.Current.Theme); candidate.AttachTheme(theme);
             await theme.RefreshAsync();

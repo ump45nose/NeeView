@@ -15,8 +15,16 @@ namespace NeeView.MacOS.Views;
 /// <summary>连续/瀑布表现：只持有可见像素及滚动位置，阅读状态、来源和缓存共用原链路。</summary>
 internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation operation, BitmapFactory factory, Action displayed) : IDisposable
 {
-    private sealed record Display(Bitmap Bitmap, BitmapLease Lease, int Width, int Height) : IDisposable
-    { public void Dispose() { Bitmap.Dispose(); Lease.Dispose(); } }
+    private sealed class Display(Bitmap bitmap, BitmapLease lease, int width, int height) : IDisposable
+    {
+        private int _references = 1;
+        public Bitmap Bitmap { get; } = bitmap;
+        public BitmapLease Lease { get; } = lease;
+        public int Width { get; } = width;
+        public int Height { get; } = height;
+        public Display Retain() { ++_references; return this; }
+        public void Dispose() { if (--_references != 0) return; Bitmap.Dispose(); Lease.Dispose(); }
+    }
     private sealed record Demand(CancellationTokenSource Cancellation, bool Background);
     private readonly Dictionary<Page, Display> _images = [];
     public ThemeRgba ContentColor => operation.Book?.CurrentPage is { } page && _images.TryGetValue(page, out var image)
@@ -57,6 +65,12 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
     public int DisplayCount => _images.Count;
     public double Offset => _offset;
     public Page? SelectedPage => _selection;
+    /// <summary>Mac连续/瀑布扩展只复制显式选中且已显示的图片，滚动锚点不作为操作目标。</summary>
+    internal Page? CopyImagePage => !_disposed && Active && ReferenceEquals(_book, operation.Book)
+        && _selection is { IsImage: true } page && !_errors.ContainsKey(page) && _images.ContainsKey(page) ? page : null;
+    /// <summary>后台编码期间保留现有显示租约，离开可见区也不能提前释放。</summary>
+    internal (Bitmap Bitmap, IDisposable Retained) RetainCopyImage(Page page)
+    { if (!ReferenceEquals(page, CopyImagePage)) throw new InvalidOperationException("选中图片已改变。"); var image = _images[page].Retain(); return (image.Bitmap, image); }
     public int PendingCount => _pending.Count + (IsLayoutPending ? 1 : 0);
     public bool HasPressedPointer => _pressed is not null;
 

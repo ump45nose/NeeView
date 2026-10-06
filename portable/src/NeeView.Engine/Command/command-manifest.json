@@ -98,7 +98,7 @@
     "Text": "复制图像",
     "Shortcut": "Ctrl+Shift+C",
     "Source": "NeeView/Command/Commands/CopyImageCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P5 原图像源复制/宿主适配",
     "MenuText": "复制图像",
     "MouseGesture": "",
     "TouchGesture": "",
