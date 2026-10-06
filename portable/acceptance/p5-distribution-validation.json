@@ -1,0 +1,155 @@
+{
+  "version": "0.1.0",
+  "commit": "886eb64707cdd893d3f02a6adfcfb724b9008c7b",
+  "worktree_dirty": true,
+  "tracked_source_dirty": true,
+  "architecture": "osx-arm64",
+  "self_contained": true,
+  "signing": "ad-hoc development",
+  "notarized": false,
+  "archive_sha256": "468adcd78fb717183836f56fe63856c35fc85469c8bd2d573b5a5e466fa0a07c",
+  "native_files": [
+    {
+      "path": "Contents/MacOS/NeeView.MacOS",
+      "architectures": [
+        "arm64"
+      ],
+      "signed_sha256": "2a4639de760c6dd285c1677a17d712b37c58d73d9e585a2516f8e9fc74af5ea7"
+    },
+    {
+      "path": "Contents/MonoBundle/Magick.Native-Q8-arm64.dll.dylib",
+      "architectures": [
+        "arm64"
+      ],
+      "signed_sha256": "f4fb117b846fbdaefeb541f1cca2532472e58e3112b61a5af3b465a353c5865b"
+    },
+    {
+      "path": "Contents/MonoBundle/libAvaloniaNative.dylib",
+      "architectures": [
+        "x86_64",
+        "arm64"
+      ],
+      "signed_sha256": "84321a4ef7e49e093ac81f95c7f1875b7b1510ce14cd4edb2501b2b5890b8069"
+    },
+    {
+      "path": "Contents/MonoBundle/libHarfBuzzSharp.dylib",
+      "architectures": [
+        "x86_64",
+        "arm64"
+      ],
+      "signed_sha256": "6f12cb8c0aff0845e8fc08c31760bbfd9de45b325696ca76576f5fe4c7d68f66"
+    },
+    {
+      "path": "Contents/MonoBundle/libSkiaSharp.dylib",
+      "architectures": [
+        "x86_64",
+        "arm64"
+      ],
+      "signed_sha256": "a314f46650e6142ff486504536fa63cf70f6e0f5129bf6d125c704284c6e1051"
+    },
+    {
+      "path": "Contents/MonoBundle/libSystem.Globalization.Native.dylib",
+      "architectures": [
+        "arm64"
+      ],
+      "signed_sha256": "c6c57fc3b40aee1326100c0a7e03f40b271804548562b80552ca190ffd9a8780"
+    },
+    {
+      "path": "Contents/MonoBundle/libSystem.IO.Compression.Native.dylib",
+      "architectures": [
+        "arm64"
+      ],
+      "signed_sha256": "983e7114913333ee9092a74c61f8a1b5e91c4a6d3d0857ff1e7d653abd6e90a9"
+    },
+    {
+      "path": "Contents/MonoBundle/libSystem.Native.dylib",
+      "architectures": [
+        "arm64"
+      ],
+      "signed_sha256": "5365ae4899a6e965dda5c2c726e465d1237cc9cceab44cf7ed306ac3187a36f0"
+    },
+    {
+      "path": "Contents/MonoBundle/libSystem.Net.Security.Native.dylib",
+      "architectures": [
+        "arm64"
+      ],
+      "signed_sha256": "b2e3084063ec106d89eb9b9460cc4047d504ba6ab872dab98935f51a75a38d90"
+    },
+    {
+      "path": "Contents/MonoBundle/libSystem.Security.Cryptography.Native.Apple.dylib",
+      "architectures": [
+        "arm64"
+      ],
+      "signed_sha256": "c2072749d3b9e519efe52e9f93ba698dc8a48ff573745346294d245b78def781"
+    },
+    {
+      "path": "Contents/MonoBundle/libclrgc.dylib",
+      "architectures": [
+        "arm64"
+      ],
+      "signed_sha256": "5c633e9b679e71a1330f9e203a3ad32b751d3a98cd3d50db406d0d8b6c6ef75e"
+    },
+    {
+      "path": "Contents/MonoBundle/libclrgcexp.dylib",
+      "architectures": [
+        "arm64"
+      ],
+      "signed_sha256": "fd2ed69da8059390aab8fdd101ddd3b7452e926cdb429eff8803a8d86518f2e7"
+    },
+    {
+      "path": "Contents/MonoBundle/libclrjit.dylib",
+      "architectures": [
+        "arm64"
+      ],
+      "signed_sha256": "89a154973c6d28417bd42148fee27bcb8a46772c41c5c7521e903d2460e8e6fb"
+    },
+    {
+      "path": "Contents/MonoBundle/libcoreclr.dylib",
+      "architectures": [
+        "arm64"
+      ],
+      "signed_sha256": "d651113f2ec88de065253b0bfd453a70e57b330293f02228446ecc08e0b66cc7"
+    },
+    {
+      "path": "Contents/MonoBundle/libhostfxr.dylib",
+      "architectures": [
+        "arm64"
+      ],
+      "signed_sha256": "4146b251652eaad24ab96ca7f4f7e17fd55bb315f01af86981343ed6a53595dd"
+    },
+    {
+      "path": "Contents/MonoBundle/libhostpolicy.dylib",
+      "architectures": [
+        "arm64"
+      ],
+      "signed_sha256": "3323cdee139a1fb79e10fea8f2ab3a6d3cc3d4a5d57cc1f2656f8d4a24483872"
+    },
+    {
+      "path": "Contents/MonoBundle/libmscordaccore.dylib",
+      "architectures": [
+        "arm64"
+      ],
+      "signed_sha256": "a71cf3d80f40db527a515f70421ad5f1a04c06ec45698a66508aef054f766ed9"
+    },
+    {
+      "path": "Contents/MonoBundle/libmscordbi.dylib",
+      "architectures": [
+        "arm64"
+      ],
+      "signed_sha256": "013ce7c5e68092c5dd8d0389e3ba24eac0a3338cd86d9eaf8ee2bd6c7be347d5"
+    }
+  ],
+  "zip_relocation_and_signature": "passed",
+  "interactive_installation": "not executed",
+  "gatekeeper": "not executed",
+  "license_metadata_only": [],
+  "utc": "2026-10-06T13:01:24.571505+00:00",
+  "script_tests": {
+    "passed": 12,
+    "failed": 0
+  },
+  "dependencies": 21,
+  "runtime_packs": 3,
+  "archive_bytes": 69177352,
+  "log": "/Users/yuwk/.codex/artifacts/neeview/p5-package-verified.log"
+}

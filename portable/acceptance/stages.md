@@ -478,3 +478,7 @@ GIF/WebP与官方ImageIO APNG沿原工厂/页框/JSON接入，原播放状态、
 ## P5 第十八批：原幻灯播放
 
 原周期/输入/EOS首周期等待、页尾覆盖、自动滚动和启动选项接入；18新增、1358全量通过/2资源跳过、14官方原生后台通过，正式ARM64构建/本地签名通过。关闭失败自动滚动恢复、顶部原4 DIP计时条及中文草稿分别回归；旧菜单禁用断言失败已保留并修正。见[契约](../docs/p5-slideshow.md)与[静默验收](p5-slideshow-runtime.md)。视频/效果/脚本、完整设置、真实导出与正式分发继续开发/验收，P5未完成。
+
+## P5 第十九批：ARM64开发分发
+
+12脚本回归通过，实际Release发布、21实际NuGet依赖/3 SDK运行时包原文许可、18 Mach-O ARM64/签名、ZIP完整性及随机目录重定位通过。未启动产品或写用户数据，Developer ID/公证/Gatekeeper/干净安装未验；[契约](../docs/p5-distribution.md)与[记录](p5-distribution-runtime.md)。P5未完成。

@@ -1,0 +1,222 @@
+{
+  "avalonia/12.1.3": {
+    "repository_commit": "8eeda4f6f546165b3f72e63c9f42247abb306905",
+    "files": [
+      {
+        "path": "licenses/upstream/avalonia/licence.md",
+        "upstream_path": "licence.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/licence.md",
+        "sha256": "213814d306090074d234d760239ff0f67eb9b8d20eefb4d5631bb39dbe0b769b"
+      },
+      {
+        "path": "licenses/upstream/avalonia/NOTICE.md",
+        "upstream_path": "NOTICE.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/NOTICE.md",
+        "sha256": "dd6f80852d16320c865a2e403ffd1a8b07a0e34c5b37122c0bc2343639ff68e6"
+      }
+    ]
+  },
+  "avalonia.desktop/12.1.3": {
+    "repository_commit": "8eeda4f6f546165b3f72e63c9f42247abb306905",
+    "files": [
+      {
+        "path": "licenses/upstream/avalonia/licence.md",
+        "upstream_path": "licence.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/licence.md",
+        "sha256": "213814d306090074d234d760239ff0f67eb9b8d20eefb4d5631bb39dbe0b769b"
+      },
+      {
+        "path": "licenses/upstream/avalonia/NOTICE.md",
+        "upstream_path": "NOTICE.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/NOTICE.md",
+        "sha256": "dd6f80852d16320c865a2e403ffd1a8b07a0e34c5b37122c0bc2343639ff68e6"
+      }
+    ]
+  },
+  "avalonia.freedesktop/12.1.3": {
+    "repository_commit": "8eeda4f6f546165b3f72e63c9f42247abb306905",
+    "files": [
+      {
+        "path": "licenses/upstream/avalonia/licence.md",
+        "upstream_path": "licence.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/licence.md",
+        "sha256": "213814d306090074d234d760239ff0f67eb9b8d20eefb4d5631bb39dbe0b769b"
+      },
+      {
+        "path": "licenses/upstream/avalonia/NOTICE.md",
+        "upstream_path": "NOTICE.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/NOTICE.md",
+        "sha256": "dd6f80852d16320c865a2e403ffd1a8b07a0e34c5b37122c0bc2343639ff68e6"
+      }
+    ]
+  },
+  "avalonia.freedesktop.atspi/12.1.3": {
+    "repository_commit": "8eeda4f6f546165b3f72e63c9f42247abb306905",
+    "files": [
+      {
+        "path": "licenses/upstream/avalonia/licence.md",
+        "upstream_path": "licence.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/licence.md",
+        "sha256": "213814d306090074d234d760239ff0f67eb9b8d20eefb4d5631bb39dbe0b769b"
+      },
+      {
+        "path": "licenses/upstream/avalonia/NOTICE.md",
+        "upstream_path": "NOTICE.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/NOTICE.md",
+        "sha256": "dd6f80852d16320c865a2e403ffd1a8b07a0e34c5b37122c0bc2343639ff68e6"
+      }
+    ]
+  },
+  "avalonia.harfbuzz/12.1.3": {
+    "repository_commit": "8eeda4f6f546165b3f72e63c9f42247abb306905",
+    "files": [
+      {
+        "path": "licenses/upstream/avalonia/licence.md",
+        "upstream_path": "licence.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/licence.md",
+        "sha256": "213814d306090074d234d760239ff0f67eb9b8d20eefb4d5631bb39dbe0b769b"
+      },
+      {
+        "path": "licenses/upstream/avalonia/NOTICE.md",
+        "upstream_path": "NOTICE.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/NOTICE.md",
+        "sha256": "dd6f80852d16320c865a2e403ffd1a8b07a0e34c5b37122c0bc2343639ff68e6"
+      }
+    ]
+  },
+  "avalonia.native/12.1.3": {
+    "repository_commit": "8eeda4f6f546165b3f72e63c9f42247abb306905",
+    "files": [
+      {
+        "path": "licenses/upstream/avalonia/licence.md",
+        "upstream_path": "licence.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/licence.md",
+        "sha256": "213814d306090074d234d760239ff0f67eb9b8d20eefb4d5631bb39dbe0b769b"
+      },
+      {
+        "path": "licenses/upstream/avalonia/NOTICE.md",
+        "upstream_path": "NOTICE.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/NOTICE.md",
+        "sha256": "dd6f80852d16320c865a2e403ffd1a8b07a0e34c5b37122c0bc2343639ff68e6"
+      }
+    ]
+  },
+  "avalonia.remote.protocol/12.1.3": {
+    "repository_commit": "8eeda4f6f546165b3f72e63c9f42247abb306905",
+    "files": [
+      {
+        "path": "licenses/upstream/avalonia/licence.md",
+        "upstream_path": "licence.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/licence.md",
+        "sha256": "213814d306090074d234d760239ff0f67eb9b8d20eefb4d5631bb39dbe0b769b"
+      },
+      {
+        "path": "licenses/upstream/avalonia/NOTICE.md",
+        "upstream_path": "NOTICE.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/NOTICE.md",
+        "sha256": "dd6f80852d16320c865a2e403ffd1a8b07a0e34c5b37122c0bc2343639ff68e6"
+      }
+    ]
+  },
+  "avalonia.skia/12.1.3": {
+    "repository_commit": "8eeda4f6f546165b3f72e63c9f42247abb306905",
+    "files": [
+      {
+        "path": "licenses/upstream/avalonia/licence.md",
+        "upstream_path": "licence.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/licence.md",
+        "sha256": "213814d306090074d234d760239ff0f67eb9b8d20eefb4d5631bb39dbe0b769b"
+      },
+      {
+        "path": "licenses/upstream/avalonia/NOTICE.md",
+        "upstream_path": "NOTICE.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/NOTICE.md",
+        "sha256": "dd6f80852d16320c865a2e403ffd1a8b07a0e34c5b37122c0bc2343639ff68e6"
+      }
+    ]
+  },
+  "avalonia.themes.fluent/12.1.3": {
+    "repository_commit": "8eeda4f6f546165b3f72e63c9f42247abb306905",
+    "files": [
+      {
+        "path": "licenses/upstream/avalonia/licence.md",
+        "upstream_path": "licence.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/licence.md",
+        "sha256": "213814d306090074d234d760239ff0f67eb9b8d20eefb4d5631bb39dbe0b769b"
+      },
+      {
+        "path": "licenses/upstream/avalonia/NOTICE.md",
+        "upstream_path": "NOTICE.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/NOTICE.md",
+        "sha256": "dd6f80852d16320c865a2e403ffd1a8b07a0e34c5b37122c0bc2343639ff68e6"
+      }
+    ]
+  },
+  "avalonia.win32/12.1.3": {
+    "repository_commit": "8eeda4f6f546165b3f72e63c9f42247abb306905",
+    "files": [
+      {
+        "path": "licenses/upstream/avalonia/licence.md",
+        "upstream_path": "licence.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/licence.md",
+        "sha256": "213814d306090074d234d760239ff0f67eb9b8d20eefb4d5631bb39dbe0b769b"
+      },
+      {
+        "path": "licenses/upstream/avalonia/NOTICE.md",
+        "upstream_path": "NOTICE.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/NOTICE.md",
+        "sha256": "dd6f80852d16320c865a2e403ffd1a8b07a0e34c5b37122c0bc2343639ff68e6"
+      }
+    ]
+  },
+  "avalonia.x11/12.1.3": {
+    "repository_commit": "8eeda4f6f546165b3f72e63c9f42247abb306905",
+    "files": [
+      {
+        "path": "licenses/upstream/avalonia/licence.md",
+        "upstream_path": "licence.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/licence.md",
+        "sha256": "213814d306090074d234d760239ff0f67eb9b8d20eefb4d5631bb39dbe0b769b"
+      },
+      {
+        "path": "licenses/upstream/avalonia/NOTICE.md",
+        "upstream_path": "NOTICE.md",
+        "url": "https://github.com/AvaloniaUI/Avalonia/blob/8eeda4f6f546165b3f72e63c9f42247abb306905/NOTICE.md",
+        "sha256": "dd6f80852d16320c865a2e403ffd1a8b07a0e34c5b37122c0bc2343639ff68e6"
+      }
+    ]
+  },
+  "microcom.runtime/0.11.6": {
+    "repository_commit": "76785efcafd91b5902fd19dd11145f6dd655b7b4",
+    "files": [
+      {
+        "path": "licenses/upstream/microcom/LICENSE",
+        "upstream_path": "LICENSE",
+        "url": "https://github.com/kekekeks/MicroCom/blob/76785efcafd91b5902fd19dd11145f6dd655b7b4/LICENSE",
+        "sha256": "6ee769c9ac4dac9abb16b98b1341e9528ff9f4ab685481410d3376d14148f3a9"
+      }
+    ]
+  },
+  "sharpcompress/0.50.3": {
+    "repository_commit": "67bd9289f99dc77e1b65730a08e8213405921488",
+    "files": [
+      {
+        "path": "licenses/upstream/sharpcompress/LICENSE.txt",
+        "upstream_path": "LICENSE.txt",
+        "url": "https://github.com/adamhathcock/sharpcompress/blob/67bd9289f99dc77e1b65730a08e8213405921488/LICENSE.txt",
+        "sha256": "b7ca2b6174cee11afe41d78b48527e3d7659a4435c25019a4a5e072299a2f8ed"
+      }
+    ]
+  },
+  "tmds.dbus.protocol/0.94.1": {
+    "repository_commit": "b4a7fed0b878f74cb54f7cca84d2889af4e596ba",
+    "files": [
+      {
+        "path": "licenses/upstream/tmds.dbus/COPYING",
+        "upstream_path": "COPYING",
+        "url": "https://github.com/tmds/Tmds.DBus/blob/b4a7fed0b878f74cb54f7cca84d2889af4e596ba/COPYING",
+        "sha256": "aca3b49277abcc7886ccb2f115603a9f5b15fc3f96019a10c00f2974098b210c"
+      }
+    ]
+  }
+}

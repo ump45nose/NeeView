@@ -1,5 +1,7 @@
 # NeeView Mac 源码迁移架构
 
+P5 第十九批：唯一正式 ARM64 Release 开发包、实际依赖/固定原文许可、完整 Mach-O 签名及 ZIP 重定位接入；失败保留旧成品。Developer ID、公证和干净安装继续待验，见[分发契约](p5-distribution.md)。
+
 P5 第十八批：原幻灯周期/输入重置/首周期EOS等待、页尾覆盖、自动滚动和启动选项进入唯一BookOperation与JSON；顶部原4 DIP计时条和设置草稿独立。关闭失败恢复播放及滚动；调度适配与剩余媒体边界见[幻灯契约](p5-slideshow.md)。
 
 
