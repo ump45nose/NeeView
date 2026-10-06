@@ -1,6 +1,6 @@
 # 完整命令迁移表
 
-固定基线235个原命令实例全部保留。当前为 **197个执行入口接入、38个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
+固定基线235个原命令实例全部保留。当前为 **200个执行入口接入、35个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
 
 原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。实际键位/手势按原A/B/C、阅读方向和用户差分计算。
 
@@ -15,8 +15,8 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | ReLoad | 重新载入 |  | UD | 已接入 | P1 宿主适配 | NeeView/Command/Commands/ReLoadCommand.cs |
 | Unload | 关闭 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/UnloadCommand.cs |
 | OpenExplorer | 在资源管理器中打开 |  |  | 已接入 | P1 宿主适配 | NeeView/Command/Commands/OpenExplorerCommand.cs |
-| OpenExternalApp | 在外部应用中打开 (简单) |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenExternalAppCommand.cs |
-| OpenExternalAppAs | 在外部应用中打开 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenExternalAppAsCommand.cs |
+| OpenExternalApp | 在外部应用中打开 (简单) |  |  | 已接入 | P5 原外部应用/参数/来源策略；见p5-external-applications.md | NeeView/Command/Commands/OpenExternalAppCommand.cs |
+| OpenExternalAppAs | 在外部应用中打开 |  |  | 已接入 | P5 原外部应用/参数/来源策略；见p5-external-applications.md | NeeView/Command/Commands/OpenExternalAppAsCommand.cs |
 | CutFile | 剪切文件 | Ctrl+X |  | 占位 | 用户选择暂保留禁用；移动使用分类/移至文件夹 | NeeView/Command/Commands/CutFileCommand.cs |
 | CopyFile | 复制文件 | Ctrl+C |  | 已接入 | P4 原页组/普通目录实体及归档四策略剪贴板；内部目录提取为原版TODO并提示，Mac链接复制接入 | NeeView/Command/Commands/CopyFileCommand.cs |
 | CopyImage | 复制图像 | Ctrl+Shift+C |  | 已接入 | P5 原图像源复制/宿主适配 | NeeView/Command/Commands/CopyImageCommand.cs |
@@ -34,13 +34,13 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | MoveToDestinationFolder9 | 移动到文件夹 9 | 9 |  | 已接入 | P4 普通目录分类/原多页策略 | NeeView/Command/Commands/MoveToFolderAsCommand.cs |
 | UndoDestinationMove | 撤销目标文件夹移动 | Ctrl+Z |  | 已接入 | P4 分类首批 | NeeView/Command/Commands/UndoDestinationMoveCommand.cs |
 | RedoDestinationMove | 重做目标文件夹移动 | Ctrl+Y |  | 已接入 | P4 分类首批 | NeeView/Command/Commands/RedoDestinationMoveCommand.cs |
-| ExportImageAs | 另存为 | Ctrl+S |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ExportImageAsCommand.cs |
-| ExportImage | 保存为文件 | Shift+Ctrl+S |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ExportImageCommand.cs |
-| ExportBookAs | 导出书籍 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ExportBookAsCommand.cs |
+| ExportImageAs | 另存为 | Ctrl+S |  | 已接入 | P5 原参数/原字节及唯一页框导出；见p5-image-export.md | NeeView/Command/Commands/ExportImageAsCommand.cs |
+| ExportImage | 保存为文件 | Shift+Ctrl+S |  | 已接入 | P5 原参数/原字节及唯一页框导出；见p5-image-export.md | NeeView/Command/Commands/ExportImageCommand.cs |
+| ExportBookAs | 导出书籍 |  |  | 已接入 | P5 原参数/原字节及唯一页框导出；见p5-image-export.md | NeeView/Command/Commands/ExportBookAsCommand.cs |
 | Print | 打印 | Ctrl+P |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/PrintCommand.cs |
 | DeleteFile | 删除文件 | Delete |  | 已接入 | P4 主页单页/页面列表显式多选；实体废纸篓、列表登记及ZIP条目，ZIP权限与永久确认 | NeeView/Command/Commands/DeleteFileCommand.cs |
 | OpenBookExplorer | 在资源管理器中打开书籍 |  |  | 已接入 | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/OpenBookExplorerCommand.cs |
-| OpenBookExternalAppAs | 用外部应用打开书籍 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenBookExternalAppAsCommand.cs |
+| OpenBookExternalAppAs | 用外部应用打开书籍 |  |  | 已接入 | P5 原外部应用/参数/来源策略；见p5-external-applications.md | NeeView/Command/Commands/OpenBookExternalAppAsCommand.cs |
 | CutBook | 剪切书籍 |  |  | 占位 | 用户选择暂保留禁用；移动使用既有文件操作 | NeeView/Command/Commands/CutBookCommand.cs |
 | CopyBook | 复制书籍 |  |  | 已接入 | P4 根实体/包内逻辑书按原四策略复制，QueryPath保持Book.Path | NeeView/Command/Commands/CopyBookCommand.cs |
 | CopyBookToFolderAs | 复制书籍到文件夹 |  |  | 已接入 | P4 根实体/逻辑书按原策略固定复制/目标Index；内部目录提取保持原版TODO提示 | NeeView/Command/Commands/CopyBookToFolderAsCommand.cs |

@@ -81,6 +81,12 @@ public sealed partial class ProfileImportService(IProfileImportReader reader, IR
                     Map(Object(config, "Playlist"), "PlaylistFolder", "Config.Playlist");
                     Map(Object(config, "Playlist"), "CurrentPlaylist", "Config.Playlist");
                     Map(Object(Object(config, "Book"), "ExportImageParameter"), "ExportFolder", "Config.Book.ExportImageParameter");
+                    Map(Object(Object(config, "Book"), "ExportBookParameter"), "ExportFolder", "Config.Book.ExportBookParameter");
+                    if (Object(raw, "Commands")?["ExportImage"] is JsonObject directExport)
+                    {
+                        var parameter = Object(directExport, "Parameter");
+                        Map(Object(parameter, "Value") ?? parameter, "ExportFolder", "Commands.ExportImage.Parameter");
+                    }
                     if (raw["MacImportedLegacyEffectUpgrade"]?.ToString() == "Layers/1")
                         notices.Add("旧 ImageEffect 已按原规则转换为效果层、参数缓存和默认预设，原材料保留；效果实际执行尚未接入。");
                     else if (raw["MacImportedLegacyEffectFormat"] is not null && config?["ImageEffect"]?["Layers"] is null)

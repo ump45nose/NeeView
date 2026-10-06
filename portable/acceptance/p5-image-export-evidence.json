@@ -1,0 +1,95 @@
+{
+  "baseline": "c5c398d89",
+  "focused_tests": {
+    "total": "44",
+    "executed": "44",
+    "passed": "44",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "full_tests": {
+    "total": "1518",
+    "executed": "1516",
+    "passed": "1516",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "test_sequence": "全量1516通过后仅新增四个全景回归，最终44专项通过；生产代码未再变更，不把新增4项算入此前全量结果",
+  "native_tests": {
+    "environment": "64-bit (ARM) .NET 10.0.12 [collection-per-class, non-parallel]",
+    "id": "63dd7e2a-8c38-438e-843e-421d5a250d4a",
+    "name": "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Backends.MacOS.Tests/bin/Debug/net10.0-macos/NeeView.Backends.MacOS.Tests.app/Contents/MonoBundle/NeeView.Backends.MacOS.Tests.dll",
+    "run-date": "2026-10-06",
+    "run-time": "23:50:45",
+    "start-rtf": "2026-10-06T23:50:45.0047880+08:00",
+    "test-framework": "xUnit.net v3 3.2.2+728c1dce01",
+    "target-framework": ".NETCoreApp,Version=v10.0",
+    "errors": "0",
+    "failed": "0",
+    "finish-rtf": "2026-10-06T23:50:46.7587510+08:00",
+    "not-run": "0",
+    "passed": "25",
+    "skipped": "0",
+    "time": "1.754",
+    "time-rtf": "00:00:01.7543054",
+    "total": "25"
+  },
+  "boundaries": {
+    "production_projects": [
+      "NeeView.Backends",
+      "NeeView.Engine",
+      "NeeView.MacOS"
+    ],
+    "source_files": 98,
+    "partial_adapters": 383,
+    "upstream_source_files": 26
+  },
+  "silent": true,
+  "command_entries": {
+    "normal_host": 199,
+    "with_import_backup": 200,
+    "total": 235,
+    "placeholders": 35
+  },
+  "real_resource": {
+    "scope": "用户指定资源的一张图片，源及Profile只读；输出仅在隔离临时目录并在结束后清理",
+    "width": 3600,
+    "height": 5400,
+    "source_sha256": "FCC295403BAB147389C5D534B2F703898A54C8F4D14C71EE73765066D14C4832",
+    "original_sha256": "FCC295403BAB147389C5D534B2F703898A54C8F4D14C71EE73765066D14C4832",
+    "view_bytes": 29392076,
+    "source_unchanged": true
+  },
+  "known_boundaries": [
+    "原生保存选择器、外部阅读器及固定Windows动态导出另验",
+    "效果层执行及完整变换恢复尚未迁入",
+    "Developer ID、公证与干净安装未验",
+    "P5整体未完成"
+  ],
+  "screenshots": [
+    "p5-image-export-image-dialog.png",
+    "p5-image-export-book-dialog.png"
+  ]
+}

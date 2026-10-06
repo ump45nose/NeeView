@@ -44,7 +44,7 @@ public sealed partial class MainWindow : Window
         "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ToggleBookLock", "Unload", "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff",
         "ToggleViewFlipVertical", "ViewFlipVerticalOn", "ViewFlipVerticalOff", "ViewReset", "ViewScaleStretch", "ViewPresetScroll", "ViewScrollNTypeUp", "ViewScrollNTypeDown",
         "ToggleStretchMode", "ToggleStretchModeReverse", "SetStretchModeUniformToFill", "SetStretchModeUniformToSize", "SetStretchModeUniformToVertical", "SetStretchModeUniformToHorizontal", "ToggleStretchAllowScaleUp", "ToggleStretchAllowScaleDown", "ToggleHoverScroll",
-        "CopyImage", "OpenExternalApp", "OpenExternalAppAs", "OpenBookExternalAppAs", "OpenVersionWindow", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
+        "ExportImage", "ExportImageAs", "ExportBookAs", "CopyImage", "OpenExternalApp", "OpenExternalAppAs", "OpenBookExternalAppAs", "OpenVersionWindow", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
         "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "ToggleVisibleFoldersTree", "ToggleVisibleContentsTree", "FocusMainView", "FocusFolderSearchBox", "FocusPageListSearchBox", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkList", "FocusBookmarkSearchBox", "ClearHistory", "ClearHistoryInPlace", "RemoveUnlinkedHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
@@ -169,6 +169,7 @@ public sealed partial class MainWindow : Window
         Viewer.MediaChanged += (_, _) => { mediaControl.UpdatePlayer(); if (!_preparing && !_closedPrepared) { MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!,GetCommandCheck);RefreshHistoryCommandStates(); } };
         model.PanelsRefreshed += Model_PanelsRefreshed;
         _leftWidth = model.LeftWidth; _rightWidth = model.RightWidth; UpdatePanelColumns(); model.Attach();
+        model.Operation.ViewImageExporter = Viewer; model.Operation.ConfirmExportOverwriteAsync = ConfirmExportOverwriteAsync;
         FilmStrip.Attach(model.Operation, images); NavigatorView.Attach(model.Operation, images);
         _sidePanels = new(this, model);
         _sidePanels.FloatingKeyDown += Key_Down;
@@ -190,6 +191,9 @@ public sealed partial class MainWindow : Window
     /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
     public bool IsCommandAvailable(string name) => name switch
     {
+        "ExportImage" => !_preparing && _exportAction.IsCompleted && _model?.Operation.CanExportImage == true
+            && (_model.SaveData.GetCommandParameter<ExportImageCommandParameter>(name).Mode != ExportImageMode.Original || _model.Operation.CanExportOriginalImage),
+        "ExportImageAs" or "ExportBookAs" => !_preparing && _exportAction.IsCompleted && _model?.Operation.CanExportImage == true,
         "CopyImage" => CanCopyImage,
         "SetDefaultPageSetting" => _model?.Operation.IsLoading == false,
         "OpenExternalApp" => _model?.Operation is { } ext && ext.CanOpenExternalApplication(ext.GetExternalApplicationPolicy(name)),
@@ -381,6 +385,7 @@ public sealed partial class MainWindow : Window
         {
             switch (name)
             {
+                case "ExportImage": case "ExportImageAs": case "ExportBookAs": await RunExportAsync(name); break;
                 case "CopyImage": await CopyImageAsync(); break;
                 case "OpenVersionWindow": await ShowVersionAsync(); break;
                 case "OpenExternalApp": await ExecuteExternalApplicationAsync(name, false); break;
@@ -956,6 +961,7 @@ public sealed partial class MainWindow : Window
         await Task.Yield();
         _preparing = true;
         StopSlideShowForClose();
+        _exportCancellation?.Cancel(); _exportDialog?.Close(null); _model?.Operation.CancelExportPreparation();
         _imageCopyCancellation?.Cancel();
         _externalMenu?.Close(); _model?.Operation.CancelExternalApplicationPreparation();
         _model?.Operation.CancelClipboardPreparation();
@@ -964,6 +970,7 @@ public sealed partial class MainWindow : Window
         _pageEndDialog?.Close(PageEndAction.None);
         try
         {
+            await _exportAction;
             await _imageCopyAction;
             foreach (var dialog in OwnedWindows.ToArray()) dialog.Close();
             _model?.Operation.CancelBookTransferPreparation();

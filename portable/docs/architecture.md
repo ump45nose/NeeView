@@ -205,3 +205,5 @@ P5第二十四批：原版本窗口布局/图标、实际Mac构建版本、复�
 P5第二十五批：原外部应用命令/集合与独立设置草稿接入；Engine捕获页组及策略，唯一平台字面提交，随机材料进程留存/2GiB共用预算；布局与启动解耦，见[外部应用契约](p5-external-applications.md)。
 
 P5第二十六批：原CopyImage首图像源、完整PNG及系统图像剪贴板接入；现有显示租约后台编码，切书/关闭拒绝旧结果，三项目/原JSON保持，见[契约](p5-image-copy.md)。
+
+P5第二十七批：原三导出命令、Config.Book参数、命名及整书页框前进沿唯一BookOperation/Archive接入；ReaderView离屏复用真实绘制并按原尺寸请求像素，JSON/三项目保持，见[图像导出契约](p5-image-export.md)。

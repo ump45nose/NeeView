@@ -1,0 +1,42 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vm="using:NeeView.MacOS.ViewModels" x:DataType="vm:ExportImageViewModel"
+        x:Class="NeeView.MacOS.Views.ExportImageDialog" Width="800" Height="650" MinWidth="700" MinHeight="500"
+        WindowStartupLocation="CenterOwner" Title="导出图像" Background="{DynamicResource Panel.Background}">
+  <Grid RowDefinitions="*,Auto" Margin="16">
+    <Grid ColumnDefinitions="350,12,*">
+      <ScrollViewer Grid.Column="0">
+        <StackPanel Spacing="8">
+          <TextBlock Text="导出模式" TextWrapping="Wrap"/>
+          <ComboBox ItemsSource="{Binding Modes}" SelectedItem="{Binding Draft.Mode}"/>
+          <StackPanel IsVisible="{Binding IsBook}" Spacing="4">
+            <TextBlock Text="整书输出类型"/><ComboBox ItemsSource="{Binding BookTypes}" SelectedItem="{Binding BookType}"/>
+          </StackPanel>
+          <StackPanel IsEnabled="{Binding IsView}" Spacing="4">
+            <CheckBox Content="包含画布背景" IsChecked="{Binding Draft.HasBackground}"/>
+            <CheckBox Content="原始页框尺寸（取消外部变换）" IsChecked="{Binding Draft.IsOriginalSize}"/>
+            <CheckBox Content="保持像素（最近邻）" IsChecked="{Binding Draft.IsDotKeep}"/>
+            <TextBlock Text="格式"/><ComboBox ItemsSource="{Binding Formats}" SelectedItem="{Binding Draft.FileFormat}"/>
+            <TextBlock Text="JPEG 质量"/><NumericUpDown Minimum="5" Maximum="100" Increment="5" Value="{Binding Draft.QualityLevel}"/>
+          </StackPanel>
+          <TextBlock Text="原图文件名格式"/><TextBox Text="{Binding Draft.FileNameFormat0}"/>
+          <TextBlock Text="视图单页格式"/><TextBox Text="{Binding Draft.FileNameFormat1}"/>
+          <TextBlock Text="视图双页格式（空白沿用单页）"/><TextBox Text="{Binding Draft.FileNameFormat2}"/>
+          <TextBlock Text="字段：{Book} {Name} {Page:000} {Part} {EntryPath} {Index:000}；1/2/L/R 后缀" TextWrapping="Wrap"/>
+          <TextBlock Text="冲突策略"/><ComboBox ItemsSource="{Binding OverwriteModes}" SelectedItem="{Binding Draft.OverwriteMode}"/>
+        </StackPanel>
+      </ScrollViewer>
+      <Border Grid.Column="2" BorderThickness="1" BorderBrush="Gray" Padding="12">
+        <Grid RowDefinitions="Auto,*,Auto,Auto">
+          <TextBlock Text="预览"/>
+          <Image x:Name="PreviewImage" Grid.Row="1" Stretch="Uniform" Margin="0,12"/>
+          <TextBlock Grid.Row="2" Text="{Binding PreviewName}" TextWrapping="Wrap"/>
+          <Button Grid.Row="3" Content="刷新预览" Click="Preview_Click" Margin="0,12,0,0"/>
+        </Grid>
+      </Border>
+    </Grid>
+    <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" Margin="0,12,0,0">
+      <TextBlock Text="{Binding Error}" TextWrapping="Wrap"/>
+      <Button Grid.Column="1" Content="导出…" Click="Export_Click" IsDefault="True"/>
+      <Button Grid.Column="2" Content="取消" Click="Cancel_Click" IsCancel="True" Margin="8,0,0,0"/>
+    </Grid>
+  </Grid>
+</Window>

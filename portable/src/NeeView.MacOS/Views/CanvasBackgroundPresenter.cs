@@ -63,9 +63,9 @@ internal sealed class CanvasBackgroundPresenter(Control owner, BookOperation ope
         }
     }
     /// <summary>原底刷与前景刷分开；棋盘/平铺以设备像素为周期，其他模式按视口伸展。</summary>
-    public void Render(DrawingContext context, ThemeRgba contentColor)
+    public void Render(DrawingContext context, ThemeRgba contentColor, Avalonia.Size? exportSize = null)
     {
-        var config = Config.Current.Background; var bounds = new Avalonia.Rect(owner.Bounds.Size);
+        var config = Config.Current.Background; var bounds = new Avalonia.Rect(exportSize ?? owner.Bounds.Size);
         IBrush? back = config.BackgroundType switch
         { BackgroundType.White => Brushes.White, BackgroundType.Auto => Solid(contentColor), BackgroundType.Check => null,
           BackgroundType.Custom => Solid(config.CustomBackground.Color), _ => Brushes.Black };

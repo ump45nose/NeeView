@@ -149,3 +149,5 @@ P5第二十四批：原版本窗口布局/图标、实际Mac构建版本、复�
 P5第二十五批：原外部应用命令/集合与独立设置草稿接入；Engine捕获页组及策略，唯一平台字面提交，随机材料进程留存/2GiB共用预算；布局与启动解耦，见[外部应用契约](p5-external-applications.md)。
 
 P5第二十六批：CopyImage由ReaderView捕获首图像源并保留显示租约，后台编码只输出独立PNG；原生剪贴板仅启动装配。画布背景/变换不进入复制像素，见[p5-image-copy.md](p5-image-copy.md)。
+
+P5第二十七批：ExportImageDialog.axaml保留原800×650、350参数区/右预览/底部按钮；独立ExportImageViewModel只编辑克隆草稿和原命名。Engine管理来源/导航/覆盖/实际写入，ReaderView只复用页框绘制。预览单槽按草稿版本拒绝旧结果，关闭等待编码；主题可独立调整，见[p5-image-export.md](p5-image-export.md)。

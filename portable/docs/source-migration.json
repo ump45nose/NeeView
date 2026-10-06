@@ -528,6 +528,66 @@
       "target": "src/NeeView.Engine/BookSetting/BookSettingConfigExtensions.cs",
       "sha256": "dde4bc43fddf4da468aaa3d42df80916126f60dcc6222fb6ac649fd61be45615",
       "status": "P5 原十二字段/实际变化历史请求、递归DirtyBook及Toggle菜单参数；可等待保存与失败恢复"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportImageParameter.cs",
+      "target": "src/NeeView.Engine/ExportImage/ExportImageTypes.cs",
+      "sha256": "221681f9a3afb85bd0e26d4c466eb19a0d96325b9cdabb1d262f35f3249ac670",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportBookParameter.cs",
+      "target": "src/NeeView.Engine/ExportImage/ExportImageTypes.cs",
+      "sha256": "b40f5889aba94964d03a4233c9e43acb75716adb60c286ee985260840931ea64",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportImageFileNamePolicy.cs",
+      "target": "src/NeeView.Engine/ExportImage/ExportImageTypes.cs",
+      "sha256": "b371acbf91a0cf60930ca59bd345419cfecd2d3a03a5ed71a14d319309dbbd50",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportFileNameFormat.cs",
+      "target": "src/NeeView.Engine/ExportImage/ExportImageTypes.cs",
+      "sha256": "7463bb85e2d2b0ed1292c93ca73115034c2d3dcbdf929ea6e179abfce9a9c1c6",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportPageSource.cs",
+      "target": "src/NeeView.Engine/ExportImage/ExportImageTypes.cs",
+      "sha256": "3b144aa367f208b50c44c16d2e4839c508a1ece0565c145e75643007ec5e22cb",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportIndexPageSource.cs",
+      "target": "src/NeeView.Engine/ExportImage/ExportImageTypes.cs",
+      "sha256": "4968cf5ac1ee3cefcd2cdc183da783f4629cdf4b3771eb118388a5886ae06e8b",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportImageMode.cs",
+      "target": "src/NeeView.Engine/ExportImage/ExportImageTypes.cs",
+      "sha256": "2117a014d362900f017f817387c6efc4c6a6eb4fa2bd09fd4f28716681d04674",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportBookType.cs",
+      "target": "src/NeeView.Engine/ExportImage/ExportImageTypes.cs",
+      "sha256": "11182dd148345da7b047ac652f256fe35d9cf71bb864ecb013cf5ef8ff3c66ad",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/IExportImageParameter.cs",
+      "target": "src/NeeView.Engine/ExportImage/ExportImageTypes.cs",
+      "sha256": "991c8abc222e70109654feb7f92dab68c1aa6545b7aaa4e8158c68929c397464",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/Bitmap/BitmapImageFormat.cs",
+      "target": "src/NeeView.Engine/ExportImage/ExportImageTypes.cs",
+      "sha256": "95c48e888f5abb296603231f5b53a45706fb988acba04efd79fded17e6849340",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
     }
   ],
   "partial_adapters": [
@@ -2768,6 +2828,66 @@
       "target": "src/NeeView.Backends/MacImageClipboard.cs",
       "sha256": "55528a9a264389a7730f43ca7cff37b6851f44e302adf1b0417235c88337a654",
       "status": "位图复制系统替换点：NSPasteboard实际public.png，独立命名剪贴板验收"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/ExportImageCommandParameter.cs",
+      "target": "src/NeeView.Engine/ExportImage/ExportImageContracts.cs",
+      "sha256": "d30c13e3f80a0412e5642eb910c9cdc879e2fe416bc271114826db879d1663e4",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/ExportImageAsCommandParameter.cs",
+      "target": "src/NeeView.Engine/ExportImage/ExportImageContracts.cs",
+      "sha256": "133563715698db2d7f48ab7a074c14a6cd413ef449d4424b4a1cb794368c5ccf",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/IImageExporter.cs",
+      "target": "src/NeeView.Engine/ExportImage/ExportImageContracts.cs",
+      "sha256": "c16a0e1c2cf9bcd2f0235adfe853ee836d81e5e66284fe7db881c1d62dc659cc",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportImageWriter.cs",
+      "target": "src/NeeView.Engine/ExportImage/ExportImageWriter.cs",
+      "sha256": "c95b7b68f18cb82674b8d864c837cd9f7ca3ddb6f6e0f4b549543117f58ffcce",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportOverwriteResolver.cs",
+      "target": "src/NeeView.Engine/ExportImage/ExportImageWriter.cs",
+      "sha256": "ecd8e81b49bec250489325410c375dbbf2118311e9460541c4127952dd955574",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportImageOverwritePolicy.cs",
+      "target": "src/NeeView.Engine/ExportImage/ExportImageWriter.cs",
+      "sha256": "8817f1f92df342f6b94d829db4c473e825fa5610e6eba8d133f3104587c9d1f6",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportImageService.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Export.cs",
+      "sha256": "e8ab151922ec4ea28bfbc8d42544ac0de03af3ab2c995e915467c86f02ad70a9",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportImageProcedure.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Export.cs",
+      "sha256": "e1e38952fe638ff0ad3fb081f52dae0e15b4b1e4f3f9dcf851623a890ec302bc",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/OriginalImageExporter.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Export.cs",
+      "sha256": "d96b2752bec68644de7bb0309a154a1f6d7cea515191510ae540819e0fadfa4c",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportBook.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Export.cs",
+      "sha256": "38783734d2979464dde60f92658e6d46e366d5709ffc9c7ff16ef328de3246f8",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
     }
   ],
   "rule_references": [
@@ -3072,6 +3192,54 @@
       "target": "src/NeeView.MacOS/Styles/AppLogo.png",
       "sha256": "49884c93e70c5501f052213b0674d66c8a54c8fe0b5bc5e1ea7bc431e0aaa747",
       "status": "P5 原版本布局/图标及版本复制/链接；Mac实际程序集版本，系统接口适配；Windows更新检查保留占位"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportImageDialog.xaml",
+      "target": "src/NeeView.MacOS/Views/ExportImageDialog.axaml",
+      "sha256": "630022a3cd72dfcd6cd0582e4f58852cbd30bad392e8872da28be79c8e480c83",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportBookDialog.xaml",
+      "target": "src/NeeView.MacOS/Views/ExportImageDialog.axaml",
+      "sha256": "e64a62f6dda85f9ed71dd5dd3c02e41c13ed491d7d87bd981ceb1a156e4d4da8",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportImageDialogViewModel.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ExportImageViewModel.cs",
+      "sha256": "4130dbd0f6e78adbc3f1a52458cb3438e23f455c9f3b4fb89b88391c31fe2612",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ExportBookDialogViewModel.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ExportImageViewModel.cs",
+      "sha256": "6457df0fd5421cd5d0df52256df72f8c687b2d36c26bbeca93503427fa1c18c3",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/ExportImage/ViewImageExporter.cs",
+      "target": "src/NeeView.MacOS/Views/ReaderView.Export.cs",
+      "sha256": "44e4b80ce2cf7dbad79435fe8e18258a26adf703a20df9846722af322f8e6cab",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/Command/Commands/ExportImageCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.Export.cs",
+      "sha256": "4962e56c7d87f9416c6784ca9e163763b4002eb72a835033467d2e45a1783f9f",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/Command/Commands/ExportImageAsCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.Export.cs",
+      "sha256": "4a9f41dace6c5e6fc6cfecb16511a1acccef6b171c6b049327e666010a97bd88",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
+    },
+    {
+      "source": "NeeView/Command/Commands/ExportBookAsCommand.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.Export.cs",
+      "sha256": "1c1f0a0bf157cc758cfe047883390007c8356c790982710ec63d9669dea3f962",
+      "status": "P5第二十七批：原导出字段/默认值/命名/页框顺序迁入；WPF与同步IO替换。单图原字节流式写入、整书错误传播及临时原子提交明确修正；详见p5-image-export.md"
     }
   ],
   "backend_reuse": [

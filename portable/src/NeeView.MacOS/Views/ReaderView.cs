@@ -15,7 +15,7 @@ using CoreBitmapFactory = NeeView.BitmapFactory;
 namespace NeeView.MacOS.Views;
 
 /// <summary>原 MainView 的绘制适配；页框与分割规则由迁入的 Engine 计算。</summary>
-public sealed partial class ReaderView : Control, IDisposable
+public sealed partial class ReaderView : Control, IDisposable, IViewImageExporter
 {
     private sealed class Display(Bitmap bitmap, BitmapLease lease, DecodeRequest request, long length, DateTime version) : IDisposable
     {
@@ -172,8 +172,8 @@ public sealed partial class ReaderView : Control, IDisposable
         var revision = ++_revision; _request?.Cancel(); var request = new CancellationTokenSource(); _request = request;
         SynchronizeFrame(); _loadError = null;
         ClampPan();
-        var sources = GetDemandSources();
-        if (IsPanorama && _operation.Book is { } sourceBook)
+        var sources = _operation.IsExporting ? _frame?.Elements.Where(e => !e.IsDummy).Select(e => e.Page).Distinct().ToArray() ?? [] : GetDemandSources();
+        if (IsPanorama && !_operation.IsExporting && _operation.Book is { } sourceBook)
         {
             try
             {
@@ -278,6 +278,7 @@ public sealed partial class ReaderView : Control, IDisposable
     private DecodeRequest GetRequest(Page page)
     {
         var size = page.Content.PageDataSource.Size;
+        if (_exportOriginalSize) return new((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height));
         var frameScale = _panorama?.Frames.FirstOrDefault(f => f.Frame.Contains(page))?.Frame.Scale ?? _frame?.Scale ?? 1;
         var scale = frameScale * _transform.BaseScale * _zoom * (TopLevel.GetTopLevel(this)?.RenderScaling ?? 1);
         if (Config.Current.ImageDotKeep.IsImageDotKeep(new(size.Width * scale, size.Height * scale), size))
@@ -311,7 +312,7 @@ public sealed partial class ReaderView : Control, IDisposable
     }
     /// <summary>同一绘制函数显示当前/退出帧；快照复用真实Bitmap与租约，不复制像素。</summary>
     private void DrawFrame(DrawingContext context,IEnumerable<(PageFrameElement Source,Avalonia.Rect Target)> targets,Matrix matrix,
-        Dictionary<Page,Display> images,Dictionary<Page,string> errors,double opacity)
+        Dictionary<Page,Display> images,Dictionary<Page,string> errors,double opacity, BitmapInterpolationMode? interpolation = null)
     {
         if(opacity<=0) return;
         using var alpha=context.PushOpacity(opacity); using var transform=context.PushTransform(matrix);
@@ -323,7 +324,7 @@ public sealed partial class ReaderView : Control, IDisposable
             {
                 if (ReferenceEquals(images, _images)) image = GetMediaDisplay(source.Page, image);
                 var crop=source.ViewSizeCalculator.GetViewBox(); var pixels=image.Bitmap.PixelSize;
-                ReaderImageRenderer.Draw(this,context,image.Bitmap,new Avalonia.Rect(crop.X*pixels.Width,crop.Y*pixels.Height,crop.Width*pixels.Width,crop.Height*pixels.Height),target,matrix);
+                ReaderImageRenderer.Draw(this,context,image.Bitmap,new Avalonia.Rect(crop.X*pixels.Width,crop.Y*pixels.Height,crop.Width*pixels.Width,crop.Height*pixels.Height),target,matrix,interpolation);
                 if (errors.GetValueOrDefault(source.Page) is { Length: > 0 } error)
                 {
                     // 静态首帧可用时仍明确显示动画失败，不能悄悄把不支持当作播放成功。

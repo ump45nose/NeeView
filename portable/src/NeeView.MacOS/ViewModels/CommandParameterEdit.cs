@@ -27,6 +27,8 @@ public sealed class CommandParameterEdit(string owner, object value)
     /// <summary>原字段在Mac编辑页的文案，业务计算继续读取原属性名。</summary>
     public static string Label(string property) => property switch
     {
+        "Mode" => "导出模式", "HasBackground" => "包含画布背景", "IsOriginalSize" => "原始页框尺寸", "IsDotKeep" => "保持像素", "ExportFolder" => "输出目录（空白时选择）",
+        "FileFormat" => "图像格式", "QualityLevel" => "JPEG质量", "IsShowToast" => "显示完成提示", "OverwriteMode" => "同名冲突策略", "FileNameFormat0" => "原图命名格式", "FileNameFormat1" => "单页命名格式", "FileNameFormat2" => "双页命名格式",
         "FileName" => "备份文件名（空白时选择 .nvzip）", "Delta" => "媒体步进秒数（0 使用默认值）", "MultiPagePolicy" => "当前页组范围", "Scale" => "缩放步幅（0–1）", "IsSnapDefaultScale" => "跨越默认比例时吸附到 100%", "Angle" => "旋转角度（度）", "IsStretch" => "旋转后适配窗口",
         "Scroll" => "滚动步幅（视口比例）", "AllowCrossScroll" => "到边界后滚动另一轴", "Horizontal" => "水平对齐", "Vertical" => "垂直对齐", "IsSnap" => "强制对齐小于视口的图像",
         "ScrollType" => "滚动路径", "LineBreakStopTime" => "换行停顿（秒）", "EndMargin" => "终端容差（DIP）", "LineBreakStopMode" => "停顿位置", "PagesAsOne" => "全景页面作为整体（P3）",
@@ -37,6 +39,8 @@ public sealed class CommandParameterEdit(string owner, object value)
     /// <summary>枚举沿用原数值，界面只转换名称。</summary>
     public static string EnumLabel(object value) => value switch
     {
+        ExportImageMode.Original => "原图", ExportImageMode.View => "当前视图", BitmapImageFormat.Jpeg => "JPEG", BitmapImageFormat.Png => "PNG", ExportBookType.Folder => "文件夹", ExportBookType.Zip => "ZIP",
+        ExportImageOverwriteMode.Confirm => "确认", ExportImageOverwriteMode.AddNumber => "加编号", ExportImageOverwriteMode.Disallow => "禁止覆盖",
         MultiPagePolicy.Once => "当前主页面", MultiPagePolicy.All => "当前页组（阅读顺序）", MultiPagePolicy.AllLeftToRight => "当前页组（从左到右）",
         LimitedHorizontalAlignment.Left => "左", LimitedHorizontalAlignment.Center => "居中", LimitedHorizontalAlignment.Right => "右",
         LimitedVerticalAlignment.Top => "上", LimitedVerticalAlignment.Center => "居中", LimitedVerticalAlignment.Bottom => "下",

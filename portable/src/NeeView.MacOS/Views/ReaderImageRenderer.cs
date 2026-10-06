@@ -38,10 +38,10 @@ internal static class ReaderImageRenderer
         return Config.Current.ImageDotKeep.IsImageDotKeep(size, new(source.Width, source.Height)) ? BitmapInterpolationMode.None : BitmapInterpolationMode.HighQuality;
     }
     /// <summary>绘图调用共享实际矩阵和裁剪源；显示资源仍由各查看器的租约拥有。</summary>
-    public static void Draw(Control owner, DrawingContext context, Bitmap bitmap, Avalonia.Rect source, Avalonia.Rect target, Matrix matrix)
+    public static void Draw(Control owner, DrawingContext context, Bitmap bitmap, Avalonia.Rect source, Avalonia.Rect target, Matrix matrix, BitmapInterpolationMode? interpolation = null)
     {
         PageBackground(context, target);
-        using var options = context.PushRenderOptions(new RenderOptions { BitmapInterpolationMode = Interpolation(owner, source, target, matrix) });
+        using var options = context.PushRenderOptions(new RenderOptions { BitmapInterpolationMode = interpolation ?? Interpolation(owner, source, target, matrix) });
         context.DrawImage(bitmap, source, target);
     }
 }

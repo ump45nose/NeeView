@@ -121,6 +121,9 @@ public sealed class SliderConfig
 /// <summary>来自原 BookConfig 的分页参数及默认值。</summary>
 public sealed class BookConfig
 {
+    /// <summary>原单页和整书导出草稿，仍由唯一JSON差分配置保存。</summary>
+    public ExportImageParameter ExportImageParameter { get; set; } = new();
+    public ExportBookParameter ExportBookParameter { get; set; } = new();
     /// <summary>原全景开关；Mac连续/瀑布模式共用同一书籍和位置。</summary>
     public bool IsPanorama { get; set; }
     /// <summary>Mac全景布局扩展，原JSON字段保留；关闭全景不丢失上次布局选择。</summary>
