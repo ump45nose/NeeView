@@ -69,9 +69,10 @@ public class ArchiveEntry(Archive archive)
     /// <summary>原PlaylistArchiveEntry代理的实际条目；显示名与实体类型/定位分别保存。</summary>
     public virtual ArchiveEntry TargetArchiveEntry => this;
     /// <summary>原已支持的图片候选；损坏图片仍保留页面。</summary>
-    public bool IsImage() => !ReferenceEquals(TargetArchiveEntry, this) ? TargetArchiveEntry.IsImage() : !IsDirectory && ImageFormats.IsImage(EntryName);
+    public bool IsImage() => !ReferenceEquals(TargetArchiveEntry, this) ? TargetArchiveEntry.IsImage() : !IsDirectory &&
+        (Archive is PdfArchive || !ArchiveFormats.IsArchive(EntryName) && ImageFormats.IsImage(EntryName));
     /// <summary>原书籍候选：目录或已接入的压缩格式。</summary>
-    public bool IsBook() => !ReferenceEquals(TargetArchiveEntry, this) ? TargetArchiveEntry.IsBook() : IsDirectory || ArchiveFormats.IsArchive(EntryName);
+    public bool IsBook() => !ReferenceEquals(TargetArchiveEntry, this) ? TargetArchiveEntry.IsBook() : IsDirectory || Archive is not PdfArchive && ArchiveFormats.IsArchive(EntryName);
     /// <summary>沿原Archive.CanRealize：普通目录直接传实体地址，归档内部目录不能提取；链接仍待适配。</summary>
     /// <returns>普通实体或归档文件项为true，归档内部目录为false。</returns>
     public bool CanRealize() => !Archive.IsDisposed && (!ReferenceEquals(TargetArchiveEntry, this) ? TargetArchiveEntry.CanRealize() : FilePath is not null || !IsShortcut && !IsDirectory);

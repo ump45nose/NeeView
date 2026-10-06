@@ -11,6 +11,25 @@ public sealed class PdfNativeTests
 {
     private static CancellationToken Token => TestContext.Current.CancellationToken;
     [Fact]
+    public async Task CustomExtensionUsesActualPdfBackendAtRootAndInsideZip()
+    {
+        using var fixture = new SyntheticPdf(); Config.SetCurrent(new()); Config.Current.Archive.Pdf.SupportFileTypes = new(".document");
+        var path = System.IO.Path.Combine(fixture.Root, "custom.document"); File.Copy(fixture.Path, path);
+        var factory = new ArchiveFactory(pdfRenderer: new MacPdfRenderer()); var decoder = new MagickImageDecoder();
+        Assert.Contains(await factory.ListBooksAsync(fixture.Root, Token), item => item.Path == path);
+        await using (var root = await factory.OpenAsync(path, Token))
+        {
+            Assert.IsType<PdfArchiveSource>(root); var entry = (await root.GetEntriesAsync(Token))[0];
+            await using var stream = await root.OpenEntryAsync(entry, Token); using var pixels = await decoder.DecodeAsync(stream, new(100, 150, true), Token);
+            Assert.Equal(new byte[] { 0, 0, 255, 255 }, Pixel(pixels, 50, 10));
+        }
+        var outer = System.IO.Path.Combine(fixture.Root, "custom.cbz"); using (var zip = ZipFile.Open(outer, ZipArchiveMode.Create)) zip.CreateEntryFromFile(path, "inside.document");
+        var location = System.IO.Path.Combine(outer, "inside.document", "002.png");
+        await using var source = await factory.OpenAsync(location, Token); Assert.True(await factory.ExistsAsync(location, Token));
+        var entries = await source.GetEntriesAsync(Token); await using var image = await source.OpenEntryAsync(entries[1], Token);
+        using var rendered = await decoder.DecodeAsync(image, new(100, 150, true), Token); Assert.Equal(new byte[] { 255, 0, 0, 255 }, Pixel(rendered, 50, 75));
+    }
+    [Fact]
     public void NativePageIndexCropRotationAndOutlineUseRealPdf()
     {
         using var fixture = new SyntheticPdf(); var renderer = new MacPdfRenderer(); var info = renderer.Inspect(fixture.Path, Token);

@@ -87,18 +87,20 @@ public sealed partial class SaveData
             foreach (var key in raw.Select(pair => pair.Key).Where(key => key != property.Name && key.Equals(property.Name, StringComparison.OrdinalIgnoreCase)).ToArray()) raw.Remove(key);
             // Mac 的关闭选择需要完整原布局快照；不对动态 Docks/Panels 字典盲目裁剪。
             if (value is PanelsConfig && property.Name == "Layout" && property.Value is not null) continue;
-            if (property.Value is not null &&
+            // 原FileTypeCollection等类型由converter写为字符串，不能仅凭CLR class递归为对象。
+            var serialized = JsonSerializer.SerializeToNode(property.Value, property.Type, Options);
+            if (property.Value is not null && serialized is JsonObject objectValue &&
                 property.Type.Assembly == typeof(Config).Assembly && !typeof(IEnumerable).IsAssignableFrom(property.Type) &&
                 property.Type.GetConstructor(Type.EmptyTypes) is not null)
             {
-                var child = raw[property.Name] as JsonObject ?? JsonSerializer.SerializeToNode(property.Value, property.Type, Options)!.AsObject();
+                var child = raw[property.Name] as JsonObject ?? objectValue;
                 TrimKnownObject(child, property.Value, property.Default ?? Activator.CreateInstance(property.Type)!);
                 if (child.Count == 0 && property.Default is not null) raw.Remove(property.Name);
                 else if (child.Parent is null) raw[property.Name] = child;
             }
             else if (property.IsDefault) raw.Remove(property.Name);
             // 原serializer输出实际getter值；旧setter可能覆盖了同一节点已有的现代字段。
-            else raw[property.Name] = JsonSerializer.SerializeToNode(property.Value, property.Type, Options);
+            else raw[property.Name] = serialized;
         }
     }
 

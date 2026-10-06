@@ -14,6 +14,9 @@
       <StackPanel Margin="24" Spacing="12">
         <TextBlock Classes="settings-section" Text="PDF" FontSize="{DynamicResource SystemFontSizeHuge}" />
         <CheckBox x:Name="PdfEnabled" Content="启用 PDF 读取" IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
+        <TextBlock Text="支持的扩展名" />
+        <TextBox x:Name="PdfFileTypes" AutomationProperties.Name="PDF 扩展名" Text="{Binding SupportFileTypes, Mode=TwoWay}" />
+        <TextBlock Text="用分号分隔，例如 .pdf;.document。留空关闭 PDF 格式识别。" TextWrapping="Wrap" />
         <TextBlock Text="默认渲染尺寸（像素）" />
         <Grid ColumnDefinitions="*,Auto,*"><NumericUpDown x:Name="PdfWidth" AutomationProperties.Name="PDF 渲染宽度" Value="{Binding RenderWidth, Mode=TwoWay}" Minimum="256" Maximum="{Binding RenderWidthMaximum}" Increment="128" /><TextBlock Grid.Column="1" Text=" × " VerticalAlignment="Center" /><NumericUpDown x:Name="PdfHeight" Grid.Column="2" AutomationProperties.Name="PDF 渲染高度" Value="{Binding RenderHeight, Mode=TwoWay}" Minimum="256" Maximum="{Binding RenderHeightMaximum}" Increment="128" /></Grid>
         <TextBlock Text="保持页面比例；普通显示按原规则选择渲染规格，提取/复制使用默认流。" TextWrapping="Wrap" />

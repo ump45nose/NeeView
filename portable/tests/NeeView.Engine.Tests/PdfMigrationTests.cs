@@ -29,6 +29,117 @@ public sealed class PdfMigrationTests
         }
     }
     private static string Pdf(Fixture f) { var path = Path.Combine(f.Root, "原文.pdf"); File.WriteAllText(path, "test provider"); return path; }
+    [Fact]
+    public void FileTypeConstructionRestoreAndRangeOperationsUseOneNormalization()
+    {
+        var types = new FileTypeCollection("PDF; .PDF ;DOCUMENT;\"Odd;Suffix\";bad/name");
+        Assert.True(types.Contains(".pdf")); Assert.True(types.Contains(".document")); Assert.True(types.Contains(".odd;suffix"));
+        Assert.True(types.Contains(".bad_name")); Assert.Single(types.Items, e => e == ".pdf");
+        Assert.Equal(types.Items, JsonSerializer.Deserialize<FileTypeCollection>(JsonSerializer.Serialize(types))!.Items);
+        types.Restore(new[] { "PNG", ".png", "", "  " }); Assert.Equal(new[] { ".png" }, types.Items);
+        types.AddRange(new[] { "TIFF", ".TIFF" }); Assert.Equal(new[] { ".png", ".tiff" }, types.Items);
+        types.RemoveRange(new[] { "PNG" }); Assert.Equal(new[] { ".tiff" }, types.Items);
+        var plain = new NeeView.Text.StringCollection("ABC;abc"); Assert.Equal(new[] { "abc", "ABC" }.OrderBy(e => e), plain.Items);
+    }
+    [Theory]
+    [InlineData(ArchiveEntryCollectionMode.CurrentDirectory)]
+    [InlineData(ArchiveEntryCollectionMode.IncludeSubDirectories)]
+    [InlineData(ArchiveEntryCollectionMode.IncludeSubArchives)]
+    public async Task VirtualPngExplicitLocationCannotReopenItAsPdf(ArchiveEntryCollectionMode mode)
+    {
+        using var f = new Fixture(); var state = new SaveData(f.State); await state.LoadAsync(Token);
+        Config.Current.Archive.Pdf.SupportFileTypes = new("PNG"); Config.Current.System.ArchiveRecursiveMode = mode;
+        var path = Path.Combine(f.Root, "document.png"); File.WriteAllText(path, "test provider");
+        var factory = new ArchiveFactory(pdfRenderer: new Renderer());
+        await using (var source = await factory.OpenAsync(path, Token))
+        {
+            var page = (await source.GetEntriesAsync(Token))[1];
+            await Assert.ThrowsAsync<NotSupportedException>(() => factory.OpenAsync(page, Token));
+            Assert.False(await factory.ExistsAsync(Path.Combine(path, "002.png", "001.png"), Token));
+        }
+        var requested = Path.Combine(path, "002.png"); Assert.True(await factory.ExistsAsync(requested, Token));
+        await using var operation = new BookOperation(factory, new MagickImageDecoder(), state);
+        await operation.OpenAsync(requested, Token); Assert.Null(operation.Error);
+        Assert.Equal(path, operation.Book!.Path); Assert.Equal("002.png", operation.Book.CurrentPage!.EntryName);
+        Assert.Equal(2, operation.Book.Pages.Count); Assert.All(operation.Book.Pages, page => Assert.False(page.ArchiveEntry.IsBook()));
+    }
+    [Fact]
+    public async Task OriginalFileTypeStringCustomEmptyAndDefaultRoundTripThroughDifferenceSave()
+    {
+        using var f = new Fixture(); Directory.CreateDirectory(f.State);
+        var path = Path.Combine(f.State, "UserSetting.json");
+        await File.WriteAllTextAsync(path, """{"Config":{"Archive":{"Pdf":{"SupportFileTypes":".pdf;.document","Future":77}}}}""", Token);
+        var state = new SaveData(f.State); await state.LoadAsync(Token);
+        Assert.True(ArchiveFormats.IsPdfArchive("Book.DOCUMENT")); await state.SaveAsync(null, Token);
+        var json = JsonNode.Parse(await File.ReadAllTextAsync(path, Token))!;
+        Assert.Equal(".document;.pdf", json["Config"]!["Archive"]!["Pdf"]!["SupportFileTypes"]!.GetValue<string>());
+        Config.Current.Archive.Pdf.SupportFileTypes = new(""); await state.SaveAsync(null, Token); await state.LoadAsync(Token);
+        Assert.False(ArchiveFormats.IsPdfArchive("book.pdf"));
+        Config.Current.Archive.Pdf.SupportFileTypes = new(".pdf"); await state.SaveAsync(null, Token); await state.LoadAsync(Token);
+        Assert.True(ArchiveFormats.IsPdfArchive("book.pdf")); Assert.False(ArchiveFormats.IsPdfArchive("book.document"));
+        json = JsonNode.Parse(await File.ReadAllTextAsync(path, Token))!; Assert.Equal(77, json["Config"]!["Archive"]!["Pdf"]!["Future"]!.GetValue<int>());
+    }
+    [Fact]
+    public async Task ConfiguredPdfExtensionUsesSameBookshelfNestedAndHistoryDispatch()
+    {
+        using var f = new Fixture(); Config.SetCurrent(new()); Config.Current.Archive.Pdf.SupportFileTypes = new(".pdf;.document");
+        var path = Path.Combine(f.Root, "原文.document"); File.WriteAllText(path, "test provider");
+        var factory = new ArchiveFactory(pdfRenderer: new Renderer());
+        Assert.Contains(await factory.ListBooksAsync(f.Root, Token), item => item.Path == path);
+        await using (var source = await factory.OpenAsync(Path.Combine(path, "002.png"), Token))
+        { Assert.Equal("002.png", source.RequestedEntryName); Assert.Equal(path, source.RootArchivePath); }
+        var zipPath = Path.Combine(f.Root, "outer.cbz"); using (var zip = ZipFile.Open(zipPath, ZipArchiveMode.Create)) zip.CreateEntryFromFile(path, "章节/inside.document");
+        var nested = Path.Combine(zipPath, "章节/inside.document", "002.png");
+        Assert.True(await factory.ExistsAsync(nested, Token));
+        await using var opened = await factory.OpenAsync(nested, Token); Assert.Equal("002.png", opened.RequestedEntryName); Assert.Equal(zipPath, opened.RootArchivePath);
+        Assert.Equal(2, (await opened.GetEntriesAsync(Token)).Count);
+    }
+    [Fact]
+    public async Task OverlappingPdfSuffixRetainsCompressedBackendPriority()
+    {
+        using var f = new Fixture(); Config.SetCurrent(new()); Config.Current.Archive.Pdf.SupportFileTypes = new(".pdf;.cbz;.nvpls");
+        Assert.False(ArchiveFormats.IsPdfArchive("list.nvpls")); Assert.False(ArchiveFormats.IsPageArchive("list.nvpls"));
+        await using var source = await new ArchiveFactory(pdfRenderer: new Renderer()).OpenAsync(f.Zip, Token);
+        Assert.IsType<CompressedArchive>(source); Assert.Equal(5, (await source.GetEntriesAsync(Token)).Count);
+    }
+    [Fact]
+    public async Task PdfConfiguredAsImageSuffixKeepsVirtualPngPagesAsImages()
+    {
+        using var f = new Fixture(); var state = new SaveData(f.State); await state.LoadAsync(Token);
+        Config.Current.Archive.Pdf.SupportFileTypes = new(".png"); var path = Path.Combine(f.Root, "document.png"); File.WriteAllText(path, "test provider");
+        var factory = new ArchiveFactory(pdfRenderer: new Renderer()); await using var operation = new BookOperation(factory, new MagickImageDecoder(), state);
+        await operation.OpenAsync(path, Token); Assert.Null(operation.Error); Assert.Equal(2, operation.Book!.Pages.Count);
+        Assert.All(operation.Book.Pages, page => { Assert.True(page.IsImage); Assert.False(page.ArchiveEntry.IsBook()); Assert.Equal(PageType.File, page.PageType); });
+        await using var stream = await operation.Book.CurrentPage!.ArchiveEntry.Archive.OpenEntryAsync(operation.Book.CurrentPage.ArchiveEntry, Token);
+        using var decoded = await new MagickImageDecoder().DecodeAsync(stream, new(100, 150, true), Token); Assert.Equal(new Size(100, 150), decoded.Size);
+    }
+    [Fact]
+    public async Task DisabledPdfIsAbsentFromBookshelfAndFailedOpenKeepsOldBook()
+    {
+        using var f = new Fixture(); var state = new SaveData(f.State); await state.LoadAsync(Token); var path = Pdf(f);
+        var factory = new ArchiveFactory(pdfRenderer: new Renderer()); await using var operation = new BookOperation(factory, new MagickImageDecoder(), state);
+        await operation.OpenAsync(f.Images, Token); var previous = operation.Book; Assert.NotNull(previous);
+        Config.Current.Archive.Pdf.IsEnabled = false;
+        Assert.DoesNotContain(await factory.ListBooksAsync(f.Root, Token), item => item.Path == path);
+        await operation.OpenAsync(path, Token); Assert.Same(previous, operation.Book); Assert.NotNull(operation.Error);
+    }
+    [AvaloniaFact]
+    public async Task ExtensionDraftParseFailureAndRetryKeepOriginalSettingsTransaction()
+    {
+        using var f = new Fixture(); var state = new SaveData(f.State); await state.LoadAsync(Token); await state.SaveAsync(null, Token);
+        await using var operation = f.Operation(state); var model = new ReaderWorkspaceViewModel(operation, new(operation), state);
+        var settings = new SettingsWindow(model); settings.Show();
+        try
+        {
+            settings.FindControl<ListBox>("SettingsNavigation")!.SelectedIndex = 9; Pump(settings);
+            var box = settings.FindControl<TextBox>("PdfFileTypes")!; box.Text = "\"unterminated";
+            Click(settings, "SaveSettings"); await Wait(() => settings.FindControl<TextBlock>("Message")!.Text?.StartsWith("保存失败：") == true);
+            Assert.Equal(".pdf", Config.Current.Archive.Pdf.SupportFileTypes.ToString()); Assert.Equal("\"unterminated", box.Text);
+            box.Text = ".pdf;.document"; Click(settings, "SaveSettings"); await Wait(() => settings.WasSaved); await state.LoadAsync(Token);
+            Assert.True(ArchiveFormats.IsPdfArchive("book.document"));
+        }
+        finally { settings.Close(); model.Detach(); }
+    }
     private sealed class BlockingRenderer : Renderer
     {
         internal TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);

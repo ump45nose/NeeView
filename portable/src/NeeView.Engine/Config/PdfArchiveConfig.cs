@@ -4,8 +4,12 @@ namespace NeeView;
 /// <summary>原PDF开关与渲染规格；其他配置继续由原JSON保留。</summary>
 public sealed class PdfArchiveConfig
 {
+    public static FileTypeCollection DefaultSupportFileTypes { get; } = new(".pdf");
+    private FileTypeCollection _supportFileTypes = (FileTypeCollection)DefaultSupportFileTypes.Clone();
     private Size _renderSize = new(1920, 1080);
     public bool IsEnabled { get; set; } = true;
+    /// <summary>原分号集合/JSON字符串；显式空集合停用所有PDF扩展，不自动补回默认。</summary>
+    public FileTypeCollection SupportFileTypes { get => _supportFileTypes; set => _supportFileTypes = value ?? new(); }
     /// <summary>原默认1920×1080，每轴最低256；非有限导入值不能进入原生分配。</summary>
     [System.Text.Json.Serialization.JsonConverter(typeof(JsonSizeConverter))]
     public Size RenderSize { get => _renderSize; set => _renderSize = new(Clamp(value.Width, 256), Clamp(value.Height, 256)); }

@@ -504,6 +504,24 @@
       "target": "src/NeeView.Engine/Config/FontsConfig.cs",
       "sha256": "6745d8b84c7b60159e5d9b50bb96f674cc91e27757cca89e237d376feeb10f8e",
       "status": "P5第九批：原六字段/默认/非正回退/五位舍入，系统默认字体为启动注入值；唯一JSON差分与事务"
+    },
+    {
+      "source": "NeeView/NeeView/Text/StringCollection.cs",
+      "target": "src/NeeView.Engine/Text/StringCollection.cs",
+      "sha256": "047e16eabb26e2b305a57d9e53e81ace4b34beddb9cb9127b887435a041af9d4",
+      "status": "P5：原解析/排序/去重/克隆和字符串JSON迁入；必要修复：构造/Restore及批量操作统一调用ValidateItem，修正原大写/无点号扩展名不能匹配的问题"
+    },
+    {
+      "source": "NeeView/NeeView/Text/StringCollectionParser.cs",
+      "target": "src/NeeView.Engine/Text/StringCollectionParser.cs",
+      "sha256": "f6f91f76f898c49c0e36612b0d7780c05f6d801a19aaec2999534743c9438ef7",
+      "status": "P5：原分号/引号解析、集合排序/去重/克隆和FileTypeCollection字符串JSON迁入，仅移除未使用合并注解"
+    },
+    {
+      "source": "NeeView/Archiver/FileTypeCollection.cs",
+      "target": "src/NeeView.Engine/Archiver/FileTypeCollection.cs",
+      "sha256": "2e678fe1f719a3fc46e686f05f04b7f38c8df4cef7b2b31f7775697f65c1de65",
+      "status": "P5：原分号/引号解析、集合排序/去重/克隆和FileTypeCollection字符串JSON迁入，仅移除未使用合并注解"
     }
   ],
   "partial_adapters": [
@@ -2329,7 +2347,7 @@
       "source": "NeeView/Config/PdfArchiveConfig.cs",
       "target": "src/NeeView.Engine/Config/PdfArchiveConfig.cs",
       "sha256": "7da29eb3656263f404a25dbbb99563f0d875096b694e829d812189296bb51c3f",
-      "status": "P5第十三批：原开关及1920x1080/每轴256配置；SupportFileTypes保留但未接入执行"
+      "status": "P5：原开关/尺寸及SupportFileTypes字符串集合已接入；压缩/列表优先，PDF逻辑PNG不参与后缀识别"
     },
     {
       "source": "NeeView/Config/PerformanceConfig.cs",

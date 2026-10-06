@@ -460,3 +460,5 @@ P5第一批最终37项专项、877项全量通过，2项需显式图片目录的
 ## P5 第十三批：原PDF阅读链
 
 原PDF归档/目录/三尺寸/配置接入，官方CoreGraphics/PDFKit替换WindowsPDFium；57相关专项、1280全量通过/2资源跳过、6实际原生后台测试通过。正式Library/默认ARM64应用及strict/deep本地签名通过。导出流并发缺陷已修复并回归，原生像素和Headless分别留证；密码/扩展名配置、Windows/设备和正式分发待迁/待验。见[契约](../docs/p5-pdf.md)与[验收](p5-pdf-runtime.md)，P5整体未完成。
+
+P5第十四批：原PDF SupportFileTypes与集合字符串JSON接入唯一来源；修复原批量集合规范与迁移虚拟PNG嵌套边界。79相关专项、1290全量通过/2资源跳过、7实际原生后台通过，正式ARM64构建/本地签名通过；[验收](p5-pdf-filetypes-runtime.md)。P5未完成，设备/Windows/真实导出与正式分发另验。

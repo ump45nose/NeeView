@@ -89,7 +89,7 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
             }
         }
         Archive archive;
-        if (ImageFormats.IsImage(path))
+        if (ImageFormats.IsImage(path) && !ArchiveFormats.IsArchive(path))
         {
             if (!File.Exists(path)) throw new FileNotFoundException("图片不存在。", path);
             var directory = System.IO.Path.GetDirectoryName(path)!;
@@ -113,7 +113,8 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
     /// <summary>原归档工厂分派PDF与压缩；不让PDF进入压缩/图片delegate。</summary>
     private Archive CreatePageArchive(string path, CancellationToken token, string? logicalPath = null, ArchiveEntry? source = null, IAsyncDisposable? lifetime = null)
     {
-        if (!ArchiveFormats.IsPdfArchive(logicalPath ?? path)) return new CompressedArchive(path, logicalPath, source, lifetime) { IsRootShortcut = source is null && new FileInfo(path).LinkTarget is not null };
+        // 原ArchiveManager顺序：ZIP/7z在PDF之前，配置重叠后缀不能夺取压缩来源。
+        if (ArchiveFormats.IsCompressedArchive(logicalPath ?? path)) return new CompressedArchive(path, logicalPath, source, lifetime) { IsRootShortcut = source is null && new FileInfo(path).LinkTarget is not null };
         if (!Config.Current.Archive.Pdf.IsEnabled) throw new NotSupportedException("PDF读取已在归档设置中关闭。");
         if (pdfRenderer is null) throw new NotSupportedException("当前宿主未装配系统PDF后端。");
         return new PdfArchiveSource(path, pdfRenderer, token, logicalPath, source, lifetime) { IsRootShortcut = source is null && new FileInfo(path).LinkTarget is not null };

@@ -13,7 +13,7 @@ public sealed partial class ArchiveFactory
         entry = entry.TargetArchiveEntry;
         if (entry.FilePath is not null || entry.Archive.IsDirectory) return OpenAsync(entry.SystemPath, token);
         if (entry.IsDirectory) return Task.FromResult<Archive>(new ArchiveDirectory(entry.Archive, entry.SystemPath, entry.EntryName, false));
-        if (!ArchiveFormats.IsPageArchive(entry.EntryName)) throw new NotSupportedException("内部条目不是已支持的压缩归档。");
+        if (!entry.IsBook() || !ArchiveFormats.IsPageArchive(entry.EntryName)) throw new NotSupportedException("内部条目不是已支持的子归档。");
         return OpenNestedAsync(entry, false, token);
     }
     /// <summary>压缩文件不是目录；不能把内部“..”规范化成归档外的真实文件。</summary>
@@ -39,7 +39,8 @@ public sealed partial class ArchiveFactory
         var entry = entries.FirstOrDefault(e => !e.IsDirectory && e.EntryName == relative);
         if (entry is not null)
         {
-            if (ArchiveFormats.IsPageArchive(entry.EntryName)) return await OpenNestedAsync(entry, true, token).ConfigureAwait(false);
+            // 类型由真实来源判定：PDF虚拟PNG即使与自定义PDF后缀重合，仍是页面。
+            if (entry.IsBook() && ArchiveFormats.IsPageArchive(entry.EntryName)) return await OpenNestedAsync(entry, true, token).ConfigureAwait(false);
             if (Config.Current.System.ArchiveRecursiveMode == ArchiveEntryCollectionMode.CurrentDirectory && relative.Contains('/'))
             {
                 var slash = relative.LastIndexOf('/');
@@ -47,7 +48,7 @@ public sealed partial class ArchiveFactory
             }
             return new RequestedArchive(source, relative);
         }
-        var container = entries.Where(e => !e.IsDirectory && ArchiveFormats.IsPageArchive(e.EntryName)
+        var container = entries.Where(e => !e.IsDirectory && e.IsBook() && ArchiveFormats.IsPageArchive(e.EntryName)
             && relative.StartsWith(e.EntryName + "/", StringComparison.Ordinal)).OrderByDescending(e => e.EntryName.Length).FirstOrDefault();
         if (container is null) throw new FileNotFoundException("归档内部指定页面或目录不存在：" + relative);
         var child = await OpenNestedAsync(container, true, token).ConfigureAwait(false);

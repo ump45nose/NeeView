@@ -1,0 +1,43 @@
+{
+  "baseline": "c5c398d89",
+  "start_commit": "517ccfeec",
+  "focused_tests": 79,
+  "tests": {
+    "total": "1292",
+    "executed": "1290",
+    "passed": "1290",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "native_tests": {
+    "total": "7",
+    "passed": "7",
+    "failed": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "repairs": [
+    "原构造/Restore与批量集合统一ValidateItem，扩展名点号/大小写一致",
+    "差分转换仅对实际JsonObject递归",
+    "PDF虚拟页的嵌套资格同时检查真实IsBook"
+  ],
+  "visual": "主线程已检查实际正式设置XAML的Headless截图；不等于真机验收",
+  "archive": "/Users/yuwk/.codex/artifacts/neeview/p5-pdf-filetypes-20261006/final-full",
+  "not_verified": [
+    "Windows动态/真实用户导出",
+    "长期原生内存",
+    "Developer ID/公证/安装"
+  ],
+  "user_data": "未激活正式窗口或修改用户图片/Profile/NAS"
+}
