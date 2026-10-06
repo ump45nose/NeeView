@@ -55,6 +55,42 @@ public sealed class ImageEffectRenderTests
         var effect=new ImageEffectConfig{IsEnabled=true,Layers=new(){new(){Effect=unit}}};Assert.InRange(Draw(source,effect).R,253,255);
         foreach(var point in unit.Points)point.Color=ThemeRgba.Parse("Blue");Assert.InRange(Draw(source,effect).B,253,255);
     }
+    [AvaloniaFact] public void MonochromeUsesOriginalThirtyFiftyNineElevenWeightsAndTint()
+    {
+        using var source=Source(MagickColors.Red);
+        var result=Draw(source,new(){IsEnabled=true,Layers=new(){new(){Effect=new MonochromeEffectUnit{Color=ThemeRgba.Parse("Blue")}}}});
+        Assert.Equal(0,result.R);Assert.Equal(0,result.G);Assert.InRange(result.B,75,77);Assert.Equal(255,result.A);
+    }
+    [AvaloniaFact] public void ColorTonePreservesDesaturationBeforeToneInterpolation()
+    {
+        using var source=Source(MagickColors.Red);
+        var tone=new ColorToneEffectUnit{LightColor=ThemeRgba.Parse("White"),DarkColor=ThemeRgba.Parse("Black"),Desaturation=.25,ToneAmount=.5};
+        var result=Draw(source,new(){IsEnabled=true,Layers=new(){new(){Effect=tone}}});
+        // 原shader: (.825,.075,.075)与(.3,.3,.3)各半；不是先tone再去色。
+        Assert.InRange(result.R,142,144);Assert.InRange(result.G,47,49);Assert.InRange(result.B,47,49);Assert.Equal(255,result.A);
+    }
+    [AvaloniaFact] public void BloomPreservesPackedBaseAndBloomComponents()
+    {
+        using var source=Source(new MagickColor("#CC6633"));
+        var bloom=new BloomEffectUnit();var effect=new ImageEffectConfig{IsEnabled=true,Layers=new(){new(){Effect=bloom}}};
+        var result=Draw(source,effect);Assert.InRange(result.R,250,252);Assert.InRange(result.G,139,141);Assert.InRange(result.B,50,52);Assert.Equal(255,result.A);
+        bloom.BloomIntensity=0;result=Draw(source,effect);Assert.InRange(result.R,203,205);Assert.InRange(result.G,101,103);
+        bloom.BaseIntensity=0;result=Draw(source,effect);Assert.Equal(0,result.A);
+    }
+    [AvaloniaTheory] [InlineData(-1)] [InlineData(1)]
+    public void BloomThresholdEndpointsRemainFiniteAndExportable(double threshold)
+    {
+        using var source=Source(MagickColors.White);
+        var effect=new ImageEffectConfig{IsEnabled=true,Layers=new(){new(){Effect=new BloomEffectUnit{Threshold=threshold}}}};
+        var result=Draw(source,effect);Assert.Equal(255,result.A);ImageEffectRenderer.EnsureExportSupported();
+    }
+    [AvaloniaFact] public void BloomUsesOriginalPremultipliedFourChannelInput()
+    {
+        using var source=Source(new MagickColor("#66000080"));
+        var result=Draw(source,new(){IsEnabled=true,Layers=new(){new(){Effect=new BloomEffectUnit()}}});
+        // 原输入(.20078,0,0,.50196)，RGB未越过阈值，alpha的bloom仍参与合成。
+        Assert.InRange(result.A,180,182);Assert.InRange(result.R,71,73);Assert.Equal(0,result.G);Assert.Equal(0,result.B);
+    }
     [AvaloniaFact] public void UnsupportedEffectsAreReportedAndBlockViewExport()
     {
         Config.SetCurrent(new(){ImageEffect=new(){IsEnabled=true,Layers=new(){new(){Effect=new RippleEffectUnit()}}}});

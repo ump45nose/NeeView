@@ -3176,6 +3176,12 @@
       "target": "src/NeeView.MacOS/Views/MainWindow.Help.cs",
       "sha256": "ad7691d75130bd0713d02c386266a1a9ae4a21ade537ccb72febb62abbb209b5",
       "status": "P5第三十批原帮助HTML→随机临时文件→唯一平台打开；关闭取消和清理。见p5-help-manuals.md"
+    },
+    {
+      "source": "NeeView/Expression.Blend.NETFramework/Microsoft.Expression.Effects.dll",
+      "target": "src/NeeView.MacOS/Views/ImageEffectRenderer.cs",
+      "sha256": "34843cfea24b713b1b5fd9a93c61d7c6d3fa320dbb84df60d9d48c5560c79452",
+      "status": "P5第三十一批：固定DLL只作Bloom/Monochrome/ColorTone行为核验；CTAB/ps_2_0及原managed打包绑定手工落实SkSL，不复制或分发DLL/字节码、不引入D3D运行兼容层。原生动态对照另验。"
     }
   ],
   "rule_references": [

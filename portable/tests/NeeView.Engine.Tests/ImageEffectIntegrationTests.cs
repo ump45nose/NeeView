@@ -176,6 +176,32 @@ public sealed class ImageEffectIntegrationTests
         finally{await window.PrepareShutdownAsync();window.Close();}
         await Wait(()=>factory.GetDiagnostics().Leases==0);Assert.Equal(0,factory.ByteCount);
     }
+    [AvaloniaTheory] [InlineData(EffectType.Bloom)] [InlineData(EffectType.Monochrome)] [InlineData(EffectType.ColorTone)]
+    public async Task MigratedColorEffectsUseRealViewExportAndLeaveSourceCopyAndPositionIntact(EffectType type)
+    {
+        using var f=new Fixture();var path=Path.Combine(f.Images,"001.png");
+        using(var image=new MagickImage(MagickColors.Red,100,200))image.Write(path);
+        var source=File.ReadAllBytes(path);var state=new SaveData(f.State);await state.LoadAsync(Token);
+        var decoder=new MagickImageDecoder();var factory=new BitmapFactory(decoder);var op=new BookOperation(new ArchiveFactory(),decoder,state);var window=Window(op,state,factory);
+        try
+        {
+            await window.OpenAsync(path);await op.ApplySettingAsync(s=>{s.PageMode=PageMode.SinglePage;s.IsSupportedDividePage=false;});var position=op.Position;
+            await op.EditImageOptionsAsync(c=>{c.ImageEffect.IsEnabled=true;c.ImageEffect.Layers[0].ChangeType(type,c.ImageEffect,c.ImageEffectCache);});
+            await window.Viewer.RefreshAsync();await Wait(()=>window.Viewer.CanCopyImage);ImageEffectRenderer.EnsureExportSupported();
+            using var output=new MemoryStream();await window.Viewer.ExportViewAsync(op.Frame!,new ExportImageParameter{Mode=ExportImageMode.View,IsOriginalSize=true},output,Token);
+            using var view=new MagickImage(output.ToArray());var pixel=view.GetPixels().GetPixel(50,100).ToColor()!;
+            if(type==EffectType.Monochrome){Assert.InRange(pixel.R,75,77);Assert.InRange(pixel.G,75,77);Assert.InRange(pixel.B,75,77);}
+            if(type==EffectType.ColorTone){Assert.InRange(pixel.R,138,140);Assert.InRange(pixel.G,97,99);Assert.InRange(pixel.B,37,39);}
+            if(type==EffectType.Bloom){Assert.Equal((byte)255,pixel.R);Assert.Equal((byte)0,pixel.G);Assert.Equal((byte)0,pixel.B);}
+            // 正式导出宿主结束后刷新普通规格；直接调用离屏接口的测试也遵守该生命周期。
+            await window.Viewer.RefreshAsync();await Wait(()=>window.Viewer.CanCopyImage);
+            var copy=await window.Viewer.CaptureCopyImageAsync(Token);using var original=new MagickImage(copy);Assert.Equal((byte)255,original.GetPixels().GetPixel(50,100).GetChannel(0));
+            Assert.Equal(position,op.Position);Assert.Equal(source,File.ReadAllBytes(path));
+            await op.SaveAsync();var saved=new SaveData(f.State);await saved.LoadAsync(Token);Assert.Equal(type,Config.Current.ImageEffect.Layers[0].EffectType);
+        }
+        finally{await window.PrepareShutdownAsync();window.Close();}
+        await Wait(()=>factory.GetDiagnostics().Leases==0);Assert.Equal(0,factory.ByteCount);
+    }
     [AvaloniaFact] public async Task BrowseGeometryKeepsAnchorWithoutRepeatingLayoutAndSceneResourcesClose()
     {
         using var f=new Fixture();for(int i=6;i<=100;i++)File.Copy(Path.Combine(f.Images,"001.png"),Path.Combine(f.Images,$"{i:000}.png"));

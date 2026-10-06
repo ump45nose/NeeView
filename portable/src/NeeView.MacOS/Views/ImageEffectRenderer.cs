@@ -23,7 +23,8 @@ internal sealed class ImageEffectRenderResult
 internal static class ImageEffectRenderer
 {
     private static readonly ConditionalWeakTable<ImageEffectConfig, SnapshotCache> Snapshots = new();
-    public static bool IsSupported(EffectUnit? unit) => unit is null or LevelEffectUnit or HsvEffectUnit or ColorSelectEffectUnit or ColorizeEffectUnit;
+    public static bool IsSupported(EffectUnit? unit) => unit is null or LevelEffectUnit or HsvEffectUnit or ColorSelectEffectUnit or ColorizeEffectUnit
+        or BloomEffectUnit or MonochromeEffectUnit or ColorToneEffectUnit;
     public static string? Unsupported(ImageEffectConfig config) => !config.IsEnabled ? null : string.Join("、", config.Layers
         .Where(x => x.IsEnabled && !IsSupported(x.Effect)).Select(x => x.Effect is UnknownEffectUnit u ? u.TypeName ?? "未知" : x.EffectType.ToString())) is { Length: > 0 } names ? names : null;
     public static void EnsureExportSupported()
@@ -203,6 +204,36 @@ internal static class ImageEffectRenderer
           return half4(mix(color,preserved,luminanceWeight)*a,a);
         }
         """);
+    // 固定原后端的颜色运算：0.30/0.59/0.11并非自有Colorize的Rec.709权重。
+    // 保留原四分量Bloom和ColorTone末端alpha乘法，不能按效果名替换为常见近似算法。
+    private static readonly Lazy<SKRuntimeEffect> Bloom = Compile("""
+        uniform float2 intensity; uniform float2 saturation; uniform float threshold;
+        half4 main(half4 src) {
+          float4 b=threshold>=1?float4(0):clamp((float4(src)-threshold)/(1-threshold),0,1);
+          float y=dot(b.rgb,float3(0.30,0.59,0.11));
+          b=mix(float4(y),b,saturation.y)*intensity.y;
+          float baseY=dot(float3(src.rgb),float3(0.30,0.59,0.11));
+          float4 base=mix(float4(baseY),float4(src),saturation.x)*intensity.x;
+          return half4(clamp(base*(1-clamp(b,0,1))+b,0,1));
+        }
+        """);
+    private static readonly Lazy<SKRuntimeEffect> Monochrome = Compile("""
+        uniform float4 filterColor;
+        half4 main(half4 src) {
+          float y=dot(float3(src.rgb),float3(0.30,0.59,0.11));
+          return half4(float3(y)*filterColor.rgb,src.a*filterColor.a);
+        }
+        """);
+    private static readonly Lazy<SKRuntimeEffect> ColorTone = Compile("""
+        uniform float3 darkColor; uniform float3 lightColor; uniform float desaturation; uniform float toned;
+        half4 main(half4 src) {
+          float3 base=float3(src.rgb)*lightColor;
+          float y=dot(base,float3(0.30,0.59,0.11));
+          base=mix(base,float3(y),desaturation);
+          float3 tone=mix(darkColor,lightColor,y);
+          return half4(clamp(mix(base,tone,toned)*src.a,0,1),src.a);
+        }
+        """);
     // Skia 的 ES2 color-filter 路径要求常量数组索引；同一 256 点表用八层查找，CPU/GPU均可编译。
     private static string LutLookupSource(int start, int end)
     {
@@ -216,7 +247,8 @@ internal static class ImageEffectRenderer
     private static Lazy<SKRuntimeEffect> Compile(string source) => new(() => SKRuntimeEffect.CreateColorFilter(source, out var error) ?? throw new InvalidOperationException("图像 shader 编译失败：" + error));
     internal static SKColorFilter CreateFilter(EffectUnit effect)
     {
-        var runtime = effect switch { LevelEffectUnit => Level.Value, HsvEffectUnit => Hsv.Value, ColorSelectEffectUnit => Select.Value, ColorizeEffectUnit => Colorize.Value, _ => throw new NotSupportedException() };
+        var runtime = effect switch { LevelEffectUnit => Level.Value, HsvEffectUnit => Hsv.Value, ColorSelectEffectUnit => Select.Value, ColorizeEffectUnit => Colorize.Value,
+            BloomEffectUnit => Bloom.Value, MonochromeEffectUnit => Monochrome.Value, ColorToneEffectUnit => ColorTone.Value, _ => throw new NotSupportedException() };
         using var uniforms = new SKRuntimeEffectUniforms(runtime);
         static float Number(double v) => double.IsFinite(v) && Math.Abs(v) <= float.MaxValue ? (float)v : throw new InvalidDataException("效果参数包含非有限值。");
         switch (effect)
@@ -225,6 +257,9 @@ internal static class ImageEffectRenderer
             case HsvEffectUnit hsv: uniforms["hue"] = Number(hsv.Hue); uniforms["satulation"] = Number(hsv.Saturation); uniforms["value"] = Number(hsv.Value); break;
             case ColorSelectEffectUnit select: uniforms["hue"] = Number(select.Hue); uniforms["range"] = Number(select.Range); uniforms["curve"] = Number(select.Curve); break;
             case ColorizeEffectUnit colorize: uniforms["luminanceWeight"] = Number(colorize.LuminanceWeight); uniforms["lut"] = CreateLut(colorize); break;
+            case BloomEffectUnit bloom: uniforms["intensity"] = new[] { Number(bloom.BaseIntensity), Number(bloom.BloomIntensity) }; uniforms["saturation"] = new[] { Number(bloom.BaseSaturation), Number(bloom.BloomSaturation) }; uniforms["threshold"] = Number(bloom.Threshold); break;
+            case MonochromeEffectUnit mono: uniforms["filterColor"] = new[] { mono.Color.R / 255f, mono.Color.G / 255f, mono.Color.B / 255f, mono.Color.A / 255f }; break;
+            case ColorToneEffectUnit tone: uniforms["darkColor"] = new[] { tone.DarkColor.R / 255f, tone.DarkColor.G / 255f, tone.DarkColor.B / 255f }; uniforms["lightColor"] = new[] { tone.LightColor.R / 255f, tone.LightColor.G / 255f, tone.LightColor.B / 255f }; uniforms["desaturation"] = Number(tone.Desaturation); uniforms["toned"] = Number(tone.ToneAmount); break;
         }
         return runtime.ToColorFilter(uniforms);
     }
