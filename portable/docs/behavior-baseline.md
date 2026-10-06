@@ -123,3 +123,9 @@ ScrollPage编辑时清除执行参数中的旧IsNScroll/PageMoveMargin，兼容�
 原 DiffJsonConverter 的公开读写属性/Equals/IDefaultable 迁入；已迁 Config 分支的写出副本只保留非默认字段，原未知材料不删除。四模板沿各自构造默认，九数字 Index1–9 沿实例默认，命令默认随输入方案/方向，触摸和通知默认保留原构造关系。原 owner 参数、空串解绑和 $type 首字段/去后缀恢复。
 
 完整 Mac 布局继续显式保留关闭 null 与动态字典，这是原差分格式的明确适配。旧滚动 setter 转换实际结果后归档，旧自动隐藏别名不能在恢复默认后复活。合成保存/重启/再次导入及失败回滚见[本批验收](../acceptance/p5-difference-settings-runtime.md)；未迁原配置、真实两分支导出、Windows动态和旧效果执行均不列为本批通过。
+
+## P5 第六批：旧效果纯数据
+
+原Alpha.5（≤46.0.4209）按单效果/本地缓存→首层→默认预设→全局缓存顺序迁入；Level raw端点、五位舍入、Bloom仅上限、13旧属性/15枚举及现代$type短名称保持。原10层限制属于运行新建，不裁剪导入数据。完整原材料归档，未来类型/未核对色彩不伪造默认效果。
+
+早期Mac保留标记可继续升级，现代层及未来升级材料不能被旧标记降级。来源效果三分支整体替换/恢复缺省，避免当前缓存递归复活；预览/事务/普通差分保存仍走唯一JSON链。见[契约](p5-effect-compatibility.md)及[验收](../acceptance/p5-effect-compatibility-runtime.md)。本批只迁数据，原效果编辑/执行命令仍占位，真实导出和Windows画面对照未验。

@@ -1,5 +1,7 @@
 # P5 第五批：原配置与命令差分保存
 
+本文件保留对应批次的交付范围。当前旧效果层/缓存/预设纯数据已由[第六批](p5-effect-compatibility.md)接入；实际执行继续待迁，差分保存的当前范围见[第五批](p5-difference-settings.md)。
+
 ## 职责、依赖与源码出处
 
 迁入固定 `c5c398d89` 的 `DiffJsonConverter<T>`：公开可读写属性、`Equals`、`DiffJsonDefault/IDefaultable`、原 JSON 名称及默认实例规则保持。只增加属性比较结果的访问入口，并排除 `JsonExtensionData`，避免将 Mac 的 `Extra` 字典写成普通字段。原源码和 SHA256 记录在 [源码清单](source-migration.json)。

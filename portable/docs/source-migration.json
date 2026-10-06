@@ -1891,7 +1891,7 @@
       "source": "NeeView/Config/ObjectMerge.cs",
       "target": "src/NeeView.Engine/SaveData/SaveData.ProfileImport.cs",
       "sha256": "16136c6f0f63a71a319121c858c7481cd3bad503e655754e117019de45e23ec1",
-      "status": "P5：原默认实例属性覆盖的业务语义适配为已迁Config投影与完整raw JSON递归合并；不迁WPF反射图。"
+      "status": "P5：原默认实例属性覆盖的业务语义适配为已迁Config投影与完整raw JSON递归合并；不迁WPF反射图。 第六批效果三分支按来源整体替换/恢复缺省，避免未建模旧缓存被递归合并复活。"
     },
     {
       "source": "NeeView/BookHistory/BookHistoryCollectionValidator.cs",
@@ -1933,7 +1933,7 @@
       "source": "NeeView/SaveData/UserSettingValidator.cs",
       "target": "src/NeeView.Engine/SaveData/LegacyUserSettingUpgrade.cs",
       "sha256": "a343581ccf9dbc32652c15824e953698e32f7195385d7cb7806df2f51e589407",
-      "status": "P5原版本规则的JSON适配；38+字体尺寸有明确门槛，旧效果层/预设升级明确保留待迁；不是完整原validator"
+      "status": "P5原版本JSON适配；38+字体尺寸有门槛；第六批接入Alpha5旧效果纯数据升级，实际执行仍未迁入，不是完整原validator"
     },
     {
       "source": "NeeView/MainWindow/TitleStringValidator.cs",
@@ -2012,6 +2012,144 @@
       "target": "src/NeeView.Engine/SaveData/SaveData.Difference.cs",
       "sha256": "9fb08a5fc71bab670fd98306cf2e592ef60a4801c9aad9dcf0743efc9bd1a23d",
       "status": "P5: original $type-first parameter names without CommandParameter suffix; typed differences and unknown future metadata preservation."
+    },
+    {
+      "source": "NeeView/SaveData/UserSettingValidator.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "a343581ccf9dbc32652c15824e953698e32f7195385d7cb7806df2f51e589407",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/Config/ImageEffectConfig.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "e52f651ebc921fffc11bee09303dc766c0125025d8fb6d13f90eaa8b2c8b9aa1",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/Config/EffectUnitCache.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "d5d1ad9c436d9f084552e29956c8c29cb5039833850ba6e6150c2743b0ce62a8",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/Config/EffectProfile.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "dfee1593321ed4d7f44ef246dd892eaaa1f324f28afd6673f5085243d5c96545",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/Config/EffectProfileCollectionConfig.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "1b61753aa1592bd610818dc45c2a74d72b1f53727a3f6a63ed9714ef0531dc3d",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/EffectType.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "8b0f0bd1d58e3fc36fd0dd726ef1e5c4519e37035016b0d87fe61a9d4968651d",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/EffectUnit.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "d98c66a1f5e2f43fe5e922f021e0cbfed9736bcb7020a0c09156b5bf32400369",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/System/AppMath.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "7e44b52fb5e993f1cc7a4f176ca37e37c9d7d13358fbe6f109be77d135d481ce",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Text/Json/JsonPointConverter.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "94b9c272c785ebd7990f8f963ef76ff2e6ea42793a532dc54b52158b8086f705",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Text/Json/JsonColorConverter.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "cb049ea496bfbf566b03b872eb8539f09d520c056ffe6ae65afd0e51d1887462",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/LevelEffectUnit.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "9baa631f3c9f0dccbc55048a0a7b4a10d88ebe292b935c5800f69fb9273602a7",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/HsvEffectUnit.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "c3c3e07df55c4bdc3b43d3a6ac806242793af4556c54b4585c5b9e80d74a2bd3",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/ColorSelectEffectUnit.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "b2bd45a763e5c4502c0aa0b82045b745cac738cd7d365697da2cfe9008b99ec7",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/BlurEffectUnit.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "97fb8fdd702d293218e9e0dbdface87ccd4cf90ff07bfa77ddc376e3f77835a0",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/BloomEffectUnit.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "0cdcafd212b3bb8af387707a5a591c1bc04de37303c9209ccd1ed8dec2c4d2f2",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/MonochromeEffectUnit.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "8d2f70cbe64ff31edff9cabb5242809c139bb1a9ada5d7e314c71697b0844ac7",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/ColorToneEffectUnit.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "331e7fc6ce0b4ae72ab7b9d296d7e9267990b6fb15be81cf8f025b97765c64ab",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/SharpenEffectUnit.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "69db67593f484ecb1e425813198958e4f0562b889a5c23a8ef82e07d673d4c74",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/EmbossedEffectUnit.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "cbaffdc0ef5697d74086f8875acd10ada6ade696c59110fa0aed1cd1fe88699b",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/PixelateEffectUnit.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "992d9a835ba648daa6fc31e6438731c90a992c0550facd2bdbde6ba061646743",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/RippleEffectUnit.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "9aca02085a5ab0949c919ea74cc129d29683db11027d6960fc048c44a3dc0a8f",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/SwirlEffectUnit.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "0e66dbd875e16b4f03bcab077d6d2cd9e3d11108e6a3b17d1c10529492c25caa",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Effects/MagnifyEffecttUnit.cs",
+      "target": "src/NeeView.Engine/SaveData/LegacyImageEffectUpgrade.cs",
+      "sha256": "3e7d3c7ae1a7d9296272a0fa9f1522b99937c2ebc32cdb46ce98f81a57ae2a51",
+      "status": "P5第六批：原Alpha5顺序、13旧参数默认/setter、cache/首层/六分支默认preset纯JSON适配；未知材料保留，WPF效果执行与编辑没有迁入"
     }
   ],
   "rule_references": [

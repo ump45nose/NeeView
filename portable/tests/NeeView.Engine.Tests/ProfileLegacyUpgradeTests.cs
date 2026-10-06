@@ -205,14 +205,15 @@ public sealed class ProfileLegacyUpgradeTests
     [Theory]
     [InlineData("46.0.4209", true)]
     [InlineData("46.0.4210", false)]
-    public void FullDesktopThumbnailAndDeferredEffectsUseAlpha5Boundary(string version, bool migrated)
+    public void FullDesktopThumbnailAndEffectDataUseAlpha5Boundary(string version, bool migrated)
     {
         var raw = Upgrade(version, """, "Config":{"Window":{"IsAutoHideInFullScreen":false},"Panels":{"ThumbnailItemProfile":{"IsTextVisible":false}},"ImageEffect":{"EffectType":"Sharpen","SharpenEffect":{"Amount":2,"Future":8}}}""");
         Assert.Equal(migrated, raw["Config"]!["Window"]!["IsAutoHideInFullDesktop"] is not null);
         Assert.Equal(migrated, raw["Config"]!["Panels"]!["ThumbnailItemProfile"]!["IsIconOverlay"]?.GetValue<bool>() ?? false);
-        Assert.Equal(8, raw["Config"]!["ImageEffect"]!["SharpenEffect"]!["Future"]!.GetValue<int>());
+        Assert.Equal(8, (migrated ? raw["MacImportedLegacyImageEffects"]!["ImageEffect"] : raw["Config"]!["ImageEffect"])!["SharpenEffect"]!["Future"]!.GetValue<int>());
         Assert.Equal(migrated, raw["MacImportedLegacyEffectFormat"] is not null);
-        Assert.Null(raw["Config"]!["ImageEffect"]!["Layers"]); // 未接入效果后端，不制造假等价层。
+        Assert.Equal(migrated, raw["Config"]!["ImageEffect"]!["Layers"] is not null);
+        if (migrated) Assert.Equal("Sharpen", raw["Config"]!["ImageEffect"]!["Layers"]![0]!["Effect"]!["$type"]!.GetValue<string>());
     }
 
     [Theory]
@@ -282,7 +283,7 @@ public sealed class ProfileLegacyUpgradeTests
         var preview = await Preview(text); var candidate = preview.GetDocument("UserSetting.json")!;
         Assert.Equal("Ctrl+F", preview.Commands.Single(c => c.Name == "ToggleVisibleFilmStrip").Shortcut);
         Assert.DoesNotContain(preview.Commands, c => c.Name == "ToggleVisibleThumbnailList");
-        Assert.Contains(preview.Notices, n => n.Contains("效果层/效果预设升级及执行尚未接入"));
+        Assert.Contains(preview.Notices, n => n.Contains("已按原规则转换") && n.Contains("实际执行尚未接入"));
         Assert.Equal("/Exports", candidate["Config"]!["Book"]!["ExportImageParameter"]!["ExportFolder"]!.GetValue<string>());
         var root = Path.Combine(Path.GetTempPath(), "NeeView-P5-Legacy-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
         try
@@ -299,7 +300,7 @@ public sealed class ProfileLegacyUpgradeTests
             Assert.Equal(.7, layout.Panels["HistoryPanel"].Weight); Assert.Equal(40, layout.Panels["HistoryPanel"].WindowPlacement.Left);
             Config.Current.Panels.Layout = layout.CreateMemento(); await loaded.SaveAsync(null, Token);
             saved = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(root, "UserSetting.json"), Token))!;
-            Assert.Equal(42, saved["Config"]!["ImageEffect"]!["LevelEffect"]!["Future"]!.GetValue<int>());
+            Assert.Equal(42, saved["Config"]!["ImageEffect"]!["Layers"]![0]!["Effect"]!["Future"]!.GetValue<int>());
             Assert.Equal(9, saved["Config"]!["Panels"]!["Layout"]!["AlternativePanelSource"]!["Future"]!.GetValue<int>());
             Assert.Contains("UnknownPanel", saved["Config"]!["Panels"]!["Layout"]!["Windows"]!["Panels"]!.AsArray().Select(n => n!.GetValue<string>()));
             await loaded.ApplyProfileImportAsync((await Preview(text)).CreateRequest(new()), Token);

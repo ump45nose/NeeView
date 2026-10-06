@@ -1,0 +1,534 @@
+{
+  "source": {
+    "Format": "NeeView/46.0.4209",
+    "Config": {
+      "ImageEffect": {
+        "IsEnabled": true,
+        "EffectType": "Level",
+        "LevelEffect": {
+          "Black": 0.12345678,
+          "Center": 0.23456789,
+          "Future": {
+            "X": 42
+          }
+        },
+        "BlurEffect": {
+          "Radius": 7
+        }
+      },
+      "ImageGrid": {
+        "DivX": 11,
+        "Future": 8
+      }
+    }
+  },
+  "candidate": {
+    "Format": "NeeView/46.3.0",
+    "Config": {
+      "ImageEffect": {
+        "IsEnabled": true,
+        "Layers": [
+          {
+            "IsEnabled": true,
+            "Effect": {
+              "$type": "Level",
+              "Black": 0.12345678,
+              "Center": 0.23457,
+              "Future": {
+                "X": 42
+              }
+            }
+          }
+        ]
+      },
+      "ImageGrid": {
+        "DivX": 11,
+        "Future": 8
+      },
+      "Window": {
+        "IsAutoHideInFullDesktop": true
+      },
+      "Panels": {
+        "ThumbnailItemProfile": {
+          "IsIconOverlay": false
+        }
+      },
+      "ImageEffectCache": [
+        {
+          "$type": "Level",
+          "Black": 0.12345678,
+          "Center": 0.23457,
+          "Future": {
+            "X": 42
+          }
+        },
+        {
+          "$type": "Blur",
+          "Radius": 7
+        }
+      ],
+      "EffectProfiles": {
+        "IdCounter": 0,
+        "Profiles": [
+          {
+            "Id": 0,
+            "Name": "",
+            "ImageCustomSize": {},
+            "ImageTrim": {},
+            "ImageDotKeep": {},
+            "ImageResizeFilter": {},
+            "ImageGrid": {
+              "DivX": 11,
+              "Future": 8
+            },
+            "ImageEffect": {
+              "IsEnabled": true,
+              "Layers": [
+                {
+                  "IsEnabled": true,
+                  "Effect": {
+                    "$type": "Level",
+                    "Black": 0.12345678,
+                    "Center": 0.23457,
+                    "Future": {
+                      "X": 42
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "MacImportedLegacyEffectFormat": "NeeView/46.0.4209",
+    "MacImportedLegacyImageEffects": {
+      "ImageEffect": {
+        "IsEnabled": true,
+        "EffectType": "Level",
+        "LevelEffect": {
+          "Black": 0.12345678,
+          "Center": 0.23456789,
+          "Future": {
+            "X": 42
+          }
+        },
+        "BlurEffect": {
+          "Radius": 7
+        }
+      },
+      "ImageEffectCache": null,
+      "EffectProfiles": null
+    },
+    "MacImportedLegacyEffectUpgrade": "Layers/1",
+    "MacImportedSourceFormat": "NeeView/46.0.4209"
+  },
+  "saved": {
+    "Config": {
+      "Panels": {
+        "LeftWidth": 240,
+        "IsDestinationFolderCopyMode": false,
+        "IsDestinationFolderAutoRefreshEnabled": true,
+        "IsDestinationFolderPanelInitialized": false,
+        "DestinationMoveHistoryCapacity": 300,
+        "DestinationFolderSectionRatio": 0.5,
+        "NormalItemProfile": {
+          "ImageShape": 1,
+          "ImageWidth": 0,
+          "IsDetailPopupEnabled": true,
+          "IsImagePopupEnabled": false,
+          "IsTextVisible": true,
+          "IsTextWrapped": false,
+          "IsTagVisible": true,
+          "IsIconOverlay": false
+        },
+        "ContentItemProfile": {
+          "ImageShape": 1,
+          "ImageWidth": 64,
+          "IsDetailPopupEnabled": true,
+          "IsImagePopupEnabled": true,
+          "IsTextVisible": true,
+          "IsTextWrapped": false,
+          "IsTagVisible": true,
+          "IsIconOverlay": false
+        },
+        "BannerItemProfile": {
+          "ImageShape": 3,
+          "ImageWidth": 200,
+          "IsDetailPopupEnabled": true,
+          "IsImagePopupEnabled": false,
+          "IsTextVisible": true,
+          "IsTextWrapped": false,
+          "IsTagVisible": true,
+          "IsIconOverlay": false
+        },
+        "ThumbnailItemProfile": {
+          "ImageShape": 0,
+          "ImageWidth": 128,
+          "IsDetailPopupEnabled": true,
+          "IsImagePopupEnabled": false,
+          "IsTextVisible": true,
+          "IsTextWrapped": true,
+          "IsTagVisible": true,
+          "IsIconOverlay": false
+        },
+        "OpenWithDoubleClick": false,
+        "Layout": null,
+        "RightWidth": 240,
+        "IsLeftVisible": true,
+        "IsRightVisible": true,
+        "IsHideLeftPanel": false,
+        "IsHideRightPanel": false,
+        "IsHideLeftPanelInAutoHideMode": true,
+        "IsHideRightPanelInAutoHideMode": true,
+        "IsSideBarEnabled": true,
+        "ConflictTopMargin": 32,
+        "ConflictBottomMargin": 20
+      },
+      "ImageEffect": {
+        "IsEnabled": true,
+        "Layers": [
+          {
+            "IsEnabled": true,
+            "Effect": {
+              "$type": "Level",
+              "Black": 0.12345678,
+              "Center": 0.23457,
+              "Future": {
+                "X": 42
+              }
+            }
+          }
+        ]
+      },
+      "ImageGrid": {
+        "DivX": 11,
+        "Future": 8
+      },
+      "ImageEffectCache": [
+        {
+          "$type": "Level",
+          "Black": 0.12345678,
+          "Center": 0.23457,
+          "Future": {
+            "X": 42
+          }
+        },
+        {
+          "$type": "Blur",
+          "Radius": 7
+        }
+      ],
+      "EffectProfiles": {
+        "IdCounter": 0,
+        "Profiles": [
+          {
+            "Id": 0,
+            "Name": "",
+            "ImageCustomSize": {},
+            "ImageTrim": {},
+            "ImageDotKeep": {},
+            "ImageResizeFilter": {},
+            "ImageGrid": {
+              "DivX": 11,
+              "Future": 8
+            },
+            "ImageEffect": {
+              "IsEnabled": true,
+              "Layers": [
+                {
+                  "IsEnabled": true,
+                  "Effect": {
+                    "$type": "Level",
+                    "Black": 0.12345678,
+                    "Center": 0.23457,
+                    "Future": {
+                      "X": 42
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "BookSetting": {
+        "PageMode": 0,
+        "BookReadOrder": 0,
+        "IsSupportedDividePage": false,
+        "IsSupportedSingleFirstPage": false,
+        "IsSupportedSingleLastPage": false,
+        "IsSupportedWidePage": true,
+        "IsRecursiveFolder": false,
+        "SortMode": 8,
+        "AutoRotate": 0,
+        "BaseScale": 1,
+        "EffectProfileId": 0
+      },
+      "BookSettingDefault": {
+        "PageMode": 0,
+        "BookReadOrder": 0,
+        "IsSupportedDividePage": false,
+        "IsSupportedSingleFirstPage": false,
+        "IsSupportedSingleLastPage": false,
+        "IsSupportedWidePage": true,
+        "IsRecursiveFolder": false,
+        "SortMode": 8,
+        "AutoRotate": 0,
+        "BaseScale": 1,
+        "EffectProfileId": 0
+      },
+      "BookSettingPolicy": {
+        "Page": 1,
+        "PageMode": 2,
+        "BookReadOrder": 2,
+        "IsSupportedDividePage": 2,
+        "IsSupportedSingleFirstPage": 2,
+        "IsSupportedSingleLastPage": 2,
+        "IsSupportedWidePage": 2,
+        "IsRecursiveFolder": 2,
+        "SortMode": 2,
+        "AutoRotate": 3,
+        "BaseScale": 2,
+        "EffectProfileId": 1
+      },
+      "Book": {
+        "IsPanorama": false,
+        "MacPanoramaLayout": 3,
+        "MacGalleryColumnWidth": 320,
+        "MacContinuousScale": 1,
+        "FrameSpace": -1,
+        "PageEndAction": 0,
+        "ResetNextBookPageMode": 2,
+        "IsNotifyPageLoop": false,
+        "Orientation": 0,
+        "BookThumbnailDepth": 2,
+        "BookThumbnailRegex": "^folder\\.jpg$",
+        "IsPrioritizeBookMove": false,
+        "WideRatio": 1,
+        "DividePageRate": 0.5,
+        "IsStaticWidePage": false,
+        "IsInsertDummyPage": false,
+        "IsInsertDummyFirstPage": false,
+        "IsInsertDummyLastPage": true,
+        "FolderSortOrder": 1,
+        "WidePageStretch": 1,
+        "ContentsSpace": -1
+      },
+      "View": {
+        "StretchMode": 1,
+        "AllowStretchScaleUp": true,
+        "AllowStretchScaleDown": true,
+        "IsBaseScaleEnabled": true,
+        "ScaleCenter": 0,
+        "RotateCenter": 0,
+        "FlipCenter": 0,
+        "IsKeepScale": false,
+        "IsKeepAngle": false,
+        "IsKeepFlip": false,
+        "IsKeepScaleBooks": false,
+        "IsKeepAngleBooks": false,
+        "IsKeepFlipBooks": false,
+        "IsKeepPageTransform": false,
+        "IsScaleStretchTracking": false,
+        "ViewHorizontalOrigin": 7,
+        "ViewVerticalOrigin": 6,
+        "ViewOriginCenterRatio": 1,
+        "AngleFrequency": 0,
+        "MovementConstraint": 2,
+        "ScrollDuration": 0.2,
+        "PageMoveType": 0,
+        "PageMoveDuration": 0
+      },
+      "FilmStrip": {
+        "IsEnabled": false,
+        "IsHideFilmStrip": false,
+        "ImageWidth": 96,
+        "IsVisibleNumber": false,
+        "IsSelectedCenter": false,
+        "IsHideFilmStripInAutoHideMode": true,
+        "IsManipulationBoundaryFeedbackEnabled": true,
+        "IsVisiblePlaylistMark": false,
+        "MouseWheelAction": 0,
+        "IsDetailPopupEnabled": true
+      },
+      "Slider": {
+        "IsEnabled": true,
+        "IsHidePageSlider": false,
+        "IsHidePageSliderInAutoHideMode": true,
+        "SliderIndexLayout": 2,
+        "Thickness": 25,
+        "Opacity": 1,
+        "SliderDirection": 2,
+        "IsSliderLinkedFilmStrip": true,
+        "IsSyncPageMode": false,
+        "MouseWheelAction": 0,
+        "IsVisiblePlaylistMark": false
+      },
+      "Bookshelf": {
+        "IsOpenNextBookWhenRemove": true,
+        "IsSearchIncludeSubdirectories": true,
+        "IsSyncFolderTree": false,
+        "IsSyncFolderTreeAuto": false,
+        "DefaultFolderOrder": 0,
+        "PlaylistFolderOrder": 0,
+        "FolderSortOrder": 1,
+        "IsVisibleSearchBox": true,
+        "IsVisibleItemsCount": true,
+        "PanelListItemStyle": 1,
+        "FolderTreeLayout": 1,
+        "IsFolderTreeVisible": false,
+        "FolderTreeAreaWidth": 128,
+        "FolderTreeAreaHeight": 72
+      },
+      "PageList": {
+        "FocusMainView": false,
+        "Format": 0,
+        "ShowBookTitle": true,
+        "IsGroupBy": false,
+        "IsVisibleSearchBox": true,
+        "IsVisibleItemsCount": true,
+        "PanelListItemStyle": 1,
+        "FolderTreeLayout": 1,
+        "IsFolderTreeVisible": false,
+        "FolderTreeAreaWidth": 128,
+        "FolderTreeAreaHeight": 72
+      },
+      "History": {
+        "PanelListItemStyle": 1,
+        "IsSaveHistory": true,
+        "IsForceUpdateHistory": false,
+        "HistoryEntryPageCount": 0,
+        "IsInnerArchiveHistoryEnabled": true,
+        "IsUncHistoryEnabled": true,
+        "IsAutoCleanupEnabled": false,
+        "LimitSize": -1,
+        "LimitSpan": "00:00:00",
+        "IsCurrentFolder": false,
+        "IsGroupBy": false,
+        "IsVisibleItemsCount": true,
+        "IsVisibleSearchBox": true,
+        "IsKeepSearchHistory": true,
+        "IsKeepFolderStatus": true
+      },
+      "Bookmark": {
+        "PanelListItemStyle": 1,
+        "IsSyncBookshelfEnabled": true,
+        "BookmarkFolderOrder": 0,
+        "IsFolderTreeVisible": false,
+        "IsVisibleItemsCount": true,
+        "IsVisibleSearchBox": true,
+        "IsSearchIncludeSubdirectories": true
+      },
+      "System": {
+        "IsFileWriteAccessEnabled": false,
+        "IsRemoveConfirmed": true,
+        "TextCopyPolicy": 0,
+        "ArchiveCopyPolicy": 3,
+        "DestinationFolderCollection": [],
+        "BookPageCollectMode": 1,
+        "ArchiveRecursiveMode": 2,
+        "IsIncrementalSearchEnabled": true,
+        "SearchHistorySize": 8
+      },
+      "Archive": {
+        "Zip": {
+          "IsFileWriteAccessEnabled": false
+        }
+      },
+      "Playlist": {
+        "PanelListItemStyle": 0,
+        "IsGroupBy": false,
+        "IsCurrentBookFilterEnabled": false,
+        "IsFirstIn": false,
+        "PlaylistFolder": null,
+        "CurrentPlaylist": null
+      },
+      "AutoHide": {
+        "AutoHideDelayTime": 1,
+        "AutoHideDelayVisibleTime": 0,
+        "AutoHideHitTestHorizontalMargin": 32,
+        "AutoHideHitTestVerticalMargin": 32,
+        "AutoHideFocusLockMode": 2,
+        "IsAutoHideKeyDownDelay": true,
+        "AutoHideConflictTopMargin": 1,
+        "AutoHideConflictBottomMargin": 0
+      },
+      "Window": {
+        "IsTopmost": false,
+        "IsAutoHideInNormal": false,
+        "IsAutoHideInMaximized": false,
+        "IsAutoHideInFullScreen": true,
+        "IsAutoHideInFullDesktop": true
+      },
+      "WindowTitle": {
+        "WindowTitleFormat1": "{Book} ({Page}{Part: (#)} / {PageMax}) - {EntryPath:/ \u003E }",
+        "WindowTitleFormat2": "{Book} ({Page}{Part: (#)} / {PageMax}) - {EntryPathL:/ \u003E } | {NameR}",
+        "WindowTitleFormatMedia": "{Book}"
+      },
+      "MenuBar": {
+        "IsHideMenu": false,
+        "IsHideMenuInAutoHideMode": true,
+        "IsAddressBarEnabled": true
+      },
+      "Mouse": {
+        "IsGestureEnabled": true,
+        "GestureMinimumDistance": 30,
+        "IsHoverScroll": false,
+        "HoverScrollSensitivity": 2,
+        "HoverScrollDuration": 0.5,
+        "IsMouseWheelScrollEnabled": false,
+        "MouseWheelScrollSensitivity": 1,
+        "MouseWheelScrollDuration": 0.2
+      },
+      "Command": {
+        "PresetInputScheme": 0,
+        "PresetPageReadOrder": 0,
+        "IsAccessKeyEnabled": true,
+        "IsReversePageMove": true,
+        "IsReversePageMoveWheel": false,
+        "IsReversePageMoveHorizontalWheel": true,
+        "IsHorizontalWheelLimitedOnce": true
+      },
+      "StartUp": {
+        "IsOpenLastFolder": false,
+        "IsOpenLastBookmarkFolder": false,
+        "LastFolder": null,
+        "LastBookmarkFolder": null
+      }
+    },
+    "Format": "NeeView/46.3.0",
+    "MacImportedSourceFormat": "NeeView/46.0.4209",
+    "MacImportedLegacyEffectFormat": "NeeView/46.0.4209",
+    "MacImportedLegacyImageEffects": {
+      "ImageEffect": {
+        "IsEnabled": true,
+        "EffectType": "Level",
+        "LevelEffect": {
+          "Black": 0.12345678,
+          "Center": 0.23456789,
+          "Future": {
+            "X": 42
+          }
+        },
+        "BlurEffect": {
+          "Radius": 7
+        }
+      },
+      "ImageEffectCache": null,
+      "EffectProfiles": null
+    },
+    "MacImportedLegacyEffectUpgrade": "Layers/1",
+    "Commands": null
+  },
+  "notices": [
+    "\u672C\u6B21\u4EC5\u9884\u89C8\uFF0C\u6CA1\u6709\u4FEE\u6539\u5F53\u524D\u8BBE\u7F6E\u3001\u5386\u53F2\u3001\u4E66\u7B7E\u6216\u6765\u6E90\u6587\u4EF6\u3002",
+    "\u5DF2\u652F\u6301\u7248\u672C\u5148\u6309\u539F\u89C4\u5219\u5347\u7EA7\u518D\u5C55\u793A\uFF1B\u672A\u77E5\u8BBE\u7F6E\u80FD\u529B\u5B8C\u6574\u4FDD\u7559\uFF0C\u4E0D\u4EE3\u8868\u5DF2\u6709\u6267\u884C\u5165\u53E3\u3002\u7F3A\u5931\u5DEE\u5206\u4F7F\u7528\u539F\u9ED8\u8BA4\u503C\u3002",
+    "Page \u4FDD\u7559\u4E3A\u539F\u6761\u76EE\u540D\uFF0CProps \u4E0E\u672A\u77E5\u5B57\u6BB5\u4FDD\u7559\uFF1B\u5F52\u6863\u5185\u90E8\u9875\u540D\u4E0D\u4F5C\u4E3A\u7269\u7406\u6587\u4EF6\u8DEF\u5F84\u6620\u5C04\u3002",
+    "UserSetting.json \u7248\u672C 46.0.4209 \u6309\u6587\u4EF6\u6838\u5BF9\u65E7\u7248\u672C\u517C\u5BB9\uFF0C\u5E94\u7528\u65F6\u518D\u6B21\u6821\u9A8C\u3002",
+    "UserSetting.json \u5DF2\u6309\u539F\u7248\u672C\u89C4\u5219\u5347\u7EA7\u5019\u9009\uFF1ANeeView/46.0.4209 \u2192 NeeView/46.3.0\uFF1B\u6765\u6E90\u53EA\u8BFB\u3002",
+    "\u65E7 ImageEffect \u5DF2\u6309\u539F\u89C4\u5219\u8F6C\u6362\u4E3A\u6548\u679C\u5C42\u3001\u53C2\u6570\u7F13\u5B58\u548C\u9ED8\u8BA4\u9884\u8BBE\uFF0C\u539F\u6750\u6599\u4FDD\u7559\uFF1B\u6548\u679C\u5B9E\u9645\u6267\u884C\u5C1A\u672A\u63A5\u5165\u3002",
+    "\u914D\u7F6E\u6295\u5F71\u5916\u5B57\u6BB5\u4FDD\u7559\uFF0C\u517C\u5BB9\u5F85\u6838\u5BF9\uFF1AConfig.ImageGrid"
+  ],
+  "scope": "\u5408\u6210\u6548\u679C\u6570\u636E\uFF1B\u9884\u89C8/\u4E8B\u52A1/\u666E\u901A\u5DEE\u5206\u4FDD\u5B58\uFF0C\u975E\u6548\u679C\u6267\u884C\u6216Windows\u52A8\u6001"
+}

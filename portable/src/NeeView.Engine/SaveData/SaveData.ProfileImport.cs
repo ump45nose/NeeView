@@ -83,6 +83,13 @@ public sealed partial class SaveData
                 var projected = JsonSerializer.SerializeToNode(ReadProfileConfig(imported), Options)!.AsObject();
                 if (imported["Config"] is JsonObject config) Merge(projected, config);
                 Merge(Object(result, "Config"), projected);
+                // 效果暂无运行类型投影；沿原默认恢复边界替换这三个纯数据分支，避免递归合并复活旧层/缓存。
+                var resultConfig = Object(result, "Config");
+                foreach (var branch in new[] { "ImageEffect", "ImageEffectCache", "EffectProfiles" })
+                    if (imported["Config"] is JsonObject importedConfig && importedConfig.ContainsKey(branch)) resultConfig[branch] = importedConfig[branch]?.DeepClone();
+                    else resultConfig.Remove(branch);
+                // 兼容材料归属于来源效果，不能把当前Profile的成功标记贴到未知/未转换的新来源上。
+                foreach (var field in new[] { "MacImportedLegacyEffectFormat", "MacImportedLegacyEffectUpgrade", "MacImportedLegacyEffectIssue", "MacImportedLegacyImageEffects" }) result.Remove(field);
                 foreach (var pair in imported.Where(p => p.Key != "Config")) result[pair.Key] = pair.Value?.DeepClone();
                 // 原 RestoreCommandCollection(reset:true)：来源没记录的键位回到默认，不继承旧差分。
                 result["Commands"] = imported["Commands"]?.DeepClone();

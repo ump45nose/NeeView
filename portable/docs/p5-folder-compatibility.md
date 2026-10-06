@@ -1,5 +1,7 @@
 # P5 第四批：旧目录、快速访问与差分参数
 
+本文件保留对应批次的交付范围。当前旧效果层/缓存/预设纯数据已由[第六批](p5-effect-compatibility.md)接入；实际执行继续待迁，差分保存的当前范围见[第五批](p5-difference-settings.md)。
+
 ## 职责、依赖与出处
 
 沿固定 `c5c398d89` 的 `FolderConfigCollectionValidator`、`FolderConfigUnit.Validate`、`Restore(Dictionary)`、`QuickAccessCollectionValidator` 和 `QueryPath.GetParent/SimplePath` 适配原 JSON 候选。出处及 SHA256 在 [源码清单](source-migration.json)。原 Windows 文件不修改；三个生产项目、唯一 SaveData 和原 JSON 权威链不变。

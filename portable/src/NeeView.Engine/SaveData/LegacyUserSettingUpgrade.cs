@@ -109,10 +109,9 @@ internal static class LegacyUserSettingUpgrade
             var thumbnail = Branch(Branch(config, "Panels"), "ThumbnailItemProfile");
             thumbnail["IsIconOverlay"] = !(thumbnail["IsTextVisible"]?.GetValue<bool>() ?? true);
             AddWithoutConflict(commands, "ToggleFullDesktop", "Shift+F11");
-            // 效果后端尚未迁入，原旧效果参数/缓存完整保留，显式记录待升级，禁止编造默认效果。
-            if (config["ImageEffect"] is not null)
-                raw["MacImportedLegacyEffectFormat"] ??= raw["Format"]?.DeepClone();
         }
+        // 原效果的层/缓存/预设纯数据迁入；旧 Mac 保存的原版本标记也从同一入口继续升级。
+        LegacyImageEffectUpgrade.Upgrade(raw, version);
         UpgradeValueAliases(config);
         LayoutPanelCompatibility.Upgrade(config["Panels"]?["Layout"] as JsonObject);
         if (version != new Version(46, 3, 0))

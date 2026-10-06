@@ -79,8 +79,12 @@ public sealed class ProfileImportService(IProfileImportReader reader, IReadOnlyL
                         Walk(Array(Object(config, "System"), field), "Config.System." + field, "Path");
                     Map(Object(config, "Playlist"), "PlaylistFolderRaw", "Config.Playlist");
                     Map(Object(Object(config, "Book"), "ExportImageParameter"), "ExportFolder", "Config.Book.ExportImageParameter");
-                    if (raw["MacImportedLegacyEffectFormat"] is not null)
-                        notices.Add("旧 ImageEffect 的原参数与缓存保留，效果层/效果预设升级及执行尚未接入，不能按本次导入视为完成。");
+                    if (raw["MacImportedLegacyEffectUpgrade"]?.ToString() == "Layers/1")
+                        notices.Add("旧 ImageEffect 已按原规则转换为效果层、参数缓存和默认预设，原材料保留；效果实际执行尚未接入。");
+                    else if (raw["MacImportedLegacyEffectFormat"] is not null && config?["ImageEffect"]?["Layers"] is null)
+                        notices.Add("旧 ImageEffect 尚未转换，原参数与缓存完整保留；效果实际执行尚未接入。" + raw["MacImportedLegacyEffectIssue"]?.ToString());
+                    else if (config?["ImageEffect"] is not null || config?["EffectProfiles"] is not null || config?["ImageEffectCache"] is not null)
+                        notices.Add("现代效果层、缓存和预设数据保持，未知类型不改写；效果实际执行尚未接入。");
                     break;
             }
             summaries.Add(new(name, true, format, paths.Count - before));
@@ -126,7 +130,7 @@ public sealed class ProfileImportService(IProfileImportReader reader, IReadOnlyL
         if (setting?["DragActions"] is not null) notices.Add("DragActions 原配置及已核对的版本参数升级保留；自定义拖动执行尚未接入。");
         foreach (var pair in setting ?? new JsonObject())
             if (pair.Key is not ("Format" or "Config" or "Commands" or "ContextMenu" or "SusiePlugins" or "DragActions" or
-                "MacImportedSourceFormat" or "MacImportedLegacyEffectFormat" or "MacImportedLegacyCommands" or "MacImportedLegacyDragActions"))
+                "MacImportedSourceFormat" or "MacImportedLegacyEffectFormat" or "MacImportedLegacyEffectUpgrade" or "MacImportedLegacyEffectIssue" or "MacImportedLegacyImageEffects" or "MacImportedLegacyCommands" or "MacImportedLegacyDragActions"))
             {
                 token.ThrowIfCancellationRequested(); CheckRecordBudget();
                 notices.Add("未知 UserSetting 字段保留，兼容待核对：" + pair.Key);
@@ -176,6 +180,8 @@ public sealed class ProfileImportService(IProfileImportReader reader, IReadOnlyL
                 token.ThrowIfCancellationRequested(); CheckRecordBudget(); var location = field + "." + pair.Key;
                 if (!properties.TryGetValue(pair.Key, out var property))
                 {
+                    // 效果纯数据有独立明确报告，尚未投影为可执行的 Config 属性。
+                    if (field == "Config" && pair.Key is "ImageEffect" or "ImageEffectCache" or "EffectProfiles") continue;
                     // 原启动快照仍由 SaveData 的原 JSON 直接读取，没有独立 Config 属性。
                     if (field == "Config.StartUp" && pair.Key is "LastBookV2" or "LastBook" or "LastFolderPath") continue;
                     notices.Add("配置投影外字段保留，兼容待核对：" + location);
