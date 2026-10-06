@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="NeeView.MacOS.Views.VersionWindow" Title="版本信息" Width="512" MinWidth="480" MinHeight="280"
+        SizeToContent="Height" CanResize="False" WindowStartupLocation="CenterOwner" x:CompileBindings="False">
+  <!-- 原VersionWindow的图标/名称/版本、更新状态与底部链接区域。 -->
+  <DockPanel>
+    <Border DockPanel.Dock="Bottom" Background="{DynamicResource Panel.Background}">
+      <Grid Margin="20,12" ColumnDefinitions="*,*">
+        <Button x:Name="LicenseLink" Content="许可" Click="OpenLicense" IsEnabled="{Binding CanAct}" />
+        <Button Grid.Column="1" x:Name="ProjectLink" Content="项目页面" HorizontalAlignment="Right" Click="OpenProject" IsEnabled="{Binding CanAct}" />
+      </Grid>
+    </Border>
+    <StackPanel Margin="30,24" Spacing="12">
+      <StackPanel.ContextMenu><ContextMenu><MenuItem Header="复制版本信息" Click="CopyVersion" IsEnabled="{Binding CanAct}" /></ContextMenu></StackPanel.ContextMenu>
+      <Grid ColumnDefinitions="80,*">
+        <Image Width="64" Height="64" Source="/Styles/AppLogo.png" />
+        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+          <TextBlock Text="{Binding ApplicationName}" FontSize="28" />
+          <TextBlock x:Name="DisplayVersion" Text="{Binding DisplayVersion}" />
+        </StackPanel>
+      </Grid>
+      <TextBlock Text="{Binding UpdateStatus}" HorizontalAlignment="Center" Foreground="{DynamicResource Control.GrayText}" />
+      <Button Content="Mac 更改记录（待发布）" IsEnabled="False" HorizontalAlignment="Center" />
+      <TextBlock Text="Windows 行为基线：46.3 / c5c398d89" FontSize="11" HorizontalAlignment="Center" />
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+        <Button x:Name="CopyVersionButton" Content="复制版本信息" Click="CopyVersion" IsEnabled="{Binding CanAct}" />
+        <Button Content="原 NeeView 项目" Click="OpenOriginalProject" IsEnabled="{Binding CanAct}" />
+      </StackPanel>
+      <TextBlock x:Name="VersionMessage" Text="{Binding Message}" TextWrapping="Wrap" />
+    </StackPanel>
+  </DockPanel>
+</Window>

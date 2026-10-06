@@ -2264,7 +2264,7 @@
     "Text": "显示版本信息",
     "Shortcut": "",
     "Source": "NeeView/Command/Commands/OpenVersionWindowCommand.cs",
-    "Stage": "待 P2–P5",
+    "Stage": "P5 原版本窗口/复制/许可/项目链接；Mac更新检查占位，见p5-version-window",
     "MenuText": "关于本程序(A)...",
     "MouseGesture": "",
     "TouchGesture": "",

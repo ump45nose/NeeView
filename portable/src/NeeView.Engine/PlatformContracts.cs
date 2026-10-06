@@ -114,6 +114,8 @@ public sealed class DecodedImageLease(Size size, byte[] pixels, ThemeRgba? sourc
 /// <summary>macOS 文件能力，系统失败必须传播给调用方。</summary>
 public interface IPlatformService
 {
+    /// <summary>系统打开明确网页或本机许可文件；失败返回异常，不通过shell启动。</summary>
+    Task OpenUriAsync(Uri uri, CancellationToken token = default) => throw new NotSupportedException("当前平台尚未提供链接打开能力。");
     /// <summary>按需取得系统文件图标PNG，未支持返回空；不返回AppKit/Avalonia对象。</summary>
     Task<byte[]?> ReadFileIconAsync(string path, CancellationToken token = default) => Task.FromResult<byte[]?>(null);
     /// <summary>在 Finder 中定位真实文件。</summary>

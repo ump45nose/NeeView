@@ -1,0 +1,50 @@
+{
+  "baseline": "c5c398d89",
+  "focused_passed": 6,
+  "full_tests": {
+    "total": "1444",
+    "executed": "1442",
+    "passed": "1442",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "native_tests": {
+    "environment": "64-bit (ARM) .NET 10.0.12 [collection-per-class, non-parallel]",
+    "id": "f07970f5-8679-4948-995a-565b68b01877",
+    "name": "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Backends.MacOS.Tests/bin/Debug/net10.0-macos/NeeView.Backends.MacOS.Tests.app/Contents/MonoBundle/NeeView.Backends.MacOS.Tests.dll",
+    "run-date": "2026-10-06",
+    "run-time": "22:39:35",
+    "start-rtf": "2026-10-06T22:39:35.6396420+08:00",
+    "test-framework": "xUnit.net v3 3.2.2+728c1dce01",
+    "target-framework": ".NETCoreApp,Version=v10.0",
+    "errors": "0",
+    "failed": "0",
+    "finish-rtf": "2026-10-06T22:39:36.8121050+08:00",
+    "not-run": "0",
+    "passed": "18",
+    "skipped": "0",
+    "time": "1.173",
+    "time-rtf": "00:00:01.1727441",
+    "total": "18"
+  },
+  "bundle_license_sha256": "ec932513a904c9f037cb580d9fef47ea50a29390e36144889eea10f60eddb8d1",
+  "silent": true,
+  "screenshots": "p5-version-window-layout.png",
+  "known_boundaries": [
+    "Mac更新检查占位",
+    "实际系统链接/剪贴板待验",
+    "Developer ID、公证、干净安装待验",
+    "P5未整体完成"
+  ]
+}

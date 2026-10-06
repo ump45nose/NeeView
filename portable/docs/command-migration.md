@@ -1,6 +1,6 @@
 # 完整命令迁移表
 
-固定基线235个原命令实例全部保留。当前为 **192个执行入口接入、43个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
+固定基线235个原命令实例全部保留。当前为 **193个执行入口接入、42个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
 
 原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。实际键位/手势按原A/B/C、阅读方向和用户差分计算。
 
@@ -228,7 +228,7 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | OpenOptionsWindow | 打开设置窗口 |  |  | 已接入 | P1 宿主适配 | NeeView/Command/Commands/OpenOptionsWindowCommand.cs |
 | OpenSettingFilesFolder | 打开配置文件位置 |  |  | 已接入 | P5 原窗口/导航语义；见p5-original-commands | NeeView/Command/Commands/OpenSettingFilesFolderCommand.cs |
 | OpenScriptsFolder | 打开脚本文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenScriptsFolderCommand.cs |
-| OpenVersionWindow | 显示版本信息 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenVersionWindowCommand.cs |
+| OpenVersionWindow | 显示版本信息 |  |  | 已接入 | P5 原版本/复制/许可/项目；Mac更新检查占位 | NeeView/Command/Commands/OpenVersionWindowCommand.cs |
 | CloseApplication | 退出应用程序 |  |  | 已接入 | P1 宿主适配 | NeeView/Command/Commands/CloseApplicationCommand.cs |
 | TogglePermitFile | 启用/禁用文件操作 |  |  | 已接入 | P5 原默认复制/重收集与文件权限；见p5-default-settings | NeeView/Command/Commands/TogglePermitFileCommand.cs |
 | HelpCommandList | 显示命令帮助 |  |  | 已接入 | P1 宿主适配 | NeeView/Command/Commands/HelpCommandListCommand.cs |
@@ -261,3 +261,5 @@ P5第二十一批接通7个原窗口/导航命令；当前182入口/53占位，�
 P5第二十二批接通8个原背景/像素保持命令；当前190入口/45占位，数量不代表功能覆盖率。见[p5-background.md](p5-background.md)。
 
 P5第二十三批：原十二字段默认复制、实际变化历史订阅、递归DirtyBook重收集及全局文件权限接入；新打开优先，失败恢复设置/位置/历史资格，权限不刷新正文。见[契约](p5-default-settings.md)。
+
+P5第二十四批：原版本窗口布局/图标、实际Mac构建版本、复制/许可/项目链接及macOS关于菜单接入；窗口与阅读独立，Windows更新检查保留Mac待接入区域。见[契约](p5-version-window.md)。

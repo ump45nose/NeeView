@@ -7,6 +7,21 @@ namespace NeeView.Backends;
 /// <summary>正式 macOS 文件能力，使用 AppKit/Foundation 的真实系统结果。</summary>
 public sealed class MacPlatformService : IPlatformService
 {
+    /// <summary>版本窗口链接替换原ExternalProcess；只允许网页和本机文件。</summary>
+    /// <param name="uri">绝对http/https或本机file URI。</param><param name="token">系统提交前取消，提交后返回实际结果。</param>
+    public Task OpenUriAsync(Uri uri, CancellationToken token = default)
+    {
+        if (!uri.IsAbsoluteUri || uri.Scheme is not ("https" or "http" or "file") || uri.IsFile && uri.Host.Length > 0 && !uri.IsLoopback)
+            throw new NotSupportedException("只支持网页或本机文件链接。");
+        token.ThrowIfCancellationRequested();
+        if (uri.IsFile && !File.Exists(uri.LocalPath)) throw new FileNotFoundException("许可文件未随应用安装。", uri.LocalPath);
+        NSApplication.SharedApplication.InvokeOnMainThread(() =>
+        {
+            token.ThrowIfCancellationRequested(); using var url = new NSUrl(uri.AbsoluteUri);
+            if (!NSWorkspace.SharedWorkspace.OpenUrl(url)) throw new IOException("系统无法打开链接。");
+        });
+        return Task.CompletedTask;
+    }
     private readonly SemaphoreSlim _icons = new(2);
     private readonly SemaphoreSlim _trash = new(1);
     private readonly Dictionary<string, byte[]?> _iconCache = new(StringComparer.Ordinal);

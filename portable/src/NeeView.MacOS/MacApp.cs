@@ -30,11 +30,12 @@ public sealed partial class MacApp : Avalonia.Application
         Name = "NeeView"; RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Dark;
         AvaloniaXamlLoader.Load(this);
         var menu = new NativeMenu(); var appMenu = new NativeMenu();
+        var about = new NativeMenuItem("关于 NeeView"); about.Click += async (_, _) => { await OpenWindowAsync(); if (_window is not null) await _window.ExecuteAsync("OpenVersionWindow"); };
         var open = new NativeMenuItem("打开…"); open.Click += async (_, _) => { await OpenWindowAsync(); if (_window is not null) await _window.ExecuteAsync("LoadAs"); };
         var reopen = new NativeMenuItem("显示阅读窗口"); reopen.Click += async (_, _) => await OpenWindowAsync();
         var quit = new NativeMenuItem("退出 NeeView") { Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.Q, Avalonia.Input.KeyModifiers.Meta) };
         quit.Click += (_, _) => (ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.TryShutdown();
-        appMenu.Items.Add(open); appMenu.Items.Add(reopen); appMenu.Items.Add(quit); menu.Items.Add(new NativeMenuItem("NeeView") { Menu = appMenu }); NativeMenu.SetMenu(this, menu);
+        appMenu.Items.Add(about); appMenu.Items.Add(open); appMenu.Items.Add(reopen); appMenu.Items.Add(quit); menu.Items.Add(new NativeMenuItem("NeeView") { Menu = appMenu }); NativeMenu.SetMenu(this, menu);
     }
     /// <summary>启动和 Finder 激活共用一个窗口初始化任务，避免重复装配。</summary>
     public override void OnFrameworkInitializationCompleted()

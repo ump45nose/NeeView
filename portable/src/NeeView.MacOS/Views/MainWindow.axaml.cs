@@ -44,7 +44,7 @@ public sealed partial class MainWindow : Window
         "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ToggleBookLock", "Unload", "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff",
         "ToggleViewFlipVertical", "ViewFlipVerticalOn", "ViewFlipVerticalOff", "ViewReset", "ViewScaleStretch", "ViewPresetScroll", "ViewScrollNTypeUp", "ViewScrollNTypeDown",
         "ToggleStretchMode", "ToggleStretchModeReverse", "SetStretchModeUniformToFill", "SetStretchModeUniformToSize", "SetStretchModeUniformToVertical", "SetStretchModeUniformToHorizontal", "ToggleStretchAllowScaleUp", "ToggleStretchAllowScaleDown", "ToggleHoverScroll",
-        "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
+        "OpenVersionWindow", "OpenOptionsWindow", "HelpCommandList", "ToggleBookmark", "LoadRecentBook", "OpenBookExplorer",
         "ToggleVisibleBookshelf", "ToggleVisiblePageList", "ToggleVisibleHistoryList", "ToggleVisibleFileInfo", "ToggleVisibleBookmarkList", "ToggleVisibleNavigator",
         "ToggleVisibleFilmStrip", "ToggleHideFilmStrip", "ToggleVisiblePlaylist", "NextScrollPage", "PrevScrollPage", "JumpPage", "NextSizePage", "PrevSizePage",
         "EnterBookshelfFolder", "SyncBookshelfFolder", "RefreshBookshelfFolder", "ToggleVisibleFoldersTree", "ToggleVisibleContentsTree", "FocusMainView", "FocusFolderSearchBox", "FocusPageListSearchBox", "RegisterBookmark", "FocusHistorySearchBox", "FocusBookmarkList", "FocusBookmarkSearchBox", "ClearHistory", "ClearHistoryInPlace", "RemoveUnlinkedHistory", "ToggleHideMenu", "ToggleHidePanel", "ToggleHidePageSlider", "ToggleVisibleSideBar", "ShowHiddenPanels", "SetFullScreen", "CancelFullScreen", "ToggleTopmost"
@@ -190,6 +190,7 @@ public sealed partial class MainWindow : Window
     public bool IsCommandAvailable(string name) => name switch
     {
         "SetDefaultPageSetting" => _model?.Operation.IsLoading == false,
+        "OpenVersionWindow" => _platform is not null,
         "SaveSetting" or "ReloadSetting" or "ExportBackup" => !_profileBusy && _model?.Operation.CanManageProfile == true,
         "OpenSettingFilesFolder" => _platform is not null && _settingFolderAction.IsCompleted,
         "ToggleNearestNeighbor" => _model?.Operation.IsLoading == false,
@@ -372,6 +373,7 @@ public sealed partial class MainWindow : Window
         {
             switch (name)
             {
+                case "OpenVersionWindow": await ShowVersionAsync(); break;
                 case "TogglePermitFile": await _model.Operation.ToggleFileWriteAccessAsync(fromMenu); break;
                 case "ToggleNearestNeighbor": await _model.Operation.ToggleNearestNeighborAsync(fromMenu); break;
                 case "ToggleVisibleAddressBar": case "ToggleVisiblePageSlider":

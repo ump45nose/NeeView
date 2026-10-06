@@ -2672,6 +2672,12 @@
       "target": "src/NeeView.Engine/BookOperation/BookOperation.DefaultSettings.cs",
       "sha256": "a4f368332b9bbd16ab38b005129676a083d38636abfd941b28e6fd6931807db5",
       "status": "P5 原十二字段/实际变化历史请求、递归DirtyBook及Toggle菜单参数；可等待保存与失败恢复"
+    },
+    {
+      "source": "NeeView/VersionWindow/VersionWindowViewModel.cs",
+      "target": "src/NeeView.MacOS/ViewModels/VersionWindowViewModel.cs",
+      "sha256": "97b4c9fc1744f46e50aad6f20b02c41eb2bcd819b3377bff87f1097ef5007b1d",
+      "status": "P5 原版本布局/图标及版本复制/链接；Mac实际程序集版本，系统接口适配；Windows更新检查保留占位"
     }
   ],
   "rule_references": [
@@ -2958,6 +2964,24 @@
       "target": "src/NeeView.MacOS/Views/SimpleProgressBar.cs",
       "sha256": "e8050b7437e9e84ce15392cd4f77ea81b6bf1f0b70ef91df4e5b898813676b49",
       "status": "P5第十八批：原宽度乘Value；Avalonia直接绘制替换WPF模板和动画"
+    },
+    {
+      "source": "NeeView/VersionWindow/VersionWindow.xaml",
+      "target": "src/NeeView.MacOS/Views/VersionWindow.axaml",
+      "sha256": "4c0e37d7038aad0a984d71d63a81dc0a4192fc7a6775754e548bb384d74176a0",
+      "status": "P5 原版本布局/图标及版本复制/链接；Mac实际程序集版本，系统接口适配；Windows更新检查保留占位"
+    },
+    {
+      "source": "NeeView/VersionWindow/VersionWindow.xaml.cs",
+      "target": "src/NeeView.MacOS/Views/VersionWindow.axaml.cs",
+      "sha256": "917f2dc6c3090472f7d303cd24c936a9984af1b5082935768f5c54f0fe480556",
+      "status": "P5 原版本布局/图标及版本复制/链接；Mac实际程序集版本，系统接口适配；Windows更新检查保留占位"
+    },
+    {
+      "source": "NeeView/Resources/App.ico",
+      "target": "src/NeeView.MacOS/Styles/AppLogo.png",
+      "sha256": "49884c93e70c5501f052213b0674d66c8a54c8fe0b5bc5e1ea7bc431e0aaa747",
+      "status": "P5 原版本布局/图标及版本复制/链接；Mac实际程序集版本，系统接口适配；Windows更新检查保留占位"
     }
   ],
   "backend_reuse": [

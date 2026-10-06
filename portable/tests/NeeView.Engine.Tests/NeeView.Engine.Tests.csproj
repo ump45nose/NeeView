@@ -22,6 +22,7 @@
     <Compile Include="../../src/NeeView.MacOS/ViewModels/**/*.cs" Link="ViewModels/%(Filename)%(Extension)" />
     <AvaloniaResource Include="../../src/NeeView.MacOS/Views/**/*.axaml" Link="Views/%(Filename)%(Extension)" />
     <AvaloniaResource Include="../../src/NeeView.MacOS/Styles/**/*.axaml" Link="Styles/%(Filename)%(Extension)" />
+    <AvaloniaResource Include="../../src/NeeView.MacOS/Styles/AppLogo.png" Link="Styles/AppLogo.png" />
     <Compile Include="../Fixtures/AnimationFixture.cs" Link="AnimationFixture.cs" />
     <Using Include="Xunit" />
     <None Update="Fixtures/**/*" CopyToOutputDirectory="PreserveNewest" />
