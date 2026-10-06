@@ -33,6 +33,8 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     public bool IsLoading { get; private set; }
     public string? Error { get; private set; }
     public event EventHandler? Changed;
+    /// <summary>界面替换原PasswordDialog；只用于明确阅读打开，不交给封面/后台清理。</summary>
+    public Func<ArchiveKeyRequest, CancellationToken, Task<string?>>? RequestArchiveKeyAsync { get; set; }
 
     /// <summary>将书签元数据需求送入同一来源后端，表现端不接触具体文件系统实现。</summary>
     public Task<FolderItem?> GetFileMetadataAsync(string path, CancellationToken token) => archives.GetFileMetadataAsync(path, token);
@@ -89,7 +91,9 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                 path = await _temporaryPlaylists.CreateAsync(openPaths, opening.Token);
                 opening.Token.ThrowIfCancellationRequested();
             }
-            source = await archives.OpenAsync(path, opening.Token);
+            source = RequestArchiveKeyAsync is { } requestKey
+                ? await archives.OpenAsync(path, opening.Token, requestKey)
+                : await archives.OpenAsync(path, opening.Token);
             // 原BookHub锁定允许同地址重载；由来源解析实际书籍地址，不能按图片路径猜测。
             if (IsBookLocked && Book is { } locked && locked.Path != source.Path) return false;
             // 原 BookHub.LoadMainAsync 优先使用显式 BookMemento；只在普通打开时按字段混合历史。
@@ -576,6 +580,8 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         CancelBookTransferPreparation();
         await Task.Yield();
         _opening?.Cancel(); _saving?.Cancel();
+        // 关闭已使旧打开代次失效，其finally不能回写；关闭方清除加载标记，保存失败也可恢复操作。
+        IsLoading = false;
         // 未确认文本/重试可取消；已开始实体操作等待真实结果和路径联动，不释放仍使用的来源。
         _renameClosing.Cancel();
         _clipboardClosing.Cancel();

@@ -126,6 +126,7 @@ public sealed partial class MainWindow : Window
     {
         _model = model; _images = images; _platform = platform; DataContext = model;
         model.Operation.PageEndDialogAsync = ShowPageEndDialogAsync;
+        model.Operation.RequestArchiveKeyAsync = AskArchiveKeyAsync;
         // 编辑树保留宿主表现绑定；独立列表的 DataContext 可以独立更换。
         this.FindControl<TreeView>("BookmarkTree")!.DataContext = model;
         var bookmarks = this.FindControl<BookmarkListView>("BookmarkPanelList")!;
@@ -926,6 +927,7 @@ public sealed partial class MainWindow : Window
                 await _model.Operation.DisposeAsync();
                 _model.Operation.Bookshelf.Changed -= FolderTree_PlaceChanged;
                 _model.Operation.PageEndDialogAsync = null;
+                _model.Operation.RequestArchiveKeyAsync = null;
                 _model.Operation.ConfirmDeleteAsync = null;
                 _model.Operation.AskBookNameAsync = null; _model.Operation.ConfirmBookRenameAsync = null; _model.Operation.RetryBookRenameAsync = null;
                 _model.HistoryRefreshed -= History_Refreshed;

@@ -55,15 +55,16 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
     /// <summary>打开真实来源或逐层解析归档逻辑定位；调用方拥有完整返回链。</summary>
     /// <param name="path">用户/历史逻辑路径，不能是应用解压材料。</param><param name="token">解析及抽取取消。</param>
     /// <returns>唯一Archive来源，临时文件不进入Path。</returns>
-    public async Task<Archive> OpenAsync(string path, CancellationToken token)
+    public Task<Archive> OpenAsync(string path, CancellationToken token) => OpenWithKeysAsync(keys => OpenPathAsync(path, keys, token), null, token);
+    private async Task<Archive> OpenPathAsync(string path, ArchiveKeys keys, CancellationToken token)
     {
-        var target = await OpenRootAsync(path, token).ConfigureAwait(false);
+        var target = await OpenRootAsync(path, keys, token).ConfigureAwait(false);
         if (target.Relative is null) return target.Archive;
-        try { return await ResolveInnerAsync(target.Archive, target.Relative, token).ConfigureAwait(false); }
+        try { return await ResolveInnerAsync(target.Archive, target.Relative, keys, token).ConfigureAwait(false); }
         catch { await target.Archive.DisposeAsync(); throw; }
     }
     /// <summary>仅在有界后台槽检查真实路径、别名及根归档；不在持槽期间等待子来源读取。</summary>
-    private Task<ArchiveOpenTarget> OpenRootAsync(string path, CancellationToken token) => SourceIo.RunAsync(() =>
+    private Task<ArchiveOpenTarget> OpenRootAsync(string path, ArchiveKeys keys, CancellationToken token) => SourceIo.RunAsync(() =>
     {
         token.ThrowIfCancellationRequested(); RejectInnerParentTraversal(path); path = System.IO.Path.GetFullPath(path);
         if (resolveAlias is not null)
@@ -83,7 +84,7 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
             {
                 token.ThrowIfCancellationRequested();
                 if (File.Exists(parent) && ArchiveFormats.IsPageArchive(parent))
-                    return new ArchiveOpenTarget(CreatePageArchive(parent, token), System.IO.Path.GetRelativePath(parent, path));
+                    return new ArchiveOpenTarget(CreatePageArchive(parent, keys, token), System.IO.Path.GetRelativePath(parent, path));
                 if (Directory.Exists(parent)) break;
                 parent = System.IO.Path.GetDirectoryName(parent);
             }
@@ -102,7 +103,7 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
             if (System.Text.RegularExpressions.Regex.IsMatch(path, @"(?:\.part\d+\.rar|\.r\d{2}|\.\d{3})$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
                 throw new NotSupportedException("分卷归档尚未迁移，请使用完整的单文件归档。");
             if (PlaylistSourceTools.IsPlaylist(path)) archive = new PlaylistArchive(path, this) { IsRootShortcut = new FileInfo(path).LinkTarget is not null };
-            else if (ArchiveFormats.IsPageArchive(path)) archive = CreatePageArchive(path, token);
+            else if (ArchiveFormats.IsPageArchive(path)) archive = CreatePageArchive(path, keys, token);
             else throw new NotSupportedException("支持目录、图片、ZIP/CBZ、RAR/CBR、7z、PDF 和播放列表；其他来源尚未迁移。");
         }
         return new ArchiveOpenTarget(archive, null);
@@ -111,13 +112,15 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
     private sealed record ArchiveOpenTarget(Archive Archive, string? Relative) : IAsyncDisposable
     { public ValueTask DisposeAsync() => Archive.DisposeAsync(); }
     /// <summary>原归档工厂分派PDF与压缩；不让PDF进入压缩/图片delegate。</summary>
-    private Archive CreatePageArchive(string path, CancellationToken token, string? logicalPath = null, ArchiveEntry? source = null, IAsyncDisposable? lifetime = null)
+    private Archive CreatePageArchive(string path, ArchiveKeys keys, CancellationToken token, string? logicalPath = null, ArchiveEntry? source = null, IAsyncDisposable? lifetime = null)
     {
         // 原ArchiveManager顺序：ZIP/7z在PDF之前，配置重叠后缀不能夺取压缩来源。
         if (ArchiveFormats.IsCompressedArchive(logicalPath ?? path)) return new CompressedArchive(path, logicalPath, source, lifetime) { IsRootShortcut = source is null && new FileInfo(path).LinkTarget is not null };
         if (!Config.Current.Archive.Pdf.IsEnabled) throw new NotSupportedException("PDF读取已在归档设置中关闭。");
         if (pdfRenderer is null) throw new NotSupportedException("当前宿主未装配系统PDF后端。");
-        return new PdfArchiveSource(path, pdfRenderer, token, logicalPath, source, lifetime) { IsRootShortcut = source is null && new FileInfo(path).LinkTarget is not null };
+        var key = keys.Get(logicalPath ?? path);
+        var renderer = key.State == ArchiveKey.ArchiveKeyState.Completed ? pdfRenderer.WithPassword(key.Key) : pdfRenderer;
+        return new PdfArchiveSource(path, renderer, token, logicalPath, source, lifetime) { IsRootShortcut = source is null && new FileInfo(path).LinkTarget is not null };
     }
 
 }

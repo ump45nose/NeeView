@@ -6,9 +6,10 @@ using NeeView;
 namespace NeeView.Backends;
 
 /// <summary>官方CoreGraphics/PDFKit绑定替换Windows PDFium；原生文档/页面/上下文均为请求级。</summary>
-public sealed class MacPdfRenderer : IPdfRenderer
+public sealed class MacPdfRenderer(string? password = null) : IPdfRenderer
 {
     private const long WorkingBudget = 256L * 1024 * 1024;
+    public IPdfRenderer WithPassword(string key) => new MacPdfRenderer(key);
     /// <summary>只读页尺寸和目录，不渲染像素；返回纯数据后释放全部原生引用。</summary>
     /// <param name="path">真实PDF或应用拥有的嵌套代理。</param><param name="token">索引取消。</param>
     /// <returns>原页序/旋转尺寸/书签关系。</returns>
@@ -26,6 +27,7 @@ public sealed class MacPdfRenderer : IPdfRenderer
             pages.Add(size);
         }
         using var url = NSUrl.FromFilename(path); using var outlines = new PdfDocument(url);
+        if (outlines.IsLocked && !outlines.Unlock(password ?? "")) throw new ArchiveKeyRequiredException();
         using var root = outlines.OutlineRoot; int nodes = 0;
         var contents = root is null ? [] : ReadOutline(root, 0);
         var attributes = new PdfDocumentAttributes(outlines.DocumentAttributes);
@@ -77,10 +79,14 @@ public sealed class MacPdfRenderer : IPdfRenderer
         finally { pinned.Free(); }
     }
     /// <summary>损坏/密码失败明确返回；不得让锁定文档伪装为空书。</summary>
-    private static CGPDFDocument Open(string path)
+    private CGPDFDocument Open(string path)
     {
         var document = CGPDFDocument.FromFile(path) ?? throw new InvalidDataException("PDF损坏或无法读取。");
-        if (!document.IsUnlocked) { document.Dispose(); throw new NotSupportedException("PDF需要密码；密码界面尚未迁移。"); }
-        return document;
+        try
+        {
+            if (!document.IsUnlocked && !document.Unlock(password ?? "")) throw new ArchiveKeyRequiredException();
+            return document;
+        }
+        catch { document.Dispose(); throw; }
     }
 }

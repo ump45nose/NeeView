@@ -59,6 +59,7 @@ public sealed partial class MacApp : Avalonia.Application
                     if (_entryRealizer is not null) { await _entryRealizer.DisposeAsync(); _entryRealizer = null; }
                     if (_temporaryPlaylists is not null) { await _temporaryPlaylists.DisposeAsync(); _temporaryPlaylists = null; }
                     if (_contentDropReceiver is not null) { await _contentDropReceiver.DisposeAsync(); _contentDropReceiver = null; }
+                    ArchiveKeyCache.Current.Clear();
                     desktop.Shutdown();
                 }
                 catch (Exception ex) { _shuttingDown = false; _quitWaiting = false; System.Diagnostics.Trace.WriteLine(ex); }

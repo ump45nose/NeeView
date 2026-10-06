@@ -50,6 +50,9 @@ public interface IArchiveFactory
     }
     /// <summary>打开目录、ZIP、RAR 或 7z。调用方负责释放返回来源。</summary>
     Task<Archive> OpenAsync(string path, CancellationToken token);
+    /// <summary>明确的阅读打开允许口令输入；封面、历史存在检查和后台枚举仍走无交互入口。</summary>
+    /// <param name="requestKey">本次窗口的可等待输入，切书/关闭时必须取消。</param>
+    Task<Archive> OpenAsync(string path, CancellationToken token, Func<ArchiveKeyRequest, CancellationToken, Task<string?>> requestKey) => OpenAsync(path, token);
     /// <summary>原CreateArchiveAsync(entry)；保留父归档/重复条目ID，返回来源借用父来源且由调用方释放。</summary>
     /// <param name="entry">仍由父书拥有的真实来源条目。</param><param name="token">读取取消。</param>
     /// <returns>独立子来源；默认实现保持既有后端路径入口。</returns>

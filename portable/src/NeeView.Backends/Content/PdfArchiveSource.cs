@@ -8,6 +8,8 @@ public interface IPdfRenderer
 {
     PdfDocumentInfo Inspect(string path, CancellationToken token);
     DecodedImageLease Render(string path, int page, Size target, CancellationToken token);
+    /// <summary>产生只属于一个已打开来源的口令绑定，不修改共享渲染器或其他书籍。</summary>
+    IPdfRenderer WithPassword(string password) => throw new NotSupportedException("此PDF后端不支持密码解锁。");
 }
 public sealed record PdfOutlineInfo(string Name, int? Page, IReadOnlyList<PdfOutlineInfo> Children);
 public sealed record PdfDocumentInfo(IReadOnlyList<Size> Pages, IReadOnlyList<PdfOutlineInfo> Contents, DateTime LastWriteTime, DateTime CreationTime = default);
@@ -26,7 +28,9 @@ public sealed class PdfArchiveSource : PdfArchive
     public PdfArchiveSource(string physicalPath, IPdfRenderer renderer, CancellationToken token, string? logicalPath = null, ArchiveEntry? source = null, IAsyncDisposable? lifetime = null)
         : base(logicalPath ?? physicalPath, source)
     {
-        _physicalPath = physicalPath; _renderer = renderer; _lifetime = lifetime; _info = renderer.Inspect(physicalPath, token);
+        _physicalPath = physicalPath; _renderer = renderer; _lifetime = lifetime;
+        try { _info = renderer.Inspect(physicalPath, token); }
+        catch (ArchiveKeyRequiredException) { throw new ArchiveKeyRequiredException(logicalPath ?? physicalPath); }
         if (_info.Pages.Count > 100_000) throw new NotSupportedException("PDF超过十万页索引预算。");
         _entries = _info.Pages.Select((_, i) => new ArchiveEntry(this) { Id = i, RawEntryName = $"{i + 1:000}.png", Length = 0, LastWriteTime = _info.LastWriteTime, CreationTime = _info.CreationTime }).ToArray();
         Contents = _info.Contents.Select(Map).ToArray();

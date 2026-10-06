@@ -1,6 +1,8 @@
 # 前端独立调整边界
 
-P5 第十三批：原PDF归档/页目录/三种尺寸及原JSON配置接入唯一阅读链；CoreGraphics/PDFKit官方绑定替换PDFium。正文直接输出像素，提取才惰性PNG，请求级流初始化/读/关闭串行。密码交互尚未执行，扩展名配置已接入，见[PDF契约](p5-pdf.md)。
+P5 第十五批：原ArchiveKey/进程AES缓存及纯输入弹窗接入唯一打开链；根/明确嵌套PDF通过系统后端解锁，后台无交互、失败父链释放、切书/关闭取消，见[密码契约](p5-pdf-password.md)。压缩密码仍待迁。
+
+P5 第十三批：原PDF归档/页目录/三种尺寸及原JSON配置接入唯一阅读链；CoreGraphics/PDFKit官方绑定替换PDFium。正文直接输出像素，提取才惰性PNG，请求级流初始化/读/关闭串行。PDF密码交互由P5第十五批接入，压缩密码仍待迁，扩展名配置已接入，见[PDF契约](p5-pdf.md)。
 
 P5 第十二批：嵌套解析/临时代理/父链生命周期全部位于Engine来源关系及Backends。ReaderView、页面列表和封面仍消费原Page与唯一BitmapFactory，不解压、不识别物理临时路径；布局/主题可独立修改，见[嵌套契约](p5-nested.md)。
 

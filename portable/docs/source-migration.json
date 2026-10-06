@@ -2378,6 +2378,18 @@
       "target": "src/NeeView.Engine/Config/JsonSizeConverter.cs",
       "sha256": "d2503dbd30d9deec470aa2d05933dc8d6cdc04a20054f38a53fc43d947ae0d64",
       "status": "P5第十三批：原Width,Height字符串写出，兼容早期Mac对象尺寸，类型级适配差分序列化"
+    },
+    {
+      "source": "NeeView/Archiver/ArchiveKey.cs",
+      "target": "src/NeeView.Engine/Archiver/ArchiveKey.cs",
+      "sha256": "5ab152eec3e0e593fafc965821378ad0885e79d51c11d8c19fcf844ab92e1e83",
+      "status": "保留原状态/逻辑路径缓存/重试与取消；窗口调用改为可等待契约，验证解锁成功才缓存"
+    },
+    {
+      "source": "NeeView/Archiver/ArchiveKeyCache.cs",
+      "target": "src/NeeView.Engine/Archiver/ArchiveKeyCache.cs",
+      "sha256": "1097c1ebbecb4c7519c0fd66e0b4b4a904c0bc2a55c22cfed20d8ba7381af38e",
+      "status": "保留原进程内AES缓存；移除明文诊断，补充锁/资源释放/临时字节擦除，不持久化"
     }
   ],
   "rule_references": [
@@ -2634,6 +2646,12 @@
       "target": "src/NeeView.MacOS/Views/FontPresenter.cs",
       "sha256": "94c4b27c0275da040f844fb05f8d0ed3902328d1a26e73e315b762d56c98b00a",
       "status": "P5第九批：原字体资源发布转换Avalonia；独立于主题/阅读，缺失字体显示默认且保留配置"
+    },
+    {
+      "source": "NeeView/Controls/PasswordDialog.xaml",
+      "target": "src/NeeView.MacOS/Views/PasswordDialog.axaml",
+      "sha256": "885c3fefa0b38d1cccf74eadf57eb3874292af225b7efa24dfc07e51879e6ff5",
+      "status": "转换原拥有窗口/非空确认/Enter/Escape/取消；只收集文本，不读取来源或保存"
     }
   ],
   "backend_reuse": [

@@ -14,7 +14,7 @@ public sealed partial class ArchiveFactory
         if (entry.FilePath is not null || entry.Archive.IsDirectory) return OpenAsync(entry.SystemPath, token);
         if (entry.IsDirectory) return Task.FromResult<Archive>(new ArchiveDirectory(entry.Archive, entry.SystemPath, entry.EntryName, false));
         if (!entry.IsBook() || !ArchiveFormats.IsPageArchive(entry.EntryName)) throw new NotSupportedException("内部条目不是已支持的子归档。");
-        return OpenNestedAsync(entry, false, token);
+        return OpenWithKeysAsync(keys => OpenNestedAsync(entry, false, keys, token), null, token);
     }
     /// <summary>压缩文件不是目录；不能把内部“..”规范化成归档外的真实文件。</summary>
     private static void RejectInnerParentTraversal(string path)
@@ -30,7 +30,7 @@ public sealed partial class ArchiveFactory
         }
     }
     /// <summary>原逐层内部定位；真实条目优先，路径边界严格，抽取名称由应用生成。</summary>
-    private async Task<Archive> ResolveInnerAsync(Archive source, string relative, CancellationToken token)
+    private async Task<Archive> ResolveInnerAsync(Archive source, string relative, ArchiveKeys keys, CancellationToken token)
     {
         relative = relative.Replace((char)92, '/').TrimEnd('/');
         var entries = await source.GetEntriesAsync(token).ConfigureAwait(false); token.ThrowIfCancellationRequested();
@@ -40,7 +40,7 @@ public sealed partial class ArchiveFactory
         if (entry is not null)
         {
             // 类型由真实来源判定：PDF虚拟PNG即使与自定义PDF后缀重合，仍是页面。
-            if (entry.IsBook() && ArchiveFormats.IsPageArchive(entry.EntryName)) return await OpenNestedAsync(entry, true, token).ConfigureAwait(false);
+            if (entry.IsBook() && ArchiveFormats.IsPageArchive(entry.EntryName)) return await OpenNestedAsync(entry, true, keys, token).ConfigureAwait(false);
             if (Config.Current.System.ArchiveRecursiveMode == ArchiveEntryCollectionMode.CurrentDirectory && relative.Contains('/'))
             {
                 var slash = relative.LastIndexOf('/');
@@ -51,12 +51,12 @@ public sealed partial class ArchiveFactory
         var container = entries.Where(e => !e.IsDirectory && e.IsBook() && ArchiveFormats.IsPageArchive(e.EntryName)
             && relative.StartsWith(e.EntryName + "/", StringComparison.Ordinal)).OrderByDescending(e => e.EntryName.Length).FirstOrDefault();
         if (container is null) throw new FileNotFoundException("归档内部指定页面或目录不存在：" + relative);
-        var child = await OpenNestedAsync(container, true, token).ConfigureAwait(false);
-        try { return await ResolveInnerAsync(child, relative[(container.EntryName.Length + 1)..], token).ConfigureAwait(false); }
+        var child = await OpenNestedAsync(container, true, keys, token).ConfigureAwait(false);
+        try { return await ResolveInnerAsync(child, relative[(container.EntryName.Length + 1)..], keys, token).ConfigureAwait(false); }
         catch { await child.DisposeAsync(); throw; }
     }
     /// <summary>原临时代理文件随子归档生命周期；借用入口不关闭父来源，路径入口拥有完整父链。</summary>
-    private async Task<Archive> OpenNestedAsync(ArchiveEntry entry, bool ownsParent, CancellationToken token)
+    private async Task<Archive> OpenNestedAsync(ArchiveEntry entry, bool ownsParent, ArchiveKeys keys, CancellationToken token)
     {
         if (entry.Archive.NestingDepth >= MaximumNestedDepth) throw new NotSupportedException($"嵌套归档超过 {MaximumNestedDepth} 层限制。");
         if (entry.EntryName.Split('/').Contains("..")) throw new NotSupportedException("归档内部定位不能包含上级路径段。");
@@ -69,7 +69,7 @@ public sealed partial class ArchiveFactory
             {
                 lifetime.Write(input, entry.Length, token);
                 token.ThrowIfCancellationRequested();
-                return CreatePageArchive(lifetime.Path, token, entry.SystemPath, entry, lifetime);
+                return CreatePageArchive(lifetime.Path, keys, token, entry.SystemPath, entry, lifetime);
             }
             catch { lifetime.DisposeAsync().AsTask().GetAwaiter().GetResult(); throw; }
         }, token, input).ConfigureAwait(false);

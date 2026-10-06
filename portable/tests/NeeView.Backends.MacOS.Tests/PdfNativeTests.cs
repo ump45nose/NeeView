@@ -10,6 +10,64 @@ namespace NeeView.Backends.MacOS.Tests;
 public sealed class PdfNativeTests
 {
     private static CancellationToken Token => TestContext.Current.CancellationToken;
+    private static string Encrypted(SyntheticPdf fixture)
+    {
+        using var url = Foundation.NSUrl.FromFilename(fixture.Path); using var document = new PdfKit.PdfDocument(url);
+        var path = System.IO.Path.Combine(fixture.Root, "locked.pdf");
+        Assert.True(document.Write(path, new PdfKit.PdfDocumentWriteOptions { UserPassword = "synthetic-test-only", OwnerPassword = "synthetic-owner-only" }));
+        return path;
+    }
+    [Fact]
+    public async Task NativePasswordRetryCacheOutlineAndPixelsUseOneSource()
+    {
+        using var fixture = new SyntheticPdf(); Config.SetCurrent(new()); var path = Encrypted(fixture); var factory = new ArchiveFactory(pdfRenderer: new MacPdfRenderer()); var requests = new List<ArchiveKeyRequest>();
+        try
+        {
+            await Assert.ThrowsAsync<ArchiveKeyRequiredException>(() => factory.OpenAsync(path, Token));
+            await using (var source = await factory.OpenAsync(path, Token, (request, _) =>
+            { requests.Add(request); return Task.FromResult<string?>(requests.Count == 1 ? "wrong-test-only" : "synthetic-test-only"); }))
+            {
+                Assert.Equal(2, (await source.GetEntriesAsync(Token)).Count); Assert.Equal("Chapter one", Assert.Single(source.Contents!).Name);
+                var entry = (await source.GetEntriesAsync(Token))[0]; await using var stream = await source.OpenEntryAsync(entry, Token);
+                using var image = await new MagickImageDecoder().DecodeAsync(stream, new(100, 150, true), Token);
+                Assert.Equal(new byte[] { 0, 0, 255, 255 }, Pixel(image, 50, 10));
+                using var exported = new MemoryStream(); await stream.CopyToAsync(exported, Token); exported.Position = 0; using var png = new MagickImage(exported); Assert.Equal(MagickFormat.Png, png.Format);
+            }
+            Assert.Equal(2, requests.Count); Assert.False(requests[0].IsRetry); Assert.True(requests[1].IsRetry);
+            await using var cached = await factory.OpenAsync(path, Token, (_, _) => throw new InvalidOperationException("已验证缓存不应再弹窗"));
+            Assert.Equal(2, (await cached.GetEntriesAsync(Token)).Count);
+        }
+        finally { ArchiveKeyCache.Current.Remove(path); }
+    }
+    [Fact]
+    public async Task NativeEncryptedPdfInsideZipUsesLogicalPasswordAndLateCancellationReleasesProxy()
+    {
+        using var fixture = new SyntheticPdf(); Config.SetCurrent(new()); var locked = Encrypted(fixture); var outer = System.IO.Path.Combine(fixture.Root, "encrypted.cbz");
+        using (var zip = ZipFile.Open(outer, ZipArchiveMode.Create)) zip.CreateEntryFromFile(locked, "inside.pdf");
+        var logical = System.IO.Path.Combine(outer, "inside.pdf"); var path = System.IO.Path.Combine(logical, "002.png"); var factory = new ArchiveFactory(pdfRenderer: new MacPdfRenderer());
+        try
+        {
+            using var cancel = new CancellationTokenSource();
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => factory.OpenAsync(path, cancel.Token, (_, _) => { cancel.Cancel(); return Task.FromResult<string?>("synthetic-test-only"); }));
+            Assert.False(ArchiveKeyCache.Current.TryGetValue(logical, out _));
+            await using var opened = await factory.OpenAsync(path, Token, (request, _) =>
+            { Assert.Equal(logical, request.ArchivePath); return Task.FromResult<string?>("synthetic-test-only"); });
+            Assert.Equal("002.png", opened.RequestedEntryName); var entries = await opened.GetEntriesAsync(Token);
+            await using var stream = await opened.OpenEntryAsync(entries[1], Token); using var pixels = await new MagickImageDecoder().DecodeAsync(stream, new(100, 150, true), Token);
+            Assert.Equal(new byte[] { 255, 0, 0, 255 }, Pixel(pixels, 50, 75)); Assert.True(await factory.ExistsAsync(path, Token));
+        }
+        finally { ArchiveKeyCache.Current.Remove(logical); }
+    }
+    [Fact]
+    public async Task NativePasswordCancelKeepsOriginalBookAndProfileContainsNoKey()
+    {
+        using var fixture = new SyntheticPdf(); Config.SetCurrent(new()); var encrypted = Encrypted(fixture); var profile = System.IO.Path.Combine(fixture.Root, "Profile"); var state = new SaveData(profile); await state.LoadAsync(Token);
+        await using var operation = new BookOperation(new ArchiveFactory(pdfRenderer: new MacPdfRenderer()), new MagickImageDecoder(), state);
+        await operation.OpenAsync(fixture.Path, Token); var previous = operation.Book;
+        operation.RequestArchiveKeyAsync = (_, _) => Task.FromResult<string?>(null); await operation.OpenAsync(encrypted, Token);
+        Assert.Same(previous, operation.Book); Assert.False(ArchiveKeyCache.Current.TryGetValue(encrypted, out _));
+        await operation.SaveAsync(); foreach (var file in Directory.GetFiles(profile, "*.json")) Assert.DoesNotContain("synthetic-test-only", await File.ReadAllTextAsync(file, Token));
+    }
     [Fact]
     public async Task CustomExtensionUsesActualPdfBackendAtRootAndInsideZip()
     {

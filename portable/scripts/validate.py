@@ -54,7 +54,7 @@ def main():
     parser.add_argument("--macos", action="store_true", help="执行正式应用构建，需匹配的完整 Xcode")
     parser.add_argument("--macos-native", action="store_true", help="后台运行官方macOS绑定的独立测试.app，不启动正式界面")
     parser.add_argument("--phase", choices=(
-        "p5-pdf-filetypes", "p5-pdf", "p5-nested", "p5-settings-search", "p5-theme-folder", "p5-fonts", "p5-theme", "p5-profile-assets", "p5-effect-compatibility", "p5-difference-settings", "p5-folder-compatibility", "p5-legacy-compatibility", "p5-profile-apply", "p5-profile-preview", "p34-device", "p4-completion", "p4-logical-book-copy",
+        "p5-pdf-password", "p5-pdf-filetypes", "p5-pdf", "p5-nested", "p5-settings-search", "p5-theme-folder", "p5-fonts", "p5-theme", "p5-profile-assets", "p5-effect-compatibility", "p5-difference-settings", "p5-folder-compatibility", "p5-legacy-compatibility", "p5-profile-apply", "p5-profile-preview", "p34-device", "p4-completion", "p4-logical-book-copy",
         "p4-directory-copy", "p4-book-transfer", "p4-delete-book", "p4-multi-paste", "p4-realization",
         "p4-clipboard", "p4-rename", "p4-delete", "p4-destination", "p4-multipage",
         "p3-navigation-completion", "p3-index", "p3-panorama", "p3-completion", "p3-performance",
