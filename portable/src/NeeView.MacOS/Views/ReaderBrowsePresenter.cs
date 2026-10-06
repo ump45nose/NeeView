@@ -300,7 +300,8 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
         var rect = Layout!.Items[index]; double scale = (TopLevel.GetTopLevel(owner)?.RenderScaling ?? 1) * owner.LoupeFixedScale;
         var size = _pages[index].Content.PageDataSource.Size;
         if (Config.Current.ImageDotKeep.IsImageDotKeep(new(rect.Width * scale, rect.Height * scale), size))
-            return new((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height), _mode == BrowseLayoutMode.Masonry);
+            return new((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height), _mode == BrowseLayoutMode.Masonry,
+                _mode == BrowseLayoutMode.Masonry ? null : Config.Current.ImageResizeFilter.CreateParameters());
         var trim = Config.Current.ImageTrim;
         var display = new NeeView.Size(rect.Width * scale / (trim.IsEnabled ? 1-trim.Left-trim.Right : 1),
             rect.Height * scale / (trim.IsEnabled ? 1-trim.Top-trim.Bottom : 1));

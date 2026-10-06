@@ -14,7 +14,7 @@ public sealed class EffectProfile : ObservableObject, IComparable<EffectProfile>
     public ImageCustomSizeConfig ImageCustomSize { get; set; } = new();
     public ImageTrimConfig ImageTrim { get; set; } = new();
     public ImageDotKeepConfig ImageDotKeep { get; set; } = new();
-    public JsonObject ImageResizeFilter { get; set; } = new();
+    public ImageResizeFilterConfig ImageResizeFilter { get; set; } = new();
     public ImageGridConfig ImageGrid { get; set; } = new();
     public ImageEffectConfig ImageEffect { get; set; } = new();
     [JsonExtensionData] public Dictionary<string, JsonElement>? ExtensionData { get; set; }
@@ -23,13 +23,13 @@ public sealed class EffectProfile : ObservableObject, IComparable<EffectProfile>
     public void Store(Config config)
     {
         ImageCustomSize = Copy(config.ImageCustomSize); ImageTrim = Copy(config.ImageTrim); ImageDotKeep = Copy(config.ImageDotKeep);
-        ImageResizeFilter = ImageResizeFilterCapability.Clone(config.ImageResizeFilter); ImageGrid = Copy(config.ImageGrid); ImageEffect = Copy(config.ImageEffect);
+        ImageResizeFilter = Copy(config.ImageResizeFilter); ImageGrid = Copy(config.ImageGrid); ImageEffect = Copy(config.ImageEffect);
     }
     /// <summary>恢复六分支；页框读取 Config 的当前对象，不持有过期分支引用。</summary>
     public void Restore(Config config)
     {
         config.ImageCustomSize = Copy(ImageCustomSize); config.ImageTrim = Copy(ImageTrim); config.ImageDotKeep = Copy(ImageDotKeep);
-        config.ImageResizeFilter = ImageResizeFilterCapability.Clone(ImageResizeFilter); config.ImageGrid = Copy(ImageGrid); config.ImageEffect = Copy(ImageEffect);
+        config.ImageResizeFilter = Copy(ImageResizeFilter); config.ImageGrid = Copy(ImageGrid); config.ImageEffect = Copy(ImageEffect);
     }
     public int CompareTo(EffectProfile? other) => other is null ? 1 : other.Id == 0 ? Id == 0 ? 0 : 1 : Id == 0 ? -1 : string.Compare(Name, other.Name, StringComparison.CurrentCulture);
 }

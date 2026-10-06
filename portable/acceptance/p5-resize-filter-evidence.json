@@ -1,0 +1,49 @@
+{
+  "backend_sample": {
+    "source_sha256": "BB602481B01AAEB65C771240C4773845F0817EA3FB6A5A290C46D7C0C2690D61",
+    "source_unchanged": true,
+    "decode_ms": [
+      2146.7788,
+      2134.357,
+      2047.1206
+    ],
+    "scope": "同一只读实图三次完整后端解码/滤镜耗时，不代表首图或屏幕P95"
+  },
+  "export_sample_supplement": {
+    "passed": 1,
+    "failed": 0,
+    "scope": "同一用户只读图片完整源/View导出；全量因未传该独立变量跳过后补验"
+  },
+  "package": {
+    "release_arm64": true,
+    "deep_strict_adhoc": true,
+    "zip_integrity_and_relocation": true,
+    "photosauce_license": {
+      "name": "PhotoSauce.MagicScaler interpolation kernels",
+      "repository_commit": "9af284f48de413e52e7b7aa7076fcaa3bc0d9d7c",
+      "repository": "https://github.com/saucecontrol/PhotoSauce/tree/9af284f48de413e52e7b7aa7076fcaa3bc0d9d7c",
+      "source_files": [
+        {
+          "path": "src/MagicScaler/Core/Interpolators.cs",
+          "sha256": "6095e3b3210c78cb8073d025819f1e770a7ed6230dd85901063db26b80d7eab4"
+        }
+      ],
+      "target": "src/NeeView.Backends/Imaging/ResizeKernel.cs",
+      "license": "licenses/photosauce.LICENSE.txt",
+      "license_files": [
+        {
+          "source": "licenses/photosauce.LICENSE.txt",
+          "file": "licenses/photosauce.LICENSE.txt",
+          "sha256": "6167218f7d1926c6f8f243aa6d77c097fc1703466086529c53afeabea47de19a"
+        }
+      ],
+      "license_material_state": "included"
+    }
+  },
+  "limits": [
+    "无屏幕P95",
+    "无Windows逐像素动态对照",
+    "缩略/动图/PDF原生滤镜未迁",
+    "Developer ID、公证、干净安装未执行"
+  ]
+}

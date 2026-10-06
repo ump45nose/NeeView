@@ -1,9 +1,32 @@
-// Copyright (c) NeeLaboratory. MIT; original resize configuration material, backend remains pending.
-using System.Text.Json.Nodes;
+// Copyright (c) NeeLaboratory. MIT; adapted from original ImageResizeFilterConfig.
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using CommunityToolkit.Mvvm.ComponentModel;
 namespace NeeView;
-/// <summary>原缩放滤镜分支暂用原始对象保存；不猜测 MagicScaler 隐含默认，也不冒充后端已迁。</summary>
-public static class ImageResizeFilterCapability
+/// <summary>原滤镜配置及不可变解码快照；JSON保留未迁字段。</summary>
+public sealed class ImageResizeFilterConfig : ObservableObject
 {
-    public const string PendingReason = "缩放滤镜后端尚未迁入；原参数完整保留。";
-    public static JsonObject Clone(JsonObject source) => source.DeepClone().AsObject();
+    private bool _isEnabled;
+    private ResizeInterpolation _resizeInterpolation = ResizeInterpolation.Lanczos;
+    private bool _isUnsharpMaskEnabled = true;
+    private UnsharpMaskConfig _unsharpMask = new();
+    public bool IsEnabled { get => _isEnabled; set => SetProperty(ref _isEnabled, value); }
+    public ResizeInterpolation ResizeInterpolation { get => _resizeInterpolation; set => SetProperty(ref _resizeInterpolation, value); }
+    public bool IsUnsharpMaskEnabled { get => _isUnsharpMaskEnabled; set => SetProperty(ref _isUnsharpMaskEnabled, value); }
+    public ImageResizeFilterConfig() { _unsharpMask.PropertyChanged += MaskChanged; }
+    public UnsharpMaskConfig UnsharpMask
+    {
+        get => _unsharpMask;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            if (ReferenceEquals(value, _unsharpMask)) return;
+            _unsharpMask.PropertyChanged -= MaskChanged;
+            _unsharpMask = value; _unsharpMask.PropertyChanged += MaskChanged; OnPropertyChanged();
+        }
+    }
+    private void MaskChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs args) => OnPropertyChanged(nameof(UnsharpMask));
+    [JsonExtensionData] public Dictionary<string, JsonElement>? ExtensionData { get; set; }
+    /// <summary>后台工作只消费当前值快照；沿原byte阈值转换，不按表单范围改写导入值。</summary>
+    public ImageResizeFilterParameters? CreateParameters() => IsEnabled ? new(ResizeInterpolation, IsUnsharpMaskEnabled, UnsharpMask.Amount, UnsharpMask.Radius, unchecked((byte)UnsharpMask.Threshold)) : null;
 }

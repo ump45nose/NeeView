@@ -1,6 +1,6 @@
 # 完整命令迁移表
 
-固定基线235个原命令实例全部保留。当前为 **218个执行入口接入、17个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
+固定基线235个原命令实例全部保留。当前为 **219个执行入口接入、16个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
 
 原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。实际键位/手势按原A/B/C、阅读方向和用户差分计算。
 
@@ -214,7 +214,7 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | PrevEffectProfile | 前一个效果配置 |  |  | 已接入 | P5第二十八批原效果/预设/几何；四类执行及十类待迁，见p5-image-effects.md | NeeView/Command/CommandTable.cs |
 | ToggleCustomSize | 启用/禁用自定义大小 |  |  | 已接入 | P5第二十八批原效果/预设/几何；四类执行及十类待迁，见p5-image-effects.md | NeeView/Command/Commands/ToggleCustomSizeCommand.cs |
 | ToggleTrim | 切换裁剪 |  |  | 已接入 | P5第二十八批原效果/预设/几何；四类执行及十类待迁，见p5-image-effects.md | NeeView/Command/Commands/ToggleTrimCommand.cs |
-| ToggleResizeFilter | 启用/禁用调整大小滤镜 | Ctrl+R |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleResizeFilterCommand.cs |
+| ToggleResizeFilter | 启用/禁用调整大小滤镜 | Ctrl+R |  | 已接入 | P5原十一核/锐化/参数/预设；实际后端范围见p5-resize-filter.md | NeeView/Command/Commands/ToggleResizeFilterCommand.cs |
 | ToggleGrid | 启用/禁用网格 |  |  | 已接入 | P5第二十八批原效果/预设/几何；四类执行及十类待迁，见p5-image-effects.md | NeeView/Command/Commands/ToggleGridCommand.cs |
 | ToggleEffect | 启用/禁用效果 | Ctrl+E |  | 已接入 | P5第二十八批原效果/预设/几何；四类执行及十类待迁，见p5-image-effects.md | NeeView/Command/Commands/ToggleEffectCommand.cs |
 | ToggleIsLoupe | 启用/禁用放大镜 |  |  | 已接入 | P5原Loupe独立变换/状态及局部捕获；真机另验 | NeeView/Command/Commands/ToggleIsLoupeCommand.cs |

@@ -22,7 +22,7 @@ public sealed class Config
     public ImageDotKeepConfig ImageDotKeep { get; set; } = new();
     public ImageCustomSizeConfig ImageCustomSize { get; set; } = new();
     public ImageTrimConfig ImageTrim { get; set; } = new();
-    public System.Text.Json.Nodes.JsonObject ImageResizeFilter { get; set; } = new();
+    public ImageResizeFilterConfig ImageResizeFilter { get; set; } = new();
     public ImageGridConfig ImageGrid { get; set; } = new();
     public ImageEffectConfig ImageEffect { get; set; } = new();
     public EffectUnitCache ImageEffectCache { get; set; } = new();

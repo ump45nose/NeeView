@@ -223,7 +223,7 @@ public sealed class DeleteFileTests
             var implemented = typeof(MainWindow).GetMethod("IsCommandImplemented", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
             var items = new CommandTable(op).Definitions.Select(d => new { d.Name, d.Text, d.Shortcut, d.MouseGesture, d.Source, d.Stage,
                 implemented = (bool)implemented.Invoke(window, [d.Name])! }).ToArray();
-            Assert.Equal(235, items.Length); Assert.Equal(218, items.Count(item => item.implemented));
+            Assert.Equal(235, items.Length); Assert.Equal(219, items.Count(item => item.implemented));
             var phase = Environment.GetEnvironmentVariable("NEEVIEW_ACCEPTANCE_PHASE") ?? "p4-delete";
             var export = Output(phase + "-commands.json");
             await File.WriteAllTextAsync(export, System.Text.Json.JsonSerializer.Serialize(new

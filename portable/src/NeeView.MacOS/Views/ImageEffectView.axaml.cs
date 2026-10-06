@@ -52,7 +52,13 @@ public sealed partial class ImageEffectView : UserControl, IDisposable
             { var property = typeof(ImageTrimConfig).GetProperty(edge)!; Number(trim, edge, (double)property.GetValue(draft.ImageTrim)!, value => property.SetValue(draft.ImageTrim, value), 0, .9); }
             var dot = Section(sections, "像素保持", draft.ImageDotKeep.IsEnabled, value => draft.ImageDotKeep.IsEnabled = value);
             Number(dot, "阈值", draft.ImageDotKeep.Threshold, value => draft.ImageDotKeep.Threshold = value, .01, 100);
-            sections.Children.Add(new TextBlock { Text = "缩放滤镜\n" + ImageResizeFilterCapability.PendingReason, TextWrapping = TextWrapping.Wrap, Opacity = .65 });
+            var resize = Section(sections, "缩放滤镜", draft.ImageResizeFilter.IsEnabled, value => draft.ImageResizeFilter.IsEnabled = value);
+            Choice(resize, "插值", draft.ImageResizeFilter.ResizeInterpolation, value => draft.ImageResizeFilter.ResizeInterpolation = value);
+            Check(resize, "锐化", draft.ImageResizeFilter.IsUnsharpMaskEnabled, value => draft.ImageResizeFilter.IsUnsharpMaskEnabled = value);
+            var mask = draft.ImageResizeFilter.UnsharpMask;
+            Number(resize, "锐化量", mask.Amount, value => mask.Amount = WholeNumber(value), Math.Min(25, mask.Amount), Math.Max(200, mask.Amount));
+            Number(resize, "半径", mask.Radius, value => mask.Radius = value, Math.Min(.3, mask.Radius), Math.Max(3, mask.Radius));
+            Number(resize, "阈值", mask.Threshold, value => mask.Threshold = WholeNumber(value), Math.Min(0, mask.Threshold), Math.Max(10, mask.Threshold));
             var grid = Section(sections, "网格", draft.ImageGrid.IsEnabled, value => draft.ImageGrid.IsEnabled = value);
             Choice(grid, "目标", draft.ImageGrid.Target, value => draft.ImageGrid.Target = value);
             Text(grid, "颜色", draft.ImageGrid.Color.ToString(), value => draft.ImageGrid.Color = ThemeRgba.Parse(value));
@@ -95,6 +101,7 @@ public sealed partial class ImageEffectView : UserControl, IDisposable
     }
     private void Number(StackPanel parent, string title, double value, Action<double> set, double min = -100000, double max = 100000) =>
         Text(parent, title, value.ToString(CultureInfo.InvariantCulture), text => { if (!double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var number) || !double.IsFinite(number) || number < min || number > max) throw new ArgumentException($"{title} 范围为 {min}–{max}。"); set(number); });
+    private static int WholeNumber(double value) => value == Math.Truncate(value) ? checked((int)value) : throw new ArgumentException("参数必须为整数。");
     private void Text(StackPanel parent, string title, string value, Action<string> set)
     {
         var input = new TextBox { Text = value, MinWidth = 70 }; string last = value;

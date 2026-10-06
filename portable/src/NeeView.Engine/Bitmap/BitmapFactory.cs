@@ -21,7 +21,7 @@ public sealed partial class BitmapFactory(IImageDecoder decoder) : IDisposable
         public CancellationTokenSource Cancellation { get; set; } = null!;
         public bool Finished;
     }
-    private readonly record struct Key(object Source, int Id, long Length, DateTime Version, int Width, int Height, bool Thumbnail, string? CoverSelection = null, long CoverRevision = 0);
+    private readonly record struct Key(object Source, int Id, long Length, DateTime Version, int Width, int Height, bool Thumbnail, string? CoverSelection = null, long CoverRevision = 0, ImageResizeFilterParameters? ResizeFilter = null);
     private readonly object _sync = new();
     private readonly Dictionary<Key, Entry> _cache = [];
     private readonly HashSet<Entry> _retired = [];
@@ -60,7 +60,7 @@ public sealed partial class BitmapFactory(IImageDecoder decoder) : IDisposable
     public Task<BitmapLease> GetAsync(Page page, DecodeRequest request, CancellationToken token, bool background = false)
     {
         var entry = page.ArchiveEntry;
-        var key = new Key(entry.Archive, entry.Id, entry.Length, entry.LastWriteTime, request.TargetWidth, request.TargetHeight, request.IsThumbnail);
+        var key = new Key(entry.Archive, entry.Id, entry.Length, entry.LastWriteTime, request.TargetWidth, request.TargetHeight, request.IsThumbnail, ResizeFilter: request.ResizeFilter);
         return GetCoreAsync(key, request, token, background, cancellation =>
         {
             if (!page.IsImage && !page.PageType.IsFolder()) throw new NotSupportedException("这个文件类型的查看器尚未迁移。");

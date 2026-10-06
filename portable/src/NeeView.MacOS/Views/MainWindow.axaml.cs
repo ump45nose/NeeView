@@ -39,7 +39,7 @@ public sealed partial class MainWindow : Window
     private SliderTextBox PageNumber => this.FindControl<SliderTextBox>("PageNumberView")!;
     private static readonly HashSet<string> HostCommands = new(StringComparer.Ordinal)
     {
-        "ToggleCustomSize", "ToggleTrim", "ToggleGrid", "ToggleEffect", "ToggleNearestNeighbor", "ToggleVisibleAddressBar", "ToggleVisiblePageSlider", "ToggleWindowMinimize", "ToggleWindowMaximize", "OpenSettingFilesFolder", "SaveSetting", "ReloadSetting", "ExportBackup", "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen", "MoveToFolderAs", "CopyToFolderAs",
+        "ToggleCustomSize", "ToggleTrim", "ToggleGrid", "ToggleEffect", "ToggleResizeFilter", "ToggleNearestNeighbor", "ToggleVisibleAddressBar", "ToggleVisiblePageSlider", "ToggleWindowMinimize", "ToggleWindowMaximize", "OpenSettingFilesFolder", "SaveSetting", "ReloadSetting", "ExportBackup", "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen", "MoveToFolderAs", "CopyToFolderAs",
         "ViewScaleUp", "ViewScaleDown", "ViewScrollUp", "ViewScrollDown", "ViewScrollLeft", "ViewScrollRight", "OpenContextMenu", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
         "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ToggleBookLock", "Unload", "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff",
         "ToggleViewFlipVertical", "ViewFlipVerticalOn", "ViewFlipVerticalOff", "ViewReset", "ViewScaleStretch", "ViewPresetScroll", "ViewScrollNTypeUp", "ViewScrollNTypeDown",
@@ -213,7 +213,7 @@ public sealed partial class MainWindow : Window
         "OpenVersionWindow" => _platform is not null,
         "SaveSetting" or "ReloadSetting" or "ExportBackup" => !_profileBusy && _model?.Operation.CanManageProfile == true,
         "OpenSettingFilesFolder" => _platform is not null && _settingFolderAction.IsCompleted,
-        "ToggleCustomSize" or "ToggleTrim" or "ToggleGrid" or "ToggleEffect" or "NextEffectProfile" or "PrevEffectProfile" or "SetEffectProfile" or "ToggleNearestNeighbor" => _model?.Operation.IsLoading == false,
+        "ToggleCustomSize" or "ToggleTrim" or "ToggleGrid" or "ToggleEffect" or "ToggleResizeFilter" or "NextEffectProfile" or "PrevEffectProfile" or "SetEffectProfile" or "ToggleNearestNeighbor" => _model?.Operation.IsLoading == false,
         "LoupeScaleUp" or "LoupeScaleDown" => Viewer.IsLoupeEnabled && !_preparing && !_closedPrepared,
         "ToggleIsLoupe" or "LoupeOn" or "LoupeOff" => _model?.Operation.Book is not null && _model.Operation.IsLoading == false && !_preparing && !_closedPrepared,
         "ToggleMediaPlay" or "PrevMediaPosition" or "NextMediaPosition" => _model?.Operation.MediaExists() == true,
@@ -266,6 +266,7 @@ public sealed partial class MainWindow : Window
         "ToggleTrim" => Config.Current.ImageTrim.IsEnabled,
         "ToggleGrid" => Config.Current.ImageGrid.IsEnabled,
         "ToggleEffect" => Config.Current.ImageEffect.IsEnabled,
+        "ToggleResizeFilter" => Config.Current.ImageResizeFilter.IsEnabled,
         "ToggleIsLoupe" => Viewer.IsLoupeEnabled,
         "ToggleSlideShow" => _model?.Operation.SlideShow.IsPlaying,
         "ToggleMediaPlay" => _model?.Operation.IsMediaPlaying(),
@@ -411,7 +412,7 @@ public sealed partial class MainWindow : Window
                 case "OpenExternalAppAs": await ExecuteExternalApplicationAsync(name, false); break;
                 case "OpenBookExternalAppAs": await ExecuteExternalApplicationAsync(name, true); break;
                 case "TogglePermitFile": await _model.Operation.ToggleFileWriteAccessAsync(fromMenu); break;
-                case "ToggleCustomSize": case "ToggleTrim": case "ToggleGrid": case "ToggleEffect": await _model.Operation.ToggleImageOptionAsync(name, fromMenu); break;
+                case "ToggleCustomSize": case "ToggleTrim": case "ToggleGrid": case "ToggleEffect": case "ToggleResizeFilter": await _model.Operation.ToggleImageOptionAsync(name, fromMenu); break;
                 case "ToggleNearestNeighbor": await _model.Operation.ToggleNearestNeighborAsync(fromMenu); break;
                 case "ToggleIsLoupe": Viewer.SetLoupe(_model.SaveData.GetCommandParameter<ToggleCommandParameter>(name).GetState(Viewer.IsLoupeEnabled, fromMenu)); break;
                 case "LoupeOn": Viewer.SetLoupe(true); break;

@@ -16,6 +16,7 @@ public sealed partial class BookOperation
             case "ToggleTrim": config.ImageTrim.IsEnabled = parameter.GetState(config.ImageTrim.IsEnabled, fromMenu); break;
             case "ToggleGrid": config.ImageGrid.IsEnabled = parameter.GetState(config.ImageGrid.IsEnabled, fromMenu); break;
             case "ToggleEffect": config.ImageEffect.IsEnabled = parameter.GetState(config.ImageEffect.IsEnabled, fromMenu); break;
+            case "ToggleResizeFilter": config.ImageResizeFilter.IsEnabled = parameter.GetState(config.ImageResizeFilter.IsEnabled, fromMenu); break;
         }
     });
 }

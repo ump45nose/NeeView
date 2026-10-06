@@ -101,7 +101,9 @@ public sealed record ImageInfo(Size Size, string Format)
     public Size AspectSize { get; init; } = Size;
 }
 /// <summary>解码目标尺寸，以设备像素计。</summary>
-public sealed record DecodeRequest(int TargetWidth, int TargetHeight, bool IsThumbnail = false);
+public sealed record DecodeRequest(int TargetWidth, int TargetHeight, bool IsThumbnail = false, ImageResizeFilterParameters? ResizeFilter = null);
+/// <summary>一次解码的原缩放滤镜值快照；不在后台读取可变全局配置。</summary>
+public sealed record ImageResizeFilterParameters(ResizeInterpolation Interpolation, bool Sharpen, int Amount, double Radius, byte Threshold);
 /// <summary>单个像素缓冲的所有者；显示端不能保留已释放缓冲。</summary>
 public sealed class DecodedImageLease(Size size, byte[] pixels, ThemeRgba? sourceColor = null, Size? sourceSize = null) : IDisposable
 {

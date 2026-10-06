@@ -16,7 +16,7 @@ internal static class ReaderImageRenderer
         double ratio = Math.Min(1, Math.Max(display.Width / source.Width, display.Height / source.Height));
         ratio = Math.Min(ratio, Math.Min(maximumEdge / source.Width, maximumEdge / source.Height));
         int Edge(double value) => Math.Clamp((int)Math.Ceiling(value * ratio / bucket) * bucket, bucket, maximumEdge);
-        return new(Edge(source.Width), Edge(source.Height), thumbnail);
+        return new(Edge(source.Width), Edge(source.Height), thumbnail, thumbnail ? null : Config.Current.ImageResizeFilter.CreateParameters());
     }
     private static (ThemeRgba Color, IBrush Brush)? _pageChecker;
     /// <summary>原透明页背景的颜色/HSV明暗格；一DIP内缩沿原ImageContentControl。</summary>

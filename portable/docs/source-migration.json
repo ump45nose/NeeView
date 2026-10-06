@@ -756,6 +756,24 @@
       "target": "src/NeeView.Engine/Command/SetEffectProfileCommandParameter.cs",
       "sha256": "047eab5086833adda00bd74f6fdeae0fe41411d10882597d31c276337abb317c",
       "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/Config/ImageResizeFilterConfig.cs",
+      "sha256": "9d65aae396ff2281b21b35c5f284ab3c53d5ddb699d5a24f7e0507ba10807638",
+      "target": "src/NeeView.Engine/Config/ImageResizeFilterConfig.cs",
+      "status": "P5第三十四批：原配置/枚举/舍入，替换MagicScaler依赖，未知JSON保留。"
+    },
+    {
+      "source": "NeeView/Config/UnsharpMaskConfig.cs",
+      "sha256": "741bce868cd3ce1e121ba2c4f1e686b9646bbd28836b36087b524eaac93db90c",
+      "target": "src/NeeView.Engine/Config/UnsharpMaskConfig.cs",
+      "status": "P5第三十四批：原配置/枚举/舍入，替换MagicScaler依赖，未知JSON保留。"
+    },
+    {
+      "source": "NeeView/SidePanels/ImageEffect/ResizeInterpolation.cs",
+      "sha256": "41773b37590b3c6003ed5fa497aaba77d0dd63aaf53b387ec886211e621070ad",
+      "target": "src/NeeView.Engine/Config/ResizeInterpolation.cs",
+      "status": "P5第三十四批：原配置/枚举/舍入，替换MagicScaler依赖，未知JSON保留。"
     }
   ],
   "partial_adapters": [
@@ -3813,6 +3831,21 @@
       "license": "licenses/upstream/dotnet-wpf/LICENSE.TXT",
       "license_sha256": "ae48df11a335dc1a615f4f938b69cba73bcf4485c4f97af49b38efb0f216353b",
       "status": "P5第三十二批：官方离散核/缩放半径的C#和Skia适配；WPF本身不进入Mac构建/分发。"
+    },
+    {
+      "name": "PhotoSauce.MagicScaler interpolation kernels",
+      "repository_commit": "9af284f48de413e52e7b7aa7076fcaa3bc0d9d7c",
+      "url": "https://github.com/saucecontrol/PhotoSauce/tree/9af284f48de413e52e7b7aa7076fcaa3bc0d9d7c",
+      "source_files": [
+        {
+          "path": "src/MagicScaler/Core/Interpolators.cs",
+          "sha256": "6095e3b3210c78cb8073d025819f1e770a7ed6230dd85901063db26b80d7eab4"
+        }
+      ],
+      "target": "src/NeeView.Backends/Imaging/ResizeKernel.cs",
+      "license": "licenses/photosauce.LICENSE.txt",
+      "license_sha256": "6167218f7d1926c6f8f243aa6d77c097fc1703466086529c53afeabea47de19a",
+      "status": "P5第三十四批：固定0.15.0十一核的纯公式适配；WIC和MagicScaler包不进入Mac分发。"
     }
   ]
 }

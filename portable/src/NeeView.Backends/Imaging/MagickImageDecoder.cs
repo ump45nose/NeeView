@@ -61,7 +61,8 @@ public sealed class MagickImageDecoder(IAnimatedImageDecoder? pngAnimation = nul
             throw new NotSupportedException("图片超过解码工作预算，当前格式不能安全降采样。");
         stream.Position = 0;
         var settings = new MagickReadSettings { FrameIndex = 0, FrameCount = 1 };
-        if (format == MagickFormat.Jpeg && (width > request.TargetWidth || height > request.TargetHeight || estimate > WorkingBudget))
+        var filterEnabled = request.ResizeFilter is not null && !request.IsThumbnail && request.TargetWidth > 0 && request.TargetHeight > 0;
+        if (format == MagickFormat.Jpeg && (!filterEnabled || estimate > WorkingBudget) && (width > request.TargetWidth || height > request.TargetHeight || estimate > WorkingBudget))
         {
             var factor = 1;
             while (estimate / (factor * factor) > WorkingBudget && factor < 8) factor *= 2;
@@ -85,6 +86,34 @@ public sealed class MagickImageDecoder(IAnimatedImageDecoder? pngAnimation = nul
         }
         var ratio = Math.Min(1, Math.Min((double)Math.Max(1, request.TargetWidth) / image.Width,
             (double)Math.Max(1, request.TargetHeight) / image.Height));
+        if (filterEnabled)
+        {
+            var dw = Math.Max(1, (int)(image.Width * ratio));
+            var dh = Math.Max(1, (int)(image.Height * ratio));
+            image.Depth = 8;
+            if (checked((long)image.Width * image.Height * 4 + (long)dw * dh * 4) >= 128L * 1024 * 1024)
+                throw new NotSupportedException("缩放滤镜源及输出超过托管工作预算。");
+            var input = image.ToByteArray(MagickFormat.Bgra);
+            // Reserve a second output for native sharpening/encoding in addition to the resampler workspace.
+            var budget = 128L * 1024 * 1024 - checked((long)dw * dh * 4);
+            var filtered = ResizeKernel.Resize(input, (int)image.Width, (int)image.Height, dw, dh, request.ResizeFilter!.Interpolation, token, budget);
+            if (request.ResizeFilter.Sharpen)
+            {
+                var mask = ResolveMask(request.ResizeFilter, Math.Min((double)image.Width / dw, (double)image.Height / dh));
+                if (!double.IsFinite(mask.Radius) || (mask.Amount > 0 && mask.Radius <= 0) || mask.Radius > 32)
+                    throw new NotSupportedException("锐化半径超出安全处理范围。");
+                using var sharp = new MagickImage(filtered, new MagickReadSettings { Width = (uint)dw, Height = (uint)dh, Format = MagickFormat.Bgra });
+                if (mask.Amount > 0)
+                {
+                    // Mature native sharpening replaces MagicScaler's luminance mask; alpha is untouched.
+                    sharp.UnsharpMask(0, mask.Radius, mask.Amount / 100.0, mask.Threshold / 255.0, Channels.RGB);
+                    filtered = sharp.ToByteArray(MagickFormat.Bgra);
+                }
+            }
+            token.ThrowIfCancellationRequested();
+            for (var offset = 0; offset < filtered.Length; offset += 4) { var a=filtered[offset+3]; filtered[offset]=(byte)((filtered[offset]*a+127)/255); filtered[offset+1]=(byte)((filtered[offset+1]*a+127)/255); filtered[offset+2]=(byte)((filtered[offset+2]*a+127)/255); }
+            return new DecodedImageLease(new(dw, dh), filtered, sourceColor, sourceSize);
+        }
         if (ratio < 1) image.Resize((uint)Math.Max(1, image.Width * ratio), (uint)Math.Max(1, image.Height * ratio));
         token.ThrowIfCancellationRequested();
         image.Depth = 8;
@@ -101,4 +130,12 @@ public sealed class MagickImageDecoder(IAnimatedImageDecoder? pngAnimation = nul
         token.ThrowIfCancellationRequested();
         return new DecodedImageLease(new((int)image.Width, (int)image.Height), pixels, sourceColor, sourceSize);
     }, token);
+
+    /// <summary>保留0.15.0 Amount未正值时按原缩放率选择默认锐化参数的规则。</summary>
+    private static (int Amount, double Radius, int Threshold) ResolveMask(ImageResizeFilterParameters settings, double ratio) => settings.Amount > 0
+        ? (settings.Amount, settings.Radius, settings.Threshold) : ratio switch
+        {
+            1 => (0, 0, 0), < .5 => (40, 1.5, 0), < 1 => (30, 1, 0), < 2 => (30, .75, 4),
+            < 4 => (75, .5, 2), < 6 => (50, .75, 2), < 8 => (100, .6, 1), < 10 => (125, .5, 0), _ => (150, .5, 0)
+        };
 }

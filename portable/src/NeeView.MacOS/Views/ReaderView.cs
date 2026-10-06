@@ -281,14 +281,14 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
     private DecodeRequest GetRequest(Page page)
     {
         var source = page.Content.PageDataSource; var size = source.Size;
-        if (_exportOriginalSize) return new((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height));
+        if (_exportOriginalSize) return new((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height), ResizeFilter: Config.Current.ImageResizeFilter.CreateParameters());
         var frameScale = _panorama?.Frames.FirstOrDefault(f => f.Frame.Contains(page))?.Frame.Scale ?? _frame?.Scale ?? 1;
         var scale = frameScale * _transform.BaseScale * _zoom * (TopLevel.GetTopLevel(this)?.RenderScaling ?? 1) * LoupeFixedScale;
         var adjusted = new PageCustomSize(Config.Current.ImageCustomSize, () => new(Bounds.Width, Bounds.Height))
             .TransformToCustomSize(Config.Current.Image.Standard.IsAspectRatioEnabled ? source.AspectSize : size);
         var display = new CoreSize(adjusted.Width * scale, adjusted.Height * scale);
         if (Config.Current.ImageDotKeep.IsImageDotKeep(display, size))
-            return new((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height));
+            return new((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height), ResizeFilter: Config.Current.ImageResizeFilter.CreateParameters());
         return ReaderImageRenderer.CreateRequest(size, display, 128, 32768);
     }
     /// <summary>邻页预取只有一个背景槽，取消或损坏不影响当前图。</summary>

@@ -496,6 +496,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                 || System.Text.Json.JsonSerializer.Serialize(snapshot.ImageTrim) != System.Text.Json.JsonSerializer.Serialize(Config.Current.ImageTrim);
             if (imageGeometryChanged && Book is not null) RebuildFrame(MoveDirection, false);
             if (imageGeometryChanged || System.Text.Json.JsonSerializer.Serialize(snapshot.ImageEffect) != System.Text.Json.JsonSerializer.Serialize(Config.Current.ImageEffect)
+                || System.Text.Json.JsonSerializer.Serialize(snapshot.ImageResizeFilter) != System.Text.Json.JsonSerializer.Serialize(Config.Current.ImageResizeFilter)
                 || System.Text.Json.JsonSerializer.Serialize(snapshot.ImageGrid) != System.Text.Json.JsonSerializer.Serialize(Config.Current.ImageGrid)
                 || System.Text.Json.JsonSerializer.Serialize(snapshot.EffectProfiles) != System.Text.Json.JsonSerializer.Serialize(Config.Current.EffectProfiles)) Notify();
             if (reading is not null && Book is { } current && System.Text.Json.JsonSerializer.Serialize(reading) != System.Text.Json.JsonSerializer.Serialize(current.Setting))

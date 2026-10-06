@@ -104,7 +104,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             if (customSize.ContainsKey("AspectRatio")) customSize.Remove("IsUniformed");
             config.ImageCustomSize = customSize.Deserialize<ImageCustomSizeConfig>(ReadOptions) ?? new();
             config.ImageTrim = ReadBranch<ImageTrimConfig>(raw, "ImageTrim");
-            config.ImageResizeFilter = raw["ImageResizeFilter"]?.DeepClone().AsObject() ?? new();
+            config.ImageResizeFilter = ReadBranch<ImageResizeFilterConfig>(raw, "ImageResizeFilter");
             config.ImageGrid = ReadBranch<ImageGridConfig>(raw, "ImageGrid");
             config.ImageEffect = ReadBranch<ImageEffectConfig>(raw, "ImageEffect");
             config.ImageEffectCache = ReadBranch<EffectUnitCache>(raw, "ImageEffectCache");
@@ -525,7 +525,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             }
             Object(config, "ImageCustomSize").Remove("IsUniformed");
             config["ImageEffectCache"] = JsonSerializer.SerializeToNode(Config.Current.ImageEffectCache, Options);
-            config["ImageResizeFilter"] = Config.Current.ImageResizeFilter.DeepClone();
+            MergeTyped(Object(config, "ImageResizeFilter"), Config.Current.ImageResizeFilter);
             // 仅覆盖本次编辑的两字段；配置在等待/失败时不暴露给防抖和其他保存。
             Object(config, "History")["LimitSize"] = historyConfig.LimitSize;
             Object(config, "History")["LimitSpan"] = JsonSerializer.SerializeToNode(historyConfig.LimitSpan, Options);

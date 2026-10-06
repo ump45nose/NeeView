@@ -39,8 +39,8 @@ public sealed class ImageEffectProfileTests
     }
     [Fact] public void OriginalProfilesStoreRestoreUniqueNamesAndDefaultProtection()
     {
-        var config=new Config();var profiles=new EffectProfileCollection(config);config.ImageTrim.Left=.2;config.ImageResizeFilter["FutureBackend"]=true;
-        var clone=profiles.CreateNew(true);Assert.Equal(.2,config.ImageTrim.Left);Assert.True(config.ImageResizeFilter["FutureBackend"]!.GetValue<bool>());
+        var config=new Config();var profiles=new EffectProfileCollection(config);config.ImageTrim.Left=.2;config.ImageResizeFilter.ExtensionData=new(){["FutureBackend"]=JsonSerializer.SerializeToElement(true)};
+        var clone=profiles.CreateNew(true);Assert.Equal(.2,config.ImageTrim.Left);Assert.True(config.ImageResizeFilter.ExtensionData!["FutureBackend"].GetBoolean());
         config.ImageTrim.Left=.4;profiles.SetSelectedId(0);Assert.Equal(.2,config.ImageTrim.Left);profiles.SetSelectedId(clone.Id);Assert.Equal(.4,config.ImageTrim.Left);
         var fresh=profiles.CreateNew();Assert.Equal(0,config.ImageTrim.Left);Assert.NotEqual(clone.Name,fresh.Name);profiles.Rename(fresh,clone.Name);Assert.NotEqual(clone.Name,fresh.Name);
         profiles.Delete(config.EffectProfiles.Profiles[0]);Assert.Equal(3,profiles.Profiles.Count);profiles.Delete(fresh);Assert.Equal(clone.Id,config.BookSetting.EffectProfileId);
@@ -57,7 +57,7 @@ public sealed class ImageEffectProfileTests
         Assert.IsType<UnknownEffectUnit>(Config.Current.ImageEffect.Layers[1].Effect);Assert.Equal(99,Assert.IsType<RippleEffectUnit>(Config.Current.ImageEffectCache.Get(typeof(RippleEffectUnit))).Frequency);
         var raw=JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(f.State,"UserSetting.json"),Token))!;
         Assert.Null(raw["Config"]?["ImageCustomSize"]?["IsUniformed"]);Assert.Equal(5,raw["Config"]!["ImageCustomSize"]!["Future"]!.GetValue<int>());
-        Assert.Equal(6,Config.Current.ImageResizeFilter["Future"]!.GetValue<int>());
+        Assert.Equal(6,Config.Current.ImageResizeFilter.ExtensionData!["Future"].GetInt32());
     }
     [Fact] public async Task EditingAndSwitchingProfilesKeepCurrentPageAndRestoreAfterReopen()
     {
@@ -76,7 +76,7 @@ public sealed class ImageEffectProfileTests
     {
         using var f=new Fixture();var data=new SaveData(f.State);await data.LoadAsync(Token);await using var op=f.Operation(data);await op.OpenAsync(f.Images,Token);
         await op.SaveAllAsync(Token);var position=op.Position;var raw=JsonSerializer.Serialize(Config.Current);Directory.Delete(f.State,true);await File.WriteAllTextAsync(f.State,"blocked",Token);
-        await Assert.ThrowsAnyAsync<Exception>(()=>op.EditImageOptionsAsync(config=>{new EffectProfileCollection(config).CreateNew(true);config.ImageTrim.Left=.3;config.ImageEffectCache.Add(new HsvEffectUnit{Hue=20});config.ImageResizeFilter["Changed"]=true;}));
+        await Assert.ThrowsAnyAsync<Exception>(()=>op.EditImageOptionsAsync(config=>{new EffectProfileCollection(config).CreateNew(true);config.ImageTrim.Left=.3;config.ImageEffectCache.Add(new HsvEffectUnit{Hue=20});config.ImageResizeFilter.ExtensionData=new(){["Changed"]=JsonSerializer.SerializeToElement(true)};}));
         Assert.Equal(raw,JsonSerializer.Serialize(Config.Current));Assert.Equal(position,op.Position);File.Delete(f.State);Directory.CreateDirectory(f.State);await op.SaveAllAsync(Token);
     }
     [AvaloniaFact] public async Task OriginalPanelHasSixSectionsAndChangingPageDoesNotRebuildDraft()
