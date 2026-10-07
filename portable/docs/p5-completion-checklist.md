@@ -123,4 +123,4 @@ P5 已开始。P3/P4 的两项真机检查按用户要求 [跳过并记录](../a
 
 兼容收尾：[契约](p5-compatibility.md)。普通分卷、Mac公开发布查询及文件操作有界隔离已接入；构建/自动/原生和开发包见[本批记录](../acceptance/p5-compatibility-runtime.md)，AX、依赖能力限制和真实SMB分别保留，不外推完整验收通过。
 
-AX最小补丁：[隔离验证](../acceptance/ax-minimal-patch-evaluation.md)已执行。静态100+1000查询不再累积数组，但动态旧控件101/101仍存活；相同Headless对照全部释放。涉及节点生命周期，按约定停止临时接入，不增加产品框架分支，AX保持未解决。
+AX最小补丁：[隔离验证](../acceptance/ax-minimal-patch-evaluation.md)已执行。动态旧控件仍存活，停止临时接入。用户随后决定保留问题记录、退出当前目标，AX不再阻塞交付；NAS真实复验、实际使用/旧数据和正式分发继续，见[当前范围](delivery-status.md)。
