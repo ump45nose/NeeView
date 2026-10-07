@@ -72,6 +72,8 @@ public sealed class SystemConfig
     /// <summary>用户配置的外部应用；默认保留一个系统关联应用槽位。</summary>
     [PropertyMapIgnore] public ExternalAppCollection ExternalAppCollection { get; set; } = new() { new ExternalApp() };
     public bool IsFileWriteAccessEnabled { get; set; }
+    /// <summary>原网络访问许可，默认开启；关闭时版本窗口不发起远端查询。</summary>
+    public bool IsNetworkEnabled { get; set; } = true;
     /// <summary>原普通文件删除默认确认；Mac始终使用系统废纸篓，不降级永久删除。</summary>
     public bool IsRemoveConfirmed { get; set; } = true;
     /// <summary>原文件复制附带文本策略；默认不把文件对象复制伪装成纯文本。</summary>

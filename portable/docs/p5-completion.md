@@ -28,7 +28,7 @@ Engine 保存原参数、纯打印几何、TSV停留记录、脚本实体操作�
 
 打印机/纸张/硬件输出及系统面板交互未由无面板PDF测试替代。TouchEmulate是WPF触摸调试模拟，Mac保留禁用能力说明；CutFile/CutBook按用户选择继续禁用。Windows专用插件/ClearType/libVLC实现不引入Mac。
 
-原未知JSON和未对应的Windows配置仍保留。本批不宣称分卷归档、内部目录提取原TODO、系统更新器或全部Windows平台专属能力已迁入。真实两分支导出、固定Windows动态一致性、混合缩放多屏、AX长期资源和NAS不可及时取消仍按既有记录计；用户跳过的浮窗菜单/停靠及屏幕P95不重开。
+原未知JSON和未对应的Windows配置仍保留。第四十批不宣称分卷归档、内部目录提取原TODO、系统更新器或全部Windows平台专属能力已迁入；后续兼容收尾已接入普通分卷和Mac发布检查，具体能力边界见[p5-compatibility.md](p5-compatibility.md)。真实两分支导出、固定Windows动态一致性、混合缩放多屏、AX长期资源和NAS不可及时取消仍按既有记录计；用户跳过的浮窗菜单/停靠及屏幕P95不重开。
 
 ## 测试与扩展点
 

@@ -29,7 +29,7 @@ public sealed class VersionWindowTests
         string? copied = null; var platform = new Platform(); using var model = new VersionWindowViewModel(platform, (text, _) => { copied = text; return Task.CompletedTask; });
         Assert.Equal(typeof(BookOperation).Assembly.GetName().Version!.ToString(3), model.DisplayVersion);
         await model.CopyVersionAsync(); Assert.Equal(model.VersionNote, copied); Assert.Contains("c5c398d89", copied); Assert.Contains(".NET", copied);
-        Assert.Empty(platform.Links); Assert.False(model.IsCheckerEnabled); Assert.Contains("尚未接入", model.UpdateStatus);
+        Assert.Empty(platform.Links); Assert.False(model.IsCheckerEnabled); Assert.Contains("未配置", model.UpdateStatus);
     }
     [Fact]
     public async Task ExactLicenseAndProjectLinksUseOnePlatformBoundary()

@@ -47,6 +47,8 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
             else if (info is FileInfo file && ArchiveFormats.IsArchive(info.Name))
                 items.Add(new(info.Name, info.FullName, false, file.Length, file.LastWriteTime, file.CreationTime));
         }
+        var names = items.Select(e => e.Name).ToHashSet(StringComparer.Ordinal);
+        items.RemoveAll(e => !e.IsDirectory && ArchiveVolumeSet.IsSecondaryName(e.Name, names));
         return items;
     }, token);
     /// <summary>后台列出当前目录直接子目录，不随同目录翻页重复调用。</summary>
@@ -100,8 +102,6 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
         else
         {
             if (!File.Exists(path)) throw new FileNotFoundException("来源不存在。", path);
-            if (System.Text.RegularExpressions.Regex.IsMatch(path, @"(?:\.part\d+\.rar|\.r\d{2}|\.\d{3})$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
-                throw new NotSupportedException("分卷归档尚未迁移，请使用完整的单文件归档。");
             if (PlaylistSourceTools.IsPlaylist(path)) archive = new PlaylistArchive(path, this) { IsRootShortcut = new FileInfo(path).LinkTarget is not null };
             else if (ArchiveFormats.IsPageArchive(path)) archive = CreatePageArchive(path, keys, token);
             else if (MediaFormats.IsBook(path)) archive = new MediaArchiveSource(path) { IsRootShortcut = new FileInfo(path).LinkTarget is not null };
@@ -116,9 +116,15 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
     private Archive CreatePageArchive(string path, ArchiveKeys keys, CancellationToken token, string? logicalPath = null, ArchiveEntry? source = null, IAsyncDisposable? lifetime = null)
     {
         // 原ArchiveManager顺序：ZIP/7z在PDF之前，配置重叠后缀不能夺取压缩来源。
+        if (ArchiveFormats.IsCompressedArchive(logicalPath ?? path))
+        {
+            var volumes = ArchiveVolumeSet.Resolve(path, token);
+            var compressedKey = keys.Get(logicalPath ?? volumes.PrimaryPath);
+            return new CompressedArchive(volumes, logicalPath, source, lifetime,
+                compressedKey.State == ArchiveKey.ArchiveKeyState.Completed ? compressedKey.Key : null, token)
+                { IsRootShortcut = source is null && new FileInfo(path).LinkTarget is not null };
+        }
         var key = keys.Get(logicalPath ?? path);
-        if (ArchiveFormats.IsCompressedArchive(logicalPath ?? path)) return new CompressedArchive(path, logicalPath, source, lifetime,
-            key.State == ArchiveKey.ArchiveKeyState.Completed ? key.Key : null, token) { IsRootShortcut = source is null && new FileInfo(path).LinkTarget is not null };
         if (!Config.Current.Archive.Pdf.IsEnabled) throw new NotSupportedException("PDF读取已在归档设置中关闭。");
         if (pdfRenderer is null) throw new NotSupportedException("当前宿主未装配系统PDF后端。");
         var renderer = key.State == ArchiveKey.ArchiveKeyState.Completed ? pdfRenderer.WithPassword(key.Key) : pdfRenderer;
@@ -295,6 +301,7 @@ public sealed partial class CompressedArchive : Archive
     public override string BackendName => "SharpCompress";
     private IArchive _archive;
     private readonly string _physicalPath;
+    private readonly ArchiveVolumeSet _volumes;
     private readonly string? _password;
     private readonly bool _rar4;
     private readonly bool _rar4EncryptedHeader;
@@ -319,21 +326,28 @@ public sealed partial class CompressedArchive : Archive
     public bool ContainsFile(string relative) => _entries.Where((_, i) => !_deletedIds.Contains(i)).Any(e => !e.IsDirectory && e.Key?.Replace('\\', '/') == relative);
     /// <summary>打开只读普通或固实归档，不按归档路径创建本地文件。</summary>
     /// <param name="password">本次打开候选；后台只能使用已验证进程缓存。</param><param name="token">准备索引及验证抽取取消。</param>
-    public CompressedArchive(string path, string? logicalPath = null, ArchiveEntry? source = null, IAsyncDisposable? lifetime = null, string? password = null, CancellationToken token = default) : base(logicalPath ?? path, source)
+    public CompressedArchive(string path, string? logicalPath = null, ArchiveEntry? source = null, IAsyncDisposable? lifetime = null, string? password = null, CancellationToken token = default)
+        : this(ArchiveVolumeSet.Resolve(path, token), logicalPath, source, lifetime, password, token) { }
+    internal CompressedArchive(ArchiveVolumeSet volumes, string? logicalPath, ArchiveEntry? source, IAsyncDisposable? lifetime, string? password, CancellationToken token) : base(logicalPath ?? volumes.PrimaryPath, source)
     {
-        _physicalPath = path; _nestedLifetime = lifetime; _password = password;
-        (_rar4, _rar4EncryptedHeader) = ReadRar4Header(path);
+        _volumes = volumes; _physicalPath = volumes.PrimaryPath; _nestedLifetime = lifetime; _password = password;
+        (_rar4, _rar4EncryptedHeader) = ReadRar4Header(_physicalPath);
         IArchive? opened = null;
         try
         {
             token.ThrowIfCancellationRequested();
-            _archive = opened = SharpCompress.Archives.ArchiveFactory.OpenArchive(path, new ReaderOptions { Password = password });
+            _archive = opened = OpenPhysicalArchive();
             // 先建立条目索引；SharpCompress对加密RAR先读取Volume属性会改变头部读取状态。
             _entries = _archive.Entries.ToList();
-            // ZIP/7z 的通用 Volume.IsMultiVolume 默认值不代表真实分卷；RAR 使用头部标志。
-            if (_archive.Volumes.Count() > 1 || _archive.Volumes.OfType<SharpCompress.Common.Rar.RarVolume>().Any(v => v.IsMultiVolume))
-                throw new NotSupportedException("分卷归档尚未迁移。");
+            // 不完整RAR拒绝；RAR2没有首卷标志，按完整条目和已验证.rar卷序列判断。
+            var rarVolume = _archive.Volumes.OfType<SharpCompress.Common.Rar.RarVolume>().FirstOrDefault();
+            if (source is not null && rarVolume is { IsMultiVolume: true }) throw new NotSupportedException("嵌套分卷归档尚不支持，请先将完整卷集放入普通目录。");
+            if (_entries.Any(e => !e.IsComplete) || rarVolume is { IsFirstVolume: false, IsMultiVolume: true, MinVersion: >= 3 })
+                throw new InvalidDataException("归档分卷不完整或缺少主卷。");
             var encrypted = _entries.FindIndex(e => e.IsEncrypted && !e.IsDirectory && e.Size > 0);
+            // 锁定库明确不支持跨RAR卷解密；不能只验证首个小条目后把整书标成已解锁。
+            if (_volumes.IsMultipart && _archive.Type == SharpCompress.Common.ArchiveType.Rar && encrypted >= 0)
+                throw new NotSupportedException("当前读取器不支持加密RAR分卷，请先解压到普通目录；未缓存密码。");
             if (encrypted >= 0)
             {
                 if (string.IsNullOrEmpty(password)) throw new ArchiveKeyRequiredException(Path);
@@ -350,8 +364,15 @@ public sealed partial class CompressedArchive : Archive
             throw;
         }
     }
+    /// <summary>索引及固实抽取都使用同一有序卷集；SharpCompress拥有并释放每个卷流。</summary>
+    private IArchive OpenPhysicalArchive() => _volumes.IsMultipart
+        ? SharpCompress.Archives.ArchiveFactory.OpenArchive(_volumes.Files, new ReaderOptions { Password = _password })
+        : SharpCompress.Archives.ArchiveFactory.OpenArchive(_physicalPath, new ReaderOptions { Password = _password });
     /// <summary>返回稳定的 entry ID 和原条目元数据。</summary>
-    public override Task<IReadOnlyList<ArchiveEntry>> GetEntriesAsync(CancellationToken token) => SourceIo.RunAsync<IReadOnlyList<ArchiveEntry>>(() =>
+    public override Task<IReadOnlyList<ArchiveEntry>> GetEntriesAsync(CancellationToken token)
+    {
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
+        return SourceIo.RunAsync<IReadOnlyList<ArchiveEntry>>(() =>
     {
         ObjectDisposedException.ThrowIf(IsDisposed, this);
         var entries = new List<ArchiveEntry>();
@@ -370,8 +391,13 @@ public sealed partial class CompressedArchive : Archive
         }
         return entries;
     }, token);
+    }
     /// <summary>串行解压到请求级可定位流；大条目使用自动删除的随机临时文件。</summary>
-    public override Task<Stream> OpenEntryAsync(ArchiveEntry entry, CancellationToken token) => SourceIo.RunAsync(() => OpenEntryCore(entry, token), token);
+    public override Task<Stream> OpenEntryAsync(ArchiveEntry entry, CancellationToken token)
+    {
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
+        return SourceIo.RunAsync(() => OpenEntryCore(entry, token), token);
+    }
     /// <summary>已在后台槽中执行的同步抽取；构造解锁验证与正文复用，不嵌套占用SourceIo槽。</summary>
     private Stream OpenEntryCore(ArchiveEntry entry, CancellationToken token)
     {
@@ -388,7 +414,7 @@ public sealed partial class CompressedArchive : Archive
             }
             // 固实包必须从块前部顺序恢复解码状态；不能直接调用随机条目流。
             // Reader 释放会关闭底层 SourceStream，固实抽取需独立来源，不能破坏登记索引的归档。
-            using var extraction = RequiresSequential ? SharpCompress.Archives.ArchiveFactory.OpenArchive(_physicalPath, new ReaderOptions { Password = _password }) : null;
+            using var extraction = RequiresSequential ? OpenPhysicalArchive() : null;
             using var reader = extraction?.ExtractAllEntries();
             if (reader is not null)
             {
@@ -473,18 +499,52 @@ public sealed partial class CompressedArchive : Archive
             File.Delete(pair.Value.Path); _solidFiles.Remove(pair.Key); total -= pair.Value.Length;
         }
     }
-    /// <summary>等待当前解压结束后关闭归档，不中途释放原生来源。</summary>
+    private readonly object _disposeSync = new();
+    private Task? _resourceDrain;
+    /// <summary>逻辑关闭后实际资源释放的完成任务；晚到读取仍拥有原来源，不提前关闭或删除。</summary>
+    internal Task ResourceDrainCompletion { get { lock (_disposeSync) return _resourceDrain ?? Task.CompletedTask; } }
+    /// <summary>先拒绝新读，再有限等待真实资源排空；卡住的只读原生调用不阻止窗口/应用退出。</summary>
     public override async ValueTask DisposeAsync()
     {
-        await _gate.WaitAsync();
+        Task drain;
+        lock (_disposeSync)
+        {
+            IsDisposed = true;
+            if (_resourceDrain is null || _resourceDrain.IsFaulted)
+            {
+                _resourceDrain = Task.Run(DrainResourcesAsync);
+                _ = ObserveDrainAsync(_resourceDrain);
+            }
+            drain = _resourceDrain;
+        }
+        try { await drain.WaitAsync(TimeSpan.FromSeconds(3)).ConfigureAwait(false); }
+        catch (TimeoutException)
+        {
+            if (drain.IsCompleted) await drain.ConfigureAwait(false);
+            else System.Diagnostics.Trace.WriteLine("Archive: logically closed; native read still draining, resources retained.");
+        }
+    }
+    private async Task DrainResourcesAsync()
+    {
+        await _gate.WaitAsync().ConfigureAwait(false);
         try
         {
-            if (!IsDisposed) { IsDisposed = true; _archive.Dispose(); }
+            _archive.Dispose();
             if (_cacheDirectory is not null && Directory.Exists(_cacheDirectory)) Directory.Delete(_cacheDirectory, true);
             _solidFiles.Clear();
         }
-        finally { try { if (_nestedLifetime is not null) await _nestedLifetime.DisposeAsync(); } finally { _gate.Release(); } }
+        finally
+        {
+            try { if (_nestedLifetime is not null) await _nestedLifetime.DisposeAsync().ConfigureAwait(false); }
+            finally { _gate.Release(); }
+        }
     }
+    private static async Task ObserveDrainAsync(Task drain)
+    {
+        try { await drain.ConfigureAwait(false); }
+        catch (Exception error) { System.Diagnostics.Trace.WriteLine("Archive: delayed resource cleanup failed: " + error.GetType().Name); }
+    }
+
 }
 
 /// <summary>显式图片定位包装；来源本身和读取条目仍属于唯一真实归档。</summary>

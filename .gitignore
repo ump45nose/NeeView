@@ -15,6 +15,9 @@
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
+# Product release-check contracts are source, not build output.
+!/portable/src/NeeView.Engine/Release/
+!/portable/src/NeeView.Backends/Release/
 x64/
 x86/
 build/

@@ -19,7 +19,11 @@
         </StackPanel>
       </Grid>
       <TextBlock Text="{Binding UpdateStatus}" HorizontalAlignment="Center" Foreground="{DynamicResource Control.GrayText}" />
-      <Button Content="Mac 更改记录（待发布）" IsEnabled="False" HorizontalAlignment="Center" />
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+        <Button x:Name="CheckReleaseButton" Content="检查更新" Click="CheckRelease" IsEnabled="{Binding CanCheck}" />
+        <Button Content="发布说明" Click="OpenRelease" IsEnabled="{Binding CanOpenRelease}" />
+        <Button Content="打开下载页面" Click="OpenDownload" IsEnabled="{Binding CanDownload}" />
+      </StackPanel>
       <TextBlock Text="Windows 行为基线：46.3 / c5c398d89" FontSize="11" HorizontalAlignment="Center" />
       <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
         <Button x:Name="CopyVersionButton" Content="复制版本信息" Click="CopyVersion" IsEnabled="{Binding CanAct}" />

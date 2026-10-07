@@ -45,7 +45,7 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
         var journal = prepared.Journal; var journalPath = prepared.Path;
         var source = journal.Source; var destination = journal.Destination;
         token.ThrowIfCancellationRequested();
-        Directory.CreateDirectory(recoveryDirectory);
+        Directory.CreateDirectory(recoveryDirectory); FileOperationProgress.Report();
         // 日志先于任何写入用户目录；副本只使用本应用随机文件名。
         await WriteJournalAsync(journalPath, journal, token);
         try
@@ -145,7 +145,7 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
                     token.ThrowIfCancellationRequested();
                     try
                     {
-                        var journal = await ReadJournalAsync(path, token);
+                        var journal = await ReadJournalAsync(path, token); FileOperationProgress.Report();
                         if (!journal.Completed) await RollbackAsync(journal);
                         else await CleanStagesAsync(journal);
                         DeleteOwned(journal.Backup, ".backup", journal.PreserveLinks); File.Delete(path);
@@ -203,7 +203,7 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
         string path = Path.Combine(parent, name);
         if (!Directory.Exists(parent)) throw new DirectoryNotFoundException();
         if (File.Exists(path) || Directory.Exists(path)) throw new IOException("同名项目已存在。");
-        Directory.CreateDirectory(path);
+        Directory.CreateDirectory(path); FileOperationProgress.Report();
     }, token);
 
     private static string Sibling(string path, string id, string suffix) => Path.Combine(Path.GetDirectoryName(path)!, ".neeview-" + id + suffix);
@@ -281,7 +281,7 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
         {
             token.ThrowIfCancellationRequested();
             if (Exists(destination)) throw new IOException("临时链接落点已被占用。");
-            File.CreateSymbolicLink(destination, target);
+            File.CreateSymbolicLink(destination, target); FileOperationProgress.Report();
             if (!await MatchesAsync(destination, hash)) { File.Delete(destination); throw new IOException("链接完整性校验失败。"); }
             return;
         }
@@ -295,8 +295,8 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
             {
                 created = true; var buffer = new byte[128 * 1024]; int count;
                 while ((count = await input.ReadAsync(buffer, token)) > 0)
-                { await output.WriteAsync(buffer.AsMemory(0, count), token); written.AppendData(buffer, 0, count); }
-                await output.FlushAsync(token); output.Flush(true);
+                { await output.WriteAsync(buffer.AsMemory(0, count), token); written.AppendData(buffer, 0, count); FileOperationProgress.Report(); }
+                await output.FlushAsync(token); output.Flush(true); FileOperationProgress.Report();
             }
             if (!await MatchesAsync(destination, hash)) throw new IOException("完整性校验失败。");
             File.SetLastWriteTimeUtc(destination, File.GetLastWriteTimeUtc(source));
@@ -322,7 +322,7 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
         try
         {
             var stream = new FileStream(path, mode, access, share, 128 * 1024, true);
-            Report("opened"); return stream;
+            Report("opened"); FileOperationProgress.Report(); return stream;
         }
         catch { Report("failed"); throw; }
     }
@@ -355,7 +355,7 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
                 await input.ReadExactlyAsync(expected.AsMemory(0, count));
                 if (!actual.AsSpan(0, count).SequenceEqual(expected.AsSpan(0, count)))
                     throw new IOException("暂存文件不是原件的完整前缀，恢复材料已保留。");
-                hash.AppendData(actual, 0, count);
+                hash.AppendData(actual, 0, count); FileOperationProgress.Report();
             }
             partialHash = Convert.ToHexString(hash.GetHashAndReset());
         }
@@ -369,13 +369,13 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
     {
         token.ThrowIfCancellationRequested();
         if (new FileInfo(path).LinkTarget is { } target)
-        { progress?.Invoke(); return "L:" + Convert.ToHexString(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(target))); }
+        { progress?.Invoke(); FileOperationProgress.Report(); return "L:" + Convert.ToHexString(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(target))); }
         if (Directory.Exists(path)) return await HashDirectoryAsync(path, token, progress);
         await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 128 * 1024, true);
         using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
         var buffer = new byte[128 * 1024]; int count;
-        while ((count = await stream.ReadAsync(buffer, token)) > 0) { hash.AppendData(buffer, 0, count); progress?.Invoke(); }
-        progress?.Invoke(); return Convert.ToHexString(hash.GetHashAndReset());
+        while ((count = await stream.ReadAsync(buffer, token)) > 0) { hash.AppendData(buffer, 0, count); progress?.Invoke(); FileOperationProgress.Report(); }
+        progress?.Invoke(); FileOperationProgress.Report(); return Convert.ToHexString(hash.GetHashAndReset());
     }
     /// <summary>事务核验使用会报告访问失败的属性查询；File.Exists不能区分不存在与断线。</summary>
     private static async Task<bool> MatchesAsync(string path, string? hash)
@@ -394,6 +394,6 @@ public sealed partial class FileOperationBackend(string recoveryDirectory) : IFi
         var temporary = path + ".tmp";
         await File.WriteAllTextAsync(temporary, JsonSerializer.Serialize(journal, RecoveryJsonContext.Default.Journal), token);
         using (var stream = new FileStream(temporary, FileMode.Open, FileAccess.Write)) stream.Flush(true);
-        File.Move(temporary, path, true);
+        File.Move(temporary, path, true); FileOperationProgress.Report();
     }
 }

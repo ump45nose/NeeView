@@ -99,14 +99,14 @@ public sealed partial class FileOperationBackend : IBookTransferBackend
             hash.AppendData(name); hash.AppendData(link ? "L"u8 : Directory.Exists(child) ? "D"u8 : "F"u8);
             hash.AppendData(Convert.FromHexString(link ? childHash[2..] : childHash));
         }
-        progress?.Invoke(); return Convert.ToHexString(hash.GetHashAndReset());
+        progress?.Invoke(); FileOperationProgress.Report(); return Convert.ToHexString(hash.GetHashAndReset());
     }
 
     /// <summary>创建独立目录树并逐文件验证，最后核对整个树；任何源变化均拒绝安装。</summary>
     private static async Task CopyDirectoryVerifiedAsync(string source, string destination, string hash, CancellationToken token)
     {
         if (Exists(destination)) throw new IOException("应用临时目录名称已被占用。");
-        Directory.CreateDirectory(destination);
+        Directory.CreateDirectory(destination); FileOperationProgress.Report();
         var copied = new List<(string Path, string Hash)>();
         try
         {
@@ -133,6 +133,7 @@ public sealed partial class FileOperationBackend : IBookTransferBackend
         // .NET File.Move拒绝指向目录的链接；Directory.Move仍是目录项改名，不递归搬动目标。
         if (Directory.Exists(source)) Directory.Move(source, destination);
         else File.Move(source, destination, false);
+        FileOperationProgress.Report();
     }
 
     /// <summary>只清理已验证的应用材料；删除链接对象，目录递归删除不跟随链接。</summary>
@@ -145,5 +146,6 @@ public sealed partial class FileOperationBackend : IBookTransferBackend
             Directory.Delete(path, true);
         }
         else File.Delete(path);
+        FileOperationProgress.Report();
     }
 }

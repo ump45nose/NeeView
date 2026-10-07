@@ -21,7 +21,7 @@ public sealed partial class MacApp : Avalonia.Application
     private Task? _openingWindow;
     private bool _explicitOpen;
     // 启动装配持有唯一具体后端，向各业务分别注入文件与重命名能力契约。
-    private FileOperationBackend? _fileOperations;
+    private FileOperationWorkerBackend? _fileOperations;
     private DestinationMoveService? _destinationMoves;
     private ArchiveEntryRealizer? _entryRealizer;
     private TemporaryPlaylistService? _temporaryPlaylists;
@@ -54,6 +54,7 @@ public sealed partial class MacApp : Avalonia.Application
                     // 退出先等导入提交/回滚和重建完成，不与五文件事务并发。
                     if (_profileImportTask is { } importing) await importing;
                     _shuttingDown = true;
+                    _fileOperations?.InterruptPendingOperations();
                     if (_window is not null) await _window.PrepareShutdownAsync();
                     // 初始化也属于进程生命周期；等待恢复操作结束，禁止退出后晚到创建后端/窗口。
                     if (_openingWindow is { } opening) await opening;
@@ -62,6 +63,7 @@ public sealed partial class MacApp : Avalonia.Application
                     if (_entryRealizer is not null) { await _entryRealizer.DisposeAsync(); _entryRealizer = null; }
                     if (_temporaryPlaylists is not null) { await _temporaryPlaylists.DisposeAsync(); _temporaryPlaylists = null; }
                     if (_contentDropReceiver is not null) { await _contentDropReceiver.DisposeAsync(); _contentDropReceiver = null; }
+                    _fileOperations?.Dispose(); _fileOperations = null;
                     ArchiveKeyCache.Current.Clear();
                     desktop.Shutdown();
                 }
@@ -117,7 +119,7 @@ public sealed partial class MacApp : Avalonia.Application
             var state = new SaveData(directory, Backends.ArchiveFactory.TemporaryDirectory); await state.LoadAsync();
             if (_shuttingDown) return;
             IReadOnlyList<string> recovery = [];
-            if (_fileOperations is null) { _fileOperations = new FileOperationBackend(Path.Combine(directory, "FileRecovery")); recovery = await _fileOperations.RecoverAsync(); }
+            if (_fileOperations is null) { _fileOperations = new FileOperationWorkerBackend(Path.Combine(directory, "FileRecovery")); recovery = await _fileOperations.RecoverAsync(); }
             recovery = recovery.Concat(await state.RecoverBookRenameAsync(_fileOperations)).ToArray();
             if (_shuttingDown) return;
             var decoder = new MagickImageDecoder(new MacAnimatedPngDecoder()); operation = new BookOperation(new Backends.ArchiveFactory(MacFileAliases.Resolve, new MacPdfRenderer()), decoder, state);
@@ -135,6 +137,7 @@ public sealed partial class MacApp : Avalonia.Application
             await candidate.AttachScriptsAsync(new JintScriptRuntimeFactory(), (file, arguments) =>
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(file) { Arguments = arguments ?? "", UseShellExecute = true }), _scriptValues);
             candidate.AttachPrinting(new MacPrintService());
+            candidate.AttachReleaseService(new GitHubReleaseService());
             candidate.AttachImageClipboard(new MacImageClipboard());
             candidate.AttachFonts(new FontPresenter(this, Config.Current.Fonts, MacFontEnvironment.Read(Avalonia.Media.FontManager.Current.DefaultFontFamily.Name)));
             var theme = new ThemePresenter(this, Config.Current.Theme); candidate.AttachTheme(theme);

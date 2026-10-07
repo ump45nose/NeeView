@@ -614,6 +614,8 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     {
         // 关闭请求当场使准备失效；先 Yield 会给原生晚到结果留下继续提交的间隙。
         _closing = true; Interlocked.Increment(ref _generation);
+        // 等待真实文件结果前先中断当前请求；无法确认的系统调用保留恢复记录。
+        (_fileBackend as IInterruptibleFileOperations)?.InterruptPendingOperations();
         _slideShow?.Stop();
         CancelExportPreparation();
         _externalClosing.Cancel(); CancelExternalApplicationPreparation();
@@ -688,5 +690,6 @@ public static class ArchiveFormats
     /// <summary>原可递归的页面来源资格，压缩与PDF各走自身后端。</summary>
     public static bool IsPageArchive(string path) => IsCompressedArchive(path) || IsPdfArchive(path);
     /// <summary>压缩后端资格与.nvpls明确分离，不能把列表JSON交给SharpCompress。</summary>
-    public static bool IsCompressedArchive(string path) => Extensions.Contains(System.IO.Path.GetExtension(path));
+    public static bool IsCompressedArchive(string path) => Extensions.Contains(System.IO.Path.GetExtension(path)) ||
+        System.Text.RegularExpressions.Regex.IsMatch(path, @"(?:\.(?:7z|zip)\.\d{3}|\.[rz]\d{2,})$", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.CultureInvariant);
 }

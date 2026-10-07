@@ -5,6 +5,10 @@ public static class Program
     public static int Main(string[] args)
     {
         SynchronizationContext.SetSynchronizationContext(null);
+        if (args.Length == 1 && args[0] == NeeView.Backends.FileOperationWorkerHost.Argument)
+            return NeeView.Backends.FileOperationWorkerHost.RunAsync(new StreamReader(Console.OpenStandardInput()), Console.Out).GetAwaiter().GetResult();
+        if (args.Length == 2 && args[0] == "--neeview-test-file-worker")
+            return FileWorkerFaultHost.RunAsync(args[1]).GetAwaiter().GetResult();
         _ = AppKit.NSApplication.SharedApplication;
         var run = Task.Run(() => Xunit.Runner.InProc.SystemConsole.ConsoleRunner.Run(args));
         // 仅泵送Foundation/AppKit回调，不创建窗口、不激活应用；Info.plist保持LSBackgroundOnly。

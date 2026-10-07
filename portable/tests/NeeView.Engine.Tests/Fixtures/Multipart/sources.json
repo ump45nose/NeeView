@@ -1,0 +1,204 @@
+{
+  "license": "../SharpCompress-LICENSE.txt",
+  "files": [
+    {
+      "name": "Rar.multi.part01.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.multi.part01.rar",
+      "sha256": "6b431db9f9d4ef45b3c4d9a15baf760d3ba1ca8896c7c13c0ba47041c9816cf7",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar.multi.part02.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.multi.part02.rar",
+      "sha256": "8211c7b2389c8c722bae7d535a7b71a5da90495d417e73afc33adc42511f95f6",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar.multi.part03.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.multi.part03.rar",
+      "sha256": "473a598bed36b0371b21a7bde91d2d4af64d2e8ca35d8ddd4a344ca0a76cba04",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar.multi.part04.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.multi.part04.rar",
+      "sha256": "3c692b219e8c33c4eb38881f1d4c5a97e98302e164f0cf17318027de7b17f619",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar.multi.part05.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.multi.part05.rar",
+      "sha256": "49112d1702e61e52608fa3461f273a160159ff1db142f48fa0e9f84445fc46e5",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar.multi.part06.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.multi.part06.rar",
+      "sha256": "1e1dd645b107c6f620672efb1e50dbf03d897df759f79f664dad3b962460251a",
+      "bytes": 9287
+    },
+    {
+      "name": "Rar.multi.solid.part01.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.multi.solid.part01.rar",
+      "sha256": "b6fec070a075fc244e8d35187b482cd6558a608e3cda158153b85a59a68903b8",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar.multi.solid.part02.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.multi.solid.part02.rar",
+      "sha256": "28257cb924d52518cc1192b9bbe222237b14e3137b829936a05c64b0a30242f5",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar.multi.solid.part03.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.multi.solid.part03.rar",
+      "sha256": "b6359f5e9f052fa3e4c5c89b416648e1fb67f3e2eb0939cdab988047e4aaeeed",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar.multi.solid.part04.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.multi.solid.part04.rar",
+      "sha256": "1b3b3dbbef9e563940af9f866511db5f692eb526b0bc51421c89f3cc091fe9d3",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar.multi.solid.part05.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.multi.solid.part05.rar",
+      "sha256": "93d4233225c7a83101464306360c0012dc9c0b2621482a1374134b9060ff4c19",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar.multi.solid.part06.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.multi.solid.part06.rar",
+      "sha256": "0196fec5b1ce4daf3beb6d8ac088d96f0abac853254640a0a11dae2a662d543a",
+      "bytes": 9931
+    },
+    {
+      "name": "Rar2.multi.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar2.multi.rar",
+      "sha256": "bc8dc02828e7552e4a0689e9476a13391f9896b872659d846de902fd51e5790b",
+      "bytes": 10000
+    },
+    {
+      "name": "Rar2.multi.r00",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar2.multi.r00",
+      "sha256": "1f506b6e5518dda165de63a9c9fea4432ee1a6442fbdffeb24be5522ea21c4a6",
+      "bytes": 10000
+    },
+    {
+      "name": "Rar2.multi.r01",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar2.multi.r01",
+      "sha256": "270d317f092b0e7b8513ecc0a055d8cb703d91e86e927f91917e9b75c760942d",
+      "bytes": 10000
+    },
+    {
+      "name": "Rar2.multi.r02",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar2.multi.r02",
+      "sha256": "e010f1008bf415d3c31ce81fa859f979740d0b92e2086d524884bbc2c4104589",
+      "bytes": 10000
+    },
+    {
+      "name": "Rar2.multi.r03",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar2.multi.r03",
+      "sha256": "08f1927004b333789a4da356012eddc7e33bede968a9a3207af03990470f03fc",
+      "bytes": 10000
+    },
+    {
+      "name": "Rar2.multi.r04",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar2.multi.r04",
+      "sha256": "b6d0f9ecca5f96c0cc72e7cb94b8e806083eb08616bbab3c5d42f1c36e70f9bf",
+      "bytes": 10000
+    },
+    {
+      "name": "Rar2.multi.r05",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar2.multi.r05",
+      "sha256": "e8a358cfb78115f4ff56e88d0959f46e01e6680eb5d14b805b92fc54b8c3a30d",
+      "bytes": 623
+    },
+    {
+      "name": "Infozip.nocomp.multi.zip",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Infozip.nocomp.multi.zip",
+      "sha256": "7c4820ba3e5c9be70aa46a37ab3b5306dbb414bb9f1543b8c00c6229681510b4",
+      "bytes": 35608
+    },
+    {
+      "name": "Infozip.nocomp.multi.z01",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Infozip.nocomp.multi.z01",
+      "sha256": "96fb0ed91d3e7f90f05b80ca86e8665579431f5bf54027a0449f7834499da78e",
+      "bytes": 66560
+    },
+    {
+      "name": "Rar5.multi.part01.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar5.multi.part01.rar",
+      "sha256": "ad9b6ac157e77ba2cc6b8be7eeba52a2c047a0ef2d06fa6ffa0c1d1ccce3a651",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar5.multi.part02.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar5.multi.part02.rar",
+      "sha256": "3e139020f6894255675c384fea78348cfa561bf4cce763190ab8e490fb67de1c",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar5.multi.part03.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar5.multi.part03.rar",
+      "sha256": "8145344bae1043aa894375926b17f0363868970e92e69732761570f7c467f1f6",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar5.multi.part04.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar5.multi.part04.rar",
+      "sha256": "d4c3ed4fb217a3f4825d7cf4d831017c05c823b46c31a80e9bbe2eb13fa876d4",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar5.multi.part05.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar5.multi.part05.rar",
+      "sha256": "825a861fbc93180461a254ca5b723404f6c2984cff988eac103702fa2087f250",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar5.multi.part06.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar5.multi.part06.rar",
+      "sha256": "d5426c1ce37b19b468b68c33d2ecf7bff8b269c3c5029ffbbca9cc632930c237",
+      "bytes": 9696
+    },
+    {
+      "name": "Rar.EncryptedParts.part01.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.EncryptedParts.part01.rar",
+      "sha256": "d753717b1210d70b2835c6e2929f2a2d70170fed7bbb7430082a45d293149857",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar.EncryptedParts.part02.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.EncryptedParts.part02.rar",
+      "sha256": "56f164a11108a25c0c353825bce5169e160d3c2d2265ed2522c8596f9a8f6c48",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar.EncryptedParts.part03.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.EncryptedParts.part03.rar",
+      "sha256": "fcf69b2c8775a3ca8d9b1c88f0e3d4fe5ce2c730ea83984e008b7c3f9e3cde5b",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar.EncryptedParts.part04.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.EncryptedParts.part04.rar",
+      "sha256": "3d8569689c726f9d3a8f6a0016bf135316f220f629c4e289f50cabca1ceb5402",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar.EncryptedParts.part05.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.EncryptedParts.part05.rar",
+      "sha256": "39c072812755922fae70e62027f9878eaaaf61fa93f0d9fa103042891445503f",
+      "bytes": 10240
+    },
+    {
+      "name": "Rar.EncryptedParts.part06.rar",
+      "source": "https://raw.githubusercontent.com/adamhathcock/sharpcompress/0.50.3/tests/TestArchives/Archives/Rar.EncryptedParts.part06.rar",
+      "sha256": "a383f45967078ba441a99b90fc98f54d8130d34d856cd7b2922da51b53dc46d4",
+      "bytes": 9576
+    }
+  ],
+  "passwords": "Rar.EncryptedParts password=test (public upstream fixture; not user credential)"
+}

@@ -1291,7 +1291,7 @@
       "source": "NeeView/Config/SystemConfig.cs",
       "target": "src/NeeView.Engine/Config/Config.cs",
       "sha256": "f108d9973d964784cc5fa46ef97e6ee62b322cf95b0ecc6682ea9621c69a3de6",
-      "status": "原搜索/写权限/IsRemoveConfirmed默认true与TextCopyPolicy数值默认None迁入；未迁字段继续由原JSON合并保留"
+      "status": "原搜索/写权限/IsRemoveConfirmed默认true与TextCopyPolicy数值默认None迁入；未迁字段继续由原JSON合并保留；本批原IsNetworkEnabled默认true接入Mac发布检查"
     },
     {
       "source": "NeeView/Command/Commands/FocusBookmarkSearchBoxCommand.cs",
@@ -3944,6 +3944,12 @@
       "target": "src/NeeView.MacOS/ViewModels/ScriptPanelDataAccessors.cs",
       "sha256": "0b347cd0bc8d238fe4af12ae00dd925f8b788e8e87fc0cf0af640662e733ec0e",
       "status": "P5第四十批：原item名称/打开/元数据；folder登记时间与文件真实时间分开"
+    },
+    {
+      "source": "NeeView/VersionWindow/VersionChecker.cs",
+      "target": "src/NeeView.Backends/Release/GitHubReleaseService.cs",
+      "sha256": "5a97d6531c05e48d5ef20da3c884ad0ddc500bdc219d4dcdea9cfd1ae778f122",
+      "status": "原检查版本/发布链接语义适配当前fork的Mac ARM64资产，10秒/1MiB及来源校验，不建立自动安装器；契约见p5-compatibility.md"
     }
   ],
   "rule_references": [
@@ -4235,13 +4241,13 @@
       "source": "NeeView/VersionWindow/VersionWindow.xaml",
       "target": "src/NeeView.MacOS/Views/VersionWindow.axaml",
       "sha256": "4c0e37d7038aad0a984d71d63a81dc0a4192fc7a6775754e548bb384d74176a0",
-      "status": "P5 原版本布局/图标及版本复制/链接；Mac实际程序集版本，系统接口适配；Windows更新检查保留占位"
+      "status": "P5 原版本布局/图标及版本复制/链接；Mac实际程序集版本，系统接口适配；Windows更新检查保留占位；P5兼容收尾：注入独立Mac发布检查，尊重原网络许可，关闭拒绝晚到"
     },
     {
       "source": "NeeView/VersionWindow/VersionWindow.xaml.cs",
       "target": "src/NeeView.MacOS/Views/VersionWindow.axaml.cs",
       "sha256": "917f2dc6c3090472f7d303cd24c936a9984af1b5082935768f5c54f0fe480556",
-      "status": "P5 原版本布局/图标及版本复制/链接；Mac实际程序集版本，系统接口适配；Windows更新检查保留占位"
+      "status": "P5 原版本布局/图标及版本复制/链接；Mac实际程序集版本，系统接口适配；Windows更新检查保留占位；P5兼容收尾：注入独立Mac发布检查，尊重原网络许可，关闭拒绝晚到"
     },
     {
       "source": "NeeView/Resources/App.ico",

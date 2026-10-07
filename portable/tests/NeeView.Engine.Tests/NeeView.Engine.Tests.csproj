@@ -18,6 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="../../src/NeeView.Backends/Script/**/*.cs" Link="Script/%(Filename)%(Extension)" />
+    <Compile Include="../../src/NeeView.Backends/Release/**/*.cs" Link="Release/%(Filename)%(Extension)" />
     <Compile Include="../../src/NeeView.Backends/Content/**/*.cs" Link="Content/%(Filename)%(Extension)" />
     <Compile Include="../../src/NeeView.Backends/FileSystem/**/*.cs" Link="FileSystem/%(Filename)%(Extension)" />
     <Compile Include="../../src/NeeView.Backends/Imaging/**/*.cs" Link="Imaging/%(Filename)%(Extension)" />

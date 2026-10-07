@@ -58,6 +58,8 @@ public sealed partial class ArchiveFactory
     /// <summary>原临时代理文件随子归档生命周期；借用入口不关闭父来源，路径入口拥有完整父链。</summary>
     private async Task<Archive> OpenNestedAsync(ArchiveEntry entry, bool ownsParent, ArchiveKeys keys, CancellationToken token)
     {
+        if (System.Text.RegularExpressions.Regex.IsMatch(entry.EntryName, @"\.(?:7z|zip)\.\d{3}$", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.CultureInvariant))
+            throw new NotSupportedException("嵌套分卷归档尚不支持，请先将完整卷集放入普通目录。");
         if (entry.Archive.NestingDepth >= MaximumNestedDepth) throw new NotSupportedException($"嵌套归档超过 {MaximumNestedDepth} 层限制。");
         if (entry.EntryName.Split('/').Contains("..")) throw new NotSupportedException("归档内部定位不能包含上级路径段。");
         // 先完成来源读取，再进入临时准备槽，避免后台槽中的嵌套等待造成死锁。

@@ -1,5 +1,7 @@
 # P5 第二十四批：原版本窗口
 
+后续[兼容收尾](p5-compatibility.md)已用注入服务接通Mac公开发布检查；以下待接入说明为第二十四批历史范围。当前版本窗口尊重原网络许可，不自动安装。
+
 ## 职责、依赖与出处
 
 固定基线c5c398d89的OpenVersionWindow、VersionWindow.xaml/代码、VersionWindowViewModel及原App.ico。Mac保留图标、名称/版本、更新区域与底部链接布局；ViewModel仅持有表现/系统动作。Engine增加实际系统URI替换点，Backends使用NSWorkspace，正式启动与菜单仍唯一。

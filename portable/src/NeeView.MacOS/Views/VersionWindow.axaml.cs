@@ -13,7 +13,7 @@ public sealed partial class VersionWindow : Window
     /// <summary>加载唯一正式XAML，关闭释放表现动作。</summary>
     public VersionWindow() { AvaloniaXamlLoader.Load(this); Closed += (_, _) => Model?.Dispose(); }
     /// <summary>使用实际平台和系统剪贴板创建原版本表现模型。</summary>
-    public VersionWindow(IPlatformService platform) : this() => DataContext = new VersionWindowViewModel(platform, CopyTextAsync);
+    public VersionWindow(IPlatformService platform, IApplicationReleaseService? releases = null) : this() => DataContext = new VersionWindowViewModel(platform, CopyTextAsync, releases: releases);
     private async Task CopyTextAsync(string text, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
@@ -24,6 +24,9 @@ public sealed partial class VersionWindow : Window
     private async void OpenLicense(object? sender, RoutedEventArgs e) { if (Model is { } model) await model.OpenLicenseAsync(); }
     private async void OpenProject(object? sender, RoutedEventArgs e) { if (Model is { } model) await model.OpenProjectAsync(); }
     private async void OpenOriginalProject(object? sender, RoutedEventArgs e) { if (Model is { } model) await model.OpenOriginalProjectAsync(); }
+    private async void CheckRelease(object? sender, RoutedEventArgs e) { if (Model is { } model) await model.CheckReleaseAsync(); }
+    private async void OpenRelease(object? sender, RoutedEventArgs e) { if (Model is { } model) await model.OpenReleaseAsync(); }
+    private async void OpenDownload(object? sender, RoutedEventArgs e) { if (Model is { } model) await model.OpenDownloadAsync(); }
     protected override void OnKeyDown(KeyEventArgs e)
     {
         if (e.Key == Key.Escape) { Close(); e.Handled = true; }

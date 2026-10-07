@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-07T09:20:44.421747+00:00",
+  "configuration": "Debug formal ARM64 executable",
+  "entry": "--neeview-file-worker",
+  "scope": "isolated synthetic data, no UI startup",
+  "move_content_sha256": "fbbab289f7f94b25736c58be46a994c441fd02552cc6022352e3d86d2fab7c83",
+  "real_move_verified": true,
+  "release_journal_verified": true,
+  "exit_code": 0,
+  "user_files_modified": false,
+  "ui_activation_requested": false
+}
