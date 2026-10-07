@@ -17,6 +17,11 @@
           "xunit.v3.mtp-v1": "[3.2.2]"
         }
       },
+      "Acornima": {
+        "type": "Transitive",
+        "resolved": "1.6.2",
+        "contentHash": "laakpDHzMwHr5C8+q5RlRf0XJJshUvghNeo4xDerICrYR3iEuGvwfpauCmXuU3RE437XDaQO5ZxieWDpADuD+w=="
+      },
       "Magick.NET.Core": {
         "type": "Transitive",
         "resolved": "14.17.2",
@@ -142,6 +147,7 @@
       "neeview.backends": {
         "type": "Project",
         "dependencies": {
+          "Jint": "[4.9.3, )",
           "Magick.NET-Q8-AnyCPU": "[14.17.2, )",
           "MetadataExtractor": "[2.9.3, )",
           "NeeView.Engine": "[0.1.0, )",
@@ -159,6 +165,15 @@
         "requested": "[8.4.2, )",
         "resolved": "8.4.2",
         "contentHash": "WadCzGEc2U+3e20avRLng4qNtt4zoOGWrdUISqJWrHe3/FSnrYjuM5Sb4yQb09LhkBXrrI4Zt3dLKgRMbItsrg=="
+      },
+      "Jint": {
+        "type": "CentralTransitive",
+        "requested": "[4.9.3, )",
+        "resolved": "4.9.3",
+        "contentHash": "8Q801Z53cOhHWxzGMQKRbsRqkfkjcomVVhp52dQRXSOOXvRVJ33ZchkwjeIIwq8k69vShk51/l9lovuaOzMzsQ==",
+        "dependencies": {
+          "Acornima": "1.6.2"
+        }
       },
       "Magick.NET-Q8-AnyCPU": {
         "type": "CentralTransitive",

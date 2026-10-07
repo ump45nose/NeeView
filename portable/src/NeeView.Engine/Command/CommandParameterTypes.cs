@@ -9,6 +9,7 @@ public static class CommandParameterTypes
     [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
     public static Type? Get(string command) => DefaultInputScheme.GetParameterOwner(command) switch
     {
+        var script when script.StartsWith("Script_", StringComparison.Ordinal) => typeof(ScriptCommandParameter),
         "ViewScaleUp" or "ViewBaseScaleUp" => typeof(ViewScaleCommandParameter),
         "CopyToFolderAs" => typeof(CopyToFolderAsCommandParameter),
         "CopyFile" => typeof(CopyFileCommandParameter),

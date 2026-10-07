@@ -17,7 +17,7 @@ public sealed class EffectProfile : ObservableObject, IComparable<EffectProfile>
     public ImageResizeFilterConfig ImageResizeFilter { get; set; } = new();
     public ImageGridConfig ImageGrid { get; set; } = new();
     public ImageEffectConfig ImageEffect { get; set; } = new();
-    [JsonExtensionData] public Dictionary<string, JsonElement>? ExtensionData { get; set; }
+    [JsonExtensionData] [PropertyMapIgnore] public Dictionary<string, JsonElement>? ExtensionData { get; set; }
     internal static T Copy<T>(T source) => JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(source))!;
     /// <summary>先保存当前原六分支，未知效果参数和暂未迁的滤镜材料同时保留。</summary>
     public void Store(Config config)

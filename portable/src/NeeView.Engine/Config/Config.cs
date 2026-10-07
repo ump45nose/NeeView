@@ -15,6 +15,7 @@ public sealed class Config
     public BookshelfConfig Bookshelf { get; set; } = new();
     public PageListConfig PageList { get; set; } = new();
     public InformationConfig Information { get; set; } = new();
+    public ScriptConfig Script { get; set; } = new();
     public HistoryConfig History { get; set; } = new();
     public BookmarkConfig Bookmark { get; set; } = new();
     public SystemConfig System { get; set; } = new();
@@ -26,7 +27,7 @@ public sealed class Config
     public ImageResizeFilterConfig ImageResizeFilter { get; set; } = new();
     public ImageGridConfig ImageGrid { get; set; } = new();
     public ImageEffectConfig ImageEffect { get; set; } = new();
-    public EffectUnitCache ImageEffectCache { get; set; } = new();
+    [PropertyMapIgnore] public EffectUnitCache ImageEffectCache { get; set; } = new();
     public EffectProfileCollectionConfig EffectProfiles { get; set; } = new();
     public ImageConfig Image { get; set; } = new();
     public SlideShowConfig SlideShow { get; set; } = new();
@@ -44,6 +45,7 @@ public sealed class Config
     public StartUpConfig StartUp { get; set; } = new();
     /// <summary>早期 Mac 字段兼容入口；真实配置沿用原 MenuBar 分支。</summary>
     [System.Text.Json.Serialization.JsonIgnore]
+    [PropertyMapIgnore]
     public bool IsAddressBarEnabled { get => MenuBar.IsAddressBarEnabled; set => MenuBar.IsAddressBarEnabled = value; }
     /// <summary>启动时装配唯一配置，读取前不初始化具体窗口。</summary>
     public static void SetCurrent(Config config) => Current = config;
@@ -66,7 +68,7 @@ public sealed class ZipArchiveConfig
 public sealed class SystemConfig
 {
     /// <summary>用户配置的外部应用；默认保留一个系统关联应用槽位。</summary>
-    public ExternalAppCollection ExternalAppCollection { get; set; } = new() { new ExternalApp() };
+    [PropertyMapIgnore] public ExternalAppCollection ExternalAppCollection { get; set; } = new() { new ExternalApp() };
     public bool IsFileWriteAccessEnabled { get; set; }
     /// <summary>原普通文件删除默认确认；Mac始终使用系统废纸篓，不降级永久删除。</summary>
     public bool IsRemoveConfirmed { get; set; } = true;
@@ -74,10 +76,10 @@ public sealed class SystemConfig
     public TextCopyPolicy TextCopyPolicy { get; set; }
     /// <summary>原默认提取文件，保留 None/归档文件/虚拟路径/提取文件的数值。</summary>
     public ArchivePolicy ArchiveCopyPolicy { get; set; } = ArchivePolicy.SendExtractFile;
-    public DestinationFolderCollection DestinationFolderCollection { get; set; } = new();
+    [PropertyMapIgnore] public DestinationFolderCollection DestinationFolderCollection { get; set; } = new();
     /// <summary>原拼写兼容仅用于读取；保存统一使用正确字段。</summary>
     [System.Text.Json.Serialization.JsonPropertyName("DestinationFodlerCollection"), System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public DestinationFolderCollection? DestinationFodlerCollection_Typo { get => null; set { if (value is not null && DestinationFolderCollection.Count == 0) DestinationFolderCollection = value; } }
+    [PropertyMapIgnore] public DestinationFolderCollection? DestinationFodlerCollection_Typo { get => null; set { if (value is not null && DestinationFolderCollection.Count == 0) DestinationFolderCollection = value; } }
     public BookPageCollectMode BookPageCollectMode { get; set; } = BookPageCollectMode.ImageAndBook;
     public ArchiveEntryCollectionMode ArchiveRecursiveMode { get; set; } = ArchiveEntryCollectionMode.IncludeSubArchives;
     public bool IsIncrementalSearchEnabled { get; set; } = true;
@@ -110,7 +112,7 @@ public enum SliderMouseWheelAction { MovePage, CommandDependent }
 /// <summary>原滑条选择/方向/轮滚字段；其他原字段由 JSON 合并保留。</summary>
 public sealed class SliderConfig
 {
-    public bool IsEnabled { get; set; } = true;
+    [PropertyMapReadOnly] public bool IsEnabled { get; set; } = true;
     public bool IsHidePageSlider { get; set; }
     public bool IsHidePageSliderInAutoHideMode { get; set; } = true;
     public SliderIndexLayout SliderIndexLayout { get; set; } = SliderIndexLayout.Right;
@@ -136,13 +138,13 @@ public sealed class BookConfig
     /// <summary>原全景开关；Mac连续/瀑布模式共用同一书籍和位置。</summary>
     public bool IsPanorama { get; set; }
     /// <summary>Mac全景布局扩展，原JSON字段保留；关闭全景不丢失上次布局选择。</summary>
-    public BrowseLayoutMode MacPanoramaLayout { get; set; } = BrowseLayoutMode.Panorama;
+    [PropertyMapIgnore] public BrowseLayoutMode MacPanoramaLayout { get; set; } = BrowseLayoutMode.Panorama;
     private double _galleryColumnWidth = 320;
     /// <summary>瀑布流目标列宽DIP；缩放调整列数，非法配置回到默认值。</summary>
-    public double MacGalleryColumnWidth { get => _galleryColumnWidth; set => _galleryColumnWidth = double.IsFinite(value) ? Math.Clamp(value, 96, 1600) : 320; }
+    [PropertyMapIgnore] public double MacGalleryColumnWidth { get => _galleryColumnWidth; set => _galleryColumnWidth = double.IsFinite(value) ? Math.Clamp(value, 96, 1600) : 320; }
     private double _continuousScale = 1;
     /// <summary>连续阅读相对视口的缩放；独立于原分页变换和瀑布列宽。</summary>
-    public double MacContinuousScale { get => _continuousScale; set => _continuousScale = double.IsFinite(value) ? Math.Clamp(value, .1, 8) : 1; }
+    [PropertyMapIgnore] public double MacContinuousScale { get => _continuousScale; set => _continuousScale = double.IsFinite(value) ? Math.Clamp(value, .1, 8) : 1; }
     /// <summary>原全景帧间隔，可负值重叠；合法数值不按界面范围截断。</summary>
     public double FrameSpace { get; set; } = -1;
     public PageEndAction PageEndAction { get; set; }
@@ -255,10 +257,10 @@ public sealed class PanelsConfig
     public PanelListItemProfile GetProfile(PanelListItemStyle style) => style switch
     { PanelListItemStyle.Normal => NormalItemProfile, PanelListItemStyle.Banner => BannerItemProfile, PanelListItemStyle.Thumbnail => ThumbnailItemProfile, _ => ContentItemProfile };
     public bool OpenWithDoubleClick { get; set; }
-    public Runtime.LayoutPanel.LayoutPanelManagerMemento? Layout { get; set; }
+    [PropertyMapIgnore] public Runtime.LayoutPanel.LayoutPanelManagerMemento? Layout { get; set; }
     public double LeftWidth { get; set; } = 240;
     public double RightWidth { get; set; } = 240;
-    public bool IsLeftVisible { get; set; } = true;
+    [PropertyMapIgnore] public bool IsLeftVisible { get; set; } = true;
     public bool IsRightVisible { get; set; } = true;
     public bool IsHideLeftPanel { get; set; }
     public bool IsHideRightPanel { get; set; }
@@ -272,8 +274,8 @@ public sealed class PanelsConfig
     public double ConflictBottomMargin { get => _conflictBottomMargin; set => _conflictBottomMargin = double.IsFinite(value) ? Math.Round(Math.Max(0, value), 5) : 20; }
     /// <summary>兼容旧 Mac 调用；不再写入第二个自动隐藏字段。</summary>
     [System.Text.Json.Serialization.JsonIgnore]
-    public bool IsLeftAutoHide { get => IsHideLeftPanel; set => IsHideLeftPanel = value; }
+    [PropertyMapIgnore] public bool IsLeftAutoHide { get => IsHideLeftPanel; set => IsHideLeftPanel = value; }
     /// <summary>右侧兼容入口，同样委托原字段。</summary>
     [System.Text.Json.Serialization.JsonIgnore]
-    public bool IsRightAutoHide { get => IsHideRightPanel; set => IsHideRightPanel = value; }
+    [PropertyMapIgnore] public bool IsRightAutoHide { get => IsHideRightPanel; set => IsHideRightPanel = value; }
 }

@@ -11,8 +11,8 @@ public sealed class ImageEffectConfig : ObservableObject
     private bool _enabled;
     private EffectLayerCollection _layers = new() { new() };
     public bool IsEnabled { get => _enabled; set => SetProperty(ref _enabled, value); }
-    public EffectLayerCollection Layers { get => _layers; set => SetProperty(ref _layers, value); }
-    [JsonExtensionData] public Dictionary<string, JsonElement>? ExtensionData { get; set; }
+    [PropertyMapIgnore] public EffectLayerCollection Layers { get => _layers; set => SetProperty(ref _layers, value); }
+    [JsonExtensionData] [PropertyMapIgnore] public Dictionary<string, JsonElement>? ExtensionData { get; set; }
 }
 /// <summary>原层切换：缓存旧类型；已有同类型层时新建默认参数，避免共享可变参数。</summary>
 public sealed class EffectLayer : ObservableObject
@@ -21,7 +21,7 @@ public sealed class EffectLayer : ObservableObject
     private EffectUnit? _effect;
     public bool IsEnabled { get => _enabled; set => SetProperty(ref _enabled, value); }
     public EffectUnit? Effect { get => _effect; set { if (SetProperty(ref _effect, value)) OnPropertyChanged(nameof(EffectType)); } }
-    [JsonExtensionData] public Dictionary<string, JsonElement>? ExtensionData { get; set; }
+    [JsonExtensionData] [PropertyMapIgnore] public Dictionary<string, JsonElement>? ExtensionData { get; set; }
     [JsonIgnore] public EffectType EffectType
     {
         get => Effect is null || Effect is UnknownEffectUnit ? EffectType.None : Enum.Parse<EffectType>(Effect.GetType().Name[..^"EffectUnit".Length]);

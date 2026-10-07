@@ -21,7 +21,7 @@ public sealed class MediaArchiveConfig : ObservableObject
     public bool IsLibVlcEnabled {get=>_libVlc;set=>SetProperty(ref _libVlc,value);}
     public string? LibVlcPath {get;set;}
     public DefaultSubtitle DefaultSubtitle {get;set;}
-    [JsonExtensionData] public Dictionary<string,JsonElement>? ExtensionData {get;set;}
+    [JsonExtensionData] [PropertyMapIgnore] public Dictionary<string,JsonElement>? ExtensionData {get;set;}
     private static double Round(double value,double fallback)=>double.IsFinite(value)?Math.Round(value,5):fallback;
 }
 /// <summary>原字幕默认值序号；系统后端字幕选择另有明确能力边界。</summary>

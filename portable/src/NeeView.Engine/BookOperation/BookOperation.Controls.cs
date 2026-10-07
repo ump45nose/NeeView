@@ -7,6 +7,7 @@ public sealed partial class BookOperation
     public bool CanUnload => !_disposed && !_closing && !IsUsingClipboard && !_renameCommitting && !_bookDeleteCommitting && !_bookTransferCommitting && (Book is not null || IsLoading);
     /// <summary>宿主仅提供原三种选择，业务在返回后再次核对书籍/位置/代次。</summary>
     public Func<int, CancellationToken, Task<PageEndAction>>? PageEndDialogAsync { get; set; }
+    public event EventHandler<int>? PageTerminated;
     public void SetBookLock(bool value) { if (_disposed || _closing) return; IsBookLocked = value; Notify(); }
     /// <summary>关闭当前来源并解锁，服务继续可用；保存失败保留书籍供重试。</summary>
     public async Task UnloadAsync(CancellationToken token = default)
@@ -63,6 +64,7 @@ public sealed partial class BookOperation
         try
         {
             if (!IsCurrent()) return;
+            PageTerminated?.Invoke(this, direction);
             book.MementoControl.RequestSaveBookMemento(true); ScheduleSave();
             var action = _slideShow?.IsPlaying == true ? Config.Current.SlideShow.PageEndAction : Config.Current.Book.PageEndAction;
             var notify = action != PageEndAction.Dialog;

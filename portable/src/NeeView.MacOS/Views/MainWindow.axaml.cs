@@ -39,7 +39,8 @@ public sealed partial class MainWindow : Window
     private SliderTextBox PageNumber => this.FindControl<SliderTextBox>("PageNumberView")!;
     private static readonly HashSet<string> HostCommands = new(StringComparer.Ordinal)
     {
-        "ToggleCustomSize", "ToggleTrim", "ToggleGrid", "ToggleEffect", "ToggleResizeFilter", "ToggleNearestNeighbor", "ToggleVisibleAddressBar", "ToggleVisiblePageSlider", "ToggleWindowMinimize", "ToggleWindowMaximize", "OpenSettingFilesFolder", "SaveSetting", "ReloadSetting", "ExportBackup", "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen", "MoveToFolderAs", "CopyToFolderAs",
+        "OpenScriptsFolder",
+        "OpenConsole", "CancelScript", "HelpScript", "ToggleCustomSize", "ToggleTrim", "ToggleGrid", "ToggleEffect", "ToggleResizeFilter", "ToggleNearestNeighbor", "ToggleVisibleAddressBar", "ToggleVisiblePageSlider", "ToggleWindowMinimize", "ToggleWindowMaximize", "OpenSettingFilesFolder", "SaveSetting", "ReloadSetting", "ExportBackup", "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen", "MoveToFolderAs", "CopyToFolderAs",
         "ViewScaleUp", "ViewScaleDown", "ViewScrollUp", "ViewScrollDown", "ViewScrollLeft", "ViewScrollRight", "OpenContextMenu", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
         "ViewBaseScaleUp", "ViewBaseScaleDown", "ViewRotateLeft", "ViewRotateRight", "ToggleBookLock", "Unload", "ToggleViewFlipHorizontal", "ViewFlipHorizontalOn", "ViewFlipHorizontalOff",
         "ToggleViewFlipVertical", "ViewFlipVerticalOn", "ViewFlipVerticalOff", "ViewReset", "ViewScaleStretch", "ViewPresetScroll", "ViewScrollNTypeUp", "ViewScrollNTypeDown",
@@ -203,6 +204,7 @@ public sealed partial class MainWindow : Window
     /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
     public bool IsCommandAvailable(string name) => name switch
     {
+        "OpenConsole" or "CancelScript" or "HelpScript" => _scripts is not null && !_preparing && !_closedPrepared,
         "HelpMainMenu" or "HelpSearchOption" => _platform is not null && _helpAction.IsCompleted,
         var command when CommandTable.BookOrderCommands.TryGetValue(command, out var order) => _model?.Operation.CanChangeFolderOrder(order) == true,
         "ToggleBookOrder" => _model?.Operation is { } sorting && sorting.Bookshelf.FolderOrders.Count > 1 && sorting.CanChangeFolderOrder(sorting.Bookshelf.FolderOrder),
@@ -260,12 +262,16 @@ public sealed partial class MainWindow : Window
         root.Children[3].Children!.Add(new(null, MenuElementType.Separator, null));
         foreach (var name in new[] { "JumpPage", "PrevHistoryPage", "NextHistoryPage", "PrevBookHistory", "NextBookHistory" })
             root.Children[3].Children!.Add(new(null, MenuElementType.Command, name));
+        if (_scripts?.Sources.Any(s => s.IsCloneable) == true)
+            root.Children.Add(new("脚本", MenuElementType.Group, null) { Children = _scripts.Sources.Where(s => s.IsCloneable)
+                .Select(s => new MenuNode(s.Text, MenuElementType.Command, "Script_" + s.Name)).ToList() });
         MenuPresenter.Populate(this.FindControl<Menu>("MenuBar")!, root, _model.Commands, _model.SaveData, IsCommandImplemented, name => ExecuteAsync(name, true), GetCommandCheck);
         RefreshHistoryCommandStates();
     }
     /// <summary>原菜单绑定的勾选表现；只读取引擎配置，不在菜单中维护第二套状态。</summary>
     private bool? GetCommandCheck(string name) => name switch
     {
+        _ when name.StartsWith("Script_", StringComparison.Ordinal) => (_model?.SaveData.GetCommandParameterObject(name) as ScriptCommandParameter)?.IsChecked,
         "ToggleCustomSize" => Config.Current.ImageCustomSize.IsEnabled,
         "ToggleTrim" => Config.Current.ImageTrim.IsEnabled,
         "ToggleGrid" => Config.Current.ImageGrid.IsEnabled,
@@ -400,7 +406,7 @@ public sealed partial class MainWindow : Window
     }
 
     /// <summary>执行宿主命令或转交原阅读命令；错误显示给用户。</summary>
-    public async Task ExecuteAsync(string name, bool fromMenu = false)
+    public async Task ExecuteAsync(string name, bool fromMenu = false, bool throwOnError = false)
     {
         if (_model is null || _preparing || _closedPrepared) return;
         if (PagedTransformCommands.Contains(name) && !_model.Operation.IsFrameReading)
@@ -532,6 +538,10 @@ public sealed partial class MainWindow : Window
                     await ShowOptionsAsync(); break;
                 case "HelpCommandList": await ShowCommandStatusAsync(); break;
                 case "HelpMainMenu": case "HelpSearchOption": await OpenManualAsync(name); break;
+                case "HelpScript": await OpenManualAsync(name); break;
+                case "OpenConsole": OpenScriptConsole(); break;
+                case "CancelScript": _scripts?.CancelAll(); break;
+                case "OpenScriptsFolder": await OpenScriptFolderAsync(); break;
                 case "ToggleBookmark":
                     if (_model.Operation.Book is { } marked) { await _model.Operation.SaveAsync(); await _model.SaveData.ToggleBookmarkAsync(marked); } break;
                 case "RegisterBookmark":
@@ -587,7 +597,7 @@ public sealed partial class MainWindow : Window
                 default: await _model.Commands.ExecuteAsync(name); break;
             }
         }
-        catch (Exception ex) { ShowError(ex.Message); }
+        catch (Exception ex) { if (throwOnError) throw; ShowError(ex.Message); }
         _autoHide?.Refresh(); UpdatePanelColumns();
         MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck);
         RefreshHistoryCommandStates();
@@ -1004,6 +1014,8 @@ public sealed partial class MainWindow : Window
         _pageEndDialog?.Close(PageEndAction.None);
         try
         {
+            if (_scripts is not null) await _scripts.CancelAndWaitAsync();
+            _scriptFolderCancellation?.Cancel(); await _scriptFolderAction;
             await _exportAction;
             await _imageCopyAction;
             foreach (var dialog in OwnedWindows.ToArray()) dialog.Close();
@@ -1038,6 +1050,7 @@ public sealed partial class MainWindow : Window
                 _sidePanels?.SaveWeights();
                 // 先完成可靠保存，再退订与释放显示资源；失败不能留下已销毁的阅读窗口。
                 await _model.Operation.DisposeAsync();
+                await ReleaseScriptsAsync();
                 await Viewer.CloseMediaAsync();
                 _model.Operation.Bookshelf.Changed -= FolderTree_PlaceChanged;
                 _model.Operation.PageEndDialogAsync = null;

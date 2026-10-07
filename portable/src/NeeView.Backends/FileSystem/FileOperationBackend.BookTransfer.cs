@@ -38,7 +38,12 @@ public sealed partial class FileOperationBackend : IBookTransferBackend
         finally { _slot.Release(); }
     }
     /// <summary>与分类/改名共享后台单槽；确认快照不持有书籍流或窗口。</summary>
-    public async Task<BookTransferPlan> PlanBookTransferAsync(string source, string folder, CancellationToken token)
+    public Task<BookTransferPlan> PlanBookTransferAsync(string source, string folder, CancellationToken token)
+        => PlanPathCoreAsync(source, folder, null, token);
+    /// <summary>原脚本SHCopy/SHMove的明确目录落点，使用与整书完全相同的快照校验。</summary>
+    public Task<BookTransferPlan> PlanPathTransferAsync(string source, string destination, CancellationToken token)
+        => PlanPathCoreAsync(source, null, destination, token);
+    private async Task<BookTransferPlan> PlanPathCoreAsync(string source, string? folder, string? path, CancellationToken token)
     {
         await _slot.WaitAsync(token);
         try
@@ -47,8 +52,8 @@ public sealed partial class FileOperationBackend : IBookTransferBackend
             return await SourceIo.RunReadAsync(async token =>
             {
                 var target = ReadRenameTarget(source, true);
-                if (!Directory.Exists(folder)) throw new DirectoryNotFoundException("目标目录已不存在。");
-                var destination = Path.Combine(Path.GetFullPath(folder), Path.GetFileName(target.Path));
+                var destination = path is null ? Path.Combine(Path.GetFullPath(folder!), Path.GetFileName(target.Path)) : Path.GetFullPath(path);
+                if (!Directory.Exists(Path.GetDirectoryName(destination))) throw new DirectoryNotFoundException("目标目录已不存在。");
                 ValidateBookPaths(CanonicalFile(target.Path), CanonicalFile(destination));
 
                 if (Exists(destination) && (Directory.Exists(destination) && new FileInfo(destination).LinkTarget is null) != target.IsDirectory) throw new IOException("源和目标类型不同，不能覆盖。");

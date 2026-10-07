@@ -224,15 +224,15 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | LoupeScaleDown | 降低放大镜倍率 |  |  | 已接入 | P5原Loupe独立变换/状态及局部捕获；真机另验 | NeeView/Command/Commands/LoupeScaleDownCommand.cs |
 | ToggleHoverScroll | 启用/禁用悬浮滚动 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/ToggleHoverScrollCommand.cs |
 | ToggleAutoScroll | 切换自动滚动 | MiddleClick |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleAutoScrollCommand.cs |
-| CancelScript | 中止脚本 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/CancelScriptCommand.cs |
+| CancelScript | 中止脚本 |  |  | 已接入 | P5 原脚本/目录/控制台/帮助；见p5-script.md | NeeView/Command/Commands/CancelScriptCommand.cs |
 | OpenOptionsWindow | 打开设置窗口 |  |  | 已接入 | P1 宿主适配 | NeeView/Command/Commands/OpenOptionsWindowCommand.cs |
 | OpenSettingFilesFolder | 打开配置文件位置 |  |  | 已接入 | P5 原窗口/导航语义；见p5-original-commands | NeeView/Command/Commands/OpenSettingFilesFolderCommand.cs |
-| OpenScriptsFolder | 打开脚本文件夹 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenScriptsFolderCommand.cs |
+| OpenScriptsFolder | 打开脚本文件夹 |  |  | 已接入 | P5 原脚本/目录/控制台/帮助；见p5-script.md | NeeView/Command/Commands/OpenScriptsFolderCommand.cs |
 | OpenVersionWindow | 显示版本信息 |  |  | 已接入 | P5 原版本/复制/许可/项目；Mac更新检查占位 | NeeView/Command/Commands/OpenVersionWindowCommand.cs |
 | CloseApplication | 退出应用程序 |  |  | 已接入 | P1 宿主适配 | NeeView/Command/Commands/CloseApplicationCommand.cs |
 | TogglePermitFile | 启用/禁用文件操作 |  |  | 已接入 | P5 原默认复制/重收集与文件权限；见p5-default-settings | NeeView/Command/Commands/TogglePermitFileCommand.cs |
 | HelpCommandList | 显示命令帮助 |  |  | 已接入 | P1 宿主适配 | NeeView/Command/Commands/HelpCommandListCommand.cs |
-| HelpScript | 显示脚本帮助 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/HelpScriptCommand.cs |
+| HelpScript | 显示脚本帮助 |  |  | 已接入 | P5 原脚本/目录/控制台/帮助；见p5-script.md | NeeView/Command/Commands/HelpScriptCommand.cs |
 | HelpMainMenu | 显示主菜单帮助 |  |  | 已接入 | P5第三十批原本地HTML/八表/备注/未迁说明；见p5-help-manuals.md | NeeView/Command/Commands/HelpMainMenuCommand.cs |
 | HelpSearchOption | 搜索选项帮助 |  |  | 已接入 | P5第三十批原本地HTML/八表/备注/未迁说明；见p5-help-manuals.md | NeeView/Command/Commands/HelpSearchOptionCommand.cs |
 | OpenContextMenu | 打开上下文菜单 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/OpenContextMenuCommand.cs |
@@ -244,7 +244,7 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | FocusPrevApp | 切换到上一个 NeeView | Ctrl+Shift+Tab |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/FocusPrevAppCommand.cs |
 | FocusNextApp | 切换到下一个 NeeView | Ctrl+Tab |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/FocusNextAppCommand.cs |
 | StretchWindow | 调整窗口大小 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/StretchWindowCommand.cs |
-| OpenConsole | 打开脚本控制台 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/OpenConsoleCommand.cs |
+| OpenConsole | 打开脚本控制台 |  |  | 已接入 | P5 原脚本/目录/控制台/帮助；见p5-script.md | NeeView/Command/Commands/OpenConsoleCommand.cs |
 
 P4第一批原九数字、MoveToFolderAs及Undo/Redo接入，数字默认输入1–9并保留可配置Index。第一批仅Once普通目录主图；第二批已迁入原多页策略及普通目录CopyToFolderAs，归档实体化复制待后续。DeleteFile/RenameBook已分别接入，CopyFile/CopyBook/Paste由第五批接入；CutFile/CutBook按用户决定保持禁用占位。菜单能力受原写权限/当前来源/有效目标/忙碌约束；详见[p4-destination-folders.md](p4-destination-folders.md)。
 

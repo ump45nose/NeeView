@@ -10,6 +10,9 @@ public interface IBookTransferBackend
     /// <param name="source">真实书籍根路径。</param><param name="folder">已经存在的目标目录。</param>
     /// <param name="token">规划和指纹计算取消。</param><returns>提交前再次核对的完整快照。</returns>
     Task<BookTransferPlan> PlanBookTransferAsync(string source, string folder, CancellationToken token);
+    /// <summary>脚本文件入口的明确落点，复用同一指纹/恢复协议并允许改名。</summary>
+    Task<BookTransferPlan> PlanPathTransferAsync(string source, string destination, CancellationToken token)
+        => throw new NotSupportedException("当前后端不支持明确目录落点。");
     /// <summary>共用临时目标、指纹校验和恢复日志；成功返回后调用既有ReleaseAsync。</summary>
     /// <param name="plan">用户确认的来源和目标指纹。</param><param name="move">true移动，false复制。</param>
     /// <param name="token">安装提交点前可取消。</param><returns>真实成功的落点及恢复材料。</returns>

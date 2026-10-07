@@ -34,7 +34,7 @@ public sealed partial class BookOperation
     /// <summary>复制按原Book.Path条目和归档策略保留阅读；移动仅真实根实体，关闭书籍且不跳目标/邻书。</summary>
     /// <param name="folder">原手动目标集合中的目录。</param><param name="move">true固定移动，false固定复制，不跟随面板模式。</param>
     /// <param name="token">确认和提交前取消；已落盘结果继续协调JSON。</param><returns>实体传输、状态联动及必要失败恢复完成的任务。</returns>
-    public async Task TransferBookToFolderAsync(DestinationFolder folder, bool move, CancellationToken token = default)
+    public async Task TransferBookToFolderAsync(DestinationFolder folder, bool move, CancellationToken token = default, string? destinationPath = null)
     {
         if (!(move ? CanMoveBookToFolder : CanCopyBookToFolder) || Interlocked.CompareExchange(ref _bookTransferBusy, 1, 0) != 0) return;
         var completion = _bookTransferCompletion = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -60,7 +60,8 @@ public sealed partial class BookOperation
             }
             await ReadDeleteBookTargetAsync(sourcePath, prompt.Token, requested.Source.CreateBookEntry().IsShortcut);
             var backend = (IBookTransferBackend)_fileBackend!;
-            var plan = await backend.PlanBookTransferAsync(sourcePath, folder.Path, prompt.Token);
+            var plan = destinationPath is null ? await backend.PlanBookTransferAsync(sourcePath, folder.Path, prompt.Token)
+                : await backend.PlanPathTransferAsync(sourcePath, destinationPath, prompt.Token);
             await ProtectBookTransferDestinationAsync(plan.Destination, prompt.Token);
             if (plan.DestinationHash is not null && (ConfirmBookOverwriteAsync is null || !await ConfirmBookOverwriteAsync(plan).WaitAsync(prompt.Token))) return;
             await _gate.WaitAsync(prompt.Token);

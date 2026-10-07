@@ -3464,6 +3464,402 @@
       "target": "src/NeeView.Engine/SidePanels/FileInfo/MetadataValueTools.cs",
       "sha256": "4c9f9a35805b02ffdb2ded47632461bcbd2af6ac72df72771e312257809379f8",
       "status": "迁入纯MetadataValueTools；移除WPF IValueConverter，固定展开原别名资源。"
+    },
+    {
+      "source": "NeeView/PropertyMap/PropertyMapNode.cs",
+      "target": "src/NeeView.Engine/PropertyMap/PropertyMapNode.cs",
+      "sha256": "6e5e30db68a2ed6bd971f821e1f43c1836fa4d169a7fbbd6a4f6d3f7fa717fa0",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/PropertyMap/PropertyMapColorConverter.cs",
+      "target": "src/NeeView.Engine/PropertyMap/PropertyMapColorConverter.cs",
+      "sha256": "92c8e7663e4ac74fd519e2eeb64cfa5e116b74fed539f526a372c18db3f1ad80",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/PropertyMap/PropertyMapConverter.cs",
+      "target": "src/NeeView.Engine/PropertyMap/PropertyMapConverter.cs",
+      "sha256": "06de4c45ccb22e0e5a97fede8bad665281dff06dc72b4406013ce38fce268a8c",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/PropertyMap/PropertyMapSource.cs",
+      "target": "src/NeeView.Engine/PropertyMap/PropertyMapSource.cs",
+      "sha256": "1a179b6daf77f533fa291ef8898451c8c67ab0dfca09155b91de1b5b12951509",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/PropertyMap/PropertyMapStringCollectionConverter.cs",
+      "target": "src/NeeView.Engine/PropertyMap/PropertyMapStringCollectionConverter.cs",
+      "sha256": "33548bb6169bf0b5ea9fe3796aadef0d656d83f353029bb6a33c3d396f7d99bb",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/IAccessDiagnostics.cs",
+      "target": "src/NeeView.Engine/PropertyMap/IAccessDiagnostics.cs",
+      "sha256": "f7433d4ebbe916800b15e80daad26a6953ee6f6fb91d5b1a21645f7569ec1810",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/PropertyMap/PropertyMapReadOnlyAttribute.cs",
+      "target": "src/NeeView.Engine/PropertyMap/PropertyMapReadOnlyAttribute.cs",
+      "sha256": "f8bcb869752cb3e1696c69f7f826c12fb2eca9394f774167af7cd227cdcdca92",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/PropertyMap/PropertyMapOptions.cs",
+      "target": "src/NeeView.Engine/PropertyMap/PropertyMapOptions.cs",
+      "sha256": "3efc802c2eb3d25534f7bfd1803c042652972a9cce20bdfb6122cba58cdb56cc",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/AlternativeAttribute.cs",
+      "target": "src/NeeView.Engine/PropertyMap/AlternativeAttribute.cs",
+      "sha256": "ebdf1d0aa3a1cebcaab97fa61ddb9395164121c0f1f8ef87db383b9011c70a36",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/PropertyMap/PropertyMapSizeConverter.cs",
+      "target": "src/NeeView.Engine/PropertyMap/PropertyMapSizeConverter.cs",
+      "sha256": "ef3e10c0f519c0be0940f444919831fb8036fe72b4d2e1af8eee9ac5fcddf20a",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/PropertyMap/PropertyMap.cs",
+      "target": "src/NeeView.Engine/PropertyMap/PropertyMap.cs",
+      "sha256": "dfa8babe073a200a2e4ae2022b9bd612e56946d5d9838995ee4c1f1b2b1949c5",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/PropertyMap/PropertyMapIgnoreAttribute.cs",
+      "target": "src/NeeView.Engine/PropertyMap/PropertyMapIgnoreAttribute.cs",
+      "sha256": "a7cfffe3b2126d7dae822735d2a1c9ba8ae84beee6f9564332366134395a74e9",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/PropertyMap/PropertyMapLabelAttribute.cs",
+      "target": "src/NeeView.Engine/PropertyMap/PropertyMapLabelAttribute.cs",
+      "sha256": "31e9186b259b76ddc54356f898f09d389a7a294b21296511e62c676b05dadfe8",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/DefaultAccessDiagnostics.cs",
+      "target": "src/NeeView.Engine/PropertyMap/DefaultAccessDiagnostics.cs",
+      "sha256": "65841a27b44c1324874d324235420efd64b90eaf4b1f6b2a691d8e42b6fa432e",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/PropertyMap/PropertyMapNameAttribute.cs",
+      "target": "src/NeeView.Engine/PropertyMap/PropertyMapNameAttribute.cs",
+      "sha256": "3bd07019fd653d1b23f619672360cfe988dc22bc6628853768c1252d1da775cb",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/PropertyMap/PropertyMapDefaultConverter.cs",
+      "target": "src/NeeView.Engine/PropertyMap/PropertyMapDefaultConverter.cs",
+      "sha256": "71a0689dc27b3563b5ae64db30b2b655d42a9764bd14d3e7f7c3ef8f8ab69cbc",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/PropertyMap/PropertyMapEnumConverter.cs",
+      "target": "src/NeeView.Engine/PropertyMap/PropertyMapEnumConverter.cs",
+      "sha256": "fbda2d80fb6fd90393e1ae6b95e4170c59484fe5fb19544fb7f4ed277170fa72",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/PropertyMap/PropertyMapFileTypeCollectionConverter.cs",
+      "target": "src/NeeView.Engine/PropertyMap/PropertyMapFileTypeCollectionConverter.cs",
+      "sha256": "b44af0b9140e53e97978b0de6477d4d21a197aef6f8c708f8bff703ff9b04def",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/ScriptAccessDiagnostics.cs",
+      "target": "src/NeeView.Engine/Script/ScriptAccessDiagnostics.cs",
+      "sha256": "b608120dc384617e1f33bd663a99f6baef6da1a2ba66b1ab4f0e03a84410be1f",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/ScriptFolderWatcher.cs",
+      "target": "src/NeeView.Engine/Script/ScriptFolderWatcher.cs",
+      "sha256": "b5a75d469c5dbf2c471a88dc39ce62e1e5cc19292739e54eb9d72c9b0265ec97",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/ScriptCommandSource.cs",
+      "target": "src/NeeView.Engine/Script/ScriptCommandSource.cs",
+      "sha256": "917cbacf284e7022a9f9a73aeaacf2c60017024ebac51cccd21b42b157d6c6c1",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/ScriptManager.cs",
+      "target": "src/NeeView.Engine/Script/ScriptManager.cs",
+      "sha256": "8cef03ae5d4bcfd60b1b5dc89f80c34eea52243f88e4b03cbe4f6453d82ca24e",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/ViewPageAccessor.cs",
+      "target": "src/NeeView.Engine/Script/ViewPageAccessor.cs",
+      "sha256": "0ad8aaa4ee7207acbafbe23fc33c01f30b4e8e564e6cf5060f796f9198127364",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/PageAccessor.cs",
+      "target": "src/NeeView.Engine/Script/PageAccessor.cs",
+      "sha256": "e0399e66f4a74df4280801da4b39bb816a80fd2f192f4029b4faaaae0fb7d27f",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/CommandAccessor.cs",
+      "target": "src/NeeView.Engine/Script/CommandAccessor.cs",
+      "sha256": "653157d891130707c35ec6e9e50cc8474bd68e1362c7e2655f775c5fcf5b7e14",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/DestinationFolderCollectionAccessor.cs",
+      "target": "src/NeeView.Engine/Script/DestinationFolderCollectionAccessor.cs",
+      "sha256": "7729fc9d59c609e1cc4402362fc3aecccd26040b729fbd7ee130b941a81202bc",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/IHasScriptPath.cs",
+      "target": "src/NeeView.Engine/Script/IHasScriptPath.cs",
+      "sha256": "64a01ec4d6036a0d4932d0a3ddd926470daee25ea5b156abb4a80a8cc5ffa693",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/MediaPlayerAccessor.cs",
+      "target": "src/NeeView.Engine/Script/MediaPlayerAccessor.cs",
+      "sha256": "69a80c08921c7e46477d800424e99c5dbd77f47858d1f9c33782c3094f22527b",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/ScriptErrorLevel.cs",
+      "target": "src/NeeView.Engine/Script/ScriptErrorLevel.cs",
+      "sha256": "f8f78ce73cf943c36e3058fe054ec69f93e5b5ff2794ebaa5f551b87f9da5447",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/ImageEffectAccessor.cs",
+      "target": "src/NeeView.Engine/Script/ImageEffectAccessor.cs",
+      "sha256": "ec23979114f1201cea3a56b11428c0b548de740ba0973251cd53a8e4547b3529",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/ScriptUnit.cs",
+      "target": "src/NeeView.Engine/Script/ScriptUnit.cs",
+      "sha256": "265dd8a297b15d0a3a80aa435471baed877482f839f544163070613adb5f6227",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/BookConfigAccessor.cs",
+      "target": "src/NeeView.Engine/Script/BookConfigAccessor.cs",
+      "sha256": "16c381b3161a66246173ad4873700d075512a18048e87434562a97aaca7885e3",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/EffectLayerAccessor.cs",
+      "target": "src/NeeView.Engine/Script/EffectLayerAccessor.cs",
+      "sha256": "e9aa1008741780437b384beba59bf24dff871b9f4302d1d0bb6023d82a625036",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/ConfigMap.cs",
+      "target": "src/NeeView.Engine/Script/ConfigMap.cs",
+      "sha256": "91c33d3f4929158195d01e7a4d2c08997701f9fb6c524a5cdf415dcfb4095725",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/CommandAccessorMap.cs",
+      "target": "src/NeeView.Engine/Script/CommandAccessorMap.cs",
+      "sha256": "eb223d3d0d5d3200947fa6584ac4483a147f173ed511115a1750a371523ea4ba",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/EnvironmentAccessor.cs",
+      "target": "src/NeeView.Engine/Script/EnvironmentAccessor.cs",
+      "sha256": "26570d7e602efc39aedabc726b7f2f09e5d6c6fbd66d90d0d33b600d8438791c",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/BookAccessor.cs",
+      "target": "src/NeeView.Engine/Script/BookAccessor.cs",
+      "sha256": "a931355839b2355036c43dcbe710464b469d520f48c4c76556e3fa2684c42a1a",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Script/ExternalAppCollectionAccessor.cs",
+      "target": "src/NeeView.Engine/Script/ExternalAppCollectionAccessor.cs",
+      "sha256": "b98e1c0bc3f6d47305a64e5ca17d3ba1af35718473d16b3bd03f7d253d9156c8",
+      "status": "P5第三十八批：迁入原属性映射/脚本关系，几何、颜色与Dispatcher替换为既有值类型/可注入UI调度；运行、事件、错误级别和取消见p5-script.md，未迁API明确列出。"
+    },
+    {
+      "source": "NeeView/Config/ScriptConfig.cs",
+      "target": "src/NeeView.Engine/Config/ScriptConfig.cs",
+      "sha256": "2146e4f6044b0d3c2c50316e00ee011fe0b6bd98f0f760ee8c5585150cd235e6",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Command/CommandParameters/ScriptCommandParameter.cs",
+      "target": "src/NeeView.Engine/Command/ScriptCommandParameter.cs",
+      "sha256": "ea0613501426ddcea3806b8e4f9e5d163e1fd871393f2327c1c1f91b4336b048",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/NeeView/Text/StringArgumentSplitter.cs",
+      "target": "src/NeeView.Engine/Text/StringArgumentSplitter.cs",
+      "sha256": "54ae5b6a4a545af5f12779f8dce86f9862c582cd2713249f3654c2ee6c1551d9",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/JavascriptEngine.cs",
+      "target": "src/NeeView.Backends/Script/JintScriptRuntime.cs",
+      "sha256": "d40e0de88725e35853cf5d2e596f4c1e5274f97e3d9c75533355b4a060add36e",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/JintCustomObjectConverter.cs",
+      "target": "src/NeeView.Backends/Script/JintCustomObjectConverter.cs",
+      "sha256": "dab3cb431043416140c3fd5cbfe9763fcd7f45cabd9af7f94c1dfdaa40a60ef0",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/JintCustomTypeConverter.cs",
+      "target": "src/NeeView.Backends/Script/JintCustomTypeConverter.cs",
+      "sha256": "8c281aa9b22c585fb2e3c25901ca6279ac85e987283a09909fd4e9b878fdb72e",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/CommandHost.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptApplicationHost.cs",
+      "sha256": "29d4baa1ca0c0a8b06a113958491035b31fdba724465a26a7fa1c6a4e18d2cce",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/ScriptEventer.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.Scripts.cs",
+      "sha256": "9bb721382cf71c242a75a35d2a7e4fbd08404260612bf638a7958e7ab7304a6e",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/MainViewPanelAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptPanelAccessors.cs",
+      "sha256": "12215a8ad7d199d99cda7f4bc193b59282fd941adf37c6b38c5f5de01259a8fd",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/WindowAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptPanelAccessors.cs",
+      "sha256": "5ad57235abc088295841811259df620033c00054f30840b044fd206a03fe3d3b",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/ConsoleWindow.xaml.cs",
+      "target": "src/NeeView.MacOS/Views/ScriptConsoleWindow.cs",
+      "sha256": "f681175445429c737cf5dc24e396227e553d2d8775bd6a140dd064c52e5fe6d3",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/ConsoleWindow.xaml",
+      "target": "src/NeeView.MacOS/Views/ScriptConsoleWindow.cs",
+      "sha256": "a99c2e8d63874664f0e5238ba3a137eaa4aca6ac4cf8d4c2ec9dfe4af5d90a76",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/ScriptManual.cs",
+      "target": "src/NeeView.Engine/Command/HelpCommand/ScriptReferenceDocument.cs",
+      "sha256": "42d2a7e7a7afeccf8611819a535523c21b7a94ce63bcd38cf9aa7cf5bbdbd39e",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/ScriptCommandSourceMap.cs",
+      "target": "src/NeeView.Engine/Script/ScriptManager.cs",
+      "sha256": "32225b08b5ee923474d6fdfd51010296e8b954190bb8255539b9bd8a9264d333",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/BookshelfPanelAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptPanelDataAccessors.cs",
+      "sha256": "fe74d19d1fe456b2e5c5d03a8b15590864b83b6d151e69e913af0b20f2fac738",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/PageListPanelAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptPanelDataAccessors.cs",
+      "sha256": "97887e131d08c47f9329aad0b055b873fea695cbf9be11ae22db62b8a4f048b8",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/HistoryPanelAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptPanelDataAccessors.cs",
+      "sha256": "361ac91bdcf48eae46075dc361f5e62bd97819550545d5bfd2acfad8924440f9",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/BookmarkPanelAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptPanelDataAccessors.cs",
+      "sha256": "182a0efb7c28c6334c062e6c6aa6f5a43a62ca085d897aff79c70c44fc777e7c",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/PlaylistPanelAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptPanelDataAccessors.cs",
+      "sha256": "1dfd9a4c0c4c0189e40c931d3e4b76acd09cb79affca98477c2a295dfdb69457",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/BookItemAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptPanelDataAccessors.cs",
+      "sha256": "f2bdeeabf89103eed1dcbf77303ba8fe8b8e7e6a92f516d6fdfd71317bac27fa",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/HistoryItemAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptPanelDataAccessors.cs",
+      "sha256": "623d9883f5f385091d35fbfa89f431bc95bc898f05463a902d0bdae537c012b9",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/PlaylistItemAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptPanelDataAccessors.cs",
+      "sha256": "d33c745fbae408699898412161f836cb0bae6546d2e2a7fe00125d353f4afcdd",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/NodeAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptTreeAccessors.cs",
+      "sha256": "4c9b29c588f0b4200bdce8380552a51eea7586540518c24e811a2824458878bc",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/DirectoryNodeAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptTreeAccessors.cs",
+      "sha256": "1b8bac12bede672bce77cf8eccac100f544ebdde63e16167d8d3d77a7bbc7649",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/QuickAccessNodeAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptTreeAccessors.cs",
+      "sha256": "dbd4628c4175d79883c6c23a86912879b257d4c65e7cc874421d5ff0365e0fff",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/BookmarkFolderNodeAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptTreeAccessors.cs",
+      "sha256": "f86fe37801971b1649ae22baea624873b3947fe229accc782d5d99ba475d1ac6",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/BookshelfFolderTreeAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptTreeAccessors.cs",
+      "sha256": "fc490b905639cc324a6ee5e2de65b37fec92144f3116327a70db5015ee7934ff",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Script/BookmarkFolderTreeAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptTreeAccessors.cs",
+      "sha256": "2b6d33a2e51b6894185cffb04651cad4241aa9f1949ef44d2bae1537a451a2e9",
+      "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
     }
   ],
   "rule_references": [

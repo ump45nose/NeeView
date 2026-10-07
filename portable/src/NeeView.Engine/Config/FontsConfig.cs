@@ -10,14 +10,14 @@ public sealed class FontsConfig : ObservableObject
     private bool _isClearTypeEnabled = true;
     private string? _fontName;
     /// <summary>替换 SystemVisualParameters.MessageFontName 的实际平台值。</summary>
-    [JsonIgnore] public string DefaultFontName { get; set; } = "";
+    [JsonIgnore] [PropertyMapIgnore] public string DefaultFontName { get; set; } = "";
     /// <summary>原空白/系统默认字体写回 null；缺失的显式字体仍保留原名称。</summary>
     [JsonIgnore] public string FontName
     {
         get => _fontName ?? DefaultFontName;
         set => SetProperty(ref _fontName, string.IsNullOrWhiteSpace(value) || value == DefaultFontName ? null : value);
     }
-    [JsonPropertyName("FontName")] public string? FontNameRaw { get => _fontName; set => _fontName = value; }
+    [JsonPropertyName("FontName")] [PropertyMapIgnore] public string? FontNameRaw { get => _fontName; set => _fontName = value; }
     /// <summary>原默认1.25，非正值读取默认；保留原五位舍入，不截断有效导入比例。</summary>
     public double FontScale { get => _fontScale <= 0 ? 1.25 : _fontScale; set => SetProperty(ref _fontScale, Math.Round(value, 5)); }
     /// <summary>菜单以平台菜单字号为基准，原默认1。</summary>

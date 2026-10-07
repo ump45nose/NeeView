@@ -1,5 +1,7 @@
 # NeeView Mac 源码迁移架构
 
+P5第三十八批：原 PropertyMap、Jint 脚本运行、动态命令/Patch、五事件、控制台/补全、真实面板/树及文件操作接入唯一产品链。中央查看器代理与主窗口分离，尚未装配的浮动能力明确拒绝；封面与启动恢复表单补齐。见[脚本契约](p5-script.md)。
+
 P5第三十七批：原完整EXIF/XMP/评分/数值格式映射及信息八组配置接入同一Page、归档、JSON和后台搜索；独立信息面板复用可见缩略图，信息缓存有界。见[元数据契约](p5-metadata.md)。
 
 P5第三十六批：原播放列表四模板、实体改名/废纸篓、可靠无效检查/确认/恢复及作为书籍打开进入唯一Hub、JSON与文件恢复链；前端复用现有可见封面/虚拟化。Windows FileID自动重新定位不猜测迁移，见[播放列表收尾](p5-playlist-completion.md)。
@@ -70,7 +72,7 @@ flowchart TB
   Backends --> Engine
 ```
 
-Engine 使用 `net10.0`，只引用原 MVVM 辅助库；不引用 WPF、Avalonia、AppKit 或具体图片/归档库。Backends、MacOS 使用 `net10.0-macos`，目标 macOS 15+、Apple Silicon。Mac 的视图和表现模型只调用 Engine 类型与契约，具体实现只在 `MacApp` 装配。
+Engine 使用 `net10.0`，引用原 MVVM 辅助库和既有 JSON/元数据类型；不引用 WPF、Avalonia、AppKit 或具体图片/归档库。Backends、MacOS 使用 `net10.0-macos`，目标 macOS 15+、Apple Silicon。Mac 的视图和表现模型只调用 Engine 类型与契约，具体实现只在 `MacApp` 装配。
 
 独立 solution 保留在 `portable/NeeView.CrossPlatform.slnx`。旧 Core/Application/Desktop/Persistence 等重写项目、SQLite 身份体系和 Preview Host 已退役，历史成果留在 Git 和旧验收记录中。测试项目直接编译正式视图与后端源码进行 Headless 验证，没有第二个产品入口。
 
@@ -78,7 +80,7 @@ Engine 使用 `net10.0`，只引用原 MVVM 辅助库；不引用 WPF、Avalonia
 
 [源码迁移清单](source-migration.json) 记录原文件、基线 SHA256、目标和改造。位置/范围、设置按字段恢复、自然排序、页框生成等算法直接迁入。`PageFrameFactory` 保留原判断顺序，几何计算只替换实际 WPF 值类型及旋转变换。
 
-Book/Page/Archive/BookOperation 是按阶段迁入的原关系适配；PDF、动图、视频及metadata/rating已按各批契约接入，脚本和其余高级控制继续迁移。原页面/普通书架搜索已由P3接入。不能把“存在同名类型”当作整组功能已经迁完。新增替换点只有来源、像素、系统交互；不建立 WPF 模拟层、事件总线或插件框架。
+Book/Page/Archive/BookOperation 是按阶段迁入的原关系适配；PDF、动图、视频及metadata/rating已按各批契约接入，脚本运行由第三十八批接入，原 item/独立中央浮窗及其余高级控制继续迁移。原页面/普通书架搜索已由P3接入。不能把“存在同名类型”当作整组功能已经迁完。新增替换点只有来源、像素、系统交互；不建立 WPF 模拟层、事件总线或插件框架。
 
 原 `BookSourceFactory.ValidatePageSortMode` 对普通书籍排除播放列表注册顺序，P1 保留其回退到文件名排序的规则。自然比较器的 Win32 字符比较改为 .NET CurrentCulture；数值、全半角、日文归一逻辑保留，语言排序细节仍待 Windows 样本对照。
 
@@ -108,7 +110,7 @@ BookshelfFolderList管理普通递归搜索与单个活动目录根监视，普�
 
 `UserSetting.json`、`History.json`、`Bookmark.json`、`Foldres.json`、`QuicAccess.json` 与原全局 `.nvpls` 是对应模块的权威数据，沿用 Path/Page/Props、差分键位和原设置枚举。未迁移配置及未知 Props 保留。Mac 用户目录为 `~/Library/Application Support/NeeView.Mac`；不修改 Windows Profile 或旧 NeeView.Portable 数据。
 
-保存先准备五个临时文件，再保留副本和小型提交标记，原子替换各文件；失败恢复旧完整文件和历史内存状态，中断在下次启动恢复，兼容旧双/三/四文件标记。书签编辑原地回滚节点，保留选择及重试引用。阅读防抖一秒，切书和退出立即保存。关闭入口共享可等待任务，保存失败保持书籍/查看器并允许重试。非文件系统激活重建窗口时恢复最后书籍；明确打开文件优先于旧状态。该链路已在正式Mac应用中验证，见[运行记录](../acceptance/p1-macos-runtime.md)。
+保存先准备五个临时文件，再保留副本和小型提交标记，原子替换各文件；失败恢复旧完整文件和历史内存状态，中断在下次启动恢复，兼容旧双/三/四文件标记。书签编辑原地回滚节点，保留选择及重试引用。阅读防抖一秒，切书和退出立即保存。关闭入口共享可等待任务，保存失败保持书籍/查看器并允许重试。启动或非文件系统激活重建窗口时按原 StartUp.IsOpenLastBook 恢复最后书籍；明确打开文件优先于旧状态。该链路已在正式Mac应用中验证，见[运行记录](../acceptance/p1-macos-runtime.md)。
 
 原 Props 无法无歧义编码 IsWide=false，Mac 增加 `MacIsSupportedWidePage` 补值；原 Props 解析算法保持。2026-10-04 同夹具复演确认早期 `MacPagePart` 导致半页恢复与 Windows/原源码不同，已收回该扩展：Find/GetLastBook 直接返回原 BookMemento，SaveAsync 不接受半页参数；普通切书/启动按原条目名恢复到阅读方向首半页，当前阅读和反向页尾仍保留原 Part 算法。旧字段不读取，更新当前记录时移除，其他未知字段保持。同书 LastBookV2 的未知嵌套字段及 Props 继续保存，不跨书传递。P2 首批接入原 BookmarkNode 字段，第五批接入原集合算法与登记编辑；完整旧版本迁移、路径映射与 .nvzip 导入在 P5，当前不能宣称任意旧 Profile 可直接使用。
 

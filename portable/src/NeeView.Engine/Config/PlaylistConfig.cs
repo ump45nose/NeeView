@@ -10,11 +10,11 @@ public sealed class PlaylistConfig
     public bool IsGroupBy { get; set; }
     public bool IsCurrentBookFilterEnabled { get; set; }
     public bool IsFirstIn { get; set; }
-    [JsonPropertyName("PlaylistFolder")] public string? PlaylistFolderRaw { get; set; }
-    [JsonPropertyName("CurrentPlaylist")] public string? CurrentPlaylistRaw { get; set; }
+    [JsonPropertyName("PlaylistFolder")] [PropertyMapIgnore] public string? PlaylistFolderRaw { get; set; }
+    [JsonPropertyName("CurrentPlaylist")] [PropertyMapIgnore] public string? CurrentPlaylistRaw { get; set; }
     [JsonIgnore] public string PlaylistFolder => System.IO.Path.GetFullPath(PlaylistFolderRaw ?? DefaultFolder);
-    [JsonIgnore] public string DefaultPlaylist => System.IO.Path.Combine(PlaylistFolder, "Default.nvpls");
-    [JsonIgnore] public string PagemarkPlaylist => System.IO.Path.Combine(PlaylistFolder, "Pagemark.nvpls");
+    [JsonIgnore] [PropertyMapIgnore] public string DefaultPlaylist => System.IO.Path.Combine(PlaylistFolder, "Default.nvpls");
+    [JsonIgnore] [PropertyMapIgnore] public string PagemarkPlaylist => System.IO.Path.Combine(PlaylistFolder, "Pagemark.nvpls");
     [JsonIgnore] public string CurrentPlaylist
     {
         get => CurrentPlaylistRaw is null ? DefaultPlaylist : System.IO.Path.GetFullPath(System.IO.Path.IsPathFullyQualified(CurrentPlaylistRaw) ? CurrentPlaylistRaw : System.IO.Path.Combine(PlaylistFolder, CurrentPlaylistRaw));

@@ -12,5 +12,6 @@
     <EmbeddedResource Include="Command/HelpCommand/*.json" />
     <EmbeddedResource Include="Command/HelpCommand/Style.css" />
     <EmbeddedResource Include="Styles/Themes/*.json" />
+    <EmbeddedResource Include="Resources/Scripts/Sample.nvjs" />
   </ItemGroup>
 </Project>

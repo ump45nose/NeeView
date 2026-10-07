@@ -6,9 +6,9 @@ using System.Text.Json.Serialization;
 namespace NeeView;
 public sealed class EffectProfileCollectionConfig
 {
-    public int IdCounter { get; set; }
-    public ObservableCollection<EffectProfile> Profiles { get; set; } = new() { new() };
-    [JsonExtensionData] public Dictionary<string, JsonElement>? ExtensionData { get; set; }
+    [PropertyMapIgnore] public int IdCounter { get; set; }
+    [PropertyMapIgnore] public ObservableCollection<EffectProfile> Profiles { get; set; } = new() { new() };
+    [JsonExtensionData] [PropertyMapIgnore] public Dictionary<string, JsonElement>? ExtensionData { get; set; }
 }
 /// <summary>保留原预设控制关系；由 BookOperation 串行调用，没有第二会话或全局事件总线。</summary>
 public sealed class EffectProfileCollection(Config config)

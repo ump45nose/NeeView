@@ -1,6 +1,6 @@
 namespace NeeView;
 
-public enum HelpDocumentKind { MainMenu, SearchOptions }
+public enum HelpDocumentKind { MainMenu, SearchOptions, Script }
 
 /// <summary>只管理随机临时帮助目录和平台打开；不保存Profile、不执行网页脚本。</summary>
 public sealed class HelpDocumentService(IPlatformService platform, string? temporaryRoot = null) : IAsyncDisposable
@@ -13,7 +13,7 @@ public sealed class HelpDocumentService(IPlatformService platform, string? tempo
     /// <param name="token">窗口关闭或请求取消；已提交系统动作等待真实结果。</param><returns>系统打开入口已接受文档。</returns>
     public async Task OpenAsync(HelpDocumentKind kind, string html, CancellationToken token = default)
     {
-        var filename = kind switch { HelpDocumentKind.MainMenu => "MainMenuList.html", HelpDocumentKind.SearchOptions => "SearchOptions.html", _ => throw new ArgumentOutOfRangeException(nameof(kind)) };
+        var filename = kind switch { HelpDocumentKind.MainMenu => "MainMenuList.html", HelpDocumentKind.SearchOptions => "SearchOptions.html", HelpDocumentKind.Script => "ScriptManual.html", _ => throw new ArgumentOutOfRangeException(nameof(kind)) };
         await _gate.WaitAsync(token);
         try
         {

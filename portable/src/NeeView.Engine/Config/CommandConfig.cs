@@ -7,8 +7,8 @@ public enum InputScheme { TypeA, TypeB, TypeC }
 /// <summary>原输入默认值；Control与Mac Command保持独立。</summary>
 public sealed class CommandConfig
 {
-    public InputScheme PresetInputScheme { get; set; }
-    public PageReadOrder PresetPageReadOrder { get; set; }
+    [PropertyMapIgnore] public InputScheme PresetInputScheme { get; set; }
+    [PropertyMapIgnore] public PageReadOrder PresetPageReadOrder { get; set; }
     public bool IsAccessKeyEnabled { get; set; } = true;
     public bool IsReversePageMove { get; set; } = true;
     public bool IsReversePageMoveWheel { get; set; }

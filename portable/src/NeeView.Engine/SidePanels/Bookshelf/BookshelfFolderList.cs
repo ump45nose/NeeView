@@ -86,7 +86,7 @@ public sealed partial class BookshelfFolderList(IArchiveFactory archives, Folder
     /// <param name="force">同目录是否重新枚举。</param>
     /// <param name="searchKeyword">候选搜索表达式；省略时同目录沿用已提交条件。</param>
     /// <returns>此次请求是否成功提交。</returns>
-    public async Task<bool> SetPlaceAsync(string place, string? selectedPath = null, CancellationToken token = default, bool force = false, string? searchKeyword = null)
+    public async Task<bool> SetPlaceAsync(string place, string? selectedPath = null, CancellationToken token = default, bool force = false, string? searchKeyword = null, bool recordHistory = true)
     {
         ObjectDisposedException.ThrowIf(_disposed, this); token.ThrowIfCancellationRequested();
         bool bookmark = place.StartsWith("bookmark:", StringComparison.Ordinal);
@@ -138,14 +138,14 @@ public sealed partial class BookshelfFolderList(IArchiveFactory archives, Folder
             var mode = GetNormalOrder(parameter.FolderOrder, query.Length > 0);
             var items = FolderCollection.Sort(entries, mode, Config.Current.Bookshelf.FolderSortOrder, parameter.Seed, pending.Token);
             _entries = entries; _parameter = parameter; Place = place; Items = items; FolderOrder = mode; SearchKeyword = query;
-            SelectedItem = selectedPath is null ? null : FindSelection(selectedPath); return true;
+            SelectedItem = selectedPath is null ? null : FindSelection(selectedPath); committed = true; return true;
         }
         catch (OperationCanceledException) when (pending.IsCancellationRequested) { return false; }
         catch (Exception ex) { if (revision == _revision) Error = "目录暂不可访问：" + ex.Message; return false; }
         finally
         {
             if (bookmark && !committed && revision == _revision && oldPlace is not null) _bookmarks?.SetPlace(oldPlace, oldSelection);
-            if (revision == _revision) { IsLoading = false; RefreshSearchWatch(); Changed?.Invoke(this, EventArgs.Empty); }
+            if (revision == _revision) { if (committed && recordHistory) RecordFolderHistory(); IsLoading = false; RefreshSearchWatch(); Changed?.Invoke(this, EventArgs.Empty); }
             if (ReferenceEquals(_request, pending)) _request = null; pending.Dispose();
         }
     }

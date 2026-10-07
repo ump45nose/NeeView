@@ -63,6 +63,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         var config = ReadProfileConfig(_setting);
         config.Theme.DefaultFolder = System.IO.Path.Combine(DirectoryPath, "Themes");
         config.Playlist.DefaultFolder = System.IO.Path.Combine(DirectoryPath, "Playlists");
+        config.Script.DefaultFolder = System.IO.Path.Combine(DirectoryPath, "Scripts");
         Playlists = new(config.Playlist);
         Config.SetCurrent(config);
         FolderConfigs.Restore(await ReadAsync(FolderConfigCollection.FileName, token));
@@ -95,6 +96,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             config.Bookshelf = ReadBranch<BookshelfConfig>(raw, "Bookshelf");
             config.PageList = ReadBranch<PageListConfig>(raw, "PageList");
             config.Information = ReadBranch<InformationConfig>(raw, "Information");
+            config.Script = ReadBranch<ScriptConfig>(raw, "Script");
             config.History = ReadBranch<HistoryConfig>(raw, "History");
             config.Bookmark = ReadBranch<BookmarkConfig>(raw, "Bookmark");
             config.System = ReadBranch<SystemConfig>(raw, "System");
@@ -248,7 +250,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
     }
 
     /// <summary>原相反方向的指定步长命令共享参数，NextSizePage 读取 PrevSizePage 的差分。</summary>
-    public MoveSizePageCommandParameter GetMoveSizeParameter() => _setting["Commands"]?["PrevSizePage"]?["Parameter"]?.Deserialize<MoveSizePageCommandParameter>(Options) ?? new();
+    public MoveSizePageCommandParameter GetMoveSizeParameter() => GetCommandParameter<MoveSizePageCommandParameter>("PrevSizePage");
 
     /// <summary>读取原命令差分参数，缺失值用原默认值，兼容数值及字符串枚举。</summary>
     public T GetCommandParameter<T>(string name) where T : class, new()
@@ -257,14 +259,14 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
         var owner = DefaultInputScheme.GetParameterOwner(name);
         // 早期Mac各方向独立写出的参数仅作读取兼容；原共享节点明确存在时优先。
-        return (_setting["Commands"]?[owner]?["Parameter"] ?? _setting["Commands"]?[name]?["Parameter"])?.Deserialize<T>(options) ?? new();
+        return (GetCommandParameterOverride(name) ?? _setting["Commands"]?[owner]?["Parameter"] ?? _setting["Commands"]?[name]?["Parameter"])?.Deserialize<T>(options) ?? new();
     }
     /// <summary>九数字实例默认索引来自原构造器；差分未写Index时仍保留该默认值。</summary>
     public MoveToFolderAsCommandParameter GetDestinationParameter(string name)
     {
         int index = name.StartsWith("MoveToDestinationFolder", StringComparison.Ordinal) && int.TryParse(name["MoveToDestinationFolder".Length..], out var number) ? number : 0;
         var defaults = JsonSerializer.SerializeToNode(new MoveToFolderAsCommandParameter { Index = index }, Options)!.AsObject();
-        if (_setting["Commands"]?[name]?["Parameter"] is JsonObject raw) Merge(defaults, raw);
+        if ((GetCommandParameterOverride(name) ?? _setting["Commands"]?[name]?["Parameter"]) is JsonObject raw) Merge(defaults, raw);
         var options = new JsonSerializerOptions(Options); options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
         return defaults.Deserialize<MoveToFolderAsCommandParameter>(options)!;
     }
@@ -519,7 +521,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         {
             new EffectProfileCollection(Config.Current).Store();
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "PageList", "Information", "History", "Bookmark", "System", "Archive", "Background", "ImageDotKeep", "ImageCustomSize", "ImageTrim", "ImageGrid", "ImageEffect", "EffectProfiles", "Image", "SlideShow", "Performance", "Playlist", "AutoHide", "Window", "WindowTitle", "MenuBar", "Command", "Mouse", "Loupe", "StartUp", "Theme", "Fonts" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "PageList", "Information", "Script", "History", "Bookmark", "System", "Archive", "Background", "ImageDotKeep", "ImageCustomSize", "ImageTrim", "ImageGrid", "ImageEffect", "EffectProfiles", "Image", "SlideShow", "Performance", "Playlist", "AutoHide", "Window", "WindowTitle", "MenuBar", "Command", "Mouse", "Loupe", "StartUp", "Theme", "Fonts" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 MergeTyped(Object(config, branch), value!);

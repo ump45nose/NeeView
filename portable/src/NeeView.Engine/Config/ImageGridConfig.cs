@@ -10,6 +10,6 @@ public sealed class ImageGridConfig : ObservableObject
     public int DivX { get => _divX; set => SetProperty(ref _divX, value); }
     public int DivY { get => _divY; set => SetProperty(ref _divY, value); }
     public bool IsSquare { get => _isSquare; set => SetProperty(ref _isSquare, value); }
-    [System.Text.Json.Serialization.JsonExtensionData] public Dictionary<string, System.Text.Json.JsonElement>? ExtensionData { get; set; }
+    [System.Text.Json.Serialization.JsonExtensionData] [PropertyMapIgnore] public Dictionary<string, System.Text.Json.JsonElement>? ExtensionData { get; set; }
 }
 public enum ImageGridTarget { Image, Screen }

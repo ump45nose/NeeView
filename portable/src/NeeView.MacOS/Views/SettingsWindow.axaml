@@ -7,7 +7,7 @@
           <Grid ColumnDefinitions="*,Auto,Auto"><TextBox x:Name="SettingsSearchBox" Text="{Binding Keyword, Mode=TwoWay}" PlaceholderText="搜索设置" KeyDown="SettingsSearch_KeyDown" TextChanged="SettingsSearch_TextChanged" ToolTip.Tip="原结构化搜索：空格 AND，/or，/not，/word，/re。Enter 确认并加入本窗口历史。" /><Button x:Name="SettingsSearchHistory" Grid.Column="1" Content="⌄" Click="SettingsSearch_History" /><Button x:Name="SettingsSearchClear" Grid.Column="2" Content="×" Click="SettingsSearch_Clear" /></Grid>
           <TextBlock x:Name="SettingsSearchError" Text="{Binding Error}" TextWrapping="Wrap" />
         </StackPanel>
-        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="主题 / 配色" /><ListBoxItem Content="字体" /><ListBoxItem Content="归档 / PDF" /><ListBoxItem Content="幻灯播放" /><ListBoxItem Content="背景 / 像素保持" /><ListBoxItem Content="放大镜" /><ListBoxItem Content="文件信息" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
+        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="主题 / 配色" /><ListBoxItem Content="字体" /><ListBoxItem Content="归档 / PDF" /><ListBoxItem Content="幻灯播放" /><ListBoxItem Content="背景 / 像素保持" /><ListBoxItem Content="放大镜" /><ListBoxItem Content="文件信息" /><ListBoxItem Content="脚本" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
       </Grid>
     </Border>
     <ScrollViewer x:Name="LoupeSettings" Grid.Column="1" IsVisible="False">
@@ -165,6 +165,13 @@
         <TextBlock Classes="settings-section" Text="书架（全局）" FontSize="16" Margin="0,8,0,0" />
         <TextBlock Text="文件夹与归档排序" /><ComboBox x:Name="BookshelfGroup"><ComboBoxItem Content="混排" /><ComboBoxItem Content="文件夹在前" /><ComboBoxItem Content="文件夹在后" /></ComboBox>
         <CheckBox x:Name="PrioritizeBookMove" Content="允许前后书命令取代正在加载的书籍" />
+        <TextBlock Classes="settings-section" Text="封面缩略图" FontSize="16" Margin="0,8,0,0" />
+        <TextBlock Text="优先图像文件名（正则表达式）" />
+        <TextBox x:Name="BookThumbnailRegex" ToolTip.Tip="留空时按原自然顺序选择首图；无效表达式会按原规则回退。" />
+        <TextBlock Text="缩略图搜索深度" />
+        <NumericUpDown x:Name="BookThumbnailDepth" Minimum="1" Increment="1" FormatString="0" />
+        <TextBlock Classes="settings-section" Text="启动恢复" FontSize="16" Margin="0,8,0,0" />
+        <CheckBox x:Name="OpenLastBook" Content="启动时恢复上次打开的书籍" />
         <CheckBox x:Name="OpenLastFolder" Content="启动时恢复上次书架位置" />
         <CheckBox x:Name="OpenLastBookmarkFolder" Content="启动时恢复独立书签列表位置" />
         <TextBlock Classes="settings-section" Text="查看器（全局）" FontSize="16" Margin="0,8,0,0" />
@@ -298,6 +305,19 @@
         <CheckBox Content="描述" IsChecked="{Binding Draft.IsVisibleDescription, Mode=TwoWay}"/><CheckBox Content="来源" IsChecked="{Binding Draft.IsVisibleOrigin, Mode=TwoWay}"/>
         <CheckBox Content="相机" IsChecked="{Binding Draft.IsVisibleCamera, Mode=TwoWay}"/><CheckBox Content="照片详细信息" IsChecked="{Binding Draft.IsVisibleAdvancedPhoto, Mode=TwoWay}"/>
         <CheckBox Content="GPS" IsChecked="{Binding Draft.IsVisibleGps, Mode=TwoWay}"/><CheckBox Content="更多信息" IsChecked="{Binding Draft.IsVisibleExtras, Mode=TwoWay}"/>
+      </StackPanel>
+    </ScrollViewer>
+    <ScrollViewer x:Name="ScriptSettings" Grid.Column="1" IsVisible="False">
+      <StackPanel Margin="24" Spacing="12">
+        <TextBlock Classes="settings-section" Text="脚本" FontSize="{DynamicResource SystemFontSizeHuge}" />
+        <CheckBox x:Name="ScriptEnabled" Content="启用脚本目录及事件" IsChecked="{Binding Enabled, Mode=TwoWay}" />
+        <TextBlock Text="脚本目录" /><TextBox x:Name="ScriptFolder" Text="{Binding Folder, Mode=TwoWay}" />
+        <Button Content="选择目录…" Click="ChooseScriptFolder_Click" HorizontalAlignment="Left" />
+        <Button Content="打开脚本目录" Click="OpenScriptFolder_Click" HorizontalAlignment="Left" />
+        <TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
+        <TextBlock Text="旧成员访问错误级别" /><ComboBox x:Name="ScriptErrorLevel" ItemsSource="{Binding ErrorLevels}" SelectedItem="{Binding ErrorLevel, Mode=TwoWay}" />
+        <CheckBox x:Name="ScriptRenameEvent" Content="重命名书籍后执行 OnBookLoaded" IsChecked="{Binding Renamed, Mode=TwoWay}" />
+        <TextBlock Text="五种事件沿原文件名。控制台和 --script 显式执行无需目录开关；Windows SQLite 程序集开关保留于配置，Mac 不装载。" TextWrapping="Wrap" />
       </StackPanel>
     </ScrollViewer>
     <ScrollViewer x:Name="SettingsSearchPage" Grid.Column="1" IsVisible="False">

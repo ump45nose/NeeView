@@ -12,10 +12,12 @@
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Avalonia.Skia" />
     <PackageReference Include="Magick.NET-Q8-AnyCPU" />
+    <PackageReference Include="Jint" />
     <PackageReference Include="MetadataExtractor" />
     <PackageReference Include="SharpCompress" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="../../src/NeeView.Backends/Script/**/*.cs" Link="Script/%(Filename)%(Extension)" />
     <Compile Include="../../src/NeeView.Backends/Content/**/*.cs" Link="Content/%(Filename)%(Extension)" />
     <Compile Include="../../src/NeeView.Backends/FileSystem/**/*.cs" Link="FileSystem/%(Filename)%(Extension)" />
     <Compile Include="../../src/NeeView.Backends/Imaging/**/*.cs" Link="Imaging/%(Filename)%(Extension)" />

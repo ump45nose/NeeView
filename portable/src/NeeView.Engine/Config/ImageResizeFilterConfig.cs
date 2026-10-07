@@ -26,7 +26,7 @@ public sealed class ImageResizeFilterConfig : ObservableObject
         }
     }
     private void MaskChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs args) => OnPropertyChanged(nameof(UnsharpMask));
-    [JsonExtensionData] public Dictionary<string, JsonElement>? ExtensionData { get; set; }
+    [JsonExtensionData] [PropertyMapIgnore] public Dictionary<string, JsonElement>? ExtensionData { get; set; }
     /// <summary>后台工作只消费当前值快照；沿原byte阈值转换，不按表单范围改写导入值。</summary>
     public ImageResizeFilterParameters? CreateParameters() => IsEnabled ? new(ResizeInterpolation, IsUnsharpMaskEnabled, UnsharpMask.Amount, UnsharpMask.Radius, unchecked((byte)UnsharpMask.Threshold)) : null;
 }

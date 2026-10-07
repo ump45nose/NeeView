@@ -248,5 +248,27 @@
     ],
     "source_tag_commit": "66b975558d9199cd3eb49093261a61deb30f8c06",
     "repository_commit": null
+  },
+  "jint/4.9.3": {
+    "repository_commit": "82d0cf4ed97af2294605aa4f384643a77f0948f1",
+    "files": [
+      {
+        "path": "licenses/upstream/jint/LICENSE.txt",
+        "upstream_path": "LICENSE.txt",
+        "url": "https://github.com/sebastienros/jint/blob/82d0cf4ed97af2294605aa4f384643a77f0948f1/LICENSE.txt",
+        "sha256": "7fd0f56c1bc3ac00b50e44fc9b93eeeaeb6905b62a272eb310590b68d4a5c3ff"
+      }
+    ]
+  },
+  "acornima/1.6.2": {
+    "repository_commit": "93b19e4e2ce0bd2c0fdca9deb92b39d1f5d9f53b",
+    "files": [
+      {
+        "path": "licenses/upstream/acornima/LICENSE",
+        "upstream_path": "LICENSE",
+        "url": "https://github.com/adams85/acornima/blob/93b19e4e2ce0bd2c0fdca9deb92b39d1f5d9f53b/LICENSE",
+        "sha256": "4182d3e7ce42f69b01f35c6ed27d075d26794a3c2f0b0182aa475be6ca565bab"
+      }
+    ]
   }
 }

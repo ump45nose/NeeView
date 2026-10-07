@@ -11,5 +11,5 @@ public sealed class UnsharpMaskConfig : ObservableObject
     public int Amount { get => _amount; set => SetProperty(ref _amount, value); }
     public double Radius { get => _radius; set => SetProperty(ref _radius, Math.Round(value, 5)); }
     public int Threshold { get => _threshold; set => SetProperty(ref _threshold, value); }
-    [JsonExtensionData] public Dictionary<string, JsonElement>? ExtensionData { get; set; }
+    [JsonExtensionData] [PropertyMapIgnore] public Dictionary<string, JsonElement>? ExtensionData { get; set; }
 }

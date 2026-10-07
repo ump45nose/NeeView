@@ -33,6 +33,8 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     public bool IsLoading { get; private set; }
     public string? Error { get; private set; }
     public event EventHandler? Changed;
+    /// <summary>成功提交真实非空书籍；渐进索引追加和失败打开不触发。</summary>
+    public event EventHandler<BookLoadedEventArgs>? BookLoaded;
     /// <summary>界面替换原PasswordDialog；只用于明确阅读打开，不交给封面/后台清理。</summary>
     public Func<ArchiveKeyRequest, CancellationToken, Task<string?>>? RequestArchiveKeyAsync { get; set; }
 
@@ -67,7 +69,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>共享原加载链；历史重放可指定条目并保留访问顺序，返回是否实际提交新书。</summary>
     /// <param name="startupMemento">原 FirstLoader 的显式启动快照，优先于历史和字段恢复策略。</param>
     /// <param name="pageSearchKeyword">同书文件结果重载保留原临时搜索；普通切书仍使用默认空查询。</param>
-    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, Playlist? expectedPlaylist = null, int? terminalDirection = null, string? pageSearchKeyword = null, IReadOnlyList<string>? openPaths = null, long? expectedGeneration = null)
+    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, Playlist? expectedPlaylist = null, int? terminalDirection = null, string? pageSearchKeyword = null, IReadOnlyList<string>? openPaths = null, long? expectedGeneration = null, bool renamed = false)
     {
         ObjectDisposedException.ThrowIf(_disposed || _closing, this);
         // 设置重收集不能抢占在导航锁释放后发起的新打开；原普通打开仍按新代次优先。
@@ -160,6 +162,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                 ScheduleSave(); Notify();
             }
             finally { _gate.Release(); }
+            if (book.Pages.Count > 0 && generation == _generation && ReferenceEquals(book, Book)) BookLoaded?.Invoke(this, new(book, renamed));
             // 首批已经可阅读，后续批次仍由本打开调用观察，切书/卸载沿原generation取消。
             while (await batches.MoveNextAsync())
                 if (!await AppendIndexBatchAsync(book, batches.Current, generation, opening.Token)) return committed;

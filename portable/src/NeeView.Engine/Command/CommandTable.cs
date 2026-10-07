@@ -10,7 +10,10 @@ public sealed record CommandDefinition(string Name, string Text, string Shortcut
 public sealed class CommandTable
 {
     private readonly Dictionary<string, Func<Task>> _actions = [];
-    public IReadOnlyList<CommandDefinition> Definitions { get; }
+    private IReadOnlyList<CommandDefinition> _definitions;
+    private readonly IReadOnlyList<CommandDefinition> _originalDefinitions;
+    public IReadOnlyList<CommandDefinition> Definitions => _definitions;
+    public event EventHandler? DefinitionsChanged;
     /// <summary>原书架排序命令；执行、来源资格与菜单勾选共用。</summary>
     public static IReadOnlyDictionary<string, FolderOrder> BookOrderCommands { get; } = new Dictionary<string, FolderOrder>
     {
@@ -26,7 +29,8 @@ public sealed class CommandTable
     public CommandTable(BookOperation operation)
     {
         using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("NeeView.Command.command-manifest.json")!;
-        Definitions = JsonSerializer.Deserialize<List<CommandDefinition>>(stream)!;
+        _originalDefinitions = JsonSerializer.Deserialize<List<CommandDefinition>>(stream)!;
+        _definitions = _originalDefinitions;
         _actions["SetEffectProfile"] = () => operation.SetEffectProfileCommandAsync();
         _actions["NextEffectProfile"] = () => operation.MoveEffectProfileAsync(1);
         _actions["PrevEffectProfile"] = () => operation.MoveEffectProfileAsync(-1);
@@ -121,4 +125,13 @@ public sealed class CommandTable
     public bool IsAvailable(string name) => _actions.ContainsKey(name);
     /// <summary>异步执行已登记命令，未知或未迁移命令返回能力错误。</summary>
     public Task ExecuteAsync(string name) => _actions.TryGetValue(name, out var action) ? action() : throw new NotSupportedException($"命令 {name} 尚未迁移。");
+    /// <summary>在装配的UI线程提交原Script_命令快照；删除脚本只移除执行器，保留JSON差分。</summary>
+    public void SetScriptCommands(IReadOnlyList<ScriptCommandSource> sources, Func<ScriptCommandSource, Task> execute)
+    {
+        foreach (var name in _actions.Keys.Where(k => k.StartsWith("Script_", StringComparison.Ordinal)).ToArray()) _actions.Remove(name);
+        foreach (var source in sources) _actions["Script_" + source.Name] = () => execute(source);
+        _definitions = _originalDefinitions.Concat(sources.Select(s => new CommandDefinition("Script_" + s.Name, s.Text, s.ShortCutKey,
+            s.Path, "P5", MouseGesture: s.MouseGesture, TouchGesture: s.TouchGesture))).ToArray();
+        DefinitionsChanged?.Invoke(this, EventArgs.Empty);
+    }
 }

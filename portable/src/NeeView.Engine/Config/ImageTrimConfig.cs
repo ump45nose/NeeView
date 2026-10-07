@@ -16,5 +16,5 @@ public sealed class ImageTrimConfig : ObservableObject
         if (!SetProperty(ref field, Math.Round(MathUtility.Clamp(value, 0, MaxRate), 5), name)) return;
         if (field + opposite > MaxRate) { opposite = Math.Round(MaxRate - field, 5); OnPropertyChanged(oppositeName); }
     }
-    [System.Text.Json.Serialization.JsonExtensionData] public Dictionary<string, System.Text.Json.JsonElement>? ExtensionData { get; set; }
+    [System.Text.Json.Serialization.JsonExtensionData] [PropertyMapIgnore] public Dictionary<string, System.Text.Json.JsonElement>? ExtensionData { get; set; }
 }

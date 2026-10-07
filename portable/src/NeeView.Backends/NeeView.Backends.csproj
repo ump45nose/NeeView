@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="../NeeView.Engine/NeeView.Engine.csproj" />
     <PackageReference Include="Magick.NET-Q8-AnyCPU" />
+    <PackageReference Include="Jint" />
     <PackageReference Include="MetadataExtractor" />
     <PackageReference Include="SharpCompress" />
   </ItemGroup>

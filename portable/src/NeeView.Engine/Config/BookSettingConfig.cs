@@ -38,7 +38,7 @@ namespace NeeView
         // ページ
         [JsonIgnore]
 
-        public string Page
+        [PropertyMapIgnore] public string Page
         {
             get { return _page; }
             set { SetProperty(ref _page, value); }

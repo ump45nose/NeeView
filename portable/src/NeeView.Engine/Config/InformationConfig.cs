@@ -52,7 +52,7 @@ namespace NeeView
         }
 
         [JsonPropertyName(nameof(DateTimeFormat))]
-        public string? DateTimeFormatRaw
+        [PropertyMapIgnore] public string? DateTimeFormatRaw
         {
             get { return _dateTimeFormat; }
             set { _dateTimeFormat = value; }
@@ -66,7 +66,7 @@ namespace NeeView
         }
 
         [JsonPropertyName(nameof(MapProgramFormat))]
-        public string? MapProgramFormatRaw
+        [PropertyMapIgnore] public string? MapProgramFormatRaw
         {
             get { return _mapProgramFormat; }
             set { _mapProgramFormat = value; }
@@ -123,9 +123,9 @@ namespace NeeView
         #region HiddenParameters
 
         [JsonIgnore]
-        public ReadOnlyDictionary<InformationGroup, bool> GroupVisibilityMap => new(_groupVisibilityMap);
+        [PropertyMapIgnore] public ReadOnlyDictionary<InformationGroup, bool> GroupVisibilityMap => new(_groupVisibilityMap);
 
-        public string PropertyHeaderWidth
+        [PropertyMapIgnore] public string PropertyHeaderWidth
         {
             get { return _propertyHeaderWidth; }
             set { SetProperty(ref _propertyHeaderWidth, value); }

@@ -95,7 +95,7 @@ public sealed partial class BookOperation
                     // 来源已释放，不回用旧Archive；原Resume恢复设置与条目，Part仍按原首半页恢复。
                     memory.Path = renamed ? plan.Destination : plan.Target.Path;
                     await OpenCoreAsync(memory.Path, CancellationToken.None, entryName: string.IsNullOrEmpty(memory.Page) ? null : memory.Page,
-                        keepHistoryOrder: true, startupMemento: memory, pageSearchKeyword: search);
+                        keepHistoryOrder: true, startupMemento: memory, pageSearchKeyword: search, renamed: renamed);
                     if (Book?.Path != memory.Path) failure = (failure is null ? "书籍来源已关闭，重新打开失败：" : failure + "\n重新打开失败：") + Error;
                     else if (_bookshelf?.Place is { } place)
                     {

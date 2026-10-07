@@ -16,11 +16,17 @@ public sealed partial class MainWindow
         _helpDocuments ??= new(_platform);
         try
         {
-            var kind = command == "HelpMainMenu" ? HelpDocumentKind.MainMenu : HelpDocumentKind.SearchOptions;
+            var kind = command switch { "HelpMainMenu" => HelpDocumentKind.MainMenu, "HelpSearchOption" => HelpDocumentKind.SearchOptions,
+                "HelpScript" => HelpDocumentKind.Script, _ => throw new ArgumentException("未知帮助命令。", nameof(command)) };
             var definitions = _model.Commands.Definitions;
             var migrated = definitions.Where(d => IsCommandImplemented(d.Name)).Select(d => d.Name).ToHashSet(StringComparer.Ordinal);
-            var html = await Task.Run(() => kind == HelpDocumentKind.MainMenu ? MainMenuManual.CreateMainMenuManual(definitions, migrated.Contains)
-                : SearchOptionManual.CreateSearchOptionManual(), cancel.Token);
+            var config = kind == HelpDocumentKind.Script ? new ConfigMap(Config.Current) : null;
+            var html = await Task.Run(() => kind switch
+            {
+                HelpDocumentKind.MainMenu => MainMenuManual.CreateMainMenuManual(definitions, migrated.Contains),
+                HelpDocumentKind.Script => ScriptReferenceDocument.Create(config!, _model.Commands, typeof(ViewModels.ScriptApplicationHost)),
+                _ => SearchOptionManual.CreateSearchOptionManual()
+            }, cancel.Token);
             cancel.Token.ThrowIfCancellationRequested();
             await _helpDocuments.OpenAsync(kind, html, cancel.Token);
         }

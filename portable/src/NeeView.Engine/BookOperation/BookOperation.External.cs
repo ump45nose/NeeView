@@ -16,9 +16,9 @@ public sealed partial class BookOperation
     /// <summary>切书/关窗只取消尚未提交准备，系统提交后保持材料所有权。</summary>
     public void CancelExternalApplicationPreparation() { lock (_externalSync) _externalPending?.Cancel(); }
     /// <summary>原页组选择或Book.Path条目；与实体写权限无关，瀑布要求明确操作对象。</summary>
-    public bool CanOpenExternalApplication(MultiPagePolicy policy, bool book = false) => Enum.IsDefined(policy) && _externalPlatform is not null && !_disposed && !_closing && !IsLoading && !IsOpeningExternalApplication
+    public bool CanOpenExternalApplication(MultiPagePolicy policy, bool book = false, IReadOnlyList<Page>? explicitPages = null) => Enum.IsDefined(policy) && _externalPlatform is not null && !_disposed && !_closing && !IsLoading && !IsOpeningExternalApplication
         && !IsUsingClipboard && !IsRenamingBook && !IsTransferringBook && !IsDeletingFile && _destinationMoves?.IsBusy != true && Book?.IsIndexing == false
-        && (book ? !Book.Source.IsDisposed : CollectFileActionPages(policy).Count > 0);
+        && (book ? !Book.Source.IsDisposed : explicitPages is null ? CollectFileActionPages(policy).Count > 0 : explicitPages.Count > 0 && explicitPages.All(p => Book.Pages.SourcePages.Contains(p)));
     /// <summary>读取唯一差分JSON的一开始应用索引；零保留原选择菜单语义。</summary>
     public int GetExternalApplicationIndex(string name) => name switch
     {
@@ -48,19 +48,22 @@ public sealed partial class BookOperation
     }
     /// <summary>捕获配置与原页组，串行实体化/提交；失败保持阅读、索引与移动历史。</summary>
     /// <param name="options">原配置应用或直接命令参数。</param><param name="policy">当前页组收集顺序。</param><param name="book">整书沿原系统归档复制策略。</param><param name="token">准备/提交前取消。</param>
-    public async Task OpenExternalApplicationAsync(IExternalApp options, MultiPagePolicy policy = MultiPagePolicy.Once, bool book = false, CancellationToken token = default)
+    public async Task OpenExternalApplicationAsync(IExternalApp options, MultiPagePolicy policy = MultiPagePolicy.Once, bool book = false, CancellationToken token = default,
+        IReadOnlyList<Page>? explicitPages = null, bool throwOnError = false)
     {
         CancellationTokenSource pending; TaskCompletionSource completion;
         lock (_externalSync)
         {
-            if (!CanOpenExternalApplication(policy, book)) return;
+            if (!CanOpenExternalApplication(policy, book, explicitPages))
+            { if (throwOnError) throw new InvalidOperationException("当前不能执行外部应用操作。"); return; }
+            if (explicitPages is not null && explicitPages.Any(p => !Book!.Pages.SourcePages.Contains(p))) throw new InvalidOperationException("脚本页面不属于当前可用来源。");
             pending = CancellationTokenSource.CreateLinkedTokenSource(token, _externalClosing.Token);
             completion = new(TaskCreationOptions.RunContinuationsAsynchronously); _externalPending = pending; _externalCompletion = completion;
             Volatile.Write(ref _externalBusy, 1);
         }
         var generation = _generation; var sourceBook = Book!;
         var captured = new ExternalApp { Command = options.Command, Parameter = options.Parameter, ArchivePolicy = options.ArchivePolicy, WorkingDirectory = options.WorkingDirectory };
-        var entries = book ? [sourceBook.Source.CreateBookEntry()] : CollectFileActionPages(policy).Select(page => page.ArchiveEntry).ToArray();
+        var entries = book ? [sourceBook.Source.CreateBookEntry()] : (explicitPages ?? CollectFileActionPages(policy)).Select(page => page.ArchiveEntry).ToArray();
         var archivePolicy = book ? Config.Current.System.ArchiveCopyPolicy.LimitedRealization() : captured.ArchivePolicy;
         RealizedFilePathList? files = null; bool entered = false, submitted = false;
         try
@@ -80,8 +83,8 @@ public sealed partial class BookOperation
             }
             if (!_closing && generation == _generation) Error = files.CapabilityWarning;
         }
-        catch (OperationCanceledException) { }
-        catch (Exception ex) { if (!_closing && generation == _generation) Error = "外部应用打开失败：" + ex.Message; }
+        catch (OperationCanceledException) { if (throwOnError) throw; }
+        catch (Exception ex) { if (!_closing && generation == _generation) Error = "外部应用打开失败：" + ex.Message; if (throwOnError) throw; }
         finally
         {
             try
@@ -99,6 +102,44 @@ public sealed partial class BookOperation
                 lock (_externalSync) { _externalPending = null; pending.Dispose(); Volatile.Write(ref _externalBusy, 0); }
                 try { Notify(); } finally { completion.TrySetResult(); }
             }
+        }
+    }
+
+    /// <summary>原脚本Execute(paths)：全是当前页面时按归档策略实体化，否则字面路径直接提交系统。</summary>
+    public async Task OpenScriptExternalApplicationAsync(IExternalApp options, IReadOnlyList<string> paths, CancellationToken token)
+    {
+        var pages = paths.Select(path => Book?.Pages.SourcePages.FirstOrDefault(p => p.EntryFullName == path || p.ArchiveEntry.TargetArchiveEntry.SystemPath == path)).ToArray();
+        if (pages.All(p => p is not null) && Book is not null)
+        { await OpenExternalApplicationAsync(options, token: token, explicitPages: pages.OfType<Page>().ToArray(), throwOnError: true); return; }
+        var platform = _externalPlatform ?? throw new NotSupportedException("外部应用后端未装配。");
+        CancellationTokenSource pending; TaskCompletionSource completion;
+        lock (_externalSync)
+        {
+            ObjectDisposedException.ThrowIf(_disposed || _closing, this);
+            if (IsOpeningExternalApplication || IsTransferringBook || IsDeletingFile || IsRenamingBook || IsUsingClipboard || _destinationMoves?.IsBusy == true)
+                throw new InvalidOperationException("文件操作正在进行。");
+            pending = CancellationTokenSource.CreateLinkedTokenSource(token, _externalClosing.Token);
+            completion = new(TaskCreationOptions.RunContinuationsAsynchronously); _externalPending = pending; _externalCompletion = completion;
+            Volatile.Write(ref _externalBusy, 1);
+        }
+        var captured = new ExternalApp { Command = options.Command, Parameter = options.Parameter, WorkingDirectory = options.WorkingDirectory, ArchivePolicy = options.ArchivePolicy };
+        var inputs = paths.ToArray(); bool entered = false;
+        try
+        {
+            Notify(); await _gate.WaitAsync(pending.Token); entered = true;
+            ObjectDisposedException.ThrowIf(_disposed || _closing, this);
+            if (ExternalAppUtility.RequiresSave(captured)) await SaveAsync();
+            foreach (var path in inputs)
+            {
+                pending.Token.ThrowIfCancellationRequested();
+                await platform.OpenExternalApplicationAsync(ExternalAppUtility.CreateLaunchRequest(captured, path, _externalExecutablePath), pending.Token);
+            }
+        }
+        finally
+        {
+            if (entered) _gate.Release();
+            lock (_externalSync) { _externalPending = null; pending.Dispose(); Volatile.Write(ref _externalBusy, 0); }
+            try { Notify(); } finally { completion.TrySetResult(); }
         }
     }
 }

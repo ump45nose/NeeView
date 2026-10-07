@@ -13,6 +13,8 @@ namespace NeeView.MacOS;
 public sealed partial class MacApp : Avalonia.Application
 {
     public static string[] InitialPaths { get; set; } = [];
+    public static ScriptLaunchRequest? InitialScript { get; set; }
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, object?> _scriptValues = new();
     private MainWindow? _window;
     private bool _shuttingDown, _quitWaiting;
     private Task? _profileImportTask;
@@ -90,7 +92,8 @@ public sealed partial class MacApp : Avalonia.Application
         await OpenWindowAsync(false);
         if (_window is null || _shuttingDown) return;
         if (InitialPaths.Length > 0) await _window.OpenFilesAsync(InitialPaths);
-        else if (!_explicitOpen) await _window.RestoreLastAsync();
+        else if (!_explicitOpen && Config.Current.StartUp.IsOpenLastBook) await _window.RestoreLastAsync();
+        if (!_shuttingDown) await _window.RunStartupScriptsAsync(InitialScript);
         if (!_shuttingDown && Config.Current.StartUp.IsAutoPlaySlideShow) _window?.StartSlideShow();
     }
     /// <summary>重用进行中的初始化，单窗口入口不增加第二个 Host。</summary>
@@ -129,6 +132,8 @@ public sealed partial class MacApp : Avalonia.Application
             var platform = new MacPlatformService();
             operation.AttachExternalApplications(platform, Environment.ProcessPath ?? "");
             candidate = new MainWindow(); _window = candidate; candidate.Bind(model, images, platform);
+            await candidate.AttachScriptsAsync(new JintScriptRuntimeFactory(), (file, arguments) =>
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(file) { Arguments = arguments ?? "", UseShellExecute = true }), _scriptValues);
             candidate.AttachImageClipboard(new MacImageClipboard());
             candidate.AttachFonts(new FontPresenter(this, Config.Current.Fonts, MacFontEnvironment.Read(Avalonia.Media.FontManager.Current.DefaultFontFamily.Name)));
             var theme = new ThemePresenter(this, Config.Current.Theme); candidate.AttachTheme(theme);
@@ -139,7 +144,9 @@ public sealed partial class MacApp : Avalonia.Application
             var boundWindow = _window;
             boundWindow.Closed += (_, _) => { if (ReferenceEquals(_window, boundWindow)) _window = null; };
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) desktop.MainWindow = _window;
-            _window.Show(); RuntimeDiagnostics.Attach(_window, images); if (restore) await _window.RestoreLastAsync();
+            _window.Show(); RuntimeDiagnostics.Attach(_window, images);
+            // Keep LastBook intact while honoring the user's startup preference; explicit paths are opened by StartAsync.
+            if (restore && Config.Current.StartUp.IsOpenLastBook) await _window.RestoreLastAsync();
             _window.ReportFileRecovery(recovery);
         }
         catch (Exception ex)

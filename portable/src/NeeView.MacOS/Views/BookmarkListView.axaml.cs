@@ -12,6 +12,7 @@ namespace NeeView.MacOS.Views;
 public sealed partial class BookmarkListView : UserControl, IDisposable
 {
     private BookmarkListViewModel? _model;
+    internal BookmarkListViewModel? ScriptModel => _model;
     private bool _refreshing, _disposed, _busy;
     private bool _closing;
     private readonly HashSet<Task> _actions = [];
