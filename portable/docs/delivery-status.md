@@ -8,7 +8,7 @@ P0–P5 已完成当前约定的功能开发与兼容收尾：三项目、原阅
 
 最新完整开发回归为 1863 项自动测试通过、0 失败，48 项 macOS 原生测试和 15 项打包脚本测试通过。完整套件中 12 个显式资源项未启用，另选三个实图目录完成全部 12 个资源用例，源图片保持只读。正式 Debug 构建/签名、Release 自包含开发包及原包/解包后的实际文件 worker 均通过；见 [最终收尾记录](../acceptance/p5-final-closure.md)。
 
-正式宿主保留原 235 个命令登记，232 个入口、3 个明确禁用占位；入口数量不表示完整功能覆盖率。最新开发包为 `portable/artifacts/NeeView.app` / `NeeView.zip`，产品源码对应 `aced727170f152d2d4b69506f46d4b02e00dbeed`，采用 ad-hoc 签名。18 个 ARM64 原生文件、25 个 NuGet 依赖/3 个运行时包许可和 ZIP 重定位均已校验；未安装至 Applications，未正式发布。
+正式宿主保留原 235 个命令登记，232 个入口、3 个明确禁用占位；入口数量不表示完整功能覆盖率。最新开发包为 `portable/artifacts/NeeView.app` / `NeeView.zip`，产品源码对应 `48fa6fb13dcee589ccfd1765aaf73511473af74e`，采用 ad-hoc 签名。已增加原 NeeView 多尺寸应用图标，正式 Release 构建、20 项打包回归、系统后台图标查询及 ZIP 重定位后的资源/运行入口均通过，见[本批记录](../acceptance/p5-app-icon-runtime.md)。18 个 ARM64 原生文件、25 个 NuGet 依赖/3 个运行时包许可继续校验；未安装至 Applications，未正式发布。
 
 ## 当前交付验收
 

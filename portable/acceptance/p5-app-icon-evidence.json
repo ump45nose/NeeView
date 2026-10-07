@@ -1,0 +1,157 @@
+{
+  "date": "2026-10-07",
+  "product_commit": "48fa6fb13dcee589ccfd1765aaf73511473af74e",
+  "source": {
+    "file": "MakePackage/Appx/Icons/Sources/AppList.targetsize-256.svg",
+    "sha256": "699ae2e164b55e1afc2f44a9bf8086e3b9a3a405bf46eb638c20bd444a1e237f",
+    "fixed_baseline_unchanged": true,
+    "license": "repository MIT"
+  },
+  "icon": {
+    "file": "Contents/Resources/AppIcon.icns",
+    "sha256": "3e51ef114e9cb289a47e06d41a61f347edc774450a5d98afa85fc22da81e4620",
+    "representations": [
+      "ic12",
+      "ic07",
+      "ic13",
+      "ic08",
+      "ic04",
+      "ic14",
+      "ic09",
+      "ic05",
+      "ic10",
+      "ic11",
+      "info"
+    ]
+  },
+  "validation": {
+    "package_tests_passed": 20,
+    "package_tests_failed": 0,
+    "serial_release_build": "passed",
+    "build_warning": "existing command-line RID override",
+    "sdk_bundle_icon_fingerprint": "passed",
+    "native_decoded_representations": [
+      {
+        "center_alpha": 1,
+        "corner_alpha": 0,
+        "file": "icon_128x128.png",
+        "has_alpha": true,
+        "height": 128,
+        "width": 128
+      },
+      {
+        "center_alpha": 1,
+        "corner_alpha": 0,
+        "file": "icon_128x128@2x.png",
+        "has_alpha": true,
+        "height": 256,
+        "width": 256
+      },
+      {
+        "center_alpha": 1,
+        "corner_alpha": 0,
+        "file": "icon_16x16.png",
+        "has_alpha": true,
+        "height": 16,
+        "width": 16
+      },
+      {
+        "center_alpha": 1,
+        "corner_alpha": 0,
+        "file": "icon_16x16@2x.png",
+        "has_alpha": true,
+        "height": 32,
+        "width": 32
+      },
+      {
+        "center_alpha": 1,
+        "corner_alpha": 0,
+        "file": "icon_256x256.png",
+        "has_alpha": true,
+        "height": 256,
+        "width": 256
+      },
+      {
+        "center_alpha": 1,
+        "corner_alpha": 0,
+        "file": "icon_256x256@2x.png",
+        "has_alpha": true,
+        "height": 512,
+        "width": 512
+      },
+      {
+        "center_alpha": 1,
+        "corner_alpha": 0,
+        "file": "icon_32x32.png",
+        "has_alpha": true,
+        "height": 32,
+        "width": 32
+      },
+      {
+        "center_alpha": 1,
+        "corner_alpha": 0,
+        "file": "icon_32x32@2x.png",
+        "has_alpha": true,
+        "height": 64,
+        "width": 64
+      },
+      {
+        "center_alpha": 1,
+        "corner_alpha": 0,
+        "file": "icon_512x512.png",
+        "has_alpha": true,
+        "height": 512,
+        "width": 512
+      },
+      {
+        "center_alpha": 1,
+        "corner_alpha": 0,
+        "file": "icon_512x512@2x.png",
+        "has_alpha": true,
+        "height": 1024,
+        "width": 1024
+      }
+    ],
+    "background_system_bundle_icon": {
+      "api": "NSWorkspace.icon(forFile:)",
+      "center_rgb": [
+        0.9490196078431372,
+        0.35294117647058826,
+        0.24705882352941178
+      ],
+      "foreground_activated": false,
+      "height": 512,
+      "width": 512
+    }
+  },
+  "package": {
+    "architecture": "osx-arm64",
+    "self_contained": true,
+    "signing": "ad-hoc development",
+    "notarized": false,
+    "archive_sha256": "a3713dde3cc1b4d1f16a812cd1d45c7903ace337b5f534479be2aa98e924e6d4",
+    "zip_relocated_app_icon": "passed",
+    "zip_relocation_and_signature": "passed",
+    "file_worker_runtime": "passed",
+    "zip_relocated_file_worker_runtime": "passed",
+    "interactive_installation": "not executed",
+    "gatekeeper": "not executed"
+  },
+  "source_matches_package_commit": true,
+  "private_evidence_sha256": {
+    "package-tests.log": "ce233cc13ac25d3e5b32c7a7d48506a23c3a10c56c9040c4d27a49c16bbdcf7d",
+    "release-build.log": "076e2851cde2e5f3a8ee4113b015d5449ee0ed25970397b6ab0c762c19ccbb94",
+    "package.log": "bbb46916f09f7c29b4aec6cff3d324351b54690724a3344456ed5864754312d2",
+    "sdk-icon.json": "53e7dc6b4d2b9758d887edf6aeeae8b35bd84c785f345eba6467d47b99b3c261",
+    "icon-imageio.json": "21b2252bb822945829cd97cc4cdf23be4441d470811fee14b5237dcd84fb8041",
+    "system-app-icon.json": "f685213c347eed00eec5b7613fc64e9dd630e940cf911118c95ea6264af0a46d",
+    "system-app-icon.png": "24d90e05af3422d8780292b4921a9d24914e0c6670519356b193396b714f4fa4",
+    "package-receipt.json": "8cf0df32bba05c338567dd94cd544398230ffa8353a47e3cd41c38689653e30a"
+  },
+  "boundaries": [
+    "Finder/Dock foreground interaction not executed; native NSWorkspace icon lookup verified without activation",
+    "Developer ID and notarization remain deferred",
+    "Previous business/device acceptance scope retained; this batch verifies icon and packaging changes",
+    "Existing unrelated acceptance files remain outside these commits"
+  ]
+}
