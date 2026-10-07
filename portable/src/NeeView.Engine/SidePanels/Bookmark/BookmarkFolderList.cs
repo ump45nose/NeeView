@@ -177,6 +177,9 @@ public sealed class BookmarkFolderList : IDisposable
         catch (OperationCanceledException) when (request.IsCancellationRequested) { return false; }
         finally { if (ReferenceEquals(_metadataRequest, request)) _metadataRequest = null; request.Dispose(); }
     }
+    /// <summary>读取后台已补齐的真实文件元数据；书签登记时间不冒充文件创建时间。</summary>
+    public FolderItem? GetMetadata(BookmarkNode node) => node.IsFolder ? null : _metadata.GetValueOrDefault(node).Item;
+
     /// <summary>显式刷新重新探测来源；纯选择/排序继续复用已知元数据。</summary>
     public void InvalidateMetadata() { _metadataRevision++; _metadataRequest?.Cancel(); _metadata.Clear(); }
 

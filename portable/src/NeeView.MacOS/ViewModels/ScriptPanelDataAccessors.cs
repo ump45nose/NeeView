@@ -119,16 +119,41 @@ public sealed class PlaylistItemAccessor(ScriptAccessContext context, PlaylistIt
 }
 public sealed class BookshelfItemAccessor(ScriptAccessContext context, FolderItem item)
 {
-    public string Name => context.Read(() => item.Name);
-    public string Path => context.Read(() => item.Path);
-    public long Size => context.Read(() => item.Length);
-    public DateTime LastWriteTime => context.Read(() => item.LastWriteTime);
-    public void Open() => context.Run(() => context.Operation.OpenAsync(item.Path, context.Token));
+    private FolderItem _item = item;
+    public string Name { get => context.Read(() => _item.Name); set => context.Run(async () => _item = await context.Operation.RenameFolderItemAsync(_item, value, context.Token)); }
+    public string Path => context.Read(() => _item.Path);
+    public long Size => context.Read(() => _item.Length);
+    public DateTime LastWriteTime => context.Read(() => _item.LastWriteTime);
+    public DateTime CreationTime => context.Read(() => _item.CreationTime);
+    public void Open() => context.Run(() => context.Operation.OpenAsync(_item.Path, context.Token));
+    public void Open(bool isRecursive) => context.Run(() => context.Operation.OpenAsync(_item.Path, isRecursive, context.Token));
 }
 public sealed class BookmarkItemAccessor(ScriptAccessContext context, BookmarkListViewModel model, BookmarkNode node)
 {
     internal BookmarkNode Source => node;
     public string Name { get => context.Read(() => node.DisplayName); set => context.Run(() => context.State.RenameBookmarkAsync(node, value)); }
+    private FolderItem? _metadata;
+    private string? _metadataPath;
+    private bool _metadataRead;
+    private FolderItem? Metadata
+    {
+        get
+        {
+            var path = context.Read(() => node.IsFolder ? null : node.Path);
+            if (path is null) return null;
+            if (!_metadataRead || path != _metadataPath)
+            {
+                _metadata = context.Read(() => model.List.GetMetadata(node));
+                if (_metadata is null) context.Run(async () => _metadata = await context.Operation.GetFileMetadataAsync(path, context.Token));
+                _metadataPath = path; _metadataRead = true;
+            }
+            return _metadata;
+        }
+    }
+    public DateTime CreationTime => Metadata?.CreationTime ?? default;
+    public DateTime LastWriteTime => context.Read(() => node.IsFolder) ? context.Read(() => node.EntryTime) : Metadata?.LastWriteTime ?? default;
+    public long Size => Metadata?.Length ?? -1;
     public string Path => context.Read(() => model.List.GetTargetPath(node));
     public void Open() => context.Run(async () => { if (node.IsFolder) { model.List.SetPlace(node); model.Refresh(true); } else if (node.Path is { } path) await context.Operation.OpenAsync(path, context.Token); });
+    public void Open(bool isRecursive) => context.Run(async () => { if (node.IsFolder) { model.List.SetPlace(node); model.Refresh(true); } else if (node.Path is { } path) await context.Operation.OpenAsync(path, isRecursive, context.Token); });
 }

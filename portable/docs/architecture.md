@@ -1,5 +1,7 @@
 # NeeView Mac 源码迁移架构
 
+P5第四十批：原打印/分页及AppKit输出、指针自动滚动/长按、FullDesktop/LastState、页面停留记录、真实脚本item及设置动作进入唯一产品链。开发收尾与设备/正式分发验收分开，见[收尾契约](p5-completion.md)。
+
 P5第三十九批：原中央唯一查看器浮动、页面列表借用/归还、宿主贴合、脚本窗口与原JSON配置接入；阅读器、图像工厂和原布局保持。见[中央浮窗契约](p5-mainview.md)。
 
 P5第三十八批：原 PropertyMap、Jint 脚本运行、动态命令/Patch、五事件、控制台/补全、真实面板/树及文件操作接入唯一产品链。中央查看器代理与主窗口分离，浮动能力由第三十九批装配；封面与启动恢复表单补齐。见[脚本契约](p5-script.md)。
@@ -82,7 +84,7 @@ Engine 使用 `net10.0`，引用原 MVVM 辅助库和既有 JSON/元数据类型
 
 [源码迁移清单](source-migration.json) 记录原文件、基线 SHA256、目标和改造。位置/范围、设置按字段恢复、自然排序、页框生成等算法直接迁入。`PageFrameFactory` 保留原判断顺序，几何计算只替换实际 WPF 值类型及旋转变换。
 
-Book/Page/Archive/BookOperation 是按阶段迁入的原关系适配；PDF、动图、视频及metadata/rating已按各批契约接入，脚本运行由第三十八批接入，原 item及其余高级控制继续迁移，独立中央浮窗由第三十九批接入。原页面/普通书架搜索已由P3接入。不能把“存在同名类型”当作整组功能已经迁完。新增替换点只有来源、像素、系统交互；不建立 WPF 模拟层、事件总线或插件框架。
+Book/Page/Archive/BookOperation 是按阶段迁入的原关系适配；PDF、动图、视频及metadata/rating已按各批契约接入，脚本运行由第三十八批接入，原item、打印及其余输入/窗口控制由第四十批接入，独立中央浮窗由第三十九批接入。原页面/普通书架搜索已由P3接入。不能把“存在同名类型”当作整组功能已经迁完。新增替换点只有来源、像素、系统交互；不建立 WPF 模拟层、事件总线或插件框架。
 
 原 `BookSourceFactory.ValidatePageSortMode` 对普通书籍排除播放列表注册顺序，P1 保留其回退到文件名排序的规则。自然比较器的 Win32 字符比较改为 .NET CurrentCulture；数值、全半角、日文归一逻辑保留，语言排序细节仍待 Windows 样本对照。
 
@@ -134,13 +136,13 @@ BookshelfFolderList管理普通递归搜索与单个活动目录根监视，普�
 
 第七批契约见 [底部页号与滑条设置](p2-slider-input.md)。独立 SliderTextBox 表现控件保留一起始转换、Enter/失焦及 Escape 提交，原始索引进入唯一 BookOperation.JumpAsync，不走双页滑块对齐；来源身份在原互斥中再次核对。滑条显示、SliderIndexLayout、厚度、透明度及滚轮写回原 JSON，纯外观保存不重建正文。主题资源修复15 DIP薄滑条裁切。原46.3页标记属于全局播放列表/Pagemark.nvpls，后续随原链路迁入，不新增每本书标记体系；当时完整自动隐藏/全局显隐为禁用占位，现由第九批接通。107项测试、正式构建与本地签名及真机重启/数据还原分别留证。
 
-[前端边界](frontend-boundaries.md)、[行为对照](behavior-baseline.md)、[完整命令表](command-migration.md)、[布局表](layout-migration.md)、[模块设计](modules/M01.md) 和 [阶段证据](../acceptance/stages.md) 是后续开发契约。P2/P3开发完成与整体验收分开；P4分类和基础文件操作开发范围已接入，集中设备验收待项独立记录；P5兼容/高级内容/发布仍是后续目标，未继承旧重写方案的“通过”。
+[前端边界](frontend-boundaries.md)、[行为对照](behavior-baseline.md)、[完整命令表](command-migration.md)、[布局表](layout-migration.md)、[模块设计](modules/M01.md) 和 [阶段证据](../acceptance/stages.md) 是后续开发契约。P2/P3开发完成与整体验收分开；P4分类和基础文件操作开发范围已接入，集中设备验收待项独立记录；P5兼容/高级内容及开发分发已按各批迁入；正式分发与设备验收独立，未继承旧重写方案的“通过”。
 
 优化只按测量热点独立修改并回归。代码删除必须说明 Windows 专属、不可达、重复或被替换的原因。构建串行、使用默认输出；不得通过 Preview 或改输出目录绕过 Xcode。本机Xcode27.0已满足构建要求；开发Host明确使用ad-hoc签名和JIT权限，最终.app在默认输出目录，RID子目录的.app只是SDK中间产物。构建及本地签名校验写入p1-validation.json；真机运行单独留证。编译、自动测试、运行、Windows 对照、用户验收、提交和发布分别报告。
 
 第八批契约见 [原播放列表与全局页标记](p2-playlist.md)。PlaylistHub沿原Default首项、真实文件自然顺序和选择关系，保留v1/v2、未知字段及别名省略规则；Mac编辑采用即时可等待的原子保存和原地回滚。BookPlaylist/BookPageMarker映射当前全局列表，书内标记和过滤/分组后的跨书列表导航独立，归档逻辑目标共用唯一加载链。主图片按原SelectedRange索引升序确定，未确认的PageSelector不改变登记对象。PlaylistView与表现模型独立，标记回报只更新绘制/菜单；未迁模板/文件管理/修复保持占位；PlaylistArchive来源由P4第七批接入。提交前指纹检查不提供跨进程互斥保证，完整监视后续迁入。最终121项测试、正式构建/本地签名及真机导航、编辑、列表重启和数据还原分别留证；源码迁移清单持续随阶段更新，数量不代表覆盖率，P2整体验收未封板。
 
-第九批契约见 [原窗口自动隐藏与显示控制](p2-autohide.md)。AutoHide/Window/MenuBar及原Panels/Slider字段沿用原JSON；早期Mac别名只读取，保存收归原字段。AutoHidePresenter独立管理五区的延迟、真实焦点/弹出层/捕获和一次显示锁，40ms背景计时不扫描页面。自动隐藏区域覆盖正文，弹出/收起不改变视口；原滑条与胶片条宿主联动及侧栏内容边角余量保留。已迁窗口显示命令接入，原生精确手势按实际控件命中排除覆盖层。常用输入与侧栏浮动/位置保存后续已接入；FullDesktop、主视图浮动及高级窗口细节保留占位，多屏/真实焦点待验。构建、自动回归、正式运行及用户验收分别记录。
+第九批契约见 [原窗口自动隐藏与显示控制](p2-autohide.md)。AutoHide/Window/MenuBar及原Panels/Slider字段沿用原JSON；早期Mac别名只读取，保存收归原字段。AutoHidePresenter独立管理五区的延迟、真实焦点/弹出层/捕获和一次显示锁，40ms背景计时不扫描页面。自动隐藏区域覆盖正文，弹出/收起不改变视口；原滑条与胶片条宿主联动及侧栏内容边角余量保留。已迁窗口显示命令接入，原生精确手势按实际控件命中排除覆盖层。常用输入与侧栏浮动/位置保存后续已接入；主视图浮动由P5第三十九批、FullDesktop由第四十批接入，多屏/真实焦点待验。构建、自动回归、正式运行及用户验收分别记录。
 
 第十批契约见[书签列表目录导航与排序](p2-bookmark-navigation.md)。BookmarkFolderList 共用原 BookmarkCollection/BookmarkNode；独立 BookmarkListViewModel/BookmarkListView 显示位置和有序子项，既有编辑树保留。书签事务专属回报避免阅读保存重复排序，编辑和加载继续进入原 SaveData/BookOperation。结构化搜索、来源元数据排序与书架 bookmark scheme 互联后续已接入；完整树布局继续占位。本批默认静默，正式窗口运行另行验收。
 

@@ -25,7 +25,13 @@ public sealed class PageHistory
     public void CommitMove(int direction) => _history.Move(Math.Sign(direction));
     /// <summary>替代原FileResolver对此明确改名的后退定位，不新增来源身份登记。</summary>
     public void RenameRecursive(string source, string destination) => _history.ReplaceValues(unit => unit with
-        { BookAddress = BookMementoTools.RenamePath(unit.BookAddress, source, destination) });
+        {
+            BookAddress = BookMementoTools.RenamePath(unit.BookAddress, source, destination),
+            PageName = BookMementoTools.RenamePath(unit.BookAddress, source, destination) == unit.BookAddress
+                && BookMementoTools.RenamePath(System.IO.Path.Combine(unit.BookAddress, unit.PageName), source, destination) is var next
+                && next != System.IO.Path.Combine(unit.BookAddress, unit.PageName)
+                ? System.IO.Path.GetRelativePath(unit.BookAddress, next) : unit.PageName
+        });
     /// <summary>保留原前进/后退菜单列表的索引和顺序。</summary>
     public IReadOnlyList<KeyValuePair<int, PageHistoryUnit>> GetHistory(int direction, int size) => _history.GetHistory(direction, size);
 }

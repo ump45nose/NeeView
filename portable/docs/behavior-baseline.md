@@ -1,5 +1,7 @@
 # 原版行为对照
 
+P5第四十批已补齐原打印、记录器、长按/自动滚动、实际FullDesktop与最近书籍菜单、脚本item及设置动作；出处、改造和最新验收见[p5-completion.md](p5-completion.md)。原235命令完整保留，232个执行入口与3个明确禁用占位见当前命令表，不将入口数或合成回归视为Windows动态一致性。后文早期批次状态按各项后续契约更新。
+
 基线 `c5c398d89`。已采集部分 Windows 安装包动态参考与 Mac 同夹具复演；Windows dirty 包未证明匹配固定源码，完整动态对照仍待执行。旧 Preview 的 56 项测试属于历史重写方案，不能作为本轮一致性证据。
 
 | 能力 | 原出处 | 迁移方式/状态 |
@@ -34,8 +36,8 @@
 | 历史/书签 | Bookamrk/BookmarkCollection.cs、BookMemento、HistoryCollection | 原 JSON 树字段/顺序保留；访问排序、共享状态、移动/递归合并/确认/颜色/删除恢复、目录导航/搜索/书架联动接入；Mac异步编辑宿主适配，修复及高级树布局继续占位 |
 | 历史列表导航/管理 | HistoryList、HistoryListViewModel、HistoryListBox、BookHistoryCollection | 原过滤后前后规则、KeepHistoryOrder/SkipSamePlace、日期/四开关、单或双击、批次移除和全部清空；结构化搜索/表达式历史、四模板、登记/保留策略及可靠无效清理已接入 |
 | 原五区自动隐藏与显示锁 | MainWindowModel/Controller/ViewModel、AutoHideBehavior、MainWindow.xaml.cs | 原资格、覆盖插槽、内容余量、滑条/胶片条联动、延迟/边缘/焦点/弹出层/捕获及显示锁；Mac焦点适配，见p2-autohide.md |
-| 全屏与置顶 | 原WindowConfig/窗口控制命令 | Mac实际WindowState/Topmost；全屏取消恢复上一普通/最大化状态，FullDesktop等占位 |
-| 旧Profile/nvzip | SaveData | 待 P5，完整旧迁移规则待迁入 |
+| 全屏与置顶 | 原WindowConfig/窗口控制命令 | Mac实际WindowState/Topmost；全屏取消恢复上一普通/最大化状态；FullDesktop与原LastState由P5第四十批接入，混合缩放多屏另验 |
+| 旧Profile/nvzip | SaveData | P5原版本升级、预览/路径映射及应用/备份/恢复接入；真实用户导出另验 |
 
 [235条命令迁移表](command-migration.md) 与源码 manifest 一致，每条单独标记状态，不用命令数量计算功能覆盖率。[源码迁入表](source-migration.json) 区分完整算法与P1子集。
 

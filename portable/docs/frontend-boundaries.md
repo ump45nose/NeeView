@@ -1,5 +1,7 @@
 # 前端独立调整边界
 
+P5第四十批：打印参数/预览结构在PrintWindow，原几何归Engine、系统纸张/输出归Backends；指针与窗口适配仅管理表现。设置后续动作返回SettingsAction，不保存第二套配置或新建导入链。见[收尾契约](p5-completion.md)。
+
 P5第三十九批：MainViewPresenter只移动唯一查看器及页面列表，MainViewWindow只管理宿主，原配置与阅读仍归Engine；主题/布局调整不创建新解码链。见[中央浮窗契约](p5-mainview.md)。
 
 P5第三十七批：FileInformationView保留当前页缩略选择、信息分组、列分隔/复制选择；FileInformationViewModel管理选择和加载代次，PageMetadataTools/后端管理字段及流。信息设置草稿沿既有事务；主题与模板不实现EXIF或搜索算法，见[元数据契约](p5-metadata.md)。

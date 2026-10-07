@@ -1,7 +1,7 @@
 namespace NeeView;
 
 /// <summary>原图像工厂的后端适配与字节缓存，显示资源由租约统一计入预算。</summary>
-public sealed partial class BitmapFactory(IImageDecoder decoder) : IDisposable
+public sealed partial class BitmapFactory(IImageDecoder decoder) : IDisposable, IAsyncDisposable
 {
     private sealed class Entry(DecodedImageLease image, bool thumbnail)
     {
@@ -29,6 +29,7 @@ public sealed partial class BitmapFactory(IImageDecoder decoder) : IDisposable
     private readonly SemaphoreSlim _decodeSlots = new(2);
     private readonly SemaphoreSlim _backgroundSlot = new(1);
     private readonly CancellationTokenSource _lifetime = new();
+    private readonly TaskCompletionSource _drained = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private bool _disposed;
     private long _clock;
     private long _coverRevision;
@@ -217,6 +218,7 @@ public sealed partial class BitmapFactory(IImageDecoder decoder) : IDisposable
     /// <summary>只回收没有显示租约的旧像素，当前显示资源不会提前释放。</summary>
     private void Trim()
     {
+        CompleteDrain();
         var main = _animationBytes + _cache.Values.Concat(_retired).Where(e => !e.IsThumbnail).Sum(e => e.Image.ByteCount + e.DisplayBytes);
         var thumbnails = _cache.Values.Concat(_retired).Where(e => e.IsThumbnail).Sum(e => e.Image.ByteCount + e.DisplayBytes);
         // 未超预算时无需分配/排序完整LRU；保留原回收顺序和租约保护。
@@ -239,9 +241,17 @@ public sealed partial class BitmapFactory(IImageDecoder decoder) : IDisposable
             sources = _animationSources.ToArray();
             foreach (var entry in _cache.Values) { entry.Cached = false; if (entry.References == 0 && entry.WaitingConsumers == 0) entry.Image.Dispose(); else _retired.Add(entry); }
             _cache.Clear();
+            CompleteDrain();
         }
         foreach (var source in sources) source.Dispose();
     }
+    /// <summary>调用方先关闭所有显示消费者，再等待已退休的像素/显示租约实际归还；不提前释放仍在使用的资源。</summary>
+    /// <returns>当前缓存与动画资源归零的任务；无消费者的原生晚到结果继续在加载finally自行清理。</returns>
+    public ValueTask DisposeAsync()
+    { Dispose(); return new(_drained.Task); }
+    /// <summary>仅在同一缓存锁下判定清理完成，等待者及租约释放都会触发；不轮询或强制清零。</summary>
+    private void CompleteDrain()
+    { if (_disposed && _cache.Count == 0 && _retired.Count == 0 && _animationBytes == 0) _drained.TrySetResult(); }
 }
 
 /// <summary>缓存的无内容标识诊断数据；RSS/原生工作内存由进程采样单独记录。</summary>

@@ -36,8 +36,10 @@ public sealed partial class FloatingPanelWindow : Window
     {
         if (_pendingPlacement is { } placement && _placementOwner is { } owner)
             ApplyPlacement(placement, owner, RenderScaling);
+        var desktop = _pendingPlacement?.WindowStateEx == WindowStateEx.FullDesktop;
         _pendingPlacement = null; _placementOwner = null;
         base.OnOpened(e);
+        if (desktop) WindowDisplayState.Set(this, WindowStateEx.FullDesktop);
     }
     private void ApplyPlacement(WindowPlacement placement, Window owner, double renderScaling)
     {
@@ -71,9 +73,7 @@ public sealed partial class FloatingPanelWindow : Window
     public WindowPlacement Snap(WindowPlacement previous)
     {
         if (_pendingPlacement is not null) return previous;
-        if (WindowState != WindowState.Normal && previous.IsValid()) return previous with { WindowStateEx = WindowState == WindowState.Maximized ? WindowStateEx.Maximized : previous.WindowStateEx };
-        return new(WindowStateEx.Normal, Position.X, Position.Y,
-            Math.Max(1, (int)Math.Round(ClientSize.Width * RenderScaling)), Math.Max(1, (int)Math.Round(ClientSize.Height * RenderScaling)));
+        return WindowDisplayState.Capture(this, previous);
     }
 }
 

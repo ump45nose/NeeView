@@ -3,6 +3,7 @@ namespace NeeView.Backends;
 /// <summary>原MediaArchive单实体来源；只持元数据，请求流按请求释放。</summary>
 public sealed class MediaArchiveSource(string path) : MediaArchive(path)
 {
+    public override string BackendName => "macOS AVFoundation";
     public override Task<IReadOnlyList<ArchiveEntry>> GetEntriesAsync(CancellationToken token)=>SourceIo.RunAsync<IReadOnlyList<ArchiveEntry>>(()=>
     {
         ObjectDisposedException.ThrowIf(IsDisposed,this);token.ThrowIfCancellationRequested();var file=new FileInfo(Path);

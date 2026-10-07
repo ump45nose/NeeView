@@ -17,6 +17,9 @@ public sealed class HistoryConfig
     public int LimitSize { get => _limitSize; set => _limitSize = Math.Max(value, -1); }
     /// <summary>原保留期限；零无限，负值按原setter归零。</summary>
     public TimeSpan LimitSpan { get => _limitSpan; set => _limitSpan = value < TimeSpan.Zero ? TimeSpan.Zero : value; }
+    private int _recentBookCount = 10;
+    /// <summary>原最近打开书籍菜单上限，至少一项；不裁剪历史权威集合。</summary>
+    public int RecentBookCount { get => _recentBookCount; set => _recentBookCount = Math.Max(1,value); }
     public bool IsCurrentFolder { get; set; }
     public bool IsGroupBy { get; set; }
     public bool IsVisibleItemsCount { get; set; } = true;

@@ -1,0 +1,11 @@
+{
+  "scope": "P5 收尾专项修前失败证据",
+  "total": 30,
+  "passed": 29,
+  "failed": 1,
+  "test": "PrintCaptureUsesSameViewerAndCanceledPreviewReleasesOutputLock",
+  "error": "System.NotSupportedException : 当前首元素不提供原图打印。",
+  "location": "ReaderView.Print.cs:17",
+  "cause": "原尺寸标记过早清除，且输出中的普通UI通知可以取消显式捕获；小视口下动画静态探测仍停留在旧规格。",
+  "resolution": "标记保持到整个捕获finally；输出期间普通无令牌刷新不打断专用捕获；测试小视口400x600原图及并发普通刷新。"
+}

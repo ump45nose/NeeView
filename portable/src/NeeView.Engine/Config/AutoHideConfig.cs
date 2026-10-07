@@ -23,6 +23,9 @@ public sealed class AutoHideConfig
 /// <summary>原 Window 配置的 Mac 能力子集；FullDesktop 等未迁入字段由 SaveData 保留。</summary>
 public sealed class WindowConfig
 {
+    [System.Text.Json.Serialization.JsonIgnore] public NeeView.Windows.WindowStateEx State { get; set; }
+    [PropertyMapIgnore] public NeeView.Windows.WindowStateEx LastState { get; set; } = NeeView.Windows.WindowStateEx.Normal;
+    [PropertyMapIgnore] public NeeView.Windows.WindowPlacement? WindowPlacement { get; set; }
     public bool IsTopmost { get; set; }
     public bool IsAutoHideInNormal { get; set; }
     public bool IsAutoHideInMaximized { get; set; }

@@ -1,0 +1,27 @@
+{
+  "utc": "2026-10-07T07:34:30.858013+00:00",
+  "steps": [
+    {
+      "name": "Engine 构建",
+      "exit_code": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:00.74\n"
+    },
+    {
+      "name": "原算法与正式视图测试",
+      "exit_code": 1,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/Views/WindowDisplayState.cs(47,17): error CS0136: 无法在此范围中声明名为“resume”的局部变量或参数，因为该名称在封闭局部范围中用于定义局部变量或参数 [/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/NeeView.Engine.Tests.csproj]\n"
+    }
+  ],
+  "scope": "p5-completion 原算法、资源、来源/导航及正式XAML Headless；不代表真机/Windows对照",
+  "formal_app": "未执行",
+  "boundaries": {
+    "production_projects": [
+      "NeeView.Backends",
+      "NeeView.Engine",
+      "NeeView.MacOS"
+    ],
+    "source_files": 129,
+    "partial_adapters": 528,
+    "upstream_source_files": 26
+  }
+}

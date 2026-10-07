@@ -47,6 +47,9 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>打开图片所在目录或来源；失败保持旧书，晚到来源只释放。</summary>
     public async Task OpenAsync(string path, CancellationToken token = default)
     { await OpenCoreAsync(path, token); }
+    /// <summary>脚本打开单项时仅覆盖本次候选的递归设置；不修改全局或持久化默认值。</summary>
+    public async Task OpenAsync(string path, bool isRecursive, CancellationToken token = default)
+    { await OpenCoreAsync(path, token, isRecursive: isRecursive); }
 
     /// <summary>原BookHubTools多路径加载；两项以上生成临时.nvpls，仍进入唯一打开链。</summary>
     /// <param name="paths">接收顺序，目录/重复项不预处理。</param><param name="token">列表准备和加载取消。</param>
@@ -69,7 +72,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>共享原加载链；历史重放可指定条目并保留访问顺序，返回是否实际提交新书。</summary>
     /// <param name="startupMemento">原 FirstLoader 的显式启动快照，优先于历史和字段恢复策略。</param>
     /// <param name="pageSearchKeyword">同书文件结果重载保留原临时搜索；普通切书仍使用默认空查询。</param>
-    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, Playlist? expectedPlaylist = null, int? terminalDirection = null, string? pageSearchKeyword = null, IReadOnlyList<string>? openPaths = null, long? expectedGeneration = null, bool renamed = false)
+    private async Task<bool> OpenCoreAsync(string path, CancellationToken token, string? entryName = null, bool keepHistoryOrder = false, bool replayPageHistory = false, bool replayBookHistory = false, BookMemento? startupMemento = null, Playlist? expectedPlaylist = null, int? terminalDirection = null, string? pageSearchKeyword = null, IReadOnlyList<string>? openPaths = null, long? expectedGeneration = null, bool renamed = false, bool? isRecursive = null)
     {
         ObjectDisposedException.ThrowIf(_disposed || _closing, this);
         // 设置重收集不能抢占在导航锁释放后发起的新打开；原普通打开仍按新代次优先。
@@ -106,6 +109,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             var restored = startupMemento?.Path == source.Path ? startupMemento : saveData.Find(source.Path);
             var setting = startupMemento?.Path == source.Path ? startupMemento.ToBookSetting()
                 : Config.Current.BookSettingPolicy.Mix(Config.Current.BookSettingDefault, Config.Current.BookSetting, restored?.ToBookSetting(), false);
+            if (isRecursive is { } recursive) setting.IsRecursiveFolder = recursive;
             collection = new(source, archives, setting.IsRecursiveFolder);
             await using var batches = BookSourceFactory.CreatePageBatchesAsync(collection, Config.Current.System.BookPageCollectMode, archives, opening.Token, saveData.FolderConfigs).GetAsyncEnumerator(opening.Token);
             var explicitEntry = entryName ?? source.RequestedEntryName;

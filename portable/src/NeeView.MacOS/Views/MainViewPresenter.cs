@@ -55,7 +55,7 @@ public sealed class MainViewPresenter : IDisposable
             if (Window is { } window)
             {
                 window.Topmost = _config.IsTopmost;
-                window.WindowDecorations = _config.IsHideTitleBar ? WindowDecorations.None : WindowDecorations.Full;
+                if (WindowDisplayState.Get(window) != WindowStateEx.FullDesktop) window.WindowDecorations = _config.IsHideTitleBar ? WindowDecorations.None : WindowDecorations.Full;
                 window.Title = _owner.Title;
                 _panels.SetAlternativeHost(_config.AlternativeContent == AlternativeContent.PageList ? _alternative : null);
             }
@@ -73,7 +73,7 @@ public sealed class MainViewPresenter : IDisposable
     private void Float()
     {
         if (Window is not null) return;
-        _owner.Viewer.CancelMouseSequence(); _owner.Viewer.SetLoupe(false);
+        _owner.Viewer.CancelMouseSequence(); _owner.Viewer.SetLoupe(false); _owner.Viewer.StopAutoScroll();
         if (!_config.WindowPlacement.IsValid())
         {
             var point = _content.PointToScreen(default); var size = _content.Bounds.Size;
@@ -98,7 +98,7 @@ public sealed class MainViewPresenter : IDisposable
     private void Dock(bool closeWindow = true)
     {
         if (Window is not { } window) return;
-        _stretchTimer.Stop(); _owner.Viewer.CancelMouseSequence(); _owner.Viewer.SetLoupe(false);
+        _stretchTimer.Stop(); _owner.Viewer.CancelMouseSequence(); _owner.Viewer.SetLoupe(false); _owner.Viewer.StopAutoScroll();
         Window = null; window.Deactivated -= Deactivated; window.Closed -= Closed;
         window.RemoveHandler(InputElement.KeyDownEvent, FloatingKeyDown); window.RemoveHandler(DragDrop.DropEvent, FloatingDrop);
         window.RemoveHandler(InputElement.PointerPressedEvent, FloatingPressed); window.RemoveHandler(InputElement.PointerWheelChangedEvent, FloatingWheel);
@@ -122,7 +122,7 @@ public sealed class MainViewPresenter : IDisposable
         if (_disposed || _updating) return;
         _config.IsFloating = false; Dock(false); Changed?.Invoke(this, EventArgs.Empty);
     }
-    private void Deactivated(object? sender, EventArgs e) => _owner.Viewer.SetLoupe(false);
+    private void Deactivated(object? sender, EventArgs e) { _owner.Viewer.SetLoupe(false); _owner.Viewer.StopAutoScroll(); }
     private void FloatingKeyDown(object? sender, KeyEventArgs e) => KeyDown?.Invoke(sender, e);
     private void FloatingDrop(object? sender, DragEventArgs e) => Drop?.Invoke(sender, e);
     private void FloatingPressed(object? sender, PointerPressedEventArgs e) => Input?.Invoke(SlideShowTimerResetGesture.InputAction, true);

@@ -79,7 +79,7 @@ public interface IArchiveFactory
 }
 
 /// <summary>目录导航只读条目，使用真实文件系统路径。</summary>
-public sealed record FolderItem(string Name, string Path, bool IsDirectory = true, long Length = -1, DateTime LastWriteTime = default)
+public sealed record FolderItem(string Name, string Path, bool IsDirectory = true, long Length = -1, DateTime LastWriteTime = default, DateTime CreationTime = default)
 {
     /// <summary>书签位置的原节点；普通文件系统条目为空，不复制书签树或建立新身份。</summary>
     public BookmarkNode? Bookmark { get; init; }

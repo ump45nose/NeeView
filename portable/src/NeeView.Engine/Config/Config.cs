@@ -44,6 +44,7 @@ public sealed class Config
     public ThemeConfig Theme { get; set; } = new();
     public FontsConfig Fonts { get; set; } = new();
     public StartUpConfig StartUp { get; set; } = new();
+    public PageViewRecorderConfig PageViewRecorder { get; set; } = new();
     /// <summary>早期 Mac 字段兼容入口；真实配置沿用原 MenuBar 分支。</summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [PropertyMapIgnore]

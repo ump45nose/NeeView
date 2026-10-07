@@ -1,0 +1,24 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="NeeView.MacOS.Views.PrintWindow" Width="800" Height="600" MinWidth="660" MinHeight="480" Title="打印" WindowStartupLocation="CenterOwner">
+  <Grid RowDefinitions="*,Auto" ColumnDefinitions="300,8,*" Margin="16">
+    <ScrollViewer>
+      <StackPanel Spacing="8">
+        <TextBlock Text="打印内容" FontSize="20" />
+        <ComboBox x:Name="Mode"><ComboBoxItem Content="原始图片"/><ComboBoxItem Content="当前视口"/><ComboBoxItem Content="视口填满纸张"/><ComboBoxItem Content="完整视图"/></ComboBox>
+        <TextBlock Text="方向"/><ComboBox x:Name="Orientation"><ComboBoxItem Content="纵向"/><ComboBoxItem Content="横向"/></ComboBox>
+        <CheckBox x:Name="PrintBackground" Content="打印背景"/><CheckBox x:Name="Nearest" Content="保持图片像素"/>
+        <TextBlock Text="分割为多张纸（同一画面）"/>
+        <Grid ColumnDefinitions="*,*"><StackPanel><TextBlock Text="列"/><NumericUpDown x:Name="Columns" Minimum="1" Maximum="4" Value="1" FormatString="0"/></StackPanel><StackPanel Grid.Column="1"><TextBlock Text="行"/><NumericUpDown x:Name="Rows" Minimum="1" Maximum="4" Value="1" FormatString="0"/></StackPanel></Grid>
+        <TextBlock Text="水平对齐"/><ComboBox x:Name="Horizontal"><ComboBoxItem Content="左"/><ComboBoxItem Content="居中"/><ComboBoxItem Content="右"/></ComboBox>
+        <TextBlock Text="垂直对齐"/><ComboBox x:Name="Vertical"><ComboBoxItem Content="上"/><ComboBoxItem Content="居中"/><ComboBoxItem Content="下"/></ComboBox>
+        <TextBlock Text="附加边距（毫米）"/><TextBlock Text="与打印机不可打印边距合并；负值可缩小边距。" TextWrapping="Wrap"/>
+        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto"><StackPanel><TextBlock Text="左"/><NumericUpDown x:Name="LeftMargin" Minimum="-500" Maximum="500" Value="0"/></StackPanel><StackPanel Grid.Column="1"><TextBlock Text="右"/><NumericUpDown x:Name="RightMargin" Minimum="-500" Maximum="500" Value="0"/></StackPanel><StackPanel Grid.Row="1"><TextBlock Text="上"/><NumericUpDown x:Name="TopMargin" Minimum="-500" Maximum="500" Value="0"/></StackPanel><StackPanel Grid.Row="1" Grid.Column="1"><TextBlock Text="下"/><NumericUpDown x:Name="BottomMargin" Minimum="-500" Maximum="500" Value="0"/></StackPanel></Grid>
+      </StackPanel>
+    </ScrollViewer>
+    <GridSplitter Grid.Column="1" Width="8" HorizontalAlignment="Stretch" ResizeDirection="Columns"/>
+    <Border Grid.Column="2" Margin="8,0,0,0" BorderBrush="Gray" BorderThickness="1"><Grid RowDefinitions="*,Auto"><Image x:Name="Preview" Stretch="Uniform" Margin="8"/><Button Grid.Row="1" Content="刷新内容预览" Click="PreviewClick" Margin="8"/></Grid></Border>
+    <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Spacing="8" Margin="0,12,0,0">
+      <TextBlock x:Name="Message" Text="打印机、纸张、范围及PDF保存将在系统打印窗口中选择。" TextWrapping="Wrap"/>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8"><Button x:Name="Cancel" Content="取消" IsCancel="True" Click="CancelClick"/><Button x:Name="Accept" Content="打印…" IsDefault="True" Click="ConfirmClick"/></StackPanel>
+    </StackPanel>
+  </Grid>
+</Window>

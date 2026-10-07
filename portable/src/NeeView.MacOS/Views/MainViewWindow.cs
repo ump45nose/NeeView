@@ -20,7 +20,7 @@ public sealed class MainViewWindow : Window
         _config = config; Content = ContentHost; Width = 800; Height = 600; MinWidth = 160; MinHeight = 120;
         ShowActivated = false; WindowStartupLocation = WindowStartupLocation.Manual;
         PositionChanged += PositionUpdated; SizeChanged += SizeUpdated;
-        PropertyChanged += StateUpdated;
+        PropertyChanged += StateUpdated; WindowDisplayState.For(this).Changed += StateAdapterUpdated;
         Closing += (_, e) =>
         {
             if (_closingHost) return;
@@ -39,8 +39,11 @@ public sealed class MainViewWindow : Window
     }
     protected override void OnOpened(EventArgs e)
     {
-        ApplyPlacement(RenderScaling); _pending = null; _restoring = false;
+        var state = _pending?.WindowStateEx;
+        ApplyPlacement(RenderScaling); _pending = null;
         base.OnOpened(e);
+        _restoring = false;
+        if (state is WindowStateEx.FullDesktop or WindowStateEx.FullScreen) WindowDisplayState.Set(this, state.Value, _config.LastState);
     }
     private void ApplyPlacement(double renderScaling)
     {
@@ -56,12 +59,9 @@ public sealed class MainViewWindow : Window
     {
         if (_restoring || _closingHost || !IsVisible) return;
         var previous = _config.WindowPlacement;
-        var state = WindowState switch { WindowState.Maximized => WindowStateEx.Maximized, WindowState.FullScreen => WindowStateEx.FullScreen, _ => WindowStateEx.Normal };
-        if (WindowState is WindowState.Normal or WindowState.Maximized) _config.LastState = state;
-        if (WindowState != WindowState.Normal && previous.IsValid())
-            _config.WindowPlacement = previous with { WindowStateEx = state };
-        else _config.WindowPlacement = new(state, Position.X, Position.Y,
-            Math.Max(1, (int)Math.Round(ClientSize.Width * RenderScaling)), Math.Max(1, (int)Math.Round(ClientSize.Height * RenderScaling)));
+        var state = WindowDisplayState.Get(this);
+        if (state is WindowStateEx.Normal or WindowStateEx.Maximized) _config.LastState = state;
+        _config.WindowPlacement = WindowDisplayState.Capture(this, previous);
     }
     /// <summary>先清空内容再允许关闭宿主，不销毁唯一 ReaderView。</summary>
     internal void CloseHost(bool closeWindow = true)
@@ -70,14 +70,15 @@ public sealed class MainViewWindow : Window
     private void SizeUpdated(object? sender, SizeChangedEventArgs e)
     {
         // 对应原 PageFrameProfile.ReferenceSizeLocker：用户调整重设参考，自动贴合保留参考。
-        if (!_restoring && !_closingHost && !IsPreparingClose && !IsReferenceSizeLocked && WindowState == WindowState.Normal
+        if (!_restoring && !_closingHost && !IsPreparingClose && !IsReferenceSizeLocked && WindowDisplayState.Get(this) == WindowStateEx.Normal
             && e.NewSize.Width > 0 && e.NewSize.Height > 0)
             _config.ReferenceSize = new(e.NewSize.Width, e.NewSize.Height);
         Store();
     }
+    private void StateAdapterUpdated(object? sender, EventArgs e) => Store();
     private void StateUpdated(object? sender, AvaloniaPropertyChangedEventArgs e)
     { if (e.Property == WindowStateProperty) Store(); }
     private void DetachStateEvents()
-    { PositionChanged -= PositionUpdated; SizeChanged -= SizeUpdated; PropertyChanged -= StateUpdated; }
+    { PositionChanged -= PositionUpdated; SizeChanged -= SizeUpdated; PropertyChanged -= StateUpdated; WindowDisplayState.For(this).Changed -= StateAdapterUpdated; }
     protected override void OnClosed(EventArgs e) { DetachStateEvents(); base.OnClosed(e); }
 }

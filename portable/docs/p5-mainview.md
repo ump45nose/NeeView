@@ -12,7 +12,7 @@
 - 顶置、尽量前置、隐藏标题栏及自动贴合沿原字段。位置以设备像素持久化，窗口尺寸以实际绘制比例转换，屏幕边界仍复用已有位置恢复规则。
 - StretchWindow 作用于 ReaderView 当前宿主，保留窗口外的其他区域。自动贴合使用 ReferenceSize，避免每页反复收缩；手动调整窗口更新参考，自动调整期间锁定。正常状态才允许贴合。
 - 输入、拖放、幻灯输入重置、Loupe 与平台手势继续通过原路由；平台来源窗口身份和命中测试改为实际浮动宿主。Command+W 使用浮窗关闭语义。
-- Window.State 的 Normal 是普通窗口，None 仅无窗口/写入不动作；跨屏 FullDesktop 尚未迁入，明确报能力错误。
+- Window.State 的 Normal 是普通窗口，None 仅无窗口/写入不动作；FullDesktop和LastState已在[收尾批次](p5-completion.md)接入；混合缩放多屏仍待设备验收。
 
 ## 生命周期与资源
 

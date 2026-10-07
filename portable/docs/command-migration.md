@@ -1,17 +1,17 @@
 # 完整命令迁移表
 
-固定基线235个原命令实例全部保留。当前为 **226个执行入口接入、9个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
+固定基线235个原命令实例全部保留。当前为 **232个执行入口接入、3个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu参数、中央宿主、打印与原输入控制已由P5各批接入，见[P5收尾](p5-completion.md)。Mac额外打开目录/窗口入口不计入原235项。
 
 原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。实际键位/手势按原A/B/C、阅读方向和用户差分计算。
 
-对照[P4运行导出](../acceptance/p4-completion-commands.json)及[P5导入证据](../acceptance/p5-profile-apply-evidence.json)、[输入契约](modules/M05.md)。ToggleVisiblePageSlider与ToggleHidePageSlider语义独立，前者及ToggleVisibleAddressBar已于第二十一批接入。参数拥有者映射不等于执行能力；P4分类/P5高级能力继续逐项迁移。
+当前登记证据为[正式宿主装配清单](../acceptance/p5-completion-configured-commands.json)，历史[P4运行导出](../acceptance/p4-completion-commands.json)及[P5导入证据](../acceptance/p5-profile-apply-evidence.json)保留；契约见[输入模块](modules/M05.md)。ToggleVisiblePageSlider与ToggleHidePageSlider语义独立，前者及ToggleVisibleAddressBar已于第二十一批接入。参数拥有者映射不等于执行能力；具体支持范围及设备验收见对应模块，不由入口数量推算完整原版一致性。
 
 P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Value参数、默认键位冲突和参数退役规则。预览显示升级后的清单，实际应用使用同一候选。没有新增执行入口，Cut仍按用户要求占位，见[兼容契约](p5-legacy-compatibility.md)。
 
 | 原命令 | 文案 | 默认输入 | 默认方向手势 | 执行入口 | 迁移说明 | 原出处 |
 |---|---|---|---|---|---|---|
 | LoadAs | 打开文件 | Ctrl+O |  | 已接入 | P1 宿主适配 | NeeView/Command/Commands/LoadAsCommand.cs |
-| LoadRecentBook | 最近使用的书籍 |  |  | 已接入 | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/LoadRecentBookCommand.cs |
+| LoadRecentBook | 最近使用的书籍 |  |  | 已接入 | P5 原可选择最近书籍菜单及数量；不自动打开首项 | NeeView/Command/Commands/LoadRecentBookCommand.cs |
 | ReLoad | 重新载入 |  | UD | 已接入 | P1 宿主适配 | NeeView/Command/Commands/ReLoadCommand.cs |
 | Unload | 关闭 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/UnloadCommand.cs |
 | OpenExplorer | 在资源管理器中打开 |  |  | 已接入 | P1 宿主适配 | NeeView/Command/Commands/OpenExplorerCommand.cs |
@@ -37,7 +37,7 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | ExportImageAs | 另存为 | Ctrl+S |  | 已接入 | P5 原参数/原字节及唯一页框导出；见p5-image-export.md | NeeView/Command/Commands/ExportImageAsCommand.cs |
 | ExportImage | 保存为文件 | Shift+Ctrl+S |  | 已接入 | P5 原参数/原字节及唯一页框导出；见p5-image-export.md | NeeView/Command/Commands/ExportImageCommand.cs |
 | ExportBookAs | 导出书籍 |  |  | 已接入 | P5 原参数/原字节及唯一页框导出；见p5-image-export.md | NeeView/Command/Commands/ExportBookAsCommand.cs |
-| Print | 打印 | Ctrl+P |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/PrintCommand.cs |
+| Print | 打印 | Ctrl+P |  | 已接入 | P5 原四模式/铺纸参数、同一查看器捕获及AppKit打印；硬件输出另验 | NeeView/Command/Commands/PrintCommand.cs |
 | DeleteFile | 删除文件 | Delete |  | 已接入 | P4 主页单页/页面列表显式多选；实体废纸篓、列表登记及ZIP条目，ZIP权限与永久确认 | NeeView/Command/Commands/DeleteFileCommand.cs |
 | OpenBookExplorer | 在资源管理器中打开书籍 |  |  | 已接入 | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/OpenBookExplorerCommand.cs |
 | OpenBookExternalAppAs | 用外部应用打开书籍 |  |  | 已接入 | P5 原外部应用/参数/来源策略；见p5-external-applications.md | NeeView/Command/Commands/OpenBookExternalAppAsCommand.cs |
@@ -47,7 +47,7 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | MoveBookToFolderAs | 移动书籍到文件夹 |  |  | 已接入 | P4 根实体整书固定移动/卸载/原JSON路径联动；不入分类历史 | NeeView/Command/Commands/MoveBookToFolderAsCommand.cs |
 | DeleteBook | 删除书籍 |  |  | 已接入 | P4 真实根目录/文件整书废纸篓与原下一书；逻辑/临时/链接拒绝 | NeeView/Command/Commands/DeleteBookCommand.cs |
 | RenameBook | 重命名书籍 |  |  | 已接入 | P4 目录/根实体及Mac链接自身改名、原路径联动；见p4-completion.md | NeeView/Command/Commands/RenameBookCommand.cs |
-| SelectArchiver | 选择归档程序 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/SelectArchiverCommand.cs |
+| SelectArchiver | 选择归档程序 |  |  | 已接入 | P5 当前来源真实后端菜单；单后端无切换候选 | NeeView/Command/Commands/SelectArchiverCommand.cs |
 | ClearHistory | 清理历史记录 |  |  | 已接入 | P2 原历史集合清空 | NeeView/Command/Commands/ClearHistoryCommand.cs |
 | ClearHistoryInPlace | 删除当前位置的历史记录 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/ClearHistoryInPlaceCommand.cs |
 | RemoveUnlinkedHistory | 删除无效的历史记录 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/RemoveUnlinkedHistoryCommand.cs |
@@ -100,7 +100,7 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | ToggleFullScreen | 切换全屏状态 | F11 | U | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/ToggleFullScreenCommand.cs |
 | SetFullScreen | 全屏 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/SetFullScreenCommand.cs |
 | CancelFullScreen | 退出全屏 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/CancelFullScreenCommand.cs |
-| ToggleFullDesktop | 切换全桌面 | Shift+F11 |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleFullDesktopCommand.cs |
+| ToggleFullDesktop | 切换全桌面 | Shift+F11 |  | 已接入 | P5 实际宿主跨桌面/原LastState恢复；混合缩放多屏另验 | NeeView/Command/Commands/ToggleFullDesktopCommand.cs |
 | ToggleWindowMinimize | 最小化窗口 |  |  | 已接入 | P5 原窗口/导航语义；见p5-original-commands | NeeView/Command/Commands/ToggleWindowMinimizeCommand.cs |
 | ToggleWindowMaximize | 最大化窗口 |  |  | 已接入 | P5 原窗口/导航语义；见p5-original-commands | NeeView/Command/Commands/ToggleWindowMaximizeCommand.cs |
 | ShowHiddenPanels | 临时显示面板 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/ShowHiddenPanelsCommand.cs |
@@ -223,7 +223,7 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | LoupeScaleUp | 提高放大镜倍率 |  |  | 已接入 | P5原Loupe独立变换/状态及局部捕获；真机另验 | NeeView/Command/Commands/LoupeScaleUpCommand.cs |
 | LoupeScaleDown | 降低放大镜倍率 |  |  | 已接入 | P5原Loupe独立变换/状态及局部捕获；真机另验 | NeeView/Command/Commands/LoupeScaleDownCommand.cs |
 | ToggleHoverScroll | 启用/禁用悬浮滚动 |  |  | 已接入 | P2 执行入口已接入；参数/行为范围见模块验收记录 | NeeView/Command/Commands/ToggleHoverScrollCommand.cs |
-| ToggleAutoScroll | 切换自动滚动 | MiddleClick |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleAutoScrollCommand.cs |
+| ToggleAutoScroll | 切换自动滚动 | MiddleClick |  | 已接入 | P5 原速度/死区/长按与释放/失焦退出；设备指针另验 | NeeView/Command/Commands/ToggleAutoScrollCommand.cs |
 | CancelScript | 中止脚本 |  |  | 已接入 | P5 原脚本/目录/控制台/帮助；见p5-script.md | NeeView/Command/Commands/CancelScriptCommand.cs |
 | OpenOptionsWindow | 打开设置窗口 |  |  | 已接入 | P1 宿主适配 | NeeView/Command/Commands/OpenOptionsWindowCommand.cs |
 | OpenSettingFilesFolder | 打开配置文件位置 |  |  | 已接入 | P5 原窗口/导航语义；见p5-original-commands | NeeView/Command/Commands/OpenSettingFilesFolderCommand.cs |
@@ -240,9 +240,9 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | ImportBackup | 导入设置 |  |  | 已接入 | P5选择/预览、确认、备份及失败恢复；受支持版本与项目限制 | NeeView/Command/Commands/ImportBackupCommand.cs |
 | ReloadSetting | 重新载入设置 |  |  | 已接入 | P5 仅UserSetting原地恢复；来源规则变化重收集 | NeeView/Command/Commands/ReloadSettingCommand.cs |
 | SaveSetting | 保存设置 |  |  | 已接入 | P5 原SaveAll(false)/列表flush/立即阅读保存 | NeeView/Command/Commands/SaveSettingCommand.cs |
-| TouchEmulate | 模拟触控 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/TouchEmulateCommand.cs |
-| FocusPrevApp | 切换到上一个 NeeView | Ctrl+Shift+Tab |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/FocusPrevAppCommand.cs |
-| FocusNextApp | 切换到下一个 NeeView | Ctrl+Tab |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/FocusNextAppCommand.cs |
+| TouchEmulate | 模拟触控 |  |  | 占位 | 原WPF触摸调试模拟属Windows专用，Mac保留禁用提示 | NeeView/Command/Commands/TouchEmulateCommand.cs |
+| FocusPrevApp | 切换到上一个 NeeView | Ctrl+Shift+Tab |  | 已接入 | P5 自身主窗/中央及侧栏浮窗轮巡；不切换其他应用 | NeeView/Command/Commands/FocusPrevAppCommand.cs |
+| FocusNextApp | 切换到下一个 NeeView | Ctrl+Tab |  | 已接入 | P5 自身主窗/中央及侧栏浮窗轮巡；不切换其他应用 | NeeView/Command/Commands/FocusNextAppCommand.cs |
 | StretchWindow | 调整窗口大小 |  |  | 已接入 | P5 原中央唯一查看器浮动/停靠与实际宿主贴合；见p5-mainview.md | NeeView/Command/Commands/StretchWindowCommand.cs |
 | OpenConsole | 打开脚本控制台 |  |  | 已接入 | P5 原脚本/目录/控制台/帮助；见p5-script.md | NeeView/Command/Commands/OpenConsoleCommand.cs |
 

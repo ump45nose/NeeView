@@ -61,7 +61,17 @@ public sealed partial class SaveData
                     item["Path"] = next;
                 }
             }
+            void RenamePage(JsonNode? memento)
+            {
+                if (memento?["Path"]?.GetValue<string>() is not { } bookPath || memento["Page"]?.GetValue<string>() is not { Length: > 0 } page) return;
+                var full = System.IO.Path.Combine(bookPath, page);
+                var renamedPage = Rename(full);
+                if (renamedPage != full && Rename(bookPath) == bookPath)
+                    memento["Page"] = System.IO.Path.GetRelativePath(bookPath, renamedPage);
+            }
+            if (_history["Items"] is JsonArray pageItems) foreach (var entry in pageItems) RenamePage(entry);
             var last = _setting["Config"]?["StartUp"]?["LastBookV2"];
+            RenamePage(last);
             if (last?["Path"]?.GetValue<string>() is { } lastPath) last["Path"] = Rename(lastPath);
             Config.Current.StartUp.LastFolder = RenameFolder(Config.Current.StartUp.LastFolder);
             Config.Current.StartUp.LastBookmarkFolder = RenameFolder(Config.Current.StartUp.LastBookmarkFolder);

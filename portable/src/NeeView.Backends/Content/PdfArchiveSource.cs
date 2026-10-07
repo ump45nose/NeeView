@@ -17,6 +17,7 @@ public sealed record PdfDocumentInfo(IReadOnlyList<Size> Pages, IReadOnlyList<Pd
 /// <summary>原PDF归档：每页原Id/001.png命名、页尺寸、书签目录及请求级渲染。</summary>
 public sealed class PdfArchiveSource : PdfArchive
 {
+    public override string BackendName => "macOS PDFKit / CoreGraphics";
     private readonly string _physicalPath;
     private readonly IPdfRenderer _renderer;
     private readonly IAsyncDisposable? _lifetime;

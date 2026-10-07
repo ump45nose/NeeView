@@ -35,14 +35,13 @@ public sealed partial class MainWindow : Window
     public MainViewWindow? FloatingMainView => _mainView?.Window;
     private Window ViewerHostWindow => _mainView?.Window ?? (Window)this;
     private AutoHidePresenter? _autoHide;
-    private WindowState _lastFullScreenState = WindowState.Normal;
     public ReaderView Viewer => this.FindControl<ReaderView>("MainViewSocket")!;
     private ThumbnailView FilmStrip => this.FindControl<ThumbnailView>("DockFilmStripSocket")!;
     private ThumbnailView NavigatorView => this.FindControl<ThumbnailView>("Navigator")!;
     private SliderTextBox PageNumber => this.FindControl<SliderTextBox>("PageNumberView")!;
     private static readonly HashSet<string> HostCommands = new(StringComparer.Ordinal)
     {
-        "ToggleMainViewFloating", "StretchWindow",
+        "ToggleMainViewFloating", "StretchWindow", "ToggleAutoScroll", "ToggleFullDesktop", "Print", "SelectArchiver", "FocusPrevApp", "FocusNextApp",
         "OpenScriptsFolder",
         "OpenConsole", "CancelScript", "HelpScript", "ToggleCustomSize", "ToggleTrim", "ToggleGrid", "ToggleEffect", "ToggleResizeFilter", "ToggleNearestNeighbor", "ToggleVisibleAddressBar", "ToggleVisiblePageSlider", "ToggleWindowMinimize", "ToggleWindowMaximize", "OpenSettingFilesFolder", "SaveSetting", "ReloadSetting", "ExportBackup", "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen", "MoveToFolderAs", "CopyToFolderAs",
         "ViewScaleUp", "ViewScaleDown", "ViewScrollUp", "ViewScrollDown", "ViewScrollLeft", "ViewScrollRight", "OpenContextMenu", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
@@ -103,7 +102,9 @@ public sealed partial class MainWindow : Window
         // Finder复制不触发阅读回报，菜单展开/窗口重新激活时只重查命令能力。
         this.FindControl<Menu>("MenuBar")!.AddHandler(MenuItem.SubmenuOpenedEvent, (_, _) => RefreshHistoryCommandStates());
         Activated += (_, _) => RefreshHistoryCommandStates();
-        Deactivated += (_, _) => Viewer.SetLoupe(false);
+        Deactivated += (_, _) => { Viewer.SetLoupe(false); Viewer.StopAutoScroll(); };
+        WindowDisplayState.For(this).Changed += (_, _) => { StoreMainWindowPlacement(); _autoHide?.Refresh(); RefreshHistoryCommandStates(); };
+        Viewer.AutoScrollChanged += (_, _) => { if (!_closedPrepared) MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck); };
         Viewer.LoupeChanged += (_, _) => { if (!_closedPrepared) { MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck); RefreshHistoryCommandStates(); } };
         AddHandler(DragDrop.DropEvent, Drop);
         DragDrop.SetAllowDrop(this, true);
@@ -136,6 +137,8 @@ public sealed partial class MainWindow : Window
             if (change.Property == WindowStateProperty && WindowState == WindowState.Minimized && change.OldValue is WindowState previous)
                 _minimizeResumeState = previous;
         };
+        Opened += (_, _) => RestoreMainWindowPlacement();
+        PositionChanged += (_, _) => StoreMainWindowPlacement(); SizeChanged += (_, _) => StoreMainWindowPlacement();
         Opened += async (_, _) => await RunStartupHistoryCleanupAsync();
     }
     /// <summary>由唯一启动层传入已经装配的契约，不在控件中创建解码或存储实现。</summary>
@@ -181,7 +184,7 @@ public sealed partial class MainWindow : Window
         model.HistoryRefreshed += History_Refreshed;
         Viewer.Attach(model.Operation, images); model.Refreshed += Model_Refreshed;
         model.Refreshed += ImageCopy_ReadingChanged; Viewer.DisplayCompleted += ImageCopy_ReadingChanged;
-        InitializeSlideShow();
+        InitializeSlideShow(); InitializePageViewRecorder();
         var mediaControl = this.FindControl<MediaControlView>("DockMediaControlSocket")!;
         mediaControl.Attach(model.Operation, Viewer.RefreshMediaAsync); mediaControl.Failed += (_, message) => ShowError(message);
         Viewer.MediaChanged += (_, _) => { mediaControl.UpdatePlayer(); if (!_preparing && !_closedPrepared) { MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!,GetCommandCheck);RefreshHistoryCommandStates(); } };
@@ -213,6 +216,10 @@ public sealed partial class MainWindow : Window
     /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
     public bool IsCommandAvailable(string name) => name switch
     {
+        "SelectArchiver" => !_preparing && !_closedPrepared && _model?.Operation.Book is not null && !_model.Operation.IsLoading,
+        "FocusPrevApp" or "FocusNextApp" => !_preparing && !_closedPrepared && GetReaderWindows().Count > 1,
+        "ToggleAutoScroll" => !_preparing && !_closedPrepared && _model?.Operation.Book is not null && _model.Operation.IsLoading == false,
+        "ToggleFullDesktop" => !_preparing && !_closedPrepared,
         "ToggleMainViewFloating" => _mainView is not null && !_preparing && !_closedPrepared,
         "StretchWindow" => !_preparing && !_closedPrepared && _model?.Operation.IsFrameReading == true && ViewerHostWindow.WindowState == WindowState.Normal,
         "OpenConsole" or "CancelScript" or "HelpScript" => _scripts is not null && !_preparing && !_closedPrepared,
@@ -222,6 +229,7 @@ public sealed partial class MainWindow : Window
         "ExportImage" => !_preparing && _exportAction.IsCompleted && _model?.Operation.CanExportImage == true
             && (_model.SaveData.GetCommandParameter<ExportImageCommandParameter>(name).Mode != ExportImageMode.Original || _model.Operation.CanExportOriginalImage),
         "ExportImageAs" or "ExportBookAs" => !_preparing && _exportAction.IsCompleted && _model?.Operation.CanExportImage == true,
+        "Print" => !_preparing && _printService is not null && _printAction.IsCompleted && _model?.Operation.CanExportImage == true,
         "CopyImage" => CanCopyImage,
         "SetDefaultPageSetting" => _model?.Operation.IsLoading == false,
         "OpenExternalApp" => _model?.Operation is { } ext && ext.CanOpenExternalApplication(ext.GetExternalApplicationPolicy(name)),
@@ -282,6 +290,8 @@ public sealed partial class MainWindow : Window
     /// <summary>原菜单绑定的勾选表现；只读取引擎配置，不在菜单中维护第二套状态。</summary>
     private bool? GetCommandCheck(string name) => name switch
     {
+        "ToggleAutoScroll" => Viewer.IsAutoScrollMode,
+        "ToggleFullDesktop" => IsFullDesktop,
         "ToggleMainViewFloating" => Config.Current.MainView.IsFloating,
         _ when name.StartsWith("Script_", StringComparison.Ordinal) => (_model?.SaveData.GetCommandParameterObject(name) as ScriptCommandParameter)?.IsChecked,
         "ToggleCustomSize" => Config.Current.ImageCustomSize.IsEnabled,
@@ -331,7 +341,7 @@ public sealed partial class MainWindow : Window
         "ToggleHideRightPanel" => Config.Current.Panels.IsHideRightPanel,
         "ToggleHidePageSlider" => Config.Current.Slider.IsHidePageSlider,
         "ToggleVisibleSideBar" => Config.Current.Panels.IsSideBarEnabled,
-        "ToggleFullScreen" => WindowState == WindowState.FullScreen,
+        "ToggleFullScreen" => ViewerHostWindow.WindowState == WindowState.FullScreen,
         "ToggleTopmost" => Config.Current.Window.IsTopmost,
         "ShowHiddenPanels" => _autoHide?.IsVisibleLocked,
         "SetStretchModeUniform" => Config.Current.View.StretchMode == PageStretchMode.Uniform,
@@ -414,6 +424,9 @@ public sealed partial class MainWindow : Window
         if (pageFormat != Config.Current.PageList.Format && _model.Operation.Book is { } book && book.Pages.SearchKeyword.Length > 0) await _model.Operation.SearchPagesAsync(book.Pages.SearchKeyword, book);
         if (recursiveSearch != Config.Current.Bookshelf.IsSearchIncludeSubdirectories && _model.Operation.Bookshelf.SearchKeyword.Length > 0) await _model.Operation.Bookshelf.RefreshAsync();
         await Viewer.RefreshAsync();
+        // 设置草稿生命周期已结束，导入只能在旧设置窗关闭后进入唯一重建链。
+        if (settings.RequestedAction == SettingsAction.ImageEffects) _model.ShowPanel("ImageEffectPanel");
+        else if (settings.RequestedAction == SettingsAction.ProfileImport) await ShowProfileImportAsync();
     }
 
     /// <summary>执行宿主命令或转交原阅读命令；错误显示给用户。</summary>
@@ -427,6 +440,10 @@ public sealed partial class MainWindow : Window
             switch (name)
             {
                 case "ExportImage": case "ExportImageAs": case "ExportBookAs": await RunExportAsync(name); break;
+                case "Print": await RunPrintAsync(); break;
+                case "SelectArchiver": OpenSelectArchiverMenu(); break;
+                case "FocusPrevApp": FocusReaderWindow(-1); break;
+                case "FocusNextApp": FocusReaderWindow(1); break;
                 case "CopyImage": await CopyImageAsync(); break;
                 case "OpenVersionWindow": await ShowVersionAsync(); break;
                 case "OpenExternalApp": await ExecuteExternalApplicationAsync(name, false); break;
@@ -481,9 +498,11 @@ public sealed partial class MainWindow : Window
                     if (_model.Operation.Book is { } book) await _platform!.RevealAsync(book.CurrentPage?.ArchiveEntry.FilePath ?? book.Path); break;
                 case "CloseWindow": Close(); break;
                 case "CloseApplication": (Avalonia.Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.TryShutdown(); break;
+                case "ToggleAutoScroll": Viewer.SetAutoScrollMode(_model.SaveData.GetCommandParameter<ToggleCommandParameter>(name).GetState(Viewer.IsAutoScrollMode, fromMenu)); break;
+                case "ToggleFullDesktop": SetFullDesktop(_model.SaveData.GetCommandParameter<ToggleCommandParameter>(name).GetState(IsFullDesktop, fromMenu)); break;
                 case "ToggleMainViewFloating": _mainView?.SetFloating(!Config.Current.MainView.IsFloating, true); break;
                 case "StretchWindow": await StretchHostWindowAsync(false); break;
-                case "ToggleFullScreen": SetFullScreen(WindowState != WindowState.FullScreen); break;
+                case "ToggleFullScreen": SetFullScreen(ViewerHostWindow.WindowState != WindowState.FullScreen); break;
                 case "SetFullScreen": SetFullScreen(true); break;
                 case "CancelFullScreen": SetFullScreen(false); break;
                 case "ToggleTopmost": Config.Current.Window.IsTopmost = !Config.Current.Window.IsTopmost; _autoHide?.Refresh(); break;
@@ -575,8 +594,7 @@ public sealed partial class MainWindow : Window
                     }
                     break;
                 case "LoadRecentBook":
-                    var recent = _model.SaveData.HistoryEntries.FirstOrDefault(e => e.Path != _model.Operation.Book?.Path);
-                    if (recent is not null) await OpenAsync(recent.Path); break;
+                    OpenRecentBookMenu(); break;
                 case "RemoveUnlinkedHistory": await CleanupHistoryAsync(); break;
                 case "ClearHistoryInPlace":
                     if (await ConfirmAsync("清理当前位置历史", "移除当前书架列表真实目标的历史记录？不会删除文件或书签。", "移除") && !_preparing && !_closedPrepared)
@@ -841,8 +859,10 @@ public sealed partial class MainWindow : Window
         // 这里只退出全局命令匹配，不设置Handled，控件仍收到自己的导航/确认/取消键。
         if (e.Key is Key.Up or Key.Down or Key.Left or Key.Right or Key.Home or Key.End or Key.PageUp or Key.PageDown or Key.Enter or Key.Space or Key.Escape
             && HasPopupInputScope(inputWindow, focusedElement as Control)) return;
-        if (e.Key == Key.Escape && (Viewer.CancelMouseSequence() || _sidePanels?.CancelDrag() == true)) { e.Handled = true; return; }
+        if (e.Key == Key.Escape && (Viewer.HandleAutoScrollEscape() || Viewer.CancelMouseSequence() || _sidePanels?.CancelDrag() == true)) { e.Handled = true; return; }
         if (focusedElement is TextBox) return;
+        if (Viewer.IsAutoScrollMode && Config.Current.Mouse.IsStopAutoScrollUponInteraction)
+        { Viewer.StopAutoScroll(); e.Handled = true; return; }
         // 弹出菜单拥有方向键，不能让原阅读快捷键抢走菜单导航/选择。
         if (this.FindControl<Menu>("MenuBar")!.IsOpen || focusedElement is MenuItem) return;
         if (ReferenceEquals(focusedElement, Viewer) && Viewer.TryLoupeEscape(e.Key, e.KeyModifiers)) { e.Handled = true; return; }
@@ -970,6 +990,7 @@ public sealed partial class MainWindow : Window
     private async void Viewer_Wheel(object? sender, PointerWheelEventArgs e)
     {
         e.Handled = true;
+        if (Viewer.IsAutoScrollMode && Config.Current.Mouse.IsStopAutoScrollUponInteraction) { Viewer.StopAutoScroll(); return; }
         if (!Viewer.TryWheelScroll(e)) await DispatchWheelAsync(Viewer, e);
     }
     /// <summary>Finder 拖入使用与菜单相同的打开链路。</summary>
@@ -995,9 +1016,9 @@ public sealed partial class MainWindow : Window
     /// <summary>Mac 全屏进入前保留普通/最大化状态；取消恢复真实上一状态。</summary>
     private void SetFullScreen(bool enabled)
     {
-        if (enabled && WindowState != WindowState.FullScreen)
-        { _lastFullScreenState = WindowState == WindowState.Maximized ? WindowState.Maximized : WindowState.Normal; WindowState = WindowState.FullScreen; }
-        else if (!enabled && WindowState == WindowState.FullScreen) WindowState = _lastFullScreenState;
+        var host = ViewerHostWindow;
+        if (enabled) WindowDisplayState.Set(host, NeeView.Windows.WindowStateEx.FullScreen);
+        else if (host.WindowState == WindowState.FullScreen) WindowDisplayState.Set(host, NeeView.Windows.WindowStateEx.Normal);
     }
     /// <summary>正常关闭先释放需求并保存，失败保留窗口供重试。</summary>
     private async void Window_Closing(object? sender, WindowClosingEventArgs e)
@@ -1016,8 +1037,9 @@ public sealed partial class MainWindow : Window
     {
         await Task.Yield();
         _preparing = true;
-        Viewer.SetLoupe(false);
+        Viewer.SetLoupe(false); Viewer.StopAutoScroll();
         StopSlideShowForClose();
+        _printWindow?.Close(null);
         _exportCancellation?.Cancel(); _exportDialog?.Close(null); _model?.Operation.CancelExportPreparation();
         _imageCopyCancellation?.Cancel();
         _externalMenu?.Close(); _model?.Operation.CancelExternalApplicationPreparation();
@@ -1030,7 +1052,7 @@ public sealed partial class MainWindow : Window
         {
             if (_scripts is not null) await _scripts.CancelAndWaitAsync();
             _scriptFolderCancellation?.Cancel(); await _scriptFolderAction;
-            await _exportAction;
+            await _exportAction; await _printAction;
             await _imageCopyAction;
             foreach (var dialog in OwnedWindows.Where(w => w is not MainViewWindow).ToArray()) dialog.Close();
             _model?.Operation.CancelBookTransferPreparation();
@@ -1061,9 +1083,10 @@ public sealed partial class MainWindow : Window
                 var right = this.FindControl<Border>("RightPanel")!.Bounds.Width;
                 if (left > 0) Config.Current.Panels.LeftWidth = left;
                 if (right > 0) Config.Current.Panels.RightWidth = right;
-                _sidePanels?.SaveWeights();
+                _sidePanels?.SaveWeights(); StoreMainWindowPlacement();
                 // 先完成可靠保存，再退订与释放显示资源；失败不能留下已销毁的阅读窗口。
                 await _model.Operation.DisposeAsync();
+                if (_pageViewRecorder is not null) { await _pageViewRecorder.DisposeAsync(); _pageViewRecorder = null; }
                 await ReleaseScriptsAsync();
                 await Viewer.CloseMediaAsync();
                 _model.Operation.Bookshelf.Changed -= FolderTree_PlaceChanged;
@@ -1084,7 +1107,10 @@ public sealed partial class MainWindow : Window
             this.FindControl<BookmarkListView>("BookmarkPanelList")!.Dispose();
             this.FindControl<ImageEffectView>("ImageEffectPanelView")!.Dispose();
             Viewer.DisplayCompleted -= ImageCopy_ReadingChanged;
-            _autoHide?.Dispose(); _mainView?.Dispose(); _sidePanels?.Dispose(); _platformInput?.Dispose(); FilmStrip.Dispose(); NavigatorView.Dispose(); Viewer.Dispose(); _images?.Dispose(); _closedPrepared = true;
+            _autoHide?.Dispose(); _mainView?.Dispose(); _sidePanels?.Dispose(); _platformInput?.Dispose();
+            FilmStrip.Dispose(); NavigatorView.Dispose(); Viewer.Dispose();
+            if (_images is not null) await _images.DisposeAsync();
+            _closedPrepared = true;
         }
         finally
         {

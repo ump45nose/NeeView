@@ -133,7 +133,7 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
     /// <summary>表现层持有序列进度与焦点取消，不拥有命令业务。</summary>
     public ReaderView()
     {
-        LostFocus += (_, _) => { CancelMouseSequence(); StopLoupe(true); };
+        LostFocus += (_, _) => { CancelLongPress(); CancelMouseSequence(); StopLoupe(true); StopAutoScroll(); };
         _motionTimer.Tick += (_, _) =>
         {
             if (!_motion.IsPageActive && !_awaitingTransition) ReleaseOutgoing();
@@ -145,7 +145,7 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
     /// <summary>只装配业务和像素边界；没有解码器或文件系统依赖。</summary>
     public void Attach(BookOperation operation, CoreBitmapFactory factory)
     {
-        StopLoupe(false);
+        StopLoupe(false); StopAutoScroll();
         if (_operation is not null) _operation.ImagePresentationChanged -= ImagePresentationChanged;
         _background?.Dispose();
         _operation = operation; _factory = factory; Focusable = true;
@@ -156,10 +156,16 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
         _browse = new(this, operation, factory, () => DisplayCompleted?.Invoke(this, EventArgs.Empty));
     }
     /// <summary>状态变化触发当前可见帧需求；版本隔离旧解码结果。</summary>
-    public async Task RefreshAsync()
+    public Task RefreshAsync() => RefreshAsync(CancellationToken.None);
+    /// <summary>输出准备可以取消同一图片工厂的需求；晚到资源仍按revision释放。</summary>
+    public async Task RefreshAsync(CancellationToken token)
     {
+        token.ThrowIfCancellationRequested();
         if (_disposed || _operation is null || _factory is null) return;
-        SynchronizeLoupe();
+        // 输出独占原导航锁；普通布局/通知刷新不能取消携带输出令牌的原尺寸捕获需求。
+        if (_operation.IsExporting && !token.CanBeCanceled) return;
+        if (!ReferenceEquals(_displayBook, _operation.Book)) CancelLongPress();
+        SynchronizeAutoScroll(); SynchronizeLoupe();
         _dotKeep = (Config.Current.ImageDotKeep.IsEnabled, Config.Current.ImageDotKeep.Threshold);
         _background?.Refresh();
         if (_browse is not null) await _browse.RefreshAsync();
@@ -172,7 +178,7 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
             _operation.SetViewport(new CoreSize(Bounds.Width, Bounds.Height), TopLevel.GetTopLevel(this)?.RenderScaling ?? 1);
             InvalidateVisual(); return;
         }
-        var revision = ++_revision; _request?.Cancel(); var request = new CancellationTokenSource(); _request = request;
+        var revision = ++_revision; _request?.Cancel(); var request = CancellationTokenSource.CreateLinkedTokenSource(token); _request = request;
         SynchronizeFrame(); _loadError = null;
         ClampPan();
         var sources = _operation.IsExporting ? _frame?.Elements.Where(e => !e.IsDummy).Select(e => e.Page).Distinct().ToArray() ?? [] : GetDemandSources();
@@ -248,6 +254,7 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
         _operation.SetViewport(new CoreSize(Bounds.Width, Bounds.Height), TopLevel.GetTopLevel(this)?.RenderScaling ?? 1);
         var nextFrame = _operation.Frame;
         bool pageChanged = !ReferenceEquals(_displayBook, _operation.Book) || _displayRange != nextFrame?.FrameRange;
+        if (pageChanged && !IsPanorama && Config.Current.Mouse.IsStopAutoScrollUponInteraction) StopAutoScroll();
         if (pageChanged)
         {
             _pan += _motion.CancelPan(); ReleaseOutgoing();
@@ -580,12 +587,20 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
     }
     /// <summary>视口变化后只请求可见帧，避免扫描目录。</summary>
     protected override async void OnSizeChanged(SizeChangedEventArgs e) { base.OnSizeChanged(e); await RefreshAsync(); }
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+        if (IsAutoScrollMode && (e.Key == Key.Escape || Config.Current.Mouse.IsStopAutoScrollUponInteraction)) { StopAutoScroll(); e.Handled = true; }
+    }
     /// <summary>按下记录拖动起点，释放时才确认是否为翻页点击。</summary>
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e); Focus(); _pointer = e.GetPosition(this);
         var properties = e.GetCurrentPoint(this).Properties;
         var button = MouseGestureSource.ChangedButton(properties);
+        if (IsAutoScrollMode && _autoScroll?.IsLongDownMode == true) { e.Handled = true; return; }
+        if (IsAutoScrollMode && button != MouseButton.None && _autoScroll?.IsLongDownMode != true && Config.Current.Mouse.IsStopAutoScrollUponInteraction)
+        { StopAutoScroll(); e.Handled = true; return; }
         if (_sequenceActive && button == MouseButton.Left && !_sequence.IsEmpty)
         { CompleteMouseSequence(properties, true); e.Handled = true; return; }
         // 所有按钮都持有本次输入，避免移出控件后的释放丢失；捕获转移会取消待确认动作。
@@ -609,6 +624,7 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
             return;
         }
         _pendingClick = gesture;
+        StartLongPress(properties, gesture);
         if (!IsLoupeEnabled && button == MouseButton.Right && e.ClickCount == 1 && e.KeyModifiers == KeyModifiers.None
             && MouseGestureSource.HeldButtons(properties).SequenceEqual([MouseButton.Right]) && Config.Current.Mouse.IsGestureEnabled && CanStartMouseSequence?.Invoke() != false)
         { _sequenceActive = true; _sequence.Reset(new(_pointer!.Value.X, _pointer.Value.Y)); }
@@ -618,6 +634,9 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e); _pointer = e.GetPosition(this);
+        _longPressProperties = e.GetCurrentPoint(this).Properties;
+        if (IsAutoScrollMode)
+        { _autoScroll!.Move(_pointer.Value, Config.Current.Mouse.AutoScrollSensitivity); e.Handled = true; return; }
         if (IsLoupeEnabled)
         {
             if (_relativePointer is null) { LoupePanBy(_pointer.Value - _loupeLastPointer); _loupeLastPointer = _pointer.Value; }
@@ -639,20 +658,30 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
         {
             if (!Config.Current.Mouse.IsGestureEnabled || CanStartMouseSequence?.Invoke() == false) { CancelMouseSequence(); _pendingClick = null; return; }
             _sequence.Move(new(_pointer!.Value.X, _pointer.Value.Y));
-            if (!_sequence.IsEmpty) { _pendingClick = null; e.Handled = true; }
+            if (!_sequence.IsEmpty) { CancelLongPress(); _pendingClick = null; e.Handled = true; }
             return;
         }
         if (IsBrowsing && _browse is not null) { _browse.Move(e); return; }
         if (_pressed is not { } start)
         { if (Config.Current.Mouse.IsHoverScroll && !MouseGestureSource.HeldButtons(properties).Any() && CanStartMouseSequence?.Invoke()!=false) HoverScroll(_pointer!.Value); return; }
         var position = e.GetPosition(this); var delta = new Avalonia.Vector(position.X - start.X, position.Y - start.Y);
-        if (delta.Length > 4) _dragged = true;
+        if (delta.Length > 4) { _dragged = true; CancelLongPress(); }
         if (_dragged) Pan(_initialPan + delta - _pan);
     }
     /// <summary>未拖动的左右点击送入原快捷键映射。</summary>
     protected override async void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
+        CancelLongPress();
+        if (_longLoupe && !MouseGestureSource.HeldButtons(e.GetCurrentPoint(this).Properties).Any()) { _longLoupe = false; SetLoupe(false); _pendingClick = null; e.Handled = true; }
+        if (IsAutoScrollMode && (_autoScroll?.IsLongDownMode == true && !MouseGestureSource.HeldButtons(e.GetCurrentPoint(this).Properties).Any()
+            || _autoScroll?.IsLongDownMode != true && Config.Current.Mouse.IsStopAutoScrollUponInteraction))
+        {
+            StopAutoScroll(); e.Handled = true;
+            _pendingClick = null; _pressed = null;
+            if (!IsAutoScrollMode && !MouseGestureSource.HeldButtons(e.GetCurrentPoint(this).Properties).Any()) e.Pointer.Capture(null);
+            return;
+        }
         if (IsBrowsing && _browse?.HasPressedPointer == true && e.InitialPressMouseButton == MouseButton.Left && !_suppressedButtons.Contains(MouseButton.Left))
         {
             try { await _browse.ReleaseAsync(e, page => ChildBookRequested?.Invoke(this, page)); }
@@ -666,11 +695,11 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
         if (!suppressed && !_dragged && !_bookCardPressed && new Avalonia.Rect(Bounds.Size).Contains(e.GetPosition(this)) && _pendingClick is { } gesture)
             e.Handled |= TryGestureRequested?.Invoke(gesture) == true;
         _pressed = null; _dragged = false; _bookCardPressed = false; _pendingClick = null;
-        if (!MouseGestureSource.HeldButtons(e.GetCurrentPoint(this).Properties).Any()) e.Pointer.Capture(null);
+        if (!IsAutoScrollMode && !MouseGestureSource.HeldButtons(e.GetCurrentPoint(this).Properties).Any()) e.Pointer.Capture(null);
     }
     /// <summary>捕获丢失取消未确认点击/拖动，旧指针不作用于新控件。</summary>
     protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
-    { base.OnPointerCaptureLost(e); _browse?.CaptureLost(); CancelMouseSequence(); _pressed = null; _dragged = false; _pendingClick = null; _bookCardPressed = false; _suppressedButtons.Clear(); }
+    { base.OnPointerCaptureLost(e); CancelLongPress(); if (_longLoupe) { _longLoupe = false; SetLoupe(false); } StopAutoScroll(); _browse?.CaptureLost(); CancelMouseSequence(); _pressed = null; _dragged = false; _pendingClick = null; _bookCardPressed = false; _suppressedButtons.Clear(); }
     /// <summary>释放或已有方向时左键终止；未知序列也不能退化为右击翻页。</summary>
     private void CompleteMouseSequence(PointerPointProperties properties, bool click)
     {
@@ -711,7 +740,7 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
     /// <summary>释放当前需求和所有显示租约，晚到结果按 revision 拒绝。</summary>
     public void Dispose()
     {
-        if (_disposed) return; StopLoupe(false); CancelMouseSequence(); StopMotion(); _disposed = true; ++_revision; _request?.Cancel(); _request = null;
+        if (_disposed) return; StopLoupe(false); CancelMouseSequence(); StopMotion(); DisposeAutoScroll(); _disposed = true; ++_revision; _request?.Cancel(); _request = null;
         ClearAnimations();
         foreach (var item in _images.Values) item.Dispose(); _images.Clear(); _pageErrors.Clear();
         _browse?.Dispose(); _panorama = null; _panoramaRecenter = null;

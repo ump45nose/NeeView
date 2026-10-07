@@ -57,7 +57,7 @@ public sealed partial class SettingsWindow : Window
         this.FindControl<CheckBox>("OpenLastBookmarkFolder")!.IsChecked = Config.Current.StartUp.IsOpenLastBookmarkFolder;
         _historySettings = new(Config.Current.History);
         this.FindControl<ScrollViewer>("HistorySettings")!.DataContext = _historySettings;
-        InitializeSettingsSearch();
+        FillCompletionSettings(); InitializeSettingsSearch();
     }
     /// <summary>历史面板的设置入口定位同一设置窗口，不复制第二套表单。</summary>
     public void SelectHistoryPage() => this.FindControl<ListBox>("SettingsNavigation")!.SelectedIndex = 4;
@@ -266,7 +266,8 @@ public sealed partial class SettingsWindow : Window
         a.AutoHideConflictBottomMargin = (AutoHideConflictMode)Math.Max(0, this.FindControl<ComboBox>("BottomConflict")!.SelectedIndex);
     }
     /// <summary>设置应用成功并保存 JSON 后关闭；失败留在表单中。</summary>
-    private async void Save_Click(object? sender, RoutedEventArgs e)
+    private async void Save_Click(object? sender, RoutedEventArgs e) => await SaveAndCloseAsync();
+    private async Task SaveAndCloseAsync(SettingsAction action = SettingsAction.None)
     {
         if (_model is null || _saving) return;
         _saving = true;
@@ -290,7 +291,7 @@ public sealed partial class SettingsWindow : Window
                 Config.Current.Mouse.IsGestureEnabled = this.FindControl<CheckBox>("GestureEnabled")!.IsChecked == true;
                 Config.Current.Mouse.GestureMinimumDistance = (double)(this.FindControl<NumericUpDown>("GestureDistance")!.Value ?? 30);
                 ApplyFilm(); ApplyAutoHide(); ApplyView(); _historySettings!.ApplyPolicy(Config.Current.History); ApplyNavigation(); ApplyFiles(); _themeSettings!.Apply(Config.Current.Theme);
-                ApplyMainView();
+                ApplyMainView(); ApplyCompletionSettings();
                 _fontSettings!.Apply(Config.Current.Fonts);
                 _pdfSettings!.Apply(Config.Current.Archive.Pdf, Config.Current.Performance);
                 _animationSettings!.Apply(Config.Current.Image,Config.Current.Archive.Media);
@@ -309,7 +310,7 @@ public sealed partial class SettingsWindow : Window
                 Config.Current.StartUp.IsOpenLastFolder = this.FindControl<CheckBox>("OpenLastFolder")!.IsChecked == true;
                 Config.Current.StartUp.IsOpenLastBookmarkFolder = this.FindControl<CheckBox>("OpenLastBookmarkFolder")!.IsChecked == true;
             }, _historySettings!.GetLimits());
-            WasSaved = true; _saving = false; Close();
+            WasSaved = true; RequestedAction = action; _saving = false; Close();
         }
         catch (Exception ex)
         {

@@ -19,7 +19,7 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
         {
             var attributes = File.GetAttributes(path);
             FileSystemInfo info = (attributes & FileAttributes.Directory) != 0 ? new DirectoryInfo(path) : new FileInfo(path);
-            return new(info.Name, info.FullName, info is DirectoryInfo, info is FileInfo file ? file.Length : -1, info.LastWriteTime) { IsSymbolicLink = (attributes & FileAttributes.ReparsePoint) != 0 || info.LinkTarget is not null };
+            return new(info.Name, info.FullName, info is DirectoryInfo, info is FileInfo file ? file.Length : -1, info.LastWriteTime, info.CreationTime) { IsSymbolicLink = (attributes & FileAttributes.ReparsePoint) != 0 || info.LinkTarget is not null };
         }
         catch (FileNotFoundException) { return null; }
         catch (DirectoryNotFoundException) { return null; }
@@ -43,9 +43,9 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
         {
             token.ThrowIfCancellationRequested();
             if (info.Name.StartsWith('.')) continue;
-            if (info is DirectoryInfo) items.Add(new(info.Name, info.FullName, true, -1, info.LastWriteTime) { IsSymbolicLink = info.LinkTarget is not null });
+            if (info is DirectoryInfo) items.Add(new(info.Name, info.FullName, true, -1, info.LastWriteTime, info.CreationTime) { IsSymbolicLink = info.LinkTarget is not null });
             else if (info is FileInfo file && ArchiveFormats.IsArchive(info.Name))
-                items.Add(new(info.Name, info.FullName, false, file.Length, file.LastWriteTime));
+                items.Add(new(info.Name, info.FullName, false, file.Length, file.LastWriteTime, file.CreationTime));
         }
         return items;
     }, token);
@@ -202,6 +202,7 @@ public static class SourceIo
 /// <summary>原 FolderArchive 的普通目录分支；直接条目元数据与请求级文件流。</summary>
 public sealed partial class FolderArchive(string path) : Archive(path)
 {
+    public override string BackendName => ".NET 文件夹";
     public override bool IsDirectory => true;
     /// <summary>有界后台枚举，最多预排两批；已知图片先产出，同一文件在后续枚举中跳过。</summary>
     /// <param name="token">读取、排队、隐藏/切书/关闭时的取消。</param>
@@ -291,6 +292,7 @@ public sealed partial class FolderArchive(string path) : Archive(path)
 /// <summary>SharpCompress 归档后端，沿用 ArchiveEntry ID 区分重复名称。</summary>
 public sealed partial class CompressedArchive : Archive
 {
+    public override string BackendName => "SharpCompress";
     private IArchive _archive;
     private readonly string _physicalPath;
     private readonly string? _password;
@@ -489,6 +491,7 @@ public sealed partial class CompressedArchive : Archive
 internal sealed class RequestedArchive : Archive
 {
     private readonly Archive _source;
+    public override string BackendName => _source.BackendName;
     public RequestedArchive(Archive source, string entry) : base(source.Path) { _source = source; RequestedEntryName = entry; }
     public override ArchiveEntry? Source => _source.Source;
     public override IReadOnlyList<ContentsArchiveEntryNode>? Contents => _source.Contents;
@@ -504,6 +507,7 @@ internal sealed class RequestedArchive : Archive
 internal sealed class ArchiveDirectory(Archive source, string path, string directory, bool ownsSource = true) : Archive(path)
 {
     private Dictionary<int, ArchiveEntry> _entries = [];
+    public override string BackendName => source.BackendName;
     public override ArchiveEntry? Source => source.Source;
     public override string RootArchivePath => source.RootArchivePath;
     /// <summary>保留包内目录的原条目归属，复制策略不能误取当前图片或把逻辑地址当作实体目录。</summary>

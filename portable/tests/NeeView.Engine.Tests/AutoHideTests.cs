@@ -102,7 +102,7 @@ public sealed class AutoHideTests
             Assert.Equal(position, operation.Position); Assert.Equal(0, refreshes);
             await window.ExecuteAsync("ToggleVisibleSideBar"); Pump(window); Assert.False(model.SideBarVisible);
             Assert.Equal(0, window.FindControl<Grid>("SidePanelFrame")!.ColumnDefinitions[0].ActualWidth);
-            Assert.True(Config.Current.Panels.IsLeftVisible); Assert.True(window.IsCommandAvailable("ShowHiddenPanels")); Assert.False(window.IsCommandAvailable("ToggleFullDesktop"));
+            Assert.True(Config.Current.Panels.IsLeftVisible); Assert.True(window.IsCommandAvailable("ShowHiddenPanels")); Assert.True(window.IsCommandAvailable("ToggleFullDesktop"));
             SaveImage(window, "hidden-layout");
             await window.ExecuteAsync("ShowHiddenPanels"); Pump(window); SaveImage(window, "overlay-layout");
         }

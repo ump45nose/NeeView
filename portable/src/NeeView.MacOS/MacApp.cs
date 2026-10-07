@@ -134,6 +134,7 @@ public sealed partial class MacApp : Avalonia.Application
             candidate = new MainWindow(); _window = candidate; candidate.Bind(model, images, platform);
             await candidate.AttachScriptsAsync(new JintScriptRuntimeFactory(), (file, arguments) =>
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(file) { Arguments = arguments ?? "", UseShellExecute = true }), _scriptValues);
+            candidate.AttachPrinting(new MacPrintService());
             candidate.AttachImageClipboard(new MacImageClipboard());
             candidate.AttachFonts(new FontPresenter(this, Config.Current.Fonts, MacFontEnvironment.Read(Avalonia.Media.FontManager.Current.DefaultFontFamily.Name)));
             var theme = new ThemePresenter(this, Config.Current.Theme); candidate.AttachTheme(theme);

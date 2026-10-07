@@ -5,6 +5,8 @@ namespace NeeView;
 public abstract class Archive(string path, ArchiveEntry? source = null) : IAsyncDisposable
 {
     public string Path { get; } = path;
+    /// <summary>实际读取实现的显示名；Mac各来源只有一个后端，不创建虚假候选或选择状态。</summary>
+    public virtual string BackendName => "归档读取器";
     /// <summary>原Source/Parent关系；逻辑定位始终指向父归档条目，临时文件只属于后端。</summary>
     public virtual ArchiveEntry? Source => source;
     public Archive? Parent => Source?.Archive;

@@ -50,14 +50,11 @@ public sealed class WindowAccessor(ScriptAccessContext context, Func<Window?> re
     public double Height { get => context.Read(() => resolve()?.Height ?? 0); set => context.Write(() => { if (resolve() is { } w) w.Height = value; }); }
     public string State
     {
-        get => context.Read(() => resolve()?.WindowState.ToString() ?? "None");
+        get => context.Read(() => resolve() is { } w ? Views.WindowDisplayState.Get(w).ToString() : "None");
         set => context.Write(() =>
         {
-            var state = Enum.Parse<NeeView.Windows.WindowStateEx>(value);
-            if (!Enum.IsDefined(state)) throw new ArgumentException("Unknown window state.");
-            if (state == NeeView.Windows.WindowStateEx.None || resolve() is not { } w) return;
-            if (state == NeeView.Windows.WindowStateEx.FullDesktop) throw new NotSupportedException("跨屏全桌面宿主尚未迁移。");
-            w.WindowState = Enum.Parse<WindowState>(state.ToString());
+            var state = ScriptEnum.Parse<NeeView.Windows.WindowStateEx>(value);
+            if (resolve() is { } w) Views.WindowDisplayState.Set(w, state);
         });
     }
     public void Open() => context.Write(open);

@@ -85,7 +85,7 @@ public sealed class AutoHidePresenter : IDisposable
     {
         if (_disposed || _window.WindowState == WindowState.Minimized) return;
         var config = Config.Current;
-        _model.SetAutoHideMode(_window.WindowState switch
+        _model.SetAutoHideMode(WindowDisplayState.Get(_window) == NeeView.Windows.WindowStateEx.FullDesktop ? config.Window.IsAutoHideInFullDesktop : _window.WindowState switch
         {
             WindowState.FullScreen => config.Window.IsAutoHideInFullScreen,
             WindowState.Maximized => config.Window.IsAutoHideInMaximized,

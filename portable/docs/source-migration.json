@@ -3884,6 +3884,66 @@
       "target": "src/NeeView.MacOS/Views/MainWindow.MainView.cs",
       "sha256": "e4981541e3568b34373f92f6bc22c9099f158b16a4aff74fbe4a9f4d6813ba56",
       "status": "P5第三十九批：原唯一中央查看器宿主、替代PageList、关闭/恢复/配置及参考尺寸关系，Avalonia替换WPF；高级跨屏窗口状态另批迁入。"
+    },
+    {
+      "source": "NeeView/Print/PrintModel.cs",
+      "target": "src/NeeView.Engine/Print/PrintLayout.cs",
+      "sha256": "5d3159c138ed2b38964dcba68faccd5f14f4a0cd40696ec4970a34b62a8c634a",
+      "status": "P5第四十批：原四模式/毫米与硬件边距/行列铺纸纯几何迁入；WPF打印机由AppKit替换"
+    },
+    {
+      "source": "NeeView/Print/PrintModel.cs",
+      "target": "src/NeeView.Engine/Print/PrintParameters.cs",
+      "sha256": "5d3159c138ed2b38964dcba68faccd5f14f4a0cd40696ec4970a34b62a8c634a",
+      "status": "P5第四十批：原打印参数与枚举保持；仅替换WPF对齐值"
+    },
+    {
+      "source": "NeeView/MainView/PrintController.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.Print.cs",
+      "sha256": "9b2ed1daf44d9cdd3d73b154b65a7757c0ffe7856acc6412cff1679a397dabcb",
+      "status": "P5第四十批：同一查看器和媒体暂停；原输出入口共用导航/取消/关闭锁"
+    },
+    {
+      "source": "NeeView/PageViewHistory/PageViewRecorder.cs",
+      "target": "src/NeeView.Engine/PageViewHistory/PageViewRecorder.cs",
+      "sha256": "4c40bc0d418618d59d2d7f67cee45c0e6bb47e90b7bacff7b131228571a52669",
+      "status": "P5第四十批：原停留TSV/字段/切书切页边界；有界单写入者替换同步UI磁盘，关闭异步补行"
+    },
+    {
+      "source": "NeeView/Config/PageViewRecorderConfig.cs",
+      "target": "src/NeeView.Engine/Config/PageViewRecorderConfig.cs",
+      "sha256": "b4c7e2895828facbbc9c03c8645da807540fdc144cce894adba9de6701eb539a",
+      "status": "P5第四十批：原默认关闭、路径及JSON字段迁入"
+    },
+    {
+      "source": "NeeView/MouseInput/MouseInputAutoScroll.cs",
+      "target": "src/NeeView.MacOS/Views/ReaderAutoScrollPresenter.cs",
+      "sha256": "819fe1fc3bc1fb87327976cc0e1ebf296666b15600d6e9e128285a896e8d1e18",
+      "status": "P5第四十批：原速度/死区/上限与按毫秒Pan保留；独立表现时钟"
+    },
+    {
+      "source": "NeeView/MouseInput/MouseInputNormal.cs",
+      "target": "src/NeeView.MacOS/Views/ReaderView.LongPress.cs",
+      "sha256": "66c86fd4d8cbdf2bca5205f3934d8b2f277384c699c60eeb4c593a1f9b1fe830",
+      "status": "P5第四十批：原三长按模式/按钮掩码/重复间隔；捕获/释放/拖动/失焦取消"
+    },
+    {
+      "source": "NeeView/NeeView/Windows/WindowStateManager.cs",
+      "target": "src/NeeView.MacOS/Views/WindowDisplayState.cs",
+      "sha256": "a3713e3e803b06f1135b22a01f2e98a9981a4800d86a9cb384f208bcc85f7078",
+      "status": "P5第四十批：原FullDesktop与ResumeState保留；Avalonia屏幕并集/宿主几何替换Win32"
+    },
+    {
+      "source": "NeeView/Script/BookItemAccessor.cs",
+      "target": "src/NeeView.Engine/BookOperation/ScriptBookItemOperations.cs",
+      "sha256": "f2bdeeabf89103eed1dcbf77303ba8fe8b8e7e6a92f516d6fdfd71317bac27fa",
+      "status": "P5第四十批：脚本实体改名/递归打开复用原来源、锁和JSON恢复链"
+    },
+    {
+      "source": "NeeView/Script/BookmarkItemAccessor.cs",
+      "target": "src/NeeView.MacOS/ViewModels/ScriptPanelDataAccessors.cs",
+      "sha256": "0b347cd0bc8d238fe4af12ae00dd925f8b788e8e87fc0cf0af640662e733ec0e",
+      "status": "P5第四十批：原item名称/打开/元数据；folder登记时间与文件真实时间分开"
     }
   ],
   "rule_references": [
@@ -4284,6 +4344,12 @@
       "target": "src/NeeView.MacOS/Views/FileInformationView.axaml",
       "sha256": "780fee0784d744e7355cec09e46155fa0648b900423f51da28942840024084f4",
       "status": "保留原顶部当前页缩略选择和下方信息分组；Avalonia模板、共享列宽、列分隔/分组菜单独立。"
+    },
+    {
+      "source": "NeeView/Print/PrintWindow.xaml",
+      "target": "src/NeeView.MacOS/Views/PrintWindow.axaml",
+      "sha256": "739f8b3cfb2ab4cc5b92394198938b793e2ae7fb3c3a9ef9032aea5c60ded2e9",
+      "status": "P5第四十批：原参数区/预览/底部按钮转换；系统打印采用官方AppKit"
     }
   ],
   "backend_reuse": [

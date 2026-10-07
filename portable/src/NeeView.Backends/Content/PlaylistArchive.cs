@@ -5,6 +5,7 @@ namespace NeeView.Backends;
 /// <summary>原.nvpls作为一本书的来源；不读取或改变全局PlaylistHub。</summary>
 public sealed partial class PlaylistArchive(string path, IArchiveFactory archives) : Archive(path)
 {
+    public override string BackendName => "NeeView 播放列表";
     private readonly SemaphoreSlim _gate = new(1);
     private readonly Dictionary<string, Archive> _owned = new(StringComparer.Ordinal);
     private readonly Dictionary<string, IReadOnlyList<ArchiveEntry>> _indexes = new(StringComparer.Ordinal);

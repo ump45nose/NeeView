@@ -7,7 +7,7 @@
           <Grid ColumnDefinitions="*,Auto,Auto"><TextBox x:Name="SettingsSearchBox" Text="{Binding Keyword, Mode=TwoWay}" PlaceholderText="搜索设置" KeyDown="SettingsSearch_KeyDown" TextChanged="SettingsSearch_TextChanged" ToolTip.Tip="原结构化搜索：空格 AND，/or，/not，/word，/re。Enter 确认并加入本窗口历史。" /><Button x:Name="SettingsSearchHistory" Grid.Column="1" Content="⌄" Click="SettingsSearch_History" /><Button x:Name="SettingsSearchClear" Grid.Column="2" Content="×" Click="SettingsSearch_Clear" /></Grid>
           <TextBlock x:Name="SettingsSearchError" Text="{Binding Error}" TextWrapping="Wrap" />
         </StackPanel>
-        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="主题 / 配色" /><ListBoxItem Content="字体" /><ListBoxItem Content="归档 / PDF" /><ListBoxItem Content="幻灯播放" /><ListBoxItem Content="背景 / 像素保持" /><ListBoxItem Content="放大镜" /><ListBoxItem Content="文件信息" /><ListBoxItem Content="脚本" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
+        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="主题 / 配色" /><ListBoxItem Content="字体" /><ListBoxItem Content="归档 / PDF" /><ListBoxItem Content="幻灯播放" /><ListBoxItem Content="背景 / 像素保持" /><ListBoxItem Content="放大镜" /><ListBoxItem Content="文件信息" /><ListBoxItem Content="脚本" /><ListBoxItem Content="图像效果" /><ListBoxItem Content="导入旧配置" /></ListBox>
       </Grid>
     </Border>
     <ScrollViewer x:Name="LoupeSettings" Grid.Column="1" IsVisible="False">
@@ -325,6 +325,22 @@
         <TextBlock Text="旧成员访问错误级别" /><ComboBox x:Name="ScriptErrorLevel" ItemsSource="{Binding ErrorLevels}" SelectedItem="{Binding ErrorLevel, Mode=TwoWay}" />
         <CheckBox x:Name="ScriptRenameEvent" Content="重命名书籍后执行 OnBookLoaded" IsChecked="{Binding Renamed, Mode=TwoWay}" />
         <TextBlock Text="五种事件沿原文件名。控制台和 --script 显式执行无需目录开关；Windows SQLite 程序集开关保留于配置，Mac 不装载。" TextWrapping="Wrap" />
+      </StackPanel>
+    </ScrollViewer>
+    <ScrollViewer x:Name="EffectIntegrationSettings" Grid.Column="1" IsVisible="False">
+      <StackPanel Margin="24" Spacing="12">
+        <TextBlock Classes="settings-section" Text="图像效果" FontSize="20"/>
+        <TextBlock Text="在现有图像效果面板中编辑效果层、预设、自定义尺寸、裁剪和网格。先结束本设置窗口的编辑，再打开面板。" TextWrapping="Wrap"/>
+        <Button x:Name="SaveAndOpenEffects" Content="保存设置并打开图像效果" Tag="ImageEffects" Click="SaveAndOpenIntegration_Click"/>
+        <Button x:Name="DiscardAndOpenEffects" Content="放弃当前设置修改并打开图像效果" Tag="ImageEffects" Click="DiscardAndOpenIntegration_Click"/>
+      </StackPanel>
+    </ScrollViewer>
+    <ScrollViewer x:Name="ImportIntegrationSettings" Grid.Column="1" IsVisible="False">
+      <StackPanel Margin="24" Spacing="12">
+        <TextBlock Classes="settings-section" Text="导入旧配置" FontSize="20"/>
+        <TextBlock Text="读取旧 Profile 或 .nvzip，预览选择项和 Windows 路径映射后导入。导入前备份当前数据，源文件保持只读。先关闭本设置窗口，导入成功后由应用重建配置。" TextWrapping="Wrap"/>
+        <Button x:Name="SaveAndOpenImport" Content="保存设置并预览旧配置导入" Tag="ProfileImport" Click="SaveAndOpenIntegration_Click"/>
+        <Button x:Name="DiscardAndOpenImport" Content="放弃当前设置修改并预览旧配置导入" Tag="ProfileImport" Click="DiscardAndOpenIntegration_Click"/>
       </StackPanel>
     </ScrollViewer>
     <ScrollViewer x:Name="SettingsSearchPage" Grid.Column="1" IsVisible="False">

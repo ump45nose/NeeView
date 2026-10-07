@@ -27,7 +27,7 @@ public sealed partial class ReaderView
         }
         // 原尺寸输出不能把按窗口降采样的显示图放大冒充原分辨率。仍复用唯一图片工厂及预算。
         _exportOriginalSize = options.IsOriginalSize;
-        try { await RefreshAsync(); }
+        try { await RefreshAsync(token); }
         finally { _exportOriginalSize = false; }
         token.ThrowIfCancellationRequested();
         if (_disposed || _frame?.FrameRange != frame.FrameRange || _operation?.Frame?.FrameRange != frame.FrameRange)
