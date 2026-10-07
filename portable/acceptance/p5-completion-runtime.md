@@ -7,7 +7,7 @@
 - 原算法及正式XAML全量：1831项，1819通过、0失败，12项需显式资源样本的用例跳过。跳过项包括挂载图片的浏览/缩略/滤镜、效果及导出，不将跳过视为通过。
 - 官方macOS后台：38/38通过，含真实AppKit打印双页PDF、横竖方向、不同裁剪、整纸背景和取消；PDF/动图/视频等既有原生回归同时通过。不弹系统打印面板、不操作物理打印机。
 - Engine及正式ARM64应用构建：0警告、0错误；默认最终.app的strict/deep本地ad-hoc签名通过。原生测试宿主构建有一个既有SDK apphost PublishFolderType元数据警告，38项后台执行实际通过；不将其混入产品构建状态。
-- Python打包脚本：14/14通过。
+- Python打包脚本：14/14通过，见[原始输出](p5-completion-package-tests.json)。
 - 来源/依赖边界：三个生产项目；129个保留源码、528个部分适配及26个内嵌上游文件的出处检查通过。计数不是功能覆盖率。
 - 本轮没有启动正式应用、激活窗口、发送真实键鼠、改写用户图片或用户Profile。
 
@@ -26,7 +26,13 @@
 
 ## 开发包与提交
 
-正式源码校验后先提交，再由package_macos.py在默认Release bin/obj生成自包含ARM64开发包。包版本、源码提交、ZIP哈希、原生文件签名及重定位结果以独立打包记录为准；本节将在打包完成后补入。没有安装到用户Applications。
+已验证源码提交为`5f6e6e2c7d5f814a3154295ec7f6cd950830e554`。随后由package_macos.py在默认Release bin/obj生成0.1.0自包含ARM64开发包，包内dependencies.json记录同一源码提交。18个Mach-O的ARM64及strict签名、ZIP完整性、随机解包重定位及签名复核通过；25个实际依赖均带许可材料，无仅元数据许可项。原始结果见[本批打包记录](p5-completion-distribution.json)。
+
+- 开发包：[NeeView.zip](../artifacts/NeeView.zip)，70,902,942字节。
+- SHA256：`b1f82c952dc83a07d97bab5fec90feffdef760de3075828bef17b169fad94586`。
+- 签名为ad-hoc development；没有Developer ID或公证，不代表Gatekeeper、交互安装或实际硬件打印通过。没有安装到用户Applications。
+- Release自包含发布有既有SDK提示：命令行RuntimeIdentifier覆盖项目RuntimeIdentifiers；发布退出0。此前正式Debug构建仍为0警告/0错误，二者分开记录。
+- 原报告worktree_dirty及tracked_source_dirty为true，来自既有/测试重新生成的验收截图与记录。本批生产源码、测试、脚本及设计文档在打包前已提交；不清理无关材料来改变标记。校验记录随本批提交，推送以远端SHA核对结果为准。
 
 ## 仍独立保留的边界
 

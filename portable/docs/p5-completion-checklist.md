@@ -119,4 +119,4 @@ P5 已开始。P3/P4 的两项真机检查按用户要求 [跳过并记录](../a
 
 第三十六批：[播放列表收尾契约](p5-playlist-completion.md)。四模板、文件管理、无效登记确认/可恢复移除及作为书籍打开进入同一产品链；构建/测试状态见[验收](../acceptance/p5-playlist-completion-runtime.md)，脚本/metadata及完整设置继续推进。
 
-第四十批：[收尾契约](p5-completion.md)。六个剩余合理Mac命令入口、原设置动作/记录器/脚本item接入；静默全量/原生/打包结果见独立验收，设备/Windows/正式分发边界继续保留。
+第四十批：[收尾契约](p5-completion.md)。六个剩余合理Mac命令入口、原设置动作/记录器/脚本item接入；1819全量、38原生、14打包脚本通过，12资源样本用例跳过。源码5f6e6e2c7及其ARM64开发ZIP的18个原生签名/重定位结果见[独立验收](../acceptance/p5-completion-runtime.md)。本轮开发收尾，设备/Windows/正式分发及兼容清单边界继续保留。
