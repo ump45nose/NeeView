@@ -11,6 +11,10 @@ namespace NeeView.MacOS.Views;
 public static class ArchivePageRenderer
 {
     private static readonly StreamGeometry FolderIcon = StreamGeometry.Parse("M0,0 L14,0 14,10 16,12 16,18 0,18 Z M14,10 L13,12 13,18");
+    private static readonly StreamGeometry MediaIcon = StreamGeometry.Parse("M1,1 L15,9 L1,17 Z");
+    internal static bool IsMedia(Page page)=>page.IsVideo||page.ArchiveEntry.IsBook()&&MediaFormats.IsBook(page.EntryName);
+    internal static string IconPath(Page page)=>IsMedia(page)?"M1,1 L15,9 L1,17 Z":"M0,0 L14,0 14,10 16,12 16,18 0,18 Z M14,10 L13,12 13,18";
+    internal static string Caption(Page page)=>IsMedia(page)?"视频"+(page.PageType.IsFolder()?" · 双击打开":""):(page.PageType==PageType.Folder?"文件夹":"压缩包")+" · 双击封面打开";
     /// <summary>原上部3/4封面区，底部保留文件信息；小尺寸按原紧凑余量显示。</summary>
     public static Avalonia.Rect CoverArea(Avalonia.Rect card)
     {
@@ -40,12 +44,12 @@ public static class ArchivePageRenderer
             // 原fic_folder轮廓；空封面与加载状态共享卡片，不制造解码资源。
             var icon = Fit(image.Deflate(Math.Min(image.Width, image.Height) / 4), new Avalonia.Size(16, 18));
             using var transform = context.PushTransform(Matrix.CreateScale(icon.Width / 16, icon.Height / 18) * Matrix.CreateTranslation(icon.X, icon.Y));
-            context.DrawGeometry(null, new Pen(border, 1), FolderIcon);
+            context.DrawGeometry(null, new Pen(border, 1), IsMedia(page)?MediaIcon:FolderIcon);
         }
         using var clip = context.PushClip(card);
         var info = new Point(card.X + 12, card.Y + card.Height * .77);
         Text(page.EntryName, 14, info);
-        Text((page.PageType == PageType.Folder ? "文件夹" : "压缩包") + " · 双击封面打开", 11, info + new Avalonia.Vector(0, 25));
+        Text(Caption(page), 11, info + new Avalonia.Vector(0, 25));
         if (status.Length > 0 && cover is null) Text(status, 11, info + new Avalonia.Vector(0, 46));
         void Text(string value, double size, Point point) => context.DrawText(new FormattedText(value, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("sans-serif"), size, foreground), point);
     }

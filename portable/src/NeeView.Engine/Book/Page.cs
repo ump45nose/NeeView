@@ -26,8 +26,9 @@ public sealed class Page(ArchiveEntry entry, string? entryName = null, IArchiveF
           _ => throw new NotSupportedException($"页面属性尚未迁移：{profile.Name}") };
     }
     public bool IsMarked { get; internal set; }
-    public PageType PageType => ArchiveEntry.IsDirectory ? PageType.Folder : ArchiveEntry.IsBook() ? PageType.Archive : PageType.File;
-    public bool IsImage => ArchiveEntry.IsImage();
+    public PageType PageType => IsVideo ? PageType.File : ArchiveEntry.IsDirectory ? PageType.Folder : ArchiveEntry.IsBook() ? PageType.Archive : PageType.File;
+    public bool IsImage => ArchiveEntry.IsImage() && !IsVideo;
+    public bool IsVideo => ArchiveEntry.IsVideoContent();
     public PageContent Content { get; } = new(!entry.IsImage(), archives, folders);
     /// <summary>供原 PageComparer 比较归档目录和文件名，逻辑路径使用 '/'。</summary>
     public string[] GetEntryNameTokens() => EntryName.Split('/');

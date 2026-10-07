@@ -213,6 +213,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <summary>保留 PageFrameBox 的帧步进与单页步进算法，I/O 前后检查书籍代次。</summary>
     public async Task MoveAsync(int direction, bool onePage = false)
     {
+        if(await TryMoveMediaAsync(direction))return;
         var requestedGeneration = Volatile.Read(ref _generation);
         Book? terminatedBook = null; long terminatedGeneration = 0; PagePosition terminatedPosition = default;
         await _gate.WaitAsync();
@@ -271,7 +272,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         await _gate.WaitAsync();
         try
         {
-            if (_disposed || _closing || IsLoading || Book is null || Frame is null) return;
+            if (_disposed || _closing || IsLoading || Book is null || Book.IsMedia || Frame is null) return;
             var generation = _generation;
             int start = new BookContext(Book.Pages).NormalizeIndex(Frame.FrameRange.Min.Index);
             int index = direction < 0 ? Book.Pages.GetPrevFolderIndex(start) : Book.Pages.GetNextFolderIndex(start);
@@ -314,6 +315,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     public async Task MoveSizeAsync(int delta)
     {
         if (delta == 0) return;
+        if(await TryMoveMediaAsync(delta))return;
         Book? terminatedBook = null; long terminatedGeneration = 0; PagePosition terminatedPosition = default;
         await _gate.WaitAsync();
         try
@@ -461,6 +463,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
     /// <param name="historyLimits">原文件保留限制；成功提交后由SaveData应用。</param>
     public async Task ApplyOptionsAsync(Action apply, (int Size, TimeSpan Span) historyLimits)
     {
+        Book? reloadBook=null;BookMemento? reloadMemento=null;long reloadGeneration=0;
         await _gate.WaitAsync();
         try
         {
@@ -504,8 +507,14 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                 var page = current.CurrentPage; current.Sort(CancellationToken.None); Position = new(page?.Index ?? 0, Position.Part);
                 RebuildFrame(MoveDirection); RecordPageHistory(); Notify();
             }
+            if(Book is {} sourceBook&&MediaFormats.IndexChanged(snapshot.Archive.Media,Config.Current.Archive.Media))
+            {reloadBook=sourceBook;reloadMemento=sourceBook.CreateMemento();reloadGeneration=_generation;}
         }
         finally { _gate.Release(); }
+        // 媒体书/媒体页资格影响条目收集和尺寸，复用原打开代次，不在视图重新枚举。
+        if(reloadBook is not null&&reloadMemento is not null&&ReferenceEquals(reloadBook,Book)&&reloadGeneration==_generation)
+            await OpenCoreAsync(reloadBook.Path,CancellationToken.None,entryName:string.IsNullOrEmpty(reloadMemento.Page)?null:reloadMemento.Page,
+                startupMemento:reloadMemento,pageSearchKeyword:reloadBook.Pages.SearchKeyword,expectedGeneration:reloadGeneration);
     }
     /// <summary>设置回滚只复制已声明的可写字段；不丢失BookSetting绑定/上下文引用。</summary>
     private static void CopySettingFields(object source, object target)
@@ -553,6 +562,12 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
             if (page.Content.HasSize) continue;
             try
             {
+                if (page.IsVideo)
+                {
+                    if (VideoPlayers is null) throw new NotSupportedException("系统视频后端尚未装配。");
+                    var media = await VideoPlayers.ProbeAsync(page.ArchiveEntry, token);
+                    page.Content.PageDataSource = new(media.Size){AspectSize=media.AspectSize}; page.Content.HasSize = true; continue;
+                }
                 if (!page.IsImage) { page.Content.HasSize = true; continue; }
                 await using var stream = await page.ArchiveEntry.Archive.OpenEntryAsync(page.ArchiveEntry, token);
                 var info = await decoder.ProbeAsync(stream, token);
@@ -659,7 +674,7 @@ public static class ArchiveFormats
 {
     private static readonly HashSet<string> Extensions = new(StringComparer.OrdinalIgnoreCase) { ".zip", ".cbz", ".rar", ".cbr", ".7z" };
     /// <summary>按扩展名识别归档候选，损坏或加密归档仍由加载入口明确报错。</summary>
-    public static bool IsArchive(string path) => IsPageArchive(path) || PlaylistSourceTools.IsPlaylist(path);
+    public static bool IsArchive(string path) => IsPageArchive(path) || PlaylistSourceTools.IsPlaylist(path) || MediaFormats.IsBook(path);
     /// <summary>PDF单独交给系统页面后端，不传入SharpCompress或ImageMagick的PDF delegate。</summary>
     public static bool IsPdfArchive(string path) => !IsCompressedArchive(path) && !PlaylistSourceTools.IsPlaylist(path) &&
         Config.Current.Archive.Pdf.IsEnabled && Config.Current.Archive.Pdf.SupportFileTypes.Contains(System.IO.Path.GetExtension(path));

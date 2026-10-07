@@ -22,9 +22,3 @@ public sealed class ImageStandardConfig
     public bool IsAnimationEnabled(string name) => System.IO.Path.GetExtension(name).ToLowerInvariant() switch
     { ".gif" => IsAnimatedGifEnabled, ".png" or ".apng" => IsAnimatedPngEnabled, ".webp" => IsAnimatedWebpEnabled, _ => false };
 }
-/// <summary>原媒体命令时间步长子集；视频字段保留到后续实际后端迁移。</summary>
-public sealed class MediaArchiveConfig
-{
-    private double _pageSeconds = 10;
-    public double PageSeconds { get => _pageSeconds; set => _pageSeconds = double.IsFinite(value) ? Math.Round(value, 5) : 10; }
-}

@@ -3,7 +3,11 @@
   <Border Background="{DynamicResource BottomBar.Background}" BorderBrush="{DynamicResource BottomBar.Border}" BorderThickness="0,1,0,0" Padding="8,3">
     <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto,*,Auto">
       <Button x:Name="MediaPlay" Content="{Binding PlayText}" Click="Play_Click" ToolTip.Tip="播放 / 暂停" MinWidth="36" />
-      <Button Grid.Column="1" Content="音量" IsEnabled="False" ToolTip.Tip="图片动画没有音轨" Margin="4,0" />
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" Margin="4,0">
+        <Button x:Name="MediaMute" Content="{Binding MuteText}" IsEnabled="{Binding HasAudio}" Click="Mute_Click" />
+        <Slider x:Name="MediaVolume" Width="70" Minimum="0" Maximum="1" Value="{Binding Volume, Mode=OneWay}" IsEnabled="{Binding HasAudio}" ValueChanged="Volume_Changed" />
+        <ComboBox x:Name="MediaRate" Width="68" ItemsSource="{Binding Rates}" SelectedItem="{Binding Rate, Mode=OneWay}" IsEnabled="{Binding RateEnabled}" SelectionChanged="Rate_Changed" ToolTip.Tip="播放倍率" />
+      </StackPanel>
       <TextBlock Grid.Column="2" Text="{Binding DisplayTime}" VerticalAlignment="Center" Margin="10,0" PointerPressed="Time_Pressed" />
       <Button x:Name="MediaRepeat" Grid.Column="3" Content="{Binding RepeatText}" Click="Repeat_Click" />
       <Slider x:Name="MediaPosition" Grid.Row="1" Grid.ColumnSpan="4" Minimum="0" Maximum="1" Value="{Binding Position, Mode=OneWay}" ValueChanged="Position_Changed" SmallChange="0.01" />

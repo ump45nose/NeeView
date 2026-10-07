@@ -103,3 +103,5 @@ P5 已开始。P3/P4 的两项真机检查按用户要求 [跳过并记录](../a
 第三十三批：[Loupe契约](p5-loupe.md)与[静默验收](../acceptance/p5-loupe-runtime.md)。原查看器放大镜与Magnify效果独立；resize、视频/脚本和其余设置继续推进，P5整体未完成。
 
 第三十四批：[缩放滤镜契约](p5-resize-filter.md)与[静默验收](../acceptance/p5-resize-filter-runtime.md)。原核公式、参数快照、预算、JSON和命令接入；视频/脚本、完整设置及其余清单继续推进，P5整体未完成。
+
+第三十五批：[原视频契约](p5-video.md)与[静默验收](../acceptance/p5-video-runtime.md)。单页媒体书、普通媒体页、真实AVPlayer和原按秒导航接入；脚本/完整设置/其他清单继续推进，P5整体未完成。

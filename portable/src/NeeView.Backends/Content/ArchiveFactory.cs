@@ -104,6 +104,7 @@ public sealed partial class ArchiveFactory(Func<string, string?>? resolveAlias =
                 throw new NotSupportedException("分卷归档尚未迁移，请使用完整的单文件归档。");
             if (PlaylistSourceTools.IsPlaylist(path)) archive = new PlaylistArchive(path, this) { IsRootShortcut = new FileInfo(path).LinkTarget is not null };
             else if (ArchiveFormats.IsPageArchive(path)) archive = CreatePageArchive(path, keys, token);
+            else if (MediaFormats.IsBook(path)) archive = new MediaArchiveSource(path) { IsRootShortcut = new FileInfo(path).LinkTarget is not null };
             else throw new NotSupportedException("支持目录、图片、ZIP/CBZ、RAR/CBR、7z、PDF 和播放列表；其他来源尚未迁移。");
         }
         return new ArchiveOpenTarget(archive, null);

@@ -154,7 +154,7 @@ public sealed class ThumbnailView : Control, IDisposable
                 context.DrawImage(image.Bitmap, new Avalonia.Rect(cell.Center.X - size.Width * scale / 2, cell.Center.Y - size.Height * scale / 2, size.Width * scale, size.Height * scale));
             }
             else if (_pageErrors.TryGetValue(page, out var error))
-                context.DrawText(new FormattedText(page.PageType.IsFolder() ? "▱" : "!", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("sans-serif"), 24, Brushes.LightGray), cell.Center - new Avalonia.Vector(12, 12));
+                context.DrawText(new FormattedText(ArchivePageRenderer.IsMedia(page)?"▶":page.PageType.IsFolder() ? "▱" : "!", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("sans-serif"), 24, Brushes.LightGray), cell.Center - new Avalonia.Vector(12, 12));
             if (_operation.Frame?.Elements.Any(e => !e.IsDummy && ReferenceEquals(e.Page, page)) == true)
                 context.DrawRectangle(null, new Pen(Brushes.LightGray, 1), cell);
             if (IsNavigator || page.Index == _operation.PageSelector.SelectedIndex) context.DrawRectangle(null, new Pen(Brushes.DodgerBlue, 2), cell);

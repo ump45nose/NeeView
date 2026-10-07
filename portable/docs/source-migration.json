@@ -2687,9 +2687,9 @@
     },
     {
       "source": "NeeView/Config/MediaArchiveConfig.cs",
-      "target": "src/NeeView.Engine/Config/ImageConfig.cs",
+      "target": "src/NeeView.Engine/Config/MediaArchiveConfig.cs",
       "sha256": "d669494d69b3ffd0e64ca1ee9479c8fbc82f9f08047e33ac563b891fae0d47fe",
-      "status": "P5图像动画子集：保留原位置/播放/循环/配置，资源和时钟替换；范围见p5-animated-images.md"
+      "status": "P5第三十五批：原媒体书/普通页开关、扩展名、秒数、延迟、音频/循环和Windows字段；唯一差分JSON，AVPlayer能力边界见p5-video.md"
     },
     {
       "source": "NeeView/Command/CommandParameters/MoveMediaPageCommandParameter.cs",
@@ -3236,6 +3236,60 @@
       "target": "src/NeeView.MacOS/Views/ReaderView.Loupe.cs",
       "sha256": "1b557cc02077b48c28facf4b445d8f344f880a170e722a2dac83e2ba192f09fe",
       "status": "P5第三十三批；保留原12字段/默认/舍入、独立倍率/开启固定基点/设备像素位移、范围关闭/全景例外；WPF变换与输入替换为Avalonia/AppKit局部相对捕获"
+    },
+    {
+      "source": "NeeView/Archiver/MediaArchive.cs",
+      "target": "src/NeeView.Engine/Archiver/MediaArchive.cs",
+      "sha256": "80747743e15eef0cb5efbfd10bf21d0b595ee00f7ea81f70444d522beb080321",
+      "status": "P5第三十五批：原单页媒体书/按秒导航/播放意图/主元素音频/EOS与占位关系适配；WPF和Windows播放由官方AVPlayer替换，见p5-video.md"
+    },
+    {
+      "source": "NeeView/Archiver/MediaArchiveEntry.cs",
+      "target": "src/NeeView.Backends/Content/MediaArchiveSource.cs",
+      "sha256": "4372f1f36e4323d3653aebc1fa04615c56e3dcee0681ba27611c5676f25a1622",
+      "status": "P5第三十五批：原单页媒体书/按秒导航/播放意图/主元素音频/EOS与占位关系适配；WPF和Windows播放由官方AVPlayer替换，见p5-video.md"
+    },
+    {
+      "source": "NeeView/BookOperation/MediaPageMoveControl.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.Media.cs",
+      "sha256": "eb9576e7e4e7f4c5da50140f7f48921be2c229df44c43c8fdaa73474f6b6c15b",
+      "status": "P5第三十五批：原单页媒体书/按秒导航/播放意图/主元素音频/EOS与占位关系适配；WPF和Windows播放由官方AVPlayer替换，见p5-video.md"
+    },
+    {
+      "source": "NeeView/Page/MediaPageContent.cs",
+      "target": "src/NeeView.Engine/Bitmap/MediaPlayerContracts.cs",
+      "sha256": "4fa872f67ac5ccc1f9a7682b8fbd4e7b39c581f2b9b589d4cbc06fda75658fa6",
+      "status": "P5第三十五批：原单页媒体书/按秒导航/播放意图/主元素音频/EOS与占位关系适配；WPF和Windows播放由官方AVPlayer替换，见p5-video.md"
+    },
+    {
+      "source": "NeeView/Page/MediaPageThumbnail.cs",
+      "target": "src/NeeView.MacOS/Views/ArchivePageRenderer.cs",
+      "sha256": "ead1e8f8a3c2c67562ed79f37aed012961680671cd13e8137c2cb6c9760c02ad",
+      "status": "P5第三十五批：原单页媒体书/按秒导航/播放意图/主元素音频/EOS与占位关系适配；WPF和Windows播放由官方AVPlayer替换，见p5-video.md"
+    },
+    {
+      "source": "NeeView/ViewContents/ViewContentMediaPlayer.cs",
+      "target": "src/NeeView.MacOS/Views/ReaderView.Video.cs",
+      "sha256": "cd860cd872f0a1e391d10b4982faf8a0ed7f063dd76d039e0e7ff5566381e563",
+      "status": "P5第三十五批：原单页媒体书/按秒导航/播放意图/主元素音频/EOS与占位关系适配；WPF和Windows播放由官方AVPlayer替换，见p5-video.md"
+    },
+    {
+      "source": "NeeView/ViewContents/PageMediaContext.cs",
+      "target": "src/NeeView.MacOS/Views/ReaderView.Video.cs",
+      "sha256": "ea304f02051b47fbe636c8a7e894adf3597d6fb081de497d6436da3b70f29056",
+      "status": "P5第三十五批：原单页媒体书/按秒导航/播放意图/主元素音频/EOS与占位关系适配；WPF和Windows播放由官方AVPlayer替换，见p5-video.md"
+    },
+    {
+      "source": "NeeView/PageSelect/MediaControl/IMediaPlayer.cs",
+      "target": "src/NeeView.Engine/Bitmap/MediaPlayerContracts.cs",
+      "sha256": "71778942d9812e87a083e2f8528de48d5333b7c6d47a255a04186c295c8d6e5a",
+      "status": "P5第三十五批：原单页媒体书/按秒导航/播放意图/主元素音频/EOS与占位关系适配；WPF和Windows播放由官方AVPlayer替换，见p5-video.md"
+    },
+    {
+      "source": "NeeView/ViewContents/MediaViewContentStrategy.cs",
+      "target": "src/NeeView.Backends/MacVideoPlayerFactory.cs",
+      "sha256": "929b9692de8b31c4ce834ad697b3f9cf0bf610dcacc086ff428aa12a7f882e07",
+      "status": "P5第三十五批：原单页媒体书/按秒导航/播放意图/主元素音频/EOS与占位关系适配；WPF和Windows播放由官方AVPlayer替换，见p5-video.md"
     }
   ],
   "rule_references": [

@@ -68,14 +68,14 @@ internal static class ReaderEffectScene
         {
             var icon = ArchivePageRenderer.Fit(image.Deflate(Math.Min(image.Width, image.Height) / 4), new(16, 18));
             int save = canvas.Save(); canvas.Translate((float)icon.X, (float)icon.Y); canvas.Scale((float)icon.Width / 16, (float)icon.Height / 18);
-            using var path = SKPath.ParseSvgPathData("M0,0 L14,0 14,10 16,12 16,18 0,18 Z M14,10 L13,12 13,18");
+            using var path = SKPath.ParseSvgPathData(ArchivePageRenderer.IconPath(page));
             using var pen = new SKPaint { Color = border, Style = SKPaintStyle.Stroke, StrokeWidth = 1 }; canvas.DrawPath(path, pen); canvas.RestoreToCount(save);
         }
         int clip = canvas.Save(); canvas.ClipRect(Rect(card));
         try
         {
             var info = new Point(card.X + 12, card.Y + card.Height * .77);
-            Text(canvas, page.EntryName, info, 14, foreground); Text(canvas, (page.PageType == PageType.Folder ? "文件夹" : "压缩包") + " · 双击封面打开", info + new Avalonia.Vector(0, 25), 11, foreground);
+            Text(canvas, page.EntryName, info, 14, foreground); Text(canvas, ArchivePageRenderer.Caption(page), info + new Avalonia.Vector(0, 25), 11, foreground);
             if (status.Length > 0 && pixels is null) Text(canvas, status, info + new Avalonia.Vector(0, 46), 11, foreground);
         }
         finally { canvas.RestoreToCount(clip); }

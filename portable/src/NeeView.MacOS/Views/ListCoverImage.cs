@@ -89,7 +89,8 @@ public sealed class ListCoverImage : Control
         base.Render(context); var area = new Avalonia.Rect(Bounds.Size); using var clip = context.PushClip(area);
         if (_bitmap is null)
         {
-            context.DrawText(new FormattedText(Error is null ? Placeholder : "!", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("sans-serif"), 24, IconBrush), area.Center - new Avalonia.Vector(12, 14));
+            var placeholder=PageSource is {} page?ArchivePageRenderer.IsMedia(page):Source is {} path&&MediaFormats.IsBook(path);
+            context.DrawText(new FormattedText(Error is null ? placeholder?"▶":Placeholder : "!", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("sans-serif"), 24, IconBrush), area.Center - new Avalonia.Vector(12, 14));
             return;
         }
         var source = new Avalonia.Rect(_bitmap.Size);

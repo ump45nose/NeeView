@@ -13,7 +13,7 @@ public sealed class SlideShow : ObservableObject, IDisposable
     private long _count, _epoch;
     private Book? _book, _displayBook;
     private PageRange? _displayRange;
-    private AnimatedMediaPlayer? _waitingPlayer;
+    private IMediaPlayer? _waitingPlayer;
     public event EventHandler<SlideShowPlayedEventArgs>? Played;
     /// <param name="operation">唯一阅读控制，所有导航仍走其命令入口。</param>
     /// <param name="clock">单调秒数；测试可注入，不使用墙上时间。</param>

@@ -88,14 +88,16 @@ public sealed partial class ReaderView
     private void SelectCurrentMedia()
     {
         if (_operation is null) return;
-        var player = _operation.Book?.CurrentPage is { } page ? _animations.GetValueOrDefault(page)?.Player : null;
+        foreach(var video in _videos.Values) ApplyVideoOptions(video);
+        var page=_frame?.Elements.FirstOrDefault(e=>!e.IsDummy)?.Page??_operation.Book?.CurrentPage;
+        IMediaPlayer? player = page is not null ? (IMediaPlayer?)_videos.GetValueOrDefault(page)?.Player ?? _animations.GetValueOrDefault(page)?.Player : null;
         if (ReferenceEquals(player, _operation.CurrentMediaPlayer)) return;
         _operation.CurrentMediaPlayer = player; MediaChanged?.Invoke(this, EventArgs.Empty);
     }
     private void MediaPlayerChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs args)
     {
         if (args.PropertyName is nameof(AnimatedMediaPlayer.IsPlaying) or nameof(AnimatedMediaPlayer.IsEnabled)
-            && sender is AnimatedMediaPlayer { IsPlaying: true, IsEnabled: true }) StartMediaTimer();
+            && sender is IMediaPlayer { IsPlaying: true, IsEnabled: true }) StartMediaTimer();
         if (args.PropertyName is nameof(AnimatedMediaPlayer.IsPlaying) or nameof(AnimatedMediaPlayer.IsRepeat)) MediaChanged?.Invoke(this, EventArgs.Empty);
     }
     private void StartMediaTimer()
@@ -113,8 +115,9 @@ public sealed partial class ReaderView
     public async Task RefreshMediaAsync()
     {
         foreach (var animation in _animations.Values) animation.Player.IsRepeat = Config.Current.Image.IsMediaRepeat;
+        foreach(var video in _videos.Values)ApplyVideoOptions(video);
         _lastMediaTick = Stopwatch.GetTimestamp(); await UpdateMediaFramesAsync(TimeSpan.Zero);
-        if (_animations.Values.Any(a=>a.Player.IsPlaying && a.Player.IsEnabled)) StartMediaTimer();
+        if (_animations.Values.Any(a=>a.Player.IsPlaying && a.Player.IsEnabled)||_videos.Values.Any(v=>v.Player.IsPlaying&&v.Player.IsEnabled)) StartMediaTimer();
     }
     private async Task UpdateMediaFramesAsync(TimeSpan elapsed)
     {
@@ -143,7 +146,8 @@ public sealed partial class ReaderView
                 }
                 finally { frame?.Dispose(); }
             }
-            if (!_animations.Values.Any(a=>a.Player.IsPlaying && a.Player.IsEnabled)) _mediaTimer.Stop();
+            await UpdateVideoFramesAsync();
+            if (!_animations.Values.Any(a=>a.Player.IsPlaying && a.Player.IsEnabled)&&!_videos.Values.Any(v=>v.Player.IsPlaying&&v.Player.IsEnabled)) _mediaTimer.Stop();
         }
         finally { _updatingMedia = false; }
         if (_pendingMediaUpdate) { _pendingMediaUpdate = false; await UpdateMediaFramesAsync(TimeSpan.Zero); }
@@ -152,6 +156,7 @@ public sealed partial class ReaderView
     {
         _mediaTimer.Stop(); _mediaTimer.Tick -= MediaTimerTick;
         foreach (var animation in _animations.Values) animation.Dispose(); _animations.Clear(); _animationAttempts.Clear();
+        ClearVideos();
         SelectCurrentMedia();
     }
 }

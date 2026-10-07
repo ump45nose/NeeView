@@ -73,6 +73,18 @@
         <CheckBox x:Name="PdfLimitSource" Content="限制源尺寸（当前用于 PDF 页面）" IsChecked="{Binding IsLimitSourceSize, Mode=TwoWay}" />
         <Grid ColumnDefinitions="*,Auto,*"><NumericUpDown x:Name="PdfMaximumWidth" AutomationProperties.Name="最大源宽度" Value="{Binding MaximumWidth, Mode=TwoWay}" Minimum="1024" Maximum="{Binding MaximumWidthMaximum}" Increment="256" /><TextBlock Grid.Column="1" Text=" × " VerticalAlignment="Center" /><NumericUpDown x:Name="PdfMaximumHeight" Grid.Column="2" AutomationProperties.Name="最大源高度" Value="{Binding MaximumHeight, Mode=TwoWay}" Minimum="1024" Maximum="{Binding MaximumHeightMaximum}" Increment="256" /></Grid>
         <TextBlock Text="保存后用于后续尺寸探测及渲染；已打开页面不会因修改表单重新扫描。密码读取已接入，分卷尚未迁入。" TextWrapping="Wrap" />
+        <StackPanel x:Name="VideoSettings" Spacing="10">
+          <TextBlock Classes="settings-section" Text="视频" FontSize="{DynamicResource SystemFontSizeLarge}" />
+          <CheckBox x:Name="VideoEnabled" Content="将视频作为书籍打开" IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
+          <CheckBox x:Name="VideoPageEnabled" Content="将普通书中的视频作为媒体页播放" IsChecked="{Binding IsMediaPageEnabled, Mode=TwoWay}" />
+          <TextBlock Text="视频扩展名" /><TextBox x:Name="VideoFileTypes" Text="{Binding SupportFileTypes, Mode=TwoWay}" />
+          <TextBlock Text="打开媒体书后开始播放的延迟（秒）" /><NumericUpDown x:Name="VideoDelay" Value="{Binding Delay, Mode=TwoWay}" Minimum="{Binding DelayMinimum}" Maximum="{Binding DelayMaximum}" Increment="0.1" FormatString="0.#####" />
+          <CheckBox x:Name="VideoMuted" Content="静音" IsChecked="{Binding IsMuted, Mode=TwoWay}" />
+          <TextBlock Text="视频音量" /><NumericUpDown x:Name="VideoVolume" Value="{Binding Volume, Mode=TwoWay}" Minimum="{Binding VolumeMinimum}" Maximum="{Binding VolumeMaximum}" Increment="0.1" FormatString="0.#####" />
+          <CheckBox x:Name="VideoRepeat" Content="循环播放媒体书" IsChecked="{Binding IsRepeat, Mode=TwoWay}" />
+          <CheckBox Content="原 Windows libVLC 后端（配置保留）" IsChecked="{Binding LegacyVlc}" IsEnabled="False" />
+          <TextBlock Text="使用 macOS 系统播放器。具体容器、编解码器取决于系统支持；普通媒体页循环沿用图像动画循环开关。原 Windows libVLC 路径及字幕配置保留，未接入此后端。" TextWrapping="Wrap" />
+        </StackPanel>
         <StackPanel x:Name="AnimationSettings" Spacing="10">
           <CheckBox x:Name="ImageAspectRatioEnabled" Content="将图像的分辨率（DPI）反映到显示尺寸" IsChecked="{Binding AspectRatio, Mode=TwoWay}" />
           <TextBlock Classes="settings-section" Text="图像动画" FontSize="{DynamicResource SystemFontSizeLarge}" />

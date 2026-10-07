@@ -1033,6 +1033,7 @@ public sealed partial class MainWindow : Window
                 _sidePanels?.SaveWeights();
                 // 先完成可靠保存，再退订与释放显示资源；失败不能留下已销毁的阅读窗口。
                 await _model.Operation.DisposeAsync();
+                await Viewer.CloseMediaAsync();
                 _model.Operation.Bookshelf.Changed -= FolderTree_PlaceChanged;
                 _model.Operation.PageEndDialogAsync = null;
                 _model.Operation.RequestArchiveKeyAsync = null;

@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace NeeView;
 
 /// <summary>保留原帧位置及播放控制；时钟、解码和界面由表现端拥有。</summary>
-public sealed class AnimatedMediaPlayer : ObservableObject, IDisposable
+public sealed class AnimatedMediaPlayer : ObservableObject, IMediaPlayer
 {
     private readonly AnimatedImageInfo _info;
     private readonly long[] _starts;
@@ -23,6 +23,9 @@ public sealed class AnimatedMediaPlayer : ObservableObject, IDisposable
     public event EventHandler? MediaEndOfStreamReached;
     public AnimatedImageInfo Info => _info;
     public bool HasAudio => false;
+    public bool IsAudioEnabled { get; set; } = true;
+    public bool IsMuted { get; set; }
+    public double Volume { get; set; } = .5;
     public bool HasVideo => true;
     public bool IsDisposed => _disposed;
     // 原IsEnabled只暂停实际推进，不丢弃用户的播放意图，重新启用后继续。
@@ -31,7 +34,7 @@ public sealed class AnimatedMediaPlayer : ObservableObject, IDisposable
     public bool IsPlaying { get => _isPlaying; private set => SetProperty(ref _isPlaying, value); }
     public bool ScrubbingEnabled => true;
     public bool RateEnabled => false;
-    public double Rate => 1;
+    public double Rate { get => 1; set { } }
     public TimeSpan Duration => TimeSpan.FromTicks(_starts[^1]);
     public int CurrentFrameIndex => _currentFrame;
     public int EndOfStreamCount { get; private set; }

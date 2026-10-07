@@ -68,7 +68,8 @@ public sealed partial class BookOperation
                         // Config.BookSetting 与当前 Book.Setting 共享对象，分支复制已应用候选；显式使用候选避免隐含依赖。
                         var recollect = reading!.IsRecursiveFolder != candidate.BookSetting.IsRecursiveFolder || snapshot.System.BookPageCollectMode != Config.Current.System.BookPageCollectMode
                             || snapshot.System.ArchiveRecursiveMode != Config.Current.System.ArchiveRecursiveMode
-                            || JsonSerializer.Serialize(snapshot.Archive.Pdf) != JsonSerializer.Serialize(Config.Current.Archive.Pdf);
+                            || JsonSerializer.Serialize(snapshot.Archive.Pdf) != JsonSerializer.Serialize(Config.Current.Archive.Pdf)
+                            || MediaFormats.IndexChanged(snapshot.Archive.Media,Config.Current.Archive.Media);
                         if (reading.SortMode != current.Setting.SortMode) current.Sort(token);
                         Position = new(anchor?.Index ?? previousPosition.Index, previousPosition.Part);
                         RebuildFrame(MoveDirection);

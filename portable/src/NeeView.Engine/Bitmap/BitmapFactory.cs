@@ -174,6 +174,8 @@ public sealed partial class BitmapFactory(IImageDecoder decoder) : IDisposable
             await _decodeSlots.WaitAsync(pending.Cancellation.Token); decodeHeld = true;
             await using var cover = await resolve(pending.Cancellation.Token);
             var entry = cover.Entry ?? throw new EmptyArchivePageException();
+            // 原MediaPageThumbnail为媒体占位，不把容器交给静态图片delegate。
+            if(entry.IsVideoContent())throw new EmptyArchivePageException();
             await using var stream = await entry.Archive.OpenEntryAsync(entry, pending.Cancellation.Token);
             var image = await decoder.DecodeAsync(stream, request, pending.Cancellation.Token);
             var result = new Entry(image, request.IsThumbnail);

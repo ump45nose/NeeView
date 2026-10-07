@@ -361,7 +361,7 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
             var item = Layout.Items[index]; var page = _pages[index];
             var target = new Avalonia.Rect(item.X - _offsetX, item.Y - _offset, item.Width, item.Height);
             if (effected) { /* 已合成整视口；选择框及滚动UI保留在效果外层。 */ }
-            else if (page.PageType.IsFolder()) ArchivePageRenderer.Draw(owner, context, page, target, _images.GetValueOrDefault(page)?.Bitmap, _errors.GetValueOrDefault(page) ?? (_pending.ContainsKey(page) ? "正在加载…" : ""));
+            else if (page.PageType.IsFolder()||page.IsVideo) ArchivePageRenderer.Draw(owner, context, page, target, _images.GetValueOrDefault(page)?.Bitmap, _errors.GetValueOrDefault(page) ?? (_pending.ContainsKey(page) ? "正在加载…" : ""));
             else if (_images.TryGetValue(page, out var image))
             {
                 var trim = Config.Current.ImageTrim; var size = image.Bitmap.PixelSize;
@@ -391,7 +391,7 @@ internal sealed class ReaderBrowsePresenter(ReaderView owner, BookOperation oper
             var item = Layout.Items[index]; var page = _pages[index];
             var target = new Avalonia.Rect(item.X - _offsetX, item.Y - _offset, item.Width, item.Height);
             var image = _images.GetValueOrDefault(page);
-            if (page.PageType.IsFolder()) ReaderEffectScene.Card(owner, canvas, page, target, image?.Lease.Image, image is null ? null : image.Retain,
+            if (page.PageType.IsFolder()||page.IsVideo) ReaderEffectScene.Card(owner, canvas, page, target, image?.Lease.Image, image is null ? null : image.Retain,
                 _errors.GetValueOrDefault(page) ?? (_pending.ContainsKey(page) ? "正在加载…" : ""), Matrix.Identity);
             else if (image is not null)
             {

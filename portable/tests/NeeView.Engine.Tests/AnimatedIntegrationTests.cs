@@ -31,7 +31,7 @@ public sealed class AnimatedIntegrationTests
         Assert.False(Config.Current.Image.Standard.IsAnimatedGifEnabled);Assert.False(Config.Current.Image.IsMediaRepeat);Assert.Equal(.12346,Config.Current.Archive.Media.PageSeconds);
         var raw=JsonNode.Parse(File.ReadAllText(Path.Combine(f.State,"UserSetting.json")))!;
         Assert.Equal(7,raw["Config"]!["Image"]!["Standard"]!["Future"]!.GetValue<int>());Assert.Equal(8,raw["Config"]!["Image"]!["Future"]!.GetValue<int>());
-        Assert.Equal(9,raw["Config"]!["Archive"]!["Media"]!["Future"]!.GetValue<int>());Assert.False(raw["Config"]!["Archive"]!["Media"]!["IsRepeat"]!.GetValue<bool>());
+        Assert.Equal(9,raw["Config"]!["Archive"]!["Media"]!["Future"]!.GetValue<int>());Assert.Null(raw["Config"]!["Archive"]!["Media"]!["IsRepeat"]);Assert.False(Config.Current.Archive.Media.IsRepeat);
     }
     [Fact]
     public async Task MediaCommandsKeepIndependentDeltaDefaultsAndUnknownJson()
@@ -101,7 +101,7 @@ public sealed class AnimatedIntegrationTests
         var operation=f.Operation(state);var factory=new BitmapFactory(new MagickImageDecoder());var window=new MainWindow();window.Bind(new(operation,new(operation),state),factory,new NoPlatform());window.Show();
         try
         {
-            await window.OpenAsync(path);await operation.JumpAsync(operation.Book!.Pages.First(p=>p.EntryName.EndsWith("000.gif")).Index);await window.Viewer.RefreshAsync();await Wait(()=>operation.MediaExists(),()=> $"page={operation.Book?.CurrentPage?.EntryName}; type={operation.Book?.CurrentPage?.PageType}; error={window.Viewer.GetPageError(operation.Book!.CurrentPage!)}; animations={window.Viewer.AnimationCount}; displays={window.Viewer.DisplayCount}; bounds={window.Viewer.Bounds}");var player=operation.CurrentMediaPlayer!;
+            await window.OpenAsync(path);await operation.JumpAsync(operation.Book!.Pages.First(p=>p.EntryName.EndsWith("000.gif")).Index);await window.Viewer.RefreshAsync();await Wait(()=>operation.MediaExists(),()=> $"page={operation.Book?.CurrentPage?.EntryName}; type={operation.Book?.CurrentPage?.PageType}; error={window.Viewer.GetPageError(operation.Book!.CurrentPage!)}; animations={window.Viewer.AnimationCount}; displays={window.Viewer.DisplayCount}; bounds={window.Viewer.Bounds}");var player=Assert.IsType<AnimatedMediaPlayer>(operation.CurrentMediaPlayer);
             player.Pause();player.Position=0;await window.Viewer.RefreshMediaAsync();Dispatcher.UIThread.RunJobs();window.UpdateLayout();var red=CenterPixel(window);
             Assert.True(red[2]>240&&red[1]<10);player.Position=1;await window.Viewer.RefreshMediaAsync();Dispatcher.UIThread.RunJobs();var green=CenterPixel(window);Assert.True(green[1]>240&&green[2]<10);
             var control=window.FindControl<MediaControlView>("DockMediaControlSocket")!;Assert.True(control.IsVisible);

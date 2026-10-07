@@ -122,6 +122,7 @@ public sealed partial class MacApp : Avalonia.Application
             images = new BitmapFactory(decoder); operation.AttachFileOperations(_destinationMoves, _fileOperations, images);
             operation.AttachFileClipboard(new MacFileClipboard());
             _entryRealizer ??= new ArchiveEntryRealizer(); operation.AttachArchiveEntryRealizer(_entryRealizer);
+            operation.AttachVideoPlayers(new MacVideoPlayerFactory(_entryRealizer));
             _temporaryPlaylists ??= new TemporaryPlaylistService(); operation.AttachTemporaryPlaylists(_temporaryPlaylists);
             _contentDropReceiver ??= new ContentDropReceiver(); operation.AttachContentDropReceiver(_contentDropReceiver);
             model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state);

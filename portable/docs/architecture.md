@@ -221,3 +221,5 @@ P5第二十五批：原外部应用命令/集合与独立设置草稿接入；En
 P5第二十六批：原CopyImage首图像源、完整PNG及系统图像剪贴板接入；现有显示租约后台编码，切书/关闭拒绝旧结果，三项目/原JSON保持，见[契约](p5-image-copy.md)。
 
 P5第二十七批：原三导出命令、Config.Book参数、命名及整书页框前进沿唯一BookOperation/Archive接入；ReaderView离屏复用真实绘制并按原尺寸请求像素，JSON/三项目保持，见[图像导出契约](p5-image-export.md)。
+
+P5第三十五批：原单页媒体书、按秒导航、音频/循环和播放条通过唯一BookOperation/JSON/ReaderView接入；AVPlayer提供真实时钟/seek/当前帧，现有工厂计显示帧，原生缓冲共享有界预算。规格变化保留播放器、首帧与晚到结果按原代次裁决，关闭等待真实资源释放。见[视频契约](p5-video.md)。

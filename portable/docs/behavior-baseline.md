@@ -165,3 +165,5 @@ P5第二十二批：原六种画布背景、五自定义刷、透明页底色/HS
 P5第三十二批：原PageFrameBox/EffectPanel整ScrollViewer作用域与原ViewImageExporter合成画布接入，十四类效果全部有实际后端。六空间参数/公式按固定Expression指令核验；Blur按官方WPF离散核与修正权重，Auto采样保留CPU nearest/GPU bilinear。双页接缝、页背景、模糊外扩/累计中心、半页/旋转及只读实图View导出/源Copy/关闭资源归零已自动验证；固定Windows动态与实际GPU另验，见[契约](p5-spatial-effects.md)。
 
 P5第三十四批：原ImageResizeFilter/UnsharpMask/十一核固定0.15.0适配。配置、预设及命令保留；静态像素/预算/取消及保存回滚自动对照，完整WIC/MagicScaler动态像素比较待验。见[p5-resize-filter.md](p5-resize-filter.md)。
+
+P5第三十五批：原MediaArchive整文件单条目，不按PageSeconds切页；根媒体书翻页按秒，普通视频页沿原页框。首帧延迟、可见性保留播放意图、选中首元素音频及EOS先计数后事件接入；原视频时间不持久化。原缩略图是媒体占位。系统codec、轨道和字幕与Windows VLC不等价，字段只保留；详见[p5-video.md](p5-video.md)。

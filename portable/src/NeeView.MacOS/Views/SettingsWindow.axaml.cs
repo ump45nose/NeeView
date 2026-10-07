@@ -38,7 +38,7 @@ public sealed partial class SettingsWindow : Window
         this.FindControl<Button>("OpenThemeFolder")!.IsEnabled = platform is not null;
         _inputs = model.Commands.Definitions.Select(d => new ShortcutEdit(d, model.SaveData.GetShortcut(d.Name, d.Shortcut), available?.Invoke(d.Name) ?? model.Commands.IsAvailable(d.Name), model.SaveData.GetMouseGesture(d.Name, d.MouseGesture).ToString())).ToArray();
         this.FindControl<ListBox>("InputList")!.ItemsSource = _inputs; Fill(); FillFilm(); FillAutoHide(); FillView(); FillNavigation(); FillFiles(); FillTheme(); FillFonts(); FillPdf(); FillAnimation();
-        FillSlideShow(available); FillBackground(); FillLoupe();
+        FillSlideShow(available); FillBackground(); FillLoupe(); FillVideo();
         this.FindControl<CheckBox>("GestureEnabled")!.IsChecked = Config.Current.Mouse.IsGestureEnabled;
         FillNumber("GestureDistance", Config.Current.Mouse.GestureMinimumDistance, 5, 200);
         this.FindControl<ComboBox>("InputScheme")!.SelectedIndex = (int)Config.Current.Command.PresetInputScheme;
@@ -289,6 +289,7 @@ public sealed partial class SettingsWindow : Window
                 _fontSettings!.Apply(Config.Current.Fonts);
                 _pdfSettings!.Apply(Config.Current.Archive.Pdf, Config.Current.Performance);
                 _animationSettings!.Apply(Config.Current.Image,Config.Current.Archive.Media);
+                _videoSettings!.Apply(Config.Current.Archive.Media);
                 _slideShowSettings!.Apply(Config.Current.SlideShow, Config.Current.StartUp);
                 _backgroundSettings!.Apply(Config.Current.Background, Config.Current.ImageDotKeep);
                 _loupeSettings!.Apply(Config.Current.Loupe);

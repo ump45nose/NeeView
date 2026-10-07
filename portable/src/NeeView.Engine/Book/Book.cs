@@ -8,6 +8,8 @@ public sealed class Book(Archive source, List<Page> pages, BookSettingConfig set
     private BookMementoControl? _mementoControl;
     public BookMementoControl MementoControl => _mementoControl ??= new(this);
     public Archive Source { get; } = source;
+    /// <summary>原书级媒体资格只来自根MediaArchive，普通书中的媒体页不改变整书导航。</summary>
+    public bool IsMedia => Source is MediaArchive;
     public PageSortModeClass PageSortModeClass => Source.IsPlaylist ? PageSortModeClass.WithEntry : PageSortModeClass.Normal;
     public BookAddress BookAddress { get; } = BookAddress.Create(source);
     public ArchiveEntryCollection? Entries { get; init; }

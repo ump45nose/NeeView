@@ -188,6 +188,7 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
             catch (OperationCanceledException) { if (ReferenceEquals(_request, request)) _request = null; request.Dispose(); return; }
         }
         ReconcileAnimations(sources);
+        ReconcileVideos(sources);
         foreach (var page in _images.Keys.Except(sources).ToArray()) { _images[page].Dispose(); _images.Remove(page); }
         foreach (var page in _pageErrors.Keys.Except(sources).ToArray()) _pageErrors.Remove(page);
         InvalidateVisual();
@@ -196,6 +197,7 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
             foreach (var page in sources)
             {
                 var specification=GetRequest(page);
+                if(page.IsVideo){await EnsureVideoAsync(page,specification,revision,request.Token);continue;}
                 if (_images.TryGetValue(page,out var displayed) && displayed.CanReuse(page,specification))
                 { await EnsureAnimationAsync(page, specification, revision, request.Token); continue; }
                 BitmapLease lease;
