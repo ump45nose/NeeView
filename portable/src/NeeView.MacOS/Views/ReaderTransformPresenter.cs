@@ -146,6 +146,14 @@ internal sealed class ReaderTransformPresenter : IShareTransformContext, IDispos
         var bounds = new Avalonia.Rect(-Frame.StretchedSize.Width / 2, -Frame.StretchedSize.Height / 2, Frame.StretchedSize.Width, Frame.StretchedSize.Height).TransformToAABB(GetMatrix());
         return new(bounds.X, bounds.Y, bounds.Width, bounds.Height);
     }
+    /// <summary>按原参考视口计算拉伸包围尺寸，保留页框/基准缩放/旋转，不修改用户变换或解码。</summary>
+    public NeeView.Size GetReferenceStretchSize(NeeView.Size reference)
+    {
+        if (Frame is null) return default;
+        if (reference.Width <= 0 || reference.Height <= 0) reference = Viewport;
+        var scale = BaseScale * CalcStretch(Frame, reference);
+        return GeometryMath.RotateSize(new(Frame.StretchedSize.Width * scale, Frame.StretchedSize.Height * scale), Frame.Angle + Angle);
+    }
     /// <summary>原中心策略，Auto按当前内容相对视口的比例逐轴求中心。</summary>
     public Point GetCenter(DragControlCenter mode, Point? pointer = null, bool allowAuto = false)
     {

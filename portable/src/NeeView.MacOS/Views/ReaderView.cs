@@ -551,6 +551,8 @@ public sealed partial class ReaderView : Control, IDisposable, IViewImageExporte
     }
     /// <summary>将原页框实际绘制尺寸转为轴对齐矩形，含双页间距、分割及旋转。</summary>
     public NeeView.Rect GetContentRect() => _transform.GetContentRect();
+    /// <summary>浮动自动调整复用唯一变换和页框，参考视口采用原 MainView.ReferenceSize。</summary>
+    public NeeView.Size GetReferenceStretchSize(NeeView.Size reference) => _transform.GetReferenceStretchSize(reference);
     /// <summary>新帧按阅读与移动方向进入起点；普通刷新/手工缩放保留当前平移。</summary>
     private void AlignPageOrigin(int direction)
     {

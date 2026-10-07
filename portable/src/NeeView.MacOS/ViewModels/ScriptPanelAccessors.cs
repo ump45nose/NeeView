@@ -4,10 +4,10 @@ namespace NeeView.MacOS.ViewModels;
 /// <summary>访问现有面板与宿主；不拥有阅读、布局或文件模型。</summary>
 public sealed class ScriptPanelAccessors
 {
-    public ScriptPanelAccessors(ScriptAccessContext context, ReaderWorkspaceViewModel model, Window window, Func<string, Window?> resolve, ScriptPanelBindings? bindings = null)
+    public ScriptPanelAccessors(ScriptAccessContext context, ReaderWorkspaceViewModel model, Window window, Func<string, Window?> resolve, ScriptPanelBindings? bindings = null, MainViewPanelAccessor? mainView = null)
     {
         Window = new(context, () => window, () => { window.Show(); window.Activate(); }, window.Close);
-        MainView = new(context);
+        MainView = mainView ?? new(context);
         Bookshelf = new BookshelfPanelAccessor(context, model, resolve, bindings); PageList = new PageListPanelAccessor(context, model, resolve, bindings);
         Bookmark = new BookmarkPanelAccessor(context, model, resolve, bindings); Playlist = new PlaylistPanelAccessor(context, model, resolve, bindings);
         History = new HistoryPanelAccessor(context, model, resolve, bindings); Information = new(context, model, "FileInformationPanel", resolve);
@@ -43,15 +43,22 @@ public class LayoutPanelAccessor
 }
 public sealed class WindowAccessor(ScriptAccessContext context, Func<Window?> resolve, Action open, Action close)
 {
-    public bool IsOpen { get => context.Read(() => resolve() is { IsVisible: true }); set { if (value) Open(); else Close(); } }
+    public bool IsOpen { get => context.Read(() => resolve() is not null); set { if (value) Open(); else Close(); } }
     public double Left { get => context.Read(() => (double)(resolve()?.Position.X ?? 0)); set => context.Write(() => { if (resolve() is { } w) w.Position = new((int)value, w.Position.Y); }); }
     public double Top { get => context.Read(() => (double)(resolve()?.Position.Y ?? 0)); set => context.Write(() => { if (resolve() is { } w) w.Position = new(w.Position.X, (int)value); }); }
     public double Width { get => context.Read(() => resolve()?.Width ?? 0); set => context.Write(() => { if (resolve() is { } w) w.Width = value; }); }
     public double Height { get => context.Read(() => resolve()?.Height ?? 0); set => context.Write(() => { if (resolve() is { } w) w.Height = value; }); }
     public string State
     {
-        get => context.Read(() => resolve()?.WindowState == WindowState.Normal ? "None" : resolve()?.WindowState.ToString() ?? "None");
-        set => context.Write(() => { if (resolve() is { } w) w.WindowState = value == "None" ? WindowState.Normal : Enum.Parse<WindowState>(value); });
+        get => context.Read(() => resolve()?.WindowState.ToString() ?? "None");
+        set => context.Write(() =>
+        {
+            var state = Enum.Parse<NeeView.Windows.WindowStateEx>(value);
+            if (!Enum.IsDefined(state)) throw new ArgumentException("Unknown window state.");
+            if (state == NeeView.Windows.WindowStateEx.None || resolve() is not { } w) return;
+            if (state == NeeView.Windows.WindowStateEx.FullDesktop) throw new NotSupportedException("跨屏全桌面宿主尚未迁移。");
+            w.WindowState = Enum.Parse<WindowState>(state.ToString());
+        });
     }
     public void Open() => context.Write(open);
     public void Close() => context.Write(close);

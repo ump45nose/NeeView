@@ -153,7 +153,10 @@ public sealed class UiTests
             var area = window.FindControl<Grid>("SidePanelFrame")!;
             Assert.Equal(41, area.ColumnDefinitions[0].ActualWidth); Assert.Equal(41, area.ColumnDefinitions[6].ActualWidth);
             Assert.True(menu.Bounds.Bottom <= area.Bounds.Top);
-            Assert.True(left.Bounds.Right < window.Viewer.Bounds.Left); Assert.True(window.Viewer.Bounds.Right < right.Bounds.Left);
+            // 查看器现在位于唯一可移出的宿主内，比较同一 SidePanelFrame 坐标系。
+            var readerOrigin = window.Viewer.TranslatePoint(default, area)!.Value;
+            Assert.True(left.Bounds.Right < readerOrigin.X);
+            Assert.True(readerOrigin.X + window.Viewer.Bounds.Width < right.Bounds.Left);
             Assert.True(area.Bounds.Bottom <= bottom.Bounds.Top);
             Assert.Equal(5, window.FindControl<ListBox>("PageList")!.ItemCount);
             var phase = Environment.GetEnvironmentVariable("NEEVIEW_ACCEPTANCE_PHASE") ?? "p2-bookmark";

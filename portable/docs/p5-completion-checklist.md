@@ -1,5 +1,7 @@
 # P5 完成清单
 
+第三十九批：[中央浮窗契约](p5-mainview.md)与[静默验收](../acceptance/p5-mainview-runtime.md)。原宿主/关闭/恢复/配置和StretchWindow接入；高级跨屏Window.State、脚本item及其余设置继续迁移。
+
 第三十八批：[脚本契约](p5-script.md)与[静默验收](../acceptance/p5-script-runtime.md)。原运行/命令/事件/控制台和实际选区、树、文件操作接通；完整脚本item、中央查看器浮动/窗口、其余设置和合理Mac命令继续迁移，P5整体未完成。
 
 第三十七批：[元数据/信息契约](p5-metadata.md)与[静默验收](../acceptance/p5-metadata-runtime.md)。原字段、评级搜索、信息分组与配置进入唯一链路；脚本、其余完整设置和合理Mac命令继续迁移，P5整体未完成。

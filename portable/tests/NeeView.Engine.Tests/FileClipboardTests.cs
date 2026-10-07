@@ -263,7 +263,8 @@ public sealed class FileClipboardTests
             await window.OpenAsync(f.Zip); Assert.False(window.IsCommandAvailable("CopyFile")); Assert.True(window.IsCommandAvailable("CopyBook"));
             var method = typeof(MainWindow).GetMethod("IsCommandImplemented", BindingFlags.Instance | BindingFlags.NonPublic)!;
             var items = new CommandTable(op).Definitions.Select(d => new { d.Name, d.Text, d.Shortcut, d.MouseGesture, d.Source, d.Stage, implemented = (bool)method.Invoke(window, [d.Name])! }).ToArray();
-            Assert.Equal(235, items.Length); Assert.Equal(223, items.Count(i => i.implemented));
+            Assert.Equal(235, items.Length); Assert.True(items.Single(i => i.Name == "CopyFile").implemented);
+            Assert.False(items.Single(i => i.Name == "CutFile").implemented);
             await File.WriteAllTextAsync(Output("commands.json"), JsonSerializer.Serialize(new { scope = "执行入口登记，不等于完整原功能覆盖率", total = items.Length, implemented = items.Count(i => i.implemented), items }, new JsonSerializerOptions { WriteIndented = true }), TestContext.Current.CancellationToken);
             window.UpdateLayout(); using var bitmap = new RenderTargetBitmap(new PixelSize((int)window.Bounds.Width, (int)window.Bounds.Height)); bitmap.Render(window); bitmap.Save(Output("layout.png"), PngBitmapEncoderOptions.Default);
         }

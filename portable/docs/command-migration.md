@@ -1,6 +1,6 @@
 # 完整命令迁移表
 
-固定基线235个原命令实例全部保留。当前为 **219个执行入口接入、16个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
+固定基线235个原命令实例全部保留。当前为 **226个执行入口接入、9个能力占位**；入口登记不是完整功能覆盖率。原帧全景、普通/内容目录树显隐及页面/书架/正文焦点已接入；脚本On/Off/ByMenu等完整参数仍在P5，见[P3清单](p3-completion-checklist.md)。Mac额外打开目录/窗口入口不计入原235项。
 
 原命令名、默认键位、方向手势、参数及菜单节点继续保留。未迁入口显示禁用/能力提示；已迁入口的参数、来源和交互限制以模块契约及验收记录为准。实际键位/手势按原A/B/C、阅读方向和用户差分计算。
 
@@ -96,7 +96,7 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | FocusMainView | 聚焦到主视图 |  |  | 已接入 | P3原主查看器焦点宿主接入 | NeeView/Command/Commands/FocusMainViewCommand.cs |
 | ToggleVisibleFilmStrip | 显示/隐藏幻灯条 |  |  | 已接入 | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleVisibleFilmStripCommand.cs |
 | ToggleHideFilmStrip | 启用/禁用自动隐藏幻灯条 |  |  | 已接入 | P2 宿主接入；具体范围见验收表 | NeeView/Command/Commands/ToggleHideFilmStripCommand.cs |
-| ToggleMainViewFloating | 切换主视图窗口 | F12 |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/ToggleMainViewFloatingCommand.cs |
+| ToggleMainViewFloating | 切换主视图窗口 | F12 |  | 已接入 | P5 原中央唯一查看器浮动/停靠与实际宿主贴合；见p5-mainview.md | NeeView/Command/Commands/ToggleMainViewFloatingCommand.cs |
 | ToggleFullScreen | 切换全屏状态 | F11 | U | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/ToggleFullScreenCommand.cs |
 | SetFullScreen | 全屏 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/SetFullScreenCommand.cs |
 | CancelFullScreen | 退出全屏 |  |  | 已接入 | P2 Mac 原窗口显示控制；见 p2-autohide.md | NeeView/Command/Commands/CancelFullScreenCommand.cs |
@@ -243,7 +243,7 @@ P5第三批迁入原旧命令/numbered实例及上下文菜单改名、Type/Valu
 | TouchEmulate | 模拟触控 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/TouchEmulateCommand.cs |
 | FocusPrevApp | 切换到上一个 NeeView | Ctrl+Shift+Tab |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/FocusPrevAppCommand.cs |
 | FocusNextApp | 切换到下一个 NeeView | Ctrl+Tab |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/FocusNextAppCommand.cs |
-| StretchWindow | 调整窗口大小 |  |  | 占位 | 待 P2–P5 | NeeView/Command/Commands/StretchWindowCommand.cs |
+| StretchWindow | 调整窗口大小 |  |  | 已接入 | P5 原中央唯一查看器浮动/停靠与实际宿主贴合；见p5-mainview.md | NeeView/Command/Commands/StretchWindowCommand.cs |
 | OpenConsole | 打开脚本控制台 |  |  | 已接入 | P5 原脚本/目录/控制台/帮助；见p5-script.md | NeeView/Command/Commands/OpenConsoleCommand.cs |
 
 P4第一批原九数字、MoveToFolderAs及Undo/Redo接入，数字默认输入1–9并保留可配置Index。第一批仅Once普通目录主图；第二批已迁入原多页策略及普通目录CopyToFolderAs，归档实体化复制待后续。DeleteFile/RenameBook已分别接入，CopyFile/CopyBook/Paste由第五批接入；CutFile/CutBook按用户决定保持禁用占位。菜单能力受原写权限/当前来源/有效目标/忙碌约束；详见[p4-destination-folders.md](p4-destination-folders.md)。

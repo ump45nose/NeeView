@@ -20,6 +20,7 @@ public sealed partial class MainWindow
             "FolderPanel" => SetListStyleAsync(false, style), "BookmarkPanel" => bookmark.SetListStyleAsync(style),
             "PlaylistPanel" => playlist.SetListStyleAsync(style), _ => throw new NotSupportedException("未知面板。")
         }, bookmark.ScriptModel, key => this.FindControl<TreeView>(key));
-        return new(context, _model, this, key => _sidePanels?.FloatingWindows.FirstOrDefault(w => w.PanelKey == key), bindings);
+        return new(context, _model, this, key => _sidePanels?.FloatingWindows.FirstOrDefault(w => w.PanelKey == key), bindings,
+            new(context, () => _mainView?.Window, () => _mainView?.SetFloating(true, true), () => _mainView?.SetFloating(false)));
     }
 }

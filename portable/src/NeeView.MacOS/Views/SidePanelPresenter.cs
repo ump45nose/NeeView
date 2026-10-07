@@ -35,6 +35,8 @@ public sealed class SidePanelPresenter : IDisposable
     private readonly Dictionary<string, FloatingPanelWindow> _windows = [];
     private Control? _dragRoot;
     private bool _disposing, _preparing, _refreshing;
+    private Border? _alternativeHost;
+    private const string AlternativePanel = "PageListPanel";
     public IReadOnlyCollection<FloatingPanelWindow> FloatingWindows => _windows.Values;
     /// <summary>浮窗输入进入同一命令路由，由实际窗口焦点确定作用域。</summary>
     public event EventHandler<KeyEventArgs>? FloatingKeyDown;
@@ -60,16 +62,18 @@ public sealed class SidePanelPresenter : IDisposable
     {
         if (_disposing || _refreshing) return;
         var signature = string.Join('|', _model.Layout.Docks.Select(d => d.Key + ":" + string.Join(';', d.Value.Items.Select(g => g.Orientation + ":" + string.Join(',', g.Select(p => p.Key)))) + ":" + d.Value.SelectedItem?.FirstOrDefault()?.Key)) + "|Windows:" + string.Join(',', _model.Layout.Windows);
+        signature += "|Alternative:" + (_alternativeHost is not null);
         if (_signature == signature) return; _signature = signature;
         _refreshing = true;
         try
         {
             // 先解除旧父容器，跨栏重排复用同一内容控件及选择状态。
             foreach (var grid in _contentGrids) grid.Children.Clear(); _contentGrids.Clear();
+            if (_alternativeHost is not null) _alternativeHost.Child = null;
             foreach (var host in _hosts.Values) { host.Children.Clear(); host.RowDefinitions.Clear(); host.ColumnDefinitions.Clear(); }
             foreach (var rail in _rails.Values) rail.Children.Clear();
             _dragSources.Clear(); _containers.Clear(); _groups.Clear();
-            foreach (var key in _windows.Keys.Where(k => !_model.Layout.Windows.Contains(k)).ToArray()) CloseWindowHost(key);
+            foreach (var key in _windows.Keys.Where(k => !_model.Layout.Windows.Contains(k) || _alternativeHost is not null && k == AlternativePanel).ToArray()) CloseWindowHost(key);
             foreach (var (side, dock) in _model.Layout.Docks)
             {
                 foreach (var group in dock.Items)
@@ -92,7 +96,11 @@ public sealed class SidePanelPresenter : IDisposable
                     header.ContextMenu = CreatePanelMenu(panel.Key, true);
                     _dragSources[header] = panel.Key;
                     var body = new Grid { RowDefinitions = new("Auto,*") };
-                    body.Children.Add(header); var content = _contents[panel.Key]; Grid.SetRow(content, 1); body.Children.Add(content); _contentGrids.Add(body);
+                    body.Children.Add(header);
+                    var content = _alternativeHost is not null && panel.Key == AlternativePanel
+                        ? new TextBlock { Text = "页面列表位于主窗口中央", Margin = new(8), TextWrapping = TextWrapping.Wrap }
+                        : _contents[panel.Key];
+                    Grid.SetRow(content, 1); body.Children.Add(content); _contentGrids.Add(body);
                     var border = new Border { Child = body, ClipToBounds = true, MinHeight = horizontal ? 0 : 64, MinWidth = horizontal ? 64 : 0 };
                     _containers[panel.Key] = border;
                     if (horizontal) Grid.SetColumn(border, slot); else Grid.SetRow(border, slot); host.Children.Add(border);
@@ -106,6 +114,7 @@ public sealed class SidePanelPresenter : IDisposable
             }
             foreach (var key in _model.Layout.Windows)
             {
+                if (_alternativeHost is not null && key == AlternativePanel) continue;
                 if (!_windows.TryGetValue(key, out var floating))
                 {
                     floating = new(key, Title(key)) { DataContext = _model };
@@ -121,9 +130,20 @@ public sealed class SidePanelPresenter : IDisposable
                 if (_window.IsVisible && !floating.IsVisible)
                 { floating.RestorePlacement(_model.Layout.Panels[key].WindowPlacement, _window); floating.Show(_window); Snap(floating); }
             }
+            if (_alternativeHost is not null) _alternativeHost.Child = _contents[AlternativePanel];
         }
         finally { _refreshing = false; }
         foreach (var floating in _windows.Values) Snap(floating);
+    }
+
+    /// <summary>中央浮动时临时借用唯一页面列表，不改原停靠/浮动布局和选择；归还后恢复原宿主。</summary>
+    /// <param name="host">中央替代插槽，null 表示归还。</param>
+    public void SetAlternativeHost(Border? host)
+    {
+        if (ReferenceEquals(host, _alternativeHost)) return;
+        SaveWeights();
+        if (_alternativeHost is not null) _alternativeHost.Child = null;
+        _alternativeHost = host; _signature = ""; Refresh();
     }
 
     /// <summary>设置重载强制恢复权重和浮动位置；复用唯一内容控件及已有窗口。</summary>
@@ -312,6 +332,8 @@ public sealed class SidePanelPresenter : IDisposable
     {
         if (_disposing) return; _disposing = true; CancelDrag(); DetachDrag(_root); _window.Opened -= OwnerOpened;
         foreach (var key in _windows.Keys.ToArray()) CloseWindowHost(key);
+        if (_alternativeHost is not null) _alternativeHost.Child = null;
+        _alternativeHost = null;
         foreach (var grid in _contentGrids) grid.Children.Clear(); _contentGrids.Clear(); FloatingKeyDown = null;
     }
     /// <summary>正常退出先冻结浮窗并保存位置；保存失败恢复同一内容供重试。</summary>

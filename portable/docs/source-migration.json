@@ -3860,6 +3860,30 @@
       "target": "src/NeeView.MacOS/ViewModels/ScriptTreeAccessors.cs",
       "sha256": "2b6d33a2e51b6894185cffb04651cad4241aa9f1949ef44d2bae1537a451a2e9",
       "status": "P5第三十八批：原脚本接口/命令/事件关系接入唯一模型、JSON、平台与资源；具体宿主替换及尚未完整迁入的MainView/BookItem/Window.State边界见p5-script.md。"
+    },
+    {
+      "source": "NeeView/Config/MainViewConfig.cs",
+      "target": "src/NeeView.Engine/Config/MainViewConfig.cs",
+      "sha256": "a8784769776f5fa64ce432083c098a6d1564c4f86b7808c6f326545687cc3c92",
+      "status": "P5第三十九批：原唯一中央查看器宿主、替代PageList、关闭/恢复/配置及参考尺寸关系，Avalonia替换WPF；高级跨屏窗口状态另批迁入。"
+    },
+    {
+      "source": "NeeView/MainView/MainViewManager.cs",
+      "target": "src/NeeView.MacOS/Views/MainViewPresenter.cs",
+      "sha256": "d0dffe577c02b9c06bc253bafa3472134fe2cec7db065a29113bc854b762fd42",
+      "status": "P5第三十九批：原唯一中央查看器宿主、替代PageList、关闭/恢复/配置及参考尺寸关系，Avalonia替换WPF；高级跨屏窗口状态另批迁入。"
+    },
+    {
+      "source": "NeeView/MainView/MainViewWindow.xaml.cs",
+      "target": "src/NeeView.MacOS/Views/MainViewWindow.cs",
+      "sha256": "474835ccfef3325ed0b403f2f8de009201d7e022c4457ad8553aa3591571da84",
+      "status": "P5第三十九批：原唯一中央查看器宿主、替代PageList、关闭/恢复/配置及参考尺寸关系，Avalonia替换WPF；高级跨屏窗口状态另批迁入。"
+    },
+    {
+      "source": "NeeView/MainView/MainViewViewModel.cs",
+      "target": "src/NeeView.MacOS/Views/MainWindow.MainView.cs",
+      "sha256": "e4981541e3568b34373f92f6bc22c9099f158b16a4aff74fbe4a9f4d6813ba56",
+      "status": "P5第三十九批：原唯一中央查看器宿主、替代PageList、关闭/恢复/配置及参考尺寸关系，Avalonia替换WPF；高级跨屏窗口状态另批迁入。"
     }
   ],
   "rule_references": [

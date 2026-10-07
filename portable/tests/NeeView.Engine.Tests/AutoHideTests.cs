@@ -69,7 +69,8 @@ public sealed class AutoHideTests
             await window.ExecuteAsync("SetFullScreen"); Pump(window);
             Assert.True(model.AutoHideMode); Assert.True(model.CanHideSlider); Assert.False(model.CanHideFilmStrip);
             Assert.False(model.MenuVisible); Assert.False(model.LeftVisible); Assert.False(model.RightVisible); Assert.False(model.SliderVisible); Assert.False(model.FilmStripVisible);
-            Assert.Equal(0, Grid.GetColumn(window.Viewer)); Assert.Equal(7, Grid.GetColumnSpan(window.Viewer));
+            var dock = window.FindControl<Border>("MainViewDockSocket")!;
+            Assert.Equal(0, Grid.GetColumn(dock)); Assert.Equal(7, Grid.GetColumnSpan(dock));
             Assert.Equal(new Thickness(0, 32, 0, 20), window.FindControl<Grid>("LeftDockHost")!.Margin);
             await window.ExecuteAsync("ShowHiddenPanels"); Pump(window);
             Assert.True(model.SliderVisible); Assert.True(model.FilmStripVisible); Assert.True(model.MenuVisible);

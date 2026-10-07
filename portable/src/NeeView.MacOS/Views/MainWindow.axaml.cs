@@ -31,6 +31,9 @@ public sealed partial class MainWindow : Window
     private double _sliderWheel;
     private double _leftWidth, _rightWidth;
     private SidePanelPresenter? _sidePanels;
+    private MainViewPresenter? _mainView;
+    public MainViewWindow? FloatingMainView => _mainView?.Window;
+    private Window ViewerHostWindow => _mainView?.Window ?? (Window)this;
     private AutoHidePresenter? _autoHide;
     private WindowState _lastFullScreenState = WindowState.Normal;
     public ReaderView Viewer => this.FindControl<ReaderView>("MainViewSocket")!;
@@ -39,6 +42,7 @@ public sealed partial class MainWindow : Window
     private SliderTextBox PageNumber => this.FindControl<SliderTextBox>("PageNumberView")!;
     private static readonly HashSet<string> HostCommands = new(StringComparer.Ordinal)
     {
+        "ToggleMainViewFloating", "StretchWindow",
         "OpenScriptsFolder",
         "OpenConsole", "CancelScript", "HelpScript", "ToggleCustomSize", "ToggleTrim", "ToggleGrid", "ToggleEffect", "ToggleResizeFilter", "ToggleNearestNeighbor", "ToggleVisibleAddressBar", "ToggleVisiblePageSlider", "ToggleWindowMinimize", "ToggleWindowMaximize", "OpenSettingFilesFolder", "SaveSetting", "ReloadSetting", "ExportBackup", "LoadAs", "OpenFolder", "ReLoad", "ParentFolder", "OpenExplorer", "CloseWindow", "CloseApplication", "ToggleFullScreen", "MoveToFolderAs", "CopyToFolderAs",
         "ViewScaleUp", "ViewScaleDown", "ViewScrollUp", "ViewScrollDown", "ViewScrollLeft", "ViewScrollRight", "OpenContextMenu", "SetStretchModeUniform", "SetStretchModeNone", "ToggleHideLeftPanel", "ToggleHideRightPanel",
@@ -63,19 +67,20 @@ public sealed partial class MainWindow : Window
     public void AttachPlatformInput(IPlatformInput input)
     {
         Viewer.AttachLoupeInput(null, null); _platformInput?.Dispose(); _platformInput = input; input.Attach(HandlePlatformGesture);
-        Viewer.AttachLoupeInput(input, () => TryGetPlatformHandle()?.Handle ?? 0);
+        Viewer.AttachLoupeInput(input, () => ViewerHostWindow.TryGetPlatformHandle()?.Handle ?? 0);
     }
     /// <summary>真实精确滚动连续平移，捏合围绕当前指针缩放，不使用增量大小猜设备。</summary>
     public bool HandlePlatformGesture(PlatformGesture gesture)
     {
-        if (_preparing || !IsActive || WindowInteraction.HasDialog(this) || _model?.Operation.Book is null) return false;
-        if (gesture.SourceWindow != (TryGetPlatformHandle()?.Handle ?? 0)) return false;
-        var point = Viewer.TranslatePoint(new Point(0, 0), this);
+        var host = ViewerHostWindow;
+        if (_preparing || !host.IsActive || WindowInteraction.HasDialog(this) || WindowInteraction.HasDialog(host) || _model?.Operation.Book is null) return false;
+        if (gesture.SourceWindow != (host.TryGetPlatformHandle()?.Handle ?? 0)) return false;
+        var point = Viewer.TranslatePoint(new Point(0, 0), host);
         if (point is null) return false;
         var local = new Point(gesture.X - point.Value.X, gesture.Y - point.Value.Y);
         if (!new Avalonia.Rect(Viewer.Bounds.Size).Contains(local)) return false;
         // 自动隐藏栏覆盖同一查看器范围；按实际命中控件排除菜单/侧栏/底栏，不能只比较矩形。
-        if (this.InputHitTest(new Point(gesture.X, gesture.Y)) is not Visual hit ||
+        if (host.InputHitTest(new Point(gesture.X, gesture.Y)) is not Visual hit ||
             (!ReferenceEquals(hit, Viewer) && !hit.GetVisualAncestors().Contains(Viewer))) return false;
         _autoHide?.LeaveVisibleLocked();
         if (!gesture.IsMagnify && Viewer.TryLoupeWheel(gesture.DeltaX, gesture.DeltaY)) return true;
@@ -103,7 +108,7 @@ public sealed partial class MainWindow : Window
         AddHandler(DragDrop.DropEvent, Drop);
         DragDrop.SetAllowDrop(this, true);
         Viewer.TryGestureRequested = TryHandleGesture;
-        Viewer.CanStartMouseSequence = () => !_preparing && !_closedPrepared && _model?.Operation.IsLoading == false && !WindowInteraction.HasDialog(this) && !this.FindControl<Menu>("MenuBar")!.IsOpen && Viewer.ContextMenu?.IsOpen != true;
+        Viewer.CanStartMouseSequence = () => !_preparing && !_closedPrepared && _model?.Operation.IsLoading == false && !WindowInteraction.HasDialog(this) && !WindowInteraction.HasDialog(ViewerHostWindow) && !this.FindControl<Menu>("MenuBar")!.IsOpen && Viewer.ContextMenu?.IsOpen != true;
         Viewer.MouseSequenceText = sequence => FindMouseSequence(sequence)?.Text;
         Viewer.TryMouseSequenceRequested = sequence => { var command = FindMouseSequence(sequence); if (command is null) return false; _ = ExecuteInputAsync(command.Name, true); return true; };
         Viewer.ChildBookRequested += async (_, page) =>
@@ -186,6 +191,10 @@ public sealed partial class MainWindow : Window
         FilmStrip.Attach(model.Operation, images); NavigatorView.Attach(model.Operation, images);
         _sidePanels = new(this, model);
         _sidePanels.FloatingKeyDown += Key_Down;
+        _mainView = new(this, model, _sidePanels);
+        _mainView.KeyDown += Key_Down; _mainView.Drop += Drop; _mainView.Input += NotifySlideShowInput;
+        _mainView.Changed += (_, _) => { if (!_preparing && !_closedPrepared) { MenuPresenter.RefreshChecks(this.FindControl<Menu>("MenuBar")!, GetCommandCheck); RefreshHistoryCommandStates(); } };
+        _mainView.AutoStretchRequested += async (_, _) => { try { await StretchHostWindowAsync(true); } catch (Exception ex) { ShowError(ex.Message); } };
         FilmStrip.PageRequested += async (_, index) => { try { await model.Operation.JumpAsync(index); } catch (Exception ex) { ShowError(ex.Message); } };
         FilmStrip.FrameMoveRequested += async (_, direction) => { try { await model.Operation.MoveAsync(direction); } catch (Exception ex) { ShowError(ex.Message); } };
         FilmStrip.GlobalWheelRequested += FilmStrip_GlobalWheel;
@@ -204,6 +213,8 @@ public sealed partial class MainWindow : Window
     /// <summary>返回真实执行能力，菜单占位与输入状态使用同一判断。</summary>
     public bool IsCommandAvailable(string name) => name switch
     {
+        "ToggleMainViewFloating" => _mainView is not null && !_preparing && !_closedPrepared,
+        "StretchWindow" => !_preparing && !_closedPrepared && _model?.Operation.IsFrameReading == true && ViewerHostWindow.WindowState == WindowState.Normal,
         "OpenConsole" or "CancelScript" or "HelpScript" => _scripts is not null && !_preparing && !_closedPrepared,
         "HelpMainMenu" or "HelpSearchOption" => _platform is not null && _helpAction.IsCompleted,
         var command when CommandTable.BookOrderCommands.TryGetValue(command, out var order) => _model?.Operation.CanChangeFolderOrder(order) == true,
@@ -271,6 +282,7 @@ public sealed partial class MainWindow : Window
     /// <summary>原菜单绑定的勾选表现；只读取引擎配置，不在菜单中维护第二套状态。</summary>
     private bool? GetCommandCheck(string name) => name switch
     {
+        "ToggleMainViewFloating" => Config.Current.MainView.IsFloating,
         _ when name.StartsWith("Script_", StringComparison.Ordinal) => (_model?.SaveData.GetCommandParameterObject(name) as ScriptCommandParameter)?.IsChecked,
         "ToggleCustomSize" => Config.Current.ImageCustomSize.IsEnabled,
         "ToggleTrim" => Config.Current.ImageTrim.IsEnabled,
@@ -361,9 +373,8 @@ public sealed partial class MainWindow : Window
         columns[4].Width = new GridLength(_model.RightVisible ? 4 : 0);
         int start = _model.LeftAutoHide ? 0 : 3;
         int end = _model.RightAutoHide ? 7 : 4;
-        Grid.SetColumn(Viewer, start); Grid.SetColumnSpan(Viewer, end - start);
-        var slideTimer = this.FindControl<SimpleProgressBar>("SlideShowTimer")!;
-        Grid.SetColumn(slideTimer, start); Grid.SetColumnSpan(slideTimer, end - start);
+        var dock = this.FindControl<Border>("MainViewDockSocket")!;
+        Grid.SetColumn(dock, start); Grid.SetColumnSpan(dock, end - start);
     }
     /// <summary>打开请求统一进入 BookOperation，窗口不枚举内容。</summary>
     public async Task OpenAsync(string path)
@@ -470,6 +481,8 @@ public sealed partial class MainWindow : Window
                     if (_model.Operation.Book is { } book) await _platform!.RevealAsync(book.CurrentPage?.ArchiveEntry.FilePath ?? book.Path); break;
                 case "CloseWindow": Close(); break;
                 case "CloseApplication": (Avalonia.Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.TryShutdown(); break;
+                case "ToggleMainViewFloating": _mainView?.SetFloating(!Config.Current.MainView.IsFloating, true); break;
+                case "StretchWindow": await StretchHostWindowAsync(false); break;
                 case "ToggleFullScreen": SetFullScreen(WindowState != WindowState.FullScreen); break;
                 case "SetFullScreen": SetFullScreen(true); break;
                 case "CancelFullScreen": SetFullScreen(false); break;
@@ -572,7 +585,7 @@ public sealed partial class MainWindow : Window
                 case "FocusHistorySearchBox":
                     Config.Current.History.IsVisibleSearchBox = true; _model.RefreshHistory(); _model.ShowPanel("HistoryPanel");
                     UpdateLayout(); var historySearch = this.FindControl<TextBox>("HistorySearchBox")!; historySearch.Focus(); historySearch.SelectAll(); break;
-                case "FocusMainView": Viewer.Focus(); break;
+                case "FocusMainView": ViewerHostWindow.Activate(); Viewer.Focus(); break;
                 case "ToggleVisibleContentsTree": await ChangePageNavigationAsync(c => c.IsFolderTreeVisible = !c.IsFolderTreeVisible); break;
                 case "FocusPageListSearchBox":
                     Config.Current.PageList.IsVisibleSearchBox = true; _model.RefreshNavigationPanel(); _model.ShowPanel("PageListPanel"); UpdateLayout(); var pageSearch = this.FindControl<TextBox>("PageListSearchBox")!; pageSearch.Focus(); pageSearch.SelectAll(); break;
@@ -823,7 +836,7 @@ public sealed partial class MainWindow : Window
         var inputWindow = sender as Window ?? this;
         var focusedElement = inputWindow.FocusManager?.GetFocusedElement();
         if (e.KeyModifiers == KeyModifiers.Meta && e.Key is Key.O or Key.W or Key.Q)
-        { e.Handled = true; if (e.Key == Key.W && inputWindow is FloatingPanelWindow) inputWindow.Close(); else await ExecuteAsync(e.Key == Key.O ? "LoadAs" : e.Key == Key.W ? "CloseWindow" : "CloseApplication"); return; }
+        { e.Handled = true; if (e.Key == Key.W && inputWindow is FloatingPanelWindow or MainViewWindow) inputWindow.Close(); else await ExecuteAsync(e.Key == Key.O ? "LoadAs" : e.Key == Key.W ? "CloseWindow" : "CloseApplication"); return; }
         // 原生popup可使用独立窗口，主窗FocusManager不一定返回ComboBox或菜单项。
         // 这里只退出全局命令匹配，不设置Handled，控件仍收到自己的导航/确认/取消键。
         if (e.Key is Key.Up or Key.Down or Key.Left or Key.Right or Key.Home or Key.End or Key.PageUp or Key.PageDown or Key.Enter or Key.Space or Key.Escape
@@ -1011,6 +1024,7 @@ public sealed partial class MainWindow : Window
         _model?.Operation.CancelClipboardPreparation();
         _model?.Operation.CancelFileCopyPreparation();
         _sidePanels?.PrepareClose();
+        _mainView?.PrepareClose();
         _pageEndDialog?.Close(PageEndAction.None);
         try
         {
@@ -1018,7 +1032,7 @@ public sealed partial class MainWindow : Window
             _scriptFolderCancellation?.Cancel(); await _scriptFolderAction;
             await _exportAction;
             await _imageCopyAction;
-            foreach (var dialog in OwnedWindows.ToArray()) dialog.Close();
+            foreach (var dialog in OwnedWindows.Where(w => w is not MainViewWindow).ToArray()) dialog.Close();
             _model?.Operation.CancelBookTransferPreparation();
             _profileCancellation?.Cancel(); await _profileAction;
             _settingFolderCancellation?.Cancel(); await _settingFolderAction;
@@ -1070,11 +1084,11 @@ public sealed partial class MainWindow : Window
             this.FindControl<BookmarkListView>("BookmarkPanelList")!.Dispose();
             this.FindControl<ImageEffectView>("ImageEffectPanelView")!.Dispose();
             Viewer.DisplayCompleted -= ImageCopy_ReadingChanged;
-            _autoHide?.Dispose(); _sidePanels?.Dispose(); _platformInput?.Dispose(); FilmStrip.Dispose(); NavigatorView.Dispose(); Viewer.Dispose(); _images?.Dispose(); _closedPrepared = true;
+            _autoHide?.Dispose(); _mainView?.Dispose(); _sidePanels?.Dispose(); _platformInput?.Dispose(); FilmStrip.Dispose(); NavigatorView.Dispose(); Viewer.Dispose(); _images?.Dispose(); _closedPrepared = true;
         }
         finally
         {
-            if (!_closedPrepared) { this.FindControl<MediaControlView>("DockMediaControlSocket")!.CancelClose(); _sidePanels?.CancelClose(); this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.CancelClose(); this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); this.FindControl<BookmarkListView>("BookmarkPanelList")!.CancelClose(); _model?.HistorySearch.CancelClose(); _model?.PageSearch.CancelClose(); _model?.FolderSearch.CancelClose(); }
+            if (!_closedPrepared) { this.FindControl<MediaControlView>("DockMediaControlSocket")!.CancelClose(); _mainView?.CancelClose(); _sidePanels?.CancelClose(); this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.CancelClose(); this.FindControl<PlaylistView>("PlaylistPanelView")!.CancelClose(); this.FindControl<BookmarkListView>("BookmarkPanelList")!.CancelClose(); _model?.HistorySearch.CancelClose(); _model?.PageSearch.CancelClose(); _model?.FolderSearch.CancelClose(); }
             _preparing = false; CompleteSlideShowClose(_closedPrepared); _shutdown = null;
         }
     }

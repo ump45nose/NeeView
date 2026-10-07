@@ -80,5 +80,5 @@ public sealed partial class FloatingPanelWindow : Window
 /// <summary>浮动面板属于非模态宿主，不应锁住主查看器和五区自动隐藏。</summary>
 internal static class WindowInteraction
 {
-    public static bool HasDialog(Window owner) => owner.OwnedWindows.Any(w => w.IsVisible && w is not FloatingPanelWindow);
+    public static bool HasDialog(Window owner) => owner.OwnedWindows.Any(w => w.IsVisible && w is not FloatingPanelWindow and not MainViewWindow);
 }

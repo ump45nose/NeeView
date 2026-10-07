@@ -9,6 +9,7 @@ public sealed class Config
     public BookSettingPolicyConfig BookSettingPolicy { get; set; } = new();
     public BookConfig Book { get; set; } = new();
     public ViewConfig View { get; set; } = new();
+    public MainViewConfig MainView { get; set; } = new();
     public PanelsConfig Panels { get; set; } = new();
     public FilmStripConfig FilmStrip { get; set; } = new();
     public SliderConfig Slider { get; set; } = new();

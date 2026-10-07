@@ -228,6 +228,13 @@
     <ScrollViewer x:Name="AutoHideSettings" Grid.Column="1" IsVisible="False">
       <StackPanel Margin="24" Spacing="14">
         <TextBlock Classes="settings-section" Text="窗口 / 自动隐藏" FontSize="20" />
+        <TextBlock Classes="settings-section" Text="中央查看器浮动（F12）" FontSize="16" />
+        <TextBlock Text="浮动时主窗口保留页面列表；同一查看器、播放状态和选择保持。" TextWrapping="Wrap" />
+        <CheckBox x:Name="MainViewEndWhenClosed" Content="关闭浮窗时结束浮动（否则最小化）" />
+        <TextBlock Text="主窗口中央替代内容" /><ComboBox x:Name="MainViewAlternative"><ComboBoxItem Content="空白" /><ComboBoxItem Content="页面列表" /></ComboBox>
+        <CheckBox x:Name="MainViewTopmost" Content="中央浮窗始终置顶" /><CheckBox x:Name="MainViewFront" Content="切页恢复时尽量置前" />
+        <CheckBox x:Name="MainViewHideTitle" Content="隐藏中央浮窗标题栏" /><CheckBox x:Name="MainViewAutoStretch" Content="按参考视口自动调整中央浮窗尺寸" />
+        <CheckBox x:Name="MainViewAutoHide" Content="未打开书籍时最小化中央浮窗" /><CheckBox x:Name="MainViewAutoShow" Content="打开书籍或切页时恢复中央浮窗" />
         <TextBlock Classes="settings-section" Text="启用自动隐藏模式" FontSize="16" />
         <CheckBox x:Name="AutoNormal" Content="普通窗口" /><CheckBox x:Name="AutoMaximized" Content="最大化窗口" /><CheckBox x:Name="AutoFullScreen" Content="全屏窗口" />
         <TextBlock Classes="settings-section" Text="菜单 / 侧栏" FontSize="16" />

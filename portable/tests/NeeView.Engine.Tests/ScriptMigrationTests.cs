@@ -59,13 +59,18 @@ public sealed class ScriptMigrationTests
         Assert.True(condition(), "脚本/界面回报未在有界等待内完成。");
     }
     [AvaloniaFact]
-    public async Task UnavailableMainViewFloatNeverClosesTheMainWindow()
+    public async Task MainViewScriptFloatAndDockNeverClosesTheMainWindow()
     {
         using var f = new Fixture(); await using var host = await CreateAsync(f); await host.Window.OpenAsync(f.Images);
         var book = host.Model.Operation.Book;
         Assert.Equal(false, await host.Evaluate("nv.MainView.Window.IsOpen;"));
         await host.Evaluate("nv.MainView.Close();"); Assert.True(host.Window.IsVisible); Assert.Same(book, host.Model.Operation.Book);
-        await Assert.ThrowsAsync<ScriptExecutionException>(() => host.Evaluate("nv.MainView.Open();"));
+        await host.Evaluate("nv.MainView.Open();"); Assert.NotNull(host.Window.FloatingMainView);
+        Assert.Equal("Normal", await host.Evaluate("nv.MainView.Window.State;"));
+        await host.Evaluate("nv.MainView.Window.State='Minimized'; nv.MainView.Window.State='None';");
+        Assert.Equal("Minimized", await host.Evaluate("nv.MainView.Window.State;")); // None 是不执行，而非普通状态别名。
+        Assert.Equal(true, await host.Evaluate("nv.MainView.Window.IsOpen;"));
+        await host.Evaluate("nv.MainView.Close();"); Assert.Null(host.Window.FloatingMainView);
         Assert.True(host.Window.IsVisible); Assert.Same(book, host.Model.Operation.Book);
     }
     [AvaloniaFact]

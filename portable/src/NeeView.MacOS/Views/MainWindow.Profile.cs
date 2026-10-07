@@ -48,6 +48,7 @@ public sealed partial class MainWindow
                 await _model.Operation.ReloadSettingAsync(cancellation.Token);
                 if (_preparing || _closedPrepared) return;
                 _model.RestorePanelLayout(); _sidePanels?.RestoreLayout();
+                _mainView?.Refresh();
                 _leftWidth = Config.Current.Panels.LeftWidth; _rightWidth = Config.Current.Panels.RightWidth;
                 RefreshFonts(); if (_themePresenter is not null) await _themePresenter.RefreshAsync();
                 _model.Refresh(); _model.RefreshSelection(); _model.RefreshPanels(); _model.RefreshNavigationPanel();
@@ -96,5 +97,6 @@ public sealed partial class MainWindow
         if (left > 0) Config.Current.Panels.LeftWidth = left;
         if (right > 0) Config.Current.Panels.RightWidth = right;
         _sidePanels?.SaveWeights();
+        _mainView?.Store();
     }
 }
