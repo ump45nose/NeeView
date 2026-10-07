@@ -8,7 +8,9 @@ from pathlib import Path
 import shutil
 import subprocess
 import plistlib
+import selectors
 import tempfile
+import time
 import xml.etree.ElementTree as ET
 
 
@@ -197,6 +199,77 @@ def inspect_bundle(app):
     return binaries
 
 
+def run_file_worker(executable, request):
+    """保持stdin直到真实响应，验证正式入口；有界读取与超时后只终止本次子进程。"""
+    env = os.environ.copy()
+    env.pop("DOTNET_ROOT", None)
+    process = subprocess.Popen([str(executable), "--neeview-file-worker"], stdin=subprocess.PIPE,
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+    output = bytearray(); errors = bytearray(); response = None
+    deadline = time.monotonic() + 20
+    try:
+        process.stdin.write((json.dumps(request, ensure_ascii=False) + "\n").encode("utf-8"))
+        process.stdin.flush()
+        with selectors.DefaultSelector() as streams:
+            streams.register(process.stdout, selectors.EVENT_READ, "stdout")
+            streams.register(process.stderr, selectors.EVENT_READ, "stderr")
+            while response is None:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise RuntimeError("正式文件worker没有在20秒内返回结果")
+                for key, _ in streams.select(min(remaining, 1)):
+                    block = os.read(key.fileobj.fileno(), 4096)
+                    if not block:
+                        streams.unregister(key.fileobj)
+                        continue
+                    if key.data == "stderr":
+                        errors.extend(block[:max(0, 32768 - len(errors))])
+                        continue
+                    output.extend(block)
+                    if len(output) > 256 * 1024:
+                        raise RuntimeError("正式文件worker响应超限")
+                    while b"\n" in output:
+                        line, _, tail = output.partition(b"\n"); output = bytearray(tail)
+                        message = json.loads(line)
+                        if not isinstance(message, dict):
+                            raise RuntimeError("正式文件worker响应不是对象")
+                        if message.get("Completed"):
+                            response = message
+                if not streams.get_map() and response is None:
+                    detail = errors.decode("utf-8", errors="replace")[:2048]
+                    raise RuntimeError("正式文件worker未返回结果：" + detail)
+        if process.wait(timeout=5) != 0 or response.get("Error"):
+            raise RuntimeError("正式文件worker执行失败：" + str(response.get("Error")))
+        return response
+    finally:
+        if process.poll() is None:
+            process.kill(); process.wait(timeout=5)
+        for stream in (process.stdin, process.stdout, process.stderr):
+            try: stream.close()
+            except BrokenPipeError: pass
+
+
+def verify_file_worker(app):
+    """运行同一正式exe的真实移动/日志释放，验证原生装载和JSON协议；不初始化产品界面。"""
+    executable = app / "Contents/MacOS/NeeView.MacOS"
+    with tempfile.TemporaryDirectory(prefix="neeview-package-worker-") as temporary:
+        root = Path(temporary); recovery = root / "recovery"; recovery.mkdir()
+        source = root / "source.png"; destination = root / "destination.png"
+        source.write_bytes(bytes(range(256)) * 4096)
+        expected = sha256(source)
+        result = run_file_worker(executable, {"RecoveryDirectory": str(recovery), "Operation": "transfer",
+            "Transfer": {"Source": str(source), "Destination": str(destination), "Move": True}})
+        transfer = result.get("Transfer") or {}
+        journal = Path(transfer.get("Journal") or root / "missing")
+        if (source.exists() or not destination.is_file() or sha256(destination) != expected
+                or str(transfer.get("ContentHash", "")).lower() != expected
+                or not journal.resolve().is_relative_to(recovery.resolve()) or not journal.is_file()):
+            raise RuntimeError("正式文件worker移动完整性或恢复记录不符")
+        run_file_worker(executable, {"RecoveryDirectory": str(recovery), "Operation": "release", "Result": transfer})
+        if journal.exists() or sha256(destination) != expected:
+            raise RuntimeError("正式文件worker日志释放或目标完整性不符")
+
+
 def install_artifacts(staged, artifacts):
     """所有校验成功后替换稳定成品；替换失败时恢复已有应用、ZIP和报告。"""
     names = ("NeeView.app", "NeeView.zip", "NeeView.report.json")
@@ -239,13 +312,18 @@ def prepare_artifacts(root, source, resolved, staged, args):
     resources.mkdir(exist_ok=True)
     manifest = dependency_manifest(root, "NeeView.MacOS", resources, resolved["Items"]["ResolvedFrameworkReference"])
     identity = args.sign or "-"
-    signing = ["codesign", "--force", "--timestamp" if args.sign else "--timestamp=none", "--options", "runtime", "--sign", identity, "--entitlements", root / "scripts/entitlements.plist"]
+    # ad-hoc没有Team ID；开启hardened library validation会拒绝自身动态库。
+    # 正式Developer ID仍启用hardened runtime，所有原生资产使用相同签名身份。
+    signing = ["codesign", "--force", "--timestamp" if args.sign else "--timestamp=none"]
+    if args.sign: signing += ["--options", "runtime"]
+    signing += ["--sign", identity, "--entitlements", root / "scripts/entitlements.plist"]
     for binary in sorted(native_binaries(app), key=lambda path: len(path.parts), reverse=True):
         run(signing + [binary], root)
     for framework in sorted(app.rglob("*.framework"), key=lambda path: len(path.parts), reverse=True):
         run(signing + [framework], root)
     run(signing + [app], root)
     binaries = inspect_bundle(app)
+    verify_file_worker(app)
     archive = app.with_suffix(".zip")
     run(["ditto", "-c", "-k", "--sequesterRsrc", "--keepParent", app, archive], root)
     if args.notary_profile:
@@ -262,9 +340,10 @@ def prepare_artifacts(root, source, resolved, staged, args):
         relocated = inspect_bundle(Path(temporary) / app.name)
         if binaries != relocated:
             raise RuntimeError("ZIP解包后的原生文件指纹变化")
+        verify_file_worker(Path(temporary) / app.name)
     report = {"version": manifest["version"], "commit": manifest["commit"], "worktree_dirty": manifest["worktree_dirty"], "tracked_source_dirty": manifest["tracked_source_dirty"],
               "architecture": "osx-arm64", "self_contained": True, "signing": "Developer ID" if args.sign else "ad-hoc development", "notarized": bool(args.notary_profile),
-              "archive_sha256": sha256(archive), "native_files": binaries, "zip_relocation_and_signature": "passed", "interactive_installation": "not executed", "gatekeeper": "passed" if args.notary_profile else "not executed",
+              "archive_sha256": sha256(archive), "native_files": binaries, "zip_relocation_and_signature": "passed", "file_worker_runtime": "passed", "zip_relocated_file_worker_runtime": "passed", "interactive_installation": "not executed", "gatekeeper": "passed" if args.notary_profile else "not executed",
               "license_metadata_only": [item["name"] for item in manifest["dependencies"] + manifest["runtime_packs"] if item["license_material_state"] == "metadata_only"]}
     archive.with_suffix(".report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
 

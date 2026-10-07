@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import plistlib
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -66,6 +67,13 @@ class PackageTests(unittest.TestCase):
         (library.parents[2] / "Example").symlink_to("Versions/A/Example")
         (main.parent / "managed.dll").write_bytes(b"MZmanaged")
         self.assertEqual({main, library}, set(package.native_binaries(app)))
+
+    def test_crashed_file_worker_cannot_be_reported_as_a_valid_runtime(self):
+        executable = self.root / "broken-worker"
+        executable.write_text(f"#!{sys.executable}\nimport sys\nsys.stdin.readline()\nsys.stderr.write('simulated dyld failure')\nsys.exit(6)\n")
+        executable.chmod(0o755)
+        with self.assertRaisesRegex(RuntimeError, "未返回结果.*simulated dyld failure"):
+            package.run_file_worker(executable, {"Operation": "recover"})
 
     def test_resolved_graph_is_filtered_against_real_bundle_and_runtime_pack_is_attributed(self):
         root = self.root / "repo/portable"

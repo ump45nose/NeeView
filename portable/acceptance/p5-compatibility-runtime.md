@@ -11,8 +11,8 @@
 | 分卷、发布检查、密码与关闭专项 | 46/46 通过 | 本批专项；包含既有密码回归，不能把 46 全部记为新增测试 |
 | 正式 ARM64 Debug 构建及本地签名 | 通过，产品构建 0 警告/0 错误 | 默认 bin/obj，串行构建；strict/deep ad-hoc 校验 |
 | 正式 Debug 无窗口入口 | 真实移动、SHA256、完成日志及释放、正常退出通过 | [合成夹具记录](p5-compatibility-formal-worker.json)；直接启动同一正式 exe 的 `--neeview-file-worker` |
-| 打包脚本回归 | 14/14 通过 | 原文许可、实际依赖归属、Mach-O 清单、替换失败恢复；只用隔离临时材料 |
-| Release 开发包 | 待本批提交后生成并记录 | 不使用旧包的结果代替本批验证 |
+| 打包脚本回归 | 15/15 通过 | 原文许可、实际依赖归属、Mach-O 清单、替换失败恢复及启动崩溃不得报告通过；只用隔离临时材料 |
+| Release 开发包 | 已发现并修复装载问题，待修复提交后的完整打包 | 隔离重签名的同一Release exe真实移动/日志释放通过；不使用静态签名结果替代运行 |
 
 命令：`python3 portable/scripts/validate.py --dotnet /Users/yuwk/.local/share/neeview-dotnet/dotnet --phase p5-compatibility --macos --macos-native`。脚本测试为 `python3 -m unittest discover -s portable/scripts/tests -p 'test_package_macos.py' -v`。
 
@@ -21,6 +21,7 @@
 ## 修复回归与兼容结果
 
 - 文件 worker 的初次取消/无 UI 入口测试曾失败：Console.In 同步包装阻止取消监听，macOS 主线程预设上下文导致异步同步等待死锁。已改用标准输入独立 StreamReader、独立监听任务，并在无 UI 分支清除同步上下文；最终专项、原生全量及正式入口通过。
+- 最初开发包静态签名/ZIP校验通过，但实际worker在dyld装载时退出，原因是ad-hoc无Team ID却启用hardened library validation。现开发包使用普通ad-hoc，正式Developer ID仍启用hardened runtime，未增加禁用library validation权限。隔离重签名实测通过；打包脚本已在稳定成品替换前增加真实移动、日志释放及解包重定位后的运行验证。不能继承此前仅静态签名的包为运行通过。
 - 真实提交后丢失响应回归确认 Completed 恢复日志保留，再由原后端核验恢复；忽略取消、排队取消、无进展、协议超限、无结果、正常长操作进展及晚取消成功分别覆盖。故障模拟不是 SMB 断线。
 - 普通/固实 RAR、RAR2/RAR5、7z 与 ZIP 分卷使用固定上游小夹具逐条比对，首/中/尾卷缺失明确报错；来源和 SHA256 在 [夹具清单](../tests/NeeView.Engine.Tests/Fixtures/Multipart/sources.json)。加密二进制 7z 分卷读取通过。
 - SharpCompress 0.50.3 明确不支持 RAR 多卷解密；加密 RAR 分卷及嵌套分卷返回能力提示，不循环询问或缓存失败口令。没有添加外部解压 CLI 或修改依赖源码。
