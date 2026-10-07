@@ -94,6 +94,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
             config.Slider = ReadBranch<SliderConfig>(raw, "Slider");
             config.Bookshelf = ReadBranch<BookshelfConfig>(raw, "Bookshelf");
             config.PageList = ReadBranch<PageListConfig>(raw, "PageList");
+            config.Information = ReadBranch<InformationConfig>(raw, "Information");
             config.History = ReadBranch<HistoryConfig>(raw, "History");
             config.Bookmark = ReadBranch<BookmarkConfig>(raw, "Bookmark");
             config.System = ReadBranch<SystemConfig>(raw, "System");
@@ -518,7 +519,7 @@ public sealed partial class SaveData(string directory, string? temporaryDirector
         {
             new EffectProfileCollection(Config.Current).Store();
             var config = Object(_setting, "Config");
-            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "PageList", "History", "Bookmark", "System", "Archive", "Background", "ImageDotKeep", "ImageCustomSize", "ImageTrim", "ImageGrid", "ImageEffect", "EffectProfiles", "Image", "SlideShow", "Performance", "Playlist", "AutoHide", "Window", "WindowTitle", "MenuBar", "Command", "Mouse", "Loupe", "StartUp", "Theme", "Fonts" })
+            foreach (var branch in new[] { "BookSetting", "BookSettingDefault", "BookSettingPolicy", "Book", "View", "Panels", "FilmStrip", "Slider", "Bookshelf", "PageList", "Information", "History", "Bookmark", "System", "Archive", "Background", "ImageDotKeep", "ImageCustomSize", "ImageTrim", "ImageGrid", "ImageEffect", "EffectProfiles", "Image", "SlideShow", "Performance", "Playlist", "AutoHide", "Window", "WindowTitle", "MenuBar", "Command", "Mouse", "Loupe", "StartUp", "Theme", "Fonts" })
             {
                 var value = typeof(Config).GetProperty(branch)!.GetValue(Config.Current);
                 MergeTyped(Object(config, branch), value!);

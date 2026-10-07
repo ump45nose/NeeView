@@ -80,7 +80,7 @@ public sealed partial class BookOperation
                 var deleted = book.Pages.SourcePages.Where(IsRemoved).ToArray();
                 var next = current is not null && !IsRemoved(current) ? current
                     : book.Pages.Skip(previous + 1).FirstOrDefault(p => !IsRemoved(p)) ?? book.Pages.Take(previous).LastOrDefault(p => !IsRemoved(p));
-                book.Pages.SetSourcePages(book.Pages.SourcePages.Where(p => !IsRemoved(p))); book.Sort(CancellationToken.None); _fileSelection = null;
+                book.Pages.SetSourcePages(book.Pages.SourcePages.Where(p => !IsRemoved(p))); await book.SortAsync(CancellationToken.None); _fileSelection = null;
                 if (book.Pages.Count == 0) book.CurrentPage = book.Pages.SourcePages.FirstOrDefault(p => p.EntryIndex > (current?.EntryIndex ?? -1)) ?? book.Pages.SourcePages.LastOrDefault();
                 Position = new(next is not null && book.Pages.Contains(next) ? next.Index : 0, next == current ? position.Part : 0);
                 foreach (var page in deleted) _fileImages?.InvalidatePage(page); _fileImages?.InvalidateCovers();

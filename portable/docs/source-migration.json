@@ -3302,6 +3302,168 @@
       "target": "src/NeeView.Engine/BookOperation/BookOperation.PlaylistFiles.cs",
       "sha256": "66d22fb6172366cba7343ab716d41a1d29047231708c3b998671c4f1b7e8a7e4",
       "status": "原列表文件动作复用现有整书改名marker、来源释放/恢复、真实废纸篓和唯一JSON联动；无第二文件事务"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/BitmapMetadataKey.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/BitmapMetadataKey.cs",
+      "sha256": "5c17d4b0f812f06ec108c3d05b89cc8d5ae94500cd5cce705e924e7f823591dc",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/BitmapMetadataAccessor.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/BitmapMetadataAccessor.cs",
+      "sha256": "34c4dc2d9ee320f14e67864aa91c09d6e278023d0c4d443f2ba3be8492bcf53b",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/BitmapMetadataDatabase.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/BitmapMetadataDatabase.cs",
+      "sha256": "e27631c232c7302b45c32ecb4fdce5b08da37051199a2e7afecaa36848dd53f5",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/BitmapMetadataUtilities.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/BitmapMetadataUtilities.cs",
+      "sha256": "2615fcbcf972a794ecf3e908901a60ed173aca42a932beac84ca4a6b8475006e",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/ExifContrast.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/ExifContrast.cs",
+      "sha256": "db1ccc8ba23f9b402ccb7b5a6f490c1fe5b03a28c0b57616f9d9979bac832aba",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/ExifDateTime.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/ExifDateTime.cs",
+      "sha256": "4ab1ed2db01d14e21cded313a4bd13cf42f8b492b967102082d444d34bda940b",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/ExifExposureProgram.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/ExifExposureProgram.cs",
+      "sha256": "ec9d5d08d07f8f396d6d8a060cd5988467f7c517c19ec1043e24ea8900fd8a5e",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/ExifFlashMode.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/ExifFlashMode.cs",
+      "sha256": "552972781a90458c65d4acd68b0d43a4a66225998cf7b364c8015122d306188b",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/ExifGpsDegree.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/ExifGpsDegree.cs",
+      "sha256": "106decf8ff7f0eebd4687fe43a7ab26617b1de236b4e9c783ffd73e0dd8416ab",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/ExifLightSource.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/ExifLightSource.cs",
+      "sha256": "373effb534d0db57ed4ba98dd82b0771a557a0fdd486bf94a8a433499a8fbb4f",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/ExifMeteringMode.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/ExifMeteringMode.cs",
+      "sha256": "2e833de74adbaca531c1eb87a22e2dd3518f01d5bdccc2bb6f1079e4e2c9f65d",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/ExifOrientation.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/ExifOrientation.cs",
+      "sha256": "f4551b4d9eec9ab4fd87b4427bce27e5e96efbc64d06cc46b7a425de1a0b7f20",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/ExifPhotometricInterpretation.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/ExifPhotometricInterpretation.cs",
+      "sha256": "9e17e16971eddbd09cd331ad4dd435581ae3e260176fb3e265c5a2d397fcd09d",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/ExifRating.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/ExifRating.cs",
+      "sha256": "bbac8e4be235740afe43bbebdedda9d58dc86b148935e3db4124f0714db526dc",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/ExifSaturation.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/ExifSaturation.cs",
+      "sha256": "10a478c57d4a60f8e1633a7371dd13e996380a20db3a81da887ea582029e4eae",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/ExifSharpness.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/ExifSharpness.cs",
+      "sha256": "83768a775a0fe2757728ffd9764bb2373fa9e21a00a1add211355d32fc4873d0",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/ExifWhiteBalance.cs",
+      "target": "src/NeeView.Engine/Media/Imaging/Metadata/ExifWhiteBalance.cs",
+      "sha256": "cbc2e47277513160574c7b1262ce64c76676be8bb21de712244377ec239d1351",
+      "status": "原纯元数据类型迁入；数据库仅移除WPF和具体后端构造，完整原查找/格式/方向规则保持"
+    },
+    {
+      "source": "NeeView/NeeView/Numetrics/IRational.cs",
+      "target": "src/NeeView.Engine/Numetrics/IRational.cs",
+      "sha256": "003bd1249ebab6d9b38a171ecb0fa189157b0a916a75bffdac21dfac8317b566",
+      "status": "原纯数值/格式算法迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Numetrics/URational.cs",
+      "target": "src/NeeView.Engine/Numetrics/URational.cs",
+      "sha256": "3275cb57fc41eb99160c005881dcbefcdde0b484da5b18603e450aa6be7ede30",
+      "status": "原纯数值/格式算法迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Numetrics/Rational.cs",
+      "target": "src/NeeView.Engine/Numetrics/Rational.cs",
+      "sha256": "9e65f7a9dd095eb8e1ea0c10224213285fd5df8043645b994cebf618fd7313a2",
+      "status": "原纯数值/格式算法迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Text/FormatValue.cs",
+      "target": "src/NeeView.Engine/Text/FormatValue.cs",
+      "sha256": "02ce357fbe2542a98f0badea48b6093d911222eba703e2997acbba2d93b56255",
+      "status": "原纯数值/格式算法迁入"
+    },
+    {
+      "source": "NeeView/SidePanels/FileInfo/InformationKey.cs",
+      "target": "src/NeeView.Engine/SidePanels/FileInfo/InformationKey.cs",
+      "sha256": "986deafbadb555352a3fdca0ae1ac5292705e0946e90e81169390d07df6867da",
+      "status": "原信息字段/类别映射完整迁入"
+    },
+    {
+      "source": "NeeView/SidePanels/FileInfo/InformationGroup.cs",
+      "target": "src/NeeView.Engine/SidePanels/FileInfo/InformationGroup.cs",
+      "sha256": "eccf4ddf0adf250a4746673be7f1f88746503859f89b03b48db71883c209d2cc",
+      "status": "原信息字段/类别映射完整迁入"
+    },
+    {
+      "source": "NeeView/NeeView/Media/Imaging/Metadata/MetadataExtractorAccessor.cs",
+      "target": "src/NeeView.Backends/Imaging/MetadataExtractorAccessor.cs",
+      "sha256": "fe9b50f73dc36c9a04d2bc9dd95ac766cc6a489b2103b197feb64b6be183e7f2",
+      "status": "原完整MetadataExtractor读取后端迁入，原2.9.3包与纯数值类型保持"
+    },
+    {
+      "source": "NeeView/Config/InformationConfig.cs",
+      "sha256": "210c8f1da4b7271d5fac6045cd4e6ad63788bab618247cd167f8210bf1ac8250",
+      "target": "src/NeeView.Engine/Config/InformationConfig.cs",
+      "status": "保留原八组显隐和raw-null字段；WPF GridLength使用旧JSON列宽字符串，显示端独立解析；移除生成编辑元数据。"
+    },
+    {
+      "source": "NeeView/Page/PageMetadataTools.cs",
+      "target": "src/NeeView.Engine/Page/PageMetadataTools.cs",
+      "sha256": "92b563eec9ea3bd9750528f215c70cbe06399d7c7b5e6356b404e7bd92b9ec25",
+      "status": "保留原字段/评分/标准优先规则；PictureInfo改纯信息，同步入口只供后台Searcher，界面异步。"
+    },
+    {
+      "source": "NeeView/SidePanels/FileInfo/MetadataValueToStringConverter.cs",
+      "target": "src/NeeView.Engine/SidePanels/FileInfo/MetadataValueTools.cs",
+      "sha256": "4c9f9a35805b02ffdb2ded47632461bcbd2af6ac72df72771e312257809379f8",
+      "status": "迁入纯MetadataValueTools；移除WPF IValueConverter，固定展开原别名资源。"
     }
   ],
   "rule_references": [
@@ -3696,6 +3858,12 @@
       "target": "src/NeeView.MacOS/Views/ImageEffectView.axaml",
       "sha256": "854fe4f62d9cc55e8eee4385681555105d6f149690d2d1aa730217cc06548916",
       "status": "P5第二十八批：原效果参数/层/缓存/六分支预设和几何迁入；四类自有shader在现有Skia执行，十类WPF/第三方算法及resize仍待迁。见p5-image-effects.md"
+    },
+    {
+      "source": "NeeView/SidePanels/FileInfo/FileInformationView.xaml",
+      "target": "src/NeeView.MacOS/Views/FileInformationView.axaml",
+      "sha256": "780fee0784d744e7355cec09e46155fa0648b900423f51da28942840024084f4",
+      "status": "保留原顶部当前页缩略选择和下方信息分组；Avalonia模板、共享列宽、列分隔/分组菜单独立。"
     }
   ],
   "backend_reuse": [

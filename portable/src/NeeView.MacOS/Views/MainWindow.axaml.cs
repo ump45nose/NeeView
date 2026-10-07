@@ -147,6 +147,10 @@ public sealed partial class MainWindow : Window
             if (!Config.Current.Bookmark.IsSyncBookshelfEnabled) _bookmarkOpenTarget = path;
             await OpenAsync(path);
         };
+        var information = this.FindControl<FileInformationView>("InformationPanelView")!;
+        information.Attach(model.FileInformation, model.Operation, images, platform);
+        information.CanAct = () => !_preparing && !_closedPrepared;
+        information.Failed += (_, message) => ShowError(message);
         bookmarks.CurrentBookPath = () => model.Operation.Book?.Path;
         bookmarks.ReadMetadataAsync = model.Operation.GetFileMetadataAsync;
         bookmarks.SaveSettingsAsync = () => model.Operation.SaveConfigurationAsync();
@@ -1009,6 +1013,7 @@ public sealed partial class MainWindow : Window
             _helpCancellation?.Cancel(); await _helpAction;
             if (_helpDocuments is not null) { await _helpDocuments.DisposeAsync(); _helpDocuments = null; }
             await _destinationAction;
+            await this.FindControl<FileInformationView>("InformationPanelView")!.PendingAction;
             await this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.PrepareCloseAsync();
             await _listStyleTask;
             await _folderTreeSettingsTask;
@@ -1045,6 +1050,7 @@ public sealed partial class MainWindow : Window
                 _model.Detach(); _model.Refreshed -= Model_Refreshed; _model.PanelsRefreshed -= Model_PanelsRefreshed; _model.ChromeRefreshed -= Model_ChromeRefreshed;
                 _model.Refreshed -= PageNavigation_Refreshed; _model.Refreshed -= ImageCopy_ReadingChanged;
             }
+            await this.FindControl<FileInformationView>("InformationPanelView")!.CloseAsync();
             this.FindControl<PlaylistView>("PlaylistPanelView")!.Dispose();
             this.FindControl<MediaControlView>("DockMediaControlSocket")!.Dispose();
             this.FindControl<DestinationFolderPanelView>("DestinationPanelView")!.Dispose();

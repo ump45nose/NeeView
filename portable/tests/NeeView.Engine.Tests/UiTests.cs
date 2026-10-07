@@ -81,11 +81,11 @@ public sealed class UiTests
             window.Viewer.Focus();
             window.KeyPress(Avalonia.Input.Key.D2, Avalonia.Input.RawInputModifiers.Control, Avalonia.Input.PhysicalKey.Digit2, null);
             window.KeyRelease(Avalonia.Input.Key.D2, Avalonia.Input.RawInputModifiers.Control, Avalonia.Input.PhysicalKey.Digit2, null);
-            for (int i = 0; i < 30 && operation.Book!.Setting.PageMode != PageMode.WidePage; i++) await Task.Delay(20, TestContext.Current.CancellationToken);
+            for (int i = 0; i < 100 && (operation.Book!.Setting.PageMode != PageMode.WidePage || !dual.IsChecked); i++) await Task.Delay(20, TestContext.Current.CancellationToken);
             Assert.Equal(PageMode.WidePage, operation.Book!.Setting.PageMode); Assert.True(dual.IsChecked);
             // 菜单自身的执行入口也必须保留，不仅验证底层 CommandTable。
             single.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(MenuItem.ClickEvent));
-            for (int i = 0; i < 30 && operation.Book.Setting.PageMode != PageMode.SinglePage; i++) await Task.Delay(20, TestContext.Current.CancellationToken);
+            for (int i = 0; i < 100 && (operation.Book.Setting.PageMode != PageMode.SinglePage || !single.IsChecked); i++) await Task.Delay(20, TestContext.Current.CancellationToken);
             Assert.Equal(PageMode.SinglePage, operation.Book.Setting.PageMode); Assert.True(single.IsChecked);
         }
         finally { await window.PrepareShutdownAsync(); window.Close(); }

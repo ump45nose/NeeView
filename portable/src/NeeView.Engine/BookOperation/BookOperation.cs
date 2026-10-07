@@ -433,7 +433,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
         {
             if (_disposed || _closing || Book is null || IsLoading) return;
             var current = Book.CurrentPage; var effectId = Book.Setting.EffectProfileId; new EffectProfileCollection(Config.Current).Store(); change(Book.Setting);
-            if (effectId != Book.Setting.EffectProfileId) new EffectProfileCollection(Config.Current).Restore(); Book.MementoControl.RequestSaveBookMemento(true); Book.Sort(CancellationToken.None);
+            if (effectId != Book.Setting.EffectProfileId) new EffectProfileCollection(Config.Current).Restore(); Book.MementoControl.RequestSaveBookMemento(true); await Book.SortAsync(CancellationToken.None);
             Position = new(current?.Index ?? 0, Position.Part); RebuildFrame(1); RecordPageHistory(); ScheduleSave(); Notify();
         }
         finally { _gate.Release(); }
@@ -504,7 +504,7 @@ public sealed partial class BookOperation(IArchiveFactory archives, IImageDecode
                 || System.Text.Json.JsonSerializer.Serialize(snapshot.EffectProfiles) != System.Text.Json.JsonSerializer.Serialize(Config.Current.EffectProfiles)) Notify();
             if (reading is not null && Book is { } current && System.Text.Json.JsonSerializer.Serialize(reading) != System.Text.Json.JsonSerializer.Serialize(current.Setting))
             {
-                var page = current.CurrentPage; current.Sort(CancellationToken.None); Position = new(page?.Index ?? 0, Position.Part);
+                var page = current.CurrentPage; await current.SortAsync(CancellationToken.None); Position = new(page?.Index ?? 0, Position.Part);
                 RebuildFrame(MoveDirection); RecordPageHistory(); Notify();
             }
             if(Book is {} sourceBook&&MediaFormats.IndexChanged(snapshot.Archive.Media,Config.Current.Archive.Media))

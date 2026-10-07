@@ -95,7 +95,7 @@
             </ListBox>
             <TextBlock Grid.Row="4" Text="{Binding HistoryCount}" IsVisible="{Binding HistoryCountVisible}" Margin="8,4" FontSize="10" Opacity="0.7" />
           </Grid></Border>
-      <Border Tag="FileInformationPanel"><ScrollViewer><TextBlock Text="{Binding Information}" TextWrapping="Wrap" Margin="10" /></ScrollViewer></Border>
+      <Border Tag="FileInformationPanel"><local:FileInformationView x:Name="InformationPanelView" /></Border>
       <Border Tag="BookmarkPanel">          <Grid RowDefinitions="Auto,*,Auto">
             <WrapPanel Margin="8">
               <Button Content="★" ToolTip.Tip="切换当前书籍书签" Tag="ToggleBookmark" Click="Command_Click" />

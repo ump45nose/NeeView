@@ -7,7 +7,7 @@
           <Grid ColumnDefinitions="*,Auto,Auto"><TextBox x:Name="SettingsSearchBox" Text="{Binding Keyword, Mode=TwoWay}" PlaceholderText="搜索设置" KeyDown="SettingsSearch_KeyDown" TextChanged="SettingsSearch_TextChanged" ToolTip.Tip="原结构化搜索：空格 AND，/or，/not，/word，/re。Enter 确认并加入本窗口历史。" /><Button x:Name="SettingsSearchHistory" Grid.Column="1" Content="⌄" Click="SettingsSearch_History" /><Button x:Name="SettingsSearchClear" Grid.Column="2" Content="×" Click="SettingsSearch_Clear" /></Grid>
           <TextBlock x:Name="SettingsSearchError" Text="{Binding Error}" TextWrapping="Wrap" />
         </StackPanel>
-        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="主题 / 配色" /><ListBoxItem Content="字体" /><ListBoxItem Content="归档 / PDF" /><ListBoxItem Content="幻灯播放" /><ListBoxItem Content="背景 / 像素保持" /><ListBoxItem Content="放大镜" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
+        <ListBox x:Name="SettingsNavigation" Grid.Row="1" SelectedIndex="0" SelectionChanged="Navigation_Changed"><ListBoxItem Content="书籍 / 阅读" /><ListBoxItem Content="命令 / 键鼠" /><ListBoxItem Content="胶片条 / 滑条" /><ListBoxItem Content="窗口 / 自动隐藏" /><ListBoxItem Content="历史记录" /><ListBoxItem Content="页面列表 / 书架" /><ListBoxItem Content="文件操作" /><ListBoxItem Content="主题 / 配色" /><ListBoxItem Content="字体" /><ListBoxItem Content="归档 / PDF" /><ListBoxItem Content="幻灯播放" /><ListBoxItem Content="背景 / 像素保持" /><ListBoxItem Content="放大镜" /><ListBoxItem Content="文件信息" /><ListBoxItem Content="图像效果（P5）" IsEnabled="False" /><ListBoxItem Content="导入旧配置（P5）" IsEnabled="False" /></ListBox>
       </Grid>
     </Border>
     <ScrollViewer x:Name="LoupeSettings" Grid.Column="1" IsVisible="False">
@@ -287,6 +287,17 @@
         <TextBlock Text="虚拟路径用于 NeeView 定位；复制到文件夹会解压归档内文件条目，目录递归提取暂不支持。" TextWrapping="Wrap" />
         <TextBlock Text="复制文件不需要开启修改权限；页组范围可在输入设置的 CopyFile 参数中调整。" TextWrapping="Wrap" />
         <TextBlock Text="剪切暂保留禁用入口，移动可使用分类或移至文件夹。" TextWrapping="Wrap" Opacity="0.5" />
+      </StackPanel>
+    </ScrollViewer>
+    <ScrollViewer x:Name="InformationSettings" Grid.Column="1" IsVisible="False">
+      <StackPanel Margin="24" Spacing="10"><TextBlock Text="文件信息" FontSize="20"/>
+        <TextBlock Text="日期格式"/><TextBox Text="{Binding Draft.DateTimeFormat, Mode=TwoWay}"/>
+        <TextBlock Text="地图 URL 格式：{Lat}、{Lon}、{LatDeg}、{LonDeg}"/><TextBox Text="{Binding Draft.MapProgramFormat, Mode=TwoWay}"/>
+        <TextBlock Text="属性标题列宽（原 GridLength：128 / Auto / *）"/><TextBox Text="{Binding Draft.PropertyHeaderWidth, Mode=TwoWay}"/>
+        <CheckBox Content="文件" IsChecked="{Binding Draft.IsVisibleFile, Mode=TwoWay}"/><CheckBox Content="图像" IsChecked="{Binding Draft.IsVisibleImage, Mode=TwoWay}"/>
+        <CheckBox Content="描述" IsChecked="{Binding Draft.IsVisibleDescription, Mode=TwoWay}"/><CheckBox Content="来源" IsChecked="{Binding Draft.IsVisibleOrigin, Mode=TwoWay}"/>
+        <CheckBox Content="相机" IsChecked="{Binding Draft.IsVisibleCamera, Mode=TwoWay}"/><CheckBox Content="照片详细信息" IsChecked="{Binding Draft.IsVisibleAdvancedPhoto, Mode=TwoWay}"/>
+        <CheckBox Content="GPS" IsChecked="{Binding Draft.IsVisibleGps, Mode=TwoWay}"/><CheckBox Content="更多信息" IsChecked="{Binding Draft.IsVisibleExtras, Mode=TwoWay}"/>
       </StackPanel>
     </ScrollViewer>
     <ScrollViewer x:Name="SettingsSearchPage" Grid.Column="1" IsVisible="False">

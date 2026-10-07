@@ -110,7 +110,7 @@ public sealed partial class BookOperation
             foreach (var result in results)
             {
                 var page = pages.First(page => System.IO.Path.GetFullPath(page.ArchiveEntry.FilePath!) == result.Source);
-                changed |= ApplyTransferredPage(book, page, result, copy, readingAnchor);
+                changed |= await ApplyTransferredPageAsync(book, page, result, copy, readingAnchor);
             }
             // 一次批次只补尺寸/重建正文一次；晚取消仍提交真实成功项并保持失败项。
             if (changed) { await ProbeAroundAsync(book, Position.Index, CancellationToken.None); RebuildFrame(1); RecordPageHistory(); }
@@ -193,7 +193,7 @@ public sealed partial class BookOperation
             {
                 // 归档或其提取输出不属于当前普通目录索引；只有真正来自当前目录的文件可补入。
                 var page = pages.FirstOrDefault(page => page.ArchiveEntry.FilePath is { } path && System.IO.Path.GetFullPath(path) == result.Source);
-                if (page is not null && !page.ArchiveEntry.TargetArchiveEntry.IsDirectory && !directoryChanged) changed |= ApplyTransferredPage(book, page, result, copy: true, readingAnchor);
+                if (page is not null && !page.ArchiveEntry.TargetArchiveEntry.IsDirectory && !directoryChanged) changed |= await ApplyTransferredPageAsync(book, page, result, copy: true, readingAnchor);
             }
             if (directoryChanged)
             {
@@ -239,7 +239,7 @@ public sealed partial class BookOperation
     /// <param name="path">实际结果或页面地址。</param><param name="root">当前书籍或目标目录。</param><returns>自身或后代路径为true。</returns>
     private static bool IsInsideBook(string path, string root) => path == root || path.StartsWith(root.TrimEnd('/') + "/", StringComparison.Ordinal);
     /// <summary>单项结果沿原来源集合协调；批次目标已捕获，推进页面不重采集后续操作对象。</summary>
-    private bool ApplyTransferredPage(Book book, Page page, FileTransferResult result, bool copy, Page? readingAnchor)
+    private async Task<bool> ApplyTransferredPageAsync(Book book, Page page, FileTransferResult result, bool copy, Page? readingAnchor)
     {
         var relative = System.IO.Path.GetRelativePath(book.Path, result.Destination);
         bool withinSource = relative != ".." && !relative.StartsWith("../", StringComparison.Ordinal) && !System.IO.Path.IsPathRooted(relative)
@@ -251,10 +251,10 @@ public sealed partial class BookOperation
         if (withinSource)
         {
             var moved = new Page(new ArchiveEntry(book.Source) { Id = book.Pages.SourcePages.Max(p => p.EntryIndex) + 1, RawEntryName = relative,
-                FilePath = result.Destination, Length = page.ArchiveEntry.Length, LastWriteTime = page.ArchiveEntry.LastWriteTime });
+                FilePath = result.Destination, Length = page.ArchiveEntry.Length, LastWriteTime = page.ArchiveEntry.LastWriteTime }, archives: page.Content.Archives, folders: page.Content.FolderConfigs);
             moved.Content.PageDataSource = page.Content.PageDataSource; moved.Content.HasSize = page.Content.HasSize; source.Add(moved);
         }
-        book.Pages.SetSourcePages(source); book.Sort(CancellationToken.None); if (!copy) _fileSelection = null;
+        book.Pages.SetSourcePages(source); await book.SortAsync(CancellationToken.None); if (!copy) _fileSelection = null;
         if (book.Pages.Count == 0) book.CurrentPage = book.Pages.SourcePages.FirstOrDefault(p => p.EntryIndex > page.EntryIndex) ?? book.Pages.SourcePages.LastOrDefault();
         var anchor = copy ? readingAnchor : next;
         Position = new(anchor is not null && book.Pages.Contains(anchor) ? anchor.Index : 0, copy ? Position.Part : 0);
@@ -292,7 +292,7 @@ public sealed partial class BookOperation
                             if (page is not null)
                             {
                                 int index = page.Index; var next = book.Pages.ElementAtOrDefault(index + 1) ?? book.Pages.ElementAtOrDefault(index - 1);
-                                book.Pages.SetSourcePages(book.Pages.SourcePages.Where(p => !ReferenceEquals(p, page))); book.Sort(CancellationToken.None);
+                                book.Pages.SetSourcePages(book.Pages.SourcePages.Where(p => !ReferenceEquals(p, page))); await book.SortAsync(CancellationToken.None);
                                 if (book.Pages.Count == 0) book.CurrentPage = book.Pages.SourcePages.FirstOrDefault(p => p.EntryIndex > page.EntryIndex) ?? book.Pages.SourcePages.LastOrDefault();
                                 Position = new(next is not null && book.Pages.Contains(next) ? next.Index : 0, 0); RebuildFrame(1); _fileSelection = null;
                             }

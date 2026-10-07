@@ -179,7 +179,7 @@ namespace NeeView
             var builder = new StringBuilder();
             builder.AppendLine(HtmlHelpUtility.CreateHeader(HelpText.GetString("_SearchManual.Title")));
             builder.AppendLine("<body>");
-            builder.AppendLine("<p>Mac：元数据和评分搜索尚未迁移，相关原选项和键表保留用于兼容参考。</p>");
+            builder.AppendLine("<p>Mac：元数据和评分搜索沿同一页面来源惰性读取；损坏或暂不可访问的字段会报告读取错误。</p>");
 
             var searchContext = new SearchContext()
              .AddProfile(new DateSearchProfile())

@@ -59,6 +59,10 @@ public sealed class Book(Archive source, List<Page> pages, BookSettingConfig set
         var result = BookPageSort.Sort(PageSearchProfile.Search(Pages.SearchKeyword, Pages.SourcePages, token), mode, SortSeed, token);
         ApplySort(result);
     }
+    /// <summary>在后台执行原筛选/排序；元数据搜索可能读取来源，不能阻塞表现调用线程。</summary>
+    /// <param name="token">排队、搜索和排序的取消。</param>
+    /// <returns>同一页面集合完成排序提交的任务；调用方持有原导航锁。</returns>
+    internal Task SortAsync(CancellationToken token) => Task.Run(() => Sort(token), token);
     /// <summary>来源补齐后更新原Smart名称公共目录，不重新扫描或解码。</summary>
     internal void UpdatePrefix() { var prefix = BookTableOfContents.GetPagesPrefix(Pages.SourcePages); foreach (var page in Pages.SourcePages) page.Prefix = prefix; }
     /// <summary>锁内提交后台生成的原排序结果；保持Page引用及同一页面集合。</summary>

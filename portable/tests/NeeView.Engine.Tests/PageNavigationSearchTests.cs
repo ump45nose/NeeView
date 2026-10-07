@@ -20,7 +20,8 @@ public sealed class PageNavigationSearchTests
         Assert.True(await op.SearchPagesAsync("impossible", book, TestContext.Current.CancellationToken)); Assert.Empty(book.Pages); Assert.Null(op.Frame); Assert.Same(selected, book.CurrentPage);
         await op.SaveAsync(); Assert.Equal("003.png", state.GetLastBook()!.Page);
         await op.SearchPagesAsync("", book, TestContext.Current.CancellationToken); Assert.Equal(5, book.Pages.Count); Assert.Same(selected, book.CurrentPage); Assert.Equal(source, book.Pages.SourcePages);
-        await Assert.ThrowsAsync<NotSupportedException>(() => op.SearchPagesAsync("/rating /gt 3", book, TestContext.Current.CancellationToken)); Assert.Equal(5, book.Pages.Count);
+        await op.SearchPagesAsync("/rating /gt 3", book, TestContext.Current.CancellationToken); Assert.Empty(book.Pages);
+        await op.SearchPagesAsync("", book, TestContext.Current.CancellationToken); Assert.Equal(5, book.Pages.Count);
         using var cancelled = new CancellationTokenSource(); cancelled.Cancel(); await Assert.ThrowsAnyAsync<OperationCanceledException>(() => op.SearchPagesAsync("001", book, cancelled.Token)); Assert.Equal(5, book.Pages.Count);
     }
     [Fact]
@@ -62,6 +63,7 @@ public sealed class PageNavigationSearchTests
             model.ShowPanel("PageListPanel"); Dispatcher.UIThread.RunJobs(); window.UpdateLayout(); using var frame = window.CaptureRenderedFrame(); Assert.NotNull(frame);
             var phase = System.Environment.GetEnvironmentVariable("NEEVIEW_ACCEPTANCE_PHASE") ?? "p3-completion";
             frame.Save(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, $"../../../../../acceptance/{phase}-page-search-layout.png")), Avalonia.Media.Imaging.PngBitmapEncoderOptions.Default);
+            await op.SaveAllAsync(TestContext.Current.CancellationToken);
             Directory.CreateDirectory(Path.Combine(f.State, "UserSetting.json.tmp")); await window.ChangePageNavigationAsync(c => c.Format = PageNameFormat.PageNumber); Assert.Equal(PageNameFormat.NameOnly, Config.Current.PageList.Format); Directory.Delete(Path.Combine(f.State, "UserSetting.json.tmp"));
         }
         finally { await window.PrepareShutdownAsync(); window.Close(); }

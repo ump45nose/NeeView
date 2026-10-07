@@ -15,7 +15,6 @@ public sealed class PageSearchProfile : SearchProfile
     public static IReadOnlyList<SearchKey> Analyze(string keyword)
     {
         using var searcher = CreateSearcher(); var keys = searcher.Analyze(keyword);
-        if (keys.Any(key => key.Property.Name is "meta" or "rating")) throw new NotSupportedException("图片元数据和评分搜索尚未迁移，原表达式会保留到后续阶段。");
         return keys;
     }
     /// <summary>原_sourcePages → Searcher.Search → 排序；返回同一Page，不改变来源集合。</summary>

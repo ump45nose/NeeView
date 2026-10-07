@@ -7,7 +7,7 @@ public sealed partial class SaveData
     /// <summary>只读取并验证 UserSetting；原地应用已迁配置，命令差分以来源为权威，不读写其他集合。</summary>
     /// <param name="apply">在调用线程合并已验证配置的回调；null Config 与原缺失文件一样不改运行配置。</param>
     /// <param name="token">排队和候选读取可取消；应用开始后完成或恢复。</param>
-    internal async Task ReloadSettingAsync(Action<Config?> apply, CancellationToken token)
+    internal async Task ReloadSettingAsync(Func<Config?, Task> apply, CancellationToken token)
     {
         await _gate.WaitAsync(token);
         var previous = _setting;
@@ -46,7 +46,7 @@ public sealed partial class SaveData
             token.ThrowIfCancellationRequested();
             // 已知字段由独立候选验证；未知节点保留来源，不递归合并复活已经从磁盘删除的旧键位。
             _setting = candidate.Raw;
-            apply(candidate.Config);
+            await apply(candidate.Config);
         }
         catch { _setting = previous; throw; }
         finally { _gate.Release(); }

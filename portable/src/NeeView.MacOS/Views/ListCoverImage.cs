@@ -10,7 +10,7 @@ using Avalonia.VisualTree;
 namespace NeeView.MacOS.Views;
 
 /// <summary>可见列表封面的像素/显示所有者；视图不打开文件，也不保留离屏Bitmap。</summary>
-public sealed class ListCoverImage : Control
+public sealed class ListCoverImage : Control, IDisposable
 {
     public static readonly StyledProperty<string?> SourceProperty = AvaloniaProperty.Register<ListCoverImage, string?>(nameof(Source));
     public string? Source { get => GetValue(SourceProperty); set => SetValue(SourceProperty, value); }
@@ -26,7 +26,7 @@ public sealed class ListCoverImage : Control
     private BitmapLease? _lease;
     private CancellationTokenSource? _request;
     private int _revision;
-    private bool _inViewport;
+    private bool _inViewport, _disposed;
     private string? _loadedPath;
     private Page? _loadedPage;
     private int _target;
@@ -50,7 +50,7 @@ public sealed class ListCoverImage : Control
     /// <summary>可见规格变化重提需求，原生晚到结果只能归还租约。</summary>
     public void Refresh()
     {
-        bool visible = _inViewport && IsVisible && _ancestors.All(visual => visual.IsVisible) && TopLevel.GetTopLevel(this) is not null && Bounds.Width > 0 && Bounds.Height > 0;
+        bool visible = !_disposed && _inViewport && IsVisible && _ancestors.All(visual => visual.IsVisible) && TopLevel.GetTopLevel(this) is not null && Bounds.Width > 0 && Bounds.Height > 0;
         var scale = TopLevel.GetTopLevel(this)?.RenderScaling ?? 1;
         int target = Math.Clamp((int)Math.Ceiling(Math.Max(Bounds.Width, Bounds.Height) * scale / 32) * 32, 32, 1024);
         var path = visible ? Source : null;
@@ -104,6 +104,14 @@ public sealed class ListCoverImage : Control
     }
     /// <summary>先关闭引用显示图的弹层，再释放Bitmap、最后归还像素租约。</summary>
     private void ClearImage() { ToolTip.SetIsOpen(this, false); ToolTip.SetTip(this, null); _bitmap?.Dispose(); _bitmap = null; _lease?.Dispose(); _lease = null; InvalidateVisual(); }
+    /// <summary>所有者关闭时立即撤销需求并归还租约；脱离视觉树前也不能再启动加载。</summary>
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true; ++_revision; _request?.Cancel(); _loadedPath = null; _loadedPage = null;
+        foreach (var visual in _ancestors) visual.PropertyChanged -= AncestorChanged;
+        _ancestors.Clear(); ClearImage();
+    }
     protected override void OnSizeChanged(SizeChangedEventArgs e) { base.OnSizeChanged(e); Refresh(); }
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     { base.OnPropertyChanged(change); if (change.Property == SourceProperty || change.Property == PageSourceProperty || change.Property == IsVisibleProperty) Refresh(); }

@@ -14,6 +14,7 @@ public sealed class Config
     public SliderConfig Slider { get; set; } = new();
     public BookshelfConfig Bookshelf { get; set; } = new();
     public PageListConfig PageList { get; set; } = new();
+    public InformationConfig Information { get; set; } = new();
     public HistoryConfig History { get; set; } = new();
     public BookmarkConfig Bookmark { get; set; } = new();
     public SystemConfig System { get; set; } = new();

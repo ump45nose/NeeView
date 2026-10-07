@@ -12,6 +12,7 @@
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Avalonia.Skia" />
     <PackageReference Include="Magick.NET-Q8-AnyCPU" />
+    <PackageReference Include="MetadataExtractor" />
     <PackageReference Include="SharpCompress" />
   </ItemGroup>
   <ItemGroup>

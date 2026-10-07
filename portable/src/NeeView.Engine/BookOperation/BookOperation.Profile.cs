@@ -55,7 +55,7 @@ public sealed partial class BookOperation
             var previousPosition = Position;
             try
             {
-                await saveData.ReloadSettingAsync(candidate =>
+                await saveData.ReloadSettingAsync(async candidate =>
                 {
                     if (generation != _generation) throw new OperationCanceledException("打开请求已改变，请重试重载设置。");
                     EnsureProfileAvailable();
@@ -70,7 +70,7 @@ public sealed partial class BookOperation
                             || snapshot.System.ArchiveRecursiveMode != Config.Current.System.ArchiveRecursiveMode
                             || JsonSerializer.Serialize(snapshot.Archive.Pdf) != JsonSerializer.Serialize(Config.Current.Archive.Pdf)
                             || MediaFormats.IndexChanged(snapshot.Archive.Media,Config.Current.Archive.Media);
-                        if (reading.SortMode != current.Setting.SortMode) current.Sort(token);
+                        if (reading.SortMode != current.Setting.SortMode) await current.SortAsync(token);
                         Position = new(anchor?.Index ?? previousPosition.Index, previousPosition.Part);
                         RebuildFrame(MoveDirection);
                         if (recollect)
@@ -89,7 +89,7 @@ public sealed partial class BookOperation
                     CopySettingFields(branch.GetValue(snapshot)!, branch.GetValue(Config.Current)!);
                 Config.Current.View.RestoreStretchMode(snapshot.View.StretchMode, stretch);
                 if (reading is not null && Book is { } current)
-                { CopySettingFields(reading, current.Setting); current.Setting.Page = reading.Page; current.Sort(CancellationToken.None); Position = previousPosition; RebuildFrame(MoveDirection); }
+                { CopySettingFields(reading, current.Setting); current.Setting.Page = reading.Page; await current.SortAsync(CancellationToken.None); Position = previousPosition; RebuildFrame(MoveDirection); }
                 throw;
             }
             Bookshelf.Reorder(); _destinationFolders?.RefreshManaged(); Notify();

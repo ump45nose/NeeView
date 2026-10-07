@@ -218,5 +218,35 @@
         "sha256": "aca3b49277abcc7886ccb2f115603a9f5b15fc3f96019a10c00f2974098b210c"
       }
     ]
+  },
+  "metadataextractor/2.9.3": {
+    "repository_commit": "15be36f1f918e6cdba0bfa8feb7af7f8ac13b69f",
+    "files": [
+      {
+        "path": "licenses/upstream/metadataextractor/LICENSE",
+        "upstream_path": "LICENSE",
+        "url": "https://github.com/drewnoakes/metadata-extractor-dotnet/blob/15be36f1f918e6cdba0bfa8feb7af7f8ac13b69f/LICENSE",
+        "sha256": "fa8ee9b6d608a5d996a974840c87357a7853e8b2d142f937e43218ba5ab50fb3"
+      }
+    ]
+  },
+  "xmpcore/6.1.10.1": {
+    "notes": "Package README declares the same BSD licence as Adobe XMP SDK. Include official BSD text and original Adobe source notice; SDK text is from the pinned current upstream, not claimed to be a historical package file.",
+    "files": [
+      {
+        "path": "licenses/upstream/xmpcore/ADOBE-LICENSE",
+        "upstream_path": "LICENSE",
+        "url": "https://github.com/adobe/XMP-Toolkit-SDK/blob/7093513bd3caaad29da01db0f275d88a39d6bcc2/LICENSE",
+        "sha256": "99678ec755c91c9400a989fef7c6e1bd2907aff40eef4cf855c111bbd282c1d4"
+      },
+      {
+        "path": "licenses/upstream/xmpcore/NOTICE",
+        "upstream_path": "NOTICE",
+        "url": "https://github.com/drewnoakes/xmp-core-dotnet/blob/66b975558d9199cd3eb49093261a61deb30f8c06/XmpCore/XmpMetaFactory.cs",
+        "sha256": "3a52a3c408e50de69942d6654561b32ff4803516b14c7f68b4126c124818dc20"
+      }
+    ],
+    "source_tag_commit": "66b975558d9199cd3eb49093261a61deb30f8c06",
+    "repository_commit": null
   }
 }

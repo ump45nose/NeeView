@@ -1,5 +1,7 @@
 # P5 完成清单
 
+第三十七批：[元数据/信息契约](p5-metadata.md)与[静默验收](../acceptance/p5-metadata-runtime.md)。原字段、评级搜索、信息分组与配置进入唯一链路；脚本、其余完整设置和合理Mac命令继续迁移，P5整体未完成。
+
 P5 已开始。P3/P4 的两项真机检查按用户要求 [跳过并记录](../acceptance/p34-skipped-validation.md)；AX 和 NAS 已知问题保留，不因进入 P5 自动关闭。
 
 | 交付 | 状态 | 边界 |

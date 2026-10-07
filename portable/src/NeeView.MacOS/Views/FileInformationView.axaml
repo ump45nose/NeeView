@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="NeeView.MacOS.Views.FileInformationView" x:CompileBindings="False">
+  <!-- 原顶部当前页缩略选择、下方分组属性；行模板/间距可独立调整。 -->
+  <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="4">
+    <DockPanel><Button DockPanel.Dock="Right" Content="⋯" Click="Groups_Click" ToolTip.Tip="信息分组"/><Button DockPanel.Dock="Right" Content="文件夹" Click="Folder_Click"/><Button DockPanel.Dock="Right" Content="地图" IsEnabled="{Binding CanOpenMap}" Click="Map_Click"/></DockPanel>
+    <ListBox x:Name="InformationPages" Grid.Row="1" ItemsSource="{Binding Pages}" SelectedItem="{Binding Selected, Mode=TwoWay}" MaxHeight="120" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+      <ListBox.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ListBox.ItemsPanel>
+    </ListBox>
+    <StackPanel Grid.Row="2"><TextBlock Text="正在读取信息…" IsVisible="{Binding IsLoading}"/><TextBlock Text="{Binding Error}" TextWrapping="Wrap"/></StackPanel>
+    <ScrollViewer Grid.Row="3" HorizontalScrollBarVisibility="Disabled"><ItemsControl ItemsSource="{Binding Groups}"><ItemsControl.ItemTemplate><DataTemplate>
+      <StackPanel Spacing="4" Margin="4,8"><TextBlock Text="{Binding Name}" FontWeight="SemiBold"/><ItemsControl ItemsSource="{Binding Fields}"><ItemsControl.ItemTemplate><DataTemplate>
+        <Grid Margin="0,2"><Grid.ColumnDefinitions><ColumnDefinition Width="{Binding $parent[UserControl].DataContext.HeaderWidth}"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Name}" Opacity="0.7"/><GridSplitter Grid.Column="0" HorizontalAlignment="Right" Width="6" ResizeDirection="Columns" DragCompleted="Header_DragCompleted" Background="Transparent"/><TextBox Grid.Column="1" Text="{Binding Value, Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap" Background="Transparent" BorderThickness="0" Padding="0"/></Grid>
+      </DataTemplate></ItemsControl.ItemTemplate></ItemsControl></StackPanel>
+    </DataTemplate></ItemsControl.ItemTemplate></ItemsControl></ScrollViewer>
+  </Grid>
+</UserControl>

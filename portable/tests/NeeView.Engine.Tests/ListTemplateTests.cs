@@ -130,7 +130,7 @@ public sealed class ListTemplateTests
         var model = new ReaderWorkspaceViewModel(operation, new CommandTable(operation), state); var window = new MainWindow(); window.Bind(model, cache, new NoPlatform()); window.Show();
         try
         {
-            await window.OpenAsync(fixture.Images); await operation.SaveAsync(); await state.RegisterBookmarkAsync(operation.Book!, token: TestContext.Current.CancellationToken);
+            await window.OpenAsync(fixture.Images); await operation.SaveAllAsync(TestContext.Current.CancellationToken); await state.RegisterBookmarkAsync(operation.Book!, token: TestContext.Current.CancellationToken);
             model.ShowPanel("HistoryPanel"); Dispatcher.UIThread.RunJobs(); await SettleAsync(window); var book = operation.Book;
             var list = window.FindControl<ListBox>("HistoryList")!; var selected = list.SelectedItem;
             await WaitForCoverAsync(window, list); SaveImage(window, "content");
@@ -156,6 +156,15 @@ public sealed class ListTemplateTests
         var view = new PanelListItemView { DataContext = row };
         var text = Assert.IsType<ListItemText>(view.FindControl<Grid>("ItemRoot")!.DataContext);
         Assert.Equal(date, text.LastAccessTime); Assert.Equal(date.ToString("g"), text.Date); Assert.True(text.DateVisible); Assert.True(text.HasGroupHeader); Assert.Same(row, view.DataContext);
+        var window = new Window { Content = view }; window.Show();
+        try
+        {
+            row.Update(new("/comic.cbz", "006.png", date.AddDays(1)), "今天");
+            var updated = Assert.IsType<ListItemText>(view.FindControl<Grid>("ItemRoot")!.DataContext);
+            Assert.Equal(date.AddDays(1), updated.LastAccessTime); Assert.Equal("006.png", updated.Page);
+            Assert.Equal("今天", updated.GroupHeader); Assert.Same(row, view.DataContext);
+        }
+        finally { window.Close(); }
     }
     /// <summary>布局与防抖队列完成后读取实际显示资源，不用单次控件创建冒充加载完成。</summary>
     private static async Task SettleAsync(Window window)

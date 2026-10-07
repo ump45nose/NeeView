@@ -34,6 +34,9 @@ public interface IPlatformInput : IDisposable
 /// <summary>内容来源替换点；沿用 Archive/ArchiveEntry 模型。</summary>
 public interface IArchiveFactory
 {
+    /// <summary>读取指定原条目的图片信息；后端只探测和读取元数据，不解码像素。请求拥有流。</summary>
+    Task<PagePictureInfo> ReadImageMetadataAsync(ArchiveEntry entry, CancellationToken token)
+        => throw new NotSupportedException("此来源后端未提供图片元数据读取。");
     /// <summary>监视单一已加载目录的直接目录变更；空表示此来源不支持，所有者隐藏/关闭释放。</summary>
     IDisposable? WatchDirectory(string path, Action changed) => null;
     /// <summary>搜索结果监视，含文件及目录元数据；仅活动书架拥有一个监视。</summary>
@@ -97,8 +100,18 @@ public interface IImageDecoder
 /// <summary>图片尺寸及格式元数据。</summary>
 public sealed record ImageInfo(Size Size, string Format)
 {
+    public int? BitsPerPixel { get; init; }
+    public double DpiX { get; init; } = 96;
+    public double DpiY { get; init; } = 96;
     /// <summary>后端探测的 DPI 显示尺寸；无可靠元数据的格式保持像素尺寸。</summary>
     public Size AspectSize { get; init; } = Size;
+}
+/// <summary>原PictureInfo的无像素信息；仍归同一Page，不携带控件、流或新内容身份。</summary>
+public sealed record PagePictureInfo(ImageInfo Image, Media.Imaging.Metadata.BitmapMetadataDatabase Metadata, string Decoder, string? MetadataWarning = null)
+{
+    /// <summary>纯信息缓存的保守估算；不包含像素或后端临时输入，二者独立计费。</summary>
+    public long EstimatedBytes => 256 + Metadata.Sum(p => 64L + TextBytes(p.Value)) + Metadata.ExtraMap.Sum(p => 128L + p.Key.Length * 2L + TextBytes(p.Value));
+    private static long TextBytes(object? value) => value is IEnumerable<string> list ? list.Sum(s => 32L + s.Length * 2L) : 32L + (value?.ToString()?.Length ?? 0) * 2L;
 }
 /// <summary>解码目标尺寸，以设备像素计。</summary>
 public sealed record DecodeRequest(int TargetWidth, int TargetHeight, bool IsThumbnail = false, ImageResizeFilterParameters? ResizeFilter = null);

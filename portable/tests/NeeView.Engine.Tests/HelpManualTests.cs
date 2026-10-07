@@ -18,7 +18,7 @@ public sealed class HelpManualTests
         Assert.Equal(8, Regex.Matches(html, "<table>").Count); Assert.DoesNotContain("[[", html); Assert.DoesNotContain("@_SearchManual", html);
         foreach (var option in new[] { "/and", "/or", "/not", "/date", "/size", "/bookmark", "/history", "/m0", "/exact", "/re", "/since", "/until", "/p.meta.[key]" }) Assert.Contains(option, html);
         foreach (var key in HelpText.MetadataKeys) Assert.Contains("<td>" + key + "</td>", html);
-        Assert.Contains("元数据和评分搜索尚未迁移", html); Assert.Contains("/since 2019-04-01 /until 2019-05-01", html);
+        Assert.DoesNotContain("元数据和评分搜索尚未迁移", html); Assert.Contains("惰性读取", html); Assert.Contains("/since 2019-04-01 /until 2019-05-01", html);
         // 真正的profile选项必须全部进入别名展开表，不能维护另一份过时清单。
         var context = new SearchContext().AddProfile(new DateSearchProfile()).AddProfile(new SizeSearchProfile()).AddProfile(new BookSearchProfile()).AddProfile(new PageSearchProfile());
         foreach (var alias in context.KeyAlias) { Assert.Contains(alias.Key, html); Assert.Contains(WebUtility.HtmlEncode(string.Join(" ", alias.Value)), html); }

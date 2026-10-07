@@ -1,0 +1,102 @@
+{
+  "utc": "2026-10-07T04:36:55.198381+00:00",
+  "steps": [
+    {
+      "name": "Engine 构建",
+      "exit_code": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:03.20\n"
+    },
+    {
+      "name": "原算法与正式视图测试",
+      "exit_code": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Engine.Tests -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/bin/Debug/net10.0/NeeView.Engine.Tests.dll\n/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/bin/Debug/net10.0/NeeView.Engine.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行\n总共 1 个测试文件与指定模式相匹配。\n[xUnit.net 00:00:05.24]     NeeView.Engine.Tests.PageThumbnailResourceTests.ResourceSamplesShowThumbnailsScrollAndCloseWithBoundedResources [SKIP]\n  已跳过 NeeView.Engine.Tests.PageThumbnailResourceTests.ResourceSamplesShowThumbnailsScrollAndCloseWithBoundedResources [1 ms]\n[xUnit.net 00:00:53.36]     NeeView.Engine.Tests.ImageEffectIntegrationTests.MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(type: Pixelate) [SKIP]\n[xUnit.net 00:00:53.36]     NeeView.Engine.Tests.ImageEffectIntegrationTests.MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(type: Blur) [SKIP]\n[xUnit.net 00:00:53.36]     NeeView.Engine.Tests.ImageEffectIntegrationTests.MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(type: Sharpen) [SKIP]\n[xUnit.net 00:00:53.36]     NeeView.Engine.Tests.ImageEffectIntegrationTests.MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(type: Swirl) [SKIP]\n[xUnit.net 00:00:53.36]     NeeView.Engine.Tests.ImageEffectIntegrationTests.MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(type: Hsv) [SKIP]\n[xUnit.net 00:00:53.37]     NeeView.Engine.Tests.ImageEffectIntegrationTests.MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(type: Magnify) [SKIP]\n[xUnit.net 00:00:53.37]     NeeView.Engine.Tests.ImageEffectIntegrationTests.MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(type: Embossed) [SKIP]\n[xUnit.net 00:00:53.37]     NeeView.Engine.Tests.ImageEffectIntegrationTests.MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(type: Ripple) [SKIP]\n  已跳过 NeeView.Engine.Tests.ImageEffectIntegrationTests.MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(type: Pixelate) [1 ms]\n  已跳过 NeeView.Engine.Tests.ImageEffectIntegrationTests.MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(type: Blur) [1 ms]\n  已跳过 NeeView.Engine.Tests.ImageEffectIntegrationTests.MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(type: Sharpen) [1 ms]\n  已跳过 NeeView.Engine.Tests.ImageEffectIntegrationTests.MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(type: Swirl) [1 ms]\n  已跳过 NeeView.Engine.Tests.ImageEffectIntegrationTests.MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(type: Hsv) [1 ms]\n  已跳过 NeeView.Engine.Tests.ImageEffectIntegrationTests.MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(type: Magnify) [1 ms]\n  已跳过 NeeView.Engine.Tests.ImageEffectIntegrationTests.MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(type: Embossed) [1 ms]\n  已跳过 NeeView.Engine.Tests.ImageEffectIntegrationTests.MountedSampleUsesSameEffectAndGeometryExportWithoutChangingSource(type: Ripple) [1 ms]\n[xUnit.net 00:02:45.34]     NeeView.Engine.Tests.ImageExportTests.MountedImageSampleExportsOriginalBytesAndFullViewWithoutChangingSource [SKIP]\n  已跳过 NeeView.Engine.Tests.ImageExportTests.MountedImageSampleExportsOriginalBytesAndFullViewWithoutChangingSource [1 ms]\n[xUnit.net 00:03:07.45]     NeeView.Engine.Tests.BrowseResourceTests.MountedResourceSubfoldersRenderAndScrollWithBoundedDisplay [SKIP]\n  已跳过 NeeView.Engine.Tests.BrowseResourceTests.MountedResourceSubfoldersRenderAndScrollWithBoundedDisplay [1 ms]\n[xUnit.net 00:03:43.48]     NeeView.Engine.Tests.ResizeFilterTests.MountedSampleFilteredDecodePreservesSourceAndRecordsBackendTiming [SKIP]\n  已跳过 NeeView.Engine.Tests.ResizeFilterTests.MountedSampleFilteredDecodePreservesSourceAndRecordsBackendTiming [1 ms]\n警告: 正在覆盖结果文件: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/TestResults/engine.trx\n结果文件: /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/TestResults/engine.trx\n\n已通过! - 失败:     0，通过:  1742，已跳过:    12，总计:  1754，持续时间: 3 m 41 s - NeeView.Engine.Tests.dll (net10.0)\n"
+    },
+    {
+      "name": "官方macOS绑定测试构建",
+      "exit_code": 0,
+      "output": "  正在确定要还原的项目…\n  已还原 /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Backends/NeeView.Backends.csproj (用时 1.85 秒)。\n  已还原 /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Backends.MacOS.Tests/NeeView.Backends.MacOS.Tests.csproj (用时 1.85 秒)。\n  1 个项目(共 3 个)是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Backends -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Backends/bin/Debug/net10.0-macos/NeeView.Backends.dll\n  检测到的签名标识:\n  \n    Code Signing Key: \"\" (-)\n    Provisioning Profile: \"\" () - no entitlements\n    Bundle Id: net.neelaboratory.neeview.native-tests\n    App Id: net.neelaboratory.neeview.native-tests\n  检测到的签名标识:\n  \n    Code Signing Key: \"\" (-)\n    Provisioning Profile: \"\" () - no entitlements\n    Bundle Id: net.neelaboratory.neeview.native-tests\n    App Id: net.neelaboratory.neeview.native-tests\n  NeeView.Backends.MacOS.Tests -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Backends.MacOS.Tests/bin/Debug/net10.0-macos/osx-arm64/NeeView.Backends.MacOS.Tests.dll\n/Users/yuwk/.local/share/neeview-dotnet/packs/Microsoft.macOS.Sdk.net10.0_27.0/27.0.10722/targets/Xamarin.Shared.Sdk.targets(2724,3): warning : 文件“/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Backends.MacOS.Tests/obj/Debug/net10.0-macos/osx-arm64/apphost”未指定 “PublishFolderType” 元数据，并且无法计算默认值。该文件不会复制到应用捆绑包。 [/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Backends.MacOS.Tests/NeeView.Backends.MacOS.Tests.csproj]\n  优化程序集以调整大小可能会更改应用的行为。请务必在发布后进行测试。请参阅: https://aka.ms/dotnet-illink\n  正在优化程序集以调整大小。此过程可能需要一段时间。\n\n已成功生成。\n\n/Users/yuwk/.local/share/neeview-dotnet/packs/Microsoft.macOS.Sdk.net10.0_27.0/27.0.10722/targets/Xamarin.Shared.Sdk.targets(2724,3): warning : 文件“/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Backends.MacOS.Tests/obj/Debug/net10.0-macos/osx-arm64/apphost”未指定 “PublishFolderType” 元数据，并且无法计算默认值。该文件不会复制到应用捆绑包。 [/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Backends.MacOS.Tests/NeeView.Backends.MacOS.Tests.csproj]\n    1 个警告\n    0 个错误\n\n已用时间 00:00:11.89\n"
+    },
+    {
+      "name": "实际macOS后端测试（无窗口）",
+      "exit_code": 0,
+      "output": "  Discovering: NeeView.Backends.MacOS.Tests\n  Discovered:  NeeView.Backends.MacOS.Tests\n  Starting:    NeeView.Backends.MacOS.Tests\n  Finished:    NeeView.Backends.MacOS.Tests (ID = 'e3e4d5e5e5bfe82c7a4c44611a863179f935ff97aa94df4a3f1a3909f118813d')\n=== TEST EXECUTION SUMMARY ===\n   NeeView.Backends.MacOS.Tests  Total: 32, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0, Time: 3.285s\nCoreGraphics PDF has logged an error. Set environment variable \"CG_PDF_VERBOSE\" to learn more.\n"
+    },
+    {
+      "name": "信息草稿及历史选择修正专项",
+      "exit_code": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Engine.Tests -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/bin/Debug/net10.0/NeeView.Engine.Tests.dll\n/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Engine.Tests/bin/Debug/net10.0/NeeView.Engine.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行\n总共 1 个测试文件与指定模式相匹配。\n\n已通过! - 失败:     0，通过:    29，已跳过:     0，总计:    29，持续时间: 14 s - NeeView.Engine.Tests.dll (net10.0)\n"
+    },
+    {
+      "name": "正式入口源码编译（Library检查）",
+      "exit_code": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Backends -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Backends/bin/Debug/net10.0-macos/NeeView.Backends.dll\n  NeeView.MacOS -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:07.91\n"
+    },
+    {
+      "name": "正式 Mac 应用构建",
+      "exit_code": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Backends -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Backends/bin/Debug/net10.0-macos/NeeView.Backends.dll\n  检测到的签名标识:\n  \n    Code Signing Key: \"\" (-)\n    Provisioning Profile: \"\" () - no entitlements\n    Bundle Id: com.ump45nose.NeeView\n    App Id: com.ump45nose.NeeView\n  检测到的签名标识:\n  \n    Code Signing Key: \"\" (-)\n    Provisioning Profile: \"\" () - no entitlements\n    Bundle Id: com.ump45nose.NeeView\n    App Id: com.ump45nose.NeeView\n  NeeView.MacOS -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/osx-arm64/NeeView.MacOS.dll\n  优化程序集以调整大小可能会更改应用的行为。请务必在发布后进行测试。请参阅: https://aka.ms/dotnet-illink\n  正在优化程序集以调整大小。此过程可能需要一段时间。\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:14.41\n"
+    },
+    {
+      "name": "正式 .app 本地签名校验",
+      "exit_code": 0,
+      "output": "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app: valid on disk\n/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app: satisfies its Designated Requirement\n"
+    }
+  ],
+  "scope": "p5-metadata 原算法、资源、来源/导航及正式XAML Headless；不代表真机/Windows对照",
+  "formal_app": "构建及本地签名校验通过；Developer ID/公证/安装未执行",
+  "boundaries": {
+    "production_projects": [
+      "NeeView.Backends",
+      "NeeView.Engine",
+      "NeeView.MacOS"
+    ],
+    "source_files": 129,
+    "partial_adapters": 448,
+    "upstream_source_files": 26
+  },
+  "tests": {
+    "total": "1754",
+    "executed": "1742",
+    "passed": "1742",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "native_tests": {
+    "environment": "64-bit (ARM) .NET 10.0.12 [collection-per-class, non-parallel]",
+    "id": "3c095ce2-1f70-4726-b203-57729bee9b3b",
+    "name": "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/tests/NeeView.Backends.MacOS.Tests/bin/Debug/net10.0-macos/NeeView.Backends.MacOS.Tests.app/Contents/MonoBundle/NeeView.Backends.MacOS.Tests.dll",
+    "run-date": "2026-10-07",
+    "run-time": "12:41:05",
+    "start-rtf": "2026-10-07T12:41:05.8796360+08:00",
+    "test-framework": "xUnit.net v3 3.2.2+728c1dce01",
+    "target-framework": ".NETCoreApp,Version=v10.0",
+    "errors": "0",
+    "failed": "0",
+    "finish-rtf": "2026-10-07T12:41:09.1648370+08:00",
+    "not-run": "0",
+    "passed": "32",
+    "skipped": "0",
+    "time": "3.285",
+    "time-rtf": "00:00:03.2854956",
+    "total": "32"
+  },
+  "resolved_failures": [
+    {
+      "name": "正式入口源码编译（Library检查）",
+      "exit_code": 1,
+      "output": "  正在确定要还原的项目…\n  已还原 /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/NeeView.MacOS.csproj (用时 175 毫秒)。\n  2 个项目(共 3 个)是最新的，无法还原。\n  NeeView.Engine -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Engine/bin/Debug/net10.0/NeeView.Engine.dll\n  NeeView.Backends -> /Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.Backends/bin/Debug/net10.0-macos/NeeView.Backends.dll\n/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/ViewModels/InformationSettingsViewModel.cs(7,93): error IL2026: Using member 'System.Text.Json.JsonSerializer.Serialize<TValue>(TValue, JsonSerializerOptions)' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved. [/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/NeeView.MacOS.csproj]\n/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/ViewModels/InformationSettingsViewModel.cs(7,47): error IL2026: Using member 'System.Text.Json.JsonSerializer.Deserialize<TValue>(String, JsonSerializerOptions)' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved. [/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/NeeView.MacOS.csproj]\n\n生成失败。\n\n/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/ViewModels/InformationSettingsViewModel.cs(7,93): error IL2026: Using member 'System.Text.Json.JsonSerializer.Serialize<TValue>(TValue, JsonSerializerOptions)' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved. [/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/NeeView.MacOS.csproj]\n/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/ViewModels/InformationSettingsViewModel.cs(7,47): error IL2026: Using member 'System.Text.Json.JsonSerializer.Deserialize<TValue>(String, JsonSerializerOptions)' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved. [/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/NeeView.MacOS.csproj]\n    0 个警告\n    2 个错误\n\n已用时间 00:00:05.29\n"
+    }
+  ],
+  "app_bundle": "/Users/yuwk/WorkSpace/Code/Github/NeeView/portable/src/NeeView.MacOS/bin/Debug/net10.0-macos/NeeView.MacOS.app"
+}

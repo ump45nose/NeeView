@@ -1,5 +1,7 @@
 # NeeView Mac 源码迁移架构
 
+P5第三十七批：原完整EXIF/XMP/评分/数值格式映射及信息八组配置接入同一Page、归档、JSON和后台搜索；独立信息面板复用可见缩略图，信息缓存有界。见[元数据契约](p5-metadata.md)。
+
 P5第三十六批：原播放列表四模板、实体改名/废纸篓、可靠无效检查/确认/恢复及作为书籍打开进入唯一Hub、JSON与文件恢复链；前端复用现有可见封面/虚拟化。Windows FileID自动重新定位不猜测迁移，见[播放列表收尾](p5-playlist-completion.md)。
 
 P5第三十四批：原缩放滤镜配置、十一核、锐化、六分支预设和原命令进入既有静态图像链；参数快照计入缓存规格，低维护纯核适配和窗口保持。见[缩放滤镜契约](p5-resize-filter.md)。
@@ -76,7 +78,7 @@ Engine 使用 `net10.0`，只引用原 MVVM 辅助库；不引用 WPF、Avalonia
 
 [源码迁移清单](source-migration.json) 记录原文件、基线 SHA256、目标和改造。位置/范围、设置按字段恢复、自然排序、页框生成等算法直接迁入。`PageFrameFactory` 保留原判断顺序，几何计算只替换实际 WPF 值类型及旋转变换。
 
-Book/Page/Archive/BookOperation 是按阶段迁入的原关系子集适配，尚未完整迁入高级媒体、metadata/rating、脚本和高级控制；原页面/普通书架搜索已由P3接入。不能把“存在同名类型”当作整组功能已经迁完。新增替换点只有来源、像素、系统交互；不建立 WPF 模拟层、事件总线或插件框架。
+Book/Page/Archive/BookOperation 是按阶段迁入的原关系适配；PDF、动图、视频及metadata/rating已按各批契约接入，脚本和其余高级控制继续迁移。原页面/普通书架搜索已由P3接入。不能把“存在同名类型”当作整组功能已经迁完。新增替换点只有来源、像素、系统交互；不建立 WPF 模拟层、事件总线或插件框架。
 
 原 `BookSourceFactory.ValidatePageSortMode` 对普通书籍排除播放列表注册顺序，P1 保留其回退到文件名排序的规则。自然比较器的 Win32 字符比较改为 .NET CurrentCulture；数值、全半角、日文归一逻辑保留，语言排序细节仍待 Windows 样本对照。
 

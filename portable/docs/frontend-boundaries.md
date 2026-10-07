@@ -1,5 +1,7 @@
 # 前端独立调整边界
 
+P5第三十七批：FileInformationView保留当前页缩略选择、信息分组、列分隔/复制选择；FileInformationViewModel管理选择和加载代次，PageMetadataTools/后端管理字段及流。信息设置草稿沿既有事务；主题与模板不实现EXIF或搜索算法，见[元数据契约](p5-metadata.md)。
+
 P5 第十八批：原幻灯周期/输入重置/首周期EOS等待、页尾覆盖、自动滚动和启动选项进入唯一BookOperation与JSON；顶部原4 DIP计时条和设置草稿独立。关闭失败恢复播放及滚动；调度适配与剩余媒体边界见[幻灯契约](p5-slideshow.md)。
 
 

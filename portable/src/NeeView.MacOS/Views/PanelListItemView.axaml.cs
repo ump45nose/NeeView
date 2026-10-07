@@ -14,7 +14,7 @@ public sealed partial class PanelListItemView : UserControl
     public ListCoverImage Cover { get; }
     private readonly PanelListItemProfile _profile;
     private readonly Func<Page, string?>? _pageHeader;
-    private BookmarkNode? _observed;
+    private INotifyPropertyChanged? _observed;
     /// <summary>XAML工具构造默认Content；产品列表由宿主传入真实封面契约。</summary>
     public PanelListItemView() : this(PanelListItemStyle.Content, PanelListItemProfile.Create(PanelListItemStyle.Content), null) { }
     public PanelListItemView(PanelListItemStyle style, PanelListItemProfile profile, Func<string, DecodeRequest, CancellationToken, Task<BitmapLease>>? load,
@@ -39,7 +39,7 @@ public sealed partial class PanelListItemView : UserControl
     private void ObserveNode()
     {
         if (_observed is not null) _observed.PropertyChanged -= NodeChanged;
-        _observed = DataContext as BookmarkNode ?? (DataContext as FolderItem)?.Bookmark;
+        _observed = DataContext as INotifyPropertyChanged ?? (DataContext as FolderItem)?.Bookmark;
         if (_observed is not null) _observed.PropertyChanged += NodeChanged;
     }
     private void NodeChanged(object? sender, PropertyChangedEventArgs e) => RefreshRow();

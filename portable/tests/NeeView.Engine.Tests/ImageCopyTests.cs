@@ -59,7 +59,7 @@ public sealed class ImageCopyTests
             Assert.True(window.IsCommandAvailable("CopyImage"));
         }
         finally { await window.PrepareShutdownAsync(); window.Close(); }
-        Assert.Equal(0, factory.ByteCount); Assert.Equal(0, factory.GetDiagnostics().Leases);
+        Assert.True(factory.ByteCount == 0, System.Text.Json.JsonSerializer.Serialize(factory.GetDiagnostics())); Assert.Equal(0, factory.GetDiagnostics().Leases);
     }
     [AvaloniaTheory]
     [InlineData(PageReadOrder.LeftToRight)]
@@ -127,7 +127,7 @@ public sealed class ImageCopyTests
             if (close)
             {
                 var shutdown = window.PrepareShutdownAsync(); await Wait(() => captured.IsCancellationRequested);
-                Assert.False(shutdown.IsCompleted); release.TrySetResult(); await copy; await shutdown; Assert.Equal(0, factory.ByteCount);
+                Assert.False(shutdown.IsCompleted); release.TrySetResult(); await copy; await shutdown; Assert.True(factory.ByteCount == 0, System.Text.Json.JsonSerializer.Serialize(factory.GetDiagnostics()));
             }
             else
             {

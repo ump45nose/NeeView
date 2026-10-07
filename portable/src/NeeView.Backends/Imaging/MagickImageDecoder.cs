@@ -40,7 +40,8 @@ public sealed class MagickImageDecoder(IAnimatedImageDecoder? pngAnimation = nul
         double Dpi(double value) => density.Units == DensityUnit.Undefined || !double.IsFinite(value) || value <= 0 ? fallback : value * multiplier;
         double x = Dpi(density.X), y = Dpi(density.Y);
         if (swapped) (x, y) = (y, x);
-        return new ImageInfo(size, image.Format.ToString()) { AspectSize = new(size.Width * 96 / x, size.Height * 96 / y) };
+        return new ImageInfo(size, image.Format.ToString()) { AspectSize = new(size.Width * 96 / x, size.Height * 96 / y), DpiX = x, DpiY = y,
+            BitsPerPixel = checked((int)image.Depth * (int)image.ChannelCount) };
     }, token);
     /// <summary>输入解码规格，返回 BGRA 8 位预乘像素；原生完成后再次检查取消。</summary>
     public Task<DecodedImageLease> DecodeAsync(Stream stream, DecodeRequest request, CancellationToken token) => stream is PdfPageStream pdf

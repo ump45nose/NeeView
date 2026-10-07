@@ -15,6 +15,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public IReadOnlyList<BrowseModeChoice> BrowseModes { get; } = [new(BrowseLayoutMode.Paged, "分页"), new(BrowseLayoutMode.Panorama, "原版全景"), new(BrowseLayoutMode.Continuous, "连续阅读"), new(BrowseLayoutMode.Masonry, "瀑布流")];
     public BrowseModeChoice SelectedBrowseMode => BrowseModes.First(e => e.Mode == Operation.BrowseMode);
     public SaveData SaveData { get; } = saveData;
+    public FileInformationViewModel FileInformation { get; } = new();
     public NavigationSearchViewModel PageSearch { get; } = new(() => operation.Book, keyword => PageSearchProfile.Analyze(keyword),
         (keyword, book, token) => operation.SearchPagesAsync(keyword, book as Book, token), saveData.PageListSearchHistory, saveData.EditPageListSearchHistoryAsync);
     public NavigationSearchViewModel FolderSearch { get; } = new(() => operation.Bookshelf.Place, SearchBookshelfCollection.Analyze,
@@ -137,7 +138,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     /// <summary>装配业务订阅；后台回报统一切 UI 线程。</summary>
     public void Attach() { _historySearchAttached = true; PageSearch.Refreshed += NavigationSearch_Refreshed; FolderSearch.Refreshed += NavigationSearch_Refreshed; HistorySearch.Refreshed += HistorySearch_Refreshed; Layout.Changed += Layout_Changed; Operation.Changed += Operation_Changed; Operation.MarkersChanged += Markers_Changed; Operation.PageSelector.SelectionChanged += Selection_Changed; Operation.Bookshelf.Changed += Bookshelf_Changed; SaveData.Changed += SaveData_Changed; Refresh(); RefreshFolders(); }
     /// <summary>关闭窗口时解除订阅，避免旧窗口收到新书变化。</summary>
-    public void Detach() { _historySearchAttached = false; PageSearch.Refreshed -= NavigationSearch_Refreshed; FolderSearch.Refreshed -= NavigationSearch_Refreshed; PageSearch.Dispose(); FolderSearch.Dispose(); HistorySearch.Refreshed -= HistorySearch_Refreshed; HistorySearch.Dispose(); Layout.Changed -= Layout_Changed; Operation.Changed -= Operation_Changed; Operation.MarkersChanged -= Markers_Changed; Operation.PageSelector.SelectionChanged -= Selection_Changed; Operation.Bookshelf.Changed -= Bookshelf_Changed; SaveData.Changed -= SaveData_Changed; }
+    public void Detach() { FileInformation.Dispose(); _historySearchAttached = false; PageSearch.Refreshed -= NavigationSearch_Refreshed; FolderSearch.Refreshed -= NavigationSearch_Refreshed; PageSearch.Dispose(); FolderSearch.Dispose(); HistorySearch.Refreshed -= HistorySearch_Refreshed; HistorySearch.Dispose(); Layout.Changed -= Layout_Changed; Operation.Changed -= Operation_Changed; Operation.MarkersChanged -= Markers_Changed; Operation.PageSelector.SelectionChanged -= Selection_Changed; Operation.Bookshelf.Changed -= Bookshelf_Changed; SaveData.Changed -= SaveData_Changed; }
     private void NavigationSearch_Refreshed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() => { if (_historySearchAttached) { OnPropertyChanged(nameof(PageSearch)); OnPropertyChanged(nameof(FolderSearch)); } });
     /// <summary>搜索只刷新导航面板，排队通知在旧窗口退订后丢弃。</summary>
     private void HistorySearch_Refreshed(object? sender, EventArgs e) => Dispatcher.UIThread.Post(() => { if (_historySearchAttached) RefreshHistory(); });
@@ -180,6 +181,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public void Refresh()
     {
         PageSearch.RefreshScope();
+        FileInformation.Update(Operation.Book, ShowInformation);
         Address = Operation.Book?.Path ?? Address;
         RefreshPages();
         // 先替换列表来源，再恢复选择；反向顺序会被 ListBox 的 TwoWay 清空回报覆盖。
@@ -209,7 +211,8 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
         {
             string? group = Config.Current.History.IsGroupBy ? HistoryList.GetGroupName(entry.LastAccessTime, DateTime.Today) : null;
             var header = group == previousGroup ? null : group; previousGroup = group;
-            return old.TryGetValue(entry.Path, out var row) && row.Entry == entry && row.GroupHeader == header ? row : new HistoryRow(entry, header);
+            if (!old.TryGetValue(entry.Path, out var row)) return new HistoryRow(entry, header);
+            row.Update(entry, header); return row;
         }).ToArray();
         OnPropertyChanged(nameof(History));
         SelectedHistory = _historyRows.FirstOrDefault(row => row.Path == selectedPath) ?? _historyRows.FirstOrDefault();
@@ -253,6 +256,7 @@ public sealed class ReaderWorkspaceViewModel(BookOperation operation, CommandTab
     public void RefreshPanels()
     {
         foreach (var name in new[] { nameof(LeftVisible), nameof(RightVisible), nameof(LeftAutoHide), nameof(RightAutoHide), nameof(ShowPageList), nameof(ShowFolderList), nameof(ShowHistory), nameof(ShowBookmarks), nameof(ShowInformation), nameof(ShowNavigator), nameof(ShowImageEffects), nameof(ShowPlaylist), nameof(FilmStripVisible) }) OnPropertyChanged(name);
+        FileInformation.Update(Operation.Book, ShowInformation);
         PanelsRefreshed?.Invoke(this, EventArgs.Empty);
     }
     /// <summary>旧 Mac 临时显示入口；最终状态由独立显示适配发布，不保存在配置中。</summary>
@@ -282,10 +286,21 @@ public sealed record FolderOrderChoice(FolderOrder Mode, string Label);
 /// <summary>Mac展示方式的文案；模式及原全景开关以Engine为唯一权威。</summary>
 public sealed record BrowseModeChoice(BrowseLayoutMode Mode, string Label);
 /// <summary>历史行的独立表现数据；分组标题不成为可导航或删除的伪历史条目。</summary>
-public sealed record HistoryRow(HistoryEntry Entry, string? GroupHeader)
+public sealed class HistoryRow(HistoryEntry entry, string? groupHeader) : ObservableObject
 {
+    public HistoryEntry Entry { get; private set; } = entry;
+    public string? GroupHeader { get; private set; } = groupHeader;
     public string Path => Entry.Path;
     public string Name => Entry.Name;
     public string? Page => Entry.Page;
     public bool HasGroupHeader => GroupHeader is not null;
+    /// <summary>同一路径的保存只更新展示值，保持多选、焦点及已有封面身份。</summary>
+    /// <param name="value">同一路径最新的原历史快照。</param>
+    /// <param name="header">当前排序下的分组标题。</param>
+    public void Update(HistoryEntry value, string? header)
+    {
+        if (value.Path != Path) throw new ArgumentException("不能把历史展示行改为另一条路径。", nameof(value));
+        if (Entry == value && GroupHeader == header) return;
+        Entry = value; GroupHeader = header; OnPropertyChanged("");
+    }
 }

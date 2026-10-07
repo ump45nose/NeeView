@@ -32,7 +32,7 @@ public sealed partial class BookOperation
                         // 原PageFrameBoxContext订阅实际设置变化，允许重新登记移除的历史；相同值不触发。
                         if (before.Page != target.Page || System.Text.Json.JsonSerializer.Serialize(before) != System.Text.Json.JsonSerializer.Serialize(target))
                             current.MementoControl.RequestSaveBookMemento(false);
-                        current.Sort(CancellationToken.None);
+                        await current.SortAsync(CancellationToken.None);
                         Position = new(anchor?.Index ?? position.Index, position.Part); RebuildFrame(MoveDirection);
                     }
                     await saveData.SaveAsync(Book);
@@ -42,7 +42,7 @@ public sealed partial class BookOperation
                     before.CopyTo(target);
                     if (Book is { } retained)
                     {
-                        retained.SortSeed = seed!.Value; retained.Sort(CancellationToken.None);
+                        retained.SortSeed = seed!.Value; await retained.SortAsync(CancellationToken.None);
                         Position = position; RebuildFrame(MoveDirection); retained.MementoControl.RestoreState(historyState!.Value);
                     }
                     throw;
