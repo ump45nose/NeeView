@@ -1,0 +1,698 @@
+{
+  "schema": 1,
+  "date": "2026-10-07",
+  "product_baseline": "c8f979d23",
+  "avalonia": {
+    "version": "12.1.3",
+    "commit": "8eeda4f6f546165b3f72e63c9f42247abb306905"
+  },
+  "microcom": {
+    "version": "0.11.6",
+    "commit": "76785efcafd91b5902fd19dd11145f6dd655b7b4"
+  },
+  "platform": {
+    "macos": "27.0.1",
+    "architecture": "arm64",
+    "xcode": "27.0 (27A266a)",
+    "dotnet_sdk": "10.0.401",
+    "minimum_target": "15.0"
+  },
+  "decision": "reject_product_integration",
+  "reason": "return-reference patch passes static query retention checks but retired native control trees remain alive after full GC",
+  "product_source_changed": false,
+  "official_nuget_cache_changed": false,
+  "accessibility_disabled": false,
+  "native_node_lifetime_changed": false,
+  "production_build_or_tests_repeated": false,
+  "native_abi": {
+    "stock": {
+      "sha256": "42765b28691538bcfbe6ed3ec39afc5c899b43cc9b7cf0ca550f91a0f1fc6533",
+      "export_count": 489,
+      "dependencies": "/Users/yuwk/.nuget/packages/avalonia.native/12.1.3/runtimes/osx/native/libAvaloniaNative.dylib:\n\t/usr/local/lib/libAvalonia.Native.OSX.dylib (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/UniformTypeIdentifiers.framework/Versions/A/UniformTypeIdentifiers (compatibility version 1.0.0, current version 709.0.0, weak)\n\t/System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore (compatibility version 1.2.0, current version 1195.14.4)\n\t/System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/OpenGL.framework/Versions/A/OpenGL (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/Carbon.framework/Versions/A/Carbon (compatibility version 2.0.0, current version 170.0.0)\n\t/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit (compatibility version 45.0.0, current version 2685.60.104)\n\t/System/Library/Frameworks/Metal.framework/Versions/A/Metal (compatibility version 1.0.0, current version 373.2.0)\n\t/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (compatibility version 64.0.0, current version 1965.5.1)\n\t/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5026.5.4)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2100.43.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n\t/System/Library/Frameworks/ApplicationServices.framework/Versions/A/ApplicationServices (compatibility version 1.0.0, current version 66.0.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5026.5.4)\n\t/System/Library/Frameworks/CoreServices.framework/Versions/A/CoreServices (compatibility version 1.0.0, current version 1226.0.0)\n\t/System/Library/Frameworks/CoreVideo.framework/Versions/A/CoreVideo (compatibility version 1.2.0, current version 734.4.0)\n"
+    },
+    "baseline": {
+      "sha256": "7de56661d87779e8b0e8ea7c25ab61f4869cac41bcff40238177417fc99406c3",
+      "export_count": 489,
+      "dependencies": "/Users/yuwk/.codex/artifacts/neeview/ax-patch-20261007/baseline.dylib:\n\t/usr/local/lib/libAvalonia.Native.OSX.dylib (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/UniformTypeIdentifiers.framework/Versions/A/UniformTypeIdentifiers (compatibility version 1.0.0, current version 709.0.0)\n\t/System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore (compatibility version 1.2.0, current version 1223.2.2)\n\t/System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/OpenGL.framework/Versions/A/OpenGL (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/Carbon.framework/Versions/A/Carbon (compatibility version 2.0.0, current version 170.0.0)\n\t/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit (compatibility version 45.0.0, current version 2775.10.103)\n\t/System/Library/Frameworks/Metal.framework/Versions/A/Metal (compatibility version 1.0.0, current version 382.5.3)\n\t/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (compatibility version 64.0.0, current version 2050.0.0)\n\t/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5027.0.69)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2200.27.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.0.0)\n\t/System/Library/Frameworks/ApplicationServices.framework/Versions/A/ApplicationServices (compatibility version 1.0.0, current version 66.0.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5027.0.69)\n\t/System/Library/Frameworks/CoreServices.framework/Versions/A/CoreServices (compatibility version 1.0.0, current version 1226.0.0)\n\t/System/Library/Frameworks/CoreVideo.framework/Versions/A/CoreVideo (compatibility version 1.2.0, current version 758.27.0)\n"
+    },
+    "patched": {
+      "sha256": "b60c559e70811bf16c902e32ce39928d5a1420944872c937d4ac19a66c3974d2",
+      "export_count": 489,
+      "dependencies": "/Users/yuwk/.codex/artifacts/neeview/ax-patch-20261007/patched.dylib:\n\t/usr/local/lib/libAvalonia.Native.OSX.dylib (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/UniformTypeIdentifiers.framework/Versions/A/UniformTypeIdentifiers (compatibility version 1.0.0, current version 709.0.0)\n\t/System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore (compatibility version 1.2.0, current version 1223.2.2)\n\t/System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/OpenGL.framework/Versions/A/OpenGL (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/Carbon.framework/Versions/A/Carbon (compatibility version 2.0.0, current version 170.0.0)\n\t/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit (compatibility version 45.0.0, current version 2775.10.103)\n\t/System/Library/Frameworks/Metal.framework/Versions/A/Metal (compatibility version 1.0.0, current version 382.5.3)\n\t/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (compatibility version 64.0.0, current version 2050.0.0)\n\t/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5027.0.69)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2200.27.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.0.0)\n\t/System/Library/Frameworks/ApplicationServices.framework/Versions/A/ApplicationServices (compatibility version 1.0.0, current version 66.0.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5027.0.69)\n\t/System/Library/Frameworks/CoreServices.framework/Versions/A/CoreServices (compatibility version 1.0.0, current version 1226.0.0)\n\t/System/Library/Frameworks/CoreVideo.framework/Versions/A/CoreVideo (compatibility version 1.2.0, current version 758.27.0)\n"
+    }
+  },
+  "runs": {
+    "baseline-repeat": {
+      "snapshots": {
+        "before": {
+          "Avalonia.Native.AvnAutomationPeerArray": {
+            "count": 821,
+            "reported_size": 48
+          },
+          "MicroCom.Runtime.MicroComShadow": {
+            "count": 1026,
+            "reported_size": 80
+          },
+          "Avalonia.Native.AvnAutomationPeer": {
+            "count": 174,
+            "reported_size": 56
+          },
+          "Avalonia.Controls.ScrollViewer": {
+            "count": 3,
+            "reported_size": 688
+          },
+          "Avalonia.Controls.TextBlock": {
+            "count": 24,
+            "reported_size": 552
+          },
+          "graph_bytes": 3960194,
+          "graph_objects": 51752
+        },
+        "after100": {
+          "Avalonia.Native.AvnAutomationPeerArray": {
+            "count": 7321,
+            "reported_size": 48
+          },
+          "MicroCom.Runtime.MicroComShadow": {
+            "count": 7526,
+            "reported_size": 80
+          },
+          "Avalonia.Native.AvnAutomationPeer": {
+            "count": 174,
+            "reported_size": 56
+          },
+          "Avalonia.Controls.ScrollViewer": {
+            "count": 3,
+            "reported_size": 688
+          },
+          "Avalonia.Controls.TextBlock": {
+            "count": 24,
+            "reported_size": 552
+          },
+          "graph_bytes": 8067186,
+          "graph_objects": 119495
+        },
+        "after1100": {
+          "Avalonia.Native.AvnAutomationPeerArray": {
+            "count": 72321,
+            "reported_size": 48
+          },
+          "MicroCom.Runtime.MicroComShadow": {
+            "count": 72526,
+            "reported_size": 80
+          },
+          "Avalonia.Native.AvnAutomationPeer": {
+            "count": 174,
+            "reported_size": 56
+          },
+          "Avalonia.Controls.ScrollViewer": {
+            "count": 3,
+            "reported_size": 688
+          },
+          "Avalonia.Controls.TextBlock": {
+            "count": 24,
+            "reported_size": 552
+          },
+          "graph_bytes": 47059392,
+          "graph_objects": 769511
+        },
+        "after_retire100": {
+          "Avalonia.Native.AvnAutomationPeerArray": {
+            "count": 89022,
+            "reported_size": 48
+          },
+          "MicroCom.Runtime.MicroComShadow": {
+            "count": 105627,
+            "reported_size": 80
+          },
+          "Avalonia.Native.AvnAutomationPeer": {
+            "count": 16574,
+            "reported_size": 56
+          },
+          "Avalonia.Controls.ScrollViewer": {
+            "count": 303,
+            "reported_size": 688
+          },
+          "Avalonia.Controls.TextBlock": {
+            "count": 2424,
+            "reported_size": 552
+          },
+          "graph_bytes": 209290890,
+          "graph_objects": 2799486
+        }
+      },
+      "summary": {
+        "warmup": {
+          "errors": 0,
+          "errorTypes": {},
+          "nodes": 2840,
+          "rounds": 10,
+          "seconds": 0.9270709753036499,
+          "trusted": true
+        },
+        "static100": {
+          "errors": 0,
+          "errorTypes": {},
+          "nodes": 28400,
+          "rounds": 100,
+          "seconds": 8.210363984107971,
+          "trusted": true
+        },
+        "static1000": {
+          "errors": 0,
+          "errorTypes": {},
+          "nodes": 283994,
+          "rounds": 1000,
+          "seconds": 82.2317830324173,
+          "trusted": true
+        },
+        "retired": {
+          "Id": 102,
+          "Action": "gc",
+          "Retired": 101,
+          "RetiredAlive": 101,
+          "ManagedBytes": 446260632
+        },
+        "retiredAfterDump": {
+          "Id": 103,
+          "Action": "gc",
+          "Retired": 101,
+          "RetiredAlive": 101,
+          "ManagedBytes": 446175312
+        }
+      },
+      "harness_source": "probe/Program.cs"
+    },
+    "patched": {
+      "snapshots": {
+        "before": {
+          "Avalonia.Native.AvnAutomationPeerArray": {
+            "count": 0,
+            "reported_size": null
+          },
+          "MicroCom.Runtime.MicroComShadow": {
+            "count": 205,
+            "reported_size": 80
+          },
+          "Avalonia.Native.AvnAutomationPeer": {
+            "count": 174,
+            "reported_size": 56
+          },
+          "Avalonia.Controls.ScrollViewer": {
+            "count": 3,
+            "reported_size": 688
+          },
+          "Avalonia.Controls.TextBlock": {
+            "count": 24,
+            "reported_size": 552
+          },
+          "graph_bytes": 3463204,
+          "graph_objects": 43435
+        },
+        "after100": {
+          "Avalonia.Native.AvnAutomationPeerArray": {
+            "count": 0,
+            "reported_size": null
+          },
+          "MicroCom.Runtime.MicroComShadow": {
+            "count": 205,
+            "reported_size": 80
+          },
+          "Avalonia.Native.AvnAutomationPeer": {
+            "count": 174,
+            "reported_size": 56
+          },
+          "Avalonia.Controls.ScrollViewer": {
+            "count": 3,
+            "reported_size": 688
+          },
+          "Avalonia.Controls.TextBlock": {
+            "count": 24,
+            "reported_size": 552
+          },
+          "graph_bytes": 3670156,
+          "graph_objects": 46177
+        },
+        "after1100": {
+          "Avalonia.Native.AvnAutomationPeerArray": {
+            "count": 0,
+            "reported_size": null
+          },
+          "MicroCom.Runtime.MicroComShadow": {
+            "count": 205,
+            "reported_size": 80
+          },
+          "Avalonia.Native.AvnAutomationPeer": {
+            "count": 174,
+            "reported_size": 56
+          },
+          "Avalonia.Controls.ScrollViewer": {
+            "count": 3,
+            "reported_size": 688
+          },
+          "Avalonia.Controls.TextBlock": {
+            "count": 24,
+            "reported_size": 552
+          },
+          "graph_bytes": 3668708,
+          "graph_objects": 46144
+        },
+        "after_retire100": {
+          "Avalonia.Native.AvnAutomationPeerArray": {
+            "count": 0,
+            "reported_size": null
+          },
+          "MicroCom.Runtime.MicroComShadow": {
+            "count": 16605,
+            "reported_size": 80
+          },
+          "Avalonia.Native.AvnAutomationPeer": {
+            "count": 16574,
+            "reported_size": 56
+          },
+          "Avalonia.Controls.ScrollViewer": {
+            "count": 303,
+            "reported_size": 688
+          },
+          "Avalonia.Controls.TextBlock": {
+            "count": 2424,
+            "reported_size": 552
+          },
+          "graph_bytes": 155484174,
+          "graph_objects": 1898994
+        }
+      },
+      "summary": {
+        "warmup": {
+          "errors": 0,
+          "nodes": 2840,
+          "rounds": 10,
+          "seconds": 1.0502099990844727,
+          "trusted": true
+        },
+        "static100": {
+          "errors": 0,
+          "nodes": 28400,
+          "rounds": 100,
+          "seconds": 9.308495998382568,
+          "trusted": true
+        },
+        "static1000": {
+          "errors": 0,
+          "nodes": 283994,
+          "rounds": 1000,
+          "seconds": 84.08396804332733,
+          "trusted": true
+        },
+        "retired": {
+          "Id": 102,
+          "Action": "gc",
+          "Retired": 101,
+          "RetiredAlive": 101,
+          "ManagedBytes": 327971584
+        },
+        "retiredAfterDump": {
+          "Id": 103,
+          "Action": "gc",
+          "Retired": 101,
+          "RetiredAlive": 101,
+          "ManagedBytes": 327783376
+        }
+      },
+      "harness_source": "probe-v1.cs"
+    },
+    "patched-noax": {
+      "snapshots": {
+        "before": {
+          "Avalonia.Native.AvnAutomationPeerArray": {
+            "count": 0,
+            "reported_size": null
+          },
+          "MicroCom.Runtime.MicroComShadow": {
+            "count": 202,
+            "reported_size": 80
+          },
+          "Avalonia.Native.AvnAutomationPeer": {
+            "count": 171,
+            "reported_size": 56
+          },
+          "Avalonia.Controls.ScrollViewer": {
+            "count": 3,
+            "reported_size": 688
+          },
+          "Avalonia.Controls.TextBlock": {
+            "count": 24,
+            "reported_size": 552
+          },
+          "graph_bytes": 3469268,
+          "graph_objects": 43539
+        },
+        "after100": {
+          "Avalonia.Native.AvnAutomationPeerArray": {
+            "count": 0,
+            "reported_size": null
+          },
+          "MicroCom.Runtime.MicroComShadow": {
+            "count": 202,
+            "reported_size": 80
+          },
+          "Avalonia.Native.AvnAutomationPeer": {
+            "count": 171,
+            "reported_size": 56
+          },
+          "Avalonia.Controls.ScrollViewer": {
+            "count": 3,
+            "reported_size": 688
+          },
+          "Avalonia.Controls.TextBlock": {
+            "count": 24,
+            "reported_size": 552
+          },
+          "graph_bytes": 3697048,
+          "graph_objects": 46507
+        },
+        "after1100": {
+          "Avalonia.Native.AvnAutomationPeerArray": {
+            "count": 0,
+            "reported_size": null
+          },
+          "MicroCom.Runtime.MicroComShadow": {
+            "count": 202,
+            "reported_size": 80
+          },
+          "Avalonia.Native.AvnAutomationPeer": {
+            "count": 171,
+            "reported_size": 56
+          },
+          "Avalonia.Controls.ScrollViewer": {
+            "count": 3,
+            "reported_size": 688
+          },
+          "Avalonia.Controls.TextBlock": {
+            "count": 24,
+            "reported_size": 552
+          },
+          "graph_bytes": 3669832,
+          "graph_objects": 46138
+        },
+        "after_retire100": {
+          "Avalonia.Native.AvnAutomationPeerArray": {
+            "count": 0,
+            "reported_size": null
+          },
+          "MicroCom.Runtime.MicroComShadow": {
+            "count": 402,
+            "reported_size": 80
+          },
+          "Avalonia.Native.AvnAutomationPeer": {
+            "count": 371,
+            "reported_size": 56
+          },
+          "Avalonia.Controls.ScrollViewer": {
+            "count": 303,
+            "reported_size": 688
+          },
+          "Avalonia.Controls.TextBlock": {
+            "count": 2424,
+            "reported_size": 552
+          },
+          "graph_bytes": 135385592,
+          "graph_objects": 1569770
+        }
+      },
+      "summary": {
+        "retired": {
+          "Id": 102,
+          "Action": "gc",
+          "Retired": 101,
+          "RetiredAlive": 101,
+          "ManagedBytes": 286949016
+        },
+        "retiredAfterDump": {
+          "Id": 103,
+          "Action": "gc",
+          "Retired": 101,
+          "RetiredAlive": 101,
+          "ManagedBytes": 287090072
+        }
+      },
+      "harness_source": "probe-v1.cs"
+    },
+    "headless-noax": {
+      "snapshots": {
+        "before": {
+          "Avalonia.Native.AvnAutomationPeerArray": {
+            "count": 0,
+            "reported_size": null
+          },
+          "MicroCom.Runtime.MicroComShadow": {
+            "count": 0,
+            "reported_size": null
+          },
+          "Avalonia.Native.AvnAutomationPeer": {
+            "count": 0,
+            "reported_size": null
+          },
+          "Avalonia.Controls.ScrollViewer": {
+            "count": 3,
+            "reported_size": 688
+          },
+          "Avalonia.Controls.TextBlock": {
+            "count": 24,
+            "reported_size": 552
+          },
+          "graph_bytes": 3016114,
+          "graph_objects": 36527
+        },
+        "after100": {
+          "Avalonia.Native.AvnAutomationPeerArray": {
+            "count": 0,
+            "reported_size": null
+          },
+          "MicroCom.Runtime.MicroComShadow": {
+            "count": 0,
+            "reported_size": null
+          },
+          "Avalonia.Native.AvnAutomationPeer": {
+            "count": 0,
+            "reported_size": null
+          },
+          "Avalonia.Controls.ScrollViewer": {
+            "count": 3,
+            "reported_size": 688
+          },
+          "Avalonia.Controls.TextBlock": {
+            "count": 24,
+            "reported_size": 552
+          },
+          "graph_bytes": 3244980,
+          "graph_objects": 39520
+        },
+        "after1100": {
+          "Avalonia.Native.AvnAutomationPeerArray": {
+            "count": 0,
+            "reported_size": null
+          },
+          "MicroCom.Runtime.MicroComShadow": {
+            "count": 0,
+            "reported_size": null
+          },
+          "Avalonia.Native.AvnAutomationPeer": {
+            "count": 0,
+            "reported_size": null
+          },
+          "Avalonia.Controls.ScrollViewer": {
+            "count": 3,
+            "reported_size": 688
+          },
+          "Avalonia.Controls.TextBlock": {
+            "count": 24,
+            "reported_size": 552
+          },
+          "graph_bytes": 3223244,
+          "graph_objects": 39166
+        },
+        "after_retire100": {
+          "Avalonia.Native.AvnAutomationPeerArray": {
+            "count": 0,
+            "reported_size": null
+          },
+          "MicroCom.Runtime.MicroComShadow": {
+            "count": 0,
+            "reported_size": null
+          },
+          "Avalonia.Native.AvnAutomationPeer": {
+            "count": 0,
+            "reported_size": null
+          },
+          "Avalonia.Controls.ScrollViewer": {
+            "count": 0,
+            "reported_size": null
+          },
+          "Avalonia.Controls.TextBlock": {
+            "count": 0,
+            "reported_size": null
+          },
+          "graph_bytes": 1864718,
+          "graph_objects": 22417
+        }
+      },
+      "summary": {
+        "retired": {
+          "Id": 102,
+          "Action": "gc",
+          "Retired": 101,
+          "RetiredAlive": 0,
+          "ManagedBytes": 3279024
+        },
+        "retiredAfterDump": {
+          "Id": 103,
+          "Action": "gc",
+          "Retired": 101,
+          "RetiredAlive": 0,
+          "ManagedBytes": 3342512
+        }
+      },
+      "harness_source": "probe/Program.cs"
+    }
+  },
+  "materials": {
+    "abi.json": "9e1378b2afb78b1917d3b37394d48295e468d8a5b071a2443c5fbc3cb10577e1",
+    "baseline/after100-collect.txt": "8e21384d4be033034e4963940e63782bf57c3095e608912be7ee53497fd9af0e",
+    "baseline/after100.gcdump": "f9610d9c839eb8e65a2887ee6afd4dd2e78f1d55eb095403c8c3e3a1c9a12b8c",
+    "baseline/after100.txt": "18449bc37cc2f43a80b68821128aed7fb91a0aaf7748f6b70da274e250cda794",
+    "baseline/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline/before-collect.txt": "fcd2d4dec75ac52ac9a46a8d3c42226893927856b7d920f5830368228df6290f",
+    "baseline/before.gcdump": "29024e35f8cca772eff14e6cef6262a7fdf85b95dc8e473b81ff0761827a9b93",
+    "baseline/before.txt": "a63e85307e7f1a8267fc8ee636c634b29c1c9c6b8b5054f6f47b5d8a9712cd97",
+    "baseline/ready.json": "48866e60e567a61c375adffb8889109fb3703f70faf6268b36f79958d7ffffe3",
+    "baseline/static100.json": "2bb3b7e88cd60858ddaad86a16cdffee4131f4a2528e90ab47c70ff3a197ebcb",
+    "baseline/warmup.json": "de3b10feb9cb51963a1d1d62ade6f6fb6e6fcb030740de2d9288d46467aa1a45",
+    "baseline-build.log": "52e9177222a76eec3e19ef60f88ae262e250fb58ed5ede4a06fdce2049b314d2",
+    "baseline-exports.txt": "a931e3d4abb3a2f32e0e78c693f172ccb514443a5c2aab34078c9dd9f941fae7",
+    "baseline-probe.log": "f78d410a870ab000c4e64a17173c56c1c279d0fdf035966137d0c460c6a8d546",
+    "baseline-repeat/after100-collect.txt": "bd35523d5b6193367f140c52df5986b4a60552a0d7b96d5e4cb39cace4a4bab8",
+    "baseline-repeat/after100.gcdump": "5b6b1772dbaee45383e4a8565f53b5592ba9734f49d857252a33d8116a009db9",
+    "baseline-repeat/after100.txt": "6b1c92907e3987cbf5588015ee90dccaae6a8c2c0282c588d9d9f3cb243628d9",
+    "baseline-repeat/after1100-collect.txt": "560fb5b75b4899be9093e674ccfe6268a66a55e7e77edbdc2e5c1b184149e244",
+    "baseline-repeat/after1100.gcdump": "8d6182224290e77390f91c51f25430a6902c1f804f5ac6e70e01c01c0c62ecbd",
+    "baseline-repeat/after1100.txt": "2c40b3d5cf0fbb2639b0f4a7675836f5b80e5a42a1aaabbd89fc07c735245ba4",
+    "baseline-repeat/after_retire100-collect.txt": "2c1408061e74302277f02e1c12068e021e3f45c4ba27d42aa028075db1969291",
+    "baseline-repeat/after_retire100.gcdump": "447f87e79d3ff8ebfc0de1016a325ae0189f9eb927cff538941786f77b8bc51c",
+    "baseline-repeat/after_retire100.txt": "a6342e55331b17a0256878e0fa81fd064d429b07cab26afea146d2420a238e40",
+    "baseline-repeat/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline-repeat/before-collect.txt": "87c213331eb386046a210d08ce6d059d18c341dfb48f64560deeedbf79053221",
+    "baseline-repeat/before.gcdump": "bb165a5f515af2ba3f6fe5715bf119016a421027eaea7f99791e143ef3384d1d",
+    "baseline-repeat/before.txt": "e0695c0e774e3dcad02fcbc38f008fbc7fbc434653744293cf3b4ca48f34654a",
+    "baseline-repeat/ready.json": "de00026511e6c97b9f3a5f63253a0da19f03a1004ca2b2927ca39f9a80c06372",
+    "baseline-repeat/request.json": "265605ca170aa40fac7edd8fdc8827881c605fd65a69bd56e4b117dc3f50e6fa",
+    "baseline-repeat/response.json": "e8b8296e6f557b6bf53861452425e614ab46fdef4f38b91c7fa823f7b31f5f7a",
+    "baseline-repeat/static100.json": "b2a6f215d28e31f3a234dd4e1a9d376604979c4bee63d6ef343e8f1e2467d2c7",
+    "baseline-repeat/static100.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline-repeat/static1000.json": "64ecbaa8c2249babf1791821b880464fcc2cbaa853918a96b4b9bf3b42342e90",
+    "baseline-repeat/static1000.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline-repeat/summary.json": "564bfd1bab33151546f9f5be6a4d631d359afc09eee8cd96e01f75a5072e79f4",
+    "baseline-repeat/warmup.json": "fb8182555b78b9c962bc9cc43244f4fbdf43304d4427a7ee3c29d000a3d0825a",
+    "baseline-repeat/warmup.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline-repeat-probe.log": "cee9187214f2c0bdbde940bd67ed90e4082123a70f50fbc38ec2db40af39aeff",
+    "baseline-signature.txt": "eda3686fbc593e58e3cab871f30203faac4feffff45107142258f4f78ed265af",
+    "com-return-ownership.patch": "fee866a7b0859090261e0ebfbe4c62c586562ec1b2b90ea297c1059b46f4d628",
+    "headless-noax/after100-collect.txt": "16484def3050871f471f5722d179aa4d35500136468c87af27448702591817a5",
+    "headless-noax/after100.gcdump": "d5d3e819f26479f93ea3939dabf24b56eef37e2c7e168d15a6216fa09fa573c1",
+    "headless-noax/after100.txt": "d820f95ef2c964b936d8840e216655af4ef0c4aa7be3ca31ab90f64b6e454800",
+    "headless-noax/after1100-collect.txt": "db6c522b1ac064d2942bc756f946a33dce5e8311e221ae83eef1ae44cbbfdfeb",
+    "headless-noax/after1100.gcdump": "adaa47c8cd4289c5f89dfb037da20bfcfc4d9775d241234c345b1e954359d164",
+    "headless-noax/after1100.txt": "c1bf20963cd2b5f2400356e9a6cc515ad6811fbc7301fca04580f3b7816d61be",
+    "headless-noax/after_retire100-collect.txt": "535f48ba635f4e7e2740a26aa478737656779515c9193d74acd5c0987779fee2",
+    "headless-noax/after_retire100.gcdump": "1c3dc00de82b059f240f67ccda5850d660cd82ef28032f7eb1c065cb15d97c59",
+    "headless-noax/after_retire100.txt": "91ac830c7ab1b76392948752693d176951876a35ae9d9a4e7ff456a65f3a35e6",
+    "headless-noax/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "headless-noax/before-collect.txt": "cee39ac1531571b04cbe9fb02c3419a1edaaf0b632ea40f502d9414fca419d9d",
+    "headless-noax/before.gcdump": "b46c14a427223592557a53c57d0da5609afaabb76f39374edfbb867b5eb39ffe",
+    "headless-noax/before.txt": "b92fbc0784d7c4baa40e78a6ec97825d51e3a9a284faa6e2726cb621b6df2846",
+    "headless-noax/ready.json": "685ffe66b91a2f0eee0380976edf4c27fc1975163a537e66ab7530cf1e0e8e0f",
+    "headless-noax/request.json": "265605ca170aa40fac7edd8fdc8827881c605fd65a69bd56e4b117dc3f50e6fa",
+    "headless-noax/response.json": "2e0e41063e82a6a79fd68f286a8a2787947e21c71ed707be432eae841adde8d6",
+    "headless-noax/summary.json": "d91cb220060c91d8a4765020818d6b1da0e71586ca694b07c4fbbf0708f4923e",
+    "headless-noax-probe.log": "5c1d63960a4702e20db2504a020e3b198ff63bf9f9502c590a603c109f0e44ab",
+    "native.xcconfig": "e695ff2875603b91af9b6db9ad20c686adba52f34bd92b896e24e20dc1319d84",
+    "patched/after100-collect.txt": "7da93cb024d6e2cb7b15d6cea107faf96fc75b60583636e6080eb273ee5d8f9d",
+    "patched/after100.gcdump": "d4384cdec194946422115d6aff26b681e0c8fcd98bd9e4d4bb54c19755325ba1",
+    "patched/after100.txt": "b316c321c7fd5848ae2068641b1c73c94c6e0c286cb8e03c918757b8a9202c07",
+    "patched/after1100-collect.txt": "2fbdb67c5a13bc938fab22c5695f759cfb9b2a3039d6e02703c61cb3230e63bf",
+    "patched/after1100.gcdump": "90f8682026a138bef40367dc0457c2d081984f2e5d231b34d836cea8656dbe02",
+    "patched/after1100.txt": "da490cf72eb04223be451b4d88690932800d97fff9b02e5a3c632efaec17c2c7",
+    "patched/after_retire100-collect.txt": "8e188c856ead22f8c05b30738db23953856279ac4b3d15b9fd68387afea1ddf2",
+    "patched/after_retire100.gcdump": "39203f53656ea6c488a7285a84b7d6f334145bd7fda27f187ae7f6789f93463f",
+    "patched/after_retire100.txt": "9cca9300a115ff85f77225f05ceb3fa493485bfce4767f9d9a81b438a7b4934a",
+    "patched/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "patched/before-collect.txt": "58c826d57ce21e190b1dacda8bbf1e7a79f7cd53bd7a46195c2a241b8ec39f77",
+    "patched/before.gcdump": "6dd2f822ebee006a31dea45b3d834f35d2846e6151380617e0199c915d130ef6",
+    "patched/before.txt": "1422e88d323318ec5927d88ac6474afc03036ad8d589d94871366949f1e4f502",
+    "patched/ready.json": "8f363ccd9036811b179d8a94f944f7b34968270a799bbc87fc66771ef590efd7",
+    "patched/request.json": "265605ca170aa40fac7edd8fdc8827881c605fd65a69bd56e4b117dc3f50e6fa",
+    "patched/response.json": "9fecd3b95d03c52d6afa38f5e2b40eb752a88887d413d7e6b947a33acbe514fb",
+    "patched/static100.json": "83998dbd45c5cc37f1e37db0e4a144ba1f25d5d693ef9153b6090c2541a06524",
+    "patched/static1000.json": "9a416f7dc97c05c1a671f5a47bbe203d1a9a91dc7995b6175716bcc7412cadd3",
+    "patched/summary.json": "b5d7fb7e6d80a7824bc28e96b02e32de9ffef1cfe2246d6aa988e568c30ca452",
+    "patched/warmup.json": "e2a2eeb69d7ed9e4eb78826413e789ca5ceff199201085c4c4f3a3cbfb90e371",
+    "patched-build.log": "317b80c823b5492afab6402551dc7bdc36ebafeaf289778c9627acd247e5d780",
+    "patched-exports.txt": "a931e3d4abb3a2f32e0e78c693f172ccb514443a5c2aab34078c9dd9f941fae7",
+    "patched-noax/after100-collect.txt": "c2669abbb2550fb6fbf760bdfc7fa0ccee632cb99c3acc59fd3f850a07640bd4",
+    "patched-noax/after100.gcdump": "b3c173d667ab9859178b7f7ed86a48e7e0e722e53f0108e820cab273ae648da1",
+    "patched-noax/after100.txt": "8ae142df3a7a0d553323d7e2e1d8d24fb18e90c64962227d456d9814b70bff09",
+    "patched-noax/after1100-collect.txt": "c1821ba01756239cc8fa0f8a7f1f9229f339a7ce550744cd69811f5d57b10aae",
+    "patched-noax/after1100.gcdump": "9d69dcf411f8b510e2088946eb32b762759957e439ce22347b2920a0aee701e7",
+    "patched-noax/after1100.txt": "883e633bb946c9fe3d99378049256809df65e764001b47f88ae9ac68a1478b0c",
+    "patched-noax/after_retire100-collect.txt": "d22828598f90ee8d3075cfbcf9862de98ac1f5be0fdcfbdbbec94ff523cac371",
+    "patched-noax/after_retire100.gcdump": "e41f3648fba7290d38ab8096b91b2d9a621c7450221ebd51030fa2668d21e133",
+    "patched-noax/after_retire100.txt": "04bcab36359715dc5091924c80df5109d6b0f11cbfb243b00585fc98a4679929",
+    "patched-noax/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "patched-noax/before-collect.txt": "49e5f7c619bd177f28fe78705442e898352ad29de9ec26fd49c1e8885a4f52db",
+    "patched-noax/before.gcdump": "1819591e7f15eedc779882d799ab7ea5967c569e74acc1b70287eae99419df59",
+    "patched-noax/before.txt": "ae02bb9545153ff9dc197fb9be95907cdbfab6b8087e5b01031af73542d502e4",
+    "patched-noax/ready.json": "dda1d6de6825d1c28957464575ec5678e4239b362204b471ac4e25fd663c218f",
+    "patched-noax/request.json": "265605ca170aa40fac7edd8fdc8827881c605fd65a69bd56e4b117dc3f50e6fa",
+    "patched-noax/response.json": "972156f60c510ae264ce045a5b5562f0f2bd3c22ffeeb4215aba9d6eb62cf096",
+    "patched-noax/summary.json": "0165fc1f247d54ff49136670fc483787a0ecd0cea4bd89a05298b679fdbb279f",
+    "patched-noax-probe.log": "4b304279a664bf8c18081d6347e0e08cffb8f0ba2e045c87106201aa14927431",
+    "patched-probe.log": "b48c8040b48b6fa3fbc9630b805b737b0decfc055f0b74a14f1ff810dacf59c5",
+    "patched-signature.txt": "baaa275fab98fe4eddfd91e60ab8d3c75dba77f9b105e2ebea5ec73090e6afcf",
+    "probe/Probe.csproj": "85e48f4da98aad1856b9b2afde1d7916850abea74ddf55ef170dd84b37b0dbf0",
+    "probe/Program.cs": "d2a15726f032f55b5920f1a0f613d239cca412db38604a83a2b7e88fe120b8f0",
+    "probe/bin/Release/net10.0/Probe.dll": "d198f579d4ddbd28788cbe74f72cb4402557a9e2a91c301cf4992aa2a6fad3e2",
+    "probe/obj/Release/net10.0/Probe.dll": "d198f579d4ddbd28788cbe74f72cb4402557a9e2a91c301cf4992aa2a6fad3e2",
+    "probe/obj/Release/net10.0/ref/Probe.dll": "8a1fa6f881ad00b143d6eec9085fb2c37da35dbaff42e9ccc71a8d661ab6b5b7",
+    "probe/obj/Release/net10.0/refint/Probe.dll": "8a1fa6f881ad00b143d6eec9085fb2c37da35dbaff42e9ccc71a8d661ab6b5b7",
+    "probe-build-v2.log": "3ba0ef2b447d28baf38afcbf221264f84ceddfff6d8f63296c3597fb3f811e74",
+    "probe-build.log": "7ae422ba344565ea1191b7ab66d799b87c8acd454f9d580ea4292eaadf73885c",
+    "provenance.json": "84540ee242353e418ae916e24dabfbfed0079c22d82b2957197b8e782e3cecb9",
+    "query": "152085a7eeceeba0e975a975d4c13c79e19fca4734ab2a63b2395081edfd0abd",
+    "query-build-v2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "query-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "query.swift": "b960204ec4d103bda17b8a18e6c53ad47e28cd1207898aa34d99b2eb0e5fd10b",
+    "run_probe.py": "81c88bb2982e52712a8e00e290335100d11761582cf34ca92e8cb2fed3a73ed1",
+    "stock-exports.txt": "a931e3d4abb3a2f32e0e78c693f172ccb514443a5c2aab34078c9dd9f941fae7",
+    "probe-v1.cs": "e2bff3850b340128ebbc2f781be804e2bc63a240fbb8c8d4daecda2365999504",
+    "probe-v1.csproj": "41ac26902a8042be0932b984369800dd0185fa154572274069b9965dad8ab9cb",
+    "native-first-build-failure.log": "1936fb03f9d96c7f7e4b3605865154deac26e937a66be5e5c2375688a646fa0b",
+    "com-return-ownership-u0.patch": "1a7757d983a590f908fa20cb76cd8ddba87e39b20a7c776210f1dbf4aea52d21"
+  },
+  "limitations": [
+    "Isolated synthetic Avalonia controls, not formal NeeView runtime acceptance.",
+    "GC-induced graph byte counts are not RSS or the GC.GetTotalMemory values.",
+    "No-input variant means zero explicit external AX queries; system AX notifications may still occur.",
+    "First baseline 1000-query attempt returned a non-zero query exit and had no raw failure receipt; rejected. Serial baseline-repeat with error receipts completed.",
+    "No long-duration browsing, focus/popup, Windows, NAS, screen P95 or signing/notarization acceptance; static repair alone did not meet integration gate."
+  ],
+  "candidate_patch": {
+    "path": "ax-minimal-return-ownership.patch",
+    "sha256": "1a7757d983a590f908fa20cb76cd8ddba87e39b20a7c776210f1dbf4aea52d21",
+    "files": 3,
+    "added_lines": 24,
+    "removed_lines": 21,
+    "active": false,
+    "context_lines": 0,
+    "apply_option": "--unidiff-zero"
+  }
+}

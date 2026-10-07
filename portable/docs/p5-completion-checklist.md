@@ -122,3 +122,5 @@ P5 已开始。P3/P4 的两项真机检查按用户要求 [跳过并记录](../a
 第四十批：[收尾契约](p5-completion.md)。六个剩余合理Mac命令入口、原设置动作/记录器/脚本item接入；1819全量、38原生、14打包脚本通过，12资源样本用例跳过。源码5f6e6e2c7及其ARM64开发ZIP的18个原生签名/重定位结果见[独立验收](../acceptance/p5-completion-runtime.md)。本轮开发收尾，设备/Windows/正式分发及兼容清单边界继续保留。
 
 兼容收尾：[契约](p5-compatibility.md)。普通分卷、Mac公开发布查询及文件操作有界隔离已接入；构建/自动/原生和开发包见[本批记录](../acceptance/p5-compatibility-runtime.md)，AX、依赖能力限制和真实SMB分别保留，不外推完整验收通过。
+
+AX最小补丁：[隔离验证](../acceptance/ax-minimal-patch-evaluation.md)已执行。静态100+1000查询不再累积数组，但动态旧控件101/101仍存活；相同Headless对照全部释放。涉及节点生命周期，按约定停止临时接入，不增加产品框架分支，AX保持未解决。

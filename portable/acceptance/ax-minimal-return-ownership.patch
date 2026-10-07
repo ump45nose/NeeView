@@ -1,0 +1,78 @@
+diff --git a/native/Avalonia.Native/src/OSX/AvnView.mm b/native/Avalonia.Native/src/OSX/AvnView.mm
+index dccf58c..fe7a87f 100644
+--- a/native/Avalonia.Native/src/OSX/AvnView.mm
++++ b/native/Avalonia.Native/src/OSX/AvnView.mm
+@@ -1141 +1141 @@ - (id _Nullable) accessibilityHitTest:(NSPoint)point
+-    auto hit = peer->RootProvider_GetPeerFromPoint(localPoint);
++    ComPtr<IAvnAutomationPeer> hit(peer->RootProvider_GetPeerFromPoint(localPoint), true);
+@@ -1177 +1177 @@ - (void)recalculateAccessibiltyChildren
+-    auto childPeers = peer->GetChildren();
++    ComPtr<IAvnAutomationPeerArray> childPeers(peer->GetChildren(), true);
+@@ -1184 +1184 @@ - (void)recalculateAccessibiltyChildren
+-            IAvnAutomationPeer* child;
++            ComPtr<IAvnAutomationPeer> child;
+@@ -1186 +1186 @@ - (void)recalculateAccessibiltyChildren
+-            if (childPeers->Get(i, &child) == S_OK)
++            if (childPeers->Get(i, child.getPPV()) == S_OK)
+diff --git a/native/Avalonia.Native/src/OSX/AvnWindow.mm b/native/Avalonia.Native/src/OSX/AvnWindow.mm
+index 5912ac9..6dbd64c 100644
+--- a/native/Avalonia.Native/src/OSX/AvnWindow.mm
++++ b/native/Avalonia.Native/src/OSX/AvnWindow.mm
+@@ -619 +619 @@ - (id _Nullable) accessibilityFocusedUIElement
+-    auto focusedPeer = automationPeer->RootProvider_GetFocus();
++    ComPtr<IAvnAutomationPeer> focusedPeer(automationPeer->RootProvider_GetFocus(), true);
+@@ -640 +640 @@ - (IAvnAutomationPeer* _Nullable) automationPeer
+-        auto peer = parent->BaseEvents->GetAutomationPeer();
++        ComPtr<IAvnAutomationPeer> peer(parent->BaseEvents->GetAutomationPeer(), true);
+diff --git a/native/Avalonia.Native/src/OSX/automation.mm b/native/Avalonia.Native/src/OSX/automation.mm
+index 8750e99..ac4df50 100644
+--- a/native/Avalonia.Native/src/OSX/automation.mm
++++ b/native/Avalonia.Native/src/OSX/automation.mm
+@@ -22 +22 @@ + (NSAccessibilityElement *)acquire:(IAvnAutomationPeer *)peer
+-    auto instance = peer->GetNode();
++    ComPtr<IAvnAutomationNode> instance(peer->GetNode(), true);
+@@ -25 +25 @@ + (NSAccessibilityElement *)acquire:(IAvnAutomationPeer *)peer
+-        return dynamic_cast<AvnAutomationNode*>(instance)->GetOwner();
++        return dynamic_cast<AvnAutomationNode*>(instance.getRaw())->GetOwner();
+@@ -34 +34 @@ + (NSAccessibilityElement *)acquire:(IAvnAutomationPeer *)peer
+-        auto window = peer->RootProvider_GetWindow();
++        ComPtr<IAvnWindowBase> window(peer->RootProvider_GetWindow(), true);
+@@ -42 +42 @@ + (NSAccessibilityElement *)acquire:(IAvnAutomationPeer *)peer
+-        auto holder = dynamic_cast<INSViewHolder*>(window);
++        auto holder = dynamic_cast<INSViewHolder*>(window.getRaw());
+@@ -338 +338 @@ - (id)accessibilityParent
+-    auto parentPeer = _peer->GetParent();
++    ComPtr<IAvnAutomationPeer> parentPeer(_peer->GetParent(), true);
+@@ -353 +353 @@ - (id)accessibilityParent
+-        auto window = parentPeer->RootProvider_GetWindow();
++        ComPtr<IAvnWindowBase> window(parentPeer->RootProvider_GetWindow(), true);
+@@ -356 +356 @@ - (id)accessibilityParent
+-            auto holder = dynamic_cast<INSViewHolder*>(window);
++            auto holder = dynamic_cast<INSViewHolder*>(window.getRaw());
+@@ -367 +367 @@ - (id)accessibilityTopLevelUIElement
+-    auto rootPeer = _peer->GetRootPeer();
++    ComPtr<IAvnAutomationPeer> rootPeer(_peer->GetRootPeer(), true);
+@@ -373 +373 @@ - (id)accessibilityWindow
+-    auto rootPeer = _peer->GetVisualRoot();
++    ComPtr<IAvnAutomationPeer> rootPeer(_peer->GetVisualRoot(), true);
+@@ -381 +381,2 @@ - (id)accessibilityHorizontalScrollBar
+-    return [AvnAccessibilityElement acquire:_peer->ScrollProvider_GetHorizontalScrollBar()];
++    ComPtr<IAvnAutomationPeer> peer(_peer->ScrollProvider_GetHorizontalScrollBar(), true);
++    return [AvnAccessibilityElement acquire:peer];
+@@ -388 +389,2 @@ - (id)accessibilityVerticalScrollBar
+-    return [AvnAccessibilityElement acquire:_peer->ScrollProvider_GetVerticalScrollBar()];
++    ComPtr<IAvnAutomationPeer> peer(_peer->ScrollProvider_GetVerticalScrollBar(), true);
++    return [AvnAccessibilityElement acquire:peer];
+@@ -575 +577,2 @@ only real elements (Text, Button, List) do, parented to one root AXHostingView.
+-    id target = [AvnAccessibilityElement acquire:_peer->GetTemplatedParent()];
++    ComPtr<IAvnAutomationPeer> templatedParent(_peer->GetTemplatedParent(), true);
++    id target = [AvnAccessibilityElement acquire:templatedParent];
+@@ -668 +671 @@ - (void)recalculateChildren
+-    auto childPeers = _peer->GetChildren();
++    ComPtr<IAvnAutomationPeerArray> childPeers(_peer->GetChildren(), true);
+@@ -677 +680 @@ - (void)recalculateChildren
+-            IAvnAutomationPeer* child;
++            ComPtr<IAvnAutomationPeer> child;
+@@ -679 +682 @@ - (void)recalculateChildren
+-            if (childPeers->Get(i, &child) == S_OK)
++            if (childPeers->Get(i, child.getPPV()) == S_OK)
