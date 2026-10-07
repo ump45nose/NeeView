@@ -14,7 +14,11 @@
     <CodesignEntitlements>../../scripts/entitlements.plist</CodesignEntitlements>
   </PropertyGroup>
   <ItemGroup>
+    <!-- SDK 增量清单只显式跟踪 PartialAppManifest；重合并原清单确保字段修改生效。 -->
+    <PartialAppManifest Include="Info.plist" />
     <AvaloniaResource Include="Styles/AppLogo.png" />
+    <!-- Finder/Dock 使用原图标的多尺寸 ICNS；不依赖 Avalonia 的窗口资源。 -->
+    <BundleResource Include="Styles/AppIcon.icns" LogicalName="AppIcon.icns" />
     <BundleResource Include="../../../LICENSE.md" LogicalName="LICENSE.md" />
     <ProjectReference Include="../NeeView.Engine/NeeView.Engine.csproj" />
     <ProjectReference Include="../NeeView.Backends/NeeView.Backends.csproj" />

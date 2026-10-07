@@ -4,6 +4,10 @@
 
 只装配唯一 NeeView.MacOS 正式项目的 SDK Release 成品；仍使用默认 bin/obj、锁定依赖和串行构建。查询本次 AppBundleDir，不把 RID 中间目录或旧 .app 作为正式输出。Info.plist 补充已经接入的 PDF 打开登记，最低 macOS 15 保持。
 
+Finder/Dock 图标复用原 `MakePackage/Appx/Icons/Sources/AppList.targetsize-256.svg`，版权和 MIT 许可随原项目保留。`Styles/AppIcon.icns` 作为 BundleResource 随 SDK 装配，`CFBundleIconFile` 明确登记；包含 16–1024 像素的十个标准/Retina 表示。原 Info.plist 同时登记为 SDK 公开的 PartialAppManifest 输入，确保增量构建追踪字段变化并重新合并，避免沿用旧的编译清单。关于窗口继续使用其原独立资源，不让应用图标依赖窗口初始化。
+
+图标需要调整时执行 `python3 portable/scripts/generate_macos_icon.py`。该开发工具仅用系统 sips/iconutil，从原矢量路径按目标分辨率直接栅格化；不放大小图、不增加运行时或普通构建依赖。正常构建直接使用已提交的 ICNS。
+
 ## 契约与来源
 
 `python3 portable/scripts/package_macos.py --dotnet <SDK路径>` 生成 portable/artifacts/NeeView.app、NeeView.zip 和 NeeView.report.json。默认为 ad-hoc 开发签名。正式分发只接受明确的 Developer ID Application 身份；公证只使用用户提供的 keychain profile，脚本不读取或生成密钥。
@@ -18,8 +22,12 @@ ad-hoc没有Team ID，开发包不启用hardened runtime；否则动态库装载
 
 构建、装配、逐 Mach-O/框架签名、最终 app 签名、ARM64 及 strict/deep 验证、正式exe无窗口真实移动/日志释放、ZIP 检查和随机目录重定位后的同一运行验证全部成功后才替换稳定成品。无窗口验证只操作隔离合成文件，stdin保持到真实响应、stdout/stderr有界读取，20秒无结果失败并清理本次子进程。中途失败保持旧成品。成品替换的异常可回滚；旧材料临时备份在 stage 外，回滚失败或进程被杀时不会被 stage 自动删除，明确保留 `.previous-package-*` 供恢复。多个工件替换不宣称跨文件原子性；发布不并发运行。
 
+签名前检查原生图标登记、资源存在、ICNS 结构及 256/512/1024 像素表示；缺失或损坏立即失败。报告保存图标条目和 SHA256，ZIP 重定位后再次核对相同资源。签名覆盖图标资源，未完成校验不替换旧成品。
+
 公证成功后 staple、spctl 检查，再重新打 ZIP 和复核。报告分别列签名、公证、Gatekeeper、ZIP 重定位和交互安装。默认开发包不声明 Developer ID、公证或干净系统安装通过。不修改用户 Applications，不启动或激活产品窗口。
 
 ## 测试与扩展
 
 隔离脚本回归覆盖许可原文/提交/哈希、路径越界、重名许可、资产归属、Mach-O、失败替换及回滚失败保留。2026-10-07增加启动崩溃不得报告运行通过的回归，共15项；Release及解包运行结果见[兼容收尾记录](../acceptance/p5-compatibility-runtime.md)。最初真实 SDK 发布、签名及静态重定位证据见[历史验收](../acceptance/p5-distribution-runtime.md)，不把签名通过代替实际装载。后续在用户提供凭据后复用同一脚本完成 Developer ID 和公证；干净系统安装仍须独立验收。
+
+应用图标批次另增加五项回归（原生登记、真实资源/Retina 指纹、缺失资源、结构损坏和缺失高分辨率），当前打包脚本共20项。实际包资源、系统解码和重定位验收分别记录，不将元数据校验外推为 Finder/Dock 前台观察。

@@ -199,6 +199,37 @@ def inspect_bundle(app):
     return binaries
 
 
+def inspect_app_icon(app):
+    """核验 app 的原生图标登记和 ICNS 结构，返回资源指纹及分辨率条目清单。"""
+    info = plistlib.loads((app / "Contents/Info.plist").read_bytes())
+    name = info.get("CFBundleIconFile")
+    if not isinstance(name, str) or not name or Path(name).name != name:
+        raise RuntimeError("应用图标未正确登记 CFBundleIconFile")
+    name = name if name.endswith(".icns") else name + ".icns"
+    resources = app / "Contents/Resources"
+    icon = resources / name
+    if not icon.is_file() or not icon.resolve().is_relative_to(resources.resolve()):
+        raise RuntimeError("应用图标资源缺失：" + name)
+    data = icon.read_bytes()
+    if len(data) < 8 or data[:4] != b"icns" or int.from_bytes(data[4:8], "big") != len(data):
+        raise RuntimeError("应用图标 ICNS 结构损坏")
+    representations = []
+    offset = 8
+    while offset < len(data):
+        length = int.from_bytes(data[offset + 4:offset + 8], "big")
+        if offset + 8 > len(data) or length < 8 or offset + length > len(data):
+            raise RuntimeError("应用图标 ICNS 条目损坏")
+        try:
+            representations.append(data[offset:offset + 4].decode("ascii"))
+        except UnicodeDecodeError as error:
+            raise RuntimeError("应用图标 ICNS 条目损坏") from error
+        offset += length
+    if not {"ic08", "ic09", "ic10"}.issubset(representations):
+        raise RuntimeError("应用图标缺少 256/512/1024 像素资源")
+    return {"file": icon.relative_to(app).as_posix(), "sha256": sha256(icon),
+            "representations": representations}
+
+
 def run_file_worker(executable, request):
     """保持stdin直到真实响应，验证正式入口；有界读取与超时后只终止本次子进程。"""
     env = os.environ.copy()
@@ -310,6 +341,7 @@ def prepare_artifacts(root, source, resolved, staged, args):
     shutil.copytree(source, app, symlinks=True)
     resources = app / "Contents/Resources"
     resources.mkdir(exist_ok=True)
+    icon = inspect_app_icon(app)
     manifest = dependency_manifest(root, "NeeView.MacOS", resources, resolved["Items"]["ResolvedFrameworkReference"])
     identity = args.sign or "-"
     # ad-hoc没有Team ID；开启hardened library validation会拒绝自身动态库。
@@ -340,9 +372,12 @@ def prepare_artifacts(root, source, resolved, staged, args):
         relocated = inspect_bundle(Path(temporary) / app.name)
         if binaries != relocated:
             raise RuntimeError("ZIP解包后的原生文件指纹变化")
+        if icon != inspect_app_icon(Path(temporary) / app.name):
+            raise RuntimeError("ZIP解包后的应用图标变化")
         verify_file_worker(Path(temporary) / app.name)
     report = {"version": manifest["version"], "commit": manifest["commit"], "worktree_dirty": manifest["worktree_dirty"], "tracked_source_dirty": manifest["tracked_source_dirty"],
               "architecture": "osx-arm64", "self_contained": True, "signing": "Developer ID" if args.sign else "ad-hoc development", "notarized": bool(args.notary_profile),
+              "app_icon": icon, "zip_relocated_app_icon": "passed",
               "archive_sha256": sha256(archive), "native_files": binaries, "zip_relocation_and_signature": "passed", "file_worker_runtime": "passed", "zip_relocated_file_worker_runtime": "passed", "interactive_installation": "not executed", "gatekeeper": "passed" if args.notary_profile else "not executed",
               "license_metadata_only": [item["name"] for item in manifest["dependencies"] + manifest["runtime_packs"] if item["license_material_state"] == "metadata_only"]}
     archive.with_suffix(".report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")

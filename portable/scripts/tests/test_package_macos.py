@@ -25,6 +25,66 @@ class PackageTests(unittest.TestCase):
         (source / f"{name}.nuspec").write_text(f'<package><metadata><license type="{license_type}">{license_value}</license><authors>Actual authors</authors></metadata></package>')
         return source
 
+    def make_icon_bundle(self, registered_name="AppIcon.icns"):
+        """使用正式图标夹具建立隔离 app，避免将发布资源校验替换为工具 mock。"""
+        app = self.root / "NeeView.app"
+        resources = app / "Contents/Resources"
+        resources.mkdir(parents=True)
+        info = {} if registered_name is None else {"CFBundleIconFile": registered_name}
+        (resources.parent / "Info.plist").write_bytes(plistlib.dumps(info))
+        original = Path(__file__).resolve().parents[2] / "src/NeeView.MacOS/Styles/AppIcon.icns"
+        (resources / "AppIcon.icns").write_bytes(original.read_bytes())
+        return app
+
+    def test_registered_application_icon_has_retina_resources_and_exact_fingerprint(self):
+        app = self.make_icon_bundle()
+        for name in ("AppIcon.icns", "AppIcon"):
+            with self.subTest(name=name):
+                (app / "Contents/Info.plist").write_bytes(plistlib.dumps({"CFBundleIconFile": name}))
+                result = package.inspect_app_icon(app)
+                self.assertEqual("Contents/Resources/AppIcon.icns", result["file"])
+                self.assertEqual(package.sha256(app / result["file"]), result["sha256"])
+                self.assertTrue({"ic08", "ic09", "ic10"}.issubset(result["representations"]))
+
+    def test_existing_application_image_without_bundle_registration_is_rejected(self):
+        app = self.make_icon_bundle(None)
+        with self.assertRaisesRegex(RuntimeError, "未正确登记"):
+            package.inspect_app_icon(app)
+
+    def test_registered_but_missing_application_icon_is_rejected(self):
+        app = self.make_icon_bundle()
+        (app / "Contents/Resources/AppIcon.icns").unlink()
+        with self.assertRaisesRegex(RuntimeError, "资源缺失"):
+            package.inspect_app_icon(app)
+
+    def test_corrupt_application_icon_is_rejected_before_packaging(self):
+        app = self.make_icon_bundle()
+        icon = app / "Contents/Resources/AppIcon.icns"
+        original = icon.read_bytes()
+        for corrupt in (b"not an icon", original[:-1],
+                        original[:8] + b"\xff\xff\xff\xff" + original[12:],
+                        original[:12] + (7).to_bytes(4, "big") + original[16:]):
+            with self.subTest(size=len(corrupt)):
+                icon.write_bytes(corrupt)
+                with self.assertRaisesRegex(RuntimeError, "损坏"):
+                    package.inspect_app_icon(app)
+
+    def test_application_icon_without_1024_pixel_representation_is_rejected(self):
+        app = self.make_icon_bundle()
+        icon = app / "Contents/Resources/AppIcon.icns"
+        original = icon.read_bytes()
+        blocks = []
+        offset = 8
+        while offset < len(original):
+            length = int.from_bytes(original[offset + 4:offset + 8], "big")
+            if original[offset:offset + 4] != b"ic10":
+                blocks.append(original[offset:offset + length])
+            offset += length
+        body = b"".join(blocks)
+        icon.write_bytes(b"icns" + (len(body) + 8).to_bytes(4, "big") + body)
+        with self.assertRaisesRegex(RuntimeError, "缺少 256/512/1024"):
+            package.inspect_app_icon(app)
+
     def test_duplicate_license_names_keep_both_original_directories_and_third_party(self):
         source = self.make_package("native")
         for relative, text in [("LICENSE.txt", "wrapper"), ("codec/LICENSE.txt", "codec"), ("THIRD-PARTY-NOTICES.txt", "native notices")]:
