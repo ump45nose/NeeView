@@ -153,3 +153,5 @@ P5第二十六批：CopyImage由ReaderView捕获首图像源并保留显示租�
 P5第二十七批：ExportImageDialog.axaml保留原800×650、350参数区/右预览/底部按钮；独立ExportImageViewModel只编辑克隆草稿和原命名。Engine管理来源/导航/覆盖/实际写入，ReaderView只复用页框绘制。预览单槽按草稿版本拒绝旧结果，关闭等待编码；主题可独立调整，见[p5-image-export.md](p5-image-export.md)。
 
 P5第二十八批：ImageEffectView.axaml保持原预设/六区域，表现模型只编辑独立参数草稿；事务与原预设/缓存/几何归Engine。现有Skia渲染边界只持有不可变参数快照和显示租约，不重新解码或改变源图。外观/焦点可独立调整；布局、排序、文件操作不进入效果控件。详见[p5-image-effects.md](p5-image-effects.md)。
+
+P5第三十六批：PlaylistView只负责选中引用、模板与输入/确认；四模板沿PanelListPresentation、可见封面沿原工厂。文件身份、失效检查、改名marker、废纸篓及阅读恢复由Engine处理，配置仍为原整数字段，见[p5-playlist-completion.md](p5-playlist-completion.md)。

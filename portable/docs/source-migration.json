@@ -3290,6 +3290,18 @@
       "target": "src/NeeView.Backends/MacVideoPlayerFactory.cs",
       "sha256": "929b9692de8b31c4ce834ad697b3f9cf0bf610dcacc086ff428aa12a7f882e07",
       "status": "P5第三十五批：原单页媒体书/按秒导航/播放意图/主元素音频/EOS与占位关系适配；WPF和Windows播放由官方AVPlayer替换，见p5-video.md"
+    },
+    {
+      "source": "NeeView/Playlist/PlaylistHub.cs",
+      "target": "src/NeeView.Engine/Playlist/PlaylistHub.FileActions.cs",
+      "sha256": "66d22fb6172366cba7343ab716d41a1d29047231708c3b998671c4f1b7e8a7e4",
+      "status": "原列表文件改名/删除/作为书籍打开与无效清理适配；实际文件结果后更新原引用，权限和失联不当作缺失；Windows FileID 自动重新定位仍未迁"
+    },
+    {
+      "source": "NeeView/Playlist/PlaylistHub.cs",
+      "target": "src/NeeView.Engine/BookOperation/BookOperation.PlaylistFiles.cs",
+      "sha256": "66d22fb6172366cba7343ab716d41a1d29047231708c3b998671c4f1b7e8a7e4",
+      "status": "原列表文件动作复用现有整书改名marker、来源释放/恢复、真实废纸篓和唯一JSON联动；无第二文件事务"
     }
   ],
   "rule_references": [

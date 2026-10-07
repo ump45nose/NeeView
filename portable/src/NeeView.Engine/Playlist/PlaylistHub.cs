@@ -111,15 +111,23 @@ public sealed partial class PlaylistHub(PlaylistConfig config)
     private async Task EditAsync(Action<Playlist> edit, CancellationToken token)
     {
         await InitializeAsync(token); await _gate.WaitAsync(token);
+        try { await EditCoreAsync(edit,token); }
+        catch (Exception ex) { Error = ex.Message; throw; }
+        finally { _gate.Release(); Changed?.Invoke(this, EventArgs.Empty); }
+    }
+    /// <summary>已持有原列表锁的编辑事务；路径/失效标志也参加变化检测和原地回滚。</summary>
+    private async Task EditCoreAsync(Action<Playlist> edit,CancellationToken token)
+    {
+        var list = Current ?? throw new IOException(Error ?? "播放列表尚未加载。");
+        var items = list.Items.ToArray(); var names = items.Select(item => item.Source.NameRaw).ToArray();
+        var paths=items.Select(item=>item.Source.Path).ToArray();var invalid=items.Select(item=>item.Source.Invalid).ToArray();
+        var removed = list.Removed; var selected = SelectedItem;
         try
         {
-            var list = Current ?? throw new IOException(Error ?? "播放列表尚未加载。");
-            var items = list.Items.ToArray(); var names = items.Select(item => item.Source.NameRaw).ToArray(); var removed = list.Removed; var selected = SelectedItem;
-            try
-            {
                 edit(list);
                 // 原已存在登记返回原对象；无变化不升级旧格式、不触碰外部文件。
-                if (items.SequenceEqual(list.Items) && items.Select(item => item.Source.NameRaw).SequenceEqual(names)) return;
+                if (items.SequenceEqual(list.Items) && items.Select(item => item.Source.NameRaw).SequenceEqual(names)
+                    &&items.Select(item=>item.Path).SequenceEqual(paths)&&items.Select(item=>item.Source.Invalid).SequenceEqual(invalid)) return;
                 if (SelectedItem is not null && !list.Items.Contains(SelectedItem)) SelectedItem = null;
                 foreach (var item in list.Items.Where(item => item.Place.Length == 0)) item.Place = await Task.Run(() => GetPlace(item.Path), token);
                 var prepared = new PlaylistSource { Items = list.Items.Select(item => item.Source).ToList(), ExtensionData = list.Source.ExtensionData };
@@ -127,12 +135,9 @@ public sealed partial class PlaylistHub(PlaylistConfig config)
                 // 读写在一个后台任务中真实完成；取消只发生在提交前，不能失败后晚到写入。
                 await Task.Run(() => WriteCore(list.Path, bytes, token), CancellationToken.None);
                 list.Source.Items = prepared.Items; list.Source.Format = PlaylistSource.CurrentFormat; Error = null;
-            }
-            catch
-            { list.Replace(items); for (int i = 0; i < items.Length; i++) items[i].Source.NameRaw = names[i]; list.Removed = removed; SelectedItem = selected; throw; }
         }
-        catch (Exception ex) { Error = ex.Message; throw; }
-        finally { _gate.Release(); Changed?.Invoke(this, EventArgs.Empty); }
+        catch
+        { list.Replace(items); for (int i = 0; i < items.Length; i++){items[i].Source.Path=paths[i];items[i].Source.NameRaw=names[i];items[i].Source.Invalid=invalid[i];} list.Removed = removed; SelectedItem = selected; throw; }
     }
     /// <summary>临时文件 Flush 后同目录原子替换；提交前校验外部变化，失败只清理自己的临时文件。</summary>
     private void WriteCore(string path, byte[] bytes, CancellationToken token)

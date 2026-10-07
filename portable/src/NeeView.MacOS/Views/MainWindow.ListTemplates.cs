@@ -18,12 +18,14 @@ public sealed partial class MainWindow
         _bookshelfPresentation.Apply(Config.Current.Bookshelf.PanelListItemStyle);
         AttachPageListTemplates();
         this.FindControl<BookmarkListView>("BookmarkPanelList")!.AttachCovers(Load, RefreshListCovers);
+        this.FindControl<PlaylistView>("PlaylistPanelView")!.AttachCovers(Load);
     }
     /// <summary>显式刷新失效原路径封面；排序、正文翻页和模板切换复用缓存。</summary>
     private void RefreshListCovers()
     {
         _images?.InvalidateCovers(); _historyPresentation?.RefreshCovers(); _bookshelfPresentation?.RefreshCovers();
         this.FindControl<BookmarkListView>("BookmarkPanelList")!.RefreshCoverPresentation();
+        this.FindControl<PlaylistView>("PlaylistPanelView")!.RefreshCoverPresentation();
     }
     /// <summary>持久化原History/Bookshelf字段；失败恢复模板、选中身份与可重试状态。</summary>
     public Task SetListStyleAsync(bool history, PanelListItemStyle style)

@@ -53,6 +53,7 @@ public sealed partial class PanelListItemView : UserControl
         switch (DataContext)
         {
             case HistoryRow row: name = row.Name; path = row.Path; page = row.Page ?? ""; date = row.Entry.LastAccessTime; header = row.GroupHeader; break;
+            case PlaylistRow row: name = row.Name; path = row.Path; header = row.GroupHeader; break;
             case FolderItem item: name = item.Name; path = item.Path; date = item.LastWriteTime; folder = item.Bookmark?.IsFolder == true; directory = item.IsDirectory; color = item.Bookmark?.Color; break;
             case BookmarkNode node: name = node.DisplayName; path = node.Path ?? ""; page = node.Page ?? ""; folder = directory = node.IsFolder; color = node.Color; date = node.EntryTime; break;
             case Page item: name = item.GetDisplayName(Config.Current.PageList.Format); header = _pageHeader?.Invoke(item); path = item.ArchiveEntry.SystemPath; date = item.ArchiveEntry.LastWriteTime; directory = item.PageType.IsFolder(); break;

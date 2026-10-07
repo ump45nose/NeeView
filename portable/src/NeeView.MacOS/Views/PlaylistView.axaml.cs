@@ -16,6 +16,8 @@ public sealed partial class PlaylistView : UserControl, IDisposable
     private bool _closing;
     private readonly HashSet<Task> _actions = [];
     private PlaylistRow? _pressed;
+    private PanelListPresentation? _presentation;
+    private bool _styleBusy;
     private ListBox List => this.FindControl<ListBox>("PlaylistItems")!;
     public event EventHandler<string>? Failed;
     /// <summary>装载正式面板，隧道命中与列表多选交互保持原开书方式。</summary>
@@ -30,9 +32,27 @@ public sealed partial class PlaylistView : UserControl, IDisposable
     /// <summary>唯一宿主传入既有业务实例，不创建第二套状态或后端。</summary>
     public void Attach(NeeView.BookOperation operation)
     {
+        _presentation ??= new(List, null);
+        _presentation.Apply(DisplayStyle);
         if (_model is not null) { _model.Refreshed -= Refresh; _model.Dispose(); } _model = new(operation); DataContext = _model;
         _model.Refreshed += Refresh; _ = RunAsync(() => _model.AttachAsync());
     }
+    private PanelListItemStyle DisplayStyle => Enum.IsDefined(typeof(PanelListItemStyle), NeeView.Config.Current.Playlist.PanelListItemStyle)
+        ? (PanelListItemStyle)NeeView.Config.Current.Playlist.PanelListItemStyle : PanelListItemStyle.Normal;
+    /// <summary>仅接收已有封面委托；模板和虚拟化不依赖具体图片/归档后端。</summary>
+    public void AttachCovers(Func<string, DecodeRequest, CancellationToken, Task<BitmapLease>> load)
+    { _presentation = new(List, load); _presentation.Apply(DisplayStyle); }
+    /// <summary>显式刷新同一可见资源，条目登记与正文保持。</summary>
+    public void RefreshCoverPresentation() => _presentation?.RefreshCovers();
+    /// <summary>保存原整数模板字段；失败恢复原值及模板，关闭等待已授权保存。</summary>
+    public Task SetListStyleAsync(PanelListItemStyle style) => RunAsync(async () =>
+    {
+        if (_model is null || _styleBusy || !Enum.IsDefined(style)) return;
+        _styleBusy = true; var before = _model.Hub.Config.PanelListItemStyle;
+        try { _model.Hub.Config.PanelListItemStyle = (int)style; _presentation?.Apply(style); await _model.Operation.SaveConfigurationAsync(); }
+        catch { _model.Hub.Config.PanelListItemStyle = before; _presentation?.Apply(DisplayStyle); throw; }
+        finally { _styleBusy = false; }
+    });
     /// <summary>集合更新恢复仍存在的选中批次，屏蔽组合框加载时回写切换。</summary>
     private void Refresh(object? sender, EventArgs e)
     {
@@ -137,27 +157,65 @@ public sealed partial class PlaylistView : UserControl, IDisposable
     public ContextMenu CreateMoreMenu()
     {
         var menu = new ContextMenu(); if (_model is null) return menu;
-        foreach (var name in new[] { "普通列表", "详细内容", "横幅", "缩略图" }) menu.Items.Add(new MenuItem { Header = name + " · 尚未迁移", IsEnabled = false });
+        foreach (var item in PanelListPresentation.CreateStyleMenuItems(DisplayStyle, SetListStyleAsync)) menu.Items.Add(item);
         menu.Items.Add(new Separator());
         Toggle("按来源分组", _model.Hub.Config.IsGroupBy, value => _model.Hub.Config.IsGroupBy = value);
         Toggle("仅显示当前书籍", _model.Hub.Config.IsCurrentBookFilterEnabled, value => _model.Hub.Config.IsCurrentBookFilterEnabled = value);
         menu.Items.Add(new Separator());
         Action("新建播放列表…", NewAsync, false); Action("打开播放列表…", OpenFileAsync, false);
-        foreach (var name in new[] { "删除播放列表文件", "更名播放列表文件", "移除无效登记" }) menu.Items.Add(new MenuItem { Header = name + " · 尚未迁移", IsEnabled = false });
+        Action("删除播放列表文件…", DeleteFileAsync, false, _model.Operation.CanDeletePlaylistFile);
+        Action("更名播放列表文件…", RenameFileAsync, false, _model.Operation.CanManagePlaylistFile);
+        Action("移除无效登记…", RemoveInvalidAsync, false, _model.CanEdit);
         Action("按路径排序", () => _model.Hub.SortAsync());
-        menu.Items.Add(new MenuItem { Header = "作为书籍打开 · 尚未迁移", IsEnabled = false }); return menu;
+        Action("作为书籍打开", async () => { if (_model.Hub.Current is { } current) await _model.Operation.OpenPlaylistAsBookAsync(current); }, enabled: _model.CanEdit); return menu;
         // 开关只写原配置和刷新面板，不重扫来源、不解码正文。
         void Toggle(string name, bool current, System.Action<bool> set)
         {
             var item = new MenuItem { Header = name, ToggleType = MenuItemToggleType.CheckBox, IsChecked = current };
-            item.Click += async (_, _) => await RunAsync(async () => { set(!current); await _model.Operation.SaveAsync(); }); menu.Items.Add(item);
+            item.Click += async (_, _) => await RunAsync(async () => { try { set(!current); await _model.Operation.SaveConfigurationAsync(); } catch { set(current); throw; } }); menu.Items.Add(item);
         }
-        void Action(string name, Func<Task> action, bool track = true)
+        void Action(string name, Func<Task> action, bool track = true, bool enabled = true)
         {
-            var item = new MenuItem { Header = name };
+            var item = new MenuItem { Header = name, IsEnabled = enabled };
             item.Click += async (_, _) => { if (_closing || _disposed) return; if (track) await RunAsync(action); else try { await action(); } catch (Exception ex) { Failed?.Invoke(this, ex.Message); } };
             menu.Items.Add(item);
         }
+    }
+    /// <summary>异步采集期间不占业务锁；提交仍验证原列表引用。</summary>
+    private async Task RenameFileAsync()
+    {
+        if (_model?.Hub.Current is not { } expected) return;
+        var name = await AskNameAsync("更名播放列表文件", System.IO.Path.GetFileNameWithoutExtension(expected.Path));
+        if (name is not null && !_closing && !_disposed) await RunAsync(() => _model.Operation.RenamePlaylistFileAsync(expected, name));
+    }
+    /// <summary>只确认原文件，图片引用不参与废纸篓操作。</summary>
+    private async Task DeleteFileAsync()
+    {
+        if (_model?.Hub.Current is not { } expected) return;
+        if (await AskConfirmAsync("删除播放列表文件", "移至废纸篓：\n" + expected.Path + "\n列表引用的图片保持。") && !_closing && !_disposed)
+            await RunAsync(() => _model.Operation.DeletePlaylistFileAsync(expected));
+    }
+    /// <summary>先检查标记，再确认和复查；原移除记录允许恢复本批。</summary>
+    private async Task RemoveInvalidAsync()
+    {
+        if (_model is null) return;
+        PlaylistInvalidPlan? plan = null;
+        await RunAsync(async () => { plan = await _model.Operation.PlanInvalidPlaylistItemsAsync(); });
+        if (plan is not { Items.Count: > 0 } || _closing || _disposed) return;
+        if (await AskConfirmAsync("移除无效登记", $"检测到 {plan.Items.Count} 项无效登记。仅移除登记，不删除图片；可使用“恢复”撤回本批。") && !_closing && !_disposed)
+            await RunAsync(async () => { await _model.Operation.RemoveInvalidPlaylistItemsAsync(plan); });
+    }
+    /// <summary>表现确认窗口；真实目标检查和文件操作都由Engine承担。</summary>
+    private async Task<bool> AskConfirmAsync(string title, string message)
+    {
+        if (TopLevel.GetTopLevel(this) is not Window owner) return false;
+        var ok = new Button { Content = "确定", IsDefault = true }; var cancel = new Button { Content = "取消", IsCancel = true };
+        var dialog = new Window { Title = title, Width = 420, Height = 230, WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Content = new DockPanel { Margin = new Thickness(16), Children = {
+                new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 8, [DockPanel.DockProperty] = Dock.Bottom, Children = { ok, cancel } },
+                new ScrollViewer { Content = new TextBlock { Text = message, TextWrapping = Avalonia.Media.TextWrapping.Wrap } } } } };
+        ok.Click += (_, _) => dialog.Close(true); cancel.Click += (_, _) => dialog.Close(false);
+        return await dialog.ShowDialog<bool>(owner);
     }
     /// <summary>打开原更多菜单，不通过宿主改写列表布局。</summary>
     private void More_Click(object? sender, RoutedEventArgs e) { if (sender is Button button) { var menu = CreateMoreMenu(); button.ContextMenu = menu; menu.Open(button); } }

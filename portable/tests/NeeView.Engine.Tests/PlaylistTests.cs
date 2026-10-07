@@ -220,7 +220,11 @@ public sealed class PlaylistTests
             var view = window.FindControl<PlaylistView>("PlaylistPanelView")!;
             await WaitAsync(() => operation.Playlists.Current is not null); Pump(window);
             Assert.True(window.IsCommandAvailable("ToggleVisiblePlaylist"));
-            var menu = view.CreateMoreMenu(); Assert.Equal(8, menu.Items.OfType<MenuItem>().Count(item => !item.IsEnabled));
+            var menu = view.CreateMoreMenu(); var menuItems=menu.Items.OfType<MenuItem>().ToArray();
+            Assert.Equal(4,menuItems.Count(item=>item.Tag is PanelListItemStyle && item.IsEnabled));
+            Assert.DoesNotContain(menuItems,item=>item.Header?.ToString()?.Contains("尚未迁移")==true);
+            Assert.True(menuItems.Single(item=>item.Header?.ToString()=="移除无效登记…").IsEnabled);
+            Assert.False(menuItems.Single(item=>item.Header?.ToString()=="删除播放列表文件…").IsEnabled);
             int refreshes = 0; model.Refreshed += (_, _) => refreshes++;
             await operation.TogglePlaylistItemAsync(); Pump(window); Assert.Equal(0, refreshes); Assert.Single(model.MarkerIndices);
             var list = view.FindControl<ListBox>("PlaylistItems")!; Assert.Single(list.Items);
