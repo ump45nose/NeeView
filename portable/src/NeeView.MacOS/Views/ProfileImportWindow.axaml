@@ -10,6 +10,8 @@
         <Button Content="选择 .nvzip 备份…" Click="ChooseBackup" />
       </StackPanel>
       <TextBlock Text="{Binding SourceLabel}" TextWrapping="Wrap" />
+      <CheckBox x:Name="ConfirmedForkSchema" Content="确认所选数据来自基于 NeeView 46.3 的 fork（版本号为 1.0.0）"
+                IsChecked="{Binding ConfirmedForkSchema, Mode=TwoWay}" ToolTip.Tip="仅在确认源码来源时选择；未知1.0格式仍拒绝。更改后点击重新预览。" />
     </StackPanel>
     <StackPanel Grid.Row="1" Spacing="6">
       <TextBlock Text="Windows → Mac 路径映射（最长前缀优先，例如 P:\图片 → /Volumes/Picture）" />

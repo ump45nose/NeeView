@@ -26,6 +26,9 @@ public sealed class ProfileImportViewModel : ObservableObject, IDisposable
     public ProfileImportPreview? Preview { get => _preview; private set { if (SetProperty(ref _preview, value)) { OnPropertyChanged(nameof(Summary)); OnPropertyChanged(nameof(CanApply)); } } }
     public bool IsBusy { get => _busy; private set { if (SetProperty(ref _busy, value)) { OnPropertyChanged(nameof(CanPreview)); OnPropertyChanged(nameof(CanApply)); } } }
     public bool CanPreview => !_disposed && _source is not null && !IsBusy;
+    private bool _confirmedForkSchema;
+    /// <summary>用户明确确认来源为46.3 fork；更改后旧预览失效，不能影响已确认快照。</summary>
+    public bool ConfirmedForkSchema { get => _confirmedForkSchema; set { if (SetProperty(ref _confirmedForkSchema, value)) Invalidate(); } }
     private bool _settings = true, _folders = true, _quickAccess = true, _history, _bookmarks, _playlists, _themes, _scripts;
     public bool ImportSettings { get => _settings; set { if (SetProperty(ref _settings, value)) SelectionChanged(); } }
     public bool ImportFolders { get => _folders; set { if (SetProperty(ref _folders, value)) SelectionChanged(); } }
@@ -64,7 +67,8 @@ public sealed class ProfileImportViewModel : ObservableObject, IDisposable
     public Task SelectSourceAsync(ProfileImportSource source)
     {
         if (_disposed) return Task.CompletedTask;
-        Invalidate(); _source = source; OnPropertyChanged(nameof(SourceLabel)); return RefreshAsync();
+        Invalidate(); ConfirmedForkSchema = source.Schema == ProfileImportSchema.ConfirmedNeeView46_3Fork;
+        _source = source; OnPropertyChanged(nameof(SourceLabel)); return RefreshAsync();
     }
     /// <summary>快照编辑字段，再进行后台预览；失败保留来源及映射草稿供重试。</summary>
     public async Task RefreshAsync()
@@ -72,9 +76,10 @@ public sealed class ProfileImportViewModel : ObservableObject, IDisposable
         if (!CanPreview || _source is null) return;
         Invalidate(); var generation = _generation; var request = new CancellationTokenSource(); _request = request; IsBusy = true;
         var mappings = Mappings.Select(m => new ProfilePathMapping(m.WindowsPrefix, m.MacPrefix)).ToArray();
+        var source = _source with { Schema = ConfirmedForkSchema ? ProfileImportSchema.ConfirmedNeeView46_3Fork : ProfileImportSchema.DeclaredVersion };
         try
         {
-            var preview = await _service.PreviewAsync(_source, mappings, request.Token);
+            var preview = await _service.PreviewAsync(source, mappings, request.Token);
             if (!_disposed && generation == _generation && !request.IsCancellationRequested) Preview = preview;
         }
         catch (OperationCanceledException) when (request.IsCancellationRequested) { }

@@ -18,11 +18,11 @@ public sealed partial class ProfileImportService(IProfileImportReader reader, IR
         {
             var bundle = await reader.ReadAsync(source, token).ConfigureAwait(false);
             token.ThrowIfCancellationRequested();
-            return await Task.Run(() => CreatePreview(bundle, mapper, token), token).ConfigureAwait(false);
+            return await Task.Run(() => CreatePreview(bundle, mapper, source.Schema, token), token).ConfigureAwait(false);
         }
         finally { _gate.Release(); }
     }
-    private ProfileImportPreview CreatePreview(ProfileImportBundle bundle, ProfilePathMapper mapper, CancellationToken token)
+    private ProfileImportPreview CreatePreview(ProfileImportBundle bundle, ProfilePathMapper mapper, ProfileImportSchema schema, CancellationToken token)
     {
         var docs = new Dictionary<string, JsonObject>(); var paths = new List<ProfileImportPath>(); int nodeCount = 0;
         var summaries = new List<ProfileImportFileSummary>(); var notices = new List<string>
@@ -42,9 +42,11 @@ public sealed partial class ProfileImportService(IProfileImportReader reader, IR
             var before = paths.Count;
             var format = String(raw, "Format") ?? "未声明版本";
             CheckFormat(name, format, raw);
-            if (ProfileImportCompatibility.BlockReason(name, raw) is null)
+            if (ProfileImportCompatibility.BlockReason(name, raw, schema) is null)
             {
-                raw = ProfileImportCompatibility.Upgrade(name, raw);
+                raw = ProfileImportCompatibility.Upgrade(name, raw, schema);
+                if (raw["MacImportedSourceSchema"] is not null)
+                    notices.Add(name + " 按明确确认的46.3 fork结构校验；原Format保留在MacImportedSourceFormat，未执行1.0旧版本升级。来源只读。");
                 if (format != String(raw, "Format")) notices.Add(name + " 已按原版本规则升级候选：" + format + " → " + String(raw, "Format") + "；来源只读。");
             }
             docs.Add(name, raw);
@@ -88,11 +90,11 @@ public sealed partial class ProfileImportService(IProfileImportReader reader, IR
                         Map(Object(parameter, "Value") ?? parameter, "ExportFolder", "Commands.ExportImage.Parameter");
                     }
                     if (raw["MacImportedLegacyEffectUpgrade"]?.ToString() == "Layers/1")
-                        notices.Add("旧 ImageEffect 已按原规则转换为效果层、参数缓存和默认预设，原材料保留；Level/Hsv/ColorSelect/Colorize 已接入；其余效果逐项标记待迁。");
+                        notices.Add("旧 ImageEffect 已按原规则转换为效果层、参数缓存和默认预设，原材料保留；十四类原效果已接入，未知类型保留并提示。");
                     else if (raw["MacImportedLegacyEffectFormat"] is not null && config?["ImageEffect"]?["Layers"] is null)
-                        notices.Add("旧 ImageEffect 尚未转换，原参数与缓存完整保留；Level/Hsv/ColorSelect/Colorize 已接入；其余效果逐项标记待迁。" + raw["MacImportedLegacyEffectIssue"]?.ToString());
+                        notices.Add("旧 ImageEffect 尚未转换，原参数与缓存完整保留；十四类原效果已接入，未知类型保留并提示。" + raw["MacImportedLegacyEffectIssue"]?.ToString());
                     else if (config?["ImageEffect"] is not null || config?["EffectProfiles"] is not null || config?["ImageEffectCache"] is not null)
-                        notices.Add("现代效果层、缓存和预设数据保持，未知类型不改写；Level/Hsv/ColorSelect/Colorize 已接入；其余效果逐项标记待迁。");
+                        notices.Add("现代效果层、缓存和预设数据保持，十四类原效果已接入，未知类型不改写。");
                     break;
             }
             summaries.Add(new(name, true, format, paths.Count - before));
@@ -138,7 +140,7 @@ public sealed partial class ProfileImportService(IProfileImportReader reader, IR
         if (setting?["DragActions"] is not null) notices.Add("DragActions 原配置及已核对的版本参数升级保留；自定义拖动执行尚未接入。");
         foreach (var pair in setting ?? new JsonObject())
             if (pair.Key is not ("Format" or "Config" or "Commands" or "ContextMenu" or "SusiePlugins" or "DragActions" or
-                "MacImportedSourceFormat" or "MacImportedLegacyEffectFormat" or "MacImportedLegacyEffectUpgrade" or "MacImportedLegacyEffectIssue" or "MacImportedLegacyImageEffects" or "MacImportedLegacyCommands" or "MacImportedLegacyDragActions"))
+                "MacImportedSourceFormat" or "MacImportedSourceSchema" or "MacImportedLegacyEffectFormat" or "MacImportedLegacyEffectUpgrade" or "MacImportedLegacyEffectIssue" or "MacImportedLegacyImageEffects" or "MacImportedLegacyCommands" or "MacImportedLegacyDragActions"))
             {
                 token.ThrowIfCancellationRequested(); CheckRecordBudget();
                 notices.Add("未知 UserSetting 字段保留，兼容待核对：" + pair.Key);
@@ -207,8 +209,9 @@ public sealed partial class ProfileImportService(IProfileImportReader reader, IR
         { if (++nodeCount > ProfileImportFiles.MaxRecords) throw new InvalidDataException("导入记录数量超限。"); }
         void CheckFormat(string file, string format, JsonObject raw)
         {
-            if (ProfileImportCompatibility.BlockReason(file, raw) is { } reason) { notices.Add(reason); return; }
+            if (ProfileImportCompatibility.BlockReason(file, raw, schema) is { } reason) { notices.Add(reason); return; }
             var parts = format.Split('/');
+            if (schema == ProfileImportSchema.ConfirmedNeeView46_3Fork && parts.Length == 2 && parts[1] == "1.0.0") return;
             if (parts.Length != 2 || !(parts[0] == "NeeView" || parts[0].StartsWith("NeeView.", StringComparison.Ordinal)) || !Version.TryParse(parts[1], out var version))
                 notices.Add(file + " 版本缺失或未识别，仅保留并预览。");
             else if (version.Major != 46 || version.Minor != 3) notices.Add(file + " 版本 " + parts[1] + " 按文件核对旧版本兼容，应用时再次校验。");

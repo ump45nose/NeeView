@@ -9,14 +9,32 @@ internal static class ProfileImportCompatibility
 {
     private static readonly JsonSerializerOptions Options = CreateOptions();
     /// <summary>按原文件类型及已迁入版本分支给出阻止实际应用的原因。</summary>
-    /// <param name="name">原五文件名。</param><param name="raw">未升级的候选。</param><returns>null 表示本批允许应用。</returns>
-    internal static string? BlockReason(string name, JsonObject raw)
+    /// <param name="name">原五文件名。</param><param name="raw">未升级的候选。</param>
+    /// <param name="schema">显式来源确认；默认不推断fork版本。</param><returns>null 表示本批允许应用。</returns>
+    internal static string? BlockReason(string name, JsonObject raw, ProfileImportSchema schema = ProfileImportSchema.DeclaredVersion)
     {
         var format = raw["Format"]?.GetValue<string>() ?? "";
         var parts = format.Split('/');
         string expected = name switch { "UserSetting.json" => "NeeView", "History.json" => "NeeView.History", "Bookmark.json" => "NeeView.Bookmark", "Foldres.json" => "NeeView.Folders", _ => "NeeView.QuickAccess" };
         if (parts.Length != 2 || !(parts[0] == expected || parts[0] == "NeeView" || name == "UserSetting.json" && parts[0] == "NeeView.UserSetting") || !Version.TryParse(parts[1], out var version))
             return name + " 版本缺失或格式类型不匹配，只允许预览。";
+        if (!Enum.IsDefined(schema)) return "未识别的来源格式选择，只允许预览。";
+        if (schema == ProfileImportSchema.ConfirmedNeeView46_3Fork && version == new Version(1, 0, 0))
+        {
+            // 不能从字段或 MacImportedSourceFormat 猜测来源；仅显式确认的 fork 使用已核验的现代 schema。
+            if (!(parts[0] == expected || name == "UserSetting.json" && parts[0] == "NeeView.UserSetting"))
+                return name + " fork 格式类型不匹配，只允许预览。";
+            bool valid = name switch
+            {
+                "UserSetting.json" => raw["Config"] is JsonObject && (!raw.ContainsKey("Commands") || raw["Commands"] is JsonObject),
+                "History.json" => raw["Items"] is JsonArray,
+                "Bookmark.json" => raw["Nodes"] is JsonObject,
+                "Foldres.json" => raw["Folders"] is JsonArray,
+                "QuicAccess.json" => raw["Items"] is JsonArray,
+                _ => false
+            };
+            return valid ? null : name + " 与已确认的46.3 fork数据结构不符，只允许预览。";
+        }
         int minimum = name == "UserSetting.json" ? 38 : name == "Foldres.json" ? 46 : 44;
         // 独立 Folders 仅核对过46数组格式；QuickAccess沿原树格式及无版本分支的validator。
         if (version.Major < minimum || version.Major > 46 || version.Major == 46 && version.Minor > 3 || version.Build > ProfileImportFiles.BaselineBuild || version.Revision > 0)
@@ -28,10 +46,28 @@ internal static class ProfileImportCompatibility
         return null;
     }
     /// <summary>在原 JSON 副本上复用明确的旧 Books 合并、UNC 根规范和日期更新；未知元数据留在兼容扩展。</summary>
-    internal static JsonObject Upgrade(string name, JsonObject raw)
+    /// <param name="name">原文件名。</param><param name="raw">独立候选副本。</param>
+    /// <param name="schema">只读来源的明确schema选择。</param><returns>原版本标识留在元数据的现代候选。</returns>
+    internal static JsonObject Upgrade(string name, JsonObject raw, ProfileImportSchema schema = ProfileImportSchema.DeclaredVersion)
     {
-        if (BlockReason(name, raw) is { } reason) throw new InvalidDataException(reason);
+        if (BlockReason(name, raw, schema) is { } reason) throw new InvalidDataException(reason);
         var version = Version.Parse(raw["Format"]!.GetValue<string>().Split('/')[1]);
+        if (schema == ProfileImportSchema.ConfirmedNeeView46_3Fork && version == new Version(1, 0, 0))
+        {
+            // 原独立文件优先，旧Bookmark内嵌后备仍单独校验；确认外层不放行未知内嵌格式。
+            if (name == "Bookmark.json" && raw["QuickAccess"] is JsonObject embedded)
+            {
+                var quick = embedded.DeepClone().AsObject();
+                if (!quick.ContainsKey("Format")) quick["Format"] = "NeeView.QuickAccess/1.0.0";
+                if (BlockReason("QuicAccess.json", quick, schema) is null)
+                    raw["QuickAccess"] = Upgrade("QuicAccess.json", quick, schema);
+            }
+            raw["MacImportedSourceFormat"] ??= raw["Format"]!.DeepClone();
+            raw["MacImportedSourceSchema"] = "NeeView/46.3." + ProfileImportFiles.BaselineBuild;
+            version = new Version(46, 3, ProfileImportFiles.BaselineBuild);
+            // 候选规范化，应用时再次验证现代版本；原标识作为元数据保留，源文件保持只读。
+            raw["Format"] = raw["Format"]!.GetValue<string>().Split('/')[0] + "/" + version;
+        }
         if (name == "UserSetting.json") { LegacyUserSettingUpgrade.Upgrade(raw, version); return raw; }
         if (name == "Foldres.json") { LegacyFolderConfigUpgrade.Upgrade(raw, version); return raw; }
         if (name == "QuicAccess.json")

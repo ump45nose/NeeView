@@ -217,10 +217,15 @@ public sealed class SelectionHistoryTests
             await window.OpenAsync(fixture.Images); Config.Current.Slider.SliderDirection = SliderDirection.LeftToRight;
             await window.ExecuteAsync("ToggleVisibleFilmStrip"); window.UpdateLayout();
             var strip = window.FindControl<ThumbnailView>("DockFilmStripSocket")!; await strip.RefreshAsync();
+            // 打开链以 UI 队列发布最后的加载状态；先排空初始化回报，再统计本次选择输入。
+            Dispatcher.UIThread.RunJobs();
             var point = strip.TranslatePoint(new Point(54, 50), window)!.Value;
             int refreshes = 0; model.Refreshed += (_, _) => refreshes++;
+            Assert.Equal(FilmStripMouseWheelAction.MoveSelection, Config.Current.FilmStrip.MouseWheelAction);
             window.MouseWheel(point, new Avalonia.Vector(0, -1), RawInputModifiers.None); Dispatcher.UIThread.RunJobs();
-            Assert.Equal(1, operation.PageSelector.SelectedIndex); Assert.Equal(0, operation.Book!.CurrentPage!.Index); Assert.Equal(0, refreshes);
+            Assert.Equal(1, operation.PageSelector.SelectedIndex);
+            Assert.Equal(0, operation.Book!.CurrentPage!.Index);
+            Assert.Equal(0, refreshes);
             strip.Focus(); window.KeyPress(Key.Right, RawInputModifiers.None, PhysicalKey.ArrowRight, null); window.KeyRelease(Key.Right, RawInputModifiers.None, PhysicalKey.ArrowRight, null);
             Assert.Equal(2, operation.PageSelector.SelectedIndex); Assert.Equal(0, operation.Book.CurrentPage.Index);
             window.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null); window.KeyRelease(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);

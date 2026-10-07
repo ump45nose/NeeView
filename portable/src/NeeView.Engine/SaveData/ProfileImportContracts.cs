@@ -15,7 +15,9 @@ public static class ProfileImportFiles
 }
 /// <summary>只读来源；目录是 Profile 根，备份是原标准 ZIP 包，不从包中执行或解压脚本。</summary>
 public enum ProfileImportSourceKind { Directory, Backup }
-public sealed record ProfileImportSource(string Path, ProfileImportSourceKind Kind);
+/// <summary>来源声明版本是默认；46.3 fork 仅在调用方确认其源码来源后显式选择。</summary>
+public enum ProfileImportSchema { DeclaredVersion, ConfirmedNeeView46_3Fork }
+public sealed record ProfileImportSource(string Path, ProfileImportSourceKind Kind, ProfileImportSchema Schema = ProfileImportSchema.DeclaredVersion);
 public sealed record ProfileImportBundle(IReadOnlyDictionary<string, string> Files, IReadOnlyList<string> ExtraEntries,
     IReadOnlyDictionary<string, byte[]>? Assets = null);
 /// <summary>实际文件读取替换点；界面不枚举来源或打开 ZIP。</summary>

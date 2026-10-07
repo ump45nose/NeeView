@@ -193,7 +193,7 @@ public sealed class ProfileEffectUpgradeTests
         var source = Setting("""{"Layers":[{"Effect":{"$type":"Future","X":42}}],"EffectType":"Blur","BlurEffect":{"Radius":7}}""", "46.3.0");
         source["MacImportedLegacyEffectFormat"] = "NeeView/46.0.4209";
         Assert.True(JsonNode.DeepEquals(source, Upgrade(source)));
-        Assert.Contains((await Preview(source)).Notices, n => n.Contains("现代效果层") && n.Contains("Level/Hsv/ColorSelect/Colorize 已接入"));
+        Assert.Contains((await Preview(source)).Notices, n => n.Contains("现代效果层") && n.Contains("十四类原效果已接入"));
     }
 
     [Fact]
@@ -202,7 +202,7 @@ public sealed class ProfileEffectUpgradeTests
         var source = Setting("""{"IsEnabled":true,"EffectType":"Level","LevelEffect":{"Black":0.12345678,"Center":0.23456789,"Future":{"X":42}},"BlurEffect":{"Radius":7}}""");
         source["Config"]!["ImageGrid"] = Parse("""{"DivX":11,"Future":8}""");
         var preview = await Preview(source); var candidate = preview.GetDocument("UserSetting.json")!;
-        Assert.Contains(preview.Notices, n => n.Contains("已按原规则转换") && n.Contains("Level/Hsv/ColorSelect/Colorize 已接入"));
+        Assert.Contains(preview.Notices, n => n.Contains("已按原规则转换") && n.Contains("十四类原效果已接入"));
         var root = NewRoot();
         try
         {
@@ -279,7 +279,7 @@ public sealed class ProfileEffectUpgradeTests
             var saved = Parse(await File.ReadAllTextAsync(Path.Combine(root, "UserSetting.json"), Token));
             Assert.Null(saved["MacImportedLegacyEffectUpgrade"]); Assert.Null(saved["MacImportedLegacyImageEffects"]);
             Assert.NotNull(saved["MacImportedLegacyEffectIssue"]);
-            Assert.Contains((await Preview(saved)).Notices, n => n.Contains("尚未转换") && n.Contains("Level/Hsv/ColorSelect/Colorize 已接入"));
+            Assert.Contains((await Preview(saved)).Notices, n => n.Contains("尚未转换") && n.Contains("十四类原效果已接入"));
             Assert.True(JsonNode.DeepEquals(source["Config"]!["ImageEffect"], saved["Config"]!["ImageEffect"]));
         }
         finally { Directory.Delete(root, true); }

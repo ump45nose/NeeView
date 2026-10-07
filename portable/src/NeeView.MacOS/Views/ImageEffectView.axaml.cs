@@ -9,6 +9,7 @@ using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using NeeView.Effects;
 using NeeView.MacOS.ViewModels;
 namespace NeeView.MacOS.Views;
@@ -16,6 +17,9 @@ public sealed partial class ImageEffectView : UserControl, IDisposable
 {
     private ImageEffectPanelViewModel? _model;
     private bool _building;
+    private int _editorSequence;
+    private string _editorScope = "";
+    private readonly Dictionary<string, Control> _editors = new();
     public Func<string, string, Task<string?>>? AskNameAsync { get; set; }
     public event EventHandler<string>? Failed;
     public ImageEffectView() { AvaloniaXamlLoader.Load(this); }
@@ -30,7 +34,11 @@ public sealed partial class ImageEffectView : UserControl, IDisposable
     }
     private void Build()
     {
-        if (_model is null) return; _building = true;
+        if (_model is null) return;
+        var focused = TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() as Control;
+        var focusedControls = focused is null ? [] : new[] { focused }.Concat(focused.GetVisualAncestors().OfType<Control>()).ToArray();
+        var focusedEditor = _editors.FirstOrDefault(pair => focusedControls.Contains(pair.Value)).Key;
+        _building = true; _editorSequence = 0; _editors.Clear();
         try
         {
             var profiles = this.FindControl<ComboBox>("Profiles")!; profiles.ItemsSource = _model.Profiles; profiles.SelectedItem = _model.Profiles.FirstOrDefault(p => p.Id == _model.SelectedId);
@@ -70,6 +78,7 @@ public sealed partial class ImageEffectView : UserControl, IDisposable
             for (int index = 0; index < draft.ImageEffect.Layers.Count; index++)
             {
                 var layer = draft.ImageEffect.Layers[index]; var row = new StackPanel { Spacing = 5, Margin = new Thickness(0,6) };
+                _editorScope = "ImageEffect.Layer." + index;
                 effect.Children.Add(new Border { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(0,1,0,0), Child = row });
                 Check(row, $"层 {index + 1}", layer.IsEnabled, value => layer.IsEnabled = value);
                 Choice(row, "类型", layer.EffectType, value => layer.ChangeType(value, draft.ImageEffect, _model.Cache));
@@ -83,20 +92,32 @@ public sealed partial class ImageEffectView : UserControl, IDisposable
             }
         }
         finally { _building = false; }
+        // 编辑事务重建参数表单后，把焦点交还同一编辑位置；后续方向键仍属于控件。
+        if (focusedEditor is not null && _editors.TryGetValue(focusedEditor, out var replacement)) replacement.Focus();
     }
     private void OpenMore(object? sender, Avalonia.Interactivity.RoutedEventArgs args) => (sender as Button)?.ContextMenu?.Open(sender as Control);
     private StackPanel Section(StackPanel parent, string title, bool enabled, Action<bool> set)
     {
+        _editorScope = title;
         var body = new StackPanel { Spacing = 5 }; Check(body, title, enabled, set); parent.Children.Add(body); return body;
     }
     private void Button(StackPanel parent, string title, Func<Task> action, bool enabled)
-    { var button = new Button { Content = title, IsEnabled = enabled, Padding = new Thickness(6,2) }; button.Click += async (_, _) => await action(); parent.Children.Add(button); }
+    { var button = new Button { Content = title, IsEnabled = enabled, Padding = new Thickness(6,2) }; RegisterEditor(button, title); button.Click += async (_, _) => await action(); parent.Children.Add(button); }
     private void Check(StackPanel parent, string title, bool value, Action<bool> set)
-    { var control = new CheckBox { Content = title, IsChecked = value }; control.IsCheckedChanged += async (_, _) => { if (!_building && _model is not null) await _model.EditAsync((_,_) => set(control.IsChecked == true)); }; parent.Children.Add(control); }
+    { var control = new CheckBox { Content = title, IsChecked = value }; RegisterEditor(control, title); control.IsCheckedChanged += async (_, _) => { if (!_building && _model is not null) await _model.EditAsync((_,_) => set(control.IsChecked == true)); }; parent.Children.Add(control); }
     private void Choice<T>(StackPanel parent, string title, T value, Action<T> set) where T : struct, Enum
     {
         var combo = new ComboBox { ItemsSource = Enum.GetValues<T>(), SelectedItem = value, HorizontalAlignment = HorizontalAlignment.Stretch };
-        combo.SelectionChanged += async (_, _) => { if (!_building && _model is not null && combo.SelectedItem is T item) await _model.EditAsync((_,_) => set(item)); };
+        var committed = value;
+        async Task Commit()
+        {
+            if (_building || _model is null || combo.IsDropDownOpen || combo.SelectedItem is not T item || EqualityComparer<T>.Default.Equals(item, committed)) return;
+            committed = item;
+            await _model.EditAsync((_, _) => set(item));
+        }
+        // 下拉方向导航只选择候选；关闭后一次提交，不能在popup交互期间删除其宿主。
+        combo.SelectionChanged += async (_, _) => await Commit();
+        combo.DropDownClosed += async (_, _) => await Commit();
         Row(parent, title, combo);
     }
     private void Number(StackPanel parent, string title, double value, Action<double> set, double min = -100000, double max = 100000) =>
@@ -109,8 +130,16 @@ public sealed partial class ImageEffectView : UserControl, IDisposable
         input.LostFocus += async (_, _) => await Commit(); input.KeyDown += async (_, e) => { if (e.Key == Key.Enter) { e.Handled = true; await Commit(); } };
         Row(parent, title, input);
     }
-    private static void Row(StackPanel parent, string title, Control control)
-    { var grid = new Grid { ColumnDefinitions = new("*,*"), ColumnSpacing = 4 }; grid.Children.Add(new TextBlock { Text = title, VerticalAlignment = VerticalAlignment.Center }); Grid.SetColumn(control,1); grid.Children.Add(control); parent.Children.Add(grid); }
+    /// <summary>登记有界表单内的稳定编辑位置，用于同一事务完成后的焦点归还。</summary>
+    private void RegisterEditor(Control control, string title)
+    {
+        var key = _editorScope + "/" + title;
+        // Colorize控制点同名，但位置有序；其他层参数数目变化不改变后续层的编辑身份。
+        var index = 0; var unique = key; while (_editors.ContainsKey(unique)) unique = key + "/" + ++index;
+        control.Name = "EffectEditor" + _editorSequence++; _editors.Add(unique, control);
+    }
+    private void Row(StackPanel parent, string title, Control control)
+    { RegisterEditor(control, title); var grid = new Grid { ColumnDefinitions = new("*,*"), ColumnSpacing = 4 }; grid.Children.Add(new TextBlock { Text = title, VerticalAlignment = VerticalAlignment.Center }); Grid.SetColumn(control,1); grid.Children.Add(control); parent.Children.Add(grid); }
     [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "正式Mac项目LinkMode=None；表单仅反射固定十四类EffectUnit公开参数，未知类型不进入表单。")]
     [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "正式Mac项目LinkMode=None保留原参数JSON；Colorize点只在编辑边界转换，不启用AOT裁剪。")]
     private void Parameters(StackPanel parent, EffectUnit unit)
@@ -126,5 +155,5 @@ public sealed partial class ImageEffectView : UserControl, IDisposable
             foreach (var point in colorize.Points) { Text(parent,"控制点颜色",point.Color.ToString(),value=>point.Color=ThemeRgba.Parse(value)); Number(parent,"强度",point.Strength,value=>point.Strength=value,0,100); }
         }
     }
-    public void Dispose() { _model?.Dispose(); _model = null; }
+    public void Dispose() { _model?.Dispose(); _model = null; _editors.Clear(); }
 }
