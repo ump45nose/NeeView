@@ -1,5 +1,9 @@
 # NeeView Mac 源码迁移架构
 
+各批说明保留当时的迁移与验收边界；当前开发包完成状态、排除项和延期范围统一见[交付边界](delivery-status.md)。
+
+最终兼容修正：明确确认的46.3 fork版本声明在只读预览中规范化，效果下拉在关闭后提交并恢复字段焦点；继续使用原JSON/事务及独立表现边界。见[最终收尾契约](p5-final-closure.md)。
+
 P5兼容收尾：普通分卷、Mac发布检查及同exe无窗口文件请求隔离进入唯一链。归档逻辑关闭与真实资源排空分开，原事务/JSON/阅读规则不变；AX、加密RAR分卷、嵌套分卷及真实SMB验收边界见[本批契约](p5-compatibility.md)。
 
 P5第四十批：原打印/分页及AppKit输出、指针自动滚动/长按、FullDesktop/LastState、页面停留记录、真实脚本item及设置动作进入唯一产品链。开发收尾与设备/正式分发验收分开，见[收尾契约](p5-completion.md)。
@@ -65,7 +69,7 @@ P0/P1 已建立工程骨架、原窗口区域和目录/图片/ZIP 阅读链路�
 
 ## 基线与技术栈
 
-共同基线 `686a43362dc4b3c9f2ea014240dbba2d0e9fbcaa`；分类分支 `801eab4842b9dbfc18eae7c96006f64eb7b80c30`、`84449934c86a2e7faba9a7c7a7d4ff9dfbea2229` 的真实合并为 `c5c398d89`。两条历史保留在 `integration/neeview-baseline`，本轮在 `feature/macos-port` 实施。Windows 构建未执行；已从用户实际安装的 dirty 包采集部分[动态参考](../acceptance/p2-windows-reference.md)，未证明该包与固定基线一致，已完成目录/CBZ 阅读和部分侧栏同夹具复演；差异修复、通过项与限制见[Mac 设备记录](../acceptance/p2-device-input-runtime.md)。
+共同基线 `686a43362dc4b3c9f2ea014240dbba2d0e9fbcaa`；分类分支 `801eab4842b9dbfc18eae7c96006f64eb7b80c30`、`84449934c86a2e7faba9a7c7a7d4ff9dfbea2229` 的真实合并为 `c5c398d89`。两条历史保留在 `integration/neeview-baseline`，本轮在 `feature/macos-port` 实施。固定Windows构建及阅读/分类/删除动态子集已有[独立记录](../acceptance/p34-final-runtime.md)。早期实际安装包[动态参考](../acceptance/p2-windows-reference.md)仍只作当时证据，不把dirty包替代固定基线。本轮另从实际fork只读采样Profile并核对版本变更；固定exe版本/指纹与实际Profile来源分别登记，见[最终收尾](../acceptance/p5-final-closure.md)。
 
 C#/.NET 10、Avalonia 12.1.3、CommunityToolkit.Mvvm 8.4.2、Magick.NET Q8 14.17.2、SharpCompress 0.50.3。状态采用原 JSON，不增加 SQLite、Rust 或收费框架。NuGet 版本集中锁定，源码继续遵循仓库 MIT 许可。macOS API版本固定27.0，对应本机workload 27.0.10722，使正式Exe和Library编译检查使用同一NuGet锁图；这不改变最低macOS15要求。
 

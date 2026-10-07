@@ -1,0 +1,171 @@
+{
+  "date": "2026-10-07",
+  "scope": "P5 development closure; selected formal UI, real SMB and fixed Windows comparison completed; formal distribution deferred",
+  "profile": {
+    "SourceFiles": 12,
+    "Commands": 235,
+    "PathCount": 311,
+    "Mapped": 288,
+    "Unmapped": 23,
+    "Assets": 0,
+    "Applied": [
+      "UserSetting.json",
+      "History.json"
+    ],
+    "SourceHistoryRecords": 309,
+    "LoadedHistoryRecords": 309,
+    "HistoryItemsPreserved": true,
+    "DirectoryZipEquivalent": true,
+    "BackupRestoredOriginalMissingFiles": true,
+    "SourceUnchanged": true
+  },
+  "nas": {
+    "interrupted_transfer_bytes": 33554432,
+    "observed_partial_bytes": 5307720,
+    "cancellation_ms": 5065.8654,
+    "source_intact": true,
+    "journal_retained": true,
+    "parent_returned": true,
+    "healthy_retry": {
+      "Warnings": [],
+      "RemainingJournals": 0,
+      "DestinationIntact": true,
+      "SourceGone": true,
+      "ContentHash": "0A767A1D3352A1071821F4B5C89BE72B43814B027C60AEB7321014CA389439C8",
+      "Retried": true
+    },
+    "independent_server_hash_verified": true,
+    "slow_proxy_mb_per_second": 2,
+    "slow_flush_canceled_and_rolled_back": true,
+    "foreground_quit": {
+      "formal_package": "aced727170f152d2d4b69506f46d4b02e00dbeed",
+      "observed_partial_bytes": 4456448,
+      "quit_upper_observation_ms": 5127,
+      "latency_is_observation_upper_bound": true,
+      "parent_and_workers_absent": true,
+      "source_intact": true,
+      "journal_retained": true,
+      "recovery_after_remount": "passed",
+      "recovery_remaining_journals": 0,
+      "server_temporary_files_remaining": 0,
+      "recovery_ms": 1024.684958
+    },
+    "cleanup": "Both isolated directories and mounts removed; proxies stopped; original ten SMB mounts intact; original Profile restored and hashed",
+    "foreground_test_setup_boundary": "Initial test source parent included a mounted-share folder; background cover discovery occupied read-only slots and local open returned the existing I/O queue timeout. Relaunched from a separate local-books parent for the transfer test. This first open is not a passed flow.",
+    "recovery_test_setup_boundary": "Private copied Profile could not recover because journal backup ownership includes its original directory. Validation at original directory preserved inaccessible-mount journal; after explicit remount normal-rate recovery passed. No journal path was rewritten."
+  },
+  "resources": {
+    "directories": 3,
+    "pages": [
+      59,
+      81,
+      78
+    ],
+    "explicit_cases_passed": 12,
+    "source_read_only": true
+  },
+  "windows": {
+    "fixed_source_receipt": "c5c398d89a9dd872382980769065e80c4592f4c2",
+    "fixed_exe_hash_matches_receipt": true,
+    "source_worktree_status": "not verifiable from current copied git metadata",
+    "effect_six_sections_and_monochrome_observed": true,
+    "mac_gray_comparison": "same paired 002/001 frame and actual Monochrome grayscale visually observed on repaired formal package; not pixel-identical platform output proof",
+    "actual_profile_source_commit": "ddc857b511e9f04cbc356bdabb1f748963e4f9e1",
+    "actual_profile_files_read_only": true,
+    "temporary_task_removed": true,
+    "same_cbz_sha256": "614f935568339eac6bcc80f624598f25268e610a9e1e7642e83e82ec2ab242c4",
+    "ssh_connection_closed": true
+  },
+  "excluded": [
+    "MAC-AX-001",
+    "encrypted multipart RAR",
+    "trackpad",
+    "complete floating/docking",
+    "screen P95"
+  ],
+  "unavailable": [
+    "multiple displays"
+  ],
+  "deferred": [
+    "Developer ID",
+    "notarization",
+    "clean signed installation"
+  ],
+  "private_evidence_sha256": {
+    "nas-disconnect-observation.json": "664adec318050818f0a9ada5a754310ef1fdf67a3d59723c0606166383ad656f",
+    "nas-final-integrity.json": "1814f4516f674aeeb1a343df19e6f591b4f73edb6438c4ad7faac5dd4aadae62",
+    "import-check/profile-real.json": "6c963625d4b4b82c46aa24d5ebda96a975496f6b787cc0758e2818dd7786decc",
+    "mac-profile-current-integrity.json": "1696fc96509181999cb513f933e30c15573fc881ed5c966b70bab48c7ef5ec31",
+    "windows-profile-receipt.json": "ed9e3ea7043cfad271086868cdad137307d37db9b84cbaae17694731c25704a4",
+    "windows-monochrome.png": "5865f788d8a06e7a31aa14c32e1e4ea2296384f3cfaf9cf74fe65475ac1b8332",
+    "build-and-test.json": "8fab27a51bfe9d67998d800ca6026660c6d6580b41c1c78317e57cdb33d50d56",
+    "final-package-receipt.json": "5d7cff9faa9af0cba5b073580b17f5a9468b60db86488c5ba0f31676ca9441b5",
+    "evidence/native.xml": "8f833eadd23180bd712ac557ac44e06055c92732cecb68542577929a9258ddcc",
+    "foreground/effect-before.ax.txt": "f4fb0be6525e5bea43721490c875285fc1755fc99f254d26b8d591d6eef4de78",
+    "foreground/effect-popup-open.ax.txt": "8a8e6d3bdce50c641775bdfbafd01d0886a382b5a2f0bdb96c64a0cad7941f5a",
+    "foreground/effect-popup-down.ax.txt": "d0ea5b1770b9a85200a1676f87cf0cc39a4dff6a1bd03e72e96f117c11e252af",
+    "foreground/effect-after-commit-down.ax.txt": "d151b6d36e7e6c9b20cba0ebf3c633639f9b51234a5919b6b44d9dec2f247e41",
+    "foreground/effect-monochrome-final.ax.txt": "047aea722c377aa103620e38a79c366f1c5e7f43b1ea8e1ec19d375f18036be3",
+    "foreground/mac-monochrome.png": "9617c49b11a792643ae9c83bbc44d04e0db16e6eed079d405eec17e40898f6e6",
+    "foreground/quit-integrity.json": "f6607eb48feae4f7fd78dc435e351e7e27800fa9ca2ea66588be9bfaf5781c20",
+    "foreground/native-recovery-after-remount.json": "d324f33df855697fff758e1400485674e72d856a3a80aa051270c3a89ecbc0bd",
+    "foreground/profile-restored.json": "81654aa77c988284a8de69c064ed0d6cadbe6e704b4c73e9eeb8c15c4074c03c",
+    "foreground/cleanup.json": "0d98c8aed3bf50f8fdf63ebcb196c2bdba441479c0d83d7702c191bc2ff369ee",
+    "logs/fixes-test.log": "b8be3919ed2c7ff4454f282c785bacb26b92d3028f165f24c9e4887635258f86",
+    "logs/film-fixed.log": "45e58c18451f2d5b8e773d0020d8b39dc2036626e5a7b62813eb1ed191683cb8",
+    "logs/package-tests.log": "b7f9e5816f7e6fdcec382b8a98f0cf4bf2453e76c94eb75679c8670cd9938c44",
+    "logs/resource-tests.log": "03991d6bedc1c92c02d83998efcdba9e969881397e176a5a6ddff073a2773aaf",
+    "logs/resource-extra.log": "8d6bbd9516b3b78531b7a221d4feb60b0458b0122c1ed65312b2c0ffe4cb1ad7"
+  },
+  "product_commit": "aced727170f152d2d4b69506f46d4b02e00dbeed",
+  "validation": {
+    "engine_passed": 1863,
+    "engine_failed": 0,
+    "engine_resource_cases_not_enabled": 12,
+    "engine_total": 1875,
+    "macos_native_passed": 48,
+    "macos_native_failed": 0,
+    "package_script_passed": 15,
+    "filmstrip_specialized_passed": 16,
+    "related_specialized_passed": 127,
+    "formal_debug_build": "passed",
+    "formal_debug_strict_signature": "passed",
+    "default_outputs_serial": true,
+    "filmstrip_failure": "initial UI notification counted as wheel refresh; setup drained; navigation and zero-refresh assertions retained"
+  },
+  "native_effect_input": {
+    "popup_options_observed": true,
+    "keyboard_navigation_kept_book_and_page": true,
+    "rebuilt_type_field_retained_focus": true,
+    "monochrome_actual_display": true,
+    "native_popup_continuous_open_navigation": "not asserted: CUA keyboard action closed popup before committing; candidate lifetime separately tested in Headless",
+    "ax_popup_item_click": "did not apply selection; not counted as passed; keyboard selection verified instead"
+  },
+  "package": {
+    "commit": "aced727170f152d2d4b69506f46d4b02e00dbeed",
+    "architecture": "osx-arm64",
+    "self_contained": true,
+    "signing": "ad-hoc development",
+    "notarized": false,
+    "archive_sha256": "5835d64209e5e15416f56611a7cacfc8a868064d3e6335ca6dd3ea73a0390173",
+    "zip_relocation_and_signature": "passed",
+    "file_worker_runtime": "passed",
+    "zip_relocated_file_worker_runtime": "passed",
+    "license_metadata_only": [],
+    "native_files": 18,
+    "nuget_dependencies": 25,
+    "runtime_packs": 3,
+    "product_sources_match_commit": true,
+    "repository_dirty": "existing acceptance screenshots/JSON and untracked evidence retained; not a source-clean claim",
+    "application_installation": "not installed to Applications",
+    "formal_release": "not published"
+  },
+  "cleanup": {
+    "test_server_directory_removed": true,
+    "test_mount_removed": true,
+    "original_smb_mounts": 10,
+    "profile_json_unchanged": true,
+    "no_original_recovery_journals": true,
+    "formal_processes_absent": true
+  }
+}
